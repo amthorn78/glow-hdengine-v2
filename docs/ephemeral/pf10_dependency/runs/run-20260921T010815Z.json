@@ -1,0 +1,5201 @@
+{
+  "artifact_type": "PF10_DEPENDENCY_PROPOSAL",
+  "blocking_states": [
+    "AWAITING_PO_PROCEED",
+    "AWAITING_THOTH_REMEDIATION",
+    "BLOCKED",
+    "PLAN_PENDING_REVISED",
+    "RESCOPE_PROPOSAL_PENDING_REVIEW"
+  ],
+  "complete": true,
+  "contract": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/424380a0-2be4-589b-8809-e0e32c8b5c38/scratchpad/s10/prep/work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+    "sha256": "7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894"
+  },
+  "controls": [
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_literal",
+      "probabilities": {
+        "COMPARISON": 1.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 0.93,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_para",
+      "probabilities": {
+        "COMPARISON": 0.94,
+        "NONE": 0.01,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.98,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.99
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.95,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_para",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.03,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.96
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "READ_ONLY",
+      "confidence": 0.99,
+      "correct": true,
+      "expected": "READ_ONLY",
+      "id": "ctl_ro_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.0,
+        "READ_ONLY": 1.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "UNCERTAIN",
+      "choice": "READ_ONLY",
+      "confidence": 0.78,
+      "correct": true,
+      "expected": "READ_ONLY",
+      "id": "ctl_ro_para",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.15,
+        "READ_ONLY": 0.83,
+        "SOURCE_AVAILABILITY": 0.01
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "NONE",
+      "confidence": 0.98,
+      "correct": true,
+      "expected": "NONE",
+      "id": "ctl_none_1",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "NONE",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "NONE",
+      "id": "ctl_none_2",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_literal",
+      "probabilities": {
+        "COMPARISON": 1.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 0.93,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_para",
+      "probabilities": {
+        "COMPARISON": 0.95,
+        "NONE": 0.02,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.99,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 1.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.96,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_para",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.03,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.96
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "READ_ONLY",
+      "confidence": 0.99,
+      "correct": true,
+      "expected": "READ_ONLY",
+      "id": "ctl_ro_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.99,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "UNCERTAIN",
+      "choice": "READ_ONLY",
+      "confidence": 0.65,
+      "correct": true,
+      "expected": "READ_ONLY",
+      "id": "ctl_ro_para",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.25,
+        "READ_ONLY": 0.74,
+        "SOURCE_AVAILABILITY": 0.01
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "NONE",
+      "confidence": 0.97,
+      "correct": true,
+      "expected": "NONE",
+      "id": "ctl_none_1",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "NONE",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "NONE",
+      "id": "ctl_none_2",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_literal",
+      "probabilities": {
+        "COMPARISON": 1.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 0.91,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_para",
+      "probabilities": {
+        "COMPARISON": 0.93,
+        "NONE": 0.02,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.99,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 1.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.98,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_para",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.99
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "READ_ONLY",
+      "confidence": 0.99,
+      "correct": true,
+      "expected": "READ_ONLY",
+      "id": "ctl_ro_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.99,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "UNCERTAIN",
+      "choice": "READ_ONLY",
+      "confidence": 0.77,
+      "correct": true,
+      "expected": "READ_ONLY",
+      "id": "ctl_ro_para",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.16,
+        "READ_ONLY": 0.83,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "NONE",
+      "confidence": 0.95,
+      "correct": true,
+      "expected": "NONE",
+      "id": "ctl_none_1",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "NONE",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "NONE",
+      "id": "ctl_none_2",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 1.0,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_literal",
+      "probabilities": {
+        "COMPARISON": 1.0,
+        "NONE": 0.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "COMPARISON",
+      "confidence": 0.92,
+      "correct": true,
+      "expected": "COMPARISON",
+      "id": "ctl_cmp_para",
+      "probabilities": {
+        "COMPARISON": 0.94,
+        "NONE": 0.01,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.98,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_literal",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.99
+      }
+    },
+    {
+      "band": "CLEAR",
+      "choice": "SOURCE_AVAILABILITY",
+      "confidence": 0.97,
+      "correct": true,
+      "expected": "SOURCE_AVAILABILITY",
+      "id": "ctl_src_para",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.02,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.98
+      }
+    }
+  ],
+  "controls_correct": 28,
+  "controls_total": 28,
+  "model_requested": "jev-latest",
+  "model_served": "jev-1.13.0",
+  "nonclaims": [
+    "Not a landed contract field. Not a guard. Not D14 coverage.",
+    "No QA verdict, acceptance, PF09 movement, OPS or closure is claimed.",
+    "The model performed a one-time reading task; the guard that would follow is a deterministic enum check with no model and no network."
+  ],
+  "pre_registered": {
+    "batch": 20,
+    "clear_at": 0.8,
+    "controls": 8,
+    "controls_per_batch": 2,
+    "options": [
+      "COMPARISON",
+      "NONE",
+      "READ_ONLY",
+      "SOURCE_AVAILABILITY"
+    ],
+    "uncertain_at": 0.5
+  },
+  "results": {
+    "CF-C-10__class_or_identity_recovery": {
+      "band": "CLEAR",
+      "branch_id": "class_or_identity_recovery",
+      "choice": "NONE",
+      "condition": "CRD selection record or change identity is missing or conflicting; CF-PO-10 records exact existing evidence or requests Nathan's decision and never chooses the class",
+      "confidence": 0.81,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.86,
+        "READ_ONLY": 0.13,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-C-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-C-10__kickoff_ready": {
+      "band": "CLEAR",
+      "branch_id": "kickoff_ready",
+      "choice": "NONE",
+      "condition": "valid CRD class selection and complete sanitized source",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-10",
+      "state": "KICKOFF_READY",
+      "terminal": false
+    },
+    "CF-C-10__kickoff_terminal": {
+      "band": "CLEAR",
+      "branch_id": "kickoff_terminal",
+      "choice": "NONE",
+      "condition": "the Product Owner decision itself remains unavailable or another true authority/source stop has no runnable prompt receiver",
+      "confidence": 0.92,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.94,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.05
+      },
+      "prompt": "CF-C-10",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "CF-C-10__material_source_omission_recovery": {
+      "band": "CLEAR",
+      "branch_id": "material_source_omission_recovery",
+      "choice": "NONE",
+      "condition": "material source omission is repairable by the same kickoff owner",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-C-10__wrong_class_epic": {
+      "band": "CLEAR",
+      "branch_id": "wrong_class_epic",
+      "choice": "NONE",
+      "condition": "the supplied Product Owner class is EPIC",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.94,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-C-20__invalid_kickoff_recovery": {
+      "band": "CLEAR",
+      "branch_id": "invalid_kickoff_recovery",
+      "choice": "NONE",
+      "condition": "kickoff is incomplete or contradictory and the kickoff owner can correct it",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-C-20__specification_authoring_terminal": {
+      "band": "CLEAR",
+      "branch_id": "specification_authoring_terminal",
+      "choice": "NONE",
+      "condition": "unrecoverable source, identity, or authority blocker",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.02
+      },
+      "prompt": "CF-C-20",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "CF-C-20__specification_pending": {
+      "band": "CLEAR",
+      "branch_id": "specification_pending",
+      "choice": "NONE",
+      "condition": "complete pending CRD Specification is ready for Thoth review",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-20",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-C-30__approved_base_correction_redline": {
+      "band": "UNCERTAIN",
+      "branch_id": "approved_base_correction_redline",
+      "choice": "NONE",
+      "condition": "approved immutable CRD base plus a source-backed factual finding or actual authorized product/scope decision is assessed as justified; exact Thoth correction redline goes to the same Isis author for the first standalone pending delta; no approval or PF10 addendum",
+      "confidence": 0.59,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.69,
+        "READ_ONLY": 0.29,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-30",
+      "state": "CORRECTION_REDLINE",
+      "terminal": false
+    },
+    "CF-C-30__correction_not_substantiated_terminal": {
+      "band": "CLEAR",
+      "branch_id": "correction_not_substantiated_terminal",
+      "choice": "NONE",
+      "condition": "source-backed factual finding is assessed as unsupported; immutable approved base remains unchanged and no delta, denial, approval, or PF10 addendum is produced",
+      "confidence": 0.92,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.94,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-30",
+      "state": null,
+      "terminal": true
+    },
+    "CF-C-30__crd_specification_delta_return": {
+      "band": "UNCERTAIN",
+      "branch_id": "crd_specification_delta_return",
+      "choice": "READ_ONLY",
+      "condition": "the exact affected native receiver recorded by the approved CRD Specification delta reads current PF10; this is not an RS-40 rescope route",
+      "confidence": 0.65,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.25,
+        "NONE": 0.01,
+        "READ_ONLY": 0.74,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-30",
+      "state": "DELTA_APPROVE",
+      "terminal": false
+    },
+    "CF-C-30__delta_deny": {
+      "band": "CLEAR",
+      "branch_id": "delta_deny",
+      "choice": "NONE",
+      "condition": "return bounded delta redlines to the same Specification author; no addendum",
+      "confidence": 0.97,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-30",
+      "state": "DELTA_DENY",
+      "terminal": false
+    },
+    "CF-C-30__initial_approve": {
+      "band": "CLEAR",
+      "branch_id": "initial_approve",
+      "choice": "NONE",
+      "condition": "initial approval; no addendum",
+      "confidence": 0.82,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.87,
+        "READ_ONLY": 0.12,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-30",
+      "state": "INITIAL_APPROVE",
+      "terminal": false
+    },
+    "CF-C-30__initial_deny": {
+      "band": "CLEAR",
+      "branch_id": "initial_deny",
+      "choice": "NONE",
+      "condition": "initial denial returns exact redlines to the same Isis author; no addendum",
+      "confidence": 0.94,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-30",
+      "state": "INITIAL_DENY",
+      "terminal": false
+    },
+    "CF-C-30__product_scope_decision_required_terminal": {
+      "band": "CLEAR",
+      "branch_id": "product_scope_decision_required_terminal",
+      "choice": "NONE",
+      "condition": "the requested correction requires an unresolved genuine product-intent or scope choice; return the exact decision required to Nathan without disguising it as a factual correction",
+      "confidence": 0.87,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.91,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.04
+      },
+      "prompt": "CF-C-30",
+      "state": null,
+      "terminal": true
+    },
+    "CF-C-30__review_terminal": {
+      "band": "CLEAR",
+      "branch_id": "review_terminal",
+      "choice": "NONE",
+      "condition": "missing source, authority, or review mode",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-C-30",
+      "state": null,
+      "terminal": true
+    },
+    "CF-C-40__approved_base_delta_revision": {
+      "band": "UNCERTAIN",
+      "branch_id": "approved_base_delta_revision",
+      "choice": "NONE",
+      "condition": "pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base",
+      "confidence": 0.73,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.8,
+        "READ_ONLY": 0.18,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-C-40__approved_base_first_delta_authoring": {
+      "band": "CLEAR",
+      "branch_id": "approved_base_first_delta_authoring",
+      "choice": "NONE",
+      "condition": "first standalone CRD Specification delta authored from the exact Thoth correction assessment/redline; immutable approved base unchanged; return to the same Thoth reviewer for approved-base delta review",
+      "confidence": 0.83,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.87,
+        "READ_ONLY": 0.12,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-C-40__preapproval_revision": {
+      "band": "UNCERTAIN",
+      "branch_id": "preapproval_revision",
+      "choice": "NONE",
+      "condition": "pending preapproval CRD Specification corrected under the exact redline",
+      "confidence": 0.64,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.08,
+        "NONE": 0.73,
+        "READ_ONLY": 0.19,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-C-40__redline_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "redline_owner_recovery",
+      "choice": "NONE",
+      "condition": "missing or contradictory redline/authority has an exact evidenced native owner",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-40",
+      "state": null,
+      "terminal": false
+    },
+    "CF-C-40__revision_terminal": {
+      "band": "CLEAR",
+      "branch_id": "revision_terminal",
+      "choice": "NONE",
+      "condition": "the redline or authority owner cannot be resolved",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.03
+      },
+      "prompt": "CF-C-40",
+      "state": null,
+      "terminal": true
+    },
+    "CF-E-10__class_selection_recovery": {
+      "band": "CLEAR",
+      "branch_id": "class_selection_recovery",
+      "choice": "NONE",
+      "condition": "Epic selection record or change identity is missing or conflicting; CF-PO-10 records exact existing evidence or requests Nathan's decision and never chooses the class",
+      "confidence": 0.92,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.94,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-E-10__kickoff_ready": {
+      "band": "CLEAR",
+      "branch_id": "kickoff_ready",
+      "choice": "NONE",
+      "condition": "valid Epic class selection and complete sanitized source",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-10",
+      "state": "KICKOFF_READY",
+      "terminal": false
+    },
+    "CF-E-10__kickoff_terminal": {
+      "band": "CLEAR",
+      "branch_id": "kickoff_terminal",
+      "choice": "NONE",
+      "condition": "another true Product Owner/source/authority stop has no runnable receiver",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-E-10",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "CF-E-10__material_source_omission_recovery": {
+      "band": "CLEAR",
+      "branch_id": "material_source_omission_recovery",
+      "choice": "NONE",
+      "condition": "material source omission is repairable by the same kickoff owner",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-E-10__wrong_class_crd": {
+      "band": "CLEAR",
+      "branch_id": "wrong_class_crd",
+      "choice": "NONE",
+      "condition": "the supplied Product Owner class is CRD",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-E-20__invalid_kickoff_recovery": {
+      "band": "CLEAR",
+      "branch_id": "invalid_kickoff_recovery",
+      "choice": "NONE",
+      "condition": "kickoff is incomplete, defective, or contradictory and the kickoff owner can correct it",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "CF-E-20__specification_authoring_terminal": {
+      "band": "CLEAR",
+      "branch_id": "specification_authoring_terminal",
+      "choice": "NONE",
+      "condition": "unrecoverable source, identity, or authority blocker",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-E-20",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "CF-E-20__specification_pending": {
+      "band": "CLEAR",
+      "branch_id": "specification_pending",
+      "choice": "NONE",
+      "condition": "complete pending Epic Specification is ready for Thoth review",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-20",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-E-30__approved_base_correction_redline": {
+      "band": "UNCERTAIN",
+      "branch_id": "approved_base_correction_redline",
+      "choice": "NONE",
+      "condition": "approved immutable Epic base plus a source-backed factual finding or actual authorized product/scope decision is assessed as justified; exact Thoth correction redline goes to the same Isis author for the first standalone pending delta; no approval or PF10 addendum",
+      "confidence": 0.73,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.05,
+        "NONE": 0.79,
+        "READ_ONLY": 0.16,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": "CORRECTION_REDLINE",
+      "terminal": false
+    },
+    "CF-E-30__correction_not_substantiated_terminal": {
+      "band": "CLEAR",
+      "branch_id": "correction_not_substantiated_terminal",
+      "choice": "NONE",
+      "condition": "source-backed factual finding is assessed as unsupported; immutable approved base remains unchanged and no delta, denial, approval, or PF10 addendum is produced",
+      "confidence": 0.89,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.05,
+        "NONE": 0.92,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": null,
+      "terminal": true
+    },
+    "CF-E-30__delta_deny": {
+      "band": "CLEAR",
+      "branch_id": "delta_deny",
+      "choice": "NONE",
+      "condition": "return bounded delta redlines to the same Specification author; no addendum",
+      "confidence": 0.97,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": "DELTA_DENY",
+      "terminal": false
+    },
+    "CF-E-30__epic_specification_delta_return": {
+      "band": "UNRESOLVED",
+      "branch_id": "epic_specification_delta_return",
+      "choice": "COMPARISON",
+      "condition": "the exact affected native receiver recorded by the approved Epic Specification delta reads current PF10; this is not an RS-40 rescope route",
+      "confidence": 0.48,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.61,
+        "NONE": 0.02,
+        "READ_ONLY": 0.37,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": "DELTA_APPROVE",
+      "terminal": false
+    },
+    "CF-E-30__initial_approve": {
+      "band": "CLEAR",
+      "branch_id": "initial_approve",
+      "choice": "NONE",
+      "condition": "initial approval; no addendum",
+      "confidence": 0.96,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": "INITIAL_APPROVE",
+      "terminal": false
+    },
+    "CF-E-30__initial_deny": {
+      "band": "CLEAR",
+      "branch_id": "initial_deny",
+      "choice": "NONE",
+      "condition": "initial denial returns exact redlines to the same Isis author; no addendum",
+      "confidence": 0.96,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": "INITIAL_DENY",
+      "terminal": false
+    },
+    "CF-E-30__product_scope_decision_required_terminal": {
+      "band": "CLEAR",
+      "branch_id": "product_scope_decision_required_terminal",
+      "choice": "NONE",
+      "condition": "the requested correction requires an unresolved genuine product-intent or scope choice; return the exact decision required to Nathan without disguising it as a factual correction",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-30",
+      "state": null,
+      "terminal": true
+    },
+    "CF-E-30__review_terminal": {
+      "band": "CLEAR",
+      "branch_id": "review_terminal",
+      "choice": "NONE",
+      "condition": "missing source, authority, or review mode",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-E-30",
+      "state": null,
+      "terminal": true
+    },
+    "CF-E-40__approved_base_delta_revision": {
+      "band": "UNCERTAIN",
+      "branch_id": "approved_base_delta_revision",
+      "choice": "NONE",
+      "condition": "pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base",
+      "confidence": 0.55,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.07,
+        "NONE": 0.67,
+        "READ_ONLY": 0.26,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-E-40__approved_base_first_delta_authoring": {
+      "band": "UNCERTAIN",
+      "branch_id": "approved_base_first_delta_authoring",
+      "choice": "NONE",
+      "condition": "first standalone Epic Specification delta authored from the exact Thoth correction assessment/redline; immutable approved base unchanged; return to the same Thoth reviewer for approved-base delta review",
+      "confidence": 0.7,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.03,
+        "NONE": 0.78,
+        "READ_ONLY": 0.19,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-E-40__preapproval_revision": {
+      "band": "UNCERTAIN",
+      "branch_id": "preapproval_revision",
+      "choice": "NONE",
+      "condition": "pending preapproval Epic Specification corrected under the exact redline",
+      "confidence": 0.7,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.13,
+        "NONE": 0.77,
+        "READ_ONLY": 0.09,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-E-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-E-40__redline_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "redline_owner_recovery",
+      "choice": "NONE",
+      "condition": "missing or contradictory redline/authority has an exact evidenced native owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-E-40",
+      "state": null,
+      "terminal": false
+    },
+    "CF-E-40__revision_terminal": {
+      "band": "CLEAR",
+      "branch_id": "revision_terminal",
+      "choice": "NONE",
+      "condition": "the redline or authority owner cannot be resolved",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "CF-E-40",
+      "state": null,
+      "terminal": true
+    },
+    "CF-PO-10__class_selected_crd": {
+      "band": "CLEAR",
+      "branch_id": "class_selected_crd",
+      "choice": "NONE",
+      "condition": "CHANGE_CLASS=CRD with an exact Product Owner selection and change identity",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-PO-10",
+      "state": "CLASS_SELECTED",
+      "terminal": false
+    },
+    "CF-PO-10__class_selected_epic": {
+      "band": "CLEAR",
+      "branch_id": "class_selected_epic",
+      "choice": "NONE",
+      "condition": "CHANGE_CLASS=EPIC with an exact Product Owner selection and change identity",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-PO-10",
+      "state": "CLASS_SELECTED",
+      "terminal": false
+    },
+    "CF-PO-10__selection_missing_or_conflicting": {
+      "band": "CLEAR",
+      "branch_id": "selection_missing_or_conflicting",
+      "choice": "NONE",
+      "condition": "no usable explicit Product Owner selection evidence, conflicting evidence, or unresolved change identity/source remains after CF-PO-10 requests or attempts to record it; return the exact requirement to Nathan with no CLASS_SELECTED result or kickoff",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-PO-10",
+      "state": null,
+      "terminal": true
+    },
+    "CL-20__adr_branch": {
+      "band": "CLEAR",
+      "branch_id": "adr_branch",
+      "choice": "NONE",
+      "condition": "the conditional ADR predicate is satisfied and the ADR branch is explicitly selected",
+      "confidence": 0.83,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.06,
+        "NONE": 0.87,
+        "READ_ONLY": 0.07,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": false
+    },
+    "CL-20__epic_pf09_maintenance": {
+      "band": "CLEAR",
+      "branch_id": "epic_pf09_maintenance",
+      "choice": "NONE",
+      "condition": "the authorized Epic PF09 branch requires post-Epic maintenance authoring",
+      "confidence": 0.88,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.92,
+        "READ_ONLY": 0.07,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": false
+    },
+    "CL-20__epic_pf09_revalidation": {
+      "band": "CLEAR",
+      "branch_id": "epic_pf09_revalidation",
+      "choice": "NONE",
+      "condition": "the authorized Epic PF09 branch requires initial or corrected revalidation authoring",
+      "confidence": 0.8,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.07,
+        "NONE": 0.85,
+        "READ_ONLY": 0.08,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": false
+    },
+    "CL-20__epic_pf09_review": {
+      "band": "CLEAR",
+      "branch_id": "epic_pf09_review",
+      "choice": "NONE",
+      "condition": "the authorized Epic PF09 branch has a complete revalidation ready for review",
+      "confidence": 0.91,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.93,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": false
+    },
+    "CL-20__final_scan": {
+      "band": "CLEAR",
+      "branch_id": "final_scan",
+      "choice": "NONE",
+      "condition": "CL-20 and every actually selected managed post-closure branch have truthful dispositions",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": false
+    },
+    "CL-20__manual_or_owner_pending": {
+      "band": "CLEAR",
+      "branch_id": "manual_or_owner_pending",
+      "choice": "NONE",
+      "condition": "the required manual act or native owner cannot yet supply a runnable continuation",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": true
+    },
+    "CL-20__native_owner_branch": {
+      "band": "CLEAR",
+      "branch_id": "native_owner_branch",
+      "choice": "NONE",
+      "condition": "an exact manual, source-recovery, escalation, rescope, or other native owner branch is evidenced",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
+      "terminal": false
+    },
+    "CL-30__adr_candidate_native_route": {
+      "band": "CLEAR",
+      "branch_id": "adr_candidate_native_route",
+      "choice": "NONE",
+      "condition": "the authorized repository or manual/TW maintenance receiver is exactly resolved",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-30",
+      "state": "ADR_CANDIDATE",
+      "terminal": false
+    },
+    "CL-30__adr_owner_terminal": {
+      "band": "CLEAR",
+      "branch_id": "adr_owner_terminal",
+      "choice": "NONE",
+      "condition": "source-qualified recovery/manual/TW/terminal owner is not a runnable selected prompt",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-30",
+      "state": null,
+      "terminal": true
+    },
+    "CL-30__final_scan": {
+      "band": "CLEAR",
+      "branch_id": "final_scan",
+      "choice": "NONE",
+      "condition": "CL-20 and every selected post-closure managed branch are complete or validly disposed",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-30",
+      "state": null,
+      "terminal": false
+    },
+    "CL-30__no_adr_native_route": {
+      "band": "CLEAR",
+      "branch_id": "no_adr_native_route",
+      "choice": "NONE",
+      "condition": "an applicable source-native post-closure route remains",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-30",
+      "state": "NO_ADR_NEEDED",
+      "terminal": false
+    },
+    "CL-40__complete": {
+      "band": "CLEAR",
+      "branch_id": "complete",
+      "choice": "NONE",
+      "condition": "true end-cycle terminal",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-40",
+      "state": "COMPLETE",
+      "terminal": true
+    },
+    "CL-40__incomplete_same_task": {
+      "band": "CLEAR",
+      "branch_id": "incomplete_same_task",
+      "choice": "NONE",
+      "condition": "resume the same CL-40 task after the exact missing bounded condition is resolved",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-40",
+      "state": "INCOMPLETE",
+      "terminal": false
+    },
+    "CL-40__scan_terminal": {
+      "band": "CLEAR",
+      "branch_id": "scan_terminal",
+      "choice": "NONE",
+      "condition": "a true source/authority/manual-owner stop has no runnable selected receiver",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-40",
+      "state": null,
+      "terminal": true
+    },
+    "CL-40__selected_native_boundary": {
+      "band": "CLEAR",
+      "branch_id": "selected_native_boundary",
+      "choice": "NONE",
+      "condition": "a selected post-closure, evidence, scope, acceptance, or recovery branch has an exact native owner",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-40",
+      "state": null,
+      "terminal": false
+    },
+    "CL-C-10__change_closed": {
+      "band": "CLEAR",
+      "branch_id": "change_closed",
+      "choice": "NONE",
+      "condition": "positive CRD closure decision",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-C-10",
+      "state": "CHANGE_CLOSED",
+      "terminal": false
+    },
+    "CL-C-10__do_not_close_existing_owner": {
+      "band": "CLEAR",
+      "branch_id": "do_not_close_existing_owner",
+      "choice": "NONE",
+      "condition": "an already-authorized ordinary correction has an exact existing owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-C-10",
+      "state": "DO_NOT_CLOSE",
+      "terminal": false
+    },
+    "CL-C-10__do_not_close_new_remedy": {
+      "band": "CLEAR",
+      "branch_id": "do_not_close_new_remedy",
+      "choice": "NONE",
+      "condition": "substantive new bounded remedy requires Thoth remediation",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-C-10",
+      "state": "DO_NOT_CLOSE",
+      "terminal": false
+    },
+    "CL-C-10__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-C-10",
+      "state": null,
+      "terminal": true
+    },
+    "CL-E-10__change_closed_epic_pf09": {
+      "band": "CLEAR",
+      "branch_id": "change_closed_epic_pf09",
+      "choice": "NONE",
+      "condition": "a separately authorized Epic PF09 revalidation branch is selected",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-10",
+      "state": "CHANGE_CLOSED",
+      "terminal": false
+    },
+    "CL-E-10__change_closed_postclosure": {
+      "band": "CLEAR",
+      "branch_id": "change_closed_postclosure",
+      "choice": "NONE",
+      "condition": "positive Epic closure decision with ordinary post-closure work",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-10",
+      "state": "CHANGE_CLOSED",
+      "terminal": false
+    },
+    "CL-E-10__do_not_close_existing_owner": {
+      "band": "CLEAR",
+      "branch_id": "do_not_close_existing_owner",
+      "choice": "NONE",
+      "condition": "an already-authorized ordinary correction has an exact existing owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-10",
+      "state": "DO_NOT_CLOSE",
+      "terminal": false
+    },
+    "CL-E-10__do_not_close_new_remedy": {
+      "band": "CLEAR",
+      "branch_id": "do_not_close_new_remedy",
+      "choice": "NONE",
+      "condition": "substantive new bounded remedy requires Thoth remediation",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-10",
+      "state": "DO_NOT_CLOSE",
+      "terminal": false
+    },
+    "CL-E-10__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-10",
+      "state": null,
+      "terminal": true
+    },
+    "CL-E-20__blocked": {
+      "band": "CLEAR",
+      "branch_id": "blocked",
+      "choice": "NONE",
+      "condition": "missing closure, unresolved authority, or unrecoverable source/access failure",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-20",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "CL-E-20__complete": {
+      "band": "CLEAR",
+      "branch_id": "complete",
+      "choice": "NONE",
+      "condition": "complete PF09 revalidation is ready for review",
+      "confidence": 0.9,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.04,
+        "NONE": 0.92,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-20",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "CL-E-20__partial": {
+      "band": "CLEAR",
+      "branch_id": "partial",
+      "choice": "NONE",
+      "condition": "repairable authoring or evidence gap; same author/session resumes",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-20",
+      "state": "PARTIAL",
+      "terminal": false
+    },
+    "CL-E-30__accept": {
+      "band": "CLEAR",
+      "branch_id": "accept",
+      "choice": "NONE",
+      "condition": "accepted revalidation",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-30",
+      "state": "ACCEPT",
+      "terminal": false
+    },
+    "CL-E-30__deny": {
+      "band": "CLEAR",
+      "branch_id": "deny",
+      "choice": "NONE",
+      "condition": "denied revalidation returns to the same author",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-30",
+      "state": "DENY",
+      "terminal": false
+    },
+    "CL-E-30__review_terminal": {
+      "band": "CLEAR",
+      "branch_id": "review_terminal",
+      "choice": "NONE",
+      "condition": "unresolved source, closure, authority, or owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-30",
+      "state": null,
+      "terminal": true
+    },
+    "CL-E-40__final_scan": {
+      "band": "CLEAR",
+      "branch_id": "final_scan",
+      "choice": "NONE",
+      "condition": "every selected post-closure author/reviewer branch and CL-20 work has a truthful disposition",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
+      "terminal": false
+    },
+    "CL-E-40__maintenance_terminal": {
+      "band": "CLEAR",
+      "branch_id": "maintenance_terminal",
+      "choice": "NONE",
+      "condition": "manual/TW receiver, source, closure, or authority remains unresolved",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
+      "terminal": true
+    },
+    "CL-E-40__manual_tw_route": {
+      "band": "CLEAR",
+      "branch_id": "manual_tw_route",
+      "choice": "NONE",
+      "condition": "the exact authorized manual/TW maintenance receiver is resolved",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
+      "terminal": false
+    },
+    "CL-E-40__selected_evidence_gap": {
+      "band": "CLEAR",
+      "branch_id": "selected_evidence_gap",
+      "choice": "NONE",
+      "condition": "a selected evidence gap requires PF09 revalidation",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.03,
+        "NONE": 0.95,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
+      "terminal": false
+    },
+    "DOC-10__instruction_ready": {
+      "band": "CLEAR",
+      "branch_id": "instruction_ready",
+      "choice": "NONE",
+      "condition": "complete documentation PR instruction is ready for detailed planning",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-10",
+      "state": "INSTRUCTION_READY",
+      "terminal": false
+    },
+    "DOC-10__instruction_terminal": {
+      "band": "CLEAR",
+      "branch_id": "instruction_terminal",
+      "choice": "NONE",
+      "condition": "product-intent, source, authority, or unrecoverable evidence blocker",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-10",
+      "state": null,
+      "terminal": true
+    },
+    "DOC-10__material_boundary": {
+      "band": "CLEAR",
+      "branch_id": "material_boundary",
+      "choice": "NONE",
+      "condition": "repository evidence proves a complete bounded material boundary",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-10",
+      "state": null,
+      "terminal": false
+    },
+    "DOC-10__repairable_instruction_defect": {
+      "band": "CLEAR",
+      "branch_id": "repairable_instruction_defect",
+      "choice": "NONE",
+      "condition": "instruction defect is repairable in the same IA session from a saved checkpoint",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-10",
+      "state": null,
+      "terminal": false
+    },
+    "DOC-20__complete": {
+      "band": "CLEAR",
+      "branch_id": "complete",
+      "choice": "NONE",
+      "condition": "all documentation obligations and landed lineage are verified, and this is ordinary initial documentation or the remedy materially affects readiness or Nathan explicitly requires a QA-10 rerun",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.94,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "DOC-20__documentation_terminal": {
+      "band": "CLEAR",
+      "branch_id": "documentation_terminal",
+      "choice": "NONE",
+      "condition": "product-intent, source, authority, or unrecoverable merge-evidence failure",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": null,
+      "terminal": true
+    },
+    "DOC-20__instruction_repair": {
+      "band": "CLEAR",
+      "branch_id": "instruction_repair",
+      "choice": "NONE",
+      "condition": "documentation instruction is missing or defective",
+      "confidence": 0.87,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.04,
+        "NONE": 0.9,
+        "READ_ONLY": 0.06,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": null,
+      "terminal": false
+    },
+    "DOC-20__landed_lineage_review": {
+      "band": "CLEAR",
+      "branch_id": "landed_lineage_review",
+      "choice": "NONE",
+      "condition": "actual merged state or landed-lineage review is required after Nathan asserts the manual merge",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": null,
+      "terminal": false
+    },
+    "DOC-20__material_delta": {
+      "band": "CLEAR",
+      "branch_id": "material_delta",
+      "choice": "NONE",
+      "condition": "evidence proves a bounded material delta",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.98,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": null,
+      "terminal": false
+    },
+    "DOC-20__remediation_complete_native_return": {
+      "band": "CLEAR",
+      "branch_id": "remediation_complete_native_return",
+      "choice": "NONE",
+      "condition": "approved remediation documentation is verified without the QA-10 predicate; resolve the exact originating selected owner/stage and complete its native intake under unchanged authority",
+      "confidence": 0.92,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.95,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "DOC-20__remediation_incomplete_native_return": {
+      "band": "CLEAR",
+      "branch_id": "remediation_incomplete_native_return",
+      "choice": "NONE",
+      "condition": "an incomplete or blocked remediation result has an exact lawful originating recovery/evidence owner and complete native return package; no PR-50, merge or manual-gate bypass",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "DOC-20",
+      "state": null,
+      "terminal": false
+    },
+    "ESC-10__awaiting_thoth_remediation": {
+      "band": "CLEAR",
+      "branch_id": "awaiting_thoth_remediation",
+      "choice": "NONE",
+      "condition": "complete QA escalation report is ready for Thoth remediation",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-10",
+      "state": "AWAITING_THOTH_REMEDIATION",
+      "terminal": false
+    },
+    "ESC-10__escalation_terminal": {
+      "band": "CLEAR",
+      "branch_id": "escalation_terminal",
+      "choice": "NONE",
+      "condition": "missing decisive source, owner, authority, or irrecoverable evidence",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-10",
+      "state": null,
+      "terminal": true
+    },
+    "ESC-25__blocked_evidence_return": {
+      "band": "CLEAR",
+      "branch_id": "blocked_evidence_return",
+      "choice": "NONE",
+      "condition": "a discovery fact is inaccessible but exact task, evidence/limitations and complete same-Thoth return package are known",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-25",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "ESC-25__blocked_terminal": {
+      "band": "CLEAR",
+      "branch_id": "blocked_terminal",
+      "choice": "NONE",
+      "condition": "the exact discovery task/return owner or complete lawful return package cannot be established",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-25",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "ESC-25__complete": {
+      "band": "CLEAR",
+      "branch_id": "complete",
+      "choice": "NONE",
+      "condition": "complete discovery result returns to continuing Thoth",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-25",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "ESC-25__partial": {
+      "band": "CLEAR",
+      "branch_id": "partial",
+      "choice": "NONE",
+      "condition": "usable partial discovery result returns to continuing Thoth",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-25",
+      "state": "PARTIAL",
+      "terminal": false
+    },
+    "ESC-30__blocked": {
+      "band": "CLEAR",
+      "branch_id": "blocked",
+      "choice": "NONE",
+      "condition": "product-intent, authority, or decisive source blocker",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-30",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "ESC-30__discovery_required": {
+      "band": "CLEAR",
+      "branch_id": "discovery_required",
+      "choice": "NONE",
+      "condition": "one complete bounded discovery task is linked to the saved/read-back actual pending Thoth remediation record, which may truthfully be DISCOVERY_REQUIRED; no complete or approved remedy is invented",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-30",
+      "state": "DISCOVERY_REQUIRED",
+      "terminal": false
+    },
+    "ESC-30__remediation_pending": {
+      "band": "CLEAR",
+      "branch_id": "remediation_pending",
+      "choice": "NONE",
+      "condition": "complete bounded remediation proposal is ready for continuing-Isis review",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-30",
+      "state": "REMEDIATION_PENDING",
+      "terminal": false
+    },
+    "ESC-40__deny": {
+      "band": "CLEAR",
+      "branch_id": "deny",
+      "choice": "NONE",
+      "condition": "return to remediation author; no addendum",
+      "confidence": 1.0,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-40",
+      "state": "DENY",
+      "terminal": false
+    },
+    "ESC-40__remediation_non_pr_return": {
+      "band": "CLEAR",
+      "branch_id": "remediation_non_pr_return",
+      "choice": "READ_ONLY",
+      "condition": "recorded remediation return is a non-PR native delivery owner; that receiver reads current PF10",
+      "confidence": 0.95,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.03,
+        "READ_ONLY": 0.96,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-40",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "ESC-40__remediation_pr30_return": {
+      "band": "CLEAR",
+      "branch_id": "remediation_pr30_return",
+      "choice": "NONE",
+      "condition": "recorded remediation return is PR-30_PREPUBLICATION or PR-30_POSTPUBLICATION; resume PR-30 directly on the qualifying approval, preserving actual vehicle state",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-40",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "ESC-40__remediation_pr35_return": {
+      "band": "CLEAR",
+      "branch_id": "remediation_pr35_return",
+      "choice": "NONE",
+      "condition": "recorded remediation return is PR-35; resume PR-35 directly on the qualifying approval in the same open PR",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.96,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "ESC-40",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "ESC-40__remediation_review_terminal": {
+      "band": "CLEAR",
+      "branch_id": "remediation_review_terminal",
+      "choice": "NONE",
+      "condition": "native continuation identity, Product Owner/source, or authority predicate is unresolved",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "ESC-40",
+      "state": null,
+      "terminal": true
+    },
+    "GCFPE-MGMT-10__implementation_blocked": {
+      "band": "CLEAR",
+      "branch_id": "implementation_blocked",
+      "choice": "NONE",
+      "condition": "real blocker; preserve a read-back recovery checkpoint and return to Nathan",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "GCFPE-MGMT-10",
+      "state": "IMPLEMENTATION_BLOCKED",
+      "terminal": true
+    },
+    "GCFPE-MGMT-10__maintenance_complete_native_return": {
+      "band": "UNCERTAIN",
+      "branch_id": "maintenance_complete_native_return",
+      "choice": "NONE",
+      "condition": "scoped maintenance complete and the exact case separately authorizes one ready native continuation; resolve the actual selected receiver and preserve original authority, session and inputs; exclude PR-50, merge, unselected candidates and unauthorized Alpha; emit one complete handoff without executing it",
+      "confidence": 0.77,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.83,
+        "READ_ONLY": 0.15,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "GCFPE-MGMT-10",
+      "state": "ECOSYSTEM_CHANGE_COMPLETE",
+      "terminal": false
+    },
+    "GCFPE-MGMT-10__maintenance_complete_terminal": {
+      "band": "CLEAR",
+      "branch_id": "maintenance_complete_terminal",
+      "choice": "NONE",
+      "condition": "scoped maintenance complete; no exact further substantive invocation is both authorized and ready; return the saved/read-back GCFPE_ECOSYSTEM_CHANGE_REPORT to Nathan",
+      "confidence": 0.85,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.89,
+        "READ_ONLY": 0.1,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "GCFPE-MGMT-10",
+      "state": "ECOSYSTEM_CHANGE_COMPLETE",
+      "terminal": true
+    },
+    "GCFPE-MGMT-10__promotion_checkpoint_required": {
+      "band": "UNCERTAIN",
+      "branch_id": "promotion_checkpoint_required",
+      "choice": "NONE",
+      "condition": "exact-snapshot promotion approval or a required active control-layer checkpoint is outstanding; return the fully specified imminent transaction without treating general repair authorization as promotion approval",
+      "confidence": 0.76,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.04,
+        "NONE": 0.82,
+        "READ_ONLY": 0.14,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "GCFPE-MGMT-10",
+      "state": "PROMOTION_CHECKPOINT_REQUIRED",
+      "terminal": true
+    },
+    "GCFPE-MGMT-10__ready_for_product_owner_alpha_resumption_decision": {
+      "band": "CLEAR",
+      "branch_id": "ready_for_product_owner_alpha_resumption_decision",
+      "choice": "NONE",
+      "condition": "separately authorized EPIC040 Alpha-preparation branch only, after exact approved promotion, complete production readback/validation and intact archival; exactly one saved/read-back PR-10 invocation for HDE-EPIC040-PR04, for Nathan to review and manually invoke; does not execute Alpha",
+      "confidence": 0.83,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.87,
+        "READ_ONLY": 0.11,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "GCFPE-MGMT-10",
+      "state": "READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION",
+      "terminal": false
+    },
+    "IA-10__answer_available": {
+      "band": "CLEAR",
+      "branch_id": "answer_available",
+      "choice": "NONE",
+      "condition": "an actual partial or complete answer is available for bounded validation/application; carry complete RECOVERY_ENVELOPE and ANSWER_REF with exact paused artifacts and authority; preserve unanswered questions and deadlines and same-author return; do not repeat research or infer whole-Plan readiness",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "IA-10__audit_and_plan_complete": {
+      "band": "CLEAR",
+      "branch_id": "audit_and_plan_complete",
+      "choice": "NONE",
+      "condition": "both Implementation Audit and initial Plan are complete and decisive architecture/feasibility questions are resolved for submission",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-10",
+      "state": "PLAN_PENDING",
+      "terminal": false
+    },
+    "IA-10__audit_recovery": {
+      "band": "CLEAR",
+      "branch_id": "audit_recovery",
+      "choice": "NONE",
+      "condition": "Audit is incomplete but useful local recovery remains in the same IA session; no separate answer-seeding or research package is required",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "IA-10__bounded_research": {
+      "band": "CLEAR",
+      "branch_id": "bounded_research",
+      "choice": "NONE",
+      "condition": "a complete bounded planning research need is identified and no usable answer exists yet; carry PLANNING_INQUIRY and RECOVERY_ENVELOPE",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "IA-10__ia10_terminal": {
+      "band": "CLEAR",
+      "branch_id": "ia10_terminal",
+      "choice": "NONE",
+      "condition": "approved-base rewrite request, product decision, or unrecoverable source/authority blocker",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-10",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "IA-10__plan_interrupted": {
+      "band": "CLEAR",
+      "branch_id": "plan_interrupted",
+      "choice": "NONE",
+      "condition": "Audit is complete and the Plan phase was interrupted; no separate answer-seeding or research package is required first",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-10",
+      "state": "AUDIT_COMPLETE",
+      "terminal": false
+    },
+    "IA-20__answer_available": {
+      "band": "CLEAR",
+      "branch_id": "answer_available",
+      "choice": "NONE",
+      "condition": "an actual partial or complete answer is available for bounded validation/application; carry complete RECOVERY_ENVELOPE and ANSWER_REF, valid completed Audit and exact Plan checkpoint; preserve unanswered questions and deadlines and same-author return; do not repeat research or infer whole-Plan readiness",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "IA-20__bounded_research": {
+      "band": "CLEAR",
+      "branch_id": "bounded_research",
+      "choice": "NONE",
+      "condition": "a bounded planning research need is identified and no usable answer exists yet; carry PLANNING_INQUIRY and RECOVERY_ENVELOPE",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "IA-20__ia20_terminal": {
+      "band": "CLEAR",
+      "branch_id": "ia20_terminal",
+      "choice": "NONE",
+      "condition": "approved-base rewrite request, product decision, or unrecoverable source/authority blocker",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-20",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "IA-20__plan_pending": {
+      "band": "CLEAR",
+      "branch_id": "plan_pending",
+      "choice": "NONE",
+      "condition": "complete initial Plan is ready for Isis review with decisive architecture/feasibility questions resolved",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-20",
+      "state": "PLAN_PENDING",
+      "terminal": false
+    },
+    "IA-20__plan_recovery": {
+      "band": "CLEAR",
+      "branch_id": "plan_recovery",
+      "choice": "NONE",
+      "condition": "Plan remains incomplete but useful local recovery remains in the same IA session; no separate answer-seeding or research package is required",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "IA-30__approved_base_plan_delta_redline": {
+      "band": "CLEAR",
+      "branch_id": "approved_base_plan_delta_redline",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; the source-backed factual finding or actual authorized material-change request is justified and no unresolved Product Owner choice remains. Issue the exact PLAN_DELTA_REDLINE with affected Plan anchors, bounded required overlay, effects, exclusions, evidence and return point to the same IA author for AUTHORING_MODE=APPROVED_BASE_PLAN_DELTA_AUTHORING first standalone delta authoring. No pending delta is required at this entry and no addendum is created.",
+      "confidence": 0.83,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.88,
+        "READ_ONLY": 0.1,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": "PLAN_DELTA_REDLINE",
+      "terminal": false
+    },
+    "IA-30__change_not_substantiated": {
+      "band": "CLEAR",
+      "branch_id": "change_not_substantiated",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; the finding is unsupported or no change is required. Preserve the approved base, create no delta or addendum, and return terminally to the actual owner.",
+      "confidence": 0.96,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.96,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": "CHANGE_NOT_SUBSTANTIATED",
+      "terminal": true
+    },
+    "IA-30__delta_deny": {
+      "band": "CLEAR",
+      "branch_id": "delta_deny",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; exact delta redlines return to the same IA author through IA-40; no addendum.",
+      "confidence": 0.87,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.9,
+        "READ_ONLY": 0.09,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": "DELTA_DENY",
+      "terminal": false
+    },
+    "IA-30__initial_approve": {
+      "band": "UNRESOLVED",
+      "branch_id": "initial_approve",
+      "choice": "READ_ONLY",
+      "condition": "REVIEW_MODE=INITIAL_PLAN_REVIEW and the pending whole-change Plan is approved; zero PF10 addenda. Route the first or next executable PR work unit already defined by the approved Plan, carrying the approved Specification, Audit, Plan, review, exact planned WORK_UNIT_ID, dependency state, conflict register, source/PF10 lineage and IA session. No future PR, Proceed, QA Guide/Plan, Ops receipt or documentation result is required; the approved Plan remains the governing source for its later Ops, documentation and QA-readiness consumers.",
+      "confidence": 0.46,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.13,
+        "NONE": 0.26,
+        "READ_ONLY": 0.59,
+        "SOURCE_AVAILABILITY": 0.02
+      },
+      "prompt": "IA-30",
+      "state": "INITIAL_APPROVE",
+      "terminal": false
+    },
+    "IA-30__initial_deny": {
+      "band": "UNCERTAIN",
+      "branch_id": "initial_deny",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=INITIAL_PLAN_REVIEW; exact itemized redlines return to the same IA author for AUTHORING_MODE=PREAPPROVAL_PLAN_REVISION; zero PF10 addenda.",
+      "confidence": 0.52,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.03,
+        "NONE": 0.64,
+        "READ_ONLY": 0.32,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "IA-30",
+      "state": "INITIAL_DENY",
+      "terminal": false
+    },
+    "IA-30__plan_delta_return": {
+      "band": "UNCERTAIN",
+      "branch_id": "plan_delta_return",
+      "choice": "COMPARISON",
+      "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approved Plan delta reads current PF10; this is not an RS-40 rescope route",
+      "confidence": 0.61,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.71,
+        "NONE": 0.03,
+        "READ_ONLY": 0.26,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": "DELTA_APPROVE",
+      "terminal": false
+    },
+    "IA-30__plan_review_terminal": {
+      "band": "CLEAR",
+      "branch_id": "plan_review_terminal",
+      "choice": "NONE",
+      "condition": "source, authority, or manual-continuation identity blocker; SOURCE_RESOLUTION_ERROR makes no inference beyond the failure itself.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": null,
+      "terminal": true
+    },
+    "IA-30__product_owner_decision_required": {
+      "band": "CLEAR",
+      "branch_id": "product_owner_decision_required",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; an unresolved product or scope decision is required. Return terminally to Nathan with exact alternatives and consequences; IA-30 never decides Product Owner intent.",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+      "terminal": true
+    },
+    "IA-30__wrong_native_lane": {
+      "band": "CLEAR",
+      "branch_id": "wrong_native_lane",
+      "choice": "NONE",
+      "condition": "the matter is truly PR rescope, remediation or another lane. Preserve the evidence and return terminally to the actual supplied origin owner without inventing or executing that lane.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-30",
+      "state": "WRONG_NATIVE_LANE",
+      "terminal": true
+    },
+    "IA-40__plan_delta_pending": {
+      "band": "CLEAR",
+      "branch_id": "plan_delta_pending",
+      "choice": "NONE",
+      "condition": "AUTHORING_MODE=APPROVED_BASE_PLAN_DELTA_AUTHORING; the complete standalone MATERIAL_PLAN_DELTA, immutable base/review, assessment or denial redlines, overlays, application report and return point go to the same Isis reviewer in REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW. The approved Plan is never modified or replaced.",
+      "confidence": 0.91,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.93,
+        "READ_ONLY": 0.06,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-40",
+      "state": "PLAN_DELTA_PENDING",
+      "terminal": false
+    },
+    "IA-40__plan_pending_revised": {
+      "band": "CLEAR",
+      "branch_id": "plan_pending_revised",
+      "choice": "NONE",
+      "condition": "AUTHORING_MODE=PREAPPROVAL_PLAN_REVISION; the complete revised pending Plan and item-by-item application report return to the same Isis reviewer in REVIEW_MODE=INITIAL_PLAN_REVIEW, same author/reviewer lineage.",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-40",
+      "state": "PLAN_PENDING_REVISED",
+      "terminal": false
+    },
+    "IA-40__redline_incomplete": {
+      "band": "CLEAR",
+      "branch_id": "redline_incomplete",
+      "choice": "NONE",
+      "condition": "ambiguous, contradictory, unsupported or unresolvable redline target identity. Preserve the complete checkpoint and return terminally to the same Isis reviewer or actual origin owner without inference.",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.02
+      },
+      "prompt": "IA-40",
+      "state": "REDLINE_INCOMPLETE",
+      "terminal": true
+    },
+    "IA-40__source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "source_authority_terminal",
+      "choice": "NONE",
+      "condition": "source or authority predicate cannot be resolved and no exact origin owner is established; return terminally to Nathan with the preserved checkpoint.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-40",
+      "state": null,
+      "terminal": true
+    },
+    "IA-40__wrong_native_lane": {
+      "band": "CLEAR",
+      "branch_id": "wrong_native_lane",
+      "choice": "NONE",
+      "condition": "the supplied matter is actually PR rescope, remediation, Specification change or another lane. Do not author or route it as a Plan delta; preserve the evidence and return terminally to the exact origin owner identified by the source package.",
+      "confidence": 0.94,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-40",
+      "state": "WRONG_NATIVE_LANE",
+      "terminal": true
+    },
+    "IA-50__duplicate_existing_continuation": {
+      "band": "CLEAR",
+      "branch_id": "duplicate_existing_continuation",
+      "choice": "NONE",
+      "condition": "the answer was already applied and its exact valid successor/result resolves. Report SEED_READY with application_disposition: REUSE_EXISTING and reuse that successor; create no second seed or successor.",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-50",
+      "state": "SEED_READY",
+      "terminal": false
+    },
+    "IA-50__seed_incomplete_audit": {
+      "band": "CLEAR",
+      "branch_id": "seed_incomplete_audit",
+      "choice": "NONE",
+      "condition": "the validated answer applies to an incomplete IA-10 Audit",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-50",
+      "state": "SEED_READY",
+      "terminal": false
+    },
+    "IA-50__seed_incomplete_terminal": {
+      "band": "CLEAR",
+      "branch_id": "seed_incomplete_terminal",
+      "choice": "NONE",
+      "condition": "the answer is missing, stale, contradictory, wrong-authority or unusably partial, or lacks a real receiver prerequisite. Preserve the exact conflict and owner and return evidence to the actual answer/base owner with no synthetic runnable successor.",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-50",
+      "state": "SEED_INCOMPLETE",
+      "terminal": true
+    },
+    "IA-50__seed_paused_plan": {
+      "band": "CLEAR",
+      "branch_id": "seed_paused_plan",
+      "choice": "NONE",
+      "condition": "the Audit is complete and the answer applies to a paused initial Plan",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-50",
+      "state": "SEED_READY",
+      "terminal": false
+    },
+    "IA-50__seed_plan_review": {
+      "band": "CLEAR",
+      "branch_id": "seed_plan_review",
+      "choice": "NONE",
+      "condition": "the initial Plan review is paused on the question, or an approved-base source-backed factual finding or actual authorized material-change request exists and no pending delta exists. Supply the pending Plan for REVIEW_MODE=INITIAL_PLAN_REVIEW, or the immutable approved Plan/review plus APPROVED_BASE_FINDING_OR_REQUEST for REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT. Never fabricate a pending delta or review ID.",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.95,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-50",
+      "state": "SEED_READY",
+      "terminal": false
+    },
+    "IA-50__seed_preapproval_or_delta_correction": {
+      "band": "CLEAR",
+      "branch_id": "seed_preapproval_or_delta_correction",
+      "choice": "NONE",
+      "condition": "a pending preapproval Plan correction, or pending approved-base Plan-delta authoring or revision, already has exact IA-30 redlines. Return to the same IA author with the exact target, redlines, answer/seed and reviewer return.",
+      "confidence": 0.9,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.93,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-50",
+      "state": "SEED_READY",
+      "terminal": false
+    },
+    "IA-60__blocked": {
+      "band": "CLEAR",
+      "branch_id": "blocked",
+      "choice": "NONE",
+      "condition": "a required source, access path, authority or owner decision is missing; return the exact question and evidence to its native owner. Do not fabricate an IA-50-ready answer.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-60",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "IA-60__research_to_seeder": {
+      "band": "CLEAR",
+      "branch_id": "research_to_seeder",
+      "choice": "NONE",
+      "condition": "the bounded planning inquiry is complete and authorized for answer seeding; return the complete finding, ANSWER_REF and unchanged RECOVERY_ENVELOPE, preserving unanswered fields, owners, limitations and the exact paused IA return.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-60",
+      "state": "RESEARCH_COMPLETE",
+      "terminal": false
+    },
+    "IA-60__unusable_partial": {
+      "band": "CLEAR",
+      "branch_id": "unusable_partial",
+      "choice": "NONE",
+      "condition": "PARTIAL with usable_for_bounded_seeding: false; the resolved subset cannot lawfully be applied without deciding an unresolved governing choice. Return terminally to the actual source/decision owner with the recoverable package.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-60",
+      "state": "PARTIAL",
+      "terminal": true
+    },
+    "IA-60__usable_partial_to_seeder": {
+      "band": "CLEAR",
+      "branch_id": "usable_partial_to_seeder",
+      "choice": "NONE",
+      "condition": "PARTIAL with usable_for_bounded_seeding: true; the resolved subset can lawfully be applied without deciding an unresolved governing choice. Return the complete finding, ANSWER_REF and unchanged RECOVERY_ENVELOPE with the remaining unknowns and their owners preserved.",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "IA-60",
+      "state": "PARTIAL",
+      "terminal": false
+    },
+    "MGR-10__class_selection": {
+      "band": "CLEAR",
+      "branch_id": "class_selection",
+      "choice": "NONE",
+      "condition": "new cycle entry has no Product Owner class-decision evidence, or has exact evidence whose selection record is missing; CF-PO-10 receives the unresolved or evidenced-recording case and never chooses the class",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
+      "terminal": false
+    },
+    "MGR-10__crd_entry": {
+      "band": "CLEAR",
+      "branch_id": "crd_entry",
+      "choice": "NONE",
+      "condition": "new cycle entry has an exact CRD classification and complete intake",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
+      "terminal": false
+    },
+    "MGR-10__epic_entry": {
+      "band": "CLEAR",
+      "branch_id": "epic_entry",
+      "choice": "NONE",
+      "condition": "new cycle entry has an exact Epic classification and complete intake",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
+      "terminal": false
+    },
+    "MGR-10__final_scan": {
+      "band": "CLEAR",
+      "branch_id": "final_scan",
+      "choice": "NONE",
+      "condition": "closure and all selected post-closure work are disposed and the final scan is next",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
+      "terminal": false
+    },
+    "MGR-10__other_native_stage": {
+      "band": "CLEAR",
+      "branch_id": "other_native_stage",
+      "choice": "NONE",
+      "condition": "another exact selected native stage is the evidenced next unmet contract; the dynamic boundary resolves one prompt at runtime",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.94,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
+      "terminal": false
+    },
+    "MGR-10__pre_qa": {
+      "band": "CLEAR",
+      "branch_id": "pre_qa",
+      "choice": "NONE",
+      "condition": "the exact next unmet contract is integrated pre-QA audit/triage/readiness",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.95,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
+      "terminal": false
+    },
+    "MGR-10__terminal_return": {
+      "band": "CLEAR",
+      "branch_id": "terminal_return",
+      "choice": "NONE",
+      "condition": "true completed-cycle or Product Owner terminal return",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "MGR-10",
+      "state": "TERMINAL_RETURN",
+      "terminal": true
+    },
+    "OPS-10__blocked_native_owner": {
+      "band": "CLEAR",
+      "branch_id": "blocked_native_owner",
+      "choice": "NONE",
+      "condition": "the complete recovery package resolves the same creator or exact native owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-10",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "OPS-10__blocked_terminal": {
+      "band": "CLEAR",
+      "branch_id": "blocked_terminal",
+      "choice": "NONE",
+      "condition": "a decisive source, authority, target, or owner fact prevents a runnable task",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-10",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "OPS-10__material_boundary_proposal": {
+      "band": "CLEAR",
+      "branch_id": "material_boundary_proposal",
+      "choice": "NONE",
+      "condition": "a new complete material boundary requires a bounded rescope proposal",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-10",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-10__ready": {
+      "band": "CLEAR",
+      "branch_id": "ready",
+      "choice": "NONE",
+      "condition": "complete bounded OPS_TASK with actual action authority is ready for execution",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-10",
+      "state": "READY",
+      "terminal": false
+    },
+    "OPS-10__remediation_discovery": {
+      "band": "CLEAR",
+      "branch_id": "remediation_discovery",
+      "choice": "NONE",
+      "condition": "the exact authorized remediation package requires bounded discovery",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-10",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-20__material_boundary_proposal": {
+      "band": "CLEAR",
+      "branch_id": "material_boundary_proposal",
+      "choice": "NONE",
+      "condition": "actual execution evidence establishes a new bounded material boundary requiring proposal",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-20__ops_execution_native_owner": {
+      "band": "CLEAR",
+      "branch_id": "ops_execution_native_owner",
+      "choice": "NONE",
+      "condition": "a blocked, incomplete, contradictory, or access-limited result has an exact native owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-20__ops_execution_terminal": {
+      "band": "CLEAR",
+      "branch_id": "ops_execution_terminal",
+      "choice": "NONE",
+      "condition": "a decisive source, authority, target, access, or owner fact prevents any runnable continuation",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": null,
+      "terminal": true
+    },
+    "OPS-20__remediation_discovery": {
+      "band": "CLEAR",
+      "branch_id": "remediation_discovery",
+      "choice": "NONE",
+      "condition": "the exact authorized remediation package requires bounded discovery before Thoth resumes",
+      "confidence": 0.89,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.92,
+        "READ_ONLY": 0.07,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-20__result_blocked": {
+      "band": "CLEAR",
+      "branch_id": "result_blocked",
+      "choice": "NONE",
+      "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "OPS-20__result_complete": {
+      "band": "CLEAR",
+      "branch_id": "result_complete",
+      "choice": "NONE",
+      "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "OPS-20__result_failed": {
+      "band": "CLEAR",
+      "branch_id": "result_failed",
+      "choice": "NONE",
+      "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": "FAILED",
+      "terminal": false
+    },
+    "OPS-20__result_notexecuted": {
+      "band": "CLEAR",
+      "branch_id": "result_notexecuted",
+      "choice": "NONE",
+      "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": "NOT_EXECUTED",
+      "terminal": false
+    },
+    "OPS-20__result_notproduced": {
+      "band": "CLEAR",
+      "branch_id": "result_notproduced",
+      "choice": "NONE",
+      "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": "NOT_PRODUCED",
+      "terminal": false
+    },
+    "OPS-20__result_partial": {
+      "band": "CLEAR",
+      "branch_id": "result_partial",
+      "choice": "NONE",
+      "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-20",
+      "state": "PARTIAL",
+      "terminal": false
+    },
+    "OPS-30__accept_native_consumer": {
+      "band": "CLEAR",
+      "branch_id": "accept_native_consumer",
+      "choice": "NONE",
+      "condition": "accepted receipt returns to the exact Plan-named downstream consumer or same creator IA",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-30",
+      "state": "ACCEPT",
+      "terminal": false
+    },
+    "OPS-30__material_boundary": {
+      "band": "CLEAR",
+      "branch_id": "material_boundary",
+      "choice": "NONE",
+      "condition": "the actual receipt establishes a material scope, architecture, requirement, or design boundary",
+      "confidence": 0.94,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-30",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-30__receipt_native_owner": {
+      "band": "CLEAR",
+      "branch_id": "receipt_native_owner",
+      "choice": "NONE",
+      "condition": "a blocked, contradictory, incomplete, or access-limited receipt has an exact native recovery owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-30",
+      "state": null,
+      "terminal": false
+    },
+    "OPS-30__receipt_terminal": {
+      "band": "CLEAR",
+      "branch_id": "receipt_terminal",
+      "choice": "NONE",
+      "condition": "the exact native recovery owner or decisive prerequisite is unresolved",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-30",
+      "state": null,
+      "terminal": true
+    },
+    "OPS-30__reject_corrective_task": {
+      "band": "CLEAR",
+      "branch_id": "reject_corrective_task",
+      "choice": "NONE",
+      "condition": "bounded correction or retry begins with a new corrective OPS_TASK; OPS-20 follows only after that task is complete",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-30",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "OPS-30__remediation_discovery": {
+      "band": "CLEAR",
+      "branch_id": "remediation_discovery",
+      "choice": "NONE",
+      "condition": "the actual receipt and remediation package explicitly require bounded discovery",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "OPS-30",
+      "state": null,
+      "terminal": false
+    },
+    "PR-10__instruction_ready": {
+      "band": "CLEAR",
+      "branch_id": "instruction_ready",
+      "choice": "NONE",
+      "condition": "complete approved-scope instruction is ready for detailed planning",
+      "confidence": 0.84,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.88,
+        "READ_ONLY": 0.11,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-10",
+      "state": "INSTRUCTION_READY",
+      "terminal": false
+    },
+    "PR-10__instruction_terminal": {
+      "band": "CLEAR",
+      "branch_id": "instruction_terminal",
+      "choice": "NONE",
+      "condition": "accepted manual prerequisite or true source/authority/product decision has no runnable prompt receiver",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-10",
+      "state": null,
+      "terminal": true
+    },
+    "PR-10__material_boundary": {
+      "band": "CLEAR",
+      "branch_id": "material_boundary",
+      "choice": "NONE",
+      "condition": "a genuine material scope, architecture, requirement, or design boundary is substantiated",
+      "confidence": 0.88,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.91,
+        "READ_ONLY": 0.08,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-10",
+      "state": null,
+      "terminal": false
+    },
+    "PR-10__same_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "same_owner_recovery",
+      "choice": "NONE",
+      "condition": "an ordinary instruction defect is repairable by the same PR-10 owner",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-10",
+      "state": null,
+      "terminal": false
+    },
+    "PR-10__upstream_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "upstream_owner_recovery",
+      "choice": "NONE",
+      "condition": "the defective upstream Plan, review, remediation, Specification, or other source has an exact native owner",
+      "confidence": 0.93,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "PR-10",
+      "state": null,
+      "terminal": false
+    },
+    "PR-20__awaiting_po_proceed": {
+      "band": "CLEAR",
+      "branch_id": "awaiting_po_proceed",
+      "choice": "NONE",
+      "condition": "one complete executable approved-scope plan awaits the original Product Owner Proceed",
+      "confidence": 0.94,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-20",
+      "state": "AWAITING_PO_PROCEED",
+      "terminal": false
+    },
+    "PR-20__material_boundary": {
+      "band": "CLEAR",
+      "branch_id": "material_boundary",
+      "choice": "NONE",
+      "condition": "the planning result substantiates a material scope, architecture, requirement, or design boundary",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-20",
+      "state": null,
+      "terminal": false
+    },
+    "PR-20__planning_terminal": {
+      "band": "CLEAR",
+      "branch_id": "planning_terminal",
+      "choice": "NONE",
+      "condition": "accepted manual prerequisite or true source/authority/product decision has no runnable prompt receiver",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-20",
+      "state": null,
+      "terminal": true
+    },
+    "PR-20__same_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "same_owner_recovery",
+      "choice": "NONE",
+      "condition": "a bounded planning defect is repairable by the same dedicated PR planning session",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-20",
+      "state": null,
+      "terminal": false
+    },
+    "PR-20__upstream_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "upstream_owner_recovery",
+      "choice": "NONE",
+      "condition": "the exact upstream instruction, Plan, remediation, Specification, or other source owner must act",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-20",
+      "state": null,
+      "terminal": false
+    },
+    "PR-30__pr30_terminal": {
+      "band": "CLEAR",
+      "branch_id": "pr30_terminal",
+      "choice": "NONE",
+      "condition": "unrecoverable source, owner, authority, or incompatible identity; never convert this into PR-50",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-30",
+      "state": null,
+      "terminal": true
+    },
+    "PR-30__pr_candidate_published": {
+      "band": "CLEAR",
+      "branch_id": "pr_candidate_published",
+      "choice": "NONE",
+      "condition": "one complete same-session phase continuation",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-30",
+      "state": "PR_CANDIDATE_PUBLISHED",
+      "terminal": false
+    },
+    "PR-30__product_owner_decision_required": {
+      "band": "CLEAR",
+      "branch_id": "product_owner_decision_required",
+      "choice": "NONE",
+      "condition": "genuine Product Owner decision outside existing PR authority",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-30",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+      "terminal": true
+    },
+    "PR-30__recovery_pending": {
+      "band": "CLEAR",
+      "branch_id": "recovery_pending",
+      "choice": "NONE",
+      "condition": "complete same-session re-entry; no new vehicle",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-30",
+      "state": "RECOVERY_PENDING",
+      "terminal": false
+    },
+    "PR-30__rescope_pending": {
+      "band": "CLEAR",
+      "branch_id": "rescope_pending",
+      "choice": "NONE",
+      "condition": "formal RESCOPE_REQUEST with exact PR_RETURN_PHASE",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-30",
+      "state": "RESCOPE_PENDING",
+      "terminal": false
+    },
+    "PR-35__merge_pending": {
+      "band": "CLEAR",
+      "branch_id": "merge_pending",
+      "choice": "NONE",
+      "condition": "conditional PR-40 invocation usable only after Nathan manually merges",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-35",
+      "state": "MERGE_PENDING",
+      "terminal": false
+    },
+    "PR-35__product_owner_decision_required": {
+      "band": "CLEAR",
+      "branch_id": "product_owner_decision_required",
+      "choice": "NONE",
+      "condition": "genuine Product Owner decision outside existing PR authority",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-35",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+      "terminal": true
+    },
+    "PR-35__recovery_pending": {
+      "band": "CLEAR",
+      "branch_id": "recovery_pending",
+      "choice": "NONE",
+      "condition": "complete same-session re-entry with checkpoint",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-35",
+      "state": "RECOVERY_PENDING",
+      "terminal": false
+    },
+    "PR-35__remote_evidence_pending": {
+      "band": "CLEAR",
+      "branch_id": "remote_evidence_pending",
+      "choice": "NONE",
+      "condition": "actual remote evidence unavailable and no local action remains; durable checkpoint required",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-35",
+      "state": "REMOTE_EVIDENCE_PENDING",
+      "terminal": false
+    },
+    "PR-35__rescope_pending": {
+      "band": "CLEAR",
+      "branch_id": "rescope_pending",
+      "choice": "NONE",
+      "condition": "formal RESCOPE_REQUEST with PR_RETURN_PHASE=PR-35",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-35",
+      "state": "RESCOPE_PENDING",
+      "terminal": false
+    },
+    "PR-40__accept": {
+      "band": "CLEAR",
+      "branch_id": "accept",
+      "choice": "NONE",
+      "condition": "return the accepted whole-unit result to the same whole-change IA/native Plan-progress owner",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-40",
+      "state": "ACCEPT",
+      "terminal": false
+    },
+    "PR-40__lineage_review_terminal": {
+      "band": "CLEAR",
+      "branch_id": "lineage_review_terminal",
+      "choice": "NONE",
+      "condition": "an in-scope correction lacks required repository authority/vehicle or another genuine Product Owner decision is required",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-40",
+      "state": null,
+      "terminal": true
+    },
+    "PR-40__pending_native_owner": {
+      "band": "CLEAR",
+      "branch_id": "pending_native_owner",
+      "choice": "NONE",
+      "condition": "the exact Product Owner, evidence, PR, or IA recovery owner is known and can perform the bounded missing act",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-40",
+      "state": "PENDING",
+      "terminal": false
+    },
+    "PR-40__pending_terminal": {
+      "band": "CLEAR",
+      "branch_id": "pending_terminal",
+      "choice": "NONE",
+      "condition": "manual merge, repository fact, review result, or evidence remains unavailable and no runnable native owner prompt is resolved",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "PR-40",
+      "state": "PENDING",
+      "terminal": true
+    },
+    "PR-40__reject_existing_pr_owner": {
+      "band": "CLEAR",
+      "branch_id": "reject_existing_pr_owner",
+      "choice": "NONE",
+      "condition": "a precise in-scope implementation/review/corrected-code/PR-lineage defect has an authorized existing PR vehicle and original Proceed",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-40",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "PR-40__reject_instruction_owner": {
+      "band": "CLEAR",
+      "branch_id": "reject_instruction_owner",
+      "choice": "NONE",
+      "condition": "the substantiated in-scope defect is in the IA-issued PR instruction",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-40",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "PR-40__reject_material_boundary_proposal": {
+      "band": "CLEAR",
+      "branch_id": "reject_material_boundary_proposal",
+      "choice": "NONE",
+      "condition": "a substantiated material boundary requires a new bounded rescope proposal",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-40",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "PR-50__pr_aborted_escalated": {
+      "band": "CLEAR",
+      "branch_id": "pr_aborted_escalated",
+      "choice": "NONE",
+      "condition": "terminal record after Nathan-only identified-PR invocation",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "PR-50",
+      "state": "PR_ABORTED_ESCALATED",
+      "terminal": true
+    },
+    "QA-100__blocked": {
+      "band": "CLEAR",
+      "branch_id": "blocked",
+      "choice": "NONE",
+      "condition": "execution receipt always returns to evidence reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-100",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "QA-100__complete": {
+      "band": "CLEAR",
+      "branch_id": "complete",
+      "choice": "NONE",
+      "condition": "execution receipt always returns to evidence reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-100",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "QA-100__failed": {
+      "band": "CLEAR",
+      "branch_id": "failed",
+      "choice": "NONE",
+      "condition": "execution receipt always returns to evidence reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-100",
+      "state": "FAILED",
+      "terminal": false
+    },
+    "QA-100__not_executed": {
+      "band": "CLEAR",
+      "branch_id": "not_executed",
+      "choice": "NONE",
+      "condition": "execution receipt always returns to evidence reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-100",
+      "state": "NOT_EXECUTED",
+      "terminal": false
+    },
+    "QA-100__partial": {
+      "band": "CLEAR",
+      "branch_id": "partial",
+      "choice": "NONE",
+      "condition": "execution receipt always returns to evidence reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-100",
+      "state": "PARTIAL",
+      "terminal": false
+    },
+    "QA-100__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "QA-100",
+      "state": null,
+      "terminal": true
+    },
+    "QA-10__evidence_owner_recovery": {
+      "band": "CLEAR",
+      "branch_id": "evidence_owner_recovery",
+      "choice": "NONE",
+      "condition": "the exact evidence/retrieval owner is identified and can perform the smallest supported recovery",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-10",
+      "state": "ASSESSMENT_INCOMPLETE",
+      "terminal": false
+    },
+    "QA-10__material_native_boundary": {
+      "band": "UNCERTAIN",
+      "branch_id": "material_native_boundary",
+      "choice": "NONE",
+      "condition": "a substantiated material scope, Canon, Specification, Plan, or authority boundary has an exact native owner",
+      "confidence": 0.63,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.73,
+        "READ_ONLY": 0.26,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-10",
+      "state": null,
+      "terminal": false
+    },
+    "QA-10__not_ready": {
+      "band": "UNCERTAIN",
+      "branch_id": "not_ready",
+      "choice": "NONE",
+      "condition": "evidence proves failure of an applicable approved Plan objective",
+      "confidence": 0.72,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.16,
+        "NONE": 0.79,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-10",
+      "state": "NOT_READY",
+      "terminal": false
+    },
+    "QA-10__qa10_terminal": {
+      "band": "CLEAR",
+      "branch_id": "qa10_terminal",
+      "choice": "NONE",
+      "condition": "manual prerequisite, source/authority stop, or unresolved evidence owner prevents a runnable continuation",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.02
+      },
+      "prompt": "QA-10",
+      "state": null,
+      "terminal": true
+    },
+    "QA-10__ready_for_qa": {
+      "band": "CLEAR",
+      "branch_id": "ready_for_qa",
+      "choice": "NONE",
+      "condition": "complete integrated audit/triage/readiness supports live QA Guide creation",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-10",
+      "state": "READY_FOR_QA",
+      "terminal": false
+    },
+    "QA-110__accept": {
+      "band": "CLEAR",
+      "branch_id": "accept",
+      "choice": "NONE",
+      "condition": "the complete approved QA run requires final reporting, including a completed failing run; the union of selected collections is reconciled to every required Plan step and requirement, not merely a completed subset",
+      "confidence": 0.82,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.06,
+        "NONE": 0.87,
+        "READ_ONLY": 0.07,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "ACCEPT",
+      "terminal": false
+    },
+    "QA-110__escalation_required": {
+      "band": "CLEAR",
+      "branch_id": "escalation_required",
+      "choice": "NONE",
+      "condition": "material QA evidence finding requires the native QA escalation report",
+      "confidence": 0.83,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.87,
+        "READ_ONLY": 0.12,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "ESCALATION_REQUIRED",
+      "terminal": false
+    },
+    "QA-110__incomplete_execution_evidence": {
+      "band": "CLEAR",
+      "branch_id": "incomplete_execution_evidence",
+      "choice": "NONE",
+      "condition": "the exact missing evidence is lawfully producible by bounded QA execution",
+      "confidence": 0.84,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.89,
+        "READ_ONLY": 0.1,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "INCOMPLETE",
+      "terminal": false
+    },
+    "QA-110__incomplete_named_owner": {
+      "band": "CLEAR",
+      "branch_id": "incomplete_named_owner",
+      "choice": "NONE",
+      "condition": "another exact evidence owner is identified; preserve QA-110 resume phase",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "INCOMPLETE",
+      "terminal": false
+    },
+    "QA-110__incomplete_terminal": {
+      "band": "CLEAR",
+      "branch_id": "incomplete_terminal",
+      "choice": "NONE",
+      "condition": "the evidence owner or required authority cannot be resolved into a runnable receiver",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "QA-110",
+      "state": "INCOMPLETE",
+      "terminal": true
+    },
+    "QA-110__rerun_execution": {
+      "band": "CLEAR",
+      "branch_id": "rerun_execution",
+      "choice": "NONE",
+      "condition": "the authorized attempt-2 task is already complete and ready for execution",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "BOUNDED_RERUN_REQUIRED",
+      "terminal": false
+    },
+    "QA-110__rerun_task_authoring": {
+      "band": "CLEAR",
+      "branch_id": "rerun_task_authoring",
+      "choice": "NONE",
+      "condition": "a new selected attempt-2 execution task still must be authored",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "BOUNDED_RERUN_REQUIRED",
+      "terminal": false
+    },
+    "QA-120__fail": {
+      "band": "CLEAR",
+      "branch_id": "fail",
+      "choice": "NONE",
+      "condition": "final QA Report/RCA demonstrates a material failure requiring escalation",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-120",
+      "state": "FAIL",
+      "terminal": false
+    },
+    "QA-120__interim_evidence_review": {
+      "band": "CLEAR",
+      "branch_id": "interim_evidence_review",
+      "choice": "NONE",
+      "condition": "remaining evidence requires Kronos classification",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-120",
+      "state": "INTERIM",
+      "terminal": false
+    },
+    "QA-120__interim_task_authoring": {
+      "band": "CLEAR",
+      "branch_id": "interim_task_authoring",
+      "choice": "NONE",
+      "condition": "an unissued selected instruction or authorized retry task must be authored",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-120",
+      "state": "INTERIM",
+      "terminal": false
+    },
+    "QA-120__pass_crd": {
+      "band": "CLEAR",
+      "branch_id": "pass_crd",
+      "choice": "NONE",
+      "condition": "PASS with verified existing CRD class, complete QA Report/RCA and the matching continuing-Isis closure intake",
+      "confidence": 0.95,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-120",
+      "state": "PASS",
+      "terminal": false
+    },
+    "QA-120__pass_epic": {
+      "band": "CLEAR",
+      "branch_id": "pass_epic",
+      "choice": "NONE",
+      "condition": "PASS with verified existing EPIC class, complete QA Report/RCA and the matching continuing-Isis closure intake",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-120",
+      "state": "PASS",
+      "terminal": false
+    },
+    "QA-120__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-120",
+      "state": null,
+      "terminal": true
+    },
+    "QA-20__blocked": {
+      "band": "CLEAR",
+      "branch_id": "blocked",
+      "choice": "NONE",
+      "condition": "material readiness invalidation or recoverable QA-10 evidence gap requires same-Isis reassessment",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-20",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "QA-20__guide_ready": {
+      "band": "CLEAR",
+      "branch_id": "guide_ready",
+      "choice": "NONE",
+      "condition": "complete live QA Guide is ready for whole-change QA Audit/Plan",
+      "confidence": 0.94,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-20",
+      "state": "GUIDE_READY",
+      "terminal": false
+    },
+    "QA-20__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-20",
+      "state": null,
+      "terminal": true
+    },
+    "QA-50__audit_complete": {
+      "band": "CLEAR",
+      "branch_id": "audit_complete",
+      "choice": "NONE",
+      "condition": "QA Audit is complete but a recoverable interruption prevented Plan completion",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": "AUDIT_COMPLETE",
+      "terminal": false
+    },
+    "QA-50__blocked_complete_pending_plan": {
+      "band": "CLEAR",
+      "branch_id": "blocked_complete_pending_plan",
+      "choice": "NONE",
+      "condition": "the pending QA Plan is complete and ready for review",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "QA-50__blocked_initial_denial": {
+      "band": "CLEAR",
+      "branch_id": "blocked_initial_denial",
+      "choice": "NONE",
+      "condition": "an initial pending QA Plan was denied by QA-70 with exact redlines",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.99,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "QA-50__blocked_plan_recovery": {
+      "band": "CLEAR",
+      "branch_id": "blocked_plan_recovery",
+      "choice": "NONE",
+      "condition": "Audit is complete and the planning gap is recoverable",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": "BLOCKED",
+      "terminal": false
+    },
+    "QA-50__existing_approval_reuse": {
+      "band": "CLEAR",
+      "branch_id": "existing_approval_reuse",
+      "choice": "NONE",
+      "condition": "a subsequent still-valid actual QA-70 approval of this exact Plan already exists and its complete native task-creation intake is available; preserve Isis decision and same Kronos lineage without new Plan/review/task execution",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.98,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": null,
+      "terminal": false
+    },
+    "QA-50__plan_pending": {
+      "band": "CLEAR",
+      "branch_id": "plan_pending",
+      "choice": "NONE",
+      "condition": "both QA Audit and QA Plan are complete and separately read back",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": "PLAN_PENDING",
+      "terminal": false
+    },
+    "QA-50__qa50_terminal": {
+      "band": "CLEAR",
+      "branch_id": "qa50_terminal",
+      "choice": "NONE",
+      "condition": "true source or authority stop has no runnable receiver",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-50",
+      "state": null,
+      "terminal": true
+    },
+    "QA-60__blocked": {
+      "band": "CLEAR",
+      "branch_id": "blocked",
+      "choice": "NONE",
+      "condition": "unique source failure, approved-base rewrite request, unrecoverable authority conflict, or missing decisive Audit",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "QA-60",
+      "state": "BLOCKED",
+      "terminal": true
+    },
+    "QA-60__existing_approval_reuse": {
+      "band": "CLEAR",
+      "branch_id": "existing_approval_reuse",
+      "choice": "NONE",
+      "condition": "a subsequent still-valid actual QA-70 approval of this exact Plan already exists and its complete native task-creation intake is available; preserve Isis decision and same Kronos lineage without new Plan/review/task execution",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.98,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-60",
+      "state": null,
+      "terminal": false
+    },
+    "QA-60__existing_revision_reuse": {
+      "band": "CLEAR",
+      "branch_id": "existing_revision_reuse",
+      "choice": "NONE",
+      "condition": "actual initial QA-70 denial or bounded redline review of this exact Plan already exists with complete review/Audit/upstream intake and same Kronos author lineage",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-60",
+      "state": null,
+      "terminal": false
+    },
+    "QA-60__plan_pending": {
+      "band": "CLEAR",
+      "branch_id": "plan_pending",
+      "choice": "NONE",
+      "condition": "complete QA Plan returns to continuing Isis review",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-60",
+      "state": "PLAN_PENDING",
+      "terminal": false
+    },
+    "QA-70__delta_deny": {
+      "band": "CLEAR",
+      "branch_id": "delta_deny",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=DELTA; return denial to the exact originating proposed-delta owner; no addendum",
+      "confidence": 0.99,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-70",
+      "state": "DENY",
+      "terminal": false
+    },
+    "QA-70__initial_approve": {
+      "band": "CLEAR",
+      "branch_id": "initial_approve",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=INITIAL; approve the pending QA Plan; no addendum",
+      "confidence": 1.0,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-70",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "QA-70__initial_deny": {
+      "band": "CLEAR",
+      "branch_id": "initial_deny",
+      "choice": "NONE",
+      "condition": "REVIEW_MODE=INITIAL; exact redlines return to the same Kronos author; no addendum",
+      "confidence": 1.0,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-70",
+      "state": "DENY",
+      "terminal": false
+    },
+    "QA-70__qa70_terminal": {
+      "band": "CLEAR",
+      "branch_id": "qa70_terminal",
+      "choice": "NONE",
+      "condition": "source, authority, mode, or continuation identity is unresolved",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-70",
+      "state": null,
+      "terminal": true
+    },
+    "QA-70__qa_plan_delta_return": {
+      "band": "CLEAR",
+      "branch_id": "qa_plan_delta_return",
+      "choice": "READ_ONLY",
+      "condition": "REVIEW_MODE=DELTA; the exact native receiver reads current PF10",
+      "confidence": 0.99,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.99,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-70",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "QA-80__existing_delta_review": {
+      "band": "CLEAR",
+      "branch_id": "existing_delta_review",
+      "choice": "READ_ONLY",
+      "condition": "approved-base rewrite refused but a complete existing explicit bounded delta, actual author, approval lineage and current PF10/addenda satisfy QA-70 APPROVED_QA_PLAN_DELTA_REVIEW intake; carry the existing delta unchanged",
+      "confidence": 0.97,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.01,
+        "READ_ONLY": 0.98,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-80",
+      "state": "WRONG_ROUTE_APPROVED_BASE",
+      "terminal": false
+    },
+    "QA-80__plan_pending_revised": {
+      "band": "CLEAR",
+      "branch_id": "plan_pending_revised",
+      "choice": "NONE",
+      "condition": "complete corrected pending preapproval QA Plan returns to the same Isis reviewer",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-80",
+      "state": "PLAN_PENDING_REVISED",
+      "terminal": false
+    },
+    "QA-80__wrong_route_terminal": {
+      "band": "CLEAR",
+      "branch_id": "wrong_route_terminal",
+      "choice": "NONE",
+      "condition": "approved-base rewrite refused and a complete lawful bounded-delta review intake is absent; identify the actual proposal owner without inventing a delta",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-80",
+      "state": "WRONG_ROUTE_APPROVED_BASE",
+      "terminal": true
+    },
+    "QA-90__escalation_required": {
+      "band": "CLEAR",
+      "branch_id": "escalation_required",
+      "choice": "NONE",
+      "condition": "material pre-execution defect; create the native QA escalation report",
+      "confidence": 0.98,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-90",
+      "state": "ESCALATION_REQUIRED",
+      "terminal": false
+    },
+    "QA-90__not_executed": {
+      "band": "CLEAR",
+      "branch_id": "not_executed",
+      "choice": "NONE",
+      "condition": "preserve non-execution evidence for the QA evidence reviewer",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-90",
+      "state": "NOT_EXECUTED",
+      "terminal": false
+    },
+    "QA-90__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-90",
+      "state": null,
+      "terminal": true
+    },
+    "QA-90__task_ready": {
+      "band": "CLEAR",
+      "branch_id": "task_ready",
+      "choice": "NONE",
+      "condition": "bounded QA execution task is complete",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-90",
+      "state": "TASK_READY",
+      "terminal": false
+    },
+    "RS-10__in_scope_native_return": {
+      "band": "CLEAR",
+      "branch_id": "in_scope_native_return",
+      "choice": "NONE",
+      "condition": "observed ordinary in-scope correction needs no rescope proposal or formal RS-20 decision; exact selected existing repair owner/session and complete native intake are resolved under unchanged authority; no PR-50, merge or manual-gate bypass",
+      "confidence": 0.91,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.93,
+        "READ_ONLY": 0.07,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-10",
+      "state": null,
+      "terminal": false
+    },
+    "RS-10__rescope_proposal_pending_review": {
+      "band": "CLEAR",
+      "branch_id": "rescope_proposal_pending_review",
+      "choice": "NONE",
+      "condition": "a real bounded delta has a complete proposal and exact actual native-stage lineage; pre-Proceed planning does not require future Proceed, PR or execution-return-phase fields",
+      "confidence": 0.81,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.86,
+        "READ_ONLY": 0.14,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-10",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+      "terminal": false
+    },
+    "RS-10__shared_source_authority_terminal": {
+      "band": "CLEAR",
+      "branch_id": "shared_source_authority_terminal",
+      "choice": "NONE",
+      "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-10",
+      "state": null,
+      "terminal": true
+    },
+    "RS-20__in_scope_native": {
+      "band": "CLEAR",
+      "branch_id": "in_scope_native",
+      "choice": "NONE",
+      "condition": "existing repair owner is a non-PR native stage under unchanged authority; no addendum",
+      "confidence": 0.97,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "IN_SCOPE_REPAIR",
+      "terminal": false
+    },
+    "RS-20__in_scope_pr30": {
+      "band": "CLEAR",
+      "branch_id": "in_scope_pr30",
+      "choice": "NONE",
+      "condition": "existing repair owner/phase is PR-30 under the original Proceed; no addendum",
+      "confidence": 0.96,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "IN_SCOPE_REPAIR",
+      "terminal": false
+    },
+    "RS-20__in_scope_pr35": {
+      "band": "UNCERTAIN",
+      "branch_id": "in_scope_pr35",
+      "choice": "NONE",
+      "condition": "existing repair owner/phase is PR-35 under the original Proceed; no addendum",
+      "confidence": 0.74,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.03,
+        "NONE": 0.8,
+        "READ_ONLY": 0.16,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "RS-20",
+      "state": "IN_SCOPE_REPAIR",
+      "terminal": false
+    },
+    "RS-20__reject_native": {
+      "band": "CLEAR",
+      "branch_id": "reject_native",
+      "choice": "NONE",
+      "condition": "recorded origin is a non-PR native stage; unchanged authority; no addendum",
+      "confidence": 0.97,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "RS-20__reject_pr30": {
+      "band": "CLEAR",
+      "branch_id": "reject_pr30",
+      "choice": "NONE",
+      "condition": "recorded origin/phase is PR-30; unchanged authority; no addendum",
+      "confidence": 0.98,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "RS-20__reject_pr35": {
+      "band": "CLEAR",
+      "branch_id": "reject_pr35",
+      "choice": "NONE",
+      "condition": "recorded origin/phase is PR-35; unchanged authority; no addendum",
+      "confidence": 0.99,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "RS-20__rescope_non_pr": {
+      "band": "CLEAR",
+      "branch_id": "rescope_non_pr",
+      "choice": "READ_ONLY",
+      "condition": "qualifying non-PR bounded rescope; exact native stage reads current PF10",
+      "confidence": 0.99,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.99,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "RS-20__rescope_open_pr": {
+      "band": "CLEAR",
+      "branch_id": "rescope_open_pr",
+      "choice": "NONE",
+      "condition": "PR_RETURN_PHASE in {PR-30_POSTPUBLICATION, PR-35}; existing open PR identity verified",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "RS-20__rescope_pr30_prepublication": {
+      "band": "CLEAR",
+      "branch_id": "rescope_pr30_prepublication",
+      "choice": "READ_ONLY",
+      "condition": "PR_RETURN_PHASE=PR-30_PREPUBLICATION; PR-30 reads current PF10; no open PR and RS-40 forbidden",
+      "confidence": 0.99,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.99,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "APPROVE",
+      "terminal": false
+    },
+    "RS-20__revision_required": {
+      "band": "CLEAR",
+      "branch_id": "revision_required",
+      "choice": "NONE",
+      "condition": "same request/proposal author; no addendum",
+      "confidence": 0.99,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "REVISION_REQUIRED",
+      "terminal": false
+    },
+    "RS-20__specification_change_required": {
+      "band": "UNCERTAIN",
+      "branch_id": "specification_change_required",
+      "choice": "NONE",
+      "condition": "native Product Owner Specification-delta decision; no RS-20 addendum",
+      "confidence": 0.74,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.16,
+        "NONE": 0.81,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "SPECIFICATION_CHANGE_REQUIRED",
+      "terminal": true
+    },
+    "RS-30__ia_revision_return": {
+      "band": "CLEAR",
+      "branch_id": "ia_revision_return",
+      "choice": "NONE",
+      "condition": "actual correction authority is RS-20 REVISION_REQUIRED; preserve RESCOPE_REQUEST vs RESCOPE_PROPOSAL type and return to the same IA decision owner",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-30",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+      "terminal": false
+    },
+    "RS-30__product_owner_explicit_native_return": {
+      "band": "CLEAR",
+      "branch_id": "product_owner_explicit_native_return",
+      "choice": "NONE",
+      "condition": "Nathan already supplied one exact selected native decision route with complete intake; preserve actual owner, same artifact type and manual gates; never invent IA approval, route PR-50 or bypass Alpha, merge or PF10 controls",
+      "confidence": 0.96,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.97,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-30",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+      "terminal": false
+    },
+    "RS-30__product_owner_revision_return": {
+      "band": "CLEAR",
+      "branch_id": "product_owner_revision_return",
+      "choice": "NONE",
+      "condition": "actual correction authority is Nathan and no exact native decision route is already supplied; preserve his decision ownership and emit no continuation block",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-30",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+      "terminal": true
+    },
+    "RS-30__revision_source_terminal": {
+      "band": "CLEAR",
+      "branch_id": "revision_source_terminal",
+      "choice": "NONE",
+      "condition": "source, exact correction authority, target or owner identity is missing; preserve valid artifact and return the exact gap",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-30",
+      "state": null,
+      "terminal": true
+    },
+    "RS-40__merge_pending": {
+      "band": "CLEAR",
+      "branch_id": "merge_pending",
+      "choice": "NONE",
+      "condition": "recorded PR-35 phase result; historical pre-merge evidence",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-40",
+      "state": "MERGE_PENDING",
+      "terminal": false
+    },
+    "RS-40__pr_candidate_published": {
+      "band": "CLEAR",
+      "branch_id": "pr_candidate_published",
+      "choice": "NONE",
+      "condition": "recorded PR-30_POSTPUBLICATION phase result",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-40",
+      "state": "PR_CANDIDATE_PUBLISHED",
+      "terminal": false
+    },
+    "RS-40__product_owner_decision_required": {
+      "band": "CLEAR",
+      "branch_id": "product_owner_decision_required",
+      "choice": "NONE",
+      "condition": "genuine Product Owner decision or unrecoverable authority conflict",
+      "confidence": 1.0,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-40",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+      "terminal": true
+    },
+    "RS-40__recovery_pr30": {
+      "band": "CLEAR",
+      "branch_id": "recovery_pr30",
+      "choice": "NONE",
+      "condition": "recorded resumed phase is PR-30_POSTPUBLICATION; same session/vehicle re-entry",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-40",
+      "state": "RECOVERY_PENDING",
+      "terminal": false
+    },
+    "RS-40__recovery_pr35": {
+      "band": "CLEAR",
+      "branch_id": "recovery_pr35",
+      "choice": "NONE",
+      "condition": "recorded resumed phase is PR-35; same session/vehicle re-entry",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-40",
+      "state": "RECOVERY_PENDING",
+      "terminal": false
+    },
+    "RS-40__remote_evidence_pending": {
+      "band": "CLEAR",
+      "branch_id": "remote_evidence_pending",
+      "choice": "NONE",
+      "condition": "PR-35 only; durable checkpoint",
+      "confidence": 0.94,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "RS-40",
+      "state": "REMOTE_EVIDENCE_PENDING",
+      "terminal": false
+    },
+    "RS-40__rescope_pending": {
+      "band": "CLEAR",
+      "branch_id": "rescope_pending",
+      "choice": "NONE",
+      "condition": "new formal RESCOPE_REQUEST preserves same vehicle",
+      "confidence": 0.99,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-40",
+      "state": "RESCOPE_PENDING",
+      "terminal": false
+    },
+    "RS-40__source_resolution_error": {
+      "band": "CLEAR",
+      "branch_id": "source_resolution_error",
+      "choice": "SOURCE_AVAILABILITY",
+      "condition": "unique current controlled PF10 Markdown unresolved; make no inference from the failure",
+      "confidence": 0.98,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.01,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.98
+      },
+      "prompt": "RS-40",
+      "state": "SOURCE_RESOLUTION_ERROR",
+      "terminal": true
+    },
+    "UTIL-10__already_applied": {
+      "band": "UNCERTAIN",
+      "branch_id": "already_applied",
+      "choice": "NONE",
+      "condition": "every item is already applied with matching target/redline lineage and resulting content, and the exact complete successor/report resolves. Reuse them and return their existing lawful route; create no duplicate successor.",
+      "confidence": 0.69,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.19,
+        "NONE": 0.77,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "UTIL-10",
+      "state": "ALREADY_APPLIED",
+      "terminal": false
+    },
+    "UTIL-10__complete": {
+      "band": "CLEAR",
+      "branch_id": "complete",
+      "choice": "NONE",
+      "condition": "return the complete revised successor and REDLINE_APPLICATION_REPORT to the exact originating decision/review owner through the actual selected native prompt, with its complete receiver inputs.",
+      "confidence": 0.94,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.02,
+        "NONE": 0.96,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "UTIL-10",
+      "state": "COMPLETE",
+      "terminal": false
+    },
+    "UTIL-10__incomplete_native_owner": {
+      "band": "CLEAR",
+      "branch_id": "incomplete_native_owner",
+      "choice": "NONE",
+      "condition": "return the complete checkpoint, exact unapplied or ambiguous item, evidence, owner and resume point to the exact redline/decision owner when that selected native receiver resolves.",
+      "confidence": 0.97,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "UTIL-10",
+      "state": "INCOMPLETE",
+      "terminal": false
+    },
+    "UTIL-10__incomplete_terminal": {
+      "band": "CLEAR",
+      "branch_id": "incomplete_terminal",
+      "choice": "NONE",
+      "condition": "no selected native receiver can be resolved; do not invent one",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.03
+      },
+      "prompt": "UTIL-10",
+      "state": "INCOMPLETE",
+      "terminal": true
+    }
+  },
+  "rows_available": 280,
+  "rows_classified": 280,
+  "run_id": "run-20260921T010815Z",
+  "status": "PROPOSAL_FOR_PRODUCT_OWNER_REVIEW",
+  "usage": {
+    "input_tokens": 136198,
+    "output_tokens": 17646
+  }
+}

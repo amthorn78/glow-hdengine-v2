@@ -1,0 +1,791 @@
+---
+artifact_type: GCFPE_DECISION_BRIEF
+artifact_version: "1.0"
+created_date: 2026-09-20
+release: GCFPE-20260914.1 / 091426.1 / 55
+author: PE34
+status: AWAITING_PRODUCT_OWNER_DECISION
+answers_to: 'Product Owner answers of 2026-09-20 on the §10 run-10 findings'
+covers: [SF10-04 usefulness investigation, SF10-07 decision brief, SF-05 explanation]
+snapshot: 'installed tree 321 files, digest excluding manifest.json c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb'
+changes_nothing: 'This artifact is analysis only. No skill, contract, registry or prompt body is changed by it.'
+---
+
+# GCFPE decision briefs — `SF10-04`, `SF10-07`, `SF-05`
+
+Three of your six answers asked for analysis before a decision. This is that analysis, in the
+order you asked. Every number in it was measured against the frozen installed tree and the
+55-body corpus; nothing is carried forward from an earlier round unverified.
+
+Your governing objective is the standard applied throughout: **the prompt flow works as
+deterministically as possible and stays maintainable when later defects appear.** Where a change
+would only satisfy a validator, that is said plainly and the change is not recommended.
+
+---
+
+# 1. `flowmaster-propagate` — what it is for, and whether it still matters
+
+You asked four concrete questions before considering any change. Answers first, evidence under
+each.
+
+## 1.1 What depends on it
+
+**One maintenance activity, and no workflow.** Four installed skills embed a marked copy of
+`flowmaster-primary`'s core block, and propagation is the named mechanism for keeping those four
+copies identical to the source:
+
+| skill | embeds the core | core revision |
+|---|---|---|
+| `tw-flowmaster` | yes | 1.0.3 |
+| `change-flow` | yes | 1.0.3 |
+| `session-relay-flowmaster` | yes | 1.0.3 |
+| `session-branch-flowmaster` | yes | 1.0.3 |
+| `flowmaster-primary` (source) | — | 1.0.3 |
+
+`change-flow` being on that list is the only reason this touches GCFPE at all: the GCFPE
+orchestrator carries an embedded copy of the Flowmaster core.
+
+**No prompt depends on it.** Zero of the 55 prompt bodies name `flowmaster-propagate`. It is not
+in any prompt's execution path, any handoff, or any result contract.
+
+## 1.2 Whether anything currently invokes it
+
+**Nothing invokes it.** It is user-invoked only, by its own terms — "Act only when the user asks
+to propagate, synchronize, or apply an approved Primary update."
+
+It is, however, **named in nine places across seven skills**, which is what makes retirement a
+change rather than a deletion. This count was "six places" until review challenged it: the table
+below had six rows, the governance-audit line was mentioned underneath it without being counted, and
+**the two `validate_flowmaster.py` sites were not in the inventory at all** — which mattered, because
+they are the two that make retirement a behaviour change rather than a wording fix:
+
+| location | what it says |
+|---|---|
+| `tw-flowmaster/SKILL.md:496` | "After a Primary core update, use `flowmaster-propagate` and then `flowmaster-validate`." |
+| `change-flow/SKILL.md:568` | same instruction, for `CHANGE_FLOW_SPECIALIZATION_REVISION` |
+| `session-relay-flowmaster/SKILL.md:723` | same instruction |
+| `session-branch-flowmaster/SKILL.md:468` | same instruction |
+| `flowmaster-primary/SKILL.md:254` | step 6 of the core-revision procedure |
+| `flowmaster-validate/SKILL.md:136` | "A drifted core fails and identifies flowmaster-propagate as the repair route" |
+| `amthor-workspace-governance-audit/references/interoperability-contracts.md:11` | the audit "may recommend propagation but never performs it" — a governance interoperability contract, in a **seventh skill** |
+| `flowmaster-validate/scripts/validate_flowmaster.py:49` | **code** — `flowmaster-propagate` in the skill roster tuple |
+| `flowmaster-validate/scripts/validate_flowmaster.py:345` | **code** — maps the skill to `scripts/propagate_core.py` in the required-files mapping |
+
+Excludes `flowmaster-propagate/SKILL.md`'s own `name:` line and the sync `manifest.json`, neither of
+which is a pointer to repoint.
+
+## 1.3 What would stop working if it were retired
+
+**Nothing at runtime, and nothing in the prompt flow.** The single concrete consequence is that
+`flowmaster-validate` would still detect core drift and would then point at a skill that no longer
+exists. That is a broken pointer, not a lost capability — but note that two of the nine sites are in
+`validate_flowmaster.py` itself, where the skill appears in the validation roster and the
+required-files mapping. **So retiring the skill without editing the validator does not leave a merely
+cosmetic dangling pointer: the validator would fail, because it validates that the retired skill's
+files are present.** That is the difference between this being a wording sweep and a behaviour change.
+
+## 1.4 Whether there is any realistic current use
+
+**No — for two independent reasons, and the second is the decisive one.**
+
+**First, there is nothing to propagate.** All five core blocks are byte-identical right now:
+
+| | |
+|---|---|
+| core block sha256 | `4d8bb9bf1c9c85ae…` |
+| characters | 18233 |
+| revision | 1.0.3 |
+| distinct blocks across all five skills | **1 — zero drift** |
+
+And no Primary-core change exists: `flowmaster-primary/SKILL.md` hashes to
+`0665507735b10b94a4f2bb76d65947db1ee6368f12a32a03ac5a509f1e609345`, exactly the value pinned in
+three bundled contracts and the validation profile, and asserted by the validator at line 2229.
+
+**Second, its method cannot work in this environment, by construction.** You are right that it
+was designed for an environment that manages its own skills. Specifically, it propagates by
+**editing tracked files in a writable git checkout of the skills root**, and it verifies before
+every write that the target `SKILL.md` "is a regular Git-tracked file and that its complete skill
+directory is clean", rejecting "a dirty, hidden, untracked, ignored-only, symlink, or non-git
+target".
+
+Here the skills root is a one-way synced directory that is not a git checkout, and only you
+install into it. So even with drift present and a Primary change approved, **the tool's own safety
+preconditions can never be satisfied in this environment.** Its failure at
+`propagate_core.py:151` is not a bug to repoint — it is the design meeting a different delivery
+model.
+
+## 1.5 Recommendation
+
+**Retire it.** The invariant it maintains is real, but the route that maintains it here is already
+proven and is not this tool.
+
+When the v11 guard changed a file that lives inside two skills, the mechanism was: rebuild the
+`.skill` packages, you install them, and the install is verified by full recursive diff against
+the reviewed package. That is propagation by **rebuild-and-reinstall**, it already covers the
+core-block case, and it is the only route that works when only you can install.
+
+Two things follow, stated so they are not surprises:
+
+1. **Retirement leaves nine stale pointers across seven skills, and two of them are code.**
+   This item previously said "six one-line edits across five skills." Both numbers were wrong, and
+   the error was the same one that mispriced `SF10-07`: counting the prose I had read rather than
+   measuring the tree. Review caught it and named six skills; measured against the frozen tree it is
+   **seven**. Excluding `flowmaster-propagate`'s own `SKILL.md` and the sync `manifest.json`:
+
+   | site | kind |
+   |---|---|
+   | `tw-flowmaster/SKILL.md:496` | prose route pointer |
+   | `change-flow/SKILL.md:568` | prose route pointer |
+   | `session-branch-flowmaster/SKILL.md:468` | prose route pointer |
+   | `session-relay-flowmaster/SKILL.md:723` | prose route pointer |
+   | `flowmaster-primary/SKILL.md:254` | prose route pointer |
+   | `flowmaster-validate/SKILL.md:136` | the **drift-detection contract** — names propagate as the repair route a drifted core identifies |
+   | `amthor-workspace-governance-audit/references/interoperability-contracts.md:11` | a governance interoperability contract, in a **seventh skill neither count included** |
+   | `flowmaster-validate/scripts/validate_flowmaster.py:49` | **code** — the skill roster tuple |
+   | `flowmaster-validate/scripts/validate_flowmaster.py:345` | **code** — maps the skill to `scripts/propagate_core.py` in the required-files mapping |
+
+   **So this is not six cheap prose edits that can ride along.** The last two are
+   `flowmaster-validate`'s validation roster: it currently *validates that*
+   `flowmaster-propagate`'s files are present, so retiring the skill without editing the validator
+   makes the validator fail. Changing a roster is execution behaviour, so it needs a
+   `FLOWMASTER_VALIDATE_REVISION` bump and its own independent review — the same shape as the
+   `CHANGE_FLOW_SPECIALIZATION_REVISION` bump in the repair package.
+
+   Line 6 is worth separating because it interacts with the recommendation below: it is the one
+   place where "a drifted core identifies propagate as the repair route" is written down, and it is
+   inside the skill whose drift detection this brief says should **stay**. That line changes its
+   named route; the detection itself does not change.
+
+   **The recommendation is unchanged — retire it — but the price is not "cheap".** Any
+   implementation or review roster for the retirement must explicitly cover all seven skills and
+   treat the two validator lines as a behaviour change, not a wording fix.
+2. **`flowmaster-validate`'s drift detection should stay.** Detecting that a specialization's
+   embedded core has diverged is genuinely useful and is unaffected by how the repair is
+   performed. Only the named repair route changes.
+
+**Not recommended: repointing it.** Even with a corrected root, its git-tracked-and-clean
+precondition is structurally unsatisfiable in a one-way synced tree. Repointing would produce a
+tool that still cannot run, and a second round of the same finding.
+
+---
+
+# 2. `SF10-07` — the four CF Specification prompts
+
+You asked for a plain-language brief on the actual prompt-flow impact, for each of the four
+prompts, before choosing. The short version is that **the four are not one case**, and the two
+obligations are not one obligation. Treating them as one block is what makes the question look
+like a contract-versus-validator dispute.
+
+## 2.0 The two obligations, in plain terms
+
+`plan_writer_contract` puts seven flags on all fourteen listed prompts. Two of them are in
+question here.
+
+**`AUTHORING_CONTEXT`** is a field written onto an artifact with exactly one of two values:
+`INITIAL_OR_PREAPPROVAL_AUTHORING` or `APPROVED_BASE_WITH_OVERLAYS`. Its job is to tell whoever
+picks the artifact up next **whether what they are holding may still be rewritten**. Under the
+immutable-base contract, a pre-approval artifact is freely revisable by its author through the
+redline loop; an approved base is immutable and may only be extended by an explicitly scoped
+overlay. The field is how a reader knows which regime applies without inferring it from which
+prompt happened to produce the artifact.
+
+**"Current-PF10 resolution"** means: before authoring, resolve and completely read the unique
+current controlled PF10 Markdown in `docs/pfcanon/` plus every applicable active addendum, and
+record their exact repository paths. PF10 is HDE Build Notes — the canon that constrains **how
+work is built**.
+
+## 2.1 The field is live, not bookkeeping
+
+This matters more than the roster question, so it is measured first. **17 of the 55 bodies write
+or read `AUTHORING_CONTEXT`**, and they are not all on the roster:
+
+| | count | prompts |
+|---|---|---|
+| on the roster and using the field | 9 | ESC-30, IA-10, IA-20, PR-10, PR-20, QA-20, QA-50, QA-60, QA-80 |
+| **using the field, not on the roster** | **8** | CL-E-20, CL-E-40, DOC-10, OPS-10, QA-70, QA-90, RS-10, RS-30 |
+| on the roster, not using the field | 5 | CF-C-20, CF-C-40, CF-E-20, CF-E-40, **IA-40** |
+
+And downstream prompts genuinely **branch** on it, rather than merely recording it:
+
+- `QA-70`: "In initial mode use `AUTHORING_CONTEXT: INITIAL_OR_PREAPPROVAL_AUTHORING`; in delta
+  mode use `AUTHORING_CONTEXT: APPROVED_BASE_WITH_OVERLAYS`, preserve the approved QA Plan
+  byte-for-substance, and review only the proposed overlay."
+- `CL-E-20`: "Its `AUTHORING_CONTEXT` is `APPROVED_BASE_WITH_OVERLAYS`; it may create a new
+  read-only revalidation artifact but may not rewrite any approved base."
+- `OPS-10`: "Set `AUTHORING_CONTEXT` to exactly one of … from the actual supplied authority."
+
+So the field decides, for a real reader, whether rewriting is permitted. **Absence of the field on
+an artifact that could be in either state is a determinism gap, not a missing token.**
+
+## 2.2 `IA-40` is the control case, and it passes
+
+`IA-40` is on the roster and does **not** contain the string `AUTHORING_CONTEXT` — yet the check
+does not fail it. Line 22 of its body:
+
+> Resolve and completely read current controlled PF10 and every applicable active addendum before
+> authoring. Record exact repository paths/scopes and preserve `INITIAL_OR_PREAPPROVAL_AUTHORING`
+> or `APPROVED_BASE_WITH_OVERLAYS` as appropriate.
+
+That satisfies all three of the check's tests. **This is the important finding for your decision:
+the check is not asking for a field name for uniformity.** It is asking for two substantive
+statements — that the prompt resolves current PF10 and active addenda before authoring, and that
+it distinguishes the two authoring contexts. `IA-40` makes both statements in its own words and
+passes. So the four CF failures are not a formatting complaint.
+
+## 2.3 The four prompts, one at a time
+
+### CF-C-40 and CF-E-40 — the strong case
+
+**What they do now.** Each makes one bounded revision in the same Specification review lineage, in
+**two distinct modes**: correct a *pending* Specification from Thoth redlines (pre-approval), or
+author a pending `SPECIFICATION_DELTA` against an **approved, immutable** base. Their own bodies
+say so at line 8.
+
+**What fails today.** `CURRENT_PF10_MARKDOWN` and `ACTIVE_ADDENDA`. They pass the authoring-context
+test only through the check's *semantic* fallback — they describe both modes in prose without ever
+naming the two values.
+
+**What breaks without the obligations — corrected, and it is less than this brief first claimed.**
+An earlier revision of this section said a downstream reader must infer "is the base in front of me
+immutable?" from lineage and prose. **That is wrong, and the repository says so.** The checked-in
+contract ledger `docs/ephemeral/GCFPE-Batch-1-Contract-Ledger-v1.0-20260915.md` states for both
+prompts, at lines 1382 and 2110: *"Both SPECIFICATION_PENDING; artifact_type distinguishes modes."*
+
+So the discriminator already exists on the artifact. A whole `CRD_SPECIFICATION` or
+`EPIC_SPECIFICATION` means the preapproval regime; `artifact_type: SPECIFICATION_DELTA` — which
+CF-C-40's own body requires it to emit in approved-base mode — means the approved base is immutable
+and only the overlay is in play. A reader does not have to infer the regime, and the ledger's own
+consistency item B1-C40-C3 is about exactly that distinction being carried in the review package.
+
+What `AUTHORING_CONTEXT` would add for these two prompts is therefore **a second encoding of
+information the artifact already carries**, not a missing discriminator. The residual case —
+distinguishing a *revised* pending Specification from an *initial* one, which `artifact_type` does
+not separate — has no consumer that needs it: CF-C-30 reviews a pending Specification either way,
+and its intake is the pending artifact plus the redline lineage.
+
+**If the bodies acquire the obligations.** Operationally: CF-C-40/CF-E-40 would stamp the value
+matching the mode they already determine at entry, so nothing new is demanded of the human. The
+gain is uniformity with the nine roster prompts that carry the field; the cost is a second field
+that can disagree with `artifact_type` and then has to be reconciled by whoever finds the
+disagreement. The PF10 flag is a separate matter, treated in §2.4.
+
+**If the contract drops them.** Nothing breaks, immediately or later — and this paragraph
+previously said the opposite. It said "the ambiguity above stays, and the next person to touch an
+approved Specification delta is the one who pays for it," which contradicted the corrected analysis
+directly above it: `artifact_type` already distinguishes the two regimes, and the one distinction it
+does not carry — revised versus initial pending Specification — has no consumer that needs it. The
+old sentence was the conclusion of the *uncorrected* premise, left standing after the premise was
+fixed. Dropping the obligations for these two prompts therefore costs nothing identified; what it
+gives up is uniformity with the nine roster prompts that carry the field.
+
+### CF-C-20 and CF-E-20 — the weak case
+
+**What they do now.** Each authors **one** pending Specification from a complete class-specific
+kickoff, and nothing else. Their own bodies: "This prompt never receives or rewrites an approved
+base."
+
+**What fails today.** All three markers, including authoring context — because there is nothing to
+distinguish. They have exactly one mode.
+
+**What breaks without the obligations.** Nothing in flow. Their artifacts are always pre-approval,
+and the next actor (CF-C-30/CF-E-30) knows that from the artifact's `state:
+SPECIFICATION_PENDING`, which the body already requires.
+
+**If the bodies acquire the obligations.** The field becomes a constant. The only gain is that a
+reader does not have to know which prompt produced the artifact to know its regime — real, but
+small.
+
+**If the contract drops them.** Nothing breaks. The roster shrinks to the prompts whose artifacts
+can actually take both values.
+
+## 2.4 Why CF-C-20 and CF-E-20 say PF10 is not a universal prerequisite
+
+Their sentence is, on the evidence, **correct and worth keeping**.
+
+A Specification states **what the change is**. PF10 — HDE Build Notes — constrains **how work is
+built**: plans, QA, ops, implementation. That is why the ten roster prompts that carry the PF10
+obligation are Plan-family and QA-family writers (IA-10, IA-20, IA-40, PR-10, PR-20, QA-20, QA-50,
+QA-60, QA-80, ESC-30) and the four that do not are the Specification authors.
+
+CF-C-20's body does not skip canon — it resolves the canon it actually needs, and says so:
+"Resolve the CRD Specification format from the canon referenced for this change, through this
+prompt's PFCanon source contract below, and cite the exact canon and section resolved." It even
+fails closed: "If that canon cannot be resolved and read, return `SOURCE_RESOLUTION_ERROR`."
+
+So the sentence is not an opt-out from canon. It refuses **one specific universal prerequisite**
+that the artifact does not depend on. Two practical consequences of removing that refusal: every
+Specification would wait on a PF10 read it does not use, and an author would be invited to shape
+the Specification to build notes before the change has been specified at all. Both make the flow
+slower and less deterministic, not more.
+
+And CF-C-40/CF-E-40 already express the right version of this, conditionally: "retain current
+PF10/overlay evidence only when the branch relies on it."
+
+## 2.5 Recommendation
+
+**Split the two flags rather than choosing one of the two options.** Neither "all four bodies
+acquire both obligations" nor "drop all four from the roster" matches what the flow needs.
+
+**Revised after the `artifact_type` correction in §2.3.** The earlier version of this
+recommendation asked CF-C-40 and CF-E-40 to acquire `AUTHORING_CONTEXT` on the strength of an
+ambiguity that the contract ledger shows does not exist. With that removed, the four prompts land
+in the same place:
+
+| prompt | `AUTHORING_CONTEXT` | current-PF10 resolution |
+|---|---|---|
+| **CF-C-40, CF-E-40** | **drop the flag** — `artifact_type` already distinguishes the two regimes on the artifact itself, per the contract ledger | **drop the flag** — keep their existing conditional wording, which is already the correct rule |
+| **CF-C-20, CF-E-20** | **drop the flag** — one mode only, and `state: SPECIFICATION_PENDING` already carries the regime | **drop the flag** — their governing canon is the Specification format canon, which they already resolve and cite |
+
+**That is your second original option — the contract exempts the four Specification authors from
+both flags** — and it is now the recommendation. **The other ten `plan_writer_contract` entries keep
+both obligations** (14 − 4 = 10; an earlier version of this line said twelve, which was simply
+wrong), and the field itself stays mandatory on the nine roster prompts and eight non-roster prompts
+that genuinely consume it: QA-70 branches on its value, CL-E-20 reads it to refuse rewriting an
+approved base, OPS-10 resolves it from supplied authority.
+
+**"Exempts" is not "removes from the roster", and the difference is the whole cost.** Review caught
+this: `plan_writer_contract` carries **seven** boolean flags, not two —
+`applicable_overlay_links_required`, `approved_base_live_reauthoring_refused`,
+`authoring_context_required`, `current_pf10_markdown_required`, `immutable_base_plus_overlays`,
+`pf10_lineage_required_in_complete_handoff`, `repository_paths_required` — and they apply to every
+id in `evaluated_prompt_ids`. Dropping the four from that list would exempt them from **all seven**,
+which is not wanted and in one case is actively wrong: **CF-C-40 and CF-E-40 must keep
+`approved_base_live_reauthoring_refused`**, since refusing to rewrite an approved base is the
+central rule of their approved-base mode.
+
+Why this rather than adding the field:
+
+- The information is already on the artifact. A second encoding that can disagree with the first
+  is a maintenance liability, not a determinism gain — and reconciling a disagreement between
+  `artifact_type` and `AUTHORING_CONTEXT` would fall to whoever next touches an approved
+  Specification delta.
+- It removes a blanket PF10 obligation from artifacts that do not depend on PF10, which is the
+  judgement CF-C-20 and CF-E-20 already state in their own words.
+- It keeps the validator honest: after the change every prompt the check tests actually owes what
+  it tests for, so no permanently-red row is left behind.
+
+**Cost, re-priced after review. Still no prompt body changes, and more than one edit.** An earlier
+version of this line said "one contract change", which was true only of the wrong implementation.
+What the recommendation actually needs:
+
+1. **Per-obligation scope in the contract.** `evaluated_prompt_ids` stays at 14, and the two flags
+   in question gain an explicit exemption list — or become per-obligation rosters — so
+   `authoring_context_required` and `current_pf10_markdown_required` can exclude the four
+   Specification authors while the other five flags keep applying to all fourteen.
+2. **Matching validator logic.** `EXPECTED_WRITERS` is a single set today, so it must split into the
+   per-obligation rosters the contract declares, and the `PLAN_WRITER_SET` check must assert the new
+   shape. That check already compares contract against validator in both directions, so a half-done
+   change fails loudly rather than quietly — which is the reason to keep it rather than route around
+   it.
+
+Both touch the bundled copies in `change-flow` and `flowmaster-validate`, so this is a skill change
+needing independent review, and it is **larger than the `SF10-03` / `SF10-05` / `SF10-06` package** —
+worth deciding on its own rather than folding in.
+
+**The option not to take:** requiring all four bodies to acquire both obligations. It would add a
+PF10 prerequisite to artifacts that do not use PF10 and a second regime field beside one that
+already works, and it would need four Notion body edits to buy that.
+
+---
+
+# 3. `SF-05` — D14's behavioural half, in plain language
+
+You asked to understand the issue before directing a mechanism. The single most useful fact is in
+§3.6, and it is stated there with its exact scope, which this opening now matches rather than
+rounding up:
+
+> **The declared graph contains no PF10-comparison stop** — established by reading **all 101 rows
+> the rule covers**: the 72 terminal branches and the 29 non-terminal rows in a blocking state, with
+> no selection of any kind. **A filtered read of all 55 bodies found none either**, and RS-40
+> explicitly forbids the behaviour in its own text. But the body pass is a filter, not an
+> enumeration, so **it is not proof that no body instructs an undeclared comparison-stop.**
+
+**Corrected after review, and the correction matters more than the number.** This said "all 72
+terminal branches" and called that exhaustive. The rule stated three paragraphs above covers a branch
+that is terminal **or emits a blocking result** — so 72 was one arm of a two-arm predicate, and 29
+non-terminal rows in a blocking state (`BLOCKED`, `AWAITING_THOTH_REMEDIATION`,
+`RESCOPE_PROPOSAL_PENDING_REVIEW`, `PLAN_PENDING_REVISED`, `AWAITING_PO_PROCEED`) were never read.
+Claiming "no selection of any kind" while silently selecting on one arm was the strongest evidential
+claim in this brief and it was wrong.
+
+Those 29 have now been read in full. **Exactly one mentions PF10 at all**, and it is a *prohibition*,
+not a comparison: RS-30's `product_owner_explicit_native_return` branch reads *"never invent IA
+approval, route PR-50 or bypass Alpha, merge or PF10 controls."* **Zero pair PF10 with comparison
+language.** So the conclusion is unchanged and the graph axis is now genuinely complete at 101 rows —
+but it was asserted before it was earned.
+
+`SF-05` is therefore best described as **a gap in what the available mechanisms can express**, on
+evidence that is exhaustive for the graph and bounded for the bodies. An earlier version of this
+paragraph said the behaviour "is not present in the current system" and is "not an open defect in the
+flow" — flow-wide claims resting on graph-only enumeration, and contradicting §3.6's own admission
+two pages later. Review caught the contradiction; the scope above is the honest form, and the §11
+position in §3.7 rests on it rather than on the stronger sentence.
+
+## 3.1 The behaviour D14 is meant to guarantee
+
+D14 says a settled ruling is enforced **against behaviour**, not against vocabulary, and that no
+ruling counts as applied until a guard exists that would catch its reintroduction and has been
+fired by an injected regression.
+
+The specific behaviour here belongs to **D8**. D8's intent, in its own words: "a qualifying
+producer creates the addendum; on the next turn PF10 is current; nothing ever blocks later work on
+an addendum transition state." A later prompt "resolves and reads current PF10 as part of its
+normal job and acts on what it finds. If that read happens to show the expected reference, nothing
+further is required or recorded."
+
+So the guarantee, agent-facing, is: **no prompt may make an agent compare current PF10 against
+what an addendum says it should be, and stop because they differ.** Reading PF10 is normal work.
+Recording what was read is provenance. Stopping on a comparison is the prohibited machinery.
+
+Why it matters to a person running the flow: such a gate stops legitimate work at a step that
+produces nothing, and it asks an agent to litigate a Product Owner action — which the same canon
+section forbids.
+
+D14 was ruled on a real instance, not a hypothetical: `RS-40` "compared current PF10 against an
+addendum's normalized delta and **stopped terminally on a mismatch** — the retired drainage
+lifecycle reinstated by function, in a body containing none of the thirteen retired tokens."
+
+## 3.2 What `CTR-002` checks today, and why those literals were chosen
+
+`CTR-002` is one composite rule applied to all 55 registry rows. Per row it asserts:
+
+| part | assertion |
+|---|---|
+| required literal | `PF10` |
+| required regex | `docs/pfcanon/` |
+| forbidden regex | `state the mismatch` |
+| forbidden regex | `[Cc]ompare the current PF10` |
+
+The positive half is sound and is not in question: every body must reference PF10 and must resolve
+it from the controlled `docs/pfcanon/` source.
+
+The two forbidden phrases are the negative half — the D8 prohibition. They were chosen the
+obvious way: they are the words the **actual** violating bodies used when the defect was found.
+That is a reasonable first move; it is also, exactly, a vocabulary selector.
+
+## 3.3 Why a violating wording can contain neither literal
+
+Because the prohibited thing is a **three-part behaviour**, and each part has unlimited phrasings:
+
+1. read current PF10, **and**
+2. compare it against an addendum-derived expectation, **and**
+3. stop, block, or return terminally because they differ.
+
+A body can do all three while using neither phrase — for example by instructing an agent to
+"resolve the current Build Notes and, where the recorded reference does not match the addendum's
+normalized delta, return `DIVERGENCE_BLOCKED` to its owner." No "state the mismatch"; no "compare
+the current PF10"; the prohibited gate, complete.
+
+This is the same failure the contract guard suffered nine times, and the decision record is blunt
+about it: "the check selects, and the prohibited gate is written where nothing selects. v1 and v2
+selected on phrasing and died to paraphrase and synonym." **A wider word list buys one round.**
+That is why your instruction not to widen it is the right one.
+
+## 3.4 Why the structural fix cannot be reused here
+
+v11 works on the contract because the contract is a **machine-readable structure with a finite
+grammar**. v11 stopped enumerating what to inspect and enumerated what may exist: the routing
+surfaces are pinned whole, and "every branch-shaped object naming PF10 anywhere else in the
+contract is an error, with no allow-list."
+
+That sentence has no meaning over prose. A prompt body is natural language: there are no objects,
+no keys, no branch shapes — nothing to enumerate, and no way to say "everything except this is
+forbidden." The registry's mechanism is regex over body text, so the only expressible rules are
+"this string must appear" and "this string must not appear." **The structural fix is not
+expressible there because the medium has no structure to pin.**
+
+## 3.5 Mechanism options
+
+Four options, with what each costs and how each is maintained. Measurements are from the current
+corpus.
+
+### Option A — move the rule onto the graph, but it needs a typed field first (recommended, with a cost)
+
+The prohibited behaviour must end in a **stop**, and stops are structural: declared rows in
+`state_routes` carrying `terminal_for_invocation`, `next_prompt_handoff_count` and `destinations`.
+So the rule can be stated where the stop lives:
+
+> No branch whose condition depends on comparing current PF10 against an addendum-derived
+> expectation may be terminal or emit a blocking result.
+
+**Correction to an earlier version of this section, which called this "vocabulary-free". It is
+not, as written.** `terminal_for_invocation` is typed, but the property that *selects* which
+branches the rule is about — whether a branch's condition compares PF10 against an
+addendum-derived expectation — lives in `condition`, which is free text. Selecting on it is a
+prose match, so a paraphrased comparison escapes selection before the terminal check ever runs.
+That is `SF-05`'s own failure reproduced inside the proposed remedy, and it would have shipped as a
+recommendation if it had not been caught in review.
+
+**What makes A a guard rather than a measurement: a typed per-branch declaration.** Add one
+enumerated field to each `state_routes` row — for example `pf10_dependency` valued `NONE`,
+`READ_ONLY`, `SOURCE_AVAILABILITY` or `COMPARISON` — and then the pin needs no prose at all:
+
+- **no row may be terminal or emit a blocking result while carrying
+  `pf10_dependency: COMPARISON`**, at any depth, with no allow-list — this is D8's prohibition
+  expressed over an enum;
+- a row may be terminal with `SOURCE_AVAILABILITY` (RS-40's case) and not with `READ_ONLY`.
+
+**Corrected after review.** The first version of this bullet said "no row may carry
+`pf10_dependency: COMPARISON`" — banning the enum value *everywhere*. That is **broader than the
+rule stated four paragraphs above**, which prohibits only a comparison that is terminal or emits a
+blocking result, and broader than D8, which prohibits a comparison **gate**. A branch that compares
+PF10 for an informational or routing purpose and then continues is not a gate, and the unscoped pin
+would have failed it. The typed field is the **selector**; `terminal_for_invocation` and the blocking
+result remain the **predicate**. Banning the selector value on its own discards the distinction the
+field was introduced to make — and the very next bullet already used the terminal predicate, so the
+proposal contradicted itself in adjacent lines.
+
+That is v11's own lesson applied to the body axis: stop enumerating what to inspect, enumerate what
+may exist.
+
+**What it costs, stated rather than glossed:** the field must be added to 280 rows across the
+bundled contract copies, the validator must assert the enum and the pin, and the authoring rule
+must require whoever writes a branch to declare its dependency. That is a schema change, not a
+free adoption.
+
+**What it does and does not buy.** A false declaration — writing `NONE` on a branch that does
+compare — still evades it. But that is a different failure class from paraphrase: it requires an
+author to state something untrue in a typed field, which is auditable and attributable, where a
+paraphrase is neither. Moving the failure mode from "phrasing walks through the check" to "someone
+must misdeclare" is the actual gain, and it is worth claiming only in those terms.
+
+**Known hole, stated plainly.** A body could instruct a stop that the graph does not declare. The
+validator pins the contract's `state_routes` against the contract's own
+`member_registry.result_states` (`covered_states == set(registered_states)`), but **nothing checks
+a body's announced result states against either.** Option A′ narrows that gap and, as measured
+below, does not close it.
+
+### Option A′ — require each body to carry its own declared result states (narrows the gap; does not close it)
+
+Each member declares its `result_states` in the contract. Require that a body contain every state
+it is declared to be able to return.
+
+**Correction to an earlier version of this section, which claimed this makes "a body that announces
+an undeclared stop fail". It does not.** The check proves only `declared_states ⊆ body_tokens`. A
+body can keep every declared token, add an undeclared `DIVERGENCE_BLOCKED`, and pass — which is
+precisely the regression this brief uses as its own worked example of the prohibited gate.
+
+**The converse direction was measured and is not cheaply expressible.** The contract declares 75
+distinct state tokens; the 55 bodies contain **239** `ALL_CAPS_UNDERSCORE` tokens, of which **180
+are not declared states** — they are artifact types (`CHANGE_CLOSURE_DECISION`), authoring contexts
+(`APPROVED_BASE_WITH_OVERLAYS`), field names (`AUTHORING_CONTEXT`, `CHANGE_ID`), ids
+(`CHANGE_AUDIT_TRIAGE_ID`) and review modes. A naive "reject undeclared states" check would raise
+180 candidates on a clean corpus. Distinguishing an *announced result state* from an artifact type
+requires reading the token's position in prose, which is the same wall Option A hits — and a
+terminal instruction expressed with no state token at all is invisible to token scanning entirely.
+
+So A′ is worth adopting for what it is — every prompt must at least name each state it can return,
+which the graph already knows — and must not be described as closing the body-to-graph hole.
+
+Measured: **157 declared result-state token slots across the 55 members; 52 of 55 bodies contain
+all of theirs.** Three bodies miss exactly one each:
+
+| prompt | missing token | what the body says instead |
+|---|---|---|
+| PR-10 | `DRAFT` | lowercase prose — "preserve the instruction draft", "as a draft" |
+| CL-20 | `POST_CLOSURE_PENDING` | uses the artifact name `POST_CLOSURE_RECORD`; the state token is absent |
+| OPS-20 | `NOT_EXECUTED` | no occurrence in any case form |
+
+**Adoption cost is therefore three single-token body edits** — or two, if the comparison is
+case-insensitive, which would absorb PR-10's prose variant. That is a small, bounded, statable
+price, and unlike a word list it does not decay: the tokens come from the contract, so the check
+tracks the graph automatically when the graph changes.
+
+### Option B — a positive provenance requirement
+
+D8 already says a record showing what it read records "the PF10 version actually read **as
+provenance — evidence, never a gate**", and D14's applied form added that requirement "where a
+prompt takes a fresh current-PF10 read". A positive requirement is harder to evade than a
+prohibition, because the author must **add** text rather than avoid text.
+
+Measured: **54 of 55 bodies mention PF10; 39 of those contain "provenance"; 15 do not** — CF-C-10,
+CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, IA-10, IA-20, IA-40,
+IA-50, IA-60, MGR-10.
+
+So as a blanket rule it costs **15 body edits**, and the narrower version — "where a prompt takes a
+fresh read" — needs a definition of "takes a fresh read" that is itself a phrase judgement. Useful
+as a supplement; not a mechanism on its own.
+
+### Option C — leave it with human review, as now
+
+Honest about what it is: the vocabulary axis has been enforced by human review since round 19, and
+that review has worked. It does not scale, it is not repeatable, and it cannot be fired by an
+injected regression, so under D14 it does not count as a guard.
+
+### Option D — widen the word list
+
+Rejected, per your instruction and the record. It failed v1–v2 and again v3–v6, and the decision
+record's judgement on making the same mistake a ninth time was that it "would have been worse than
+the hole."
+
+## 3.6 Does `SF-05` have to block §11?
+
+**No — and this is the part that should carry your decision.**
+
+Two separate questions were being answered as one:
+
+| question | answer |
+|---|---|
+| Does the **declared graph** implement the prohibited PF10-comparison gate anywhere? | **No**, on a complete enumeration of all **101** rows the rule covers — 72 terminal branches and 29 non-terminal blocking rows — see below. |
+| Does any **prompt body** instruct one? | **None found**, on a filtered read of all 55 bodies — 34 candidate passages, all read. Filtered, so not exhaustive; the limit is stated below. |
+| Can the registry, or the graph as currently typed, express the rule that would catch one if it appeared? | **No.** The registry's mechanism is regex over prose; the graph's `condition` is also prose. A typed field would be needed, per Option A. |
+
+**How the first answer was established, after the first attempt was wrong.** An earlier version of
+this brief selected branches by regex over `condition` — "names PF10, Build Notes or an addendum" —
+and reported 37 hits. That is a vocabulary selector, so a paraphrased comparison could have escaped
+the selection and the clean result would have been an artefact of the filter.
+
+The defect can only live in a branch that **stops or blocks** — and those are two different row
+shapes, which an earlier version of this section conflated. There are **72 terminal branches** and
+**29 non-terminal rows in a blocking state**: `BLOCKED`, `AWAITING_THOTH_REMEDIATION`,
+`RESCOPE_PROPOSAL_PENDING_REVIEW`, `PLAN_PENDING_REVISED`, `AWAITING_PO_PROCEED`. **All 101 were
+printed and read in full, with no selection of any kind.**
+
+Of the 29 non-terminal blocking rows, exactly one mentions PF10, and as a prohibition rather than a
+comparison — RS-30's `product_owner_explicit_native_return`: *"never invent IA approval, route PR-50
+or bypass Alpha, merge or PF10 controls."* None pairs PF10 with comparison language.
+
+Most conditions are **disjunctive** — they list several alternative stop reasons in one branch — so
+they do not partition into disjoint buckets, and any single tally of them would be invented
+precision. What can be counted exactly are the distinctive ones:
+
+Each row below is counted in **terminal branch rows**, written `PROMPT branch_id`, because a prompt
+can have several terminal branches and two of them stop for different reasons — an earlier version
+listed prompt ids alone, and review read that as one branch double-counted:
+
+| stop reason | rows | terminal branch rows |
+|---|---|---|
+| a source-backed finding assessed as **unsupported** | 3 | CF-C-30 `correction_not_substantiated_terminal`, CF-E-30 `correction_not_substantiated_terminal`, IA-30 `change_not_substantiated` |
+| the matter belongs to **another native lane** | 3 | IA-30 `wrong_native_lane`, IA-40 `wrong_native_lane`, QA-80 `wrong_route_terminal` |
+| a **promotion checkpoint** is outstanding | 1 | GCFPE-MGMT-10 `promotion_checkpoint_required` |
+| **PF10 itself cannot be resolved** | 1 | RS-40 `source_resolution_error` |
+| a terminal record after a Nathan-only abort | 1 | PR-50 `pr_aborted_escalated` |
+| a completed cycle or terminal return | 3 | CL-40 `complete`, MGR-10 `terminal_return`, GCFPE-MGMT-10 `maintenance_complete_terminal` |
+
+**Twelve distinct rows**, verified against the contract: IA-30 has four terminal branches and
+GCFPE-MGMT-10 three, so `IA-30 change_not_substantiated` / `IA-30 wrong_native_lane` and
+GCFPE-MGMT-10's promotion and maintenance-complete branches are four different rows, not two rows
+counted twice. Every pair above exists in `state_routes` with `terminal_for_invocation: true`.
+
+The remaining **60** stop on some combination of an unresolvable source, authority, owner, identity or
+access fact and a required Product Owner decision — most naming more than one as alternatives,
+which is why they are not split further here.
+
+**None of the 72 stops because a comparison between current PF10 and an addendum-derived
+expectation found a difference.** The closest is RS-40's `source_resolution_error` — "unique current
+controlled PF10 Markdown unresolved; make no inference from the failure" — which stops because the
+canonical source cannot be read, not because a comparison differed, and which explicitly forbids
+inferring anything from the failure. D8 strikes a mandatory *comparison* gate; it does not require
+an agent to proceed without its canon. All 72 also carry `next_prompt_handoff_count: 0`, so D15's
+invariant holds across the set.
+
+**What the enumeration establishes and what it does not.** It establishes that the prohibited
+behaviour is absent **from the declared graph**, by enumeration rather than by filter. It says
+nothing on its own about a body instructing a stop the graph never declared — and since this brief
+itself concedes that hole exists, a graph-only result cannot support a claim about the flow. That
+gap was pointed out in review and is closed as far as it can be, below.
+
+### The bodies, read under a stated filter
+
+All 55 bodies were scanned for sentences that mention PF10, Build Notes or an addendum **and** a
+stop-shaped word (terminal, stop, block, halt, refuse, mismatch, diverge, differ, cannot proceed).
+That returned **34 passages across 21 bodies**, and all 34 were read. What they are:
+
+| what the passage is | reading |
+|---|---|
+| a `PF10 non-mutation` boundary in a tools/limits line | the majority; a prohibition on editing PF10, not a stop |
+| an artifact-status enumeration (`COMPLETE` / `PARTIAL` / `BLOCKED`) that also lists PF10 lineage | a status vocabulary, not a gate |
+| a writer's obligation to resolve and read current PF10 and active addenda | D8's intended shape |
+| a **source-unavailability** stop | two, both explicit — RS-20 line 40 and RS-40 line 16: "if unique current controlled PF10 cannot be resolved and read, return `SOURCE_RESOLUTION_ERROR` and stop" |
+
+**None instructs a comparison and a stop.** And the strongest single line in the corpus is RS-40's,
+which is worth quoting because RS-40 is the prompt whose historical defect produced D14:
+
+> Do not compare current PF10 against the addendum, and never stop, wait, or route on whether the
+> approved delta is yet present, absent, or worded differently.
+
+The prompt that once implemented the prohibited behaviour now forbids it in its own text.
+
+**The limit of this second pass, stated rather than glossed.** It is a **filter**, not an
+enumeration. A body could instruct a comparison-and-stop using none of those stop words — "return
+the discrepancy to its owner before continuing" contains no listed term — and would not appear in
+the 34. So the two passes are not equally strong, and the brief does not claim they are:
+
+| pass | strength |
+|---|---|
+| the declared graph's 101 stopping-or-blocking rows (72 terminal + 29 blocking) | **exhaustive** — every row read, no selection |
+| the 55 bodies | **filtered** — 34 passages read; a paraphrase avoiding the stop-word list could escape it |
+
+An unfiltered body conclusion means a complete semantic read of roughly 1,060,000 characters across
+55 documents. That is a different exercise from this brief and should be commissioned as one if the
+conclusion needs to be exhaustive on both axes.
+
+`SF-05` is the second, not the first. It is a **mechanism gap**: no guard exists that would catch
+the behaviour's reintroduction, which under D14 is a real deficiency — "no ruling is considered
+applied until a guard exists that would catch its reintroduction."
+
+**Scoped, because the paragraph above earns nothing wider.** What is established is that the
+**declared graph** contains no comparison-stop, exhaustively, and that the filtered body read found
+none. What is *not* established is that no body instructs an undeclared one. So the claim is not
+that the flow is clean; it is that **no defect was found where the evidence is exhaustive, and the
+one axis that is not exhaustive is the axis `SF-05` exists to make mechanical.** On that basis the
+gap does not make §11's output wrong — and if a body does instruct an undeclared comparison-stop,
+neither pass would have caught it, which is an argument for the mechanism rather than against §11.
+
+## 3.7 Recommendation
+
+**Revised after review.** The earlier version of this recommendation said A "costs nothing to
+adopt" and that A + A′ would make `SF-05` a fireable guard. Both were overstated, and the honest
+version is narrower:
+
+- **A, with the typed `pf10_dependency` field, is a guard over the *declared graph* — and that is
+  narrower than "a guard D14 would accept".** An earlier version of this bullet claimed the latter,
+  and review was right to reject it: D14 requires a guard that would catch **behavioural**
+  reintroduction, and A inspects only typed `state_routes` rows. **A body that reintroduces the
+  comparison-stop without changing the graph produces no error**, and a row that falsely declares
+  `NONE` evades the rule — both holes this brief already concedes elsewhere, which is exactly why the
+  stronger claim could not stand. Cost: an enumerated field on 280 rows in the bundled contract
+  copies, validator support for the enum and the pin, and an authoring rule. What it buys, stated at
+  its real size: **on the declared axis** it shifts the failure mode from paraphrase to
+  misdeclaration, which is a genuine gain and the only one worth claiming.
+
+  **So no option on the table is a D14-acceptable guard today.** Closing the body axis needs a
+  mechanism this brief does not have: either a body-level check with a typed anchor the bodies do not
+  currently carry, or a runtime observation of the emitted handoff — and the reason that is hard is
+  the same measurement recorded under `SF10-06`, that all 68 `NEXT_PROMPT_HANDOFF` occurrences are
+  prose instructing a runtime rather than a parseable structure. **That is the honest state of
+  `SF-05`, and it is the fourth time review has had to narrow this section.** A remains the best
+  available step and it is a partial one.
+- **A′ is worth adopting for what it is** — every prompt names each state it can return, for three
+  single-token edits, self-maintaining because the tokens come from the contract — **and it does not
+  close the body-to-graph hole.** Its converse is not cheaply expressible: 180 of the 239 ALL-CAPS
+  tokens in the corpus are not states.
+- **B** remains a later supplement at 15 body edits; decide separately.
+- **Do not widen the word list.** That is unchanged and it is the one thing every option here
+  agrees on.
+
+**So the honest answer to "what concrete mechanism options exist" is: one partial mechanism, at a
+stated cost, covering the declared graph and not the bodies.** The others narrow the gap further. If the typed field is too much for now, the defensible interim position is
+A′ plus the enumeration in §3.6 repeated each round — which is a recurring manual check, not a
+guard, and should be called that.
+
+`SF-05` is not parked, and nothing here changes the registry or widens a word list.
+
+**On §11, narrowed after review.** The earlier version said the behaviour "is absent today and
+measurably so", resting on a graph-only measurement while conceding that bodies can stop undeclared.
+The accurate position: the declared graph is clean by enumeration, and a filtered read of all 55
+bodies found nothing, with RS-40 explicitly forbidding the behaviour in its own text. That is a good
+basis for not treating `SF-05` as a §11 blocker, and it is **not** proof that no body instructs an
+undeclared comparison-stop. If you want that proof before §11, it is the complete semantic body read
+described above, not a check that exists today.
+
+**What I have not done:** no registry change, no word-list change, no body edit, and `SF-05` is not
+parked. A and A′ are proposals with measured adoption costs, awaiting your decision.
+
+---
+
+# 4. What this artifact changes
+
+Nothing. It is analysis. The three items you approved — the `SF10-03` validator fix, the
+`SF10-05` disclaimer, and the `SF10-06` check change — are prepared separately as working copies
+with bench evidence, for independent review before adoption, and are not installed.
