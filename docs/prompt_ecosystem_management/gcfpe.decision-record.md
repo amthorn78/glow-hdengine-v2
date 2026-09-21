@@ -897,3 +897,48 @@ remain inside the 55 prompt bodies and the two bundled machine contracts. Those 
 follow-on, they touch bytes an independent review was scoped to, and they are recorded as open
 rather than quietly performed. A promotion that silently edited 55 validated bodies would have
 voided the post-flight verdict that authorised it.
+
+## D18 — Alpha is resumed; `ALPHA_RESUMED` is minted because no resumed state existed
+
+**Product Owner, 2026-09-21:** *"You should also unblock the alpha."*
+
+`HDE-EPIC040` had been held at `ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR` since the Change Flow
+prompt ecosystem was found defective. **That refactor is `GCFPE-20260914.1 / 091426.1 / 55`**,
+selected earlier the same day under `D17`. The stop's own condition is therefore discharged, and
+the Product Owner discharged it.
+
+### The vocabulary had no word for this
+
+Every Alpha token in the ecosystem named a *stop* or a *decision about* a stop:
+`ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR`, `ALPHA_STOPPED_PENDING_GOVERNANCE_CORRECTION`,
+`ALPHA_STOPPED_PENDING_MANUAL_PF`, `READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION`. **There
+was no token for Alpha actually running**, because in this Epic's recorded history it never has.
+
+`ALPHA_RESUMED` is minted here rather than left to drift in. A state that is described in prose on
+six surfaces and named on none of them is the shape of defect this record exists to prevent —
+`D11` and `D15` are both instances of a value that no one could resolve to a single authority.
+
+### Resuming is not a Proceed, and the two are recorded separately
+
+| authorised | not authorised |
+|---|---|
+| `PR-10 — Create PR Work-Unit Instructions — 091426.1` for `HDE-EPIC040-PR04`, by the retained whole-change IA | PR04 implementation, which needs the Product Owner's separate exact `PR-30` invocation |
+| | a branch, a pull request, a merge, auto-merge |
+| | a PF10 edit, a number allocation, an addendum drainage |
+| | QA, Ops, release promotion, Epic closure, `PR-50` |
+
+The detailed PR04 Plan that a `PR-30` Proceed would be issued against **does not yet exist**; it is
+`PR-20`'s output. An agent must not treat the resumption as its precondition being met.
+
+### Where the state lives
+
+`ALPHA_RESUMED` is carried on the **Prompt Flow Index — 091426.1**, in the `Sole operative Alpha
+state` block, which is the single operative record. The release register, the selected catalog,
+the register entry and the Glow Operations Hub each state it consistently and point there. If they
+ever disagree, the Flow Index block governs and the others are defects to correct.
+
+### What it does not reopen
+
+`PR01`–`PR03` remain `ACCEPTED_FINAL` and are not rerun. The approved Specification `v1.1`, the
+Implementation Audit `v2.0` and the Implementation Plan `v2.1` remain immutable; resuming Alpha
+progresses the current Plan, it does not re-author it. Merge and abort remain Nathan-only actions.
