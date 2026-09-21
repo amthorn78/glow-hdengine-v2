@@ -75,34 +75,38 @@ belongs where it is read once, on the catalog or the index, not replicated acros
 must then be maintained at every release. `091326.2` shipped and ran with no such line on any of
 its 54 bodies.
 
-## Enforcement — REQUIRED, NOT YET IMPLEMENTED
+## Enforcement — BUILT, AWAITING INDEPENDENT REVIEW AND INSTALL
 
 A rule with no consumer that fails on mismatch is decoration — see
-`prompt-validation-procedure.md`. This policy therefore requires the following validator change,
-which **has not been made as of this document's date**. Until it lands, this policy binds authors
-but nothing enforces it.
+`prompt-validation-procedure.md`. The validator change below **is built and its gates pass**, in
+`change-flow` 3.2.9 and `flowmaster-validate` 3.2.15. It is **not installed**: no skill is trusted
+until a party that did not author it has validated it, so this policy is enforced from the moment
+Nathan installs those packages after a §10 verdict, and not before.
 
-`prompt_identity_header_valid` must:
+`prompt_identity_header_valid` now:
 
-- **require** identity — title, `Prompt ID:`, `Prompt version:`, `Ecosystem release:`, exactly one
+- **requires** identity — title, `Prompt ID:`, `Prompt version:`, `Ecosystem release:`, exactly one
   `Notion URL:` line whose page identity matches the registry binding;
-- **reject** a body carrying `Selection status:` or `Lifecycle:`, under a distinct error code such
-  as `PROMPT_BODY_GOVERNANCE_STATE`;
-- **reject** the `Candidate Notion URL:` prefix, as release-phase language on a locator label;
-- **lose its production mode entirely**, because nothing in a body should depend on whether the
-  release is selected.
+- **rejects** a body carrying `Selection status:` or `Lifecycle:`, as `PROMPT_BODY_GOVERNANCE_STATE`
+  — a separate check with its own code, because a body can be identity-valid and still carry
+  governance state;
+- **rejects** the `Candidate Notion URL:` and `Selected Notion URL:` prefixes, as release-phase
+  language on a locator label;
+- **has no production mode at all**, because nothing in a body should depend on whether the release
+  is selected.
 
-Two coupled defects must be repaired in the same change, or the ecosystem cannot reach a
-consistent promoted state at all:
+Three coupled defects were repaired in the same change. Without them the ecosystem could not reach
+a consistent promoted state — each required the release to still be a candidate:
 
-- `change-flow/scripts/validate_gcfpe_20260914.py` hard-requires
-  `contract["selection_status"] == "UNSELECTED_CANDIDATE"`, so a promoted contract fails that gate.
-- `validate_graph_contract` requires the graph contract to declare `UNSELECTED_CANDIDATE`, with no
-  production branch — the same no-removal-path defect one layer down.
+- `change-flow` hard-required `contract["selection_status"] == "UNSELECTED_CANDIDATE"`;
+- `change-flow` also required a `candidate_page_binding` on every member, which promotion removes
+  and which `flowmaster-validate` rejects once present in production;
+- `validate_graph_contract` pinned the graph to `UNSELECTED_CANDIDATE` with no production branch,
+  so the graph was required to contradict a promoted contract. It now mirrors the contract.
 
-Because this changes skill bytes, it requires a fresh independent §10 review before installation.
-The 55 bodies are cleaned in the same change: the `Lifecycle:` line removed, `Candidate Notion
-URL:` renamed to `Notion URL:`, and **no** selection-authority line added.
+The 55 bodies were cleaned in the same change: the selection line removed, `Candidate Notion URL:`
+renamed to `Notion URL:`, and **no** selection-authority line added. Both header dialects were
+found in the corpus — `Lifecycle:` and `Selection status:` — and both are rejected.
 
 ## The general form
 

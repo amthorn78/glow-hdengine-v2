@@ -72,7 +72,7 @@
     "candidate_version": "091426.1",
     "id": "ESC-10",
     "lane": "ESC",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create QA Escalation Report for the exact supplied change.",
     "output_artifacts": [
       "QA_ESCALATION_REPORT"

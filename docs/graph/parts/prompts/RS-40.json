@@ -229,7 +229,7 @@
     "candidate_version": "091426.1",
     "id": "RS-40",
     "lane": "RS",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Approved Rescope — Resume PR Implementation for the exact supplied change.",
     "output_artifacts": [
       "PR_IMPLEMENTATION_RESULT"

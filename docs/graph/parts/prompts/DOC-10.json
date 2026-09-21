@@ -154,7 +154,7 @@
     "candidate_version": "091426.1",
     "id": "DOC-10",
     "lane": "DOC",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create Final Repository Documentation PR Instructions for the exact supplied change.",
     "output_artifacts": [
       "PR_INSTRUCTION"

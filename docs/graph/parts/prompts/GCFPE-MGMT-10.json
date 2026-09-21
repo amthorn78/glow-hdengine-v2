@@ -145,7 +145,7 @@
     "candidate_version": "091426.1",
     "id": "GCFPE-MGMT-10",
     "lane": "GCFPE-MGMT",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Manage an Ecosystem Change for the exact supplied change.",
     "output_artifacts": [
       "GCFPE_ECOSYSTEM_CHANGE_REPORT"

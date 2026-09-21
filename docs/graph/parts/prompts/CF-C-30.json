@@ -204,7 +204,7 @@
     "candidate_version": "091426.1",
     "id": "CF-C-30",
     "lane": "CF-C",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Review an initial pending CRD Specification, assess a requested correction to an approved immutable CRD base, or review one pending bounded CRD Specification delta.",
     "output_artifacts": [
       "INITIAL_SPECIFICATION_REVIEW / SPECIFICATION_CORRECTION_ASSESSMENT / SPECIFICATION_DELTA_REVIEW",

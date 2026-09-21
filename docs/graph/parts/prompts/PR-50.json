@@ -43,7 +43,7 @@
     "candidate_version": "091426.1",
     "id": "PR-50",
     "lane": "PR",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Abort PR and Escalate for the exact supplied change.",
     "output_artifacts": [
       "PR_ABORT_ESCALATION_RECORD"

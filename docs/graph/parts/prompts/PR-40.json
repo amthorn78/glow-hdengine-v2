@@ -226,7 +226,7 @@
     "candidate_version": "091426.1",
     "id": "PR-40",
     "lane": "PR",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Review PR Work-Unit Lineage for the exact supplied change.",
     "output_artifacts": [
       "PR_WORK_UNIT_LINEAGE_REVIEW"

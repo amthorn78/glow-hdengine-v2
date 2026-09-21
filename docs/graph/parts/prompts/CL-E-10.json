@@ -171,7 +171,7 @@
     "candidate_version": "091426.1",
     "id": "CL-E-10",
     "lane": "CL-E",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Perform Epic Retrospective and Decide Closure for the exact supplied change.",
     "output_artifacts": [
       "CHANGE_CLOSURE_DECISION"

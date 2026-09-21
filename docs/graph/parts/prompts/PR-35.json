@@ -170,7 +170,7 @@
     "cross_session_route": false,
     "id": "PR-35",
     "lane": "PR",
-    "lifecycle": "UNSELECTED_CANDIDATE_NEW_MEMBER",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Continue the same proceeded PR work unit after initial publication; resolve reviews, retest, publish coherent corrections, verify current-head CI/reviews/head/mergeability, and return MERGE_PENDING without merging.",
     "output_artifacts": [
       "PR_IMPLEMENTATION_RESULT"

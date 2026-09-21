@@ -241,7 +241,7 @@
     "candidate_version": "091426.1",
     "id": "MGR-10",
     "lane": "MGR",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Coordinate the Complete Change Flow within Current Authority for the exact supplied change.",
     "output_artifacts": [
       "FLOW_PROGRESS"

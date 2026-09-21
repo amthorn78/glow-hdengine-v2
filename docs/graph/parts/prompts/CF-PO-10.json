@@ -105,7 +105,7 @@
     "candidate_version": "091426.1",
     "id": "CF-PO-10",
     "lane": "CF-PO",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Record Product Owner Change-Class Selection for the exact supplied change.",
     "output_artifacts": [
       "CHANGE_CLASS_SELECTION"

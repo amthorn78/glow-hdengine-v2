@@ -109,7 +109,7 @@
     "candidate_version": "091426.1",
     "id": "CF-E-20",
     "lane": "CF-E",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create Epic Specification for the exact supplied change.",
     "output_artifacts": [
       "EPIC_SPECIFICATION"

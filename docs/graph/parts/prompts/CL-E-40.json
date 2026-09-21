@@ -142,7 +142,7 @@
     "candidate_version": "091426.1",
     "id": "CL-E-40",
     "lane": "CL-E",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Prepare Post-Epic PF09 Maintenance for the exact supplied change.",
     "output_artifacts": [
       "PF09_MAINTENANCE_CANDIDATE"
