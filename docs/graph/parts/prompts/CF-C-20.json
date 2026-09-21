@@ -109,7 +109,7 @@
     "candidate_version": "091426.1",
     "id": "CF-C-20",
     "lane": "CF-C",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create CRD Specification for the exact supplied change.",
     "output_artifacts": [
       "CRD_SPECIFICATION"

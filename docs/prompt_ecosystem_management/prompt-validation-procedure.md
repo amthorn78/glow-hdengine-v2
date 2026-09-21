@@ -17,7 +17,7 @@ recorded identities that the same repair established. Post-flight has its own pr
 
 Standing procedure, Product Owner approved 2026-09-21. This is how prompt validation is performed now that the **Prompt Corpus Storage and Fidelity Policy** governs. It replaces `--prompt-dir` and every practice built on it.
 ### The procedure
-1. **Decide which prompts the task actually concerns.** A change to one prompt needs one page. A change to the QA closure route needs three. A corpus-wide sweep is a Product Owner decision, not a default.
+1. **Decide which prompts the task actually concerns.** A change to one prompt needs one page. A change to the QA closure route needs three. A corpus-wide sweep is not the default because it is expensive — **not because it is disallowed.** Reading prompts is never restricted; if the work needs all fifty-five, read all fifty-five. What is forbidden is writing them anywhere. See `prompt-corpus-policy.md`, *Reading is not restricted. Copying is.*
 2. **Read those pages from Notion.** That is the operative source, and reading it is sufficient evidence.
 3. **Pipe the bodies in as JSON on stdin**, `{"PROMPT-ID": "<text>"}`:
    `echo "$bodies" | python3 flowmaster-validate/scripts/validate_gcfpe_20260914.py change-flow --contract <contract> --bodies-stdin`

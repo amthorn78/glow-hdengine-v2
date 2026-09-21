@@ -86,7 +86,7 @@
       }
     ]
   },
-  "_prologue": "# GCFPE-20260914.1 Candidate Graph Contract\n\n```yaml\nartifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\nrelease: GCFPE-20260914.1\nprompt_version_family: '091426.1'\nselection_status: UNSELECTED_CANDIDATE\ncomplete_source_path: candidate/graph/GCFPE-20260914.1-Candidate-Graph-Contract.json\ncomplete_source_bytes: 580051\ncomplete_source_sha256: 77e9e1e0f393fc8bc630a78bda8f50ee77d72e118e436cb2a244e20c9cb0c344\ncontent_status: COMPLETE\nsource_binding_revision: 20260916.1-batch-2-contract-synchronization\nvalidation_scope: TARGETED_AUTHOR_SELF_REVIEW_PENDING_INDEPENDENT_POSTFLIGHT_REQUIRED\n```\n\n```json",
+  "_prologue": "# GCFPE-20260914.1 Candidate Graph Contract\n\n```yaml\nartifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\nrelease: GCFPE-20260914.1\nprompt_version_family: '091426.1'\nselection_status: SELECTED_PRODUCTION\ncomplete_source_path: candidate/graph/GCFPE-20260914.1-Candidate-Graph-Contract.json\ncomplete_source_bytes: 580051\ncomplete_source_sha256: 77e9e1e0f393fc8bc630a78bda8f50ee77d72e118e436cb2a244e20c9cb0c344\ncontent_status: COMPLETE\nsource_binding_revision: 20260916.1-batch-2-contract-synchronization\nvalidation_scope: TARGETED_AUTHOR_SELF_REVIEW_PENDING_INDEPENDENT_POSTFLIGHT_REQUIRED\n```\n\n```json",
   "abort_contract": {
     "agent_skill_prompt_hub_inbound_edges": 0,
     "automatic_inbound_edges": 0,
@@ -582,7 +582,7 @@
     "may_reopen_accepted_pr03": false
   },
   "schema_version": "gcfpe-candidate-graph-contract/2.1",
-  "selection_status": "UNSELECTED_CANDIDATE",
+  "selection_status": "SELECTED_PRODUCTION",
   "source_bindings": {
     "binding_revision": "20260914.1-recovery.1",
     "binding_scope": "REPAIR_BASELINE_EVIDENCE_ONLY_NOT_A_RUNTIME_CURRENT_PF10_ALIAS",

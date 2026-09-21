@@ -112,7 +112,7 @@
     "candidate_version": "091426.1",
     "id": "UTIL-10",
     "lane": "UTIL",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Apply Exact Redline to a Complete Artifact for the exact supplied change.",
     "output_artifacts": [
       "REVISED_TARGET_ARTIFACT / REDLINE_APPLICATION_REPORT"

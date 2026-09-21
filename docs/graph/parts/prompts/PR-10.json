@@ -186,7 +186,7 @@
     "candidate_version": "091426.1",
     "id": "PR-10",
     "lane": "PR",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create PR Work-Unit Instructions for the exact supplied change.",
     "output_artifacts": [
       "PR_INSTRUCTION"

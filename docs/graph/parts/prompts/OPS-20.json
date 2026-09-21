@@ -302,7 +302,7 @@
     "candidate_version": "091426.1",
     "id": "OPS-20",
     "lane": "OPS",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Execute Bounded Ops Task for the exact supplied change.",
     "output_artifacts": [
       "OPS_EXECUTION_RESULT"

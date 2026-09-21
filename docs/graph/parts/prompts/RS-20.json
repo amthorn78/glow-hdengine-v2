@@ -298,7 +298,7 @@
     "candidate_version": "091426.1",
     "id": "RS-20",
     "lane": "RS",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Review Bounded Work-Unit Rescope for the exact supplied change.",
     "output_artifacts": [
       "RESCOPE_REVIEW"

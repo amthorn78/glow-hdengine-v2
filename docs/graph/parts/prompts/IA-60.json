@@ -112,7 +112,7 @@
     "candidate_version": "091426.1",
     "id": "IA-60",
     "lane": "IA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Thoth Planning Research for the exact supplied change.",
     "output_artifacts": [
       "PLANNING_RESEARCH_FINDING"

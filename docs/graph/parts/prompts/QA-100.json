@@ -144,7 +144,7 @@
     "candidate_version": "091426.1",
     "id": "QA-100",
     "lane": "QA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Execute Bounded QA Task for the exact supplied change.",
     "output_artifacts": [
       "QA_EXECUTION_RESULT"

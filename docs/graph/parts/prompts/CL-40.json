@@ -134,7 +134,7 @@
     "candidate_version": "091426.1",
     "id": "CL-40",
     "lane": "CL",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Scan for PF09 Gaps and CRD Candidates for the exact supplied change.",
     "output_artifacts": [
       "CYCLE_GAP_SCAN"

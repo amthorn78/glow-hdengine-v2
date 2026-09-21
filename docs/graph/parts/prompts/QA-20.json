@@ -105,7 +105,7 @@
     "candidate_version": "091426.1",
     "id": "QA-20",
     "lane": "QA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create Live QA Guide for the exact supplied change.",
     "output_artifacts": [
       "LIVE_QA_GUIDE"

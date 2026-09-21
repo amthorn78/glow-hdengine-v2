@@ -241,7 +241,7 @@
     "candidate_version": "091426.1",
     "id": "CL-20",
     "lane": "CL",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Prepare Closure Memo and Post-Closure Record for the exact supplied change.",
     "output_artifacts": [
       "CLOSURE_MEMO / POST_CLOSURE_RECORD"

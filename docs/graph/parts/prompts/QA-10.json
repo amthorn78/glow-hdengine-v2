@@ -161,7 +161,7 @@
     "candidate_version": "091426.1",
     "id": "QA-10",
     "lane": "QA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Audit Implementation and Establish QA Readiness for the exact supplied change.",
     "output_artifacts": [
       "REALITY_AUDIT / CHANGE_AUDIT_TRIAGE / QA_READINESS"

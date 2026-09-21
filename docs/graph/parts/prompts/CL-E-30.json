@@ -105,7 +105,7 @@
     "candidate_version": "091426.1",
     "id": "CL-E-30",
     "lane": "CL-E",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Review Bounded PF09 Revalidation for the exact supplied change.",
     "output_artifacts": [
       "PF09_REVALIDATION_REVIEW"

@@ -208,7 +208,7 @@
     "candidate_version": "091426.1",
     "id": "IA-10",
     "lane": "IA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Create Whole-Change Implementation Audit and Plan for the exact supplied change.",
     "output_artifacts": [
       "IMPLEMENTATION_AUDIT / IMPLEMENTATION_PLAN"

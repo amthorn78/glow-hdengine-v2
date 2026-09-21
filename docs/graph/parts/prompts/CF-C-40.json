@@ -135,7 +135,7 @@
     "candidate_version": "091426.1",
     "id": "CF-C-40",
     "lane": "CF-C",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Revise a pending CRD Specification, author the first bounded delta from a justified approved-base correction redline, or revise a denied pending delta.",
     "output_artifacts": [
       "CRD_SPECIFICATION / SPECIFICATION_DELTA"

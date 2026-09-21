@@ -131,7 +131,7 @@
     "candidate_version": "091426.1",
     "id": "CL-30",
     "lane": "CL",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Prepare Conditional Post-Change ADR Maintenance for the exact supplied change.",
     "output_artifacts": [
       "ADR_CANDIDATE / NO_ADR_NEEDED"

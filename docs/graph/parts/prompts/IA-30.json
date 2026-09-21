@@ -244,7 +244,7 @@
     "candidate_version": "091426.1",
     "id": "IA-30",
     "lane": "IA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Review Whole-Change Implementation Plan for the exact supplied change.",
     "output_artifacts": [
       "IMPLEMENTATION_PLAN_REVIEW / APPROVED_BASE_CHANGE_ASSESSMENT / PLAN_DELTA_REDLINE / MATERIAL_PLAN_DELTA_REVIEW"

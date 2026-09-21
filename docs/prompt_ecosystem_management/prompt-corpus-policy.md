@@ -35,6 +35,42 @@ Product Owner directive, 2026-09-21. **Permanent unless Nathan explicitly change
 > If an existing skill, prompt, validator, plan, or proposed repair conflicts with this policy, treat that element as defective. Do not work around the policy by creating a "temporary" or "read-only" corpus copy. Revise the procedure so it works from Notion directly, or clearly report the genuine limitation to Nathan before proceeding.
 >
 > This policy is permanent unless Nathan explicitly changes it.
+## Reading is not restricted. Copying is.
+
+**Product Owner, 2026-09-21:** *"you should not be forbidden to read them that is stupid. I just
+don't want them copied to disk. How will you ever do any work if you cannot read them"*
+
+The directive above already says this — *"read the relevant Notion pages directly and use that
+available content as sufficient evidence"* — but it was misread once, so it is now stated
+separately and in the plainest terms available:
+
+| | |
+|---|---|
+| **Prohibited, absolutely** | persisting, mirroring, exporting, hashing, byte-comparing, backing up, or accumulating prompt bodies anywhere outside Notion |
+| **Not restricted at all** | reading prompts. One, three, all fifty-five. As many as the work needs, as often as the work needs |
+
+**There is no cap on how many prompts a session may read.** A whole-corpus read is a cost
+decision, never a permission question. If a session needs to read every prompt to do the work,
+it reads every prompt — into context, and not onto disk.
+
+### The misreading this exists to prevent
+
+A session conflated this policy with the separate **source-read minimalism** rule in
+`session-working-rules.md` — an efficiency rule whose subject is *method*, about not routing bulk
+through context when a *tool* needs the files — and concluded it was forbidden to read the corpus.
+It then shipped a verification with a hole in it and told the Product Owner the policy required
+the hole. The policy required no such thing.
+
+**Keep the two apart:**
+
+- **This policy governs storage.** It is absolute, it has no exceptions, and it says nothing about
+  how much may be read.
+- **Source-read minimalism governs method and cost.** It is subordinate to the work. It never
+  forbids a read, and "this would be expensive" is never "this is not allowed."
+
+When they appear to conflict over prompt bodies, this policy wins on storage and the work wins on
+reading. Neither of them makes reading a prompt a thing that needs authorising.
+
 ## What this invalidates, named on the day it was issued
 **`SF10-12`**** — the whole content of round 25 — is defective under this policy.** It pins a byte count and SHA-256 for each of the 55 bodies and compares them on every run. That is a raw-file identity check for prompt bodies, and the package is withdrawn rather than repaired. The two blocking findings `SFR-01` raised against it need no repair round; the thing they are findings about does not survive.
 **The ****`--prompt-dir`**** mechanism predates round 25 and conflicts with the same clause.** The end-to-end gate and the 181-case body-fixture suite both require a complete local corpus of 55 `.md` files before they will run. That is a mirrored tree, and requiring it is a suggestion that a complete local corpus is needed before work can proceed. It is a Product Owner decision, not a session's, but it is the larger conflict and it should not be discovered again by a third reviewer.

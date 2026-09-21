@@ -109,7 +109,7 @@
     "candidate_version": "091426.1",
     "id": "CL-E-20",
     "lane": "CL-E",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Perform Bounded PF09 Epic Revalidation for the exact supplied change.",
     "output_artifacts": [
       "PF09_REVALIDATION"

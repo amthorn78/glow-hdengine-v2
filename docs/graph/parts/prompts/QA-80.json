@@ -94,7 +94,7 @@
     "candidate_version": "091426.1",
     "id": "QA-80",
     "lane": "QA",
-    "lifecycle": "UNSELECTED_CANDIDATE",
+    "lifecycle": "SELECTED_PRODUCTION",
     "native_function": "Execute Revise Whole-Change QA Plan for the exact supplied change.",
     "output_artifacts": [
       "QA_PLAN"
