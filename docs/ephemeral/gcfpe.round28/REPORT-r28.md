@@ -125,9 +125,15 @@ that line immediately followed by the `Candidate Notion URL:` label, and each re
 an exact-match replace cannot succeed unless the text was there. One line existed per body; one
 line was removed from each; zero remain.
 
-**Direct.** Bodies read individually from Notion after the edit and confirmed clean — no selection
-line, `Notion URL:` label present. Bodies are read, never persisted: each was read, the verdict
-kept, the body discarded.
+**Direct, partial.** **7 of 55** bodies read individually from Notion after the edit and confirmed
+clean — no selection line, `Notion URL:` label present: `CF-C-10`, `CF-C-20`, `CF-C-30`, `CF-C-40`,
+`CF-E-10`, `CF-PO-10`, `CL-20`. Both header dialects are represented in that set. Each was read,
+the verdict kept, the body discarded; nothing was written to disk.
+
+The remaining 48 were not individually re-read. That is a **cost** decision, not a restriction —
+the inferential line above already closes the question, and reading the rest would re-prove it.
+The count is stated exactly rather than rounded up to "bodies were read", because the difference
+between 7 and 55 is precisely the kind of thing a reader should not have to infer.
 
 ## Left open, deliberately
 

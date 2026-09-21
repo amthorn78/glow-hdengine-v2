@@ -79,9 +79,11 @@ A1. **Test the claim that all 55 bodies are clean.** Two lines of evidence suppo
     inferential one: the round-27 post-flight ran all 55 bodies through the OLD validator with
     zero failures, and that validator required len(status_lines) == 1, so every body carried
     exactly one selection line; each of my 55 replaces matched an anchor containing that line
-    immediately followed by the Candidate Notion URL: label, and each succeeded. The direct one:
-    bodies read back individually from Notion after the edit. Attack both. **Read any prompts you
-    need — reading is not restricted, only copying is.**
+    immediately followed by the Candidate Notion URL: label, and each succeeded. The direct one is
+    PARTIAL: 7 of 55 read back individually after the edit and confirmed clean (CF-C-10, CF-C-20,
+    CF-C-30, CF-C-40, CF-E-10, CF-PO-10, CL-20), both header dialects represented. The other 48
+    rest on the inferential line alone. Attack both. **Read any prompts you need — reading is not
+    restricted, only copying is.**
 A2. **prompt_body_governance_state is a check I wrote to test my own change.** It is a substring
     scan over SELECTION_HEADER_KEYS plus one literal. Ask what it misses: a lifecycle line with
     leading whitespace, a different key, the same fact stated in prose.
