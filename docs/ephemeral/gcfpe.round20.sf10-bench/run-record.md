@@ -285,10 +285,42 @@ improvement in score.
 | run | `--base` | `--work` |
 |---|---|---|
 | `change-flow` contract validator | exit 0 — `PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy` | exit 0 — **byte-identical stdout** |
-| `validate_flowmaster.py` | exit 0 | exit 0 — the whole report differs in **2 line(s)** |
+| `validate_flowmaster.py` | exit 0 | exit 0 — the difference is reproduced below |
 
-`validate_flowmaster.py`'s two differing lines are its own `fixture_source` absolute path and
-its `validator_revision`, 3.2.6 against 3.2.7. Nothing else in roughly 1600 lines moves.
+**This was a prose summary and it went stale, which is why it is now generated.** It read "the
+whole report differs in 2 line(s) … its `fixture_source` absolute path and its
+`validator_revision`", and the `SF10-04` roster retirement landed later in the same round and
+removed a six-line `flowmaster-propagate` block from the work-side report. The summary was then
+false in both documents, with the commit that falsified it recorded a few hundred lines away in
+one of them. The recorder now runs each tree's own copy of the validator and embeds the
+difference itself, so `--check` fails if it moves.
+
+Each tree's own `flowmaster-validate/scripts/validate_flowmaster.py` is used, because its
+`DEFAULT_ROOT` is the tree holding the script — that is what makes a scratch copy validate
+itself. The two tree roots are normalised to `<tree>`: the report prints `fixture_source` as an
+absolute path, and where the copies live is not a behavioural difference. Both copies exit 0;
+the recorder refuses to record a difference count for a nonzero run.
+
+<!-- generated: flowmaster-diff -->
+```diff
+--- base
++++ work
+@@ -1530,8 +1530,2 @@
+     },
+-    "flowmaster-propagate": {
+-      "core_sync": null,
+-      "errors": [],
+-      "status": "PASS",
+-      "warnings": []
+-    },
+     "flowmaster-validate": {
+@@ -1562,3 +1556,3 @@
+   "suite_ok": true,
+-  "validator_revision": "3.2.6",
++  "validator_revision": "3.2.7",
+   "verdict": "FLOWMASTER_SUITE_PASS",
+```
+<!-- /generated: flowmaster-diff -->
 
 ### Guard-block parity — D8/D15
 

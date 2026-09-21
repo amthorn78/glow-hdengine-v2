@@ -350,7 +350,7 @@ are the commands' own, captured directly.
 | `change-flow/scripts/validate_gcfpe_20260914.py` | exit 0 | exit 0, output byte-identical |
 | `run_gcfpe_20260914_fixtures.py` (contract only) | exit 0 — 140 cases, 0 failed | exit 0 — 140 cases, 0 failed; report differs only in `validator_revision` |
 | `run_gcfpe_20260914_fixtures.py --prompt-dir` | **exit 1 — crash, suite cannot run** | **exit 0 — 164 cases, 0 failed** |
-| `validate_flowmaster.py` | exit 0 | exit 0; the whole 1600-line report differs in exactly two lines, the fixture-source path and `validator_revision` |
+| `validate_flowmaster.py` | exit 0 | exit 0; with the tree roots normalised the whole ~1600-line report **differs in exactly 8 lines** — `validator_revision`, and the six-line `flowmaster-propagate` block the `SF10-04` retirement removed from the roster ([verbatim in the run record](gcfpe.round20.sf10-bench/run-record.md)) |
 | end-to-end `--prompt-dir` | exit 1 — 12 errors | exit 1 — **10 errors**, all `PROMPT_WRITER` (`SF10-07`) |
 
 Two-run identity holds: the end-to-end JSON is equal field for field across two runs, and the
@@ -834,6 +834,97 @@ Corrected in all four places it appeared, not only the one the finding cited.
 
 **No skill byte changed in this batch.** Both package digests are unchanged, and the nine-file split
 and patch are unchanged. The instrument and two documents moved; the deliverable did not.
+
+### Nothing bound the shipped bytes to the tested bytes
+
+Two findings on the completed cycle, and the first is the most consequential defect found in this
+instrument because it concerns the **deliverable**, not the record.
+
+**The recorder accepted a package on readability alone.** It listed the archive, counted its files,
+took its size and digest — and never checked that the archive *contained the tree the bench had
+exercised*. The bench runs against `--work`; the packages are separate files in `--pkg`. So a valid
+but stale or wrongly built ZIP could be recorded, reported and published while the tests that passed
+had run against something else. **This report already claimed each archive was recursively identical
+to its source** — and that claim rested on a manual step I happened to run at build time, not on
+anything enforced. A claim nothing verifies is the same defect this whole batch sequence has been
+about, and here it applied to the thing that gets installed.
+
+`identities()` now extracts each archive and compares its **complete payload** — every path and every
+digest — against the corresponding subtree of `--work`, refusing with the differing, extra and missing
+paths named.
+
+**Three controls, because there are three ways an archive can be wrong:**
+
+| injected | result |
+|---|---|
+| a **valid** archive built from the **unrepaired** base tree | refused, naming **7 differing files** |
+| a valid archive with one file altered after packaging | refused, naming `SKILL.md` |
+| a valid archive **missing** a file the tested tree has | refused, `1 only in --work: ['scripts/pf_header_parity.py']` |
+
+The first is the real scenario: nothing about that ZIP is malformed. It is simply not the thing that
+was tested, and until now the recorder could not tell the difference.
+
+**The second finding is the fourth instance of one habit.** The report's package identities were three
+fragment tests — digest somewhere, size somewhere, a `| count | size |` fragment somewhere — so
+swapping the two packages' digests between rows left every fragment present and passed. Both records
+use the identical row format, and the run-record side had been row-bound **one cycle earlier**; I did
+not carry it across to the report. Control: swapping the two digests is now caught on both rows
+independently.
+
+That is the same shape as the changed-file rows, the bench refusal versus the freeze check, and
+`--check` versus `--write`. Each time I fixed the instance I was shown. The previous batch moved
+*input validation* into one gate, which fixed that class — but the *record assertions* in `check()`
+remained a pile of individually written checks, and this is where the habit reappeared. Both records
+are now asserted as complete rows for both tables they share.
+
+**No skill byte changed.** Both package digests are unchanged, and the payload comparison confirms the
+archives are exactly the tested trees.
+
+### My own retirement falsified a summary in this document, and the summary is now generated
+
+Found in **step 5** of the batch above — re-running everything and checking that the summary, the
+evidence and the implementation agree — not by a reviewer. The re-run was performed **2026-09-21
+UTC** against the same frozen tree (`c321be051b90c346…`, 321 files) and the same two archives
+(`07864f2b…`, `43075084…`); every other row of the regression table reproduced byte-for-byte,
+including the two end-to-end output sizes, so the only thing that had moved was this summary.
+
+The regression table said `validate_flowmaster.py`'s two reports "differ in exactly two lines, the
+fixture-source path and `validator_revision`", and the run record said the same. That was true when
+it was measured. Then the **`SF10-04` retirement** landed in this same round and removed
+`flowmaster-propagate` from the required-presence roster, so the work-side report stopped emitting a
+six-line block for it. Measured now, the two reports differ in **eight lines** across two places.
+
+The part worth recording is not the wrong number. It is that **this document contained both the false
+claim and its cause**: the retirement is described in `SF10-04` a few hundred lines below the table it
+falsified. Re-reading every summary after every change is exactly the practice that has now failed
+four times in this round, which is why the earlier stale figures were replaced by generated blocks.
+This claim had been left as prose.
+
+So it is generated too. The recorder runs **each tree's own copy** of the validator — its
+`DEFAULT_ROOT` is the tree holding the script, which is what makes a scratch copy validate itself —
+and embeds the difference verbatim, with the two tree roots normalised to `<tree>` because the report
+prints `fixture_source` as an absolute path and where a copy lives is not behaviour. Both copies must
+exit 0 or the recorder refuses to record a difference at all.
+
+| injected | result |
+|---|---|
+| the report's count set back to its superseded value | refused **twice** — the current phrase absent, and the superseded one still present |
+| one line inside the embedded diff altered | refused, the diff no longer verbatim |
+| the embedded diff emptied to its headers | refused, same |
+| the work copy of the validator made to exit nonzero | refused before any count is taken |
+| the `SF10-04` retirement itself reverted in `--work` | refused — by the **package payload** binding from the batch above, then by the patch binding, both of which sit earlier |
+
+The last row is worth stating precisely rather than claiming as a win for the new check: any change to
+the tested tree is now caught by an earlier gate, so the embedded diff is never reached with a stale
+tree. What the new check covers is the remaining path, and it is the one that actually occurred — the
+tree changed, the patch and the packages were regenerated with it, and a prose sentence about a
+validator's output was left behind.
+
+**Two claims in the same table were re-measured rather than assumed.** The contract-only fixture
+report does still differ only in `validator_revision` (verified, normalised diff: one line). And the
+`zip -X` reproducibility claim was confirmed by accident during the controls: `change-flow.skill`
+rebuilt from unchanged content came out byte-for-byte identical, `07864f2b…`, at the same 241886
+bytes.
 
 ### The whole table above was re-run against the packaged copies
 
