@@ -16,5 +16,16 @@
     "is 321 (320)\"* — and wrote nothing.": "Continuation of the quoted refusal message above.",
     "the freeze digest re-verified at `c321be051b90c346…`, and the whole suite re-run with the pin set;": "The freeze digest is recomputed and enforced by make_run_record.py `identities()` (FREEZE_DIGEST) on every run, in both --write and --check.",
     "| the patch summary stale, the other `411` left in place | refused **twice** — expected phrase absent, superseded value present |": "Narrative describing the defect as it stood when found, 2026-09-21. The figures are quotations of the weak assertion's subject, not live values; the live ones are bound in make_run_record.py check(). A dated record, never corrected (AUTH-001)."
+  },
+  "docs/ephemeral/pf10_dependency/PROPOSAL.md": {
+    "**Establishes:** a typed value is available for all 280 rows; the controls show the instrument": "280 is the classified row count, regenerated live in the `run` block by render.py.",
+    "- `CF-E-30__epic_specification_delta_return` — 0.51, with `READ_ONLY` second at 0.34": "Quotes this row's confidence and runner-up probability from pf10_dependency.proposal.json. Argument prose, not a table; re-quote from the JSON if the run is repeated.",
+    "- `IA-30__plan_delta_return` — 0.57, with `READ_ONLY` second at 0.29": "Quotes this row's confidence and runner-up probability from pf10_dependency.proposal.json. Argument prose, not a table; re-quote from the JSON if the run is repeated.",
+    "0.62, `COMPARISON` at 0.51, `COMPARISON` at 0.57. Three identically-worded rows cannot belong to three": "The three sibling rows' confidences (CF-C-30, CF-E-30, IA-30 *_delta_return) from pf10_dependency.proposal.json. Argument prose; re-quote if the run is repeated.",
+    "That is the row §3.6 names as the closest case, arrived at here without being told.": "References the decision briefs' §3.6; carries no figure of its own.",
+    "The remaining cost is what the briefs already priced: the field on 280 rows across the bundled": "280 is the classified row count, regenerated live in the `run` block by render.py.",
+    "The §3.6 enumeration concluded that no branch stops because a comparison between current PF10 and an": "References the decision briefs' §3.6 conclusion; no figure of its own. The 72/12/60 figures it rests on are accounted for in the briefs' own entries.",
+    "came back `SOURCE_AVAILABILITY` at **0.98**, the highest-confidence non-`NONE` judgment in the run.": "RS-40__source_resolution_error's confidence from pf10_dependency.proposal.json. Argument prose; re-quote if the run is repeated.",
+    "subject: A typed `pf10_dependency` value proposed for each of the 280 state_routes rows": "280 is the row count of state_routes in the direct-handoff contract; classify.py reads every row and render.py regenerates the live count in the `run` block."
   }
 }
