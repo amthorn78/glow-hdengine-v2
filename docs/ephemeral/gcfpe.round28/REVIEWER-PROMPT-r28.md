@@ -75,11 +75,13 @@ C6. The round-27 post-flight's three warnings are unaffected by this change and 
     not being qualified by families that evaluated nothing.
 
 === 6. WHAT TO ATTACK, IN PRIORITY ORDER ===
-A1. **The claim that all 55 bodies are clean is the weakest thing here.** I did not read 55
-    bodies — the corpus policy forbids it. My proof is indirect: 55 exact-match replaces each
-    succeeded, and the OLD validator enforced len(status_lines) == 1, so exactly one line existed
-    per body and exactly one was removed. Test that reasoning. If you can falsify it on even one
-    prompt, the claim fails. Read any prompts you need directly from Notion.
+A1. **Test the claim that all 55 bodies are clean.** Two lines of evidence support it. The
+    inferential one: the round-27 post-flight ran all 55 bodies through the OLD validator with
+    zero failures, and that validator required len(status_lines) == 1, so every body carried
+    exactly one selection line; each of my 55 replaces matched an anchor containing that line
+    immediately followed by the Candidate Notion URL: label, and each succeeded. The direct one:
+    bodies read back individually from Notion after the edit. Attack both. **Read any prompts you
+    need — reading is not restricted, only copying is.**
 A2. **prompt_body_governance_state is a check I wrote to test my own change.** It is a substring
     scan over SELECTION_HEADER_KEYS plus one literal. Ask what it misses: a lifecycle line with
     leading whitespace, a different key, the same fact stated in prose.
@@ -107,9 +109,9 @@ Q3. member_registry node keys candidate_url and candidate_version keep candidate
 L1. The 55 prompt bodies live in Notion and are NOT in the repository, by standing Product Owner
     policy. You cannot diff them. Read any page you need directly; the page ids are in
     docs/prompt_ecosystem_management/project-prompt-contract-registry.md under notion_page_id.
-L2. I did not run the body-level gate against all 55 live bodies. Doing so would be a corpus read
-    the policy prohibits. If you want body-level evidence, read the prompts you judge necessary
-    and pipe them with --bodies-stdin.
+L2. I did not run the body-level gate against all 55 live bodies in a single sweep — a cost
+    choice, not a restriction. **Reading prompts is not restricted; only copying them is.** Read
+    as many as you judge necessary and pipe them with --bodies-stdin. Keep nothing on disk.
 L3. The dated source_bindings capture in docs/graph/parts/global.json still reads
     UNSELECTED_CANDIDATE. That is deliberate: it is a dated repair-snapshot observation marked
     EVIDENCE_ONLY, and AUTH-001 forbids rewriting one.
@@ -169,7 +171,8 @@ enable auto-merge. Do not treat the round-27 confirmation as carrying to these b
 any prompt body in Notion — read only. Do not write to docs/pfcanon/. Do not build a local copy of
 the prompt corpus, hash prompt bodies, or compare them byte-for-byte; the Prompt Corpus Storage
 and Fidelity Policy prohibits it, and if a procedure you are given conflicts with it, report that
-and stop rather than working around it.
+and stop rather than working around it. **That policy restricts storage, not reading** — read
+whatever prompts the review needs, and keep none of them.
 
 === 10. THE DELIVERABLE ===
 One verdict, using exactly this vocabulary: SKILL_FIT_CONFIRMED or SKILL_REPAIR_REQUIRED. Bind it
