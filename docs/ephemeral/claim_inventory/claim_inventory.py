@@ -155,12 +155,18 @@ def changed_lines(rng: str, paths: list[str]) -> dict[str, list[int]]:
     # An UNTRACKED file shows in no diff, so a brand-new document's claims were invisible -- and a
     # new document is exactly where fresh claims appear.  Every line of one counts as added.
     if range_end(rng) is None:
-        for rel in run("git", "ls-files", "--others", "--exclude-standard", "--",
-                       *(paths or [])).split():
+        # NUL-delimited, because splitting on whitespace turned a filename containing a space
+        # into several nonexistent paths -- so every claim in such a file was skipped and the
+        # command reported clean.  Reproduced before fixing with `docs/ephemeral/new claim.md`
+        # holding `**55 files**`: clean, exit 0.
+        for rel in run("git", "ls-files", "-z", "--others", "--exclude-standard", "--",
+                       *(paths or [])).split("\0"):
+            if not rel:
+                continue
             f = REPO / rel
             if f.is_file():
                 per[rel] = list(range(1, len(f.read_text(encoding="utf-8",
-                                                          errors="replace").splitlines()) + 1))
+                                                         errors="replace").splitlines()) + 1))
     current = None
     for line in out.splitlines():
         if line.startswith("+++ b/"):
@@ -243,7 +249,13 @@ def main() -> int:
                     help="what to inventory; default HEAD, which is the uncommitted work. "
                          "Pass a range such as origin/main..HEAD before a push, or "
                          "<rev>~1..<rev> for one commit.")
-    ap.add_argument("--paths", nargs="*", default=["docs/"])
+    # NARROW BY DEFAULT, at the Product Owner's direction, 2026-09-21: the two governed evidence
+    # artefacts, not every Markdown file under docs/.  The wide default meant every prose paragraph
+    # in every ephemeral document had to be accounted for, which is far more bookkeeping than the
+    # stale-figure problem warranted.  Pass --paths explicitly to widen it for a specific sweep.
+    ap.add_argument("--paths", nargs="*",
+                    default=["docs/ephemeral/gcfpe.round20.sf10-bench/run-record.md",
+                             "docs/ephemeral/gcfpe.round20.sf10-repairs.repair-report.md"])
     ap.add_argument("--allow", default=str(DEFAULT_ALLOW))
     ap.add_argument("--since-baseline", action="store_true",
                     help="inventory everything from the recorded baseline commit to HEAD")

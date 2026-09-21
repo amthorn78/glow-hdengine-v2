@@ -79,6 +79,7 @@ def load(tree: pathlib.Path):
     return mod
 
 
+REPO = pathlib.Path(__file__).resolve().parents[3]
 REGISTRY_DEFAULT = pathlib.Path("docs/prompt_ecosystem_management/project-prompt-contract-registry.md")
 _REGISTRY_DIGESTS: dict[str, str] | None = None
 
@@ -95,7 +96,23 @@ def registry_digests(registry_path: pathlib.Path) -> dict[str, str]:
         return _REGISTRY_DIGESTS
     if not registry_path.is_file():
         die(f"no registry at {registry_path}; pass --registry")
+    # The registry is the ROOT OF TRUST for every body-level claim in this package, and it was
+    # a caller-supplied path checked only for parsing to 55 pairs.  A stale or fabricated
+    # registry holding 55 plausible pairs would have let a DIFFERENT corpus pass the gate while
+    # the records described it as the approved one -- the corpus gate trusting its argument.
+    # The supplied bytes must now be the committed registry's bytes.
+    committed = REPO / REGISTRY_DEFAULT
+    if not committed.is_file():
+        die(f"the committed registry is missing at {REGISTRY_DEFAULT}; the corpus gate has no "
+            f"identity to bind to")
     text = registry_path.read_text(encoding="utf-8")
+    if hashlib.sha256(text.encode()).hexdigest() != hashlib.sha256(
+            committed.read_bytes()).hexdigest():
+        die(f"the supplied registry is not the committed registry.\n"
+            f"  supplied:  {registry_path} {hashlib.sha256(text.encode()).hexdigest()[:16]}…\n"
+            f"  committed: {REGISTRY_DEFAULT} "
+            f"{hashlib.sha256(committed.read_bytes()).hexdigest()[:16]}…\n"
+            f"A corpus verified against an unapproved registry is not verified.")
     pairs: dict[str, str] = {}
     current: str | None = None
     for line in text.splitlines():

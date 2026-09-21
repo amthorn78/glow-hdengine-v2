@@ -27,7 +27,7 @@ vocabulary selector. This run proposes that typed representation.
 | | |
 |---|---|
 | model requested / served | `jev-latest` / `jev-1.13.0` |
-| rows classified | **280**, every `state_routes` row |
+| rows classified | **280** of 280, every `state_routes` row |
 | contract classified | `7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894` |
 | blocking states, from the briefs | `AWAITING_PO_PROCEED`, `AWAITING_THOTH_REMEDIATION`, `BLOCKED`, `PLAN_PENDING_REVISED`, `RESCOPE_PROPOSAL_PENDING_REVIEW` |
 | options | `COMPARISON`, `NONE`, `READ_ONLY`, `SOURCE_AVAILABILITY` |
@@ -53,7 +53,7 @@ carried into this proposal. No revision was made after seeing the full run.
 | `COMPARISON` | 2 |
 | `SOURCE_AVAILABILITY` | 1 |
 
-**258 `CLEAR`, 20 `UNCERTAIN`, 2 `UNRESOLVED`.**
+**261 `CLEAR`, 17 `UNCERTAIN`, 2 `UNRESOLVED`.**
 <!-- /generated: result -->
 
 ## The decisive finding: the briefs' conclusion survives a paraphrase-sensitive screen
@@ -91,22 +91,36 @@ three should carry the same value.
 came back `SOURCE_AVAILABILITY` at **0.98**, the highest-confidence non-`NONE` judgment in the run.
 That is the row §3.6 names as the closest case, arrived at here without being told.
 
-## Two runs: the conclusion reproduces, the individual confidences do not
+## Reproducibility across retained runs
 
-The run was repeated in full after review asked for the served model, response completeness and each
-row's `state` to be captured. **The labels and bands reproduced exactly** — 270 / 7 / 2 / 1 and
-258 / 20 / 2, with the same two `COMPARISON` candidates, the same seven `READ_ONLY` and the same
-`RS-40` at 0.98, on identical token counts.
+Review asked for this and was right to: the previous version claimed a two-run comparison while only
+the later JSON survived, so the evidence for the reproducibility conclusion did not exist. **Every run
+is now retained under its own identity in `runs/` and never overwritten**, and the table below is
+generated from those files.
 
-**The individual confidences moved**, by up to 0.10: the `CF-C-30` sibling went 0.62 → 0.72, `CF-E-30`
-0.51 → 0.49 and `IA-30` 0.57 → 0.55. One consequence worth naming: `CF-E-30` crossed below 0.50, so
-it is now `UNRESOLVED` rather than `UNCERTAIN`, and the band totals held only because another row
-crossed the other way.
+<!-- generated: reproducibility -->
+| retained run | served | contract | controls | labels | bands |
+|---|---|---|---|---|---|
+| `run-20260921T004100Z-retained-after-the-fact.json` | `jev-1.13.0` | `7f8d683e672d…` | 28/28 | 270 / 7 / 2 / 1 | 258 / 20 / 2 |
+| `run-20260921T010815Z.json` | `jev-1.13.0` | `7f8d683e672d…` | 28/28 | 270 / 7 / 2 / 1 | 261 / 17 / 2 |
 
-So read the figures in this document as one run's reading and the **labels, bands and candidate set as
-reproducible**. That is a property of the instrument, not a defect in it, and it is a further reason
-the guard must be a deterministic check on an approved typed field rather than anything that consults
-a model at runtime.
+Label columns are `NONE / READ_ONLY / COMPARISON / SOURCE_AVAILABILITY`; band columns are `CLEAR / UNCERTAIN / UNRESOLVED`. Comparing the first and last retained runs over 280 shared rows:
+
+- **identical label: 280 of 280**
+- identical band: 275 of 280 — moved: `CL-20__adr_branch`, `IA-30__delta_deny`, `IA-30__initial_approve`, `IA-30__initial_deny`, `QA-110__escalation_required`
+- largest confidence difference: **0.110** on `CF-C-10__class_or_identity_recovery`
+- the `COMPARISON` candidate set is **the same in both**
+<!-- /generated: reproducibility -->
+
+**What that means for reading this document.** The **labels** — the thing the proposal's argument and
+the §1 rule actually rest on — reproduce. The **bands** and the individual confidences do not, so
+treat every per-row figure quoted in the prose as one run's reading and check it against the retained
+JSON if it matters.
+
+**One honest gap in the history.** A run earlier than both of these was made before retention existed
+and was overwritten by the second; it is not recoverable and no claim here rests on it. The first row
+below is the run that was committed before this fix, kept as a retained artefact after the fact, which
+its `run_id` says.
 
 ## Where the screen and the lexical selector disagree, honestly
 
@@ -123,34 +137,31 @@ neither mechanism covers both paraphrase and terse literal forms, so both run.
 ## The rows you would need to read
 
 <!-- generated: reading -->
-Of the **22** rows outside the `CLEAR` band, **2** are terminal: `GCFPE-MGMT-10__promotion_checkpoint_required` (NONE, 0.78), `RS-20__specification_change_required` (NONE, 0.70).
+Of the **19** rows outside the `CLEAR` band, **2** are terminal: `GCFPE-MGMT-10__promotion_checkpoint_required` (NONE, 0.76), `RS-20__specification_change_required` (NONE, 0.74).
 
 | row | proposed | conf | terminal | lexical | condition |
 |---|---|---|---|---|---|
-| `CF-C-30__approved_base_correction_redline` | NONE | 0.69 | no | NAMES_SOURCE | approved immutable CRD base plus a source-backed factual finding or actual authorized product/s… |
-| `CF-C-30__crd_specification_delta_return` | READ_ONLY | 0.72 | no | NAMES_SOURCE | the exact affected native receiver recorded by the approved CRD Specification delta reads curre… |
-| `CF-C-40__approved_base_delta_revision` | NONE | 0.66 | no | NO_MATCH | pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base… |
-| `CF-C-40__preapproval_revision` | NONE | 0.67 | no | NO_MATCH | pending preapproval CRD Specification corrected under the exact redline… |
-| `CF-E-30__approved_base_correction_redline` | NONE | 0.74 | no | NAMES_SOURCE | approved immutable Epic base plus a source-backed factual finding or actual authorized product/… |
-| `CF-E-30__epic_specification_delta_return` | COMPARISON | 0.49 | no | NAMES_SOURCE | the exact affected native receiver recorded by the approved Epic Specification delta reads curr… |
-| `CF-E-40__approved_base_delta_revision` | NONE | 0.54 | no | NO_MATCH | pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base… |
-| `CF-E-40__approved_base_first_delta_authoring` | NONE | 0.69 | no | NO_MATCH | first standalone Epic Specification delta authored from the exact Thoth correction assessment/r… |
-| `CF-E-40__preapproval_revision` | NONE | 0.68 | no | NO_MATCH | pending preapproval Epic Specification corrected under the exact redline… |
-| `CL-20__adr_branch` | NONE | 0.79 | no | NO_MATCH | the conditional ADR predicate is satisfied and the ADR branch is explicitly selected… |
-| `GCFPE-MGMT-10__maintenance_complete_native_return` | NONE | 0.70 | no | NO_MATCH | scoped maintenance complete and the exact case separately authorizes one ready native continuat… |
-| `GCFPE-MGMT-10__promotion_checkpoint_required` | NONE | 0.78 | yes | NO_MATCH | exact-snapshot promotion approval or a required active control-layer checkpoint is outstanding;… |
-| `IA-30__delta_deny` | NONE | 0.77 | no | NAMES_SOURCE | REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; exact delta redlines return to the same IA author throu… |
-| `IA-30__initial_approve` | READ_ONLY | 0.51 | no | NAMES_SOURCE | REVIEW_MODE=INITIAL_PLAN_REVIEW and the pending whole-change Plan is approved; zero PF10 addend… |
-| `IA-30__initial_deny` | NONE | 0.43 | no | NAMES_SOURCE | REVIEW_MODE=INITIAL_PLAN_REVIEW; exact itemized redlines return to the same IA author for AUTHO… |
-| `IA-30__plan_delta_return` | COMPARISON | 0.55 | no | NAMES_SOURCE | REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approve… |
-| `QA-10__material_native_boundary` | NONE | 0.56 | no | NO_MATCH | a substantiated material scope, Canon, Specification, Plan, or authority boundary has an exact … |
-| `QA-10__not_ready` | NONE | 0.70 | no | NO_MATCH | evidence proves failure of an applicable approved Plan objective… |
-| `QA-110__escalation_required` | NONE | 0.79 | no | NO_MATCH | material QA evidence finding requires the native QA escalation report… |
-| `RS-20__in_scope_pr35` | NONE | 0.78 | no | NAMES_SOURCE | existing repair owner/phase is PR-35 under the original Proceed; no addendum… |
-| `RS-20__specification_change_required` | NONE | 0.70 | yes | NAMES_SOURCE | native Product Owner Specification-delta decision; no RS-20 addendum… |
-| `UTIL-10__already_applied` | NONE | 0.73 | no | NO_MATCH | every item is already applied with matching target/redline lineage and resulting content, and t… |
+| `CF-C-30__approved_base_correction_redline` | NONE | 0.59 | no | NAMES_SOURCE | approved immutable CRD base plus a source-backed factual finding or actual authorized product/s… |
+| `CF-C-30__crd_specification_delta_return` | READ_ONLY | 0.65 | no | NAMES_SOURCE | the exact affected native receiver recorded by the approved CRD Specification delta reads curre… |
+| `CF-C-40__approved_base_delta_revision` | NONE | 0.73 | no | NO_MATCH | pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base… |
+| `CF-C-40__preapproval_revision` | NONE | 0.64 | no | NO_MATCH | pending preapproval CRD Specification corrected under the exact redline… |
+| `CF-E-30__approved_base_correction_redline` | NONE | 0.73 | no | NAMES_SOURCE | approved immutable Epic base plus a source-backed factual finding or actual authorized product/… |
+| `CF-E-30__epic_specification_delta_return` | COMPARISON | 0.48 | no | NAMES_SOURCE | the exact affected native receiver recorded by the approved Epic Specification delta reads curr… |
+| `CF-E-40__approved_base_delta_revision` | NONE | 0.55 | no | NO_MATCH | pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base… |
+| `CF-E-40__approved_base_first_delta_authoring` | NONE | 0.70 | no | NO_MATCH | first standalone Epic Specification delta authored from the exact Thoth correction assessment/r… |
+| `CF-E-40__preapproval_revision` | NONE | 0.70 | no | NO_MATCH | pending preapproval Epic Specification corrected under the exact redline… |
+| `GCFPE-MGMT-10__maintenance_complete_native_return` | NONE | 0.77 | no | NO_MATCH | scoped maintenance complete and the exact case separately authorizes one ready native continuat… |
+| `GCFPE-MGMT-10__promotion_checkpoint_required` | NONE | 0.76 | yes | NO_MATCH | exact-snapshot promotion approval or a required active control-layer checkpoint is outstanding;… |
+| `IA-30__initial_approve` | READ_ONLY | 0.46 | no | NAMES_SOURCE | REVIEW_MODE=INITIAL_PLAN_REVIEW and the pending whole-change Plan is approved; zero PF10 addend… |
+| `IA-30__initial_deny` | NONE | 0.52 | no | NAMES_SOURCE | REVIEW_MODE=INITIAL_PLAN_REVIEW; exact itemized redlines return to the same IA author for AUTHO… |
+| `IA-30__plan_delta_return` | COMPARISON | 0.61 | no | NAMES_SOURCE | REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approve… |
+| `QA-10__material_native_boundary` | NONE | 0.63 | no | NO_MATCH | a substantiated material scope, Canon, Specification, Plan, or authority boundary has an exact … |
+| `QA-10__not_ready` | NONE | 0.72 | no | NO_MATCH | evidence proves failure of an applicable approved Plan objective… |
+| `RS-20__in_scope_pr35` | NONE | 0.74 | no | NAMES_SOURCE | existing repair owner/phase is PR-35 under the original Proceed; no addendum… |
+| `RS-20__specification_change_required` | NONE | 0.74 | yes | NAMES_SOURCE | native Product Owner Specification-delta decision; no RS-20 addendum… |
+| `UTIL-10__already_applied` | NONE | 0.69 | no | NO_MATCH | every item is already applied with matching target/redline lineage and resulting content, and t… |
 
-The other 258 are `CLEAR`. Full per-row output, with every probability distribution, is in `pf10_dependency.proposal.json` beside this file.
+The other 261 are `CLEAR`. Full per-row output, with every probability distribution, is in `pf10_dependency.proposal.json` beside this file.
 <!-- /generated: reading -->
 
 ## Answers to review, 2026-09-21

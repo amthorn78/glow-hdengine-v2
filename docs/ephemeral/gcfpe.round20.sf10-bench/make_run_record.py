@@ -351,6 +351,7 @@ def identities(args) -> dict:
         if count == 0:
             raise SystemExit(f"{name} contains no files; refusing to record an empty package")
 
+        skill = name[:-len(".skill")] if name.endswith(".skill") else name
         # Entry TYPES are read from the archive's own metadata, before extraction, because
         # extracting first and using `is_file()` follows the link: a symlink entry whose target
         # happens to hold the expected bytes ON THIS HOST hashed equal and the package was
@@ -358,8 +359,20 @@ def identities(args) -> dict:
         # bench never ran against a link at any of these paths.  `unzip -Z1` prints a name for
         # a symlink exactly as for a file, so the name listing cannot tell them apart.
         with zipfile.ZipFile(p) as zf:
-            linked = [i.filename for i in zf.infolist()
+            infos = zf.infolist()
+            linked = [i.filename for i in infos
                       if stat.S_ISLNK(i.external_attr >> 16)]
+        # The ENTRY ROSTER, directory entries included.  `payload_map()` records regular files
+        # only, so an archive carrying an unexpected EMPTY directory -- top-level or sibling --
+        # compared equal and was certified.  Same family as the outside-root finding: the
+        # comparison erased a node type it had no reason to erase.
+        outside = sorted({i.filename for i in infos
+                          if i.filename != f"{skill}/"
+                          and not i.filename.startswith(f"{skill}/")})
+        if outside:
+            raise SystemExit(f"{name} contains {len(outside)} entr(ies) outside `{skill}/`, "
+                             f"including directory entries the payload comparison does not see: "
+                             f"{outside[:5]}")
         if linked:
             raise SystemExit(f"{name} contains {len(linked)} symlink entr(ies); the tested tree "
                              f"has only regular files and a link's bytes are the host's, not the "
@@ -372,7 +385,6 @@ def identities(args) -> dict:
         # and that claim rested on a manual step rather than on anything checked here.  This
         # is the link between "the tests passed" and "these are the bytes you install", so it
         # is the one binding in this file that concerns the deliverable rather than the record.
-        skill = name[:-len(".skill")] if name.endswith(".skill") else name
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="pkgcheck-"))
         try:
             unpack = subprocess.run(["unzip", "-qq", str(p), "-d", str(tmp)],

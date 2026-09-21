@@ -41,6 +41,7 @@ import hashlib
 import json
 import pathlib
 import sys
+import time
 import urllib.request
 
 sys.dont_write_bytecode = True
@@ -131,8 +132,14 @@ def band(conf: float) -> str:
     return "CLEAR" if conf >= CLEAR else ("UNCERTAIN" if conf >= UNCERTAIN else "UNRESOLVED")
 
 
-def rows_of(contract: pathlib.Path) -> list[dict]:
-    sr = json.loads(contract.read_text(encoding="utf-8"))["state_routes"]
+def rows_of(raw: bytes) -> list[dict]:
+    """The rows, parsed from bytes the caller has already read and digested.
+
+    The contract was read twice: once here for the rows and once later for the digest. Across a
+    multi-batch network run lasting minutes, a change between those reads would have attributed
+    every decision to bytes the model never saw. One snapshot, one digest, one parse.
+    """
+    sr = json.loads(raw.decode("utf-8"))["state_routes"]
     out = []
     for prompt, lst in sorted(sr.items()):
         for r in lst:
@@ -150,7 +157,10 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0)
     args = ap.parse_args()
 
-    rows = rows_of(pathlib.Path(args.contract))
+    raw = pathlib.Path(args.contract).read_bytes()
+    contract_sha = hashlib.sha256(raw).hexdigest()
+    rows = rows_of(raw)
+    rows_available = len(rows)
     if args.limit:
         rows = rows[:args.limit]
     out_dir = pathlib.Path(args.out)
@@ -227,26 +237,41 @@ def main() -> int:
             "The model performed a one-time reading task; the guard that would follow is a "
             "deterministic enum check with no model and no network.",
         ],
+        "run_id": time.strftime("run-%Y%m%dT%H%M%SZ", time.gmtime()),
         "model_requested": MODEL,
         "model_served": sorted(served)[0],
         # The external input's exact identity, so a reviewer can tell whether the contract this
         # was classified from is the contract they are holding.
-        "contract": {"path": str(args.contract),
-                     "sha256": hashlib.sha256(
-                         pathlib.Path(args.contract).read_bytes()).hexdigest()},
+        "contract": {"path": str(args.contract), "sha256": contract_sha},
         "blocking_states": sorted(BLOCKING_STATES),
         "pre_registered": {"options": sorted(OPTIONS), "clear_at": CLEAR,
                            "uncertain_at": UNCERTAIN, "batch": BATCH,
                            "controls": len(CONTROLS), "controls_per_batch": 2},
         "rows_classified": len(results),
+        # COMPLETENESS is recorded, so a --limit run cannot be rendered as "every state_routes
+        # row".  It previously wrote the ordinary payload and exited 0, and pointing --out at the
+        # published directory would have republished the proposal from a slice.
+        "rows_available": rows_available,
+        "complete": len(results) == rows_available,
         "controls": control_results,
         "controls_correct": sum(1 for c in control_results if c["correct"]),
         "controls_total": len(control_results),
         "usage": dict(usage),
         "results": results,
     }
-    (out_dir / "pf10_dependency.proposal.json").write_text(
-        json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    body = json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    # Every run is RETAINED under its own name as well as published as the current one.  The
+    # proposal claimed a two-run reproducibility result while only the later JSON survived, so a
+    # reviewer could not check the comparison the conclusion rested on.  Run files are never
+    # overwritten; the name carries the run's own identity.
+    runs = out_dir / "runs"
+    runs.mkdir(parents=True, exist_ok=True)
+    stamp = payload["run_id"]
+    retained = runs / f"{stamp}.json"
+    if retained.exists():
+        raise SystemExit(f"{retained} already exists; run artefacts are never overwritten")
+    retained.write_text(body, encoding="utf-8")
+    (out_dir / "pf10_dependency.proposal.json").write_text(body, encoding="utf-8")
 
     tally = collections.Counter(r["choice"] for r in results.values())
     bands = collections.Counter(r["band"] for r in results.values())

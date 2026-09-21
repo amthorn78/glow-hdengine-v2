@@ -39,7 +39,8 @@ def blocks(d: dict) -> dict[str, str]:
         # absent value renders as unknown, which is what it is.
         f'| model requested / served | `{d["model_requested"]}` / '
         f'{"`" + d["model_served"] + "`" if d.get("model_served") else "**unknown — not captured**"} |',
-        f'| rows classified | **{len(R)}**, every `state_routes` row |',
+        f'| rows classified | **{len(R)}** of {d.get("rows_available", len(R))}, '
+        f'every `state_routes` row |',
         f'| contract classified | `{d["contract"]["sha256"]}` |',
         f'| blocking states, from the briefs | {", ".join(f"`{x}`" for x in d["blocking_states"])} |',
         f'| options | {", ".join(f"`{o}`" for o in d["pre_registered"]["options"])} |',
@@ -69,7 +70,56 @@ def blocks(d: dict) -> dict[str, str]:
         for k, v in need
     ] + ["", f'The other {bands["CLEAR"]} are `CLEAR`. Full per-row output, with every probability '
              f'distribution, is in `{DATA.name}` beside this file.']
-    return {"run": "\n".join(run), "result": "\n".join(result), "reading": "\n".join(reading)}
+    return {"run": "\n".join(run), "result": "\n".join(result), "reading": "\n".join(reading),
+            "reproducibility": reproducibility(d)}
+
+
+def reproducibility(_d: dict) -> str:
+    """Compare every retained run, from the retained files.
+
+    The two-run claim was prose while only the later JSON survived, so a reviewer could not check
+    the comparison the conclusion rested on. Every run is retained now and this block is derived
+    from those files, so the claim and its evidence cannot drift apart.
+    """
+    runs = sorted((HERE / "runs").glob("*.json"))
+    if len(runs) < 2:
+        return ("Only one run is retained, so no reproducibility comparison is made. "
+                f"Retained: {[r.name for r in runs] or 'none'}.")
+    loaded = [(r.name, json.loads(r.read_text(encoding="utf-8"))) for r in runs]
+    lines = ["| retained run | served | contract | controls | labels | bands |",
+             "|---|---|---|---|---|---|"]
+    for name, d in loaded:
+        R = d["results"]
+        lab = collections.Counter(v["choice"] for v in R.values())
+        bnd = collections.Counter(v["band"] for v in R.values())
+        lines.append(
+            f'| `{name}` | `{d["model_served"]}` | `{d["contract"]["sha256"][:12]}…` '
+            f'| {d["controls_correct"]}/{d["controls_total"]} '
+            f'| {" / ".join(str(lab[k]) for k in ("NONE", "READ_ONLY", "COMPARISON", "SOURCE_AVAILABILITY"))} '
+            f'| {" / ".join(str(bnd[k]) for k in ("CLEAR", "UNCERTAIN", "UNRESOLVED"))} |')
+    a, b = loaded[0][1]["results"], loaded[-1][1]["results"]
+    keys = sorted(set(a) & set(b))
+    same_label = sum(1 for k in keys if a[k]["choice"] == b[k]["choice"])
+    same_band = sum(1 for k in keys if a[k]["band"] == b[k]["band"])
+    moved = [k for k in keys if a[k]["band"] != b[k]["band"]]
+    worst = max(keys, key=lambda k: abs(a[k]["confidence"] - b[k]["confidence"]))
+    cmp_a = sorted(k for k in a if a[k]["choice"] == "COMPARISON")
+    cmp_b = sorted(k for k in b if b[k]["choice"] == "COMPARISON")
+    lines += [
+        "",
+        f'Label columns are `NONE / READ_ONLY / COMPARISON / SOURCE_AVAILABILITY`; band columns are '
+        f'`CLEAR / UNCERTAIN / UNRESOLVED`. Comparing the first and last retained runs over '
+        f'{len(keys)} shared rows:',
+        "",
+        f'- **identical label: {same_label} of {len(keys)}**',
+        f'- identical band: {same_band} of {len(keys)}'
+        + (f' — moved: {", ".join("`" + k + "`" for k in moved)}' if moved else ""),
+        f'- largest confidence difference: **{abs(a[worst]["confidence"] - b[worst]["confidence"]):.3f}** '
+        f'on `{worst}`',
+        f'- the `COMPARISON` candidate set is '
+        + ("**the same in both**" if cmp_a == cmp_b else f"**different**: {cmp_a} vs {cmp_b}"),
+    ]
+    return "\n".join(lines)
 
 
 def apply(doc: str, name: str, body: str) -> str:
@@ -88,7 +138,16 @@ def main() -> int:
     args = ap.parse_args()
     if not DATA.is_file():
         raise SystemExit(f"{DATA.name} is absent; there is no run to render")
-    b = blocks(json.loads(DATA.read_text(encoding="utf-8")))
+    d = json.loads(DATA.read_text(encoding="utf-8"))
+    # A run that classified a SLICE cannot be rendered as this proposal, whose generated blocks
+    # say "every `state_routes` row".  Refused rather than annotated, because the document's
+    # claim is completeness.
+    if d.get("complete") is False or (
+            d.get("rows_available") and d["rows_classified"] != d["rows_available"]):
+        raise SystemExit(f"{DATA.name} records a limited run "
+                         f"({d['rows_classified']} of {d.get('rows_available')} rows); this "
+                         f"proposal claims every row and will not be rendered from a slice")
+    b = blocks(d)
     doc = DOC.read_text(encoding="utf-8")
     if args.write:
         for name, body in b.items():

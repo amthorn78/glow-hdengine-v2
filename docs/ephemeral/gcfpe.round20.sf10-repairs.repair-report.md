@@ -1120,6 +1120,34 @@ was void and is credited nowhere; the table above is the re-run with exit codes 
 directly. This is the third instance this session of a harness that reports success while
 testing nothing, and the reason the bench keeps its three phases apart.
 
+### The corpus gate trusted its own argument — and five more
+
+Six findings, and the **P1 is the deepest defect found in this package**: `bench.py`'s corpus gate is
+the root of trust for every body-level claim here, and it checked only that the supplied `--registry`
+parsed to 55 pairs. A stale or fabricated registry holding 55 plausible pairs would have let a
+**different corpus** pass the gate while the records described it as the approved one. Reproduced: a
+copy of the registry with one digest zeroed still parsed to 55 rows. The supplied bytes must now equal
+the committed registry's bytes, and the control names both digests when they differ.
+
+The other five, each verified before fixing:
+
+| finding | what it allowed |
+|---|---|
+| archive **directory** entries uncompared | an archive with an unexpected empty directory certified; `payload_map()` records regular files only |
+| the contract read **twice** | the digest described the final bytes while the rows came from the initial read — a multi-batch network run could be attributed to bytes the model never saw |
+| `--limit` runs publishable | a slice written as the ordinary payload, renderable as "every `state_routes` row" |
+| only the later run retained | the two-run reproducibility claim had no evidence a reviewer could check |
+| `git ls-files` split on whitespace | an untracked document whose filename contains a space was skipped entirely and the inventory reported clean |
+
+All six controls fire. Every run is now retained under its own identity and never overwritten, and the
+reproducibility comparison is **generated from the retained files**.
+
+**That comparison corrected my own claim.** I had written that labels *and bands* reproduced exactly;
+that held between the first two runs and does not generalise. Measured across the two retained runs:
+**280 of 280 labels identical**, 275 of 280 bands identical, largest confidence difference **0.110**,
+and the `COMPARISON` candidate set the same in both. The labels are what the argument rests on; the
+bands are not reproducible and the document now says so.
+
 ## Independent §10 review — `SKILL_FIT_CONFIRMED` (`SFR-01`, 2026-09-21)
 
 Recorded as delivered, not paraphrased into an endorsement. `SFR-01` returned **`SKILL_FIT_CONFIRMED`**
