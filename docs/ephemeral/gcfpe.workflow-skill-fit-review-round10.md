@@ -10,6 +10,11 @@ findings: 3
 corpus_findings: 2
 finding_ids: [SF10-03, SF10-04, SF10-05, SF10-06, SF10-07]
 carried_forward: [SF10-02, prompt_bodies_validated, SF-05]
+successor_correction: 'SF10-04 is reclassified out of scope — see "Successor correction" at the
+  end of this artifact. The dated counts above are preserved unedited under AUTH-001; the
+  effective skill-finding set is {SF10-03, SF10-05} and the verdict is unchanged.'
+guard_holds_record_landed: 'PR #422 merged as 23a8b24; gcfpe.round19.d8-v11-cleared-and-installed.md
+  is now on main. The dependency section below is preserved as written and dated.'
 frozen_snapshot_sha256: c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb
 frozen_snapshot_files: 321
 gate: post-flight remains blocked until this returns SKILL_FIT_CONFIRMED
@@ -718,3 +723,62 @@ is not QA, not acceptance, not promotion, and not post-flight. Per §10, post-fl
 blocked: **the three skill findings and the two corpus findings are presented to Nathan for
 separate approval before any repair is attempted**, and `SF-05` is re-surfaced to him as the
 still-open body half of D8 rather than left in metadata.
+
+## Successor correction — `SF10-04` is out of this review's scope
+
+Added after this artifact was merged as `bb10357`. **Everything above is preserved unedited
+under `AUTH-001`**, including the frontmatter counts and the `SF10-04` finding text. This section
+is the correction; it does not rewrite the record it corrects.
+
+### What was wrong
+
+`SF10-04` should not have been raised as a finding, and this artifact contradicted itself in
+doing so. §A.0 above repeats round 7's uniform relationships, which include `flowmaster-propagate`
+as `NONE` at prompt level and out of scope by the review brief's own condition — and then
+Finding 2 raised that same skill and counted it among the three behind
+`SKILL_REPAIR_REQUIRED`.
+
+The governing scope is explicit. `docs/ephemeral/gcfpe.plan.repair-checklist.md`, under
+**"Skill-review scope"**, lists what the review covers and conditions one entry:
+
+> - `flowmaster-propagate` only if an approved Primary-core change exists; and
+
+**No Primary-core change exists, approved or otherwise**, measured rather than assumed:
+`flowmaster-primary/SKILL.md` in the frozen tree hashes to
+`0665507735b10b94a4f2bb76d65947db1ee6368f12a32a03ac5a509f1e609345`, which is exactly the value
+pinned as `flowmaster_primary_sha256` in three bundled direct-handoff contracts, as
+`flowmaster_primary_file_sha256` in the validation profile, and asserted by the validator itself
+at line 2229. The core is byte-unchanged, so the condition that would bring
+`flowmaster-propagate` into scope is not met.
+
+### What changes
+
+| | as written above | effective |
+|---|---|---|
+| skill findings | 3 — `SF10-03`, `SF10-04`, `SF10-05` | **2 — `SF10-03`, `SF10-05`** |
+| corpus findings | 2 — `SF10-06`, `SF10-07` | unchanged |
+| question 9 rests on | `SF10-04` and `SF10-05` | **`SF10-05` alone** — still **YES**, since the retired `glow-hde-devops` binding and the `contract_id` disagreement are obsolete bindings on their own |
+| verdict | `SKILL_REPAIR_REQUIRED` | **unchanged** — `SF10-03` blocks §11 by itself and `SF10-05` stands |
+
+`SF10-04`'s **observation** survives as an observation: `flowmaster-propagate` as installed cannot
+run by either route, and the measurements behind that are unchanged and correct. What does not
+survive is its status as a finding of this review and as a reason the post-flight gate stays
+blocked. **An out-of-scope maintenance tool must not hold the gate.** It becomes a finding for a
+future run only if an approved Primary-core change brings it into scope; until then it is
+recorded, not routed.
+
+### Why this matters beyond the one finding
+
+Round 19 was corrected for stating an absolute that its own next paragraph contradicted. This is
+the same shape: a scope statement quoted faithfully in §A.0 and then not applied two sections
+later. Quoting a constraint is not the same as checking the work against it — **a finding needs a
+scope check as well as an evidence check, and the scope was in this artifact the whole time.**
+
+### Also resolved since merge
+
+The dependency section above states that `gcfpe.round19.d8-v11-cleared-and-installed.md` was not
+on `main`. **PR #422 has since merged as `23a8b24`, so that record is now on `main`** and the
+`GUARD_HOLDS` row of that section's table resolves. The section is left as written, dated, and
+true when written; this is its successor note. The caution it carries is satisfied rather than
+withdrawn: the artifact may now be read against a `main` that carries the independent-review
+record.
