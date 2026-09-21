@@ -1,11 +1,15 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_POSTFLIGHT_PROMPT
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-21
 author: PE35
 round: 27
 release: GCFPE-20260914.1 / 091426.1 / 55
 subject: Independent post-flight of the frozen candidate — scoped to what stops the flow
+amended_date: 2026-09-21
+amendment: repointed at the repository homes established by PR #441 — freeze.py, the corpus
+  policy and the post-flight procedure all moved out of Notion and out of round 23. The prompt
+  had not yet been run; no finding or verdict is affected.
 ---
 
 # Post-flight prompt — GCFPE-20260914.1 / 091426.1 / 55
@@ -54,12 +58,14 @@ docs/ephemeral/gcfpe.round27/FREEZE-SNAPSHOT-r27.md. Reproduce each before audit
   CHANGE_FLOW_SPECIALIZATION_REVISION 3.2.8 · FLOWMASTER_VALIDATE_REVISION 3.2.14 ·
   validator_revision 3.2.12 · SKILL_TREE_SHA256 6f682315a9437c1275688d568ee8b79baeccdd52f9c896b89fdd617a46863a93
 
-Digest recipe: docs/ephemeral/gcfpe.round23/freeze.py, ROOTED AT THE SKILL DIRECTORY.
+Digest recipe: docs/prompt_ecosystem_management/freeze.py, ROOTED AT THE SKILL DIRECTORY.
 If any identity does not reproduce, stop and report that. Do not audit a tree you cannot name.
 
 === 2. THE ABSOLUTE CONSTRAINT ===
-Read the Prompt Corpus Storage and Fidelity Policy in the Glow Operations Hub before you start. It
-is non-negotiable and it governs your method, not just your conclusions.
+Read docs/prompt_ecosystem_management/prompt-corpus-policy.md before you start. It carries the
+Product Owner's directive verbatim, it is non-negotiable, and it governs your method, not just your
+conclusions. The Glow Operations Hub holds the same directive; the repository document governs.
+Your own procedure is docs/prompt_ecosystem_management/postflight-procedure.md.
 
 You may NOT, at any point, for any reason:
   - write prompt bodies to disk, individually or in bulk, even temporarily or "read-only"
