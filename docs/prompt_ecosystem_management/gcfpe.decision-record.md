@@ -842,3 +842,58 @@ governed for `glow-hde-devops` by this decision.
 draw authority from an unapproved one. When it does, the contradiction surfaces as a disagreement
 about a fact, and the repair instinct is to change the fact in whichever document is easier to
 edit. The correct repair is to fix the authority relationship and leave the observation intact.
+
+## D17 — `GCFPE-20260914.1 / 091426.1 / 55` is promoted; every predecessor is archived intact
+
+**Product Owner, 2026-09-21:** *"I approve promotion. Promote, document thoroughly, and move all
+predecessors to archive."*
+
+The three predicates the register entry set were met first, in order: complete behaviour
+validation of the exact pinned snapshot, independent governance post-flight with no mandatory
+unresolved finding (`PASS WITH WARNINGS`, **zero findings against the release**), and the Product
+Owner's separate approval of that snapshot.
+
+### The transaction order is part of the decision
+
+The register entry specified it and it was followed: **prepare and verify every successor binding
+first, update the stable selection register last, rerun production validation against the
+activated state, archive only after that.** No write failed, none was ambiguous, and no receipt
+was inferred. This is a coordinated transaction, not an atomic one — the ordering *is* the safety
+property, because there is no cross-system rollback.
+
+### No page asserts its own selection
+
+Ten control bindings moved to `status: REGISTER_CONTROLLED`, each carrying the register's URL and
+the rule that it is operative **if and only if** the register selects this release. The register
+alone says "selected".
+
+This is not decoration. The ecosystem's own rule is *"never infer selected, merged, accepted or
+resumed from those surfaces — resolve the authority that owns that exact state."* A catalog that
+declares itself selected is a second authority, and two authorities is how a release ends up half
+promoted with nobody able to say which half. The pattern was already designed, in
+`GCFPE-20260914.1-Production-Activation-Delta-Manifest.md`; this decision adopts it as standing.
+
+### Archival is a move, never a copy
+
+56 pages — 54 member prompts, the PE Metaprompt, and the predecessor catalog — were **moved** to
+the existing archive. A move preserves the page, its ID and its body; nothing was deleted,
+overwritten or reconstructed. All 56 were confirmed present under the destination afterwards.
+
+The un-versioned *Glow HDE Prompt Flow Index* was deliberately left in place: it is the parent of
+the stable register, and archiving it would have taken the selection authority with it. **Check
+what a page parents before archiving it.**
+
+### What promotion did not change
+
+Alpha remains `ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR`. **Selection is governance maintenance,
+not Alpha execution.** `HDE-EPIC040` PR01–PR03 remain accepted-final, PR04 has not started, and
+its PR-10 handoff remains `NOT_YET_APPROVED` until Nathan's manual decision. Merge and abort
+remain Nathan-only actions.
+
+### The activation delta beyond the register is a separate, open change
+
+Promotion recorded the selection. It did **not** rewrite the `UNSELECTED_CANDIDATE` literals that
+remain inside the 55 prompt bodies and the two bundled machine contracts. Those are a real
+follow-on, they touch bytes an independent review was scoped to, and they are recorded as open
+rather than quietly performed. A promotion that silently edited 55 validated bodies would have
+voided the post-flight verdict that authorised it.
