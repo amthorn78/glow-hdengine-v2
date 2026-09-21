@@ -41,7 +41,7 @@ Superseded, do not chase: contract 1c3c7969… / 610549 bytes and graph 1d0b7258
 Both were correct through round 27 and appear in every earlier record.
 
 === 4. WHERE THE REPOSITORY EVIDENCE IS ===
-Repository amthorn78/glow-hdengine-v2. Branch docs/20260921-prompt-body-policy.
+Repository amthorn78/glow-hdengine-v2. Branch docs/20260921-prompt-body-policy, commit b83bd1070b2437184c17b5ac254a7cfcd52380dc.
 **NOT MERGED.** Do not look on main; the graph parts and the policy are only on that branch.
   docs/prompt_ecosystem_management/prompt-body-content-policy.md   the governing policy
   docs/ephemeral/gcfpe.round28/REPORT-r28.md                       this round's report
