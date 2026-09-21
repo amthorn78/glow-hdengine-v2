@@ -304,6 +304,7 @@ def identities(args) -> dict:
 
     ids = {
         "base_tree": (total, counted, digest),
+        "base_pyc": sum(1 for q in base.rglob("*.pyc")),
         "fm_diff": fm_text,
         "fm_changed": fm_changed,
         "files": differing(base, work),
@@ -449,6 +450,21 @@ def bench_block(ids: dict) -> str:
             f"Full stdout:\n\n```\n{ids['bench_stdout']}\n```")
 
 
+def freeze_summary(ids: dict) -> str:
+    """The frozen tree's three identity fields, from the tree.
+
+    `check()` used to ask only whether the DIGEST occurred somewhere in the document, so the
+    recorded 321 and 320 were never compared with what `identities()` had just counted: input
+    validation recomputed them and record validation threw them away.  All three are one block
+    now, generated and asserted whole, because a count that disagrees with its own digest is
+    exactly the kind of record a reader trusts without checking.
+    """
+    total, counted, digest = ids["base_tree"]
+    return (f"- files: **{total}**, of which **{counted}** excluding `manifest.json`\n"
+            f"- `.pyc` files: **{ids['base_pyc']}**\n"
+            f"- recorded freeze digest: `{digest}`")
+
+
 def corpus_summary(ids: dict) -> str:
     """The corpus roster's two summary lines, from the corpus itself.
 
@@ -485,6 +501,7 @@ def write_records(ids: dict) -> int:
     doc = replace_marked(doc, "bodies", bodies_table(ids))
     doc = replace_marked(doc, "flowmaster-diff", "```diff\n" + ids["fm_diff"] + "\n```")
     doc = replace_marked(doc, "corpus-summary", corpus_summary(ids))
+    doc = replace_marked(doc, "freeze-summary", freeze_summary(ids))
     doc = replace_marked(doc, "bench", bench_block(ids))
     RUN_RECORD.write_text(doc, encoding="utf-8")
     print(f"run record regenerated: {len(ids['files'])} changed files, "
@@ -513,8 +530,11 @@ def check(ids: dict) -> int:
     # `check()` asserts what the RECORDS say.  The freeze count and digest of `--base` are
     # properties of an INPUT, enforced in `identities()`, which BOTH modes traverse --
     # asserting them only here is precisely what let `--write` bypass them.
-    if FREEZE_DIGEST not in rr:
-        problems.append("run-record does not state the frozen tree digest")
+    if freeze_summary(ids) not in rr:
+        total, counted, digest = ids["base_tree"]
+        problems.append(f"run-record does not state the frozen tree as measured: {total} files, "
+                        f"{counted} excluding manifest.json, {ids['base_pyc']} .pyc, "
+                        f"{digest[:16]}…")
 
     # The roster is compared in both directions.  The old check only asked whether every
     # file it found was in the record, never whether every file in the record was found --
@@ -587,8 +607,18 @@ def check(ids: dict) -> int:
                             f"difference: {other} lines where it should be "
                             f"{ids['fm_changed']}")
 
-    if str(ids["patch_lines"]) not in rp:
-        problems.append(f"report does not state the patch's current line count {ids['patch_lines']}")
+    # A LABELLED sentence, not the bare digits.  `str(411) in rp` passed on any occurrence of
+    # "411" anywhere in a 1100-line document -- including a control description that happened to
+    # restate the same number -- so the summary sentence it was meant to protect could go stale
+    # while the check stayed green.  The duplicate mention was removed rather than bound twice.
+    patch_phrase = f"**{ids['patch_lines']} patch lines**"
+    if patch_phrase not in rp:
+        problems.append(f"report does not state the patch's current line count: expected "
+                        f"{patch_phrase!r}")
+    for other in re.findall(r"\*\*(\d+) patch lines\*\*", rp):
+        if int(other) != ids["patch_lines"]:
+            problems.append(f"report states a superseded patch line count: {other} where it "
+                            f"should be {ids['patch_lines']}")
     # The report spells the bench's case count in words, so the check requires the spelled
     # form and rejects any OTHER spelled number appearing in that role.  A bare `str(n)`
     # substring test was tried first and silently passed a reverted count, because the
@@ -611,10 +641,14 @@ def check(ids: dict) -> int:
             if other != n and f"{word} cases, exit 0" in rp:
                 problems.append(f"report still states a superseded bench case count: "
                                 f"{word!r} ({other}) where it should be {spelled!r} ({n})")
-    if f"**{n} cases," not in rr:
-        problems.append(f"run-record does not state the bench's current case count {n}")
-    if ids["bench_stdout"] not in rr:
-        problems.append("run-record does not contain the current bench stdout verbatim")
+    # The WHOLE rendered block, which binds the exit status, both counts and the verbatim stdout
+    # together.  Two fragment tests stood here -- "**19 cases," somewhere, and the stdout
+    # somewhere -- and a fragment cannot tell a consistent record from one whose headline and
+    # output disagree.
+    if bench_block(ids) not in rr:
+        problems.append(f"run-record does not contain the bench block as measured: exit "
+                        f"{ids['bench_exit']}, {n} cases, {ids['bench_failed']} not as expected, "
+                        f"with its stdout verbatim")
 
     # The corpus is verified, not merely computed.  An earlier revision of this checker
     # built `ids["bodies"]` -- 55 prompt ids, digests and byte counts -- and then never

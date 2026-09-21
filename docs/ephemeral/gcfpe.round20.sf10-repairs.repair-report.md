@@ -76,7 +76,7 @@ the package, which are also the two with the widest consequences.
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `0460116f1a57e78d…` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 411 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, **411 patch lines**.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and it still is: four functions, 7355 characters, md5
@@ -818,7 +818,7 @@ a difference that was not a difference.
 
 | injected | result |
 |---|---|
-| a patch with the **same 411 lines** but one changed content line | refused, canonical digests named |
+| a patch with the **same line count** but one changed content line | refused, canonical digests named |
 | a work tree with a file replaced by a **directory** | refused, quoting the unparsed `diff` line |
 | **`--write`** against a modified base tree | refused, **and the record is byte-unchanged afterwards** |
 | two report rows exchanging their repaired prefixes | refused, both rows named |
@@ -986,6 +986,44 @@ was found by a **file count in a package listing**, after the fact. This time th
 exactly that failure stopped the measurement before any record was produced. The files were removed,
 the freeze digest re-verified at `c321be051b90c346…`, and the whole suite re-run with the pin set;
 every exit code reproduced.
+
+### The seventh membership test, and the sweep I should have done at the second
+
+Two findings, both correct, both the same shape as five before them: an assertion weaker than the
+claim it backs.
+
+- `str(patch_lines) in report` passed on **any** occurrence of `411` in a 1100-line document —
+  including a control description that restated the same number — so the summary sentence it
+  protected could go stale while the check stayed green.
+- `FREEZE_DIGEST in run_record` asked only whether the digest appeared. The recorded **321** and
+  **320** were never compared with what `identities()` had just counted: input validation
+  recomputed them and record validation threw them away.
+
+**So this time I swept every remaining assertion rather than fixing the two shown.** All nine record
+assertions in `check()` were enumerated and classified; three were weaker than their claims and all
+three are now bound:
+
+| assertion | before | now |
+|---|---|---|
+| frozen tree | digest present somewhere | the three fields generated as one block and asserted whole |
+| patch line count | the bare digits anywhere in the report | a labelled phrase, asserted positively **and** negatively |
+| bench | two fragments — a headline substring, the stdout somewhere | the whole rendered block, binding exit status, both counts and stdout together |
+
+The other six were already complete-row or verbatim bindings. The duplicate `411` was **removed**
+rather than bound twice: a second copy of a figure is a second place for it to go stale, and that
+control's sentence did not need the number to make its point.
+
+| injected | result |
+|---|---|
+| the freeze file count mistyped, digest left correct | refused, naming all three measured fields |
+| the excluding-manifest count mistyped | refused |
+| the patch summary stale, the other `411` left in place | refused **twice** — expected phrase absent, superseded value present |
+| the bench headline and its stdout made to disagree | refused |
+
+**The claim inventory then caught the line I had just bound**, on its first use against live work:
+`**411 patch lines**` is owned by `check()`, but the inventory only recognises marker blocks and
+allow-list entries, so it required me to say so in writing. That is the tool doing its job rather
+than a false positive, and the entry now names the mechanism.
 
 ### One review finding declined, with the measurement
 

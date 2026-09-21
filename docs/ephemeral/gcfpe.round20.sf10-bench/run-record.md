@@ -64,9 +64,12 @@ harness; the report should not be read as claiming otherwise.
 ### The frozen installed tree (the `--base` source)
 
 - root: `synced/<bucket-id>/` (the freeze is rooted here, not at `~/.claude/skills`)
+
+<!-- generated: freeze-summary -->
 - files: **321**, of which **320** excluding `manifest.json`
 - `.pyc` files: **0**
 - recorded freeze digest: `c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb`
+<!-- /generated: freeze-summary -->
 
 ### The 55-body corpus (the `--prompt-dir` / `--bodies` source)
 
