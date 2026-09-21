@@ -1,0 +1,13 @@
+{
+  "docs/ephemeral/gcfpe.round20.decision-briefs.md": {
+    "The remaining **60** stop on some combination of an unresolvable source, authority, owner, identity or": "DERIVED, NOT OWNED: 72 terminal state_routes rows minus the 12 enumerated above. Nothing recomputes it. If the contract's terminal rows change — which Option A's `pf10_dependency` field would do — this must be re-measured from `state_routes`. Flagged deliberately as the live exposure this tool was built to surface."
+  },
+  "docs/ephemeral/gcfpe.round20.sf10-repairs.repair-report.md": {
+    "**321 files, 320 counted, `c321be051b90c346…`** — while `find . -type f`, the recipe this file": "Fixed historical measurement: what the OLD traversal returned on a symlinked copy of the freeze, recorded 2026-09-21. Must not be updated; it is evidence that the defect was real.",
+    "The recorder refused immediately — *\"--base holds 324 files (323 excluding manifest.json); the freeze": "Verbatim quotation of a refusal message from a specific run, 2026-09-21. A dated record, never corrected (AUTH-001).",
+    "asserted, but `- total bytes: **1,060,573**` above them was typed once and never summed — so": "Quotes the run record's corpus total as it stood when the defect was found. The live value is generated in run-record.md under the `corpus-summary` marker; this is the historical quotation.",
+    "documents, counts **320**. So the implementation and the recipe it claimed to implement disagreed,": "Same fixed measurement as the line above (the `find . -type f` count on that copy).",
+    "is 321 (320)\"* — and wrote nothing.": "Continuation of the quoted refusal message above.",
+    "the freeze digest re-verified at `c321be051b90c346…`, and the whole suite re-run with the pin set;": "The freeze digest is recomputed and enforced by make_run_record.py `identities()` (FREEZE_DIGEST) on every run, in both --write and --check."
+  }
+}

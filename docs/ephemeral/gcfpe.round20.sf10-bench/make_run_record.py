@@ -449,57 +449,43 @@ def bench_block(ids: dict) -> str:
             f"Full stdout:\n\n```\n{ids['bench_stdout']}\n```")
 
 
-FM_OPEN = "<!-- generated: flowmaster-diff -->"
-FM_CLOSE = "<!-- /generated: flowmaster-diff -->"
-
-
-def replace_fm(doc: str, ids: dict) -> str:
-    block = f"{FM_OPEN}\n```diff\n{ids['fm_diff']}\n```\n{FM_CLOSE}"
-    pat = re.compile(re.escape(FM_OPEN) + r".*?" + re.escape(FM_CLOSE), re.S)
-    if not pat.search(doc):
-        raise SystemExit("cannot find the flowmaster-diff block in the run record")
-    return pat.sub(lambda _m: block, doc, count=1)
-
-
-CORPUS_SUMMARY = re.compile(r"- bodies: \*\*\d+\*\*\n- total bytes: \*\*[\d,]+\*\*")
-
-
-def replace_corpus_summary(doc: str, ids: dict) -> str:
-    """Regenerate the corpus roster's two summary lines from the corpus itself.
+def corpus_summary(ids: dict) -> str:
+    """The corpus roster's two summary lines, from the corpus itself.
 
     The body TABLE was generated and every row asserted, but the `total bytes` figure above it
     was typed once and never summed -- so `--check` could report that every identity was
     mechanically current while the summary named a corpus that was not supplied.  The aggregate
     is the same species as the rows it sits above; it just happened to be written in prose.
     """
-    block = (f"- bodies: **{len(ids['bodies'])}**\n"
-             f"- total bytes: **{ids['bodies_bytes']:,}**")
-    if not CORPUS_SUMMARY.search(doc):
-        raise SystemExit("cannot find the corpus summary lines in the run record")
-    return CORPUS_SUMMARY.sub(lambda _m: block, doc, count=1)
+    return (f"- bodies: **{len(ids['bodies'])}**\n"
+            f"- total bytes: **{ids['bodies_bytes']:,}**")
 
 
-def replace_table(doc: str, header: tuple[str, str], new_block: str, label: str) -> str:
-    pat = re.compile(re.escape(header[0]) + r"\n" + re.escape(header[1]) + r"\n(?:\|[^\n]*\|\n?)+")
-    m = pat.search(doc)
-    if not m:
-        raise SystemExit(f"cannot find the {label} table in the run record")
-    return doc[:m.start()] + new_block + "\n" + doc[m.end():]
+def replace_marked(doc: str, name: str, body: str) -> str:
+    """Replace the content between `<!-- generated: name -->` and its closing marker.
+
+    Every generated region is marker-delimited, and that is a correctness property rather than
+    tidiness.  The shape-matching patterns this replaced -- "a table whose header is exactly
+    this", "a fence introduced by this sentence" -- had to be duplicated into the claim-inventory
+    tool so that it could tell a generated value from a typed one.  Two copies of one rule is
+    how the guard drift in this package began.  The markers put ownership in the document, where
+    both tools read the same statement of it instead of each carrying its own.
+    """
+    open_t, close_t = f"<!-- generated: {name} -->", f"<!-- /generated: {name} -->"
+    pat = re.compile(re.escape(open_t) + r".*?" + re.escape(close_t), re.S)
+    if not pat.search(doc):
+        raise SystemExit(f"cannot find the `{name}` generated block in the run record")
+    return pat.sub(lambda _m: f"{open_t}\n{body}\n{close_t}", doc, count=1)
 
 
 def write_records(ids: dict) -> int:
     doc = RUN_RECORD.read_text(encoding="utf-8")
-    doc = replace_table(doc, MARK_FILES, files_table(ids), "changed-files")
-    doc = replace_table(doc, MARK_PKG, packages_table(ids), "packages")
-    doc = replace_table(doc, MARK_BODIES, bodies_table(ids), "bodies")
-    doc = replace_fm(doc, ids)
-    doc = replace_corpus_summary(doc, ids)
-    pat = re.compile(r"Exit \d+\. \*\*\d+ cases, \d+ not as expected\.\*\* Full stdout:\n\n```\n.*?\n```",
-                     re.S)
-    m = pat.search(doc)
-    if not m:
-        raise SystemExit("cannot find the bench section in the run record")
-    doc = doc[:m.start()] + bench_block(ids) + doc[m.end():]
+    doc = replace_marked(doc, "changed-files", files_table(ids))
+    doc = replace_marked(doc, "packages", packages_table(ids))
+    doc = replace_marked(doc, "bodies", bodies_table(ids))
+    doc = replace_marked(doc, "flowmaster-diff", "```diff\n" + ids["fm_diff"] + "\n```")
+    doc = replace_marked(doc, "corpus-summary", corpus_summary(ids))
+    doc = replace_marked(doc, "bench", bench_block(ids))
     RUN_RECORD.write_text(doc, encoding="utf-8")
     print(f"run record regenerated: {len(ids['files'])} changed files, "
           f"{len(ids['bodies'])} bodies, {len(ids['packages'])} packages, "
@@ -647,7 +633,7 @@ def check(ids: dict) -> int:
                         + (" …" if len(missing_rows) > 5 else ""))
     # The aggregate is asserted as a COMPLETE pair of lines, so a stale body count and a stale
     # byte total cannot each look plausible beside the other.
-    summary = f"- bodies: **{len(ids['bodies'])}**\n- total bytes: **{ids['bodies_bytes']:,}**"
+    summary = corpus_summary(ids)
     if summary not in rr:
         problems.append(f"run-record does not state the corpus summary: expected "
                         f"{len(ids['bodies'])} bodies totalling {ids['bodies_bytes']:,} bytes")

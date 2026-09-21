@@ -70,12 +70,15 @@ harness; the report should not be read as claiming otherwise.
 
 ### The 55-body corpus (the `--prompt-dir` / `--bodies` source)
 
+<!-- generated: corpus-summary -->
 - bodies: **55**
 - total bytes: **1,060,573**
+<!-- /generated: corpus-summary -->
 - every body's SHA-256 is checked against its `evidence_contract` digest in
   `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` before any case runs;
   the bench exits 1 if the set is not exactly those 55 with exactly those digests.
 
+<!-- generated: bodies -->
 | prompt | sha256 | bytes |
 |---|---|---|
 | `CF-C-10` | `41dce73a62735927d291bd8f7342654d314d38de47070fe37f8a6c9318fd1702` | 7203 |
@@ -133,9 +136,10 @@ harness; the report should not be read as claiming otherwise.
 | `RS-30` | `4c5f96f002762200a18fc8eff864d85157ef5d12487e6b044adc51e3fef5641a` | 12113 |
 | `RS-40` | `ddef768be169c6eb41660433ff7557d72b3ebc5dd3ba8f617bdeb113b4732630` | 8233 |
 | `UTIL-10` | `9234ff70454e2cd12f2d98e40a9ce103f9a27c87d51e7ded78aae5352cd96de4` | 6934 |
-
+<!-- /generated: bodies -->
 ### The nine files that differ between `--base` and `--work`
 
+<!-- generated: changed-files -->
 | file | base sha256 | work sha256 |
 |---|---|---|
 | `change-flow/SKILL.md` | `e6bd29d59ca0152254c9f234e79b7fe146152bc20898e6e621c58904b6aa4f93` | `b26332af385b7c169739d7635c381a75dfa658c8d967fb9168634458f3592d2c` |
@@ -147,14 +151,15 @@ harness; the report should not be read as claiming otherwise.
 | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef0996249540b46607b855c8d17d841fdd24ce3b615f97e6199bc2e` | `b0456a27816c47dea31382a55e3bc9070c329d140a8dcbec76c0e56ef0195094` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d599812498e015fa7dfa88c095a899be80464a394d14d727e5` | `8cff6c7ef685c0a008dc5ea6290a379368723c46d14b184912a1971fd67dd43b` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f172ef4107b084a1b6151bcb056944504572e3e3e245fb7fb` | `272d7b81fa091ce2f03dcf3fcc68c62134a5426bfa26214b0af50e03e5b17f91` |
-
+<!-- /generated: changed-files -->
 ### The packages built from `--work`
 
+<!-- generated: packages -->
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241886 | `07864f2b1315aca01c7c0d0fba9278a31afb64f3df5587c55303f5ffd7fddf7b` |
 | `flowmaster-validate.skill` | 29 | 272724 | `43075084f00515f12a3a88bfd61e585054697106c416d8dfef89ab942207d7a0` |
-
+<!-- /generated: packages -->
 Each archive was verified by extracting it and running a full recursive diff against the
 working copy; both are identical. `zip -X` is used so a rebuild from unchanged content
 reproduces the same digest, which was confirmed by building twice.
@@ -352,6 +357,7 @@ is untouched by this package.
 
 ### The bench
 
+<!-- generated: bench -->
 Exit 0. **19 cases, 0 not as expected.** Full stdout:
 
 ```
@@ -495,3 +501,4 @@ corpus gate: all 55 bodies match their recorded evidence_contract digest
 
 ALL CASES AS EXPECTED
 ```
+<!-- /generated: bench -->
