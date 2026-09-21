@@ -1,0 +1,528 @@
+diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
+--- base/flowmaster-validate/SKILL.md	2026-09-21 15:25:59.958210328 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-21 15:31:04.955186802 +0000
+@@ -5,7 +5,8 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.2.11
++FLOWMASTER_VALIDATE_REVISION: 3.2.13
++SKILL_TREE_SHA256: 5bb632ce952b11649e5e868904a5fe7f4d594d5ec1083fa1c000c58cf1cd2fb6
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+@@ -51,6 +52,32 @@
+ that uniquely fires it; before this round the length half had none. `change-flow` is untouched and stays at 3.2.8; only this skill's bytes
+ move, so only this skill needs a fresh §10.
+ 
++Round 26 removes the prompt-corpus mirror. The Product Owner's **Prompt Corpus Storage and
++Fidelity Policy** of 2026-09-21 governs: the ecosystem is authored in Notion, is not an
++application source repository, and must not be transcribed, exported, mirrored, cached or hashed
++to disk. `--prompt-dir` required a complete local corpus of 55 files before the body-level gates
++would run, which is that mirror, and five files depended on it. Bodies now arrive as
++`{prompt_id: text}` on **stdin** -- deliberately with no path option, because a file persists --
++and the validator checks whatever pages the caller actually read. Coverage is **reported**, not
++required: the result names the prompts validated and the set-scoped checks that could not run,
++so a partial run can never read as a full pass. Four checks went with the mirror they policed:
++`PROMPT_BODY_MEMBER_SET`, `PROMPT_BODY_DUPLICATE`, `PROMPT_BODY_FILENAME_ID` and
++`PROMPT_BODY_UTF8` described a directory, never the ecosystem, and membership belongs to the
++registry and the graph. `PROMPT_BODY_MISSING_ID` becomes `PROMPT_BODY_ID_MISMATCH`, which
++compares the body's own `Prompt ID:` header against the key it was supplied under and so catches
++the one error this interface makes likelier than a directory did -- reading the wrong page. Body
++hashes are gone entirely, `prompt_body_sha256` with them.
++
++`SKILL_TREE_SHA256` is the single hash this skill computes, and it is of **itself**. A skill's
++own bytes are not the prompt corpus. It exists because nothing else catches the wrong package
++being installed: on 2026-09-21 a withdrawn package was installed in place of its successor, under
++the identical filename the packager is required to use, and the hash-pin chain, the fixture
++suites and the independent review all stayed green for a full round. The validator now refuses to
++certify anything when its own tree does not match its declaration. Validation behaviour changes,
++so `validator_revision` moves to **3.2.11** and `FLOWMASTER_VALIDATE_REVISION` to **3.2.13**;
++3.2.10 and 3.2.12 belong to the withdrawn round-25 package that a published verdict describes.
++`change-flow` is untouched and stays at 3.2.8.
++
+ R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1
+ 
+ R1_CONTRACT_MATRIX_SHA256: faa7fb7d77066cc491bde957b6d2f7d3255c74833936e3952f97873da27ea2f1
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 15:25:59.969681063 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 15:30:54.207221781 +0000
+@@ -42,5 +42,5 @@
+   "selected_release_during_staging": "GCFPE-20260913.1",
+   "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20260914.1",
+-  "validator_revision": "3.2.9"
++  "validator_revision": "3.2.11"
+ }
+diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+--- base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 15:25:59.972683940 +0000
++++ work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 15:30:54.207555739 +0000
+@@ -287,7 +287,7 @@
+ 
+ 
+ def run(change_skill_dir: Path, contract_path: Path, fixture_path: Path | None = None,
+-        prompt_dir: Path | None = None) -> dict[str, Any]:
++        bodies: dict[str, str] | None = None) -> dict[str, Any]:
+     fixture_path = fixture_path or FIXTURE_PATH
+     profile, profile_errors = load_profile()
+     source = json.loads(contract_path.read_text(encoding="utf-8"))
+@@ -542,7 +542,7 @@
+     source_case_count = 0
+     # SF10-09: the CURRENT_PF10_MARKDOWN predicate is exercised directly, because it is a pure
+     # function of the body text and so needs no corpus -- these cases run in the contract suite
+-    # rather than only when --prompt-dir is supplied.
++    # rather than only when bodies are supplied.
+     #
+     # Three of the ten FAIL on the previous encoding and are the proof of the repair: an interposed
+     # word, the document's own title, and Markdown stated before the identity. The other seven
+@@ -588,14 +588,11 @@
+             "errors": [] if observed_stated == expect_stated else ["CURRENT_PF10_MARKDOWN_PREDICATE"],
+         })
+ 
+-    if prompt_dir is not None:
+-        bodies = {}
+-        for prompt_id in ("QA-120", "CL-E-10", "CL-C-10"):
+-            paths = list(prompt_dir.rglob(f"{prompt_id}.md"))
+-            if len(paths) != 1:
+-                raise ValueError(f"Expected one complete {prompt_id} body")
+-            bodies[prompt_id] = paths[0].read_text(encoding="utf-8")
+-        observed = validate_qa_closure_bodies(bodies, source)
++    # The QA class-map cases need exactly three bodies and run only when all three were
++    # supplied.  Absent them the suite reports fewer cases rather than inventing a result.
++    qa_trio = ("QA-120", "CL-E-10", "CL-C-10")
++    if bodies and all(pid in bodies for pid in qa_trio):
++        observed = validate_qa_closure_bodies({pid: bodies[pid] for pid in qa_trio}, source)
+         cases.append({"name": "accept-live-source-class-specific-closure-intakes",
+                       "passed": observed == [], "errors": observed})
+         # The first two anchors previously assumed the Markdown pipe rendering of
+@@ -658,13 +655,13 @@
+                       "expected_error": "QA_PASS_BODY_CLASS_MAP", "errors": observed})
+         source_case_count = 9
+ 
+-    timing_cases = run_artifact_timing_cases(prompt_dir, source) if prompt_dir is not None else []
++    timing_cases = run_artifact_timing_cases(bodies, source) if bodies else []
+     cases.extend(timing_cases)
+     section_13_cases = [case for case in cases if case.get("fixture_id")]
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.2.9",
++        "validator_revision": "3.2.11",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+@@ -688,12 +685,17 @@
+     parser.add_argument("change_skill_dir", type=Path)
+     parser.add_argument("--contract", type=Path, required=True)
+     parser.add_argument("--fixture", type=Path)
+-    parser.add_argument("--prompt-dir", type=Path)
++    # STDIN only, as {"PROMPT-ID": "<text>"}.  No path option: a file would persist.
++    parser.add_argument("--bodies-stdin", action="store_true")
+     args = parser.parse_args()
++    supplied: dict[str, str] | None = None
++    if args.bodies_stdin:
++        raw = sys.stdin.read()
++        supplied = json.loads(raw) if raw.strip() else {}
+     result = run(
+         args.change_skill_dir.resolve(), args.contract.resolve(),
+         args.fixture.resolve() if args.fixture else None,
+-        args.prompt_dir.resolve() if args.prompt_dir else None,
++        supplied,
+     )
+     print(json.dumps(result, indent=2, sort_keys=True))
+     return 0 if result["fixture_suite_ok"] else 1
+diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
+--- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 15:25:59.973626204 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 15:30:54.208566468 +0000
+@@ -839,16 +839,14 @@
+         from validate_gcfpe_20260914 import validate_package as validate_candidate
+         from run_gcfpe_20260914_fixtures import run as run_candidate_fixtures
+ 
+-        prompt_dir = (
+-            gcfpe_candidate_root / "prompts"
+-            if gcfpe_candidate_root is not None
+-            else None
+-        )
++        # The suite supplies no prompt bodies.  It used to construct
++        # <candidate-root>/prompts and hand it over, which assumed a corpus mirror existed;
++        # the body-level checks now run only where a caller has read the relevant pages.
+         try:
+             candidate = validate_candidate(
+                 change_dir,
+                 gcfpe_contract,
+-                prompt_dir,
++                None,
+                 gcfpe_candidate_root,
+             )
+         except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+@@ -883,7 +881,7 @@
+             )
+ 
+         try:
+-            candidate_cases = run_candidate_fixtures(change_dir, gcfpe_contract, prompt_dir=prompt_dir)
++            candidate_cases = run_candidate_fixtures(change_dir, gcfpe_contract, bodies=None)
+         except (OSError, UnicodeError, json.JSONDecodeError, KeyError, IndexError, TypeError, ValueError) as exc:
+             candidate_cases = {
+                 "fixture_suite_ok": False,
+@@ -1220,7 +1218,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.2.9",
++            "validator_revision": "3.2.11",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 15:25:59.974187091 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 15:30:54.208210843 +0000
+@@ -1060,7 +1060,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+-        "validator_revision": "3.2.9",
++        "validator_revision": "3.2.11",
+         "target_release": "GCFPE-20260914.1",
+         "prompt_version": "091426.1",
+         "candidate_member_count": 55,
+@@ -2190,41 +2190,99 @@
+     return re.search(rf"(?<![0-9A-Za-z_-]){re.escape(prompt_id)}(?![0-9A-Za-z_-])", text) is not None
+ 
+ 
+-def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
++# The one hash this skill computes, and it is of ITSELF, never of a prompt body.  The Prompt
++# Corpus Storage and Fidelity Policy governs the corpus; a skill's own bytes are not the corpus.
++#
++# It exists because nothing else catches the wrong package being installed.  The hash-pin chain
++# protects the contract, the fixture suites protect validator behaviour, and the independent
++# review is scoped to digests it never sees installed -- all three pass happily against a
++# superseded build.  That is not hypothetical: on 2026-09-21 a withdrawn package was installed
++# in place of its successor, under the identical filename the packager is required to use, and
++# every gate stayed green for a full round.
++#
++# SKILL.md's own declaration line is excluded from the digest, or declaring the value would
++# change it.
++SELF_IDENTITY_RE = re.compile(rb"(?m)^SKILL_TREE_SHA256: [0-9a-f]{64}\n")
++SELF_IDENTITY_DECLARATION_RE = re.compile(r"(?m)^SKILL_TREE_SHA256: ([0-9a-f]{64})$")
++
++
++def skill_tree_digest(root: Path) -> str:
++    """Digest of a skill directory: sorted relative paths, each with its content hash."""
++    digest = hashlib.sha256()
++    names = sorted(
++        (item.relative_to(root).as_posix() for item in root.rglob("*") if item.is_file()),
++        key=lambda name: name.encode("utf-8"),
++    )
++    for name in names:
++        data = (root / name).read_bytes()
++        if name == "SKILL.md":
++            data = SELF_IDENTITY_RE.sub(b"", data)
++        digest.update(name.encode("utf-8") + b"\n")
++        digest.update(hashlib.sha256(data).hexdigest().encode("ascii") + b"\n")
++    return digest.hexdigest()
++
++
++def validate_self_identity(skill_root: Path) -> list[str]:
++    """Refuse to certify anything if this is not the package it says it is."""
++    skill_md = skill_root / "SKILL.md"
++    if not skill_md.is_file():
++        return ["SKILL_SELF_IDENTITY:SKILL_MD_ABSENT"]
++    declared = SELF_IDENTITY_DECLARATION_RE.search(skill_md.read_text(encoding="utf-8"))
++    if declared is None:
++        return ["SKILL_SELF_IDENTITY:UNDECLARED"]
++    measured = skill_tree_digest(skill_root)
++    if measured != declared.group(1):
++        return [f"SKILL_SELF_IDENTITY:DECLARED_{declared.group(1)[:12]}_MEASURED_{measured[:12]}"]
++    return []
++
++
++def validate_prompt_bodies(
++    bodies: dict[str, str], contract: dict[str, Any]
++) -> tuple[list[str], list[str], list[str]]:
++    """Validate whatever prompt bodies the caller actually read -- one, three, or more.
++
++    The prompt ecosystem is authored and maintained in Notion.  The Prompt Corpus Storage and
++    Fidelity Policy of 2026-09-21 forbids mirroring, exporting, caching or hashing the corpus
++    to disk, so this takes {prompt_id: text} for the pages the caller read and nothing else:
++    no directory walk, no membership gate, no byte identity, no body hashes.
++
++    FOUR CHECKS WERE DELETED WITH THE MIRROR THEY POLICED, and none of them described the
++    ecosystem -- each described the copy:
++      PROMPT_BODY_MEMBER_SET   asked whether all 55 files were present.  Membership is a
++                               property of the registry and the graph, which carry it already
++                               and need no bodies to do so.
++      PROMPT_BODY_DUPLICATE    cannot arise: dict keys are unique.
++      PROMPT_BODY_FILENAME_ID  compared a filename to an id.  There are no filenames.
++      PROMPT_BODY_UTF8         decoded a file.  Text arrives decoded.
++
++    ONE CHECK GAINED VALUE.  PROMPT_BODY_ID_MISMATCH replaces PROMPT_BODY_MISSING_ID: it
++    compares the `Prompt ID:` header in the supplied text against the key it was supplied
++    under, so a caller who fetched or pasted the wrong page is told which page they actually
++    have.  That is the Notion-native form of the question the filename check was asking, and
++    it is the one failure this interface makes MORE likely than a directory did.
++
++    COVERAGE IS REPORTED, NOT REQUIRED.  Returns (errors, validated, not_evaluated).  A caller
++    supplying three bodies gets three validated and a named list of the set-scoped checks that
++    could not run -- never a false pass, never a spurious failure for absent pages.
++    """
+     errors: list[str] = []
+-    hashes: dict[str, str] = {}
+-    paths: dict[str, Path] = {}
+-    for path in sorted(prompt_dir.rglob("*.md")):
+-        try:
+-            prefix = path.read_bytes().decode("utf-8")
+-        except UnicodeDecodeError:
+-            errors.append(f"PROMPT_BODY_UTF8:{path.relative_to(prompt_dir)}")
+-            continue
+-        match = PROMPT_ID_HEADER_RE.search(prefix)
+-        if match is None:
+-            if path.stem in EXPECTED_MEMBERS:
+-                errors.append(f"PROMPT_BODY_MISSING_ID:{path.stem}")
+-            continue
+-        prompt_id = match.group(1)
++    validated: list[str] = []
++    not_evaluated: list[str] = []
++    texts: dict[str, str] = {}
++    for prompt_id, text in sorted(bodies.items()):
+         if prompt_id not in EXPECTED_MEMBERS:
+             errors.append(f"PROMPT_BODY_UNEXPECTED_ID:{prompt_id}")
+             continue
+-        if path.stem != prompt_id:
+-            errors.append(f"PROMPT_BODY_FILENAME_ID:{path.relative_to(prompt_dir)}:{prompt_id}")
+-        if prompt_id in paths:
+-            errors.append(f"PROMPT_BODY_DUPLICATE:{prompt_id}")
+-        paths[prompt_id] = path
+-    if set(paths) != EXPECTED_MEMBERS:
+-        return ["PROMPT_BODY_MEMBER_SET", *errors], hashes
+-    registry = contract.get("member_registry", {})
+-    for prompt_id, path in sorted(paths.items()):
+-        raw = path.read_bytes()
+-        hashes[prompt_id] = hashlib.sha256(raw).hexdigest()
+-        try:
+-            text = raw.decode("utf-8")
+-        except UnicodeDecodeError:
+-            errors.append(f"PROMPT_BODY_UTF8:{prompt_id}")
++        match = PROMPT_ID_HEADER_RE.search(text)
++        if match is None or match.group(1) != prompt_id:
++            errors.append(
++                f"PROMPT_BODY_ID_MISMATCH:{prompt_id}:{match.group(1) if match else 'ABSENT'}"
++            )
+             continue
++        texts[prompt_id] = text
++    registry = contract.get("member_registry", {})
++    for prompt_id, text in sorted(texts.items()):
++        validated.append(prompt_id)
+         nonblank = [line for line in text.splitlines() if line.strip()]
+         member = registry.get(prompt_id, {})
+         production_mode = contract.get("status") == "SELECTED_PRODUCTION"
+@@ -2348,22 +2406,26 @@
+         "RS-40": ("SOURCE_RESOLUTION_ERROR", *EXPECTED_RETURN_PHASES),
+     }
+     for prompt_id, markers in exact_markers.items():
+-        text = paths[prompt_id].read_text(encoding="utf-8")
++        if prompt_id not in texts:
++            continue
+         for marker in markers:
+-            if marker not in text:
++            if marker not in texts[prompt_id]:
+                 errors.append(f"PROMPT_ROUTE_SEMANTICS:{prompt_id}:{marker}")
+-    errors.extend(validate_qa_closure_bodies(
+-        {prompt_id: paths[prompt_id].read_text(encoding="utf-8")
+-         for prompt_id in ("QA-120", "CL-E-10", "CL-C-10")}, contract
+-    ))
+-    errors.extend(validate_artifact_timing_bodies({id: path.read_text(encoding="utf-8") for id, path in paths.items()}))
+-    return sorted(set(errors)), hashes
++    # A set-scoped check says plainly that it did not run.  Silence would read as a pass, which
++    # is the failure mode this whole interface exists to avoid.
++    qa_trio = ("QA-120", "CL-E-10", "CL-C-10")
++    if all(pid in texts for pid in qa_trio):
++        errors.extend(validate_qa_closure_bodies({pid: texts[pid] for pid in qa_trio}, contract))
++    else:
++        not_evaluated.append("QA_PASS_CLASS_MAP_AND_INTAKES")
++    errors.extend(validate_artifact_timing_bodies(dict(texts)))
++    return sorted(set(errors)), sorted(validated), sorted(not_evaluated)
+ 
+ 
+ def validate_package(
+     change_skill_dir: Path,
+     contract_path: Path,
+-    prompt_dir: Path | None = None,
++    bodies: dict[str, str] | None = None,
+     candidate_root: Path | None = None,
+ ) -> dict[str, Any]:
+     errors: list[str] = []
+@@ -2443,11 +2505,9 @@
+                         errors.append("CANDIDATE_GRAPH_BUNDLE_BYTE_MISMATCH")
+                 except OSError:
+                     errors.append("CANDIDATE_GRAPH_UNREADABLE")
+-        expected_prompt_dir = (root / "prompts").resolve()
+-        if prompt_dir is None:
+-            prompt_dir = expected_prompt_dir
+-        elif prompt_dir.resolve() != expected_prompt_dir:
+-            errors.append("CANDIDATE_PROMPT_ROOT_MISMATCH")
++        # CANDIDATE_PROMPT_ROOT_MISMATCH was deleted with the mirror it policed.  It asserted
++        # that the corpus lived at <candidate-root>/prompts, which institutionalised exactly the
++        # parallel storage location the Storage and Fidelity Policy forbids.
+ 
+     selected_alias: dict[str, Any] = {}
+     if contract.get("selection_status") == "UNSELECTED_CANDIDATE":
+@@ -2508,9 +2568,13 @@
+     if not runtime_map.is_file() or sha256(runtime_map) != "5574666e5975c104ccf13e77a13d94e0d16f37af37de7eb26d7e0f7b00f45b0e":
+         errors.append("R1_RUNTIME_MAP_IDENTITY")
+ 
+-    prompt_hashes: dict[str, str] = {}
+-    if prompt_dir is not None:
+-        prompt_errors, prompt_hashes = validate_prompt_bodies(prompt_dir, contract)
++    errors.extend(validate_self_identity(Path(__file__).resolve().parent.parent))
++    prompt_validated: list[str] = []
++    prompt_not_evaluated: list[str] = []
++    if bodies:
++        prompt_errors, prompt_validated, prompt_not_evaluated = validate_prompt_bodies(
++            bodies, contract
++        )
+         errors.extend(prompt_errors)
+     return {
+         "ok": not errors,
+@@ -2533,9 +2597,9 @@
+         "selected_member_count": contract.get("selected_member_count"),
+         "pf10_producers": sorted((contract.get("pf10_addendum_contract") or {}).get("exact_producer_set", [])),
+         "plan_writers": sorted((contract.get("plan_writer_contract") or {}).get("evaluated_prompt_ids", [])),
+-        "prompt_bodies_validated": prompt_dir is not None,
+-        "prompt_body_count": len(prompt_hashes),
+-        "prompt_body_sha256": prompt_hashes,
++        "prompt_bodies_validated": prompt_validated,
++        "prompt_body_count": len(prompt_validated),
++        "prompt_body_checks_not_evaluated": prompt_not_evaluated,
+     }
+ 
+ 
+@@ -2543,12 +2607,28 @@
+     parser = argparse.ArgumentParser()
+     parser.add_argument("change_skill_dir", type=Path)
+     parser.add_argument("--contract", type=Path, required=True)
+-    parser.add_argument("--prompt-dir", type=Path)
++    # Bodies arrive on STDIN as {"PROMPT-ID": "<text>"} and there is deliberately no path
++    # option: a file would persist, and a persisted corpus is what the policy forbids.  Supply
++    # only the pages the task actually needs.
++    parser.add_argument("--bodies-stdin", action="store_true")
+     parser.add_argument("--candidate-root", type=Path)
+     args = parser.parse_args()
++    bodies: dict[str, str] | None = None
++    if args.bodies_stdin:
++        raw = sys.stdin.read()
++        try:
++            bodies = json.loads(raw) if raw.strip() else {}
++        except json.JSONDecodeError as exc:
++            print(json.dumps({"ok": False, "errors": [f"BODIES_STDIN_MALFORMED:{exc.msg}"]}))
++            return 1
++        if not isinstance(bodies, dict) or not all(
++            isinstance(k, str) and isinstance(v, str) for k, v in bodies.items()
++        ):
++            print(json.dumps({"ok": False, "errors": ["BODIES_STDIN_NOT_ID_TO_TEXT_MAP"]}))
++            return 1
+     result = validate_package(
+         args.change_skill_dir.resolve(), args.contract.resolve(),
+-        args.prompt_dir.resolve() if args.prompt_dir else None,
++        bodies,
+         args.candidate_root.resolve() if args.candidate_root else None,
+     )
+     print(json.dumps(result, indent=2, sort_keys=True))
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-21 15:25:59.975537287 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-21 15:29:22.396874651 +0000
+@@ -73,12 +73,15 @@
+             if re.search(r"It fully populates (?:the selected RS-20 name|RS-20's selected name)",body):errors.append('RESCOPE_UNCONDITIONAL_REVIEW_HANDOFF:'+id)
+     return sorted(set(errors))
+ 
+-def run_artifact_timing_cases(prompt_dir, contract):
+-    paths={p.stem:p for p in Path(prompt_dir).rglob('*.md') if p.stem in EXPECTED_POLICY['stage_categories']}
+-    bodies={id:p.read_text(encoding='utf-8') for id,p in paths.items()}
++def run_artifact_timing_cases(supplied, contract):
++    # Bodies are supplied by the caller from Notion reads, never walked off disk.  The scan is
++    # over what was supplied, so its name no longer claims a complete corpus it does not have.
++    bodies={id:text for id,text in supplied.items() if id in EXPECTED_POLICY['stage_categories']}
+     cases=[]
++    if not bodies:return cases
+     observed=validate_artifact_timing_bodies(bodies)
+-    cases.append({'name':'artifact-timing-complete-55-source-bodies','passed':not observed,'errors':observed,'evidence_kind':'STATIC_COMPLETE_BODY_SCAN'})
++    cases.append({'name':'artifact-timing-supplied-source-bodies','passed':not observed,'errors':observed,'evidence_kind':'STATIC_SUPPLIED_BODY_SCAN','bodies_scanned':sorted(bodies)})
++    if 'PR-35' not in bodies:return cases
+     changed=dict(bodies);changed['PR-35']+='\n## Actual post-QA remedy evidence\nFor this approved remedy, preserve its exact existing Guide reference and originating finding as relevant evidence. The Guide is not a general PR prerequisite or approved PR base; no absent future artifact or new approval is required.\n'
+     found=validate_artifact_timing_bodies(changed)
+     cases.append({'name':'allow-existing-qa-guide-as-conditional-remedy-evidence','passed':not found,'errors':found,'evidence_kind':'SYNTHETIC_POSITIVE_SOURCE_VARIANT'})
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_current.py work/flowmaster-validate/scripts/validate_gcfpe_current.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-09-21 15:25:59.975680056 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-09-21 15:29:22.397770083 +0000
+@@ -532,13 +532,14 @@
+     return None
+ 
+ 
+-def validate_prompt_bodies(prompt_dir: Path) -> list[str]:
++def validate_prompt_bodies(bodies: dict[str, str]) -> list[str]:
++    # Whatever the caller read from Notion.  The membership gate is gone with the mirror:
++    # whether all 55 exist is the registry's and the graph's question, not a directory's.
+     errors: list[str] = []
+-    paths = {path.stem: path for path in prompt_dir.glob("*.md")}
+-    if set(paths) != EXPECTED_MEMBERS:
+-        return ["PROMPT_BODY_MEMBER_SET"]
+-    for prompt_id, path in sorted(paths.items()):
+-        text = path.read_text(encoding="utf-8")
++    for prompt_id, text in sorted(bodies.items()):
++        if prompt_id not in EXPECTED_MEMBERS:
++            errors.append(f"PROMPT_BODY_UNEXPECTED_ID:{prompt_id}")
++            continue
+         nonblank = [line for line in text.splitlines() if line.strip()]
+         if (
+             f"Prompt ID: {prompt_id}" not in text
+@@ -609,7 +610,7 @@
+     return hashlib.sha256(path.read_bytes()).hexdigest()
+ 
+ 
+-def validate_package(change_skill_dir: Path, contract_path: Path | None = None, prompt_dir: Path | None = None) -> dict[str, Any]:
++def validate_package(change_skill_dir: Path, contract_path: Path | None = None, bodies: dict[str, str] | None = None) -> dict[str, Any]:
+     errors: list[str] = []
+     contract_path = contract_path or change_skill_dir / "references" / "gcfpe-current-direct-handoff-contract.json"
+     if not contract_path.is_file():
+@@ -618,7 +619,7 @@
+     if contract.get("schema_version") == "gcfpe-direct-handoff-contract/4.0":
+         from validate_gcfpe_20260914 import validate_package as validate_package_v4
+ 
+-        return validate_package_v4(change_skill_dir, contract_path, prompt_dir)
++        return validate_package_v4(change_skill_dir, contract_path, bodies)
+     errors.extend(validate_contract(contract))
+ 
+     skill_text = (change_skill_dir / "SKILL.md").read_text(encoding="utf-8")
+@@ -658,15 +659,15 @@
+     runtime_map = change_skill_dir / "references" / "glow-hde-canonical-change-flow-r1-runtime-map.json"
+     if not runtime_map.is_file() or sha256(runtime_map) != EXPECTED_RUNTIME_MAP_SHA256:
+         errors.append("R1_RUNTIME_MAP_IDENTITY")
+-    if prompt_dir is not None:
+-        errors.extend(validate_prompt_bodies(prompt_dir))
++    if bodies:
++        errors.extend(validate_prompt_bodies(bodies))
+     return {
+         "ok": not errors, "errors": sorted(set(errors)), "contract_status": contract.get("status"),
+         "target_release": contract.get("target_release"), "prompt_version": contract.get("prompt_version"),
+         "selected_member_count": contract.get("selected_member_count"),
+         "pf10_producers": sorted((contract.get("pf10_addendum_contract") or {}).get("producers", {})),
+         "plan_writers": sorted((contract.get("plan_writer_contract") or {}).get("prompt_ids", [])),
+-        "prompt_bodies_validated": prompt_dir is not None,
++        "prompt_bodies_validated": sorted(bodies) if bodies else [],
+     }
+ 
+ 
+@@ -674,12 +675,12 @@
+     parser = argparse.ArgumentParser()
+     parser.add_argument("change_skill_dir", nargs="?", default=".")
+     parser.add_argument("--contract")
+-    parser.add_argument("--prompt-dir")
++    parser.add_argument("--bodies-stdin", action="store_true")
+     args = parser.parse_args()
+     result = validate_package(
+         Path(args.change_skill_dir).resolve(),
+         Path(args.contract).resolve() if args.contract else None,
+-        Path(args.prompt_dir).resolve() if args.prompt_dir else None,
++        (json.loads(sys.stdin.read() or "{}") if args.bodies_stdin else None),
+     )
+     print(json.dumps(result, indent=2, sort_keys=True))
+     return 0 if result["ok"] else 1
