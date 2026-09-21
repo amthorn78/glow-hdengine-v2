@@ -52,6 +52,14 @@ Added after `SF10-12`. The GCFPE validator computed `prompt_body_sha256` for all
 4. **Normalise exactly one thing, and say why in the code.** `SF10-12` strips exactly one trailing newline before hashing, because the pin is a property of the Notion page and not of the file holding it. CRLF, stripped whitespace and a second blank line stay fatal. Every additional tolerance is a class of corruption you have chosen not to detect, so each one is a decision that gets written down beside the code.
 5. **Pin where the expectation lives, not where it is cheapest.** Validation expectations belong in the validation profile; contract terms belong in the contract. Cost may break a tie; it may not decide one. State the reasoning either way, because the reviewer will ask.
 ### Procedure — re-pinning after an authorised body change
+
+> **Retired by the Prompt Corpus Storage and Fidelity Policy, 2026-09-21.** `SF10-12` pinned
+> a SHA-256 of every prompt **body**, and body hashes are exactly what the policy forbids. The
+> pins and the re-pinning sequence are gone. The sequence is kept here because the *general*
+> rule above — a recorded identity must have a consumer that fails on mismatch — still binds
+> every identity the ecosystem does record, and because the reasoning in the closing section
+> is the part that generalises.
+
 A pinned identity turns every legitimate edit into a failing gate until the pin moves. That is the forcing function working, not a defect, and it has a defined sequence:
 1. Make the authorised change to the prompt body in Notion. Nothing else.
 2. Re-extract the affected body under the recorded convention — the exact slice between the fetch result's `<content>` and `</content>` markers, **no trailing newline added** — and update its `evidence_contract` row in `docs/prompt_ecosystem_management/project-prompt-contract-registry.md`.
@@ -60,5 +68,8 @@ A pinned identity turns every legitimate edit into a failing gate until the pin 
 5. The profile change moves skill bytes, so it carries a `validator_revision` increment and a fresh §10 like any other validation-behaviour change.
 **Re-pinning is part of the change that caused it.** A session that edits a body and leaves the pins stale has handed the next session a gate that fails for a reason it did not cause.
 ### Deriving pins costs nothing if the values were already recorded
+
+Also a record of the retired `SF10-12`, kept for the reasoning rather than the procedure.
+
 The Product Owner's condition for authorising `SF10-12` was that it must not require reading all 55 prompt bodies through a session. It did not, and the reason generalises: **the identities already existed in the registry**, so deriving the pins was registry on disk → script → profile on disk, and confirming that all 55 reproduce was a script printing six numbers. No body content entered context.
 Before concluding that a verification is too expensive, check whether the values are already written down somewhere and simply unread. This is the same shape as *`A grep proves the absence of a string, never the absence of a thing`* — the record is usually richer than the last session assumed.
