@@ -102,8 +102,8 @@ A1  The weakest reasoning in this round is C3's second half — the judgment tha
     A case that cannot fail proves nothing. If any of these three disagrees, say so.
 A2  The absence fixture deletes the class CELL rather than the row, on the argument that deleting
     the row fires two guards and proves neither. Test whether removing the cell is a real defect
-    shape or an artefact chosen to make one guard fire: does a body could-plausibly-have this
-    malformation, and does the fixture still test what its name claims?
+    shape or an artefact chosen to make one guard fire: could a real body carry this malformation,
+    and does the fixture still test what its name claims?
 A3  The duplicate fixture locates QA-120's CRD row by LINE SCAN and raises ValueError if the
     surrounding lines are not <tr> / <td>`PASS`</td>. That is deliberate — building the mutation
     with QA_PASS_ROW_HTML_RE would make the fixture unable to fail when that regex is wrong. Check
