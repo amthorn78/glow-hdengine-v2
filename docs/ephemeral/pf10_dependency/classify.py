@@ -37,6 +37,7 @@ production run are what made its output interpretable:
 """
 import argparse
 import collections
+import hashlib
 import json
 import pathlib
 import sys
@@ -91,6 +92,11 @@ CONTROLS = [
     ("ctl_none_2", "NONE",
      "a true completed-cycle or Product Owner terminal return"),
 ]
+
+# The blocking states the decision briefs enumerate alongside the terminal rows.  Recorded in the
+# artifact so the "terminal or blocking" claim is auditable from the output rather than from prose.
+BLOCKING_STATES = {"BLOCKED", "AWAITING_THOTH_REMEDIATION", "RESCOPE_PROPOSAL_PENDING_REVIEW",
+                   "PLAN_PENDING_REVISED", "AWAITING_PO_PROCEED"}
 
 # The complementary lexical selector: names the source, AND comparison language.  Deliberately the
 # kind of selector the briefs call a vocabulary filter -- it is reported beside the screen, not
@@ -151,6 +157,7 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     results, control_results, usage = {}, [], collections.Counter()
+    served: set[str] = set()
     subjects = [(r["id"], r["condition"]) for r in rows]
     for i in range(0, len(subjects), BATCH):
         chunk = subjects[i:i + BATCH]
@@ -165,6 +172,21 @@ def main() -> int:
                                                "condition": f"`{key}.condition`"},
                               "criteria": OPTIONS}
         resp = ask(state, questions)
+        # The response must answer EXACTLY what was asked.  Accepting only the keys that came
+        # back meant an omitted subject or control was silently dropped: `controls_total` was
+        # computed from what arrived, so a missing control read as "27/27 correct" while the
+        # renderer still called the reduced set "every state_routes row".  A harness reporting
+        # success over fewer subjects than it claimed.
+        want_keys, got_keys = set(questions), set(resp["answers"])
+        if want_keys != got_keys:
+            raise SystemExit(
+                f"batch {i // BATCH + 1} did not answer what was asked: "
+                f"{len(want_keys - got_keys)} missing {sorted(want_keys - got_keys)[:5]}, "
+                f"{len(got_keys - want_keys)} unexpected {sorted(got_keys - want_keys)[:5]}")
+        # The SERVED model is observed, not assumed.  It was never captured, and the renderer
+        # supplied `jev-1.13.0` as a hard-coded default -- publishing an identity nothing had
+        # read, for a run made against the `jev-latest` alias which can resolve elsewhere.
+        served.add(resp["model"])
         for k, v in resp["usage"].items():
             if isinstance(v, int):
                 usage[k] += v
@@ -179,12 +201,21 @@ def main() -> int:
                 results[key] = rec
         print(f"batch {i // BATCH + 1}: {len(chunk)} rows + 2 controls", file=sys.stderr)
 
+    if len(served) != 1:
+        raise SystemExit(f"the batches were served by {len(served)} different models "
+                         f"({sorted(served)}); a single proposal cannot claim one provenance")
+
     by_id = {r["id"]: r for r in rows}
     for key, rec in results.items():
         rec["lexical"] = lexical(by_id[key]["condition"])
         rec["prompt"] = by_id[key]["prompt"]
         rec["branch_id"] = by_id[key]["branch_id"]
         rec["terminal"] = by_id[key]["terminal"]
+        # `state` is PERSISTED.  The proposal's central claim is about rows that are terminal OR
+        # in a blocking state, and the enrichment dropped the state it had already read -- so a
+        # reviewer could not audit whether a candidate was BLOCKED.  A conclusion whose evidence
+        # was computed and then discarded.
+        rec["state"] = by_id[key]["state"]
         rec["condition"] = by_id[key]["condition"]
 
     payload = {
@@ -197,6 +228,13 @@ def main() -> int:
             "deterministic enum check with no model and no network.",
         ],
         "model_requested": MODEL,
+        "model_served": sorted(served)[0],
+        # The external input's exact identity, so a reviewer can tell whether the contract this
+        # was classified from is the contract they are holding.
+        "contract": {"path": str(args.contract),
+                     "sha256": hashlib.sha256(
+                         pathlib.Path(args.contract).read_bytes()).hexdigest()},
+        "blocking_states": sorted(BLOCKING_STATES),
         "pre_registered": {"options": sorted(OPTIONS), "clear_at": CLEAR,
                            "uncertain_at": UNCERTAIN, "batch": BATCH,
                            "controls": len(CONTROLS), "controls_per_batch": 2},

@@ -98,6 +98,12 @@ def canonical_patch(text: str, base: pathlib.Path = None, work: pathlib.Path = N
         subs.append((str(pathlib.Path(work)).rstrip("/"), "work"))
     out = []
     for line in text.splitlines():
+        # Diff METADATA, which is the addressing: the `---`/`+++` pair and the `diff -ru a b`
+        # command line that opens each file's section.  Restricting normalisation to `---`/`+++`
+        # alone was too narrow and turned this check red, because `diff -ru` echoes its arguments
+        # on that third line too.  A `+`/`-`/context line never matches, since a content line
+        # carrying the word `diff` is prefixed by its change marker.
+        header = line.startswith(("--- ", "+++ ", "diff "))
         if line.startswith(("--- ", "+++ ")) and "\t" in line:
             line = line.split("\t", 1)[0]
         # How the trees were ADDRESSED is not part of the change.  The committed patch was
@@ -105,8 +111,14 @@ def canonical_patch(text: str, base: pathlib.Path = None, work: pathlib.Path = N
         # with absolute paths produced different header text and the comparison failed on a
         # difference that was not a difference.  Normalising both sides to the same tokens is
         # what makes the content comparison mean what it claims.
-        for actual, token in subs:
-            line = line.replace(actual, token)
+        # ONLY on header lines.  Replacing the root path everywhere rewrote substantive `+`/`-`
+        # content too, so a patch body saying `work` where the tested tree says `prep/work`
+        # normalised to the same bytes and could be certified as the diff of those trees. The
+        # normalisation exists to make two ways of ADDRESSING the trees comparable; a path inside
+        # a changed line is content, not addressing.
+        if header:
+            for actual, token in subs:
+                line = line.replace(actual, token)
         out.append(line)
     return "\n".join(out)
 

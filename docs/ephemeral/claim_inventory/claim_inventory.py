@@ -59,11 +59,29 @@ CLAIM = re.compile(
     r"|\b[0-9][0-9,]{2,}\b"    # any number of three or more digits, e.g. a byte count
     r"|\b[0-9]+(?:\.[0-9]+)+\b"  # a dotted revision, e.g. 3.2.7
     r"|\b[0-9]+\s?%"           # a percentage
+    # A SHORT count or size, which the alternatives above all missed unless it was bold: "55
+    # bodies" and "99 bytes" went unreported by a tool whose whole subject is stale counts.
+    # Matched through a measure word rather than by matching every numeral, so ordinary prose
+    # ("one of 2 ways") does not flood the report.
+    r"|\b[0-9]+\s+(?:" + "|".join((
+        "bod(?:y|ies)", "rows?", "files?", "bytes?", "lines?", "cases?", "entries|entry",
+        "commits?", "threads?", "findings?", "columns?", "keys?", "prompts?", "branches|branch",
+        "digits?", "tokens?", "controls?", "packages?", "skills?", "digests?", "paths?",
+        "blocks?", "markers?", "assertions?", "passages?", "questions?", "batches|batch",
+    )) + r")\b"
 )
 # Shapes that are references or dates rather than derived measurements.  Excluded by SHAPE and
 # named here, so the exclusion is auditable instead of being a silent hole: a PR or issue number,
 # and an ISO date.  Nothing else is excluded -- a version, a count and a size all stay in.
-NOT_A_MEASUREMENT = re.compile(r"#[0-9]+|\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b")
+NOT_A_MEASUREMENT = re.compile(
+    r"#[0-9]+"                                   # a PR or issue reference
+    r"|\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b"           # an ISO date
+    # An IDENTIFIER, not a measurement: CTR-002, RS-40, CF-C-30, SF10-04, HDE-EPIC039. These
+    # name things and appear constantly in these documents; flagging them is pure noise. The
+    # shape is deliberately narrow -- an uppercase token, then hyphenated segments ending in
+    # digits -- so a count written beside a word is untouched.
+    r"|\b[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-[0-9]+\b"
+)
 # One whole-line exclusion, for the front-matter version an author DECLARES.  Deliberately narrow:
 # a `validator_revision` read out of a tool's output is a measurement and stays in scope.
 DECLARED_LINE = re.compile(r"^artifact_version: ")

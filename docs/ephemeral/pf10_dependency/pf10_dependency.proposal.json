@@ -1,5 +1,16 @@
 {
   "artifact_type": "PF10_DEPENDENCY_PROPOSAL",
+  "blocking_states": [
+    "AWAITING_PO_PROCEED",
+    "AWAITING_THOTH_REMEDIATION",
+    "BLOCKED",
+    "PLAN_PENDING_REVISED",
+    "RESCOPE_PROPOSAL_PENDING_REVIEW"
+  ],
+  "contract": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/424380a0-2be4-589b-8809-e0e32c8b5c38/scratchpad/s10/prep/work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+    "sha256": "7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894"
+  },
   "controls": [
     {
       "band": "CLEAR",
@@ -18,21 +29,21 @@
     {
       "band": "CLEAR",
       "choice": "COMPARISON",
-      "confidence": 0.94,
+      "confidence": 0.92,
       "correct": true,
       "expected": "COMPARISON",
       "id": "ctl_cmp_para",
       "probabilities": {
-        "COMPARISON": 0.95,
+        "COMPARISON": 0.94,
         "NONE": 0.01,
-        "READ_ONLY": 0.04,
+        "READ_ONLY": 0.05,
         "SOURCE_AVAILABILITY": 0.0
       }
     },
     {
       "band": "CLEAR",
       "choice": "SOURCE_AVAILABILITY",
-      "confidence": 0.99,
+      "confidence": 0.98,
       "correct": true,
       "expected": "SOURCE_AVAILABILITY",
       "id": "ctl_src_literal",
@@ -46,21 +57,21 @@
     {
       "band": "CLEAR",
       "choice": "SOURCE_AVAILABILITY",
-      "confidence": 0.97,
+      "confidence": 0.95,
       "correct": true,
       "expected": "SOURCE_AVAILABILITY",
       "id": "ctl_src_para",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.02,
+        "NONE": 0.03,
         "READ_ONLY": 0.01,
-        "SOURCE_AVAILABILITY": 0.97
+        "SOURCE_AVAILABILITY": 0.96
       }
     },
     {
       "band": "CLEAR",
       "choice": "READ_ONLY",
-      "confidence": 1.0,
+      "confidence": 0.99,
       "correct": true,
       "expected": "READ_ONLY",
       "id": "ctl_ro_literal",
@@ -74,7 +85,7 @@
     {
       "band": "UNCERTAIN",
       "choice": "READ_ONLY",
-      "confidence": 0.72,
+      "confidence": 0.73,
       "correct": true,
       "expected": "READ_ONLY",
       "id": "ctl_ro_para",
@@ -135,7 +146,7 @@
       "expected": "COMPARISON",
       "id": "ctl_cmp_para",
       "probabilities": {
-        "COMPARISON": 0.94,
+        "COMPARISON": 0.93,
         "NONE": 0.02,
         "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
@@ -150,8 +161,8 @@
       "id": "ctl_src_literal",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.0,
-        "READ_ONLY": 0.01,
+        "NONE": 0.01,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.99
       }
     },
@@ -186,14 +197,14 @@
     {
       "band": "UNCERTAIN",
       "choice": "READ_ONLY",
-      "confidence": 0.66,
+      "confidence": 0.68,
       "correct": true,
       "expected": "READ_ONLY",
       "id": "ctl_ro_para",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.25,
-        "READ_ONLY": 0.74,
+        "NONE": 0.23,
+        "READ_ONLY": 0.76,
         "SOURCE_AVAILABILITY": 0.01
       }
     },
@@ -247,9 +258,9 @@
       "expected": "COMPARISON",
       "id": "ctl_cmp_para",
       "probabilities": {
-        "COMPARISON": 0.93,
+        "COMPARISON": 0.92,
         "NONE": 0.02,
-        "READ_ONLY": 0.05,
+        "READ_ONLY": 0.06,
         "SOURCE_AVAILABILITY": 0.0
       }
     },
@@ -296,30 +307,30 @@
       }
     },
     {
-      "band": "UNCERTAIN",
+      "band": "CLEAR",
       "choice": "READ_ONLY",
-      "confidence": 0.75,
+      "confidence": 0.81,
       "correct": true,
       "expected": "READ_ONLY",
       "id": "ctl_ro_para",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.18,
-        "READ_ONLY": 0.81,
-        "SOURCE_AVAILABILITY": 0.0
+        "NONE": 0.13,
+        "READ_ONLY": 0.85,
+        "SOURCE_AVAILABILITY": 0.01
       }
     },
     {
       "band": "CLEAR",
       "choice": "NONE",
-      "confidence": 0.94,
+      "confidence": 0.97,
       "correct": true,
       "expected": "NONE",
       "id": "ctl_none_1",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.96,
-        "READ_ONLY": 0.04,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       }
     },
@@ -354,29 +365,29 @@
     {
       "band": "CLEAR",
       "choice": "COMPARISON",
-      "confidence": 0.93,
+      "confidence": 0.91,
       "correct": true,
       "expected": "COMPARISON",
       "id": "ctl_cmp_para",
       "probabilities": {
-        "COMPARISON": 0.95,
-        "NONE": 0.01,
-        "READ_ONLY": 0.04,
+        "COMPARISON": 0.93,
+        "NONE": 0.02,
+        "READ_ONLY": 0.05,
         "SOURCE_AVAILABILITY": 0.0
       }
     },
     {
       "band": "CLEAR",
       "choice": "SOURCE_AVAILABILITY",
-      "confidence": 0.98,
+      "confidence": 0.97,
       "correct": true,
       "expected": "SOURCE_AVAILABILITY",
       "id": "ctl_src_literal",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.01,
-        "READ_ONLY": 0.0,
-        "SOURCE_AVAILABILITY": 0.99
+        "NONE": 0.02,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.97
       }
     },
     {
@@ -397,6 +408,7 @@
   "controls_correct": 28,
   "controls_total": 28,
   "model_requested": "jev-latest",
+  "model_served": "jev-1.13.0",
   "nonclaims": [
     "Not a landed contract field. Not a guard. Not D14 coverage.",
     "No QA verdict, acceptance, PF09 movement, OPS or closure is claimed.",
@@ -425,11 +437,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.94,
+        "NONE": 0.95,
         "READ_ONLY": 0.05,
-        "SOURCE_AVAILABILITY": 0.01
+        "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-C-10__kickoff_ready": {
@@ -446,6 +459,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-10",
+      "state": "KICKOFF_READY",
       "terminal": false
     },
     "CF-C-10__kickoff_terminal": {
@@ -453,7 +467,7 @@
       "branch_id": "kickoff_terminal",
       "choice": "NONE",
       "condition": "the Product Owner decision itself remains unavailable or another true authority/source stop has no runnable prompt receiver",
-      "confidence": 0.93,
+      "confidence": 0.91,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -462,6 +476,7 @@
         "SOURCE_AVAILABILITY": 0.05
       },
       "prompt": "CF-C-10",
+      "state": "BLOCKED",
       "terminal": true
     },
     "CF-C-10__material_source_omission_recovery": {
@@ -478,6 +493,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-C-10__wrong_class_epic": {
@@ -485,15 +501,16 @@
       "branch_id": "wrong_class_epic",
       "choice": "NONE",
       "condition": "the supplied Product Owner class is EPIC",
-      "confidence": 0.92,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.94,
-        "READ_ONLY": 0.05,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-C-20__invalid_kickoff_recovery": {
@@ -505,11 +522,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-C-20__specification_authoring_terminal": {
@@ -517,7 +535,7 @@
       "branch_id": "specification_authoring_terminal",
       "choice": "NONE",
       "condition": "unrecoverable source, identity, or authority blocker",
-      "confidence": 0.98,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -526,6 +544,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "CF-C-20",
+      "state": "BLOCKED",
       "terminal": true
     },
     "CF-C-20__specification_pending": {
@@ -533,15 +552,16 @@
       "branch_id": "specification_pending",
       "choice": "NONE",
       "condition": "complete pending CRD Specification is ready for Thoth review",
-      "confidence": 0.96,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.97,
-        "READ_ONLY": 0.02,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-20",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-C-30__approved_base_correction_redline": {
@@ -549,7 +569,7 @@
       "branch_id": "approved_base_correction_redline",
       "choice": "NONE",
       "condition": "approved immutable CRD base plus a source-backed factual finding or actual authorized product/scope decision is assessed as justified; exact Thoth correction redline goes to the same Isis author for the first standalone pending delta; no approval or PF10 addendum",
-      "confidence": 0.7,
+      "confidence": 0.69,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -558,6 +578,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-30",
+      "state": "CORRECTION_REDLINE",
       "terminal": false
     },
     "CF-C-30__correction_not_substantiated_terminal": {
@@ -565,15 +586,16 @@
       "branch_id": "correction_not_substantiated_terminal",
       "choice": "NONE",
       "condition": "source-backed factual finding is assessed as unsupported; immutable approved base remains unchanged and no delta, denial, approval, or PF10 addendum is produced",
-      "confidence": 0.93,
+      "confidence": 0.92,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.02,
-        "NONE": 0.94,
+        "COMPARISON": 0.01,
+        "NONE": 0.95,
         "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-30",
+      "state": null,
       "terminal": true
     },
     "CF-C-30__crd_specification_delta_return": {
@@ -581,15 +603,16 @@
       "branch_id": "crd_specification_delta_return",
       "choice": "READ_ONLY",
       "condition": "the exact affected native receiver recorded by the approved CRD Specification delta reads current PF10; this is not an RS-40 rescope route",
-      "confidence": 0.62,
+      "confidence": 0.72,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.27,
+        "COMPARISON": 0.19,
         "NONE": 0.01,
-        "READ_ONLY": 0.72,
+        "READ_ONLY": 0.8,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-30",
+      "state": "DELTA_APPROVE",
       "terminal": false
     },
     "CF-C-30__delta_deny": {
@@ -597,15 +620,16 @@
       "branch_id": "delta_deny",
       "choice": "NONE",
       "condition": "return bounded delta redlines to the same Specification author; no addendum",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.97,
-        "READ_ONLY": 0.02,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-30",
+      "state": "DELTA_DENY",
       "terminal": false
     },
     "CF-C-30__initial_approve": {
@@ -613,15 +637,16 @@
       "branch_id": "initial_approve",
       "choice": "NONE",
       "condition": "initial approval; no addendum",
-      "confidence": 0.83,
+      "confidence": 0.85,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.87,
-        "READ_ONLY": 0.12,
+        "NONE": 0.89,
+        "READ_ONLY": 0.1,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-30",
+      "state": "INITIAL_APPROVE",
       "terminal": false
     },
     "CF-C-30__initial_deny": {
@@ -638,6 +663,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-30",
+      "state": "INITIAL_DENY",
       "terminal": false
     },
     "CF-C-30__product_scope_decision_required_terminal": {
@@ -645,15 +671,16 @@
       "branch_id": "product_scope_decision_required_terminal",
       "choice": "NONE",
       "condition": "the requested correction requires an unresolved genuine product-intent or scope choice; return the exact decision required to Nathan without disguising it as a factual correction",
-      "confidence": 0.93,
+      "confidence": 0.88,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.95,
-        "READ_ONLY": 0.03,
+        "NONE": 0.91,
+        "READ_ONLY": 0.07,
         "SOURCE_AVAILABILITY": 0.02
       },
       "prompt": "CF-C-30",
+      "state": null,
       "terminal": true
     },
     "CF-C-30__review_terminal": {
@@ -670,6 +697,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "CF-C-30",
+      "state": null,
       "terminal": true
     },
     "CF-C-40__approved_base_delta_revision": {
@@ -677,31 +705,33 @@
       "branch_id": "approved_base_delta_revision",
       "choice": "NONE",
       "condition": "pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base",
-      "confidence": 0.62,
+      "confidence": 0.66,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.03,
-        "NONE": 0.71,
-        "READ_ONLY": 0.26,
-        "SOURCE_AVAILABILITY": 0.0
-      },
-      "prompt": "CF-C-40",
-      "terminal": false
-    },
-    "CF-C-40__approved_base_first_delta_authoring": {
-      "band": "UNCERTAIN",
-      "branch_id": "approved_base_first_delta_authoring",
-      "choice": "NONE",
-      "condition": "first standalone CRD Specification delta authored from the exact Thoth correction assessment/redline; immutable approved base unchanged; return to the same Thoth reviewer for approved-base delta review",
-      "confidence": 0.69,
-      "lexical": "NO_MATCH",
-      "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.76,
+        "COMPARISON": 0.02,
+        "NONE": 0.75,
         "READ_ONLY": 0.23,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-40",
+      "state": "SPECIFICATION_PENDING",
+      "terminal": false
+    },
+    "CF-C-40__approved_base_first_delta_authoring": {
+      "band": "CLEAR",
+      "branch_id": "approved_base_first_delta_authoring",
+      "choice": "NONE",
+      "condition": "first standalone CRD Specification delta authored from the exact Thoth correction assessment/redline; immutable approved base unchanged; return to the same Thoth reviewer for approved-base delta review",
+      "confidence": 0.83,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.87,
+        "READ_ONLY": 0.12,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "CF-C-40",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-C-40__preapproval_revision": {
@@ -709,15 +739,16 @@
       "branch_id": "preapproval_revision",
       "choice": "NONE",
       "condition": "pending preapproval CRD Specification corrected under the exact redline",
-      "confidence": 0.58,
+      "confidence": 0.67,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.11,
-        "NONE": 0.68,
-        "READ_ONLY": 0.21,
+        "COMPARISON": 0.07,
+        "NONE": 0.75,
+        "READ_ONLY": 0.18,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-40",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-C-40__redline_owner_recovery": {
@@ -734,6 +765,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-C-40",
+      "state": null,
       "terminal": false
     },
     "CF-C-40__revision_terminal": {
@@ -741,7 +773,7 @@
       "branch_id": "revision_terminal",
       "choice": "NONE",
       "condition": "the redline or authority owner cannot be resolved",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -750,6 +782,7 @@
         "SOURCE_AVAILABILITY": 0.02
       },
       "prompt": "CF-C-40",
+      "state": null,
       "terminal": true
     },
     "CF-E-10__class_selection_recovery": {
@@ -757,15 +790,16 @@
       "branch_id": "class_selection_recovery",
       "choice": "NONE",
       "condition": "Epic selection record or change identity is missing or conflicting; CF-PO-10 records exact existing evidence or requests Nathan's decision and never chooses the class",
-      "confidence": 0.88,
+      "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.91,
-        "READ_ONLY": 0.08,
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-E-10__kickoff_ready": {
@@ -773,7 +807,7 @@
       "branch_id": "kickoff_ready",
       "choice": "NONE",
       "condition": "valid Epic class selection and complete sanitized source",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -782,6 +816,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-10",
+      "state": "KICKOFF_READY",
       "terminal": false
     },
     "CF-E-10__kickoff_terminal": {
@@ -789,7 +824,7 @@
       "branch_id": "kickoff_terminal",
       "choice": "NONE",
       "condition": "another true Product Owner/source/authority stop has no runnable receiver",
-      "confidence": 0.97,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -798,6 +833,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "CF-E-10",
+      "state": "BLOCKED",
       "terminal": true
     },
     "CF-E-10__material_source_omission_recovery": {
@@ -814,6 +850,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-E-10__wrong_class_crd": {
@@ -821,7 +858,7 @@
       "branch_id": "wrong_class_crd",
       "choice": "NONE",
       "condition": "the supplied Product Owner class is CRD",
-      "confidence": 0.94,
+      "confidence": 0.95,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.03,
@@ -830,6 +867,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-E-20__invalid_kickoff_recovery": {
@@ -837,15 +875,16 @@
       "branch_id": "invalid_kickoff_recovery",
       "choice": "NONE",
       "condition": "kickoff is incomplete, defective, or contradictory and the kickoff owner can correct it",
-      "confidence": 0.99,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 1.0,
-        "READ_ONLY": 0.0,
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "CF-E-20__specification_authoring_terminal": {
@@ -862,6 +901,7 @@
         "SOURCE_AVAILABILITY": 0.02
       },
       "prompt": "CF-E-20",
+      "state": "BLOCKED",
       "terminal": true
     },
     "CF-E-20__specification_pending": {
@@ -869,15 +909,16 @@
       "branch_id": "specification_pending",
       "choice": "NONE",
       "condition": "complete pending Epic Specification is ready for Thoth review",
-      "confidence": 0.95,
+      "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.96,
-        "READ_ONLY": 0.03,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-20",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-E-30__approved_base_correction_redline": {
@@ -885,15 +926,16 @@
       "branch_id": "approved_base_correction_redline",
       "choice": "NONE",
       "condition": "approved immutable Epic base plus a source-backed factual finding or actual authorized product/scope decision is assessed as justified; exact Thoth correction redline goes to the same Isis author for the first standalone pending delta; no approval or PF10 addendum",
-      "confidence": 0.76,
+      "confidence": 0.74,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.03,
-        "NONE": 0.82,
-        "READ_ONLY": 0.15,
+        "COMPARISON": 0.05,
+        "NONE": 0.81,
+        "READ_ONLY": 0.13,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": "CORRECTION_REDLINE",
       "terminal": false
     },
     "CF-E-30__correction_not_substantiated_terminal": {
@@ -901,15 +943,16 @@
       "branch_id": "correction_not_substantiated_terminal",
       "choice": "NONE",
       "condition": "source-backed factual finding is assessed as unsupported; immutable approved base remains unchanged and no delta, denial, approval, or PF10 addendum is produced",
-      "confidence": 0.88,
+      "confidence": 0.89,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.06,
-        "NONE": 0.91,
+        "COMPARISON": 0.05,
+        "NONE": 0.92,
         "READ_ONLY": 0.03,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": null,
       "terminal": true
     },
     "CF-E-30__delta_deny": {
@@ -917,7 +960,7 @@
       "branch_id": "delta_deny",
       "choice": "NONE",
       "condition": "return bounded delta redlines to the same Specification author; no addendum",
-      "confidence": 0.97,
+      "confidence": 0.96,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -926,22 +969,24 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": "DELTA_DENY",
       "terminal": false
     },
     "CF-E-30__epic_specification_delta_return": {
-      "band": "UNCERTAIN",
+      "band": "UNRESOLVED",
       "branch_id": "epic_specification_delta_return",
       "choice": "COMPARISON",
       "condition": "the exact affected native receiver recorded by the approved Epic Specification delta reads current PF10; this is not an RS-40 rescope route",
-      "confidence": 0.51,
+      "confidence": 0.49,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.64,
+        "COMPARISON": 0.62,
         "NONE": 0.02,
-        "READ_ONLY": 0.34,
+        "READ_ONLY": 0.36,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": "DELTA_APPROVE",
       "terminal": false
     },
     "CF-E-30__initial_approve": {
@@ -958,6 +1003,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": "INITIAL_APPROVE",
       "terminal": false
     },
     "CF-E-30__initial_deny": {
@@ -965,7 +1011,7 @@
       "branch_id": "initial_deny",
       "choice": "NONE",
       "condition": "initial denial returns exact redlines to the same Isis author; no addendum",
-      "confidence": 0.97,
+      "confidence": 0.96,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -974,6 +1020,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": "INITIAL_DENY",
       "terminal": false
     },
     "CF-E-30__product_scope_decision_required_terminal": {
@@ -990,6 +1037,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-30",
+      "state": null,
       "terminal": true
     },
     "CF-E-30__review_terminal": {
@@ -1006,6 +1054,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "CF-E-30",
+      "state": null,
       "terminal": true
     },
     "CF-E-40__approved_base_delta_revision": {
@@ -1013,15 +1062,16 @@
       "branch_id": "approved_base_delta_revision",
       "choice": "NONE",
       "condition": "pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base",
-      "confidence": 0.59,
+      "confidence": 0.54,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.06,
-        "NONE": 0.7,
+        "COMPARISON": 0.1,
+        "NONE": 0.66,
         "READ_ONLY": 0.24,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-40",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-E-40__approved_base_first_delta_authoring": {
@@ -1029,15 +1079,16 @@
       "branch_id": "approved_base_first_delta_authoring",
       "choice": "NONE",
       "condition": "first standalone Epic Specification delta authored from the exact Thoth correction assessment/redline; immutable approved base unchanged; return to the same Thoth reviewer for approved-base delta review",
-      "confidence": 0.68,
+      "confidence": 0.69,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.03,
+        "COMPARISON": 0.04,
         "NONE": 0.76,
-        "READ_ONLY": 0.21,
+        "READ_ONLY": 0.2,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-40",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-E-40__preapproval_revision": {
@@ -1045,15 +1096,16 @@
       "branch_id": "preapproval_revision",
       "choice": "NONE",
       "condition": "pending preapproval Epic Specification corrected under the exact redline",
-      "confidence": 0.6,
+      "confidence": 0.68,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.17,
-        "NONE": 0.69,
-        "READ_ONLY": 0.13,
+        "COMPARISON": 0.13,
+        "NONE": 0.76,
+        "READ_ONLY": 0.1,
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "CF-E-40",
+      "state": "SPECIFICATION_PENDING",
       "terminal": false
     },
     "CF-E-40__redline_owner_recovery": {
@@ -1061,7 +1113,7 @@
       "branch_id": "redline_owner_recovery",
       "choice": "NONE",
       "condition": "missing or contradictory redline/authority has an exact evidenced native owner",
-      "confidence": 0.99,
+      "confidence": 1.0,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -1070,6 +1122,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-E-40",
+      "state": null,
       "terminal": false
     },
     "CF-E-40__revision_terminal": {
@@ -1086,6 +1139,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "CF-E-40",
+      "state": null,
       "terminal": true
     },
     "CF-PO-10__class_selected_crd": {
@@ -1102,6 +1156,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-PO-10",
+      "state": "CLASS_SELECTED",
       "terminal": false
     },
     "CF-PO-10__class_selected_epic": {
@@ -1118,6 +1173,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-PO-10",
+      "state": "CLASS_SELECTED",
       "terminal": false
     },
     "CF-PO-10__selection_missing_or_conflicting": {
@@ -1125,15 +1181,16 @@
       "branch_id": "selection_missing_or_conflicting",
       "choice": "NONE",
       "condition": "no usable explicit Product Owner selection evidence, conflicting evidence, or unresolved change identity/source remains after CF-PO-10 requests or attempts to record it; return the exact requirement to Nathan with no CLASS_SELECTED result or kickoff",
-      "confidence": 0.96,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.97,
-        "READ_ONLY": 0.03,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CF-PO-10",
+      "state": null,
       "terminal": true
     },
     "CL-20__adr_branch": {
@@ -1144,12 +1201,13 @@
       "confidence": 0.79,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.06,
+        "COMPARISON": 0.07,
         "NONE": 0.84,
-        "READ_ONLY": 0.1,
+        "READ_ONLY": 0.09,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": false
     },
     "CL-20__epic_pf09_maintenance": {
@@ -1157,7 +1215,7 @@
       "branch_id": "epic_pf09_maintenance",
       "choice": "NONE",
       "condition": "the authorized Epic PF09 branch requires post-Epic maintenance authoring",
-      "confidence": 0.9,
+      "confidence": 0.91,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -1166,6 +1224,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": false
     },
     "CL-20__epic_pf09_revalidation": {
@@ -1177,11 +1236,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.06,
-        "NONE": 0.85,
-        "READ_ONLY": 0.09,
+        "NONE": 0.86,
+        "READ_ONLY": 0.08,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": false
     },
     "CL-20__epic_pf09_review": {
@@ -1189,15 +1249,16 @@
       "branch_id": "epic_pf09_review",
       "choice": "NONE",
       "condition": "the authorized Epic PF09 branch has a complete revalidation ready for review",
-      "confidence": 0.9,
+      "confidence": 0.92,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.93,
-        "READ_ONLY": 0.05,
+        "NONE": 0.94,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": false
     },
     "CL-20__final_scan": {
@@ -1209,11 +1270,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.98,
-        "READ_ONLY": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": false
     },
     "CL-20__manual_or_owner_pending": {
@@ -1230,6 +1292,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": true
     },
     "CL-20__native_owner_branch": {
@@ -1246,6 +1309,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-20",
+      "state": "POST_CLOSURE_PENDING",
       "terminal": false
     },
     "CL-30__adr_candidate_native_route": {
@@ -1262,6 +1326,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-30",
+      "state": "ADR_CANDIDATE",
       "terminal": false
     },
     "CL-30__adr_owner_terminal": {
@@ -1278,6 +1343,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-30",
+      "state": null,
       "terminal": true
     },
     "CL-30__final_scan": {
@@ -1294,6 +1360,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-30",
+      "state": null,
       "terminal": false
     },
     "CL-30__no_adr_native_route": {
@@ -1310,6 +1377,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-30",
+      "state": "NO_ADR_NEEDED",
       "terminal": false
     },
     "CL-40__complete": {
@@ -1326,6 +1394,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-40",
+      "state": "COMPLETE",
       "terminal": true
     },
     "CL-40__incomplete_same_task": {
@@ -1333,7 +1402,7 @@
       "branch_id": "incomplete_same_task",
       "choice": "NONE",
       "condition": "resume the same CL-40 task after the exact missing bounded condition is resolved",
-      "confidence": 0.99,
+      "confidence": 1.0,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -1342,6 +1411,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-40",
+      "state": "INCOMPLETE",
       "terminal": false
     },
     "CL-40__scan_terminal": {
@@ -1353,11 +1423,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-40",
+      "state": null,
       "terminal": true
     },
     "CL-40__selected_native_boundary": {
@@ -1374,6 +1445,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-40",
+      "state": null,
       "terminal": false
     },
     "CL-C-10__change_closed": {
@@ -1390,6 +1462,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-C-10",
+      "state": "CHANGE_CLOSED",
       "terminal": false
     },
     "CL-C-10__do_not_close_existing_owner": {
@@ -1406,6 +1479,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-C-10",
+      "state": "DO_NOT_CLOSE",
       "terminal": false
     },
     "CL-C-10__do_not_close_new_remedy": {
@@ -1422,6 +1496,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-C-10",
+      "state": "DO_NOT_CLOSE",
       "terminal": false
     },
     "CL-C-10__shared_source_authority_terminal": {
@@ -1438,6 +1513,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-C-10",
+      "state": null,
       "terminal": true
     },
     "CL-E-10__change_closed_epic_pf09": {
@@ -1445,15 +1521,16 @@
       "branch_id": "change_closed_epic_pf09",
       "choice": "NONE",
       "condition": "a separately authorized Epic PF09 revalidation branch is selected",
-      "confidence": 0.96,
+      "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.97,
-        "READ_ONLY": 0.02,
+        "COMPARISON": 0.02,
+        "NONE": 0.95,
+        "READ_ONLY": 0.03,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-10",
+      "state": "CHANGE_CLOSED",
       "terminal": false
     },
     "CL-E-10__change_closed_postclosure": {
@@ -1461,7 +1538,7 @@
       "branch_id": "change_closed_postclosure",
       "choice": "NONE",
       "condition": "positive Epic closure decision with ordinary post-closure work",
-      "confidence": 0.99,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -1470,6 +1547,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-10",
+      "state": "CHANGE_CLOSED",
       "terminal": false
     },
     "CL-E-10__do_not_close_existing_owner": {
@@ -1486,6 +1564,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-10",
+      "state": "DO_NOT_CLOSE",
       "terminal": false
     },
     "CL-E-10__do_not_close_new_remedy": {
@@ -1497,11 +1576,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 1.0,
-        "READ_ONLY": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-10",
+      "state": "DO_NOT_CLOSE",
       "terminal": false
     },
     "CL-E-10__shared_source_authority_terminal": {
@@ -1518,6 +1598,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-10",
+      "state": null,
       "terminal": true
     },
     "CL-E-20__blocked": {
@@ -1534,6 +1615,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-20",
+      "state": "BLOCKED",
       "terminal": true
     },
     "CL-E-20__complete": {
@@ -1541,15 +1623,16 @@
       "branch_id": "complete",
       "choice": "NONE",
       "condition": "complete PF09 revalidation is ready for review",
-      "confidence": 0.88,
+      "confidence": 0.89,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.04,
-        "NONE": 0.92,
+        "COMPARISON": 0.05,
+        "NONE": 0.91,
         "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-20",
+      "state": "COMPLETE",
       "terminal": false
     },
     "CL-E-20__partial": {
@@ -1557,7 +1640,7 @@
       "branch_id": "partial",
       "choice": "NONE",
       "condition": "repairable authoring or evidence gap; same author/session resumes",
-      "confidence": 1.0,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -1566,6 +1649,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-20",
+      "state": "PARTIAL",
       "terminal": false
     },
     "CL-E-30__accept": {
@@ -1573,7 +1657,7 @@
       "branch_id": "accept",
       "choice": "NONE",
       "condition": "accepted revalidation",
-      "confidence": 0.94,
+      "confidence": 0.95,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.03,
@@ -1582,6 +1666,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-30",
+      "state": "ACCEPT",
       "terminal": false
     },
     "CL-E-30__deny": {
@@ -1589,7 +1674,7 @@
       "branch_id": "deny",
       "choice": "NONE",
       "condition": "denied revalidation returns to the same author",
-      "confidence": 0.98,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -1598,6 +1683,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-30",
+      "state": "DENY",
       "terminal": false
     },
     "CL-E-30__review_terminal": {
@@ -1614,6 +1700,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-30",
+      "state": null,
       "terminal": true
     },
     "CL-E-40__final_scan": {
@@ -1630,6 +1717,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
       "terminal": false
     },
     "CL-E-40__maintenance_terminal": {
@@ -1646,6 +1734,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
       "terminal": true
     },
     "CL-E-40__manual_tw_route": {
@@ -1653,15 +1742,16 @@
       "branch_id": "manual_tw_route",
       "choice": "NONE",
       "condition": "the exact authorized manual/TW maintenance receiver is resolved",
-      "confidence": 0.98,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
       "terminal": false
     },
     "CL-E-40__selected_evidence_gap": {
@@ -1678,6 +1768,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "CL-E-40",
+      "state": "MAINTENANCE_PENDING",
       "terminal": false
     },
     "DOC-10__instruction_ready": {
@@ -1685,15 +1776,16 @@
       "branch_id": "instruction_ready",
       "choice": "NONE",
       "condition": "complete documentation PR instruction is ready for detailed planning",
-      "confidence": 0.96,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.98,
-        "READ_ONLY": 0.02,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-10",
+      "state": "INSTRUCTION_READY",
       "terminal": false
     },
     "DOC-10__instruction_terminal": {
@@ -1705,11 +1797,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 1.0,
+        "NONE": 0.99,
         "READ_ONLY": 0.0,
-        "SOURCE_AVAILABILITY": 0.0
+        "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "DOC-10",
+      "state": null,
       "terminal": true
     },
     "DOC-10__material_boundary": {
@@ -1720,12 +1813,13 @@
       "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.98,
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
         "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-10",
+      "state": null,
       "terminal": false
     },
     "DOC-10__repairable_instruction_defect": {
@@ -1733,15 +1827,16 @@
       "branch_id": "repairable_instruction_defect",
       "choice": "NONE",
       "condition": "instruction defect is repairable in the same IA session from a saved checkpoint",
-      "confidence": 0.97,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 0.98,
+        "COMPARISON": 0.01,
+        "NONE": 0.97,
         "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-10",
+      "state": null,
       "terminal": false
     },
     "DOC-20__complete": {
@@ -1758,6 +1853,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-20",
+      "state": "COMPLETE",
       "terminal": false
     },
     "DOC-20__documentation_terminal": {
@@ -1765,7 +1861,7 @@
       "branch_id": "documentation_terminal",
       "choice": "NONE",
       "condition": "product-intent, source, authority, or unrecoverable merge-evidence failure",
-      "confidence": 0.99,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -1774,6 +1870,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "DOC-20",
+      "state": null,
       "terminal": true
     },
     "DOC-20__instruction_repair": {
@@ -1781,15 +1878,16 @@
       "branch_id": "instruction_repair",
       "choice": "NONE",
       "condition": "documentation instruction is missing or defective",
-      "confidence": 0.92,
+      "confidence": 0.9,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.94,
-        "READ_ONLY": 0.04,
+        "NONE": 0.93,
+        "READ_ONLY": 0.05,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-20",
+      "state": null,
       "terminal": false
     },
     "DOC-20__landed_lineage_review": {
@@ -1801,11 +1899,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 1.0,
-        "READ_ONLY": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-20",
+      "state": null,
       "terminal": false
     },
     "DOC-20__material_delta": {
@@ -1813,15 +1912,16 @@
       "branch_id": "material_delta",
       "choice": "NONE",
       "condition": "evidence proves a bounded material delta",
-      "confidence": 0.97,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.02,
-        "NONE": 0.98,
+        "COMPARISON": 0.03,
+        "NONE": 0.97,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-20",
+      "state": null,
       "terminal": false
     },
     "DOC-20__remediation_complete_native_return": {
@@ -1833,11 +1933,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.97,
-        "READ_ONLY": 0.03,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-20",
+      "state": "COMPLETE",
       "terminal": false
     },
     "DOC-20__remediation_incomplete_native_return": {
@@ -1854,6 +1955,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "DOC-20",
+      "state": null,
       "terminal": false
     },
     "ESC-10__awaiting_thoth_remediation": {
@@ -1870,6 +1972,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-10",
+      "state": "AWAITING_THOTH_REMEDIATION",
       "terminal": false
     },
     "ESC-10__escalation_terminal": {
@@ -1886,6 +1989,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-10",
+      "state": null,
       "terminal": true
     },
     "ESC-25__blocked_evidence_return": {
@@ -1902,6 +2006,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-25",
+      "state": "BLOCKED",
       "terminal": false
     },
     "ESC-25__blocked_terminal": {
@@ -1918,6 +2023,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-25",
+      "state": "BLOCKED",
       "terminal": true
     },
     "ESC-25__complete": {
@@ -1934,6 +2040,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-25",
+      "state": "COMPLETE",
       "terminal": false
     },
     "ESC-25__partial": {
@@ -1950,6 +2057,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-25",
+      "state": "PARTIAL",
       "terminal": false
     },
     "ESC-30__blocked": {
@@ -1966,6 +2074,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-30",
+      "state": "BLOCKED",
       "terminal": true
     },
     "ESC-30__discovery_required": {
@@ -1982,6 +2091,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-30",
+      "state": "DISCOVERY_REQUIRED",
       "terminal": false
     },
     "ESC-30__remediation_pending": {
@@ -1998,6 +2108,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-30",
+      "state": "REMEDIATION_PENDING",
       "terminal": false
     },
     "ESC-40__deny": {
@@ -2014,6 +2125,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-40",
+      "state": "DENY",
       "terminal": false
     },
     "ESC-40__remediation_non_pr_return": {
@@ -2021,7 +2133,7 @@
       "branch_id": "remediation_non_pr_return",
       "choice": "READ_ONLY",
       "condition": "recorded remediation return is a non-PR native delivery owner; that receiver reads current PF10",
-      "confidence": 0.95,
+      "confidence": 0.94,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -2030,6 +2142,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-40",
+      "state": "APPROVE",
       "terminal": false
     },
     "ESC-40__remediation_pr30_return": {
@@ -2037,15 +2150,16 @@
       "branch_id": "remediation_pr30_return",
       "choice": "NONE",
       "condition": "recorded remediation return is PR-30_PREPUBLICATION or PR-30_POSTPUBLICATION; resume PR-30 directly on the qualifying approval, preserving actual vehicle state",
-      "confidence": 0.99,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-40",
+      "state": "APPROVE",
       "terminal": false
     },
     "ESC-40__remediation_pr35_return": {
@@ -2053,15 +2167,16 @@
       "branch_id": "remediation_pr35_return",
       "choice": "NONE",
       "condition": "recorded remediation return is PR-35; resume PR-35 directly on the qualifying approval in the same open PR",
-      "confidence": 0.95,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.96,
-        "READ_ONLY": 0.02,
+        "NONE": 0.95,
+        "READ_ONLY": 0.03,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "ESC-40",
+      "state": "APPROVE",
       "terminal": false
     },
     "ESC-40__remediation_review_terminal": {
@@ -2069,7 +2184,7 @@
       "branch_id": "remediation_review_terminal",
       "choice": "NONE",
       "condition": "native continuation identity, Product Owner/source, or authority predicate is unresolved",
-      "confidence": 0.98,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -2078,6 +2193,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "ESC-40",
+      "state": null,
       "terminal": true
     },
     "GCFPE-MGMT-10__implementation_blocked": {
@@ -2094,6 +2210,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "GCFPE-MGMT-10",
+      "state": "IMPLEMENTATION_BLOCKED",
       "terminal": true
     },
     "GCFPE-MGMT-10__maintenance_complete_native_return": {
@@ -2101,15 +2218,16 @@
       "branch_id": "maintenance_complete_native_return",
       "choice": "NONE",
       "condition": "scoped maintenance complete and the exact case separately authorizes one ready native continuation; resolve the actual selected receiver and preserve original authority, session and inputs; exclude PR-50, merge, unselected candidates and unauthorized Alpha; emit one complete handoff without executing it",
-      "confidence": 0.73,
+      "confidence": 0.7,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.8,
-        "READ_ONLY": 0.19,
+        "COMPARISON": 0.02,
+        "NONE": 0.77,
+        "READ_ONLY": 0.21,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "GCFPE-MGMT-10",
+      "state": "ECOSYSTEM_CHANGE_COMPLETE",
       "terminal": false
     },
     "GCFPE-MGMT-10__maintenance_complete_terminal": {
@@ -2117,15 +2235,16 @@
       "branch_id": "maintenance_complete_terminal",
       "choice": "NONE",
       "condition": "scoped maintenance complete; no exact further substantive invocation is both authorized and ready; return the saved/read-back GCFPE_ECOSYSTEM_CHANGE_REPORT to Nathan",
-      "confidence": 0.86,
+      "confidence": 0.83,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 0.9,
-        "READ_ONLY": 0.1,
+        "COMPARISON": 0.01,
+        "NONE": 0.87,
+        "READ_ONLY": 0.12,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "GCFPE-MGMT-10",
+      "state": "ECOSYSTEM_CHANGE_COMPLETE",
       "terminal": true
     },
     "GCFPE-MGMT-10__promotion_checkpoint_required": {
@@ -2133,15 +2252,16 @@
       "branch_id": "promotion_checkpoint_required",
       "choice": "NONE",
       "condition": "exact-snapshot promotion approval or a required active control-layer checkpoint is outstanding; return the fully specified imminent transaction without treating general repair authorization as promotion approval",
-      "confidence": 0.77,
+      "confidence": 0.78,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.04,
-        "NONE": 0.83,
-        "READ_ONLY": 0.13,
+        "NONE": 0.84,
+        "READ_ONLY": 0.12,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "GCFPE-MGMT-10",
+      "state": "PROMOTION_CHECKPOINT_REQUIRED",
       "terminal": true
     },
     "GCFPE-MGMT-10__ready_for_product_owner_alpha_resumption_decision": {
@@ -2158,6 +2278,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "GCFPE-MGMT-10",
+      "state": "READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION",
       "terminal": false
     },
     "IA-10__answer_available": {
@@ -2174,6 +2295,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "IA-10__audit_and_plan_complete": {
@@ -2190,6 +2312,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-10",
+      "state": "PLAN_PENDING",
       "terminal": false
     },
     "IA-10__audit_recovery": {
@@ -2206,6 +2329,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "IA-10__bounded_research": {
@@ -2222,6 +2346,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "IA-10__ia10_terminal": {
@@ -2232,12 +2357,13 @@
       "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 1.0,
+        "COMPARISON": 0.01,
+        "NONE": 0.99,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-10",
+      "state": "BLOCKED",
       "terminal": true
     },
     "IA-10__plan_interrupted": {
@@ -2254,6 +2380,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-10",
+      "state": "AUDIT_COMPLETE",
       "terminal": false
     },
     "IA-20__answer_available": {
@@ -2261,7 +2388,7 @@
       "branch_id": "answer_available",
       "choice": "NONE",
       "condition": "an actual partial or complete answer is available for bounded validation/application; carry complete RECOVERY_ENVELOPE and ANSWER_REF, valid completed Audit and exact Plan checkpoint; preserve unanswered questions and deadlines and same-author return; do not repeat research or infer whole-Plan readiness",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -2270,6 +2397,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "IA-20__bounded_research": {
@@ -2286,6 +2414,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "IA-20__ia20_terminal": {
@@ -2293,15 +2422,16 @@
       "branch_id": "ia20_terminal",
       "choice": "NONE",
       "condition": "approved-base rewrite request, product decision, or unrecoverable source/authority blocker",
-      "confidence": 0.99,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 1.0,
+        "COMPARISON": 0.01,
+        "NONE": 0.99,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-20",
+      "state": "BLOCKED",
       "terminal": true
     },
     "IA-20__plan_pending": {
@@ -2318,6 +2448,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-20",
+      "state": "PLAN_PENDING",
       "terminal": false
     },
     "IA-20__plan_recovery": {
@@ -2334,6 +2465,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "IA-30__approved_base_plan_delta_redline": {
@@ -2341,7 +2473,7 @@
       "branch_id": "approved_base_plan_delta_redline",
       "choice": "NONE",
       "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; the source-backed factual finding or actual authorized material-change request is justified and no unresolved Product Owner choice remains. Issue the exact PLAN_DELTA_REDLINE with affected Plan anchors, bounded required overlay, effects, exclusions, evidence and return point to the same IA author for AUTHORING_MODE=APPROVED_BASE_PLAN_DELTA_AUTHORING first standalone delta authoring. No pending delta is required at this entry and no addendum is created.",
-      "confidence": 0.83,
+      "confidence": 0.84,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.02,
@@ -2350,6 +2482,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": "PLAN_DELTA_REDLINE",
       "terminal": false
     },
     "IA-30__change_not_substantiated": {
@@ -2357,15 +2490,16 @@
       "branch_id": "change_not_substantiated",
       "choice": "NONE",
       "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; the finding is unsupported or no change is required. Preserve the approved base, create no delta or addendum, and return terminally to the actual owner.",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.02,
-        "NONE": 0.97,
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
         "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": "CHANGE_NOT_SUBSTANTIATED",
       "terminal": true
     },
     "IA-30__delta_deny": {
@@ -2373,31 +2507,33 @@
       "branch_id": "delta_deny",
       "choice": "NONE",
       "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; exact delta redlines return to the same IA author through IA-40; no addendum.",
-      "confidence": 0.75,
+      "confidence": 0.77,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.81,
-        "READ_ONLY": 0.18,
+        "NONE": 0.83,
+        "READ_ONLY": 0.16,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": "DELTA_DENY",
       "terminal": false
     },
     "IA-30__initial_approve": {
-      "band": "UNRESOLVED",
+      "band": "UNCERTAIN",
       "branch_id": "initial_approve",
       "choice": "READ_ONLY",
       "condition": "REVIEW_MODE=INITIAL_PLAN_REVIEW and the pending whole-change Plan is approved; zero PF10 addenda. Route the first or next executable PR work unit already defined by the approved Plan, carrying the approved Specification, Audit, Plan, review, exact planned WORK_UNIT_ID, dependency state, conflict register, source/PF10 lineage and IA session. No future PR, Proceed, QA Guide/Plan, Ops receipt or documentation result is required; the approved Plan remains the governing source for its later Ops, documentation and QA-readiness consumers.",
-      "confidence": 0.42,
+      "confidence": 0.51,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.12,
-        "NONE": 0.29,
-        "READ_ONLY": 0.57,
+        "COMPARISON": 0.13,
+        "NONE": 0.22,
+        "READ_ONLY": 0.63,
         "SOURCE_AVAILABILITY": 0.02
       },
       "prompt": "IA-30",
+      "state": "INITIAL_APPROVE",
       "terminal": false
     },
     "IA-30__initial_deny": {
@@ -2405,15 +2541,16 @@
       "branch_id": "initial_deny",
       "choice": "NONE",
       "condition": "REVIEW_MODE=INITIAL_PLAN_REVIEW; exact itemized redlines return to the same IA author for AUTHORING_MODE=PREAPPROVAL_PLAN_REVISION; zero PF10 addenda.",
-      "confidence": 0.39,
+      "confidence": 0.43,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.55,
-        "READ_ONLY": 0.42,
-        "SOURCE_AVAILABILITY": 0.01
+        "NONE": 0.57,
+        "READ_ONLY": 0.39,
+        "SOURCE_AVAILABILITY": 0.02
       },
       "prompt": "IA-30",
+      "state": "INITIAL_DENY",
       "terminal": false
     },
     "IA-30__plan_delta_return": {
@@ -2421,7 +2558,7 @@
       "branch_id": "plan_delta_return",
       "choice": "COMPARISON",
       "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approved Plan delta reads current PF10; this is not an RS-40 rescope route",
-      "confidence": 0.57,
+      "confidence": 0.55,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.67,
@@ -2430,6 +2567,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": "DELTA_APPROVE",
       "terminal": false
     },
     "IA-30__plan_review_terminal": {
@@ -2446,6 +2584,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": null,
       "terminal": true
     },
     "IA-30__product_owner_decision_required": {
@@ -2453,15 +2592,16 @@
       "branch_id": "product_owner_decision_required",
       "choice": "NONE",
       "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; an unresolved product or scope decision is required. Return terminally to Nathan with exact alternatives and consequences; IA-30 never decides Product Owner intent.",
-      "confidence": 0.97,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.98,
-        "READ_ONLY": 0.02,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
       "terminal": true
     },
     "IA-30__wrong_native_lane": {
@@ -2473,11 +2613,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-30",
+      "state": "WRONG_NATIVE_LANE",
       "terminal": true
     },
     "IA-40__plan_delta_pending": {
@@ -2494,6 +2635,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-40",
+      "state": "PLAN_DELTA_PENDING",
       "terminal": false
     },
     "IA-40__plan_pending_revised": {
@@ -2505,11 +2647,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-40",
+      "state": "PLAN_PENDING_REVISED",
       "terminal": false
     },
     "IA-40__redline_incomplete": {
@@ -2526,6 +2669,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "IA-40",
+      "state": "REDLINE_INCOMPLETE",
       "terminal": true
     },
     "IA-40__source_authority_terminal": {
@@ -2542,6 +2686,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-40",
+      "state": null,
       "terminal": true
     },
     "IA-40__wrong_native_lane": {
@@ -2549,7 +2694,7 @@
       "branch_id": "wrong_native_lane",
       "choice": "NONE",
       "condition": "the supplied matter is actually PR rescope, remediation, Specification change or another lane. Do not author or route it as a Plan delta; preserve the evidence and return terminally to the exact origin owner identified by the source package.",
-      "confidence": 0.95,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -2558,6 +2703,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-40",
+      "state": "WRONG_NATIVE_LANE",
       "terminal": true
     },
     "IA-50__duplicate_existing_continuation": {
@@ -2574,6 +2720,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-50",
+      "state": "SEED_READY",
       "terminal": false
     },
     "IA-50__seed_incomplete_audit": {
@@ -2581,7 +2728,7 @@
       "branch_id": "seed_incomplete_audit",
       "choice": "NONE",
       "condition": "the validated answer applies to an incomplete IA-10 Audit",
-      "confidence": 0.99,
+      "confidence": 1.0,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -2590,6 +2737,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-50",
+      "state": "SEED_READY",
       "terminal": false
     },
     "IA-50__seed_incomplete_terminal": {
@@ -2606,6 +2754,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-50",
+      "state": "SEED_INCOMPLETE",
       "terminal": true
     },
     "IA-50__seed_paused_plan": {
@@ -2622,6 +2771,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-50",
+      "state": "SEED_READY",
       "terminal": false
     },
     "IA-50__seed_plan_review": {
@@ -2632,12 +2782,13 @@
       "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
+        "COMPARISON": 0.02,
         "NONE": 0.95,
-        "READ_ONLY": 0.04,
+        "READ_ONLY": 0.03,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-50",
+      "state": "SEED_READY",
       "terminal": false
     },
     "IA-50__seed_preapproval_or_delta_correction": {
@@ -2645,15 +2796,16 @@
       "branch_id": "seed_preapproval_or_delta_correction",
       "choice": "NONE",
       "condition": "a pending preapproval Plan correction, or pending approved-base Plan-delta authoring or revision, already has exact IA-30 redlines. Return to the same IA author with the exact target, redlines, answer/seed and reviewer return.",
-      "confidence": 0.92,
+      "confidence": 0.91,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.9299999999999999,
-        "READ_ONLY": 0.05,
+        "NONE": 0.93,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-50",
+      "state": "SEED_READY",
       "terminal": false
     },
     "IA-60__blocked": {
@@ -2670,6 +2822,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-60",
+      "state": "BLOCKED",
       "terminal": true
     },
     "IA-60__research_to_seeder": {
@@ -2677,7 +2830,7 @@
       "branch_id": "research_to_seeder",
       "choice": "NONE",
       "condition": "the bounded planning inquiry is complete and authorized for answer seeding; return the complete finding, ANSWER_REF and unchanged RECOVERY_ENVELOPE, preserving unanswered fields, owners, limitations and the exact paused IA return.",
-      "confidence": 0.99,
+      "confidence": 1.0,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -2686,6 +2839,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-60",
+      "state": "RESEARCH_COMPLETE",
       "terminal": false
     },
     "IA-60__unusable_partial": {
@@ -2697,11 +2851,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
+        "NONE": 1.0,
         "READ_ONLY": 0.0,
-        "SOURCE_AVAILABILITY": 0.01
+        "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-60",
+      "state": "PARTIAL",
       "terminal": true
     },
     "IA-60__usable_partial_to_seeder": {
@@ -2718,6 +2873,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "IA-60",
+      "state": "PARTIAL",
       "terminal": false
     },
     "MGR-10__class_selection": {
@@ -2734,6 +2890,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
       "terminal": false
     },
     "MGR-10__crd_entry": {
@@ -2741,15 +2898,16 @@
       "branch_id": "crd_entry",
       "choice": "NONE",
       "condition": "new cycle entry has an exact CRD classification and complete intake",
-      "confidence": 0.96,
+      "confidence": 0.95,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.97,
-        "READ_ONLY": 0.02,
+        "NONE": 0.96,
+        "READ_ONLY": 0.03,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
       "terminal": false
     },
     "MGR-10__epic_entry": {
@@ -2757,15 +2915,16 @@
       "branch_id": "epic_entry",
       "choice": "NONE",
       "condition": "new cycle entry has an exact Epic classification and complete intake",
-      "confidence": 0.92,
+      "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.94,
-        "READ_ONLY": 0.05,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
       "terminal": false
     },
     "MGR-10__final_scan": {
@@ -2782,6 +2941,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
       "terminal": false
     },
     "MGR-10__other_native_stage": {
@@ -2793,11 +2953,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.95,
-        "READ_ONLY": 0.03,
+        "NONE": 0.94,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
       "terminal": false
     },
     "MGR-10__pre_qa": {
@@ -2805,15 +2966,16 @@
       "branch_id": "pre_qa",
       "choice": "NONE",
       "condition": "the exact next unmet contract is integrated pre-QA audit/triage/readiness",
-      "confidence": 0.91,
+      "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.93,
-        "READ_ONLY": 0.05,
+        "NONE": 0.94,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "MGR-10",
+      "state": "FLOW_PROGRESS",
       "terminal": false
     },
     "MGR-10__terminal_return": {
@@ -2830,6 +2992,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "MGR-10",
+      "state": "TERMINAL_RETURN",
       "terminal": true
     },
     "OPS-10__blocked_native_owner": {
@@ -2846,6 +3009,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-10",
+      "state": "BLOCKED",
       "terminal": false
     },
     "OPS-10__blocked_terminal": {
@@ -2862,6 +3026,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-10",
+      "state": "BLOCKED",
       "terminal": true
     },
     "OPS-10__material_boundary_proposal": {
@@ -2878,6 +3043,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-10",
+      "state": null,
       "terminal": false
     },
     "OPS-10__ready": {
@@ -2894,6 +3060,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-10",
+      "state": "READY",
       "terminal": false
     },
     "OPS-10__remediation_discovery": {
@@ -2901,15 +3068,16 @@
       "branch_id": "remediation_discovery",
       "choice": "NONE",
       "condition": "the exact authorized remediation package requires bounded discovery",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.97,
-        "READ_ONLY": 0.03,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-10",
+      "state": null,
       "terminal": false
     },
     "OPS-20__material_boundary_proposal": {
@@ -2926,6 +3094,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": null,
       "terminal": false
     },
     "OPS-20__ops_execution_native_owner": {
@@ -2942,6 +3111,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": null,
       "terminal": false
     },
     "OPS-20__ops_execution_terminal": {
@@ -2958,6 +3128,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": null,
       "terminal": true
     },
     "OPS-20__remediation_discovery": {
@@ -2974,6 +3145,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": null,
       "terminal": false
     },
     "OPS-20__result_blocked": {
@@ -2990,6 +3162,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "OPS-20__result_complete": {
@@ -3006,6 +3179,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": "COMPLETE",
       "terminal": false
     },
     "OPS-20__result_failed": {
@@ -3022,6 +3196,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": "FAILED",
       "terminal": false
     },
     "OPS-20__result_notexecuted": {
@@ -3038,6 +3213,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": "NOT_EXECUTED",
       "terminal": false
     },
     "OPS-20__result_notproduced": {
@@ -3054,6 +3230,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": "NOT_PRODUCED",
       "terminal": false
     },
     "OPS-20__result_partial": {
@@ -3070,6 +3247,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-20",
+      "state": "PARTIAL",
       "terminal": false
     },
     "OPS-30__accept_native_consumer": {
@@ -3086,6 +3264,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-30",
+      "state": "ACCEPT",
       "terminal": false
     },
     "OPS-30__material_boundary": {
@@ -3093,15 +3272,16 @@
       "branch_id": "material_boundary",
       "choice": "NONE",
       "condition": "the actual receipt establishes a material scope, architecture, requirement, or design boundary",
-      "confidence": 0.9,
+      "confidence": 0.92,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.93,
-        "READ_ONLY": 0.06,
+        "NONE": 0.94,
+        "READ_ONLY": 0.05,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-30",
+      "state": null,
       "terminal": false
     },
     "OPS-30__receipt_native_owner": {
@@ -3118,6 +3298,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-30",
+      "state": null,
       "terminal": false
     },
     "OPS-30__receipt_terminal": {
@@ -3134,6 +3315,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-30",
+      "state": null,
       "terminal": true
     },
     "OPS-30__reject_corrective_task": {
@@ -3145,11 +3327,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 1.0,
-        "READ_ONLY": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-30",
+      "state": "REJECT",
       "terminal": false
     },
     "OPS-30__remediation_discovery": {
@@ -3157,15 +3340,16 @@
       "branch_id": "remediation_discovery",
       "choice": "NONE",
       "condition": "the actual receipt and remediation package explicitly require bounded discovery",
-      "confidence": 0.92,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.9299999999999999,
-        "READ_ONLY": 0.06,
+        "NONE": 0.95,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "OPS-30",
+      "state": null,
       "terminal": false
     },
     "PR-10__instruction_ready": {
@@ -3173,15 +3357,16 @@
       "branch_id": "instruction_ready",
       "choice": "NONE",
       "condition": "complete approved-scope instruction is ready for detailed planning",
-      "confidence": 0.87,
+      "confidence": 0.83,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
-        "NONE": 0.9,
-        "READ_ONLY": 0.08,
+        "NONE": 0.87,
+        "READ_ONLY": 0.11,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-10",
+      "state": "INSTRUCTION_READY",
       "terminal": false
     },
     "PR-10__instruction_terminal": {
@@ -3193,11 +3378,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 1.0,
-        "READ_ONLY": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-10",
+      "state": null,
       "terminal": true
     },
     "PR-10__material_boundary": {
@@ -3205,15 +3391,16 @@
       "branch_id": "material_boundary",
       "choice": "NONE",
       "condition": "a genuine material scope, architecture, requirement, or design boundary is substantiated",
-      "confidence": 0.85,
+      "confidence": 0.86,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.89,
-        "READ_ONLY": 0.1,
+        "NONE": 0.9,
+        "READ_ONLY": 0.09,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-10",
+      "state": null,
       "terminal": false
     },
     "PR-10__same_owner_recovery": {
@@ -3230,6 +3417,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-10",
+      "state": null,
       "terminal": false
     },
     "PR-10__upstream_owner_recovery": {
@@ -3237,15 +3425,16 @@
       "branch_id": "upstream_owner_recovery",
       "choice": "NONE",
       "condition": "the defective upstream Plan, review, remediation, Specification, or other source has an exact native owner",
-      "confidence": 0.95,
+      "confidence": 0.93,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.96,
-        "READ_ONLY": 0.03,
+        "NONE": 0.94,
+        "READ_ONLY": 0.05,
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "PR-10",
+      "state": null,
       "terminal": false
     },
     "PR-20__awaiting_po_proceed": {
@@ -3253,15 +3442,16 @@
       "branch_id": "awaiting_po_proceed",
       "choice": "NONE",
       "condition": "one complete executable approved-scope plan awaits the original Product Owner Proceed",
-      "confidence": 0.93,
+      "confidence": 0.94,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.95,
-        "READ_ONLY": 0.05,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-20",
+      "state": "AWAITING_PO_PROCEED",
       "terminal": false
     },
     "PR-20__material_boundary": {
@@ -3269,15 +3459,16 @@
       "branch_id": "material_boundary",
       "choice": "NONE",
       "condition": "the planning result substantiates a material scope, architecture, requirement, or design boundary",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.96,
-        "READ_ONLY": 0.03,
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-20",
+      "state": null,
       "terminal": false
     },
     "PR-20__planning_terminal": {
@@ -3294,6 +3485,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-20",
+      "state": null,
       "terminal": true
     },
     "PR-20__same_owner_recovery": {
@@ -3301,7 +3493,7 @@
       "branch_id": "same_owner_recovery",
       "choice": "NONE",
       "condition": "a bounded planning defect is repairable by the same dedicated PR planning session",
-      "confidence": 1.0,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -3310,6 +3502,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-20",
+      "state": null,
       "terminal": false
     },
     "PR-20__upstream_owner_recovery": {
@@ -3326,6 +3519,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-20",
+      "state": null,
       "terminal": false
     },
     "PR-30__pr30_terminal": {
@@ -3333,7 +3527,7 @@
       "branch_id": "pr30_terminal",
       "choice": "NONE",
       "condition": "unrecoverable source, owner, authority, or incompatible identity; never convert this into PR-50",
-      "confidence": 0.99,
+      "confidence": 1.0,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -3342,6 +3536,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-30",
+      "state": null,
       "terminal": true
     },
     "PR-30__pr_candidate_published": {
@@ -3358,6 +3553,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-30",
+      "state": "PR_CANDIDATE_PUBLISHED",
       "terminal": false
     },
     "PR-30__product_owner_decision_required": {
@@ -3369,11 +3565,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-30",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
       "terminal": true
     },
     "PR-30__recovery_pending": {
@@ -3390,6 +3587,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-30",
+      "state": "RECOVERY_PENDING",
       "terminal": false
     },
     "PR-30__rescope_pending": {
@@ -3406,6 +3604,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-30",
+      "state": "RESCOPE_PENDING",
       "terminal": false
     },
     "PR-35__merge_pending": {
@@ -3422,6 +3621,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-35",
+      "state": "MERGE_PENDING",
       "terminal": false
     },
     "PR-35__product_owner_decision_required": {
@@ -3429,7 +3629,7 @@
       "branch_id": "product_owner_decision_required",
       "choice": "NONE",
       "condition": "genuine Product Owner decision outside existing PR authority",
-      "confidence": 0.99,
+      "confidence": 1.0,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -3438,6 +3638,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-35",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
       "terminal": true
     },
     "PR-35__recovery_pending": {
@@ -3454,6 +3655,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-35",
+      "state": "RECOVERY_PENDING",
       "terminal": false
     },
     "PR-35__remote_evidence_pending": {
@@ -3470,6 +3672,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-35",
+      "state": "REMOTE_EVIDENCE_PENDING",
       "terminal": false
     },
     "PR-35__rescope_pending": {
@@ -3486,6 +3689,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-35",
+      "state": "RESCOPE_PENDING",
       "terminal": false
     },
     "PR-40__accept": {
@@ -3502,6 +3706,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-40",
+      "state": "ACCEPT",
       "terminal": false
     },
     "PR-40__lineage_review_terminal": {
@@ -3518,6 +3723,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-40",
+      "state": null,
       "terminal": true
     },
     "PR-40__pending_native_owner": {
@@ -3534,6 +3740,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-40",
+      "state": "PENDING",
       "terminal": false
     },
     "PR-40__pending_terminal": {
@@ -3541,7 +3748,7 @@
       "branch_id": "pending_terminal",
       "choice": "NONE",
       "condition": "manual merge, repository fact, review result, or evidence remains unavailable and no runnable native owner prompt is resolved",
-      "confidence": 0.98,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -3550,6 +3757,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "PR-40",
+      "state": "PENDING",
       "terminal": true
     },
     "PR-40__reject_existing_pr_owner": {
@@ -3566,6 +3774,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-40",
+      "state": "REJECT",
       "terminal": false
     },
     "PR-40__reject_instruction_owner": {
@@ -3573,7 +3782,7 @@
       "branch_id": "reject_instruction_owner",
       "choice": "NONE",
       "condition": "the substantiated in-scope defect is in the IA-issued PR instruction",
-      "confidence": 0.97,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -3582,6 +3791,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-40",
+      "state": "REJECT",
       "terminal": false
     },
     "PR-40__reject_material_boundary_proposal": {
@@ -3589,7 +3799,7 @@
       "branch_id": "reject_material_boundary_proposal",
       "choice": "NONE",
       "condition": "a substantiated material boundary requires a new bounded rescope proposal",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -3598,6 +3808,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-40",
+      "state": "REJECT",
       "terminal": false
     },
     "PR-50__pr_aborted_escalated": {
@@ -3614,6 +3825,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "PR-50",
+      "state": "PR_ABORTED_ESCALATED",
       "terminal": true
     },
     "QA-100__blocked": {
@@ -3630,6 +3842,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-100",
+      "state": "BLOCKED",
       "terminal": false
     },
     "QA-100__complete": {
@@ -3646,6 +3859,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-100",
+      "state": "COMPLETE",
       "terminal": false
     },
     "QA-100__failed": {
@@ -3662,6 +3876,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-100",
+      "state": "FAILED",
       "terminal": false
     },
     "QA-100__not_executed": {
@@ -3678,6 +3893,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-100",
+      "state": "NOT_EXECUTED",
       "terminal": false
     },
     "QA-100__partial": {
@@ -3694,6 +3910,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-100",
+      "state": "PARTIAL",
       "terminal": false
     },
     "QA-100__shared_source_authority_terminal": {
@@ -3710,6 +3927,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "QA-100",
+      "state": null,
       "terminal": true
     },
     "QA-10__evidence_owner_recovery": {
@@ -3726,6 +3944,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-10",
+      "state": "ASSESSMENT_INCOMPLETE",
       "terminal": false
     },
     "QA-10__material_native_boundary": {
@@ -3737,11 +3956,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.66,
+        "NONE": 0.67,
         "READ_ONLY": 0.32,
-        "SOURCE_AVAILABILITY": 0.01
+        "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-10",
+      "state": null,
       "terminal": false
     },
     "QA-10__not_ready": {
@@ -3749,15 +3969,16 @@
       "branch_id": "not_ready",
       "choice": "NONE",
       "condition": "evidence proves failure of an applicable approved Plan objective",
-      "confidence": 0.65,
+      "confidence": 0.7,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.19,
-        "NONE": 0.73,
-        "READ_ONLY": 0.08,
+        "COMPARISON": 0.16,
+        "NONE": 0.78,
+        "READ_ONLY": 0.06,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-10",
+      "state": "NOT_READY",
       "terminal": false
     },
     "QA-10__qa10_terminal": {
@@ -3765,15 +3986,16 @@
       "branch_id": "qa10_terminal",
       "choice": "NONE",
       "condition": "manual prerequisite, source/authority stop, or unresolved evidence owner prevents a runnable continuation",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.97,
-        "READ_ONLY": 0.02,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "QA-10",
+      "state": null,
       "terminal": true
     },
     "QA-10__ready_for_qa": {
@@ -3790,6 +4012,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-10",
+      "state": "READY_FOR_QA",
       "terminal": false
     },
     "QA-110__accept": {
@@ -3801,27 +4024,29 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.06,
-        "NONE": 0.89,
-        "READ_ONLY": 0.05,
+        "NONE": 0.87,
+        "READ_ONLY": 0.07,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-110",
+      "state": "ACCEPT",
       "terminal": false
     },
     "QA-110__escalation_required": {
-      "band": "CLEAR",
+      "band": "UNCERTAIN",
       "branch_id": "escalation_required",
       "choice": "NONE",
       "condition": "material QA evidence finding requires the native QA escalation report",
-      "confidence": 0.85,
+      "confidence": 0.79,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.88,
-        "READ_ONLY": 0.11,
+        "NONE": 0.84,
+        "READ_ONLY": 0.15,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-110",
+      "state": "ESCALATION_REQUIRED",
       "terminal": false
     },
     "QA-110__incomplete_execution_evidence": {
@@ -3829,15 +4054,16 @@
       "branch_id": "incomplete_execution_evidence",
       "choice": "NONE",
       "condition": "the exact missing evidence is lawfully producible by bounded QA execution",
-      "confidence": 0.86,
+      "confidence": 0.88,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.9,
-        "READ_ONLY": 0.09,
+        "NONE": 0.91,
+        "READ_ONLY": 0.08,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-110",
+      "state": "INCOMPLETE",
       "terminal": false
     },
     "QA-110__incomplete_named_owner": {
@@ -3854,6 +4080,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-110",
+      "state": "INCOMPLETE",
       "terminal": false
     },
     "QA-110__incomplete_terminal": {
@@ -3870,6 +4097,7 @@
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "QA-110",
+      "state": "INCOMPLETE",
       "terminal": true
     },
     "QA-110__rerun_execution": {
@@ -3877,6 +4105,23 @@
       "branch_id": "rerun_execution",
       "choice": "NONE",
       "condition": "the authorized attempt-2 task is already complete and ready for execution",
+      "confidence": 0.96,
+      "lexical": "NO_MATCH",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "QA-110",
+      "state": "BOUNDED_RERUN_REQUIRED",
+      "terminal": false
+    },
+    "QA-110__rerun_task_authoring": {
+      "band": "CLEAR",
+      "branch_id": "rerun_task_authoring",
+      "choice": "NONE",
+      "condition": "a new selected attempt-2 execution task still must be authored",
       "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
@@ -3886,22 +4131,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-110",
-      "terminal": false
-    },
-    "QA-110__rerun_task_authoring": {
-      "band": "CLEAR",
-      "branch_id": "rerun_task_authoring",
-      "choice": "NONE",
-      "condition": "a new selected attempt-2 execution task still must be authored",
-      "confidence": 0.98,
-      "lexical": "NO_MATCH",
-      "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
-        "SOURCE_AVAILABILITY": 0.0
-      },
-      "prompt": "QA-110",
+      "state": "BOUNDED_RERUN_REQUIRED",
       "terminal": false
     },
     "QA-120__fail": {
@@ -3909,15 +4139,16 @@
       "branch_id": "fail",
       "choice": "NONE",
       "condition": "final QA Report/RCA demonstrates a material failure requiring escalation",
-      "confidence": 0.99,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.99,
-        "READ_ONLY": 0.0,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-120",
+      "state": "FAIL",
       "terminal": false
     },
     "QA-120__interim_evidence_review": {
@@ -3934,6 +4165,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-120",
+      "state": "INTERIM",
       "terminal": false
     },
     "QA-120__interim_task_authoring": {
@@ -3950,6 +4182,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-120",
+      "state": "INTERIM",
       "terminal": false
     },
     "QA-120__pass_crd": {
@@ -3966,6 +4199,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-120",
+      "state": "PASS",
       "terminal": false
     },
     "QA-120__pass_epic": {
@@ -3973,15 +4207,16 @@
       "branch_id": "pass_epic",
       "choice": "NONE",
       "condition": "PASS with verified existing EPIC class, complete QA Report/RCA and the matching continuing-Isis closure intake",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.97,
+        "COMPARISON": 0.0,
+        "NONE": 0.98,
         "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-120",
+      "state": "PASS",
       "terminal": false
     },
     "QA-120__shared_source_authority_terminal": {
@@ -3998,6 +4233,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-120",
+      "state": null,
       "terminal": true
     },
     "QA-20__blocked": {
@@ -4005,15 +4241,16 @@
       "branch_id": "blocked",
       "choice": "NONE",
       "condition": "material readiness invalidation or recoverable QA-10 evidence gap requires same-Isis reassessment",
-      "confidence": 0.94,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.03,
-        "NONE": 0.96,
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
         "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-20",
+      "state": "BLOCKED",
       "terminal": false
     },
     "QA-20__guide_ready": {
@@ -4021,15 +4258,16 @@
       "branch_id": "guide_ready",
       "choice": "NONE",
       "condition": "complete live QA Guide is ready for whole-change QA Audit/Plan",
-      "confidence": 0.94,
+      "confidence": 0.9,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
-        "NONE": 0.95,
-        "READ_ONLY": 0.04,
+        "NONE": 0.93,
+        "READ_ONLY": 0.06,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-20",
+      "state": "GUIDE_READY",
       "terminal": false
     },
     "QA-20__shared_source_authority_terminal": {
@@ -4046,6 +4284,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-20",
+      "state": null,
       "terminal": true
     },
     "QA-50__audit_complete": {
@@ -4062,6 +4301,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": "AUDIT_COMPLETE",
       "terminal": false
     },
     "QA-50__blocked_complete_pending_plan": {
@@ -4078,6 +4318,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": "BLOCKED",
       "terminal": false
     },
     "QA-50__blocked_initial_denial": {
@@ -4088,12 +4329,13 @@
       "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.99,
+        "COMPARISON": 0.0,
+        "NONE": 1.0,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": "BLOCKED",
       "terminal": false
     },
     "QA-50__blocked_plan_recovery": {
@@ -4110,6 +4352,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": "BLOCKED",
       "terminal": false
     },
     "QA-50__existing_approval_reuse": {
@@ -4117,7 +4360,7 @@
       "branch_id": "existing_approval_reuse",
       "choice": "NONE",
       "condition": "a subsequent still-valid actual QA-70 approval of this exact Plan already exists and its complete native task-creation intake is available; preserve Isis decision and same Kronos lineage without new Plan/review/task execution",
-      "confidence": 0.97,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
@@ -4126,6 +4369,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": null,
       "terminal": false
     },
     "QA-50__plan_pending": {
@@ -4137,11 +4381,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": "PLAN_PENDING",
       "terminal": false
     },
     "QA-50__qa50_terminal": {
@@ -4158,6 +4403,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-50",
+      "state": null,
       "terminal": true
     },
     "QA-60__blocked": {
@@ -4165,15 +4411,16 @@
       "branch_id": "blocked",
       "choice": "NONE",
       "condition": "unique source failure, approved-base rewrite request, unrecoverable authority conflict, or missing decisive Audit",
-      "confidence": 0.97,
+      "confidence": 0.98,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.01,
-        "NONE": 0.98,
+        "COMPARISON": 0.0,
+        "NONE": 0.99,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "QA-60",
+      "state": "BLOCKED",
       "terminal": true
     },
     "QA-60__existing_approval_reuse": {
@@ -4181,15 +4428,16 @@
       "branch_id": "existing_approval_reuse",
       "choice": "NONE",
       "condition": "a subsequent still-valid actual QA-70 approval of this exact Plan already exists and its complete native task-creation intake is available; preserve Isis decision and same Kronos lineage without new Plan/review/task execution",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.03,
-        "NONE": 0.97,
+        "COMPARISON": 0.02,
+        "NONE": 0.98,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-60",
+      "state": null,
       "terminal": false
     },
     "QA-60__existing_revision_reuse": {
@@ -4197,15 +4445,16 @@
       "branch_id": "existing_revision_reuse",
       "choice": "NONE",
       "condition": "actual initial QA-70 denial or bounded redline review of this exact Plan already exists with complete review/Audit/upstream intake and same Kronos author lineage",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.03,
-        "NONE": 0.96,
+        "COMPARISON": 0.02,
+        "NONE": 0.97,
         "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-60",
+      "state": null,
       "terminal": false
     },
     "QA-60__plan_pending": {
@@ -4217,11 +4466,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 1.0,
-        "READ_ONLY": 0.0,
+        "NONE": 0.99,
+        "READ_ONLY": 0.01,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-60",
+      "state": "PLAN_PENDING",
       "terminal": false
     },
     "QA-70__delta_deny": {
@@ -4229,7 +4479,7 @@
       "branch_id": "delta_deny",
       "choice": "NONE",
       "condition": "REVIEW_MODE=DELTA; return denial to the exact originating proposed-delta owner; no addendum",
-      "confidence": 0.98,
+      "confidence": 0.99,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -4238,6 +4488,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-70",
+      "state": "DENY",
       "terminal": false
     },
     "QA-70__initial_approve": {
@@ -4254,6 +4505,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-70",
+      "state": "APPROVE",
       "terminal": false
     },
     "QA-70__initial_deny": {
@@ -4270,6 +4522,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-70",
+      "state": "DENY",
       "terminal": false
     },
     "QA-70__qa70_terminal": {
@@ -4286,6 +4539,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-70",
+      "state": null,
       "terminal": true
     },
     "QA-70__qa_plan_delta_return": {
@@ -4302,6 +4556,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-70",
+      "state": "APPROVE",
       "terminal": false
     },
     "QA-80__existing_delta_review": {
@@ -4318,6 +4573,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-80",
+      "state": "WRONG_ROUTE_APPROVED_BASE",
       "terminal": false
     },
     "QA-80__plan_pending_revised": {
@@ -4334,6 +4590,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-80",
+      "state": "PLAN_PENDING_REVISED",
       "terminal": false
     },
     "QA-80__wrong_route_terminal": {
@@ -4341,7 +4598,7 @@
       "branch_id": "wrong_route_terminal",
       "choice": "NONE",
       "condition": "approved-base rewrite refused and a complete lawful bounded-delta review intake is absent; identify the actual proposal owner without inventing a delta",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -4350,6 +4607,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-80",
+      "state": "WRONG_ROUTE_APPROVED_BASE",
       "terminal": true
     },
     "QA-90__escalation_required": {
@@ -4360,12 +4618,13 @@
       "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 1.0,
+        "COMPARISON": 0.01,
+        "NONE": 0.99,
         "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-90",
+      "state": "ESCALATION_REQUIRED",
       "terminal": false
     },
     "QA-90__not_executed": {
@@ -4382,6 +4641,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-90",
+      "state": "NOT_EXECUTED",
       "terminal": false
     },
     "QA-90__shared_source_authority_terminal": {
@@ -4398,6 +4658,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-90",
+      "state": null,
       "terminal": true
     },
     "QA-90__task_ready": {
@@ -4414,6 +4675,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "QA-90",
+      "state": "TASK_READY",
       "terminal": false
     },
     "RS-10__in_scope_native_return": {
@@ -4425,11 +4687,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.97,
-        "READ_ONLY": 0.03,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-10",
+      "state": null,
       "terminal": false
     },
     "RS-10__rescope_proposal_pending_review": {
@@ -4437,15 +4700,16 @@
       "branch_id": "rescope_proposal_pending_review",
       "choice": "NONE",
       "condition": "a real bounded delta has a complete proposal and exact actual native-stage lineage; pre-Proceed planning does not require future Proceed, PR or execution-return-phase fields",
-      "confidence": 0.87,
+      "confidence": 0.83,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.91,
-        "READ_ONLY": 0.09,
+        "NONE": 0.87,
+        "READ_ONLY": 0.13,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-10",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
       "terminal": false
     },
     "RS-10__shared_source_authority_terminal": {
@@ -4462,6 +4726,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-10",
+      "state": null,
       "terminal": true
     },
     "RS-20__in_scope_native": {
@@ -4469,6 +4734,74 @@
       "branch_id": "in_scope_native",
       "choice": "NONE",
       "condition": "existing repair owner is a non-PR native stage under unchanged authority; no addendum",
+      "confidence": 0.97,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.01,
+        "NONE": 0.98,
+        "READ_ONLY": 0.01,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "IN_SCOPE_REPAIR",
+      "terminal": false
+    },
+    "RS-20__in_scope_pr30": {
+      "band": "CLEAR",
+      "branch_id": "in_scope_pr30",
+      "choice": "NONE",
+      "condition": "existing repair owner/phase is PR-30 under the original Proceed; no addendum",
+      "confidence": 0.93,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.95,
+        "READ_ONLY": 0.05,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "IN_SCOPE_REPAIR",
+      "terminal": false
+    },
+    "RS-20__in_scope_pr35": {
+      "band": "UNCERTAIN",
+      "branch_id": "in_scope_pr35",
+      "choice": "NONE",
+      "condition": "existing repair owner/phase is PR-35 under the original Proceed; no addendum",
+      "confidence": 0.78,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.04,
+        "NONE": 0.83,
+        "READ_ONLY": 0.12,
+        "SOURCE_AVAILABILITY": 0.01
+      },
+      "prompt": "RS-20",
+      "state": "IN_SCOPE_REPAIR",
+      "terminal": false
+    },
+    "RS-20__reject_native": {
+      "band": "CLEAR",
+      "branch_id": "reject_native",
+      "choice": "NONE",
+      "condition": "recorded origin is a non-PR native stage; unchanged authority; no addendum",
+      "confidence": 0.95,
+      "lexical": "NAMES_SOURCE",
+      "probabilities": {
+        "COMPARISON": 0.0,
+        "NONE": 0.96,
+        "READ_ONLY": 0.04,
+        "SOURCE_AVAILABILITY": 0.0
+      },
+      "prompt": "RS-20",
+      "state": "REJECT",
+      "terminal": false
+    },
+    "RS-20__reject_pr30": {
+      "band": "CLEAR",
+      "branch_id": "reject_pr30",
+      "choice": "NONE",
+      "condition": "recorded origin/phase is PR-30; unchanged authority; no addendum",
       "confidence": 0.98,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
@@ -4478,46 +4811,15 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
+      "state": "REJECT",
       "terminal": false
     },
-    "RS-20__in_scope_pr30": {
+    "RS-20__reject_pr35": {
       "band": "CLEAR",
-      "branch_id": "in_scope_pr30",
+      "branch_id": "reject_pr35",
       "choice": "NONE",
-      "condition": "existing repair owner/phase is PR-30 under the original Proceed; no addendum",
-      "confidence": 0.94,
-      "lexical": "NAMES_SOURCE",
-      "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 0.96,
-        "READ_ONLY": 0.04,
-        "SOURCE_AVAILABILITY": 0.0
-      },
-      "prompt": "RS-20",
-      "terminal": false
-    },
-    "RS-20__in_scope_pr35": {
-      "band": "UNCERTAIN",
-      "branch_id": "in_scope_pr35",
-      "choice": "NONE",
-      "condition": "existing repair owner/phase is PR-35 under the original Proceed; no addendum",
-      "confidence": 0.74,
-      "lexical": "NAMES_SOURCE",
-      "probabilities": {
-        "COMPARISON": 0.03,
-        "NONE": 0.8200000000000001,
-        "READ_ONLY": 0.15,
-        "SOURCE_AVAILABILITY": 0.0
-      },
-      "prompt": "RS-20",
-      "terminal": false
-    },
-    "RS-20__reject_native": {
-      "band": "CLEAR",
-      "branch_id": "reject_native",
-      "choice": "NONE",
-      "condition": "recorded origin is a non-PR native stage; unchanged authority; no addendum",
-      "confidence": 0.97,
+      "condition": "recorded origin/phase is PR-35; unchanged authority; no addendum",
+      "confidence": 0.98,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -4526,38 +4828,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
-      "terminal": false
-    },
-    "RS-20__reject_pr30": {
-      "band": "CLEAR",
-      "branch_id": "reject_pr30",
-      "choice": "NONE",
-      "condition": "recorded origin/phase is PR-30; unchanged authority; no addendum",
-      "confidence": 0.99,
-      "lexical": "NAMES_SOURCE",
-      "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
-        "SOURCE_AVAILABILITY": 0.0
-      },
-      "prompt": "RS-20",
-      "terminal": false
-    },
-    "RS-20__reject_pr35": {
-      "band": "CLEAR",
-      "branch_id": "reject_pr35",
-      "choice": "NONE",
-      "condition": "recorded origin/phase is PR-35; unchanged authority; no addendum",
-      "confidence": 0.99,
-      "lexical": "NAMES_SOURCE",
-      "probabilities": {
-        "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
-        "SOURCE_AVAILABILITY": 0.0
-      },
-      "prompt": "RS-20",
+      "state": "REJECT",
       "terminal": false
     },
     "RS-20__rescope_non_pr": {
@@ -4574,6 +4845,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
+      "state": "APPROVE",
       "terminal": false
     },
     "RS-20__rescope_open_pr": {
@@ -4581,7 +4853,7 @@
       "branch_id": "rescope_open_pr",
       "choice": "NONE",
       "condition": "PR_RETURN_PHASE in {PR-30_POSTPUBLICATION, PR-35}; existing open PR identity verified",
-      "confidence": 1.0,
+      "confidence": 0.99,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
@@ -4590,6 +4862,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
+      "state": "APPROVE",
       "terminal": false
     },
     "RS-20__rescope_pr30_prepublication": {
@@ -4606,6 +4879,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
+      "state": "APPROVE",
       "terminal": false
     },
     "RS-20__revision_required": {
@@ -4622,6 +4896,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
+      "state": "REVISION_REQUIRED",
       "terminal": false
     },
     "RS-20__specification_change_required": {
@@ -4629,15 +4904,16 @@
       "branch_id": "specification_change_required",
       "choice": "NONE",
       "condition": "native Product Owner Specification-delta decision; no RS-20 addendum",
-      "confidence": 0.66,
+      "confidence": 0.7,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
-        "COMPARISON": 0.22,
-        "NONE": 0.75,
-        "READ_ONLY": 0.03,
+        "COMPARISON": 0.19,
+        "NONE": 0.77,
+        "READ_ONLY": 0.04,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-20",
+      "state": "SPECIFICATION_CHANGE_REQUIRED",
       "terminal": true
     },
     "RS-30__ia_revision_return": {
@@ -4654,6 +4930,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-30",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
       "terminal": false
     },
     "RS-30__product_owner_explicit_native_return": {
@@ -4661,15 +4938,16 @@
       "branch_id": "product_owner_explicit_native_return",
       "choice": "NONE",
       "condition": "Nathan already supplied one exact selected native decision route with complete intake; preserve actual owner, same artifact type and manual gates; never invent IA approval, route PR-50 or bypass Alpha, merge or PF10 controls",
-      "confidence": 0.95,
+      "confidence": 0.97,
       "lexical": "NAMES_SOURCE",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.97,
-        "READ_ONLY": 0.03,
+        "NONE": 0.98,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-30",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
       "terminal": false
     },
     "RS-30__product_owner_revision_return": {
@@ -4686,6 +4964,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-30",
+      "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
       "terminal": true
     },
     "RS-30__revision_source_terminal": {
@@ -4697,11 +4976,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
+        "NONE": 1.0,
         "READ_ONLY": 0.0,
-        "SOURCE_AVAILABILITY": 0.01
+        "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-30",
+      "state": null,
       "terminal": true
     },
     "RS-40__merge_pending": {
@@ -4718,6 +4998,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-40",
+      "state": "MERGE_PENDING",
       "terminal": false
     },
     "RS-40__pr_candidate_published": {
@@ -4734,6 +5015,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-40",
+      "state": "PR_CANDIDATE_PUBLISHED",
       "terminal": false
     },
     "RS-40__product_owner_decision_required": {
@@ -4750,6 +5032,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-40",
+      "state": "PRODUCT_OWNER_DECISION_REQUIRED",
       "terminal": true
     },
     "RS-40__recovery_pr30": {
@@ -4761,11 +5044,12 @@
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.99,
-        "READ_ONLY": 0.01,
+        "NONE": 1.0,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-40",
+      "state": "RECOVERY_PENDING",
       "terminal": false
     },
     "RS-40__recovery_pr35": {
@@ -4782,6 +5066,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-40",
+      "state": "RECOVERY_PENDING",
       "terminal": false
     },
     "RS-40__remote_evidence_pending": {
@@ -4789,15 +5074,16 @@
       "branch_id": "remote_evidence_pending",
       "choice": "NONE",
       "condition": "PR-35 only; durable checkpoint",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.96,
-        "READ_ONLY": 0.03,
+        "NONE": 0.97,
+        "READ_ONLY": 0.02,
         "SOURCE_AVAILABILITY": 0.01
       },
       "prompt": "RS-40",
+      "state": "REMOTE_EVIDENCE_PENDING",
       "terminal": false
     },
     "RS-40__rescope_pending": {
@@ -4814,6 +5100,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "RS-40",
+      "state": "RESCOPE_PENDING",
       "terminal": false
     },
     "RS-40__source_resolution_error": {
@@ -4830,6 +5117,7 @@
         "SOURCE_AVAILABILITY": 0.98
       },
       "prompt": "RS-40",
+      "state": "SOURCE_RESOLUTION_ERROR",
       "terminal": true
     },
     "UTIL-10__already_applied": {
@@ -4846,6 +5134,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "UTIL-10",
+      "state": "ALREADY_APPLIED",
       "terminal": false
     },
     "UTIL-10__complete": {
@@ -4853,7 +5142,7 @@
       "branch_id": "complete",
       "choice": "NONE",
       "condition": "return the complete revised successor and REDLINE_APPLICATION_REPORT to the exact originating decision/review owner through the actual selected native prompt, with its complete receiver inputs.",
-      "confidence": 0.94,
+      "confidence": 0.95,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.02,
@@ -4862,6 +5151,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "UTIL-10",
+      "state": "COMPLETE",
       "terminal": false
     },
     "UTIL-10__incomplete_native_owner": {
@@ -4869,7 +5159,7 @@
       "branch_id": "incomplete_native_owner",
       "choice": "NONE",
       "condition": "return the complete checkpoint, exact unapplied or ambiguous item, evidence, owner and resume point to the exact redline/decision owner when that selected native receiver resolves.",
-      "confidence": 0.96,
+      "confidence": 0.97,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.01,
@@ -4878,6 +5168,7 @@
         "SOURCE_AVAILABILITY": 0.0
       },
       "prompt": "UTIL-10",
+      "state": "INCOMPLETE",
       "terminal": false
     },
     "UTIL-10__incomplete_terminal": {
@@ -4885,15 +5176,16 @@
       "branch_id": "incomplete_terminal",
       "choice": "NONE",
       "condition": "no selected native receiver can be resolved; do not invent one",
-      "confidence": 0.95,
+      "confidence": 0.96,
       "lexical": "NO_MATCH",
       "probabilities": {
         "COMPARISON": 0.0,
-        "NONE": 0.96,
-        "READ_ONLY": 0.01,
+        "NONE": 0.97,
+        "READ_ONLY": 0.0,
         "SOURCE_AVAILABILITY": 0.03
       },
       "prompt": "UTIL-10",
+      "state": "INCOMPLETE",
       "terminal": true
     }
   },

@@ -35,8 +35,13 @@ def blocks(d: dict) -> dict[str, str]:
     run = [
         "| | |",
         "|---|---|",
-        f'| model requested / served | `{d["model_requested"]}` / `{d.get("model_served", "jev-1.13.0")}` |',
+        # No default.  A hard-coded `jev-1.13.0` published an identity nothing had read; an
+        # absent value renders as unknown, which is what it is.
+        f'| model requested / served | `{d["model_requested"]}` / '
+        f'{"`" + d["model_served"] + "`" if d.get("model_served") else "**unknown — not captured**"} |',
         f'| rows classified | **{len(R)}**, every `state_routes` row |',
+        f'| contract classified | `{d["contract"]["sha256"]}` |',
+        f'| blocking states, from the briefs | {", ".join(f"`{x}`" for x in d["blocking_states"])} |',
         f'| options | {", ".join(f"`{o}`" for o in d["pre_registered"]["options"])} |',
         f'| bands, fixed before the run | `CLEAR` ≥ {d["pre_registered"]["clear_at"]} · '
         f'`UNCERTAIN` {d["pre_registered"]["uncertain_at"]}–{d["pre_registered"]["clear_at"]} · '

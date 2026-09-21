@@ -99,9 +99,15 @@ none of them — its only change is the one revision string described under `SF1
 pipe table or an HTML table — and compares each destination by **page identity** via the existing
 `notion_page_identity`, not as literal text.
 
-**Scope preserved as instructed.** The predicate is not relaxed: still exactly two rows, still
-exactly the `EPIC → CL-E-10` and `CRD → CL-C-10` mapping, still the same two destination pages.
-Only the rendering assumption and the literal URL comparison are removed.
+**Scope preserved as instructed — and one comparison deliberately loosened, said plainly.** What is
+unchanged is the roster: still exactly two rows, still exactly the `EPIC → CL-E-10` and
+`CRD → CL-C-10` mapping, still the same two destination pages. What **did** loosen is the URL
+comparison — from literal text equality to Notion page identity via `notion_page_identity`. That is
+the repair working as intended, since a body may legitimately render its own binding as a page
+mention, but it is a widening and this record should not have said "the predicate is not relaxed"
+flatly and then qualified it a clause later. Independent §10 review (`SFR-01`) asked for exactly this
+wording, and it is right: a reader who stops at the bold sentence takes away something stronger than
+what the code does.
 
 **Bench, all cases as expected:**
 
@@ -1113,6 +1119,55 @@ errored, because `$?` captured a `tail | tr` pipeline rather than the command. T
 was void and is credited nowhere; the table above is the re-run with exit codes captured
 directly. This is the third instance this session of a harness that reports success while
 testing nothing, and the reason the bench keeps its three phases apart.
+
+## Independent §10 review — `SKILL_FIT_CONFIRMED` (`SFR-01`, 2026-09-21)
+
+Recorded as delivered, not paraphrased into an endorsement. `SFR-01` returned **`SKILL_FIT_CONFIRMED`**
+as a **successor record**: the prior `SKILL_GAP_REQUIRES_PRODUCT_OWNER_DECISION` stands as written and
+is not corrected, which is `AUTH-001` applied to a verdict.
+
+**Bound to exact bytes.** `change-flow.skill` `07864f2b…` and `flowmaster-validate.skill`
+`43075084…`. If either changes — including through `SF10-07` or `SF-05` — the confirmation does not
+carry to the new bytes. Verified at the time of writing: both digests and the 321-file freeze
+`c321be051b90c346…` are unchanged, and every file changed since is a repository-side tool under
+`docs/ephemeral/`, none inside a packaged skill tree.
+
+**The condition was tested rather than assumed.** `SFR-01` read all five remaining
+`flowmaster-propagate` prose pointers in context and found none on a production execution path —
+`session-branch-flowmaster` and `session-relay-flowmaster` under *"Maintaining this specialization"*,
+`flowmaster-primary` under *"Maintaining the core"*, `tw-flowmaster` in a specialization-maintenance
+paragraph, and `amthor-workspace-governance-audit` in an ownership boundary that says Governance Audit
+*"may recommend propagation but never performs it"*. Three further checks clean: none inside a marked
+core block, no script or contract reference once `SF10-04` lands, and no Change Flow / TW Flow / relay
+/ branch run reaches those sentences. The only non-prose reference left is `manifest.json`, the sync
+roster, updated by the removal itself.
+
+**What the confirmation accepts, on the record.** The maintenance path *is* affected. Trigger: the next
+approved Primary core update. Effect: five skills will tell an agent to use a skill that does not
+exist. Nothing detects it — `validate_flowmaster` returns `suite_ok: true` with six skills. `SFR-01`'s
+evidence that this is operative prose rather than decoration is this package's own work: `SF10-04`
+rewrote exactly that sentence in the two skills it owned. Bounded, dated, and the Product Owner's to
+carry.
+
+**One ground withdrawn, with its reasoning given.** `SFR-01`'s prior record also cited `SF10-07` and
+`SF-05` being undecided; it withdrew that as a gate rather than dropping it quietly, on the ground that
+a hash-scoped verdict held hostage to undecided future work could never confirm anything, and that the
+right instrument is the scoping line.
+
+**Two items carried forward, neither blocking.** The fixture case
+`reject-source-missing-crd-branch` tests a destination retarget rather than an absent branch — one
+line, and `SFR-01` would take it before installation. And `SF10-03`'s "predicate not relaxed" needed
+the URL loosening said in the same breath; that correction is made above, at the `SF10-03` section.
+
+**A limit `SFR-01` states and this report should repeat.** The body-level half of this package rests on
+**single-party evidence**. `SF10-03`, `SF10-06` and `SF10-08` act on the 55-body corpus, which is
+authored in Notion and is not in the repository, so an independent reviewer cannot reproduce the
+end-to-end or body-fixture results. Every claim `SFR-01` could check came back exact, which raises
+confidence in the rest; it does not close the gap, and the gap is a property of the ecosystem rather
+than something this package can fix.
+
+**Freeze held across the review**: `c321be05…` before and after, zero `.pyc`, nothing installed,
+merged, or pushed by the reviewer.
 
 ## The bench
 
