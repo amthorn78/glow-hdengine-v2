@@ -1,6 +1,6 @@
 diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
 --- base/change-flow/SKILL.md	2026-09-21 01:29:43.993269176 +0000
-+++ work/change-flow/SKILL.md	2026-09-21 02:08:46.194951730 +0000
++++ work/change-flow/SKILL.md	2026-09-21 02:17:44.356087722 +0000
 @@ -5,7 +5,7 @@
  
  # Change Flow
@@ -15,19 +15,20 @@ diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
  The bundled `gcfpe-20260913.1-091326.2`, `gcfpe-20260913.1`, and `gcfpe-20260912.2` direct-handoff contracts are superseded candidate records and remain immutable historical provenance on the same terms. They are not executed as current routing overlays and confer no current skill binding. Three of these files share `contract_id` `GCFPE-PF10-INTEGRITY-20260913.1` with the current contract above; that identifier resolves for current execution to `gcfpe-current-direct-handoff-contract.json` alone, which carries `status: SELECTED_PRODUCTION`. A `CANDIDATE_VALIDATED` or `CANDIDATE_UNTIL_SELECTED_IN_NOTION_REGISTER` copy is never the current answer for that identifier.
  
 -This resolution rule is execution behaviour, not commentary: before it, a run had no stated way to resolve the shared `contract_id` and two runs could resolve it differently. `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.6 for it, so the two behaviours do not advertise the same specialization identity.
-+This resolution rule is execution behaviour, not commentary: before it, a run had no stated way to resolve the shared `contract_id` and two runs could resolve it differently. `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.6 for it, so the two behaviours do not advertise the same specialization identity. `SF10-07` then scoped two body obligations -- active addenda and authoring context -- to the ten writers that owe them, exempting the four CF Specification authors on `exact_producer_set`, `rescope_contract` and `member_registry` evidence; the current-PF10 obligation remains on all fourteen. That changes validation behaviour and the bundled contract, so `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.7.
++This resolution rule is execution behaviour, not commentary: before it, a run had no stated way to resolve the shared `contract_id` and two runs could resolve it differently. `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.6 for it, so the two behaviours do not advertise the same specialization identity. `SF10-07` then scoped two body obligations to the writers that owe them, on `exact_producer_set`, `rescope_contract` and `member_registry` evidence checked against the prompt bodies: active addenda to ten, exempting all four CF Specification authors; authoring context to twelve, exempting only the two initial authors, because CF-C-40 and CF-E-40 declare one and satisfy the check. The current-PF10 obligation remains on all fourteen. That changes validation behaviour and the bundled contract, so `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.7.
  
  The `support_skill` field in those superseded copies names `glow-hde-devops`, which **D16 retires**: none is installed, none is required, and none is to be created. That field is a dated record of what the contract said when it was written; it is not a current support-skill binding, and no current run resolves a support skill from it. The current contract declares only `primary_skill: glow-hde-pr-development`. Do not edit those dated bytes to remove the field.
  
 diff -ru base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json work/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
 --- base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 01:29:44.000135234 +0000
-+++ work/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 02:08:46.162356503 +0000
-@@ -2873,6 +2873,48 @@
++++ work/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 02:17:44.331872136 +0000
+@@ -2873,6 +2873,50 @@
      "applicable_overlay_links_required": true,
      "approved_base_live_reauthoring_refused": true,
      "authoring_context_required": true,
 +    "body_obligation_ids": {
 +      "active_addenda_required": [
++        "ESC-30",
 +        "IA-10",
 +        "IA-20",
 +        "IA-40",
@@ -36,10 +37,12 @@ diff -ru base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-co
 +        "QA-20",
 +        "QA-50",
 +        "QA-60",
-+        "QA-80",
-+        "ESC-30"
++        "QA-80"
 +      ],
 +      "authoring_context_required": [
++        "CF-C-40",
++        "CF-E-40",
++        "ESC-30",
 +        "IA-10",
 +        "IA-20",
 +        "IA-40",
@@ -48,8 +51,7 @@ diff -ru base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-co
 +        "QA-20",
 +        "QA-50",
 +        "QA-60",
-+        "QA-80",
-+        "ESC-30"
++        "QA-80"
 +      ],
 +      "current_pf10_markdown_required": [
 +        "CF-C-20",
@@ -97,13 +99,14 @@ diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
  contract without changing the Primary core or existing domain/oracle checks. Its behavioral
 diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
 --- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 01:29:44.093269182 +0000
-+++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 02:08:46.188746582 +0000
-@@ -2873,6 +2873,48 @@
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 02:17:44.352444508 +0000
+@@ -2873,6 +2873,50 @@
      "applicable_overlay_links_required": true,
      "approved_base_live_reauthoring_refused": true,
      "authoring_context_required": true,
 +    "body_obligation_ids": {
 +      "active_addenda_required": [
++        "ESC-30",
 +        "IA-10",
 +        "IA-20",
 +        "IA-40",
@@ -112,10 +115,12 @@ diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-ha
 +        "QA-20",
 +        "QA-50",
 +        "QA-60",
-+        "QA-80",
-+        "ESC-30"
++        "QA-80"
 +      ],
 +      "authoring_context_required": [
++        "CF-C-40",
++        "CF-E-40",
++        "ESC-30",
 +        "IA-10",
 +        "IA-20",
 +        "IA-40",
@@ -124,8 +129,7 @@ diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-ha
 +        "QA-20",
 +        "QA-50",
 +        "QA-60",
-+        "QA-80",
-+        "ESC-30"
++        "QA-80"
 +      ],
 +      "current_pf10_markdown_required": [
 +        "CF-C-20",
@@ -149,18 +153,18 @@ diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-ha
        "CF-C-20",
 diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
 --- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 01:29:44.098513714 +0000
-+++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 02:09:14.307733838 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 02:17:44.355748389 +0000
 @@ -1,11 +1,11 @@
  {
    "candidate_contract": {
      "bundled_relative_path": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
 -    "byte_count": 609824,
-+    "byte_count": 610587,
++    "byte_count": 610625,
      "relative_to_change_flow": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
      "schema_version": "gcfpe-direct-handoff-contract/4.0",
      "selection_status": "UNSELECTED_CANDIDATE",
 -    "sha256": "7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894"
-+    "sha256": "37c6a41e7cf50ea18c32d99c139b71e38774834b0d712074fc3bd7a135eeaad5"
++    "sha256": "5d871b5d052f3ebabc850696db860802bac2b4ce44ad9e6b39a18ac784b18f36"
    },
    "candidate_member_count": 55,
    "fixtures": {
@@ -226,8 +230,8 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
      }
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 01:29:44.100649459 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 02:10:07.374989631 +0000
-@@ -48,6 +48,36 @@
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 02:17:44.355127868 +0000
+@@ -48,6 +48,44 @@
      "CF-C-20", "CF-C-40", "CF-E-20", "CF-E-40", "IA-10", "IA-20", "IA-40",
      "PR-10", "PR-20", "QA-20", "QA-50", "QA-60", "QA-80", "ESC-30",
  }
@@ -239,10 +243,17 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +#       {CF-C-30, CF-E-30, ESC-40, IA-30, QA-70, RS-20} and contains none of the four, and
 +#       `rescope_contract.decisions.SPECIFICATION_CHANGE_REQUIRED` routes a Specification change as
 +#       a Specification-delta with "no RS-20 addendum". The four neither produce nor consume one.
-+#   authoring_context_required -- `member_registry` distinguishes the modes already:
-+#       `output_artifacts` is ["CRD_SPECIFICATION"] for CF-C-20 against
++#   authoring_context_required -- exempt for the two INITIAL Specification authors only, CF-C-20 and
++#       CF-E-20. `member_registry.output_artifacts` is ["CRD_SPECIFICATION"] for CF-C-20 against
 +#       ["CRD_SPECIFICATION / SPECIFICATION_DELTA"] for CF-C-40, with `native_function` saying the
-+#       same. A declared AUTHORING_CONTEXT would be a second encoding that can disagree with it.
++#       same: an initial author has no approved base and no overlay, so there is no mode to declare.
++#       CF-C-40 and CF-E-40 STAY on this roster, because their bodies satisfy the obligation --
++#       "Preapproval revision corrects a pending Specification", "preserve the approved Specification
++#       unchanged", "State the immutable base" together meet the semantic form the check accepts, and
++#       that is why neither raised AUTHORING_CONTEXT among the original ten errors. Exempting a
++#       prompt from an obligation it demonstrably meets removes a check that was working, which is
++#       the same error as R1 in the opposite direction. Found by reading the bodies rather than by
++#       watching the error count, which cannot tell a right roster from a wrong one.
 +#
 +# current_pf10_markdown_required stays at ALL FOURTEEN. An earlier revision of this change exempted
 +# the four from it too; independent review asked for the evidence and there is none. The opposite is
@@ -256,26 +267,27 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +# and CF-E-40's approved-base mode. Removing them from the writer set would have taken that with it,
 +# which is why this is per-obligation scope rather than a smaller roster.
 +SPECIFICATION_AUTHORS = {"CF-C-20", "CF-C-40", "CF-E-20", "CF-E-40"}
++INITIAL_SPECIFICATION_AUTHORS = {"CF-C-20", "CF-E-20"}
 +EXPECTED_BODY_OBLIGATION_IDS = {
 +    "active_addenda_required": EXPECTED_WRITERS - SPECIFICATION_AUTHORS,
-+    "authoring_context_required": EXPECTED_WRITERS - SPECIFICATION_AUTHORS,
++    "authoring_context_required": EXPECTED_WRITERS - INITIAL_SPECIFICATION_AUTHORS,
 +    "current_pf10_markdown_required": set(EXPECTED_WRITERS),
 +}
  # D6/D8: the PF10 addendum drainage lifecycle is retired for this candidate release.
  # These tokens are no longer permitted anywhere in the candidate contract; the guard
  # below asserts their ABSENCE rather than requiring their presence.
-@@ -833,8 +863,8 @@
+@@ -833,8 +871,8 @@
  SHA_RE = re.compile(r"^[0-9a-f]{64}$")
  EXPECTED_FROZEN_GRAPH_SHA256 = "1d0b72582df4735b3d22dd325687b0375a624bd9ab5760c9589171049cd715a7"
  EXPECTED_FROZEN_GRAPH_BYTES = 569902
 -EXPECTED_CANDIDATE_CONTRACT_SHA256 = "7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894"
 -EXPECTED_CANDIDATE_CONTRACT_BYTES = 609824
-+EXPECTED_CANDIDATE_CONTRACT_SHA256 = "37c6a41e7cf50ea18c32d99c139b71e38774834b0d712074fc3bd7a135eeaad5"
-+EXPECTED_CANDIDATE_CONTRACT_BYTES = 610587
++EXPECTED_CANDIDATE_CONTRACT_SHA256 = "5d871b5d052f3ebabc850696db860802bac2b4ce44ad9e6b39a18ac784b18f36"
++EXPECTED_CANDIDATE_CONTRACT_BYTES = 610625
  EXPECTED_FIXTURE_SHA256 = "a1a730623e5385a6214a6f3e18b8cef56acd0d227028b2236e56d586d822fa14"
  PRODUCTION_SELECTION_AUTHORITY_LINE = (
      "Selection authority: The GCFPE Membership and Release Register exclusively determines "
-@@ -1421,7 +1451,11 @@
+@@ -1421,7 +1459,11 @@
  
      writers = contract.get("plan_writer_contract")
      writer_ids = writers.get("evaluated_prompt_ids") if isinstance(writers, dict) else None
@@ -288,7 +300,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
          errors.append("PLAN_WRITER_SET")
      errors += subset_errors(writers, {
          "current_pf10_markdown_required": True, "applicable_overlay_links_required": True,
-@@ -1430,6 +1464,29 @@
+@@ -1430,6 +1472,29 @@
          "pf10_lineage_required_in_complete_handoff": True,
      }, "PLAN_WRITER_CONTRACT")
  
@@ -318,7 +330,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
      addendum = contract.get("pf10_addendum_contract")
      producer_list = addendum.get("exact_producer_set") if isinstance(addendum, dict) else None
      producers = addendum.get("producers") if isinstance(addendum, dict) else None
-@@ -2182,7 +2239,9 @@
+@@ -2182,7 +2247,9 @@
                      errors.append(f"PROMPT_PRODUCER:{prompt_id}:{marker}")
          if prompt_id in EXPECTED_WRITERS:
              lower = text.lower()
@@ -329,7 +341,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
                  "current controlled pf10 markdown" in lower
                  or (
                      "current controlled pf10" in lower
-@@ -2190,7 +2249,7 @@
+@@ -2190,7 +2257,7 @@
                  )
              ):
                  errors.append(f"PROMPT_WRITER:{prompt_id}:CURRENT_PF10_MARKDOWN")
@@ -338,7 +350,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
                  errors.append(f"PROMPT_WRITER:{prompt_id}:ACTIVE_ADDENDA")
              exact_context = any(
                  marker in text
-@@ -2204,7 +2263,7 @@
+@@ -2204,7 +2271,7 @@
                  and "approved" in lower
                  and any(marker in lower for marker in ("immutable", "wrong-route", "wrong route", "must not rewrite", "never revises"))
              )

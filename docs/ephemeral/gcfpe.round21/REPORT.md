@@ -26,7 +26,9 @@ applied **three body checks to all fourteen**. Membership was all-or-nothing, so
 say that an obligation applies to some writers and not others.
 
 The contract now carries `body_obligation_ids`: one explicit roster per body obligation, naming the
-**ten** writers that owe it. The four CF Specification authors — `CF-C-20`, `CF-C-40`, `CF-E-20`,
+writers that owe it — **ten** for active addenda, **twelve** for authoring context, **fourteen** for
+current PF10. The three rosters differ because the evidence differs, which is the whole point of
+per-obligation scope. The four CF Specification authors — `CF-C-20`, `CF-C-40`, `CF-E-20`,
 `CF-E-40` — are not on those rosters. A Specification states what a change **is**, so it neither
 reads current PF10, nor consumes its active addenda, nor declares an authoring context; the contract
 ledger already records that `artifact_type` distinguishes their modes, so an `AUTHORING_CONTEXT`
@@ -131,13 +133,40 @@ equality alone accepted a duplicated id.** The check now compares length as well
 drift fixture points at a roster that genuinely excludes the four, and a separate
 `reject-body-obligation-duplicate-id` case covers the duplicate. Five controls, all firing.
 
+### A fifth defect, found by doing the check I had written into the reviewer's prompt
+
+Having fixed R1, I drafted a re-review prompt asking `SFR-01` to test the two *surviving* exemptions
+against the four bodies — the axis neither of us had covered. That is the same mistake R1 was: asking
+the reviewer to validate something only I can reach. The Product Owner caught it. I ran the check
+instead.
+
+**Active addenda: confirmed.** All four bodies state they do *not* create a PF10 addendum — *"This
+prompt does not ... create a PF10 addendum"*, and *"only a qualifying reviewer approval may do so"* —
+and none carries active-addenda language. Contract evidence and body evidence now agree.
+
+**Authoring context: my roster was too broad, in the opposite direction from R1.** The check accepts a
+semantic form as well as the exact markers, and `CF-C-40` and `CF-E-40` meet it: *"Preapproval revision
+corrects a pending Specification"*, *"preserve the approved Specification unchanged"*, *"State the
+immutable base"*. **That is why neither raised `AUTHORING_CONTEXT` among the original ten errors** —
+they declare an authoring context and pass. Exempting them removed a check that was working.
+
+The roster is narrowed to the **two initial Specification authors**, `CF-C-20` and `CF-E-20`, which is
+what the contract evidence actually says: `output_artifacts` is `["CRD_SPECIFICATION"]` for `CF-C-20`
+against `["CRD_SPECIFICATION / SPECIFICATION_DELTA"]` for `CF-C-40`. An initial author has no approved
+base and no overlay, so it has no mode to declare; a delta author does.
+
+**The error count is 4 either way.** The wrong roster and the right one produce identical output,
+because the errors it suppresses were absent for a different reason. That is R1's lesson generalised:
+the count cannot tell a correct roster from a lucky one. Only the bodies can, and reading them is
+cheap.
+
 ## Two things the suite caught that reading did not
 
 **A hash-pin chain.** Changing the contract broke three pins in sequence — `CONTRACT_HASH`, then
 `PROFILE_BUNDLED_CONTRACT_HASH`, then `PROFILE_CONTRACT_PIN` — because the contract's digest **and
 byte count** are pinned in both the validator and the validation profile, and the profile's revision
 map carried `change-flow: 3.2.6` where a plain digest grep did not find it. All four are updated to
-the new contract identity, `37c6a41e7cf50ea1…`, 610587 bytes.
+the new contract identity, `5d871b5d052f3eba…`, 610625 bytes.
 
 **A derived error reported as a root cause.** My first version of the scope check fired
 `PLAN_WRITER_BODY_OBLIGATION_SCOPE` three times *in addition to* `PLAN_WRITER_SET` when a writer id
@@ -166,8 +195,8 @@ rewritten**; a successor sentence is added beside it, per `AUTH-001`.
 
 | package | files | bytes | sha256 |
 |---|---|---|---|
-| `change-flow.skill` | 21 | 242115 | `45c339415f158602b75d8cb56af9463e0299c87e324c6f7e90f3031d2e645e2d` |
-| `flowmaster-validate.skill` | 29 | 275155 | `094301f74a95b971e08280f015ec9979f6f5fe7f58446a37fb5d971ede324f1d` |
+| `change-flow.skill` | 21 | 242174 | `729cad112532ef5ea23450f60a99defdf163b6842d1dc7a15300e2473dd31d2b` |
+| `flowmaster-validate.skill` | 29 | 275426 | `337182438b884a42ecefe0299f65de8a6485b2483edadb4fdb3525b68c882936` |
 
 Each archive was extracted and compared path-by-path and digest-by-digest against the tested tree:
 **identical, with no entries outside the skill root.**
@@ -176,7 +205,7 @@ Each archive was extracted and compared path-by-path and digest-by-digest agains
 
 No QA verdict, no acceptance, no closure. The independent §10 confirmation on the previous build is
 scoped to that build's digests and **does not carry to these bytes** — this package needs its own
-review. Ten files changed, all inside the two skills; the complete diff is `sf10-07.patch`, 363 lines.
+review. Ten files changed, all inside the two skills; the complete diff is `sf10-07.patch`, 375 lines.
 
 Prompt bodies are untouched: no body, registry row, or Notion page changed. The selected release
 `GCFPE-20260913.1 / 091326.2 / 54` is untouched.
