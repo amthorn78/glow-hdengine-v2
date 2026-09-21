@@ -11,12 +11,26 @@ generated_by: 'Emitted programmatically from the run artefacts; no value in this
 
 # Round 20 run record — inputs, commands, outputs
 
-> **Regenerated at `210bb8f`+1 from the final artefacts.** The first version of this file was
-> emitted before the last validator change and then not refreshed, so it named the previous
+> **This file's generated sections are regenerated on every cycle, and the check that they are
+> current is mechanical rather than a statement in this header.** Run
+> `make_run_record.py … --check`: it recomputes every identity below from the artefacts and fails,
+> naming the expected and actual values, if any record has drifted. That is the only currency claim
+> this file makes about itself.
+>
+> **A fixed attribution was tried here and it went stale, which is why the sentence above replaced
+> it.** The header used to read "Regenerated at `210bb8f`+1 from the final artefacts" — `fddf488`,
+> the commit that first made staleness checkable. Four later commits changed the work tree, both
+> packages and this file's tables (`b472b0c`, `4af2d72`, `0fee635`, `4871916`), so the attribution
+> named a revision that had not produced the evidence below it. Review found it. Naming a commit in
+> a file the next commit regenerates is a claim that falsifies itself, so this file no longer makes
+> one; **`git log` is the authority on when it was last written, and `--check` on whether it is
+> current.**
+>
+> The defect that put the original note here is still worth keeping: the first version of this file
+> was emitted before the last validator change and then not refreshed, so it named the previous
 > validator digest, the previous package size and an 18-case bench run — sending a reviewer to
-> verify bytes that were not the bytes under review. `make_run_record.py --check` now recomputes
-> every identity below from the artefacts and fails if any record has drifted; re-reading the
-> summaries by hand was tried and failed three times in one round.
+> verify bytes that were not the bytes under review. Re-reading the summaries by hand was tried and
+> failed three times in one round.
 
 Review asked for this, correctly, and cited the repository's own standard against the earlier
 version of the report. The registry's `corroboration_not_reproducible_here` key says a review whose

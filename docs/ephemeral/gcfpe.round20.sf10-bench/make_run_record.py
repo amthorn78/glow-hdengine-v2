@@ -328,8 +328,18 @@ def identities(args) -> dict:
             if unpack.returncode != 0:
                 raise SystemExit(f"{name} could not be extracted (unzip exited "
                                  f"{unpack.returncode}): {unpack.stderr.strip()}")
-            got = payload_map(tmp / skill)
-            want = payload_map(work / skill)
+            # The COMPLETE extracted archive is compared, not just its `<skill>/` subtree.
+            # Reading `got` from `tmp / skill` left everything outside that root uncompared, so
+            # an archive holding the right subtree PLUS an extra top-level file or sibling
+            # directory passed the payload check -- and `--write` then recorded its new count,
+            # size and digest and reported success, certifying a package that installs bytes
+            # the bench never ran against.  Proven before fixing: a 22-entry `change-flow.skill`
+            # carrying a `README-EXTRA.txt` was written into the record with exit 0.  Rooting
+            # `got` at the extraction directory and prefixing `want` with `<skill>/` rejects
+            # every entry outside the one expected root by construction, rather than by a list
+            # of shapes someone thought of.
+            got = payload_map(tmp)
+            want = {f"{skill}/{rel}": h for rel, h in payload_map(work / skill).items()}
             if not want:
                 raise SystemExit(f"--work has no {skill}/ subtree to compare {name} against")
             if got != want:

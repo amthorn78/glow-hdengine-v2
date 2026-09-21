@@ -853,16 +853,29 @@ about, and here it applied to the thing that gets installed.
 digest — against the corresponding subtree of `--work`, refusing with the differing, extra and missing
 paths named.
 
-**Three controls, because there are three ways an archive can be wrong:**
+**Five controls, because there are five ways an archive can be wrong:**
 
 | injected | result |
 |---|---|
 | a **valid** archive built from the **unrepaired** base tree | refused, naming **7 differing files** |
-| a valid archive with one file altered after packaging | refused, naming `SKILL.md` |
-| a valid archive **missing** a file the tested tree has | refused, `1 only in --work: ['scripts/pf_header_parity.py']` |
+| a valid archive with one file altered after packaging | refused, `1 file(s) differ: ['change-flow/SKILL.md']` |
+| a valid archive **missing** a file the tested tree has | refused, `1 only in --work: ['change-flow/scripts/pf_header_parity.py']` |
+| the correct subtree **plus an extra top-level file** | refused, `1 only in the archive: ['README-EXTRA.txt']` |
+| the correct subtree **plus a sibling directory** | refused, `1 only in the archive: ['other-skill/SKILL.md']` |
 
 The first is the real scenario: nothing about that ZIP is malformed. It is simply not the thing that
 was tested, and until now the recorder could not tell the difference.
+
+**The last two rows are a review finding on the fix above, and they were the same defect again.** The
+comparison read the archive from `tmp / skill`, so *everything outside that one subtree was never
+compared* — an archive holding the right `<skill>/` tree plus untested extra bytes passed. Reproduced
+before changing anything: a 22-entry `change-flow.skill` carrying a `README-EXTRA.txt` was accepted,
+and **`--write` recorded its new count, size and digest and printed success**. The count was the only
+thing that noticed, and the count is regenerated. `got` is now rooted at the extraction directory and
+`want` is prefixed with `<skill>/`, which rejects every entry outside the expected root by
+construction rather than by a list of shapes I thought of. All three original controls were re-fired
+after the change; the paths in their messages are now `<skill>/`-prefixed, which is why the rows above
+read differently from the first time they were recorded.
 
 **The second finding is the fourth instance of one habit.** The report's package identities were three
 fragment tests — digest somewhere, size somewhere, a `| count | size |` fragment somewhere — so
