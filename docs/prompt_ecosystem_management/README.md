@@ -85,4 +85,7 @@ the application's.
 | `project-prompt-contract-registry.md` | The approved machine-readable per-prompt contract registry |
 | `execution-and-delegation-model.md` | How work is divided: the coordinator's role, what may be delegated, the reporting contract, and verification isolation |
 | `ecosystem-change-management.md` | **How a change to this ecosystem is made routine**: the five-step change lifecycle, the defect-class catalogue, the standing instruments, the definition of done, and what needs Product Owner authorization |
+| `postflight-procedure.md` | **How an independent post-flight is run**: scope set by what stops the change flow, cheap checks before bodies, bodies streamed and never persisted, the struck checks and their rulings |
+| `skill-identity-and-freeze.md` | Skill digests, what each identity proves, and why an install is not complete until its digest is compared |
+| `freeze.py` | The digest recipe itself. Root it at a skill directory, never at the synced tree |
 | `pe-succession/` | Session succession records, newest last |
