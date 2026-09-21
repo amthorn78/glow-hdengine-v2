@@ -28,7 +28,12 @@ authority_sources:
 - type: SELECTED_CATALOG
   version_family: '091426.1'
   member_count: 55
-  url: https://app.notion.com/p/3da4590a05eb81bcbc5deb2d2cec4f1f
+  url: https://app.notion.com/p/3db4590a05eb81738ef1d846e3c0df8c
+  correction: 'Until 2026-09-21 this row named 091426.1 and 55 members but pointed at the
+    091326.2 catalog (3da4590a05eb81bcbc5deb2d2cec4f1f), which holds 54 members of a different
+    release. The identifiers were right and the URL was wrong. Corrected at promotion (D17) to
+    the catalog that actually carries the 55 rows this registry describes; the predecessor
+    catalog is archived intact and is historical evidence only.'
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
   path: candidate/prompts/manifest.json
   note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path does not exist in the repository. Current prompt bodies are authored in Notion and are resolved through the candidate catalog; the evidence_contract byte count and SHA-256 on each row below are the reproducible identity.'
