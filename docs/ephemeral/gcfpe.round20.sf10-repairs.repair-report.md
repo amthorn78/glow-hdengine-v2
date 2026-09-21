@@ -1025,6 +1025,48 @@ control's sentence did not need the number to make its point.
 allow-list entries, so it required me to say so in writing. That is the tool doing its job rather
 than a false positive, and the entry now names the mechanism.
 
+### Three findings on the instrument built to stop stale claims, all of its own family
+
+The claim inventory landed and review immediately found three defects in it. Each is the shape the
+tool exists to catch, which is worth stating plainly rather than framing as polish.
+
+**It documented a command that could not pass.** The README presented `--range origin/main..HEAD` as
+the pre-push check. Run over this branch it exits 1 with **180** unaccounted claims, because the
+three new Markdown deliverables carry many claim lines while the allow-list accounted for a subset.
+So the check could not validate the change that introduced it and would have blocked every push here.
+
+The fix is a **baseline commit recorded in `allow.json`** — the commit that introduced the tool —
+with the limit stated rather than left implicit: lines authored before it are not inventoried,
+because writing 180 ownership notes for historical narrative would produce a large artefact of
+little value and make the allow-list unreviewable. A range reaching behind the baseline is now
+**refused with its reason and the remedy**, since a check that looks like a gate and cannot pass is
+worse than one with a stated limit. What the baseline does not excuse: every line touched from that
+commit onward is inventoried, including lines in older documents.
+
+**A deleted allow-listed file skipped all of its entries.** `content_at()` returned `None` and the
+loop moved on, so removing a document could leave every one of its exemptions behind and still exit
+clean — directly contradicting the two-direction check the README advertises. Absence now makes all
+of that file's entries stale.
+
+**The allow-list was a membership test on the key.** The note was never inspected, so an empty string
+permitted the claim and the tool did not enforce its own central requirement that an exception name
+what recomputes the value. That is an assertion weaker than the claim it backs, inside the tool
+written to catch exactly that, and it is the **ninth** instance of the shape in this round.
+
+| injected | result |
+|---|---|
+| a range reaching behind the baseline | refused, with the reason and the remedy |
+| an allow-listed file deleted, no claim lines added | reported — all of its entries are stale |
+| an allow-list entry with an empty note | reported as unaccounted |
+| a placeholder note (`"see above"`) | reported as unaccounted |
+
+**A fourth defect, found by running the fix.** `--since-baseline` was first written as
+`baseline..HEAD`, which reported three freshly written allow-list entries as stale — the stale check
+behaving correctly on a range that asked the wrong question, since at revision `HEAD` those lines did
+not exist yet. It now uses a bare revision so the new side is the working tree, which is the useful
+pre-push question. That is the third time in this tool that a range and the content it was compared
+against came from different sides of a diff.
+
 ### One review finding declined, with the measurement
 
 Review read the terminal-branch table in the decision briefs as double-counting — `IA-30` and

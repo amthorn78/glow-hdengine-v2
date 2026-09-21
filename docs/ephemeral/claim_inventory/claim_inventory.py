@@ -48,6 +48,9 @@ sys.dont_write_bytecode = True
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 DEFAULT_ALLOW = pathlib.Path(__file__).resolve().parent / "allow.json"
+# An ownership note has to say something.  Forty characters is not a quality bar; it is
+# enough to stop "" , "ok" and "see above" from standing in for one.
+MIN_NOTE = 40
 
 # A line "claims" something if it states a value a later change can falsify.
 CLAIM = re.compile(
@@ -182,6 +185,17 @@ def inventory(rng: str, paths: list[str], allow: dict) -> tuple[list[str], list[
                 continue
             stripped = line.strip()
             if stripped in permitted:
+                # The NOTE is inspected, not just the key.  A membership test permitted a claim
+                # whatever its value held, including an empty string -- so the tool did not enforce
+                # its own central requirement that an exception name what recomputes the value.
+                # An assertion weaker than the claim it backs, inside the tool written to catch
+                # exactly that.
+                note = permitted[stripped]
+                if not isinstance(note, str) or len(note.strip()) < MIN_NOTE:
+                    problems.append(f"{rel}:{n} is allow-listed with no usable ownership note "
+                                    f"(needs at least {MIN_NOTE} characters naming what recomputes "
+                                    f"the value or why it is fixed)\n      {stripped[:120]}")
+                    continue
                 seen.add((rel, stripped))
                 continue
             problems.append(f"{rel}:{n} states a value nothing here owns\n"
@@ -190,6 +204,12 @@ def inventory(rng: str, paths: list[str], allow: dict) -> tuple[list[str], list[
     for rel, entries in sorted(allow.items()):
         text = content_at(end, rel)
         if text is None:
+            # A DELETED or renamed file used to skip every one of its entries, so a change that
+            # removed a document could leave all its exemptions behind and still exit clean --
+            # contradicting the two-direction check this tool advertises.  Absence makes them all
+            # stale, which is the only reading consistent with the claim.
+            stale.append(f"{rel}: the file is absent, so all {len(entries)} of its allow-list "
+                         f"entries are stale")
             continue
         present = {x.strip() for x in text.splitlines()}
         for ln in sorted(entries):
@@ -207,12 +227,40 @@ def main() -> int:
                          "<rev>~1..<rev> for one commit.")
     ap.add_argument("--paths", nargs="*", default=["docs/"])
     ap.add_argument("--allow", default=str(DEFAULT_ALLOW))
+    ap.add_argument("--since-baseline", action="store_true",
+                    help="inventory everything from the recorded baseline commit to HEAD")
     args = ap.parse_args()
 
     allow_path = pathlib.Path(args.allow)
-    allow = json.loads(allow_path.read_text(encoding="utf-8")) if allow_path.is_file() else {}
+    raw = json.loads(allow_path.read_text(encoding="utf-8")) if allow_path.is_file() else {}
+    baseline = (raw.get("baseline") or {}).get("commit")
+    allow = raw.get("files", {})
+    rng = args.rng
+    if args.since_baseline:
+        if not baseline:
+            raise SystemExit(f"{allow_path.name} records no baseline commit to measure from")
+        # A BARE revision, so the new side is the working tree: the useful pre-push question is
+        # "everything since the baseline including what I have not committed yet".  `baseline..HEAD`
+        # was tried and reported three freshly written allow-list entries as stale, because at
+        # revision HEAD their lines did not exist yet -- the stale check behaving correctly on a
+        # range that asked the wrong question.
+        rng = baseline
+    # A range reaching BEHIND the recorded baseline cannot pass, because lines authored before the
+    # tool existed were never inventoried.  Refusing it, with the reason, is the difference between
+    # a documented scope limit and a command that looks like a gate and blocks every push.
+    end = range_end(rng)
+    start = rng.partition("..")[0].strip() if ".." in rng else rng.strip()
+    if baseline and start:
+        merge = subprocess.run(["git", "merge-base", "--is-ancestor", baseline, start],
+                               capture_output=True, text=True, cwd=str(REPO))
+        if merge.returncode != 0:
+            raise SystemExit(
+                f"the range starts at {start}, which is not at or after the recorded baseline "
+                f"{baseline}. Lines authored before the baseline were never inventoried, so this "
+                f"range cannot pass and reporting them as unaccounted would be misleading. Use "
+                f"--since-baseline, or a range starting at or after {baseline}.")
 
-    problems, stale = inventory(args.rng, args.paths, allow)
+    problems, stale = inventory(rng, args.paths, allow)
     for group, title in ((problems, "UNACCOUNTED CLAIMS"), (stale, "STALE ALLOW-LIST ENTRIES")):
         if group:
             print(f"{title} — {len(group)}:")
@@ -222,7 +270,7 @@ def main() -> int:
         print("\nEach unaccounted line must be moved into a generated block, or added to "
               f"{allow_path.name} with a note naming what recomputes it or why it is fixed.")
         return 1
-    print(f"claim inventory clean over {args.rng}: every claim-bearing changed line is "
+    print(f"claim inventory clean over {rng}: every claim-bearing changed line is "
           f"generated or accounted for")
     return 0
 
