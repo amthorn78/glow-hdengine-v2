@@ -1,0 +1,135 @@
+diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
+--- base/flowmaster-validate/SKILL.md	2026-09-21 04:21:17.220048791 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-21 06:58:49.269058269 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.2.10
++FLOWMASTER_VALIDATE_REVISION: 3.2.11
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+@@ -35,6 +35,22 @@
+ moves with it; validation behaviour changes again, so `FLOWMASTER_VALIDATE_REVISION` is
+ incremented to 3.2.10. Both skills ship together and install together.
+ 
++Round 24 carries two corrections and changes no prompt body and no contract. `F1`, raised by
++the independent §10 review of round 23 and accepted without argument: round 23 shipped
++`SF10-09`'s validation behaviour while still emitting `validator_revision: 3.2.8`, the
++identity round 22's report on `main` already records measurements against from different
++bytes. The counts coincided and that coincidence was the hazard, so `validator_revision`
++moves to **3.2.9** at its four sites. Because 3.2.10 is installed and bound to a published
++§10 verdict, corrected bytes must not reuse it, so `FLOWMASTER_VALIDATE_REVISION` moves to
++**3.2.11** in the same change. `SF10-11` closes a coverage gap `D5` concealed: the class-map
++fixture renamed in round 21 tests a *retargeted* CRD destination, and nothing exercised an
++*absent* CRD branch. Two fixtures are added, and falsification decides which: dropping the
++mapping half of `len(rows) != 2 or mapping != expected` leaves only
++`reject-source-epic-to-crd` failing, and dropping the length half leaves only
++`reject-source-duplicate-crd-class-branch` failing. Each half of the guard now has a case
++that uniquely fires it; before this round the length half had none. `change-flow` is untouched and stays at 3.2.8; only this skill's bytes
++move, so only this skill needs a fresh §10.
++
+ R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1
+ 
+ R1_CONTRACT_MATRIX_SHA256: faa7fb7d77066cc491bde957b6d2f7d3255c74833936e3952f97873da27ea2f1
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 04:21:17.227139813 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 06:55:28.749052942 +0000
+@@ -42,5 +42,5 @@
+   "selected_release_during_staging": "GCFPE-20260913.1",
+   "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20260914.1",
+-  "validator_revision": "3.2.8"
++  "validator_revision": "3.2.9"
+ }
+diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+--- base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 04:21:17.228352610 +0000
++++ work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 06:58:20.690478390 +0000
+@@ -610,6 +610,21 @@
+             ("reject-source-missing-rca", "QA-120", "`QA_RCA_ID`", "`OMITTED_RCA`", "QA_PASS_BODY_INTAKE"),
+             ("reject-source-epic-receiver-crd-intake", "CL-E-10", "complete approved `Epic` Specification", "complete approved `CRD` Specification", "QA_PASS_RECEIVER_BODY:CL-E-10"),
+             ("reject-source-crd-receiver-epic-class", "CL-C-10", "Confirm exact `CRD` class/change", "Confirm exact `EPIC` class/change", "QA_PASS_RECEIVER_BODY:CL-C-10"),
++            # SF10-11: the *absent* CRD branch, which no fixture exercised.  Round 20's `D5`
++            # deferred a rename of `reject-source-missing-crd-branch`; round 21 performed it,
++            # and the renamed case -- `reject-source-retargeted-crd-destination` above -- tests
++            # a CRD branch pointed at the wrong receiver, never a missing one.  So the arity
++            # half of `len(rows) != 2 or mapping != expected` had nothing firing it, while the
++            # old name advertised that it did.  Concealed coverage is worse than visible
++            # absence.
++            #
++            # The anchor deletes only the class cell, not the whole row.  Deleting the row
++            # also trips `PROMPT_HANDOFF_RECEIVER:QA-120:CL-C-10`, and a fixture that fires two
++            # guards cannot prove which one caught it.  Removing the cell leaves the CL-C-10
++            # mention in the body, so the receiver binding still resolves and this case
++            # isolates the arity branch: the row stops matching either rendering's row regex,
++            # the map holds one branch instead of two, and only `QA_PASS_BODY_CLASS_MAP` fires.
++            ("reject-source-absent-crd-class-branch", "QA-120", "<td>`CRD`</td>", "", "QA_PASS_BODY_CLASS_MAP"),
+         ):
+             if old not in bodies[prompt_id]:
+                 raise ValueError(f"Mutation anchor absent: {name}")
+@@ -618,7 +633,30 @@
+             observed = validate_qa_closure_bodies(changed_bodies, source)
+             cases.append({"name": name, "passed": expected_error in observed,
+                           "expected_error": expected_error, "errors": observed})
+-        source_case_count = 7
++        # SF10-11, second half: the DUPLICATE branch, which the absence case above does not
++        # reach.  Falsifying that case showed the mapping half of
++        # `len(rows) != 2 or mapping != expected` catches absence on its own, so the length
++        # half still had nothing firing it -- the same shape as the contract-side duplicate
++        # case round 23 repointed, and the same reason round 21 added a length check there.
++        # A duplicated CRD row leaves the mapping exactly equal, because the dict collapses
++        # the repeat, and moves the count to three, so only the length branch can catch it.
++        #
++        # The row is located by line scan, not by `QA_PASS_ROW_HTML_RE`: a fixture that builds
++        # its mutation with the same regex the check uses cannot fail when that regex is
++        # wrong, and that is precisely the failure this suite has already hit once.
++        producer_lines = bodies["QA-120"].split("\n")
++        anchor = producer_lines.index("<td>`CRD`</td>")
++        start, end = anchor - 2, producer_lines.index("</tr>", anchor)
++        if producer_lines[start] != "<tr>" or producer_lines[anchor - 1] != "<td>`PASS`</td>":
++            raise ValueError("Mutation anchor absent: reject-source-duplicate-crd-class-branch")
++        crd_row = "\n".join(producer_lines[start:end + 1])
++        duplicated = dict(bodies)
++        duplicated["QA-120"] = bodies["QA-120"].replace(crd_row, crd_row + "\n" + crd_row)
++        observed = validate_qa_closure_bodies(duplicated, source)
++        cases.append({"name": "reject-source-duplicate-crd-class-branch",
++                      "passed": "QA_PASS_BODY_CLASS_MAP" in observed,
++                      "expected_error": "QA_PASS_BODY_CLASS_MAP", "errors": observed})
++        source_case_count = 9
+ 
+     timing_cases = run_artifact_timing_cases(prompt_dir, source) if prompt_dir is not None else []
+     cases.extend(timing_cases)
+@@ -626,7 +664,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.2.8",
++        "validator_revision": "3.2.9",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
+--- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 04:21:17.229624294 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 06:55:28.751804267 +0000
+@@ -1220,7 +1220,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.2.8",
++            "validator_revision": "3.2.9",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 04:21:17.230030409 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 06:55:28.750659436 +0000
+@@ -1060,7 +1060,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+-        "validator_revision": "3.2.8",
++        "validator_revision": "3.2.9",
+         "target_release": "GCFPE-20260914.1",
+         "prompt_version": "091426.1",
+         "candidate_member_count": 55,
