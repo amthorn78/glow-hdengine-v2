@@ -118,3 +118,11 @@ blind spot is F1 itself.
 
 **F1's correction plus one sweep with `--bodies-stdin` closes it**, and that sweep has not been
 run. Neither `SFR-01` nor I assert any body is dirty; this is the honest residual, stated as one.
+
+**Deferred by the Product Owner, 2026-09-21** — *"mark it for maintenance the next time I do a
+MGMT run"* — and recorded as **`AF-004`** on *GCFPE Alpha Feedback — Deferred Items — 091426.1*,
+owned by the next `GCFPE-MGMT-10` run. The entry carries the exact two strings to scan for, why
+nothing has ever looked, and the fact that the scan tests **false positives** as well: once
+`flowmaster-validate` 3.2.15 is installed, a body that legitimately contains such a line would
+make the gate fail on a corpus that is fine. That direction is the more useful one and is stated
+in the entry.
