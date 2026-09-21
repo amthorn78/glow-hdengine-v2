@@ -1,0 +1,451 @@
+diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
+--- base/flowmaster-validate/SKILL.md	2026-09-21 04:21:17.220048791 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-21 14:19:46.081288160 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.2.10
++FLOWMASTER_VALIDATE_REVISION: 3.2.12
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+@@ -35,6 +35,38 @@
+ moves with it; validation behaviour changes again, so `FLOWMASTER_VALIDATE_REVISION` is
+ incremented to 3.2.10. Both skills ship together and install together.
+ 
++Round 24 carries two corrections and changes no prompt body and no contract. `F1`, raised by
++the independent §10 review of round 23 and accepted without argument: round 23 shipped
++`SF10-09`'s validation behaviour while still emitting `validator_revision: 3.2.8`, the
++identity round 22's report on `main` already records measurements against from different
++bytes. The counts coincided and that coincidence was the hazard, so `validator_revision`
++moves to **3.2.9** at its four sites. Because 3.2.10 is installed and bound to a published
++§10 verdict, corrected bytes must not reuse it, so `FLOWMASTER_VALIDATE_REVISION` moves to
++**3.2.11** in the same change. `SF10-11` closes a coverage gap `D5` concealed: the class-map
++fixture renamed in round 21 tests a *retargeted* CRD destination, and nothing exercised an
++*absent* CRD branch. Two fixtures are added, and falsification decides which: dropping the
++mapping half of `len(rows) != 2 or mapping != expected` leaves only
++`reject-source-epic-to-crd` failing, and dropping the length half leaves only
++`reject-source-duplicate-crd-class-branch` failing. Each half of the guard now has a case
++that uniquely fires it; before this round the length half had none. `change-flow` is untouched and stays at 3.2.8; only this skill's bytes
++move, so only this skill needs a fresh §10.
++
++Round 25 answers the limit the independent review of round 24 exposed, and carries that review's
++one finding. `SF10-12`: the validator computed `prompt_body_sha256`, reported it, and **compared it
++with nothing**, so a rebuilt corpus could be verified by nobody but the session that built it --
++which is why the reviewer correctly declined to run the 55-body gate and reported the limit rather
++than a number. The 55 body identities were already recorded, in the approved registry's
++`evidence_contract`; they were simply never checked. They are now pinned in the validation profile
++and compared on every run, with exactly one trailing newline stripped first, because the pin is a
++property of the Notion page and not of the file that holds it. Missing pins are an error, not a
++silent skip. The round also corrects the round-24 comment that said the absence fixture "isolates
++the arity branch" -- it does not, as that round's own falsification showed -- and that said row
++deletion trips `PROMPT_HANDOFF_RECEIVER` here, which is true of the end-to-end validator and not of
++the checker the fixture calls. Validation behaviour changes, so `validator_revision` moves to
++**3.2.10** at its four sites and `FLOWMASTER_VALIDATE_REVISION` to **3.2.12**: 3.2.9 and 3.2.11 are
++bound to the published §10 verdict naming `e8f30b9a...`, and corrected bytes must not reuse an
++identity a verdict already describes. `change-flow` is untouched and stays at 3.2.8.
++
+ R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1
+ 
+ R1_CONTRACT_MATRIX_SHA256: faa7fb7d77066cc491bde957b6d2f7d3255c74833936e3952f97873da27ea2f1
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 04:21:17.227139813 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 14:19:29.754012239 +0000
+@@ -28,6 +28,233 @@
+     "glow-hde-pr-development": "1.2.5"
+   },
+   "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
++  "prompt_bodies": {
++    "count": 55,
++    "extraction_convention": "the exact slice between the fetch result's <content> and </content> markers, with no trailing newline added; a file holding one body may carry a single trailing newline, which the validator strips before hashing",
++    "members": {
++      "CF-C-10": {
++        "byte_count": 7203,
++        "sha256": "41dce73a62735927d291bd8f7342654d314d38de47070fe37f8a6c9318fd1702"
++      },
++      "CF-C-20": {
++        "byte_count": 5888,
++        "sha256": "4570e718530316c018b18dcb15848f061e938e268ae4ec163630b310c14c67c7"
++      },
++      "CF-C-30": {
++        "byte_count": 9420,
++        "sha256": "b56d218a4f5d2a08f4f12af99fe097b001925dd1a1a445c2375edf4d3cd894e7"
++      },
++      "CF-C-40": {
++        "byte_count": 7518,
++        "sha256": "9b62004b93aa3a1e93fb5cf325bb6e78ea460ed78f49c523a654be6fd5a0c95f"
++      },
++      "CF-E-10": {
++        "byte_count": 7307,
++        "sha256": "5cdfce4d502c5b5b564b562b18e108cc38b1ffa85b3b655edd6706d0e76e80fe"
++      },
++      "CF-E-20": {
++        "byte_count": 5900,
++        "sha256": "5add38939d7e920b90c4031846e51f0fdb29b1bf50ec3574dcb72eaddc134108"
++      },
++      "CF-E-30": {
++        "byte_count": 9428,
++        "sha256": "6e92232ba58cc4e8c53004af7176ae2422863f2e1bcf1c6e209dc3a257066e76"
++      },
++      "CF-E-40": {
++        "byte_count": 7533,
++        "sha256": "e5e297ebcf0585c4114d30311535089ea16bad4ea679120a8e0e8d08050987ce"
++      },
++      "CF-PO-10": {
++        "byte_count": 6091,
++        "sha256": "ba98c011ec3607c25618d2dfe8409c4a1f6232dbf0323812b80f551a8a277b79"
++      },
++      "CL-20": {
++        "byte_count": 32573,
++        "sha256": "6c7860c0b23210e7a4f58938b134c0f80ba1f2ec69d4c4bfe567d2b83608660e"
++      },
++      "CL-30": {
++        "byte_count": 29622,
++        "sha256": "dc0a967032467707c738c465069b0cc3c042b1b1cbcdadb3389356e1d7b7d2c1"
++      },
++      "CL-40": {
++        "byte_count": 29401,
++        "sha256": "a3fd6cd79929c91829672faee9c5129e3f0ca80b9eef38360a6c1f80dc898e06"
++      },
++      "CL-C-10": {
++        "byte_count": 35878,
++        "sha256": "794b9bf3bed9278386379f898039bfde22e1831a92bdf40942fe74ca4d7b1b91"
++      },
++      "CL-E-10": {
++        "byte_count": 36353,
++        "sha256": "0c2b669d5833dcfb4c60d11fe5afe3851343c2f866251bffeb8f1af952b00753"
++      },
++      "CL-E-20": {
++        "byte_count": 14832,
++        "sha256": "10698a09852b296886f36d4df4ae0250285f8b13741c122ba9fcb90f54659689"
++      },
++      "CL-E-30": {
++        "byte_count": 13629,
++        "sha256": "7e1524159e9f6b00f5b4ffb8d33a90b3cd78e4115b526313322d7a0f5f8b99ae"
++      },
++      "CL-E-40": {
++        "byte_count": 15457,
++        "sha256": "582b6476d38e45bc9733c5d5d3e599281178a1a9f0cadb99aaf451dcbddd3b8c"
++      },
++      "DOC-10": {
++        "byte_count": 19787,
++        "sha256": "c858901a70cf0532395fda643841b9de2ea55b236b48f12bb24cac77661218ac"
++      },
++      "DOC-20": {
++        "byte_count": 20217,
++        "sha256": "e37624c24c349aff20324721fd2c9ae3d9b23e33b7261d6e49884805fafd4194"
++      },
++      "ESC-10": {
++        "byte_count": 16683,
++        "sha256": "93b05f42c6c18c4a1bc67bac767efc36c8d84f075a90292384a7be64e7e6e75c"
++      },
++      "ESC-25": {
++        "byte_count": 17279,
++        "sha256": "7766e52f3da17ee56e3ff4b60edb2a264215503e53fa7ed286a097769c6c09e2"
++      },
++      "ESC-30": {
++        "byte_count": 17751,
++        "sha256": "459ed2988a3fe000e70079a02967a1f47a8644498f54fc6199586c16a428ac6a"
++      },
++      "ESC-40": {
++        "byte_count": 17786,
++        "sha256": "9159ec0d9b52a52a58b1cf654547f31089381c331f5d10d133c1f619cea2bd08"
++      },
++      "GCFPE-MGMT-10": {
++        "byte_count": 8015,
++        "sha256": "e5b77f9c5c9939b2234146b106360b06fe73101b6ec50459ada16b18f6d25b12"
++      },
++      "IA-10": {
++        "byte_count": 10301,
++        "sha256": "5b7980fe30e9fced15b3c88133f834236d0309dc1f8966db9d0a9430b4fe8659"
++      },
++      "IA-20": {
++        "byte_count": 6411,
++        "sha256": "802ccd490feb83f6c4df3c73c325342e0202a02935579ffbf33c74feb35451be"
++      },
++      "IA-30": {
++        "byte_count": 9729,
++        "sha256": "a07e8933a00a4979298fabb703a0c2226aaf96eb870f1109a2c71b1252d14ebc"
++      },
++      "IA-40": {
++        "byte_count": 5712,
++        "sha256": "8c9bb2273f3e54ba8b1422a6f8d1c3bd1132497faa0ffd561038342a0c268326"
++      },
++      "IA-50": {
++        "byte_count": 6668,
++        "sha256": "42ce029be426cd3d745b3e9f7099439a091d3ee915c1f4c0dcd660cf5cf0afef"
++      },
++      "IA-60": {
++        "byte_count": 5633,
++        "sha256": "5addd33093e4c794e609829bba434275f06e798d313eda8ed29d63ffdba3e8c6"
++      },
++      "MGR-10": {
++        "byte_count": 7276,
++        "sha256": "5c8aebc68f7f7f6aa708851e0464e5793b27df158af1e37537ab450efbd86f6a"
++      },
++      "OPS-10": {
++        "byte_count": 42826,
++        "sha256": "4a30d7342f4a71e314b7962c2f7eb2ab6b313d9323044a1fcc8e6cbc6bc41563"
++      },
++      "OPS-20": {
++        "byte_count": 36912,
++        "sha256": "429c6ccca8c1602b3457433b85f3c91f96d7c21bb4891ee921dd56decd8b2c0c"
++      },
++      "OPS-30": {
++        "byte_count": 57532,
++        "sha256": "321e626fc72fb71dddf865860193b9d66fb36eae30b6a43c7d713e27443ff45f"
++      },
++      "PR-10": {
++        "byte_count": 49351,
++        "sha256": "d1e2458c39037c9aa1dfbc3f97641e2e6b2c1dd2143447f40c142dacb6a8b623"
++      },
++      "PR-20": {
++        "byte_count": 51725,
++        "sha256": "d64997b20867063089a23b42d44f6744a6537f158844e0a13f84670fd5f41110"
++      },
++      "PR-30": {
++        "byte_count": 39791,
++        "sha256": "482ca2a7657058154147acf3768334dfb956246c45a400a80e6c6f0138004a9d"
++      },
++      "PR-35": {
++        "byte_count": 17908,
++        "sha256": "51e8a5e85ca3b66ce755e979d0a1ac61540c7f06e58237f516f3a28148570e79"
++      },
++      "PR-40": {
++        "byte_count": 54043,
++        "sha256": "042255564c9916c4a933f0986ad8f98e36a495bdf1e35a956cdc0704a87991dc"
++      },
++      "PR-50": {
++        "byte_count": 6887,
++        "sha256": "ac910fe9e1374a4206179c58b8fba187b6c0e62e66e9c0cc1ffab85de93a91c8"
++      },
++      "QA-10": {
++        "byte_count": 82485,
++        "sha256": "9aeaeff42ad12f44f0e6036e922cb14c9da16457128a07159a8ee4331b152b99"
++      },
++      "QA-100": {
++        "byte_count": 13317,
++        "sha256": "373907a43557e87e46892fb35c683228a779765fb388cfff9dc98389d0c3fb7c"
++      },
++      "QA-110": {
++        "byte_count": 14305,
++        "sha256": "698c44f0c57d7294eed8a9a34049ee729b4a334eda81d6da0da8ad2dfb287718"
++      },
++      "QA-120": {
++        "byte_count": 13731,
++        "sha256": "94d6abb95dc8c637f91e2cb16d5a68323addc416bb961cef32c27477fb6a53d4"
++      },
++      "QA-20": {
++        "byte_count": 13217,
++        "sha256": "927b57745409bb99c4a83013a84f86ba7a375f2811b03d5a8beb46dcaba453a2"
++      },
++      "QA-50": {
++        "byte_count": 16351,
++        "sha256": "6fee14353c20e21d8ae1d38df31d3be2fc93a73161606fc17a7e45bd385881ff"
++      },
++      "QA-60": {
++        "byte_count": 14012,
++        "sha256": "f523e6354696e5ba637181f1ad7f1b60b54f11bb421ea39ac55cf7b9ede965a3"
++      },
++      "QA-70": {
++        "byte_count": 14014,
++        "sha256": "ed4ee3adca15bf2a3e91525eca413d6aba0d2ef1819ce81640f9b4cbd2505881"
++      },
++      "QA-80": {
++        "byte_count": 10163,
++        "sha256": "3c0080857a39aa14cf8e8e93f80674858e906a5e30e58d44dfdc944abfa8a02d"
++      },
++      "QA-90": {
++        "byte_count": 13892,
++        "sha256": "b77124fc789087f297fb668547617c3d6d82f3b0e4c8fcaff93686684c62d097"
++      },
++      "RS-10": {
++        "byte_count": 12732,
++        "sha256": "93905c67c008c31d829ad1cf3b3b621ff699a84228df61cb2268a6d0cbfc83c1"
++      },
++      "RS-20": {
++        "byte_count": 14818,
++        "sha256": "e6ccd013f8b390fc39069bbd3f87508cf630d3c1d267fda5feada00184ec5659"
++      },
++      "RS-30": {
++        "byte_count": 12113,
++        "sha256": "4c5f96f002762200a18fc8eff864d85157ef5d12487e6b044adc51e3fef5641a"
++      },
++      "RS-40": {
++        "byte_count": 8233,
++        "sha256": "ddef768be169c6eb41660433ff7557d72b3ebc5dd3ba8f617bdeb113b4732630"
++      },
++      "UTIL-10": {
++        "byte_count": 6934,
++        "sha256": "9234ff70454e2cd12f2d98e40a9ce103f9a27c87d51e7ded78aae5352cd96de4"
++      }
++    },
++    "recorded_from": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md, evidence_contract, Notion extraction of 2026-09-18, 2026-09-19"
++  },
+   "prompt_version": "091426.1",
+   "protected_identities": {
+     "flowmaster_primary_core_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
+@@ -42,5 +269,5 @@
+   "selected_release_during_staging": "GCFPE-20260913.1",
+   "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20260914.1",
+-  "validator_revision": "3.2.8"
++  "validator_revision": "3.2.10"
+ }
+diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+--- base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 04:21:17.228352610 +0000
++++ work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 14:19:29.755127108 +0000
+@@ -610,6 +610,28 @@
+             ("reject-source-missing-rca", "QA-120", "`QA_RCA_ID`", "`OMITTED_RCA`", "QA_PASS_BODY_INTAKE"),
+             ("reject-source-epic-receiver-crd-intake", "CL-E-10", "complete approved `Epic` Specification", "complete approved `CRD` Specification", "QA_PASS_RECEIVER_BODY:CL-E-10"),
+             ("reject-source-crd-receiver-epic-class", "CL-C-10", "Confirm exact `CRD` class/change", "Confirm exact `EPIC` class/change", "QA_PASS_RECEIVER_BODY:CL-C-10"),
++            # SF10-11: the *absent* CRD branch, which no fixture exercised.  Round 20's `D5`
++            # deferred a rename of `reject-source-missing-crd-branch`; round 21 performed it,
++            # and the renamed case -- `reject-source-retargeted-crd-destination` above -- tests
++            # a CRD branch pointed at the wrong receiver, never a missing one.  So the arity
++            # half of `len(rows) != 2 or mapping != expected` had nothing firing it, while the
++            # old name advertised that it did.  Concealed coverage is worse than visible
++            # absence.
++            #
++            # The anchor deletes only the class cell, not the whole row.  Deleting the row
++            # would also trip `PROMPT_HANDOFF_RECEIVER:QA-120:CL-C-10` in the END-TO-END
++            # validator -- `validate_prompt_bodies`, not the `validate_qa_closure_bodies` this
++            # fixture calls, which never emits that error at all -- and a case that fires two
++            # guards across two checkers cannot prove which one caught it.  Removing the cell
++            # leaves the CL-C-10 mention in the body, so the receiver binding still resolves.
++            #
++            # What this case does NOT do is isolate the arity branch.  Deleting the class cell
++            # drops the row count to one AND breaks the mapping, so the mapping half catches it
++            # unaided; measured by removing the length half, after which this case still passes.
++            # `reject-source-duplicate-crd-class-branch` below is the case that isolates the
++            # length half.  This one proves that absence is caught at all, which before round 24
++            # nothing tested.
++            ("reject-source-absent-crd-class-branch", "QA-120", "<td>`CRD`</td>", "", "QA_PASS_BODY_CLASS_MAP"),
+         ):
+             if old not in bodies[prompt_id]:
+                 raise ValueError(f"Mutation anchor absent: {name}")
+@@ -618,7 +640,30 @@
+             observed = validate_qa_closure_bodies(changed_bodies, source)
+             cases.append({"name": name, "passed": expected_error in observed,
+                           "expected_error": expected_error, "errors": observed})
+-        source_case_count = 7
++        # SF10-11, second half: the DUPLICATE branch, which the absence case above does not
++        # reach.  Falsifying that case showed the mapping half of
++        # `len(rows) != 2 or mapping != expected` catches absence on its own, so the length
++        # half still had nothing firing it -- the same shape as the contract-side duplicate
++        # case round 23 repointed, and the same reason round 21 added a length check there.
++        # A duplicated CRD row leaves the mapping exactly equal, because the dict collapses
++        # the repeat, and moves the count to three, so only the length branch can catch it.
++        #
++        # The row is located by line scan, not by `QA_PASS_ROW_HTML_RE`: a fixture that builds
++        # its mutation with the same regex the check uses cannot fail when that regex is
++        # wrong, and that is precisely the failure this suite has already hit once.
++        producer_lines = bodies["QA-120"].split("\n")
++        anchor = producer_lines.index("<td>`CRD`</td>")
++        start, end = anchor - 2, producer_lines.index("</tr>", anchor)
++        if producer_lines[start] != "<tr>" or producer_lines[anchor - 1] != "<td>`PASS`</td>":
++            raise ValueError("Mutation anchor absent: reject-source-duplicate-crd-class-branch")
++        crd_row = "\n".join(producer_lines[start:end + 1])
++        duplicated = dict(bodies)
++        duplicated["QA-120"] = bodies["QA-120"].replace(crd_row, crd_row + "\n" + crd_row)
++        observed = validate_qa_closure_bodies(duplicated, source)
++        cases.append({"name": "reject-source-duplicate-crd-class-branch",
++                      "passed": "QA_PASS_BODY_CLASS_MAP" in observed,
++                      "expected_error": "QA_PASS_BODY_CLASS_MAP", "errors": observed})
++        source_case_count = 9
+ 
+     timing_cases = run_artifact_timing_cases(prompt_dir, source) if prompt_dir is not None else []
+     cases.extend(timing_cases)
+@@ -626,7 +671,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.2.8",
++        "validator_revision": "3.2.10",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
+--- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 04:21:17.229624294 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 14:19:29.758462347 +0000
+@@ -1220,7 +1220,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.2.8",
++            "validator_revision": "3.2.10",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 04:21:17.230030409 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 14:19:29.757999500 +0000
+@@ -1060,7 +1060,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+-        "validator_revision": "3.2.8",
++        "validator_revision": "3.2.10",
+         "target_release": "GCFPE-20260914.1",
+         "prompt_version": "091426.1",
+         "candidate_member_count": 55,
+@@ -2190,7 +2190,9 @@
+     return re.search(rf"(?<![0-9A-Za-z_-]){re.escape(prompt_id)}(?![0-9A-Za-z_-])", text) is not None
+ 
+ 
+-def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
++def validate_prompt_bodies(
++    prompt_dir: Path, contract: dict[str, Any], profile: dict[str, Any]
++) -> tuple[list[str], dict[str, str]]:
+     errors: list[str] = []
+     hashes: dict[str, str] = {}
+     paths: dict[str, Path] = {}
+@@ -2217,9 +2219,38 @@
+     if set(paths) != EXPECTED_MEMBERS:
+         return ["PROMPT_BODY_MEMBER_SET", *errors], hashes
+     registry = contract.get("member_registry", {})
++    # SF10-12: the recorded body identity, CHECKED rather than merely reported.  Until this
++    # round the validator computed `prompt_body_sha256`, put it in the output and compared it
++    # with nothing, so a corpus rebuilt by hand could not be verified by anyone but the session
++    # that built it -- which is why the independent reviewer of round 24 correctly declined to
++    # run this gate at all and reported the limit instead of a number.
++    #
++    # Absence of the pins is an error, not a quiet skip.  The shipped profile always carries
++    # them; if they have been stripped, the corpus is unverifiable and saying so is the point.
++    body_pins = (profile.get("prompt_bodies") or {}).get("members") or {}
++    if not body_pins:
++        errors.append("PROMPT_BODY_PINS_ABSENT")
+     for prompt_id, path in sorted(paths.items()):
+         raw = path.read_bytes()
+         hashes[prompt_id] = hashlib.sha256(raw).hexdigest()
++        # The pin is a property of the Notion page, not of the file that happens to hold it.
++        # The recorded convention is the exact slice between the fetch result's <content> and
++        # </content> markers with no trailing newline added, while a file written from that
++        # slice normally ends in one.  Exactly one trailing "\n" is therefore stripped before
++        # hashing, and nothing else is normalised -- CRLF, stripped whitespace or a second
++        # blank line are real corruption and must still fail.  Getting this wrong in the other
++        # direction is not hypothetical: 24 of 55 `evidence_contract` entries once reproduced
++        # only with a trailing newline the page does not contain, because the corpus had been
++        # assembled by two different methods.
++        body = raw[:-1] if raw.endswith(b"\n") else raw
++        pin = body_pins.get(prompt_id)
++        if body_pins and pin is None:
++            errors.append(f"PROMPT_BODY_IDENTITY:{prompt_id}:UNPINNED")
++        elif pin is not None and (
++            hashlib.sha256(body).hexdigest() != pin.get("sha256")
++            or len(body) != pin.get("byte_count")
++        ):
++            errors.append(f"PROMPT_BODY_IDENTITY:{prompt_id}")
+         try:
+             text = raw.decode("utf-8")
+         except UnicodeDecodeError:
+@@ -2510,7 +2541,7 @@
+ 
+     prompt_hashes: dict[str, str] = {}
+     if prompt_dir is not None:
+-        prompt_errors, prompt_hashes = validate_prompt_bodies(prompt_dir, contract)
++        prompt_errors, prompt_hashes = validate_prompt_bodies(prompt_dir, contract, profile)
+         errors.extend(prompt_errors)
+     return {
+         "ok": not errors,
