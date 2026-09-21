@@ -1,0 +1,216 @@
+diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
+--- base/flowmaster-validate/SKILL.md	2026-09-21 02:35:53.241004933 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-21 03:06:00.973869525 +0000
+@@ -5,13 +5,24 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.2.8
++FLOWMASTER_VALIDATE_REVISION: 3.2.9
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+ tests remain in that specialization and must be executed separately; a text contract check
+ does not establish live provider, connector or Chat Pro target-surface availability.
+ 
++`SF10-09` then re-encoded the `CURRENT_PF10_MARKDOWN` predicate. It had tested two hard-coded
++contiguous strings, which was wrong in both directions: too strict, because an interposed word
++defeated it and the document's own title, "the current controlled PF10 - HDE Build Notes in
++Markdown", raised; and too loose, because its second form accepted its two substrings from
++anywhere in a body. The obligation is now tested as the two claims it makes -- the PF10 object
++identified as current and controlled, and the controlled-Markdown source rule stated -- each
++within a measured word span, so a body may factor the source rule into its general PFCanon
++sentence. No body verdict changes: all fourteen writers classify as before and the same four
++raise. Validation behaviour changes, so `FLOWMASTER_VALIDATE_REVISION` is incremented to
++3.2.9. `change-flow` is untouched and stays at 3.2.7.
++
+ R1_ORACLE_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1
+ 
+ R1_CONTRACT_MATRIX_SHA256: faa7fb7d77066cc491bde957b6d2f7d3255c74833936e3952f97873da27ea2f1
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 02:35:53.243766564 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 03:06:00.976010493 +0000
+@@ -42,5 +42,5 @@
+   "selected_release_during_staging": "GCFPE-20260913.1",
+   "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20260914.1",
+-  "validator_revision": "3.2.7"
++  "validator_revision": "3.2.8"
+ }
+diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+--- base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 02:35:53.244549720 +0000
++++ work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 03:06:00.975420325 +0000
+@@ -20,6 +20,7 @@
+     FIXTURE_PATH,
+     load_profile,
+     prompt_identity_header_valid,
++    states_current_pf10_markdown,
+     PRODUCTION_SELECTION_AUTHORITY_LINE,
+     validate_contract,
+     validate_qa_closure_contract,
+@@ -532,6 +533,54 @@
+                   "expected_errors": ["QA_PASS_CLASS_ROUTES"], "errors": observed})
+ 
+     source_case_count = 0
++    # SF10-09: the CURRENT_PF10_MARKDOWN predicate is exercised directly, because it is a pure
++    # function of the body text and so needs no corpus -- these cases run in the contract suite
++    # rather than only when --prompt-dir is supplied.
++    #
++    # Three of the ten FAIL on the previous encoding and are the proof of the repair: an interposed
++    # word, the document's own title, and Markdown stated before the identity. The other seven
++    # agree under both encodings and are regression guards -- four of them negative, which is the
++    # point: they pin the predicate's ability to STILL FAIL, so the repair cannot quietly become a
++    # check that accepts anything. A guard that cannot fail is the defect class this series exists
++    # to remove.
++    pf10_filler = " ".join(["filler"] * 60)
++    pf10_source_rule = (
++        "When a PFCanon source is necessary, read only the unique controlled Markdown "
++        "source from docs/pfcanon/."
++    )
++    for name, expect_stated, body_text in (
++        ("accept-pf10-contiguous-markdown", True,
++         "Reread the current controlled PF10 Markdown from `docs/pfcanon/`."),
++        ("accept-pf10-split-source-rule", True,
++         "Resolve the current controlled PF10; work only from controlled Markdown."),
++        ("accept-pf10-interposed-build-notes", True,
++         "Reread the current controlled PF10 build notes in Markdown."),
++        ("accept-pf10-document-title-citation", True,
++         "Reread the current controlled PF10 - HDE Build Notes in Markdown."),
++        ("accept-pf10-markdown-before-identity", True,
++         "Work from the Markdown copy of the current controlled PF10."),
++        ("accept-pf10-factored-source-rule", True,
++         "Reread the current controlled PF10 from `docs/pfcanon/`. "
++         + pf10_filler + " " + pf10_source_rule),
++        ("reject-pf10-missing-currency", False,
++         "Reread the controlled PF10 Markdown from `docs/pfcanon/`."),
++        ("reject-pf10-missing-control", False,
++         "Reread the current PF10 Markdown from `docs/pfcanon/`."),
++        ("reject-pf10-missing-source-rule", False,
++         "Reread the current controlled PF10 from `docs/pfcanon/`."),
++        ("reject-pf10-dispersed-identity", False,
++         "Current controlled sources matter. " + pf10_filler
++         + " Reread PF10. " + pf10_source_rule),
++    ):
++        observed_stated = states_current_pf10_markdown(body_text)
++        cases.append({
++            "name": name,
++            "passed": observed_stated == expect_stated,
++            "expected_stated": expect_stated,
++            "observed_stated": observed_stated,
++            "errors": [] if observed_stated == expect_stated else ["CURRENT_PF10_MARKDOWN_PREDICATE"],
++        })
++
+     if prompt_dir is not None:
+         bodies = {}
+         for prompt_id in ("QA-120", "CL-E-10", "CL-C-10"):
+@@ -570,7 +619,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.2.7",
++        "validator_revision": "3.2.8",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
+--- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 02:35:53.245522240 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 03:06:00.975803425 +0000
+@@ -1220,7 +1220,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.2.7",
++            "validator_revision": "3.2.8",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 02:35:53.245652368 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 03:06:00.974834129 +0000
+@@ -86,6 +86,61 @@
+     "authoring_context_required": EXPECTED_WRITERS - INITIAL_SPECIFICATION_AUTHORS,
+     "current_pf10_markdown_required": set(EXPECTED_WRITERS),
+ }
++
++# SF10-09: the obligation is that a plan writer be directed to the CURRENT CONTROLLED PF10 MARKDOWN
++# -- the contract's own wording, which its prose carries as "current controlled PF10 Markdown
++# reread". The previous encoding tested two hard-coded contiguous strings:
++#
++#     "current controlled pf10 markdown" in lower
++#     or ("current controlled pf10" in lower and "controlled markdown" in lower)
++#
++# which was wrong in BOTH directions at once. Too strict, because any word between "PF10" and
++# "Markdown" defeated the first form -- "the current controlled PF10 build notes in Markdown"
++# raised, and so did the document's own title, "the current controlled PF10 - HDE Build Notes in
++# Markdown". A check that rejects the canonical way to cite PF10 is not measuring the obligation.
++# Too loose, because the second form accepted its two substrings from ANYWHERE in the body, so a
++# prompt could satisfy it with "current controlled PF10" in one section and an unrelated
++# "controlled Markdown" many paragraphs away.
++#
++# The obligation is therefore encoded as the TWO CLAIMS it actually makes, each tested in
++# proximity rather than as a fixed string:
++#
++#   identity -- the PF10 object is identified as current and controlled: "pf10", "current" and
++#               "controlled" within CURRENT_PF10_WORD_SPAN words of one another.
++#   source   -- the controlled-Markdown source rule is stated: "controlled" and "markdown" within
++#               the same span, anywhere in the body. A body may legitimately FACTOR this rule out
++#               into its general PFCanon-resolution sentence instead of restating it beside PF10,
++#               and IA-40 does exactly that; requiring all four components in one window would
++#               have raised on it. That regression was found by measurement before shipping, not
++#               by reading.
++#
++# This is NOT a widening of the predicate until bodies pass, which is the act SF10-07 refused and
++# which stays refused. It changes NO body verdict: all fourteen writers classify exactly as they
++# did under the old check, the same four raise, and the results are identical at every span from
++# 10 to 200 words. The span does not drive the outcome; it was chosen by sensitivity measurement
++# and 30 is about one long sentence in this corpus.
++CURRENT_PF10_WORD_SPAN = 30
++CURRENT_PF10_IDENTITY_TERMS = ("pf10", "current", "controlled")
++CURRENT_PF10_SOURCE_TERMS = ("markdown", "controlled")
++BODY_WORD_RE = re.compile(r"[a-z0-9]+")
++
++
++def _terms_in_proximity(words, terms, span=CURRENT_PF10_WORD_SPAN):
++    """True when every term occurs within `span` words of some occurrence of terms[0]."""
++    positions = {term: [i for i, word in enumerate(words) if word == term] for term in terms}
++    if not all(positions.values()):
++        return False
++    return any(
++        all(any(anchor - span <= i <= anchor + span for i in positions[term]) for term in terms)
++        for anchor in positions[terms[0]]
++    )
++
++
++def states_current_pf10_markdown(text):
++    words = BODY_WORD_RE.findall(text.lower())
++    return (_terms_in_proximity(words, CURRENT_PF10_IDENTITY_TERMS)
++            and _terms_in_proximity(words, CURRENT_PF10_SOURCE_TERMS))
++
+ # D6/D8: the PF10 addendum drainage lifecycle is retired for this candidate release.
+ # These tokens are no longer permitted anywhere in the candidate contract; the guard
+ # below asserts their ABSENCE rather than requiring their presence.
+@@ -991,7 +1046,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+-        "validator_revision": "3.2.7",
++        "validator_revision": "3.2.8",
+         "target_release": "GCFPE-20260914.1",
+         "prompt_version": "091426.1",
+         "candidate_member_count": 55,
+@@ -2249,13 +2304,8 @@
+             lower = text.lower()
+             owes = {obligation for obligation, ids in EXPECTED_BODY_OBLIGATION_IDS.items()
+                     if prompt_id in ids}
+-            if "current_pf10_markdown_required" in owes and not (
+-                "current controlled pf10 markdown" in lower
+-                or (
+-                    "current controlled pf10" in lower
+-                    and "controlled markdown" in lower
+-                )
+-            ):
++            if ("current_pf10_markdown_required" in owes
++                    and not states_current_pf10_markdown(text)):
+                 errors.append(f"PROMPT_WRITER:{prompt_id}:CURRENT_PF10_MARKDOWN")
+             if "active_addenda_required" in owes and "active addend" not in lower:
+                 errors.append(f"PROMPT_WRITER:{prompt_id}:ACTIVE_ADDENDA")
