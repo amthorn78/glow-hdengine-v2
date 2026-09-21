@@ -188,7 +188,7 @@ enumerate what may exist rather than select what is forbidden — which is why t
 closed on an absent or unknown value rather than treating absence as compliance.
 
 Against the current contract the check passes: both `COMPARISON` candidates are non-terminal and in
-`DELTA_APPROVE`, and all 42 rows in a blocking state are `NONE`. The 22-row reading task now has a
+`DELTA_APPROVE`, and all 42 rows in a blocking state are `NONE`. The reading task below now has a
 criterion: a row's proposed value is wrong if reading its `condition` contradicts the rule above.
 
 ### 2. What makes a wrong label fail — and what does not
@@ -248,7 +248,7 @@ That is the specification gap review identified, and it is not closed by anythin
 answered as specified on known labels, paraphrases included; no row is both `COMPARISON` and
 terminal-or-blocking; the three ambiguous siblings are identified and grouped.
 
-**Does not establish:** that the values are correct — 22 need your reading, and a false declaration on
+**Does not establish:** that the values are correct — the rows listed above need your reading, and a false declaration on
 any row is not detectable by this or any classifier. It moves no gate, closes no finding, and makes no
 `QA`, acceptance, `PF09`, OPS, deployment or closure claim. It is not `D14` coverage: the guard is the
 deterministic enum check that would follow your approval.
