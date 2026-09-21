@@ -26,9 +26,11 @@ import hashlib
 import pathlib
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
+import zipfile
 
 sys.dont_write_bytecode = True
 
@@ -54,10 +56,32 @@ def sha(p: pathlib.Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
-def payload_map(root: pathlib.Path) -> dict[str, str]:
-    """Every file under `root`, as relative path -> sha256."""
+def regular_files(root: pathlib.Path, label: str) -> list[pathlib.Path]:
+    """Every REGULAR file under `root`, refusing any symlink.
+
+    One root cause behind three findings: `is_file()` FOLLOWS symlinks and `sha()` then hashes
+    the target, so every traversal in this file erased node type.  A symlink at a frozen path
+    pointing to byte-identical content preserved the file count, the relative-path digest and
+    the tree diff; and the documented freeze recipe is `find . -type f`, which does not match a
+    symlink at all, so the implementation and the recipe it claims to implement disagreed.
+
+    The recipe is implemented exactly -- symlinks are not counted -- AND a symlink anywhere in
+    a supplied tree is refused, because a digest computed over regular files cannot see one
+    being added.  The freeze provably contains none today, so this is a guard against
+    reintroduction rather than a fix to a current tree.
+    """
+    links = sorted(q for q in root.rglob("*") if q.is_symlink())
+    if links:
+        raise SystemExit(f"{label} contains {len(links)} symlink(s), which the freeze recipe "
+                         f"(`find . -type f`) does not count and a content digest cannot see: "
+                         f"{[q.relative_to(root).as_posix() for q in links[:5]]}")
+    return sorted(q for q in root.rglob("*") if q.is_file())
+
+
+def payload_map(root: pathlib.Path, label: str) -> dict[str, str]:
+    """Every regular file under `root`, as relative path -> sha256."""
     return {q.relative_to(root).as_posix(): sha(q)
-            for q in sorted(root.rglob("*")) if q.is_file()}
+            for q in regular_files(root, label)}
 
 
 def canonical_patch(text: str, base: pathlib.Path = None, work: pathlib.Path = None) -> str:
@@ -136,9 +160,9 @@ def flowmaster_diff(base: pathlib.Path,
     return "\n".join(body), changed, (exits["base"], exits["work"])
 
 
-def tree_identity(root: pathlib.Path) -> tuple[int, int, str]:
-    """Total files, files excluding manifest.json, and the freeze digest of `root`."""
-    files = sorted(q for q in root.rglob("*") if q.is_file())
+def tree_identity(root: pathlib.Path, label: str) -> tuple[int, int, str]:
+    """Total regular files, files excluding manifest.json, and the freeze digest of `root`."""
+    files = regular_files(root, label)
     counted = [q for q in files if q.name != "manifest.json"]
     h = hashlib.sha256()
     for q in sorted(counted, key=lambda x: x.relative_to(root).as_posix()):
@@ -263,7 +287,7 @@ def identities(args) -> dict:
     bodies = sorted(pathlib.Path(args.bodies).glob("*.md"))
     bench, bench_exit = run_bench(args)
 
-    total, counted, digest = tree_identity(base)
+    total, counted, digest = tree_identity(base, "--base")
     if (total, counted) != (FREEZE_FILES, FREEZE_FILES_EXCL_MANIFEST):
         raise SystemExit(f"--base holds {total} files ({counted} excluding manifest.json); the "
                          f"freeze is {FREEZE_FILES} ({FREEZE_FILES_EXCL_MANIFEST})")
@@ -284,6 +308,7 @@ def identities(args) -> dict:
         "fm_changed": fm_changed,
         "files": differing(base, work),
         "bodies": [(p.stem, sha(p), p.stat().st_size) for p in bodies],
+        "bodies_bytes": sum(p.stat().st_size for p in bodies),
         "packages": [],
         "patch_lines": len(PATCH.read_text(encoding="utf-8").splitlines()),
         "patch_sha": hashlib.sha256(
@@ -313,6 +338,20 @@ def identities(args) -> dict:
         if count == 0:
             raise SystemExit(f"{name} contains no files; refusing to record an empty package")
 
+        # Entry TYPES are read from the archive's own metadata, before extraction, because
+        # extracting first and using `is_file()` follows the link: a symlink entry whose target
+        # happens to hold the expected bytes ON THIS HOST hashed equal and the package was
+        # certified, while what installs is a link that can break or resolve elsewhere.  The
+        # bench never ran against a link at any of these paths.  `unzip -Z1` prints a name for
+        # a symlink exactly as for a file, so the name listing cannot tell them apart.
+        with zipfile.ZipFile(p) as zf:
+            linked = [i.filename for i in zf.infolist()
+                      if stat.S_ISLNK(i.external_attr >> 16)]
+        if linked:
+            raise SystemExit(f"{name} contains {len(linked)} symlink entr(ies); the tested tree "
+                             f"has only regular files and a link's bytes are the host's, not the "
+                             f"archive's: {linked[:5]}")
+
         # The archive's PAYLOAD must be the tree the bench exercised.  Readability was
         # enforced; identity was not -- so a valid but stale or wrongly built ZIP could be
         # recorded, and published, while the tests that passed had run against `--work`.
@@ -338,8 +377,9 @@ def identities(args) -> dict:
             # `got` at the extraction directory and prefixing `want` with `<skill>/` rejects
             # every entry outside the one expected root by construction, rather than by a list
             # of shapes someone thought of.
-            got = payload_map(tmp)
-            want = {f"{skill}/{rel}": h for rel, h in payload_map(work / skill).items()}
+            got = payload_map(tmp, f"the extracted {name}")
+            want = {f"{skill}/{rel}": h
+                    for rel, h in payload_map(work / skill, f"--work/{skill}").items()}
             if not want:
                 raise SystemExit(f"--work has no {skill}/ subtree to compare {name} against")
             if got != want:
@@ -421,6 +461,24 @@ def replace_fm(doc: str, ids: dict) -> str:
     return pat.sub(lambda _m: block, doc, count=1)
 
 
+CORPUS_SUMMARY = re.compile(r"- bodies: \*\*\d+\*\*\n- total bytes: \*\*[\d,]+\*\*")
+
+
+def replace_corpus_summary(doc: str, ids: dict) -> str:
+    """Regenerate the corpus roster's two summary lines from the corpus itself.
+
+    The body TABLE was generated and every row asserted, but the `total bytes` figure above it
+    was typed once and never summed -- so `--check` could report that every identity was
+    mechanically current while the summary named a corpus that was not supplied.  The aggregate
+    is the same species as the rows it sits above; it just happened to be written in prose.
+    """
+    block = (f"- bodies: **{len(ids['bodies'])}**\n"
+             f"- total bytes: **{ids['bodies_bytes']:,}**")
+    if not CORPUS_SUMMARY.search(doc):
+        raise SystemExit("cannot find the corpus summary lines in the run record")
+    return CORPUS_SUMMARY.sub(lambda _m: block, doc, count=1)
+
+
 def replace_table(doc: str, header: tuple[str, str], new_block: str, label: str) -> str:
     pat = re.compile(re.escape(header[0]) + r"\n" + re.escape(header[1]) + r"\n(?:\|[^\n]*\|\n?)+")
     m = pat.search(doc)
@@ -435,6 +493,7 @@ def write_records(ids: dict) -> int:
     doc = replace_table(doc, MARK_PKG, packages_table(ids), "packages")
     doc = replace_table(doc, MARK_BODIES, bodies_table(ids), "bodies")
     doc = replace_fm(doc, ids)
+    doc = replace_corpus_summary(doc, ids)
     pat = re.compile(r"Exit \d+\. \*\*\d+ cases, \d+ not as expected\.\*\* Full stdout:\n\n```\n.*?\n```",
                      re.S)
     m = pat.search(doc)
@@ -586,6 +645,13 @@ def check(ids: dict) -> int:
         problems.append(f"{len(missing_rows)} body row(s) in the run record do not match the "
                         f"supplied corpus: {missing_rows[:5]}"
                         + (" …" if len(missing_rows) > 5 else ""))
+    # The aggregate is asserted as a COMPLETE pair of lines, so a stale body count and a stale
+    # byte total cannot each look plausible beside the other.
+    summary = f"- bodies: **{len(ids['bodies'])}**\n- total bytes: **{ids['bodies_bytes']:,}**"
+    if summary not in rr:
+        problems.append(f"run-record does not state the corpus summary: expected "
+                        f"{len(ids['bodies'])} bodies totalling {ids['bodies_bytes']:,} bytes")
+
     recorded = set(re.findall(r"^\| `([A-Z][A-Z0-9-]*)` \| `[0-9a-f]{64}` \| \d+ \|$",
                               rr, re.M))
     supplied = {k for k, _h, _s in ids["bodies"]}

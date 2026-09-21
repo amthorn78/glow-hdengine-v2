@@ -939,6 +939,72 @@ report does still differ only in `validator_revision` (verified, normalised diff
 rebuilt from unchanged content came out byte-for-byte identical, `07864f2b…`, at the same 241886
 bytes.
 
+### Every traversal in the recorder erased node type
+
+Three findings on one cycle, **one root cause**, and the P1 among them was demonstrated rather than
+accepted: `is_file()` **follows** symlinks and `sha()` then hashes the target.
+
+**Proven before fixing.** A copy of the frozen tree with one regular file replaced by a symlink to
+byte-identical content produced, under the old traversal, *exactly* the recorded identity —
+**321 files, 320 counted, `c321be051b90c346…`** — while `find . -type f`, the recipe this file
+documents, counts **320**. So the implementation and the recipe it claimed to implement disagreed,
+and a structurally different base was approvable as the freeze.
+
+The same hole ran through the package comparison: an archive can carry a **symlink entry**, and
+extracting it and hashing through `is_file()` reads the target's bytes **on this host**. A link whose
+target happens to hold the expected content hashed equal and the package was certified, while what
+installs is a link that can break or resolve elsewhere — and the bench never ran against a link at
+that path.
+
+| injected | result |
+|---|---|
+| a symlink at a frozen path in `--base`, pointing to identical bytes | refused, naming the path |
+| the same symlink in `--work` | refused, naming the path |
+| a **symlink entry inside an archive** whose target holds the expected bytes | refused, naming the entry |
+
+Symlinks are now not counted, matching the recipe exactly, **and** refused anywhere in a supplied
+tree, because a digest over regular files cannot see one being added. Archive entry types are read
+from the ZIP's own metadata **before extraction**, since `unzip -Z1` prints a symlink's name exactly
+as it prints a file's. The frozen tree contains **zero** symlinks today, so all three are guards
+against reintroduction rather than fixes to a current tree.
+
+**The third finding was the corpus aggregate.** The 55 body rows were generated and each one
+asserted, but `- total bytes: **1,060,573**` above them was typed once and never summed — so
+`--check` could report every identity mechanically current while the summary named a corpus that was
+not supplied. It is now generated and asserted as a complete pair of lines with the body count, so a
+stale count and a stale total cannot look plausible beside each other. Both controls fire.
+
+### The freeze gate caught my own harness error this round
+
+While re-running the full suite for this batch I set the locale and timezone pins but **not**
+`PYTHONDONTWRITEBYTECODE=1`, so the validator runs left six `.pyc` files in the two scratch trees.
+The recorder refused immediately — *"--base holds 324 files (323 excluding manifest.json); the freeze
+is 321 (320)"* — and wrote nothing.
+
+Recorded because of who caught it. Bytecode contamination happened once before in this package and
+was found by a **file count in a package listing**, after the fact. This time the gate written for
+exactly that failure stopped the measurement before any record was produced. The files were removed,
+the freeze digest re-verified at `c321be051b90c346…`, and the whole suite re-run with the pin set;
+every exit code reproduced.
+
+### One review finding declined, with the measurement
+
+Review read the terminal-branch table in the decision briefs as double-counting — `IA-30` and
+`GCFPE-MGMT-10` each appear in two rows, so subtracting 12 from 72 would double-count and the
+remainder should be 62.
+
+**Measured against the contract: the remainder is 60.** `IA-30` has **four** terminal branches and
+`GCFPE-MGMT-10` **three**, so `IA-30 change_not_substantiated` and `IA-30 wrong_native_lane` are two
+different rows stopping for two different reasons, as are GCFPE-MGMT-10's `promotion_checkpoint_required`
+and `maintenance_complete_terminal`. All twelve `(prompt, branch_id)` pairs are distinct and every one
+exists in `state_routes` with `terminal_for_invocation: true`.
+
+**The finding was still worth its round**, because the misreading was the table's fault: the column
+was headed "branches" and contained bare prompt ids, which cannot distinguish two branches of one
+prompt from one branch listed twice. The table now names `PROMPT branch_id` for every row and states
+the distinctness explicitly. The count did not change; the thing that made it checkable by a reader
+did.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract

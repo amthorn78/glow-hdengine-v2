@@ -649,16 +649,25 @@ Most conditions are **disjunctive** — they list several alternative stop reaso
 they do not partition into disjoint buckets, and any single tally of them would be invented
 precision. What can be counted exactly are the distinctive ones:
 
-| stop reason | count | branches |
-|---|---|---|
-| a source-backed finding assessed as **unsupported** | 3 | CF-C-30, CF-E-30, IA-30 |
-| the matter belongs to **another native lane** | 3 | IA-30, IA-40, QA-80 |
-| a **promotion checkpoint** is outstanding | 1 | GCFPE-MGMT-10 |
-| **PF10 itself cannot be resolved** | 1 | RS-40 `source_resolution_error` |
-| a terminal record after a Nathan-only abort | 1 | PR-50 |
-| a completed cycle or terminal return | 3 | CL-40, MGR-10, GCFPE-MGMT-10 |
+Each row below is counted in **terminal branch rows**, written `PROMPT branch_id`, because a prompt
+can have several terminal branches and two of them stop for different reasons — an earlier version
+listed prompt ids alone, and review read that as one branch double-counted:
 
-The remaining 60 stop on some combination of an unresolvable source, authority, owner, identity or
+| stop reason | rows | terminal branch rows |
+|---|---|---|
+| a source-backed finding assessed as **unsupported** | 3 | CF-C-30 `correction_not_substantiated_terminal`, CF-E-30 `correction_not_substantiated_terminal`, IA-30 `change_not_substantiated` |
+| the matter belongs to **another native lane** | 3 | IA-30 `wrong_native_lane`, IA-40 `wrong_native_lane`, QA-80 `wrong_route_terminal` |
+| a **promotion checkpoint** is outstanding | 1 | GCFPE-MGMT-10 `promotion_checkpoint_required` |
+| **PF10 itself cannot be resolved** | 1 | RS-40 `source_resolution_error` |
+| a terminal record after a Nathan-only abort | 1 | PR-50 `pr_aborted_escalated` |
+| a completed cycle or terminal return | 3 | CL-40 `complete`, MGR-10 `terminal_return`, GCFPE-MGMT-10 `maintenance_complete_terminal` |
+
+**Twelve distinct rows**, verified against the contract: IA-30 has four terminal branches and
+GCFPE-MGMT-10 three, so `IA-30 change_not_substantiated` / `IA-30 wrong_native_lane` and
+GCFPE-MGMT-10's promotion and maintenance-complete branches are four different rows, not two rows
+counted twice. Every pair above exists in `state_routes` with `terminal_for_invocation: true`.
+
+The remaining **60** stop on some combination of an unresolvable source, authority, owner, identity or
 access fact and a required Product Owner decision — most naming more than one as alternatives,
 which is why they are not split further here.
 
