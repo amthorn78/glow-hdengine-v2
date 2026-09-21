@@ -1,0 +1,330 @@
+diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
+--- base/change-flow/SKILL.md	2026-09-21 01:29:43.993269176 +0000
++++ work/change-flow/SKILL.md	2026-09-21 01:40:21.348460801 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Change Flow
+ 
+-CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6
++CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.7
+ 
+ R1_CONTRACT_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1
+ 
+@@ -555,7 +555,7 @@
+ 
+ The bundled `gcfpe-20260913.1-091326.2`, `gcfpe-20260913.1`, and `gcfpe-20260912.2` direct-handoff contracts are superseded candidate records and remain immutable historical provenance on the same terms. They are not executed as current routing overlays and confer no current skill binding. Three of these files share `contract_id` `GCFPE-PF10-INTEGRITY-20260913.1` with the current contract above; that identifier resolves for current execution to `gcfpe-current-direct-handoff-contract.json` alone, which carries `status: SELECTED_PRODUCTION`. A `CANDIDATE_VALIDATED` or `CANDIDATE_UNTIL_SELECTED_IN_NOTION_REGISTER` copy is never the current answer for that identifier.
+ 
+-This resolution rule is execution behaviour, not commentary: before it, a run had no stated way to resolve the shared `contract_id` and two runs could resolve it differently. `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.6 for it, so the two behaviours do not advertise the same specialization identity.
++This resolution rule is execution behaviour, not commentary: before it, a run had no stated way to resolve the shared `contract_id` and two runs could resolve it differently. `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.6 for it, so the two behaviours do not advertise the same specialization identity. `SF10-07` then scoped three body obligations to the ten writers that owe them, exempting the four CF Specification authors, which changes validation behaviour and the bundled contract; `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.7 for that.
+ 
+ The `support_skill` field in those superseded copies names `glow-hde-devops`, which **D16 retires**: none is installed, none is required, and none is to be created. That field is a dated record of what the contract said when it was written; it is not a current support-skill binding, and no current run resolves a support skill from it. The current contract declares only `primary_skill: glow-hde-pr-development`. Do not edit those dated bytes to remove the field.
+ 
+diff -ru base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json work/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
+--- base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 01:29:44.000135234 +0000
++++ work/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 01:37:50.047070275 +0000
+@@ -2873,6 +2873,44 @@
+     "applicable_overlay_links_required": true,
+     "approved_base_live_reauthoring_refused": true,
+     "authoring_context_required": true,
++    "body_obligation_ids": {
++      "active_addenda_required": [
++        "IA-10",
++        "IA-20",
++        "IA-40",
++        "PR-10",
++        "PR-20",
++        "QA-20",
++        "QA-50",
++        "QA-60",
++        "QA-80",
++        "ESC-30"
++      ],
++      "authoring_context_required": [
++        "IA-10",
++        "IA-20",
++        "IA-40",
++        "PR-10",
++        "PR-20",
++        "QA-20",
++        "QA-50",
++        "QA-60",
++        "QA-80",
++        "ESC-30"
++      ],
++      "current_pf10_markdown_required": [
++        "IA-10",
++        "IA-20",
++        "IA-40",
++        "PR-10",
++        "PR-20",
++        "QA-20",
++        "QA-50",
++        "QA-60",
++        "QA-80",
++        "ESC-30"
++      ]
++    },
+     "current_pf10_markdown_required": true,
+     "evaluated_prompt_ids": [
+       "CF-C-20",
+diff -ru base/change-flow/scripts/validate_gcfpe_20260914.py work/change-flow/scripts/validate_gcfpe_20260914.py
+--- base/change-flow/scripts/validate_gcfpe_20260914.py	2026-09-21 01:29:44.001900376 +0000
++++ work/change-flow/scripts/validate_gcfpe_20260914.py	2026-09-21 01:39:55.441951632 +0000
+@@ -743,7 +743,7 @@
+     topology_bytes = TOPOLOGY_READBACK.read_bytes()
+     topology = json.loads(topology_bytes.decode("utf-8"))
+ 
+-    require("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6" in skill, "specialization revision")
++    require("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.7" in skill, "specialization revision")
+     require("Resolve the selected GCFPE operating procedure through the release register's direct binding" in skill, "register-bound operating procedure")
+     require("Do not infer a `Glow / Ops` procedure route" in skill, "no inferred Ops procedure route")
+     require(sha256(marked_core(skill_bytes)) == EXPECTED_CORE_SHA, "protected Primary core SHA")
+diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
+--- base/flowmaster-validate/SKILL.md	2026-09-21 01:29:44.089269181 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-21 01:40:21.347965653 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.2.7
++FLOWMASTER_VALIDATE_REVISION: 3.2.8
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 01:29:44.093269182 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-21 01:37:50.065755627 +0000
+@@ -2873,6 +2873,44 @@
+     "applicable_overlay_links_required": true,
+     "approved_base_live_reauthoring_refused": true,
+     "authoring_context_required": true,
++    "body_obligation_ids": {
++      "active_addenda_required": [
++        "IA-10",
++        "IA-20",
++        "IA-40",
++        "PR-10",
++        "PR-20",
++        "QA-20",
++        "QA-50",
++        "QA-60",
++        "QA-80",
++        "ESC-30"
++      ],
++      "authoring_context_required": [
++        "IA-10",
++        "IA-20",
++        "IA-40",
++        "PR-10",
++        "PR-20",
++        "QA-20",
++        "QA-50",
++        "QA-60",
++        "QA-80",
++        "ESC-30"
++      ],
++      "current_pf10_markdown_required": [
++        "IA-10",
++        "IA-20",
++        "IA-40",
++        "PR-10",
++        "PR-20",
++        "QA-20",
++        "QA-50",
++        "QA-60",
++        "QA-80",
++        "ESC-30"
++      ]
++    },
+     "current_pf10_markdown_required": true,
+     "evaluated_prompt_ids": [
+       "CF-C-20",
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 01:29:44.098513714 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-21 01:40:21.348085041 +0000
+@@ -1,11 +1,11 @@
+ {
+   "candidate_contract": {
+     "bundled_relative_path": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+-    "byte_count": 609824,
++    "byte_count": 610511,
+     "relative_to_change_flow": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+     "schema_version": "gcfpe-direct-handoff-contract/4.0",
+     "selection_status": "UNSELECTED_CANDIDATE",
+-    "sha256": "7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894"
++    "sha256": "0fc5dcc051a5af98882f9b54057263030c3dd9e58f95fb5746e3f583f32f587b"
+   },
+   "candidate_member_count": 55,
+   "fixtures": {
+@@ -24,7 +24,7 @@
+     "sha256": "1d0b72582df4735b3d22dd325687b0375a624bd9ab5760c9589171049cd715a7"
+   },
+   "installed_skill_revisions": {
+-    "change-flow": "3.2.6",
++    "change-flow": "3.2.7",
+     "glow-hde-pr-development": "1.2.5"
+   },
+   "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+--- base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 01:29:44.099516455 +0000
++++ work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-21 01:41:54.784682105 +0000
+@@ -382,6 +382,13 @@
+     # Exact-equality comparison is retained, so PF10_PRODUCER_SET is still required to fire.
+     mutation("reject-second-pf10-producer", lambda c: c["pf10_addendum_contract"]["exact_producer_set"].append("PR-35"), ["PF10_ADDENDUM_LIST_VALUE_DRIFT", "PF10_PRODUCER_SET"])
+     mutation("reject-missing-pr10-writer", lambda c: c["plan_writer_contract"]["evaluated_prompt_ids"].remove("PR-10"), "PLAN_WRITER_SET")
++    # SF10-07: the three body obligations are scoped to the ten writers that owe them, so each way
++    # that scope can be wrong gets a case. Without these the new check would be a guard nobody has
++    # fired -- and a roster that cannot be read must not silently mean "owed by nobody".
++    mutation("reject-absent-body-obligation-block", lambda c: c["plan_writer_contract"].pop("body_obligation_ids"), "PLAN_WRITER_BODY_OBLIGATION_SET")
++    mutation("reject-body-obligation-roster-drift", lambda c: c["plan_writer_contract"]["body_obligation_ids"]["current_pf10_markdown_required"].append("CF-C-20"), "PLAN_WRITER_BODY_OBLIGATION:current_pf10_markdown_required")
++    mutation("reject-body-obligation-non-list", lambda c: c["plan_writer_contract"]["body_obligation_ids"].__setitem__("active_addenda_required", "IA-10"), "PLAN_WRITER_BODY_OBLIGATION:active_addenda_required")
++    mutation("reject-body-obligation-outside-writers", lambda c: c["plan_writer_contract"]["body_obligation_ids"].__setitem__("authoring_context_required", sorted(set(c["plan_writer_contract"]["body_obligation_ids"]["authoring_context_required"]) | {"CL-20"})), "PLAN_WRITER_BODY_OBLIGATION:authoring_context_required")
+     mutation("reject-incomplete-handoff", lambda c: c["transition_contract"].__setitem__("actual_pasteable_complete_prompt", False), "HANDOFF_CONTRACT")
+     mutation("reject-alpha-execution", lambda c: c["alpha_resumption_contract"]["successor_trigger"].__setitem__("execute_pr10", True), "ALPHA_TRIGGER")
+     mutation("reject-primary-core-change", lambda c: c["protected_identities"].__setitem__("flowmaster_primary_core_changed", True), "PROTECTED_IDENTITIES")
+@@ -538,7 +545,7 @@
+         # receiver identity, which is present in either rendering.
+         for name, prompt_id, old, new, expected_error in (
+             ("reject-source-epic-to-crd", "QA-120", "`CL-E-10 — ", "`CL-C-10 — ", "QA_PASS_BODY_CLASS_MAP"),
+-            ("reject-source-missing-crd-branch", "QA-120", "`CL-C-10 — ", "`CL-Z-99 — ", "QA_PASS_BODY_CLASS_MAP"),
++            ("reject-source-retargeted-crd-destination", "QA-120", "`CL-C-10 — ", "`CL-Z-99 — ", "QA_PASS_BODY_CLASS_MAP"),
+             ("reject-source-inferred-class", "QA-120", "Do not infer a class", "Infer a class", "QA_CLASS_UNRESOLVED_HANDOFF"),
+             ("reject-source-missing-rca", "QA-120", "`QA_RCA_ID`", "`OMITTED_RCA`", "QA_PASS_BODY_INTAKE"),
+             ("reject-source-epic-receiver-crd-intake", "CL-E-10", "complete approved `Epic` Specification", "complete approved `CRD` Specification", "QA_PASS_RECEIVER_BODY:CL-E-10"),
+diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
+--- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 01:29:44.100509408 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-21 01:40:21.345307062 +0000
+@@ -144,7 +144,7 @@
+         "END TECHNICAL WRITING FLOW: NO TARGETS",
+     ),
+     "change-flow": (
+-        "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6",
++        "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.7",
+         "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1",
+         "R1_ROW_COVERAGE: 46/46",
+         "PRIMARY_CHANGE_REQUIRED = false",
+@@ -683,7 +683,7 @@
+     # compared to the unchanged, hash-verified oracle below.
+     maintenance_metadata = {
+         "CHANGE_FLOW_SPECIALIZATION_REVISION: 2.0.0":
+-            "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6",
++            "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.7",
+         "PROMPT_REPAIR_PLAN_STATUS = SUSPENDED_PENDING_REPAIR_SYSTEM_RECOVERY":
+             "PROMPT_REPAIR_PLAN_STATUS = RESOLVE_CURRENT_REGISTER",
+     }
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 01:29:44.100649459 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-21 01:41:15.634128089 +0000
+@@ -48,6 +48,23 @@
+     "CF-C-20", "CF-C-40", "CF-E-20", "CF-E-40", "IA-10", "IA-20", "IA-40",
+     "PR-10", "PR-20", "QA-20", "QA-50", "QA-60", "QA-80", "ESC-30",
+ }
++# SF10-07: the fourteen writers owe the contract's seven obligations, but the three BODY
++# obligations below are owed by ten of them.  The four CF Specification authors -- CF-C-20,
++# CF-C-40, CF-E-20, CF-E-40 -- do not: a Specification states what a change IS, so it neither
++# reads current PF10, nor consumes its active addenda, nor declares an authoring context. The
++# contract ledger already records that `artifact_type` distinguishes their modes, so an
++# AUTHORING_CONTEXT declaration would be a second encoding that can disagree with the first.
++#
++# Membership in EXPECTED_WRITERS is unchanged at fourteen, so the four keep the obligations that
++# do apply to them -- `approved_base_live_reauthoring_refused` above all, which is the central
++# rule of CF-C-40's and CF-E-40's approved-base mode. Removing them from the writer set would
++# have taken that with it, which is why this is per-obligation scope rather than a smaller roster.
++SPECIFICATION_AUTHORS = {"CF-C-20", "CF-C-40", "CF-E-20", "CF-E-40"}
++EXPECTED_BODY_OBLIGATION_IDS = {
++    "active_addenda_required": EXPECTED_WRITERS - SPECIFICATION_AUTHORS,
++    "authoring_context_required": EXPECTED_WRITERS - SPECIFICATION_AUTHORS,
++    "current_pf10_markdown_required": EXPECTED_WRITERS - SPECIFICATION_AUTHORS,
++}
+ # D6/D8: the PF10 addendum drainage lifecycle is retired for this candidate release.
+ # These tokens are no longer permitted anywhere in the candidate contract; the guard
+ # below asserts their ABSENCE rather than requiring their presence.
+@@ -833,8 +850,8 @@
+ SHA_RE = re.compile(r"^[0-9a-f]{64}$")
+ EXPECTED_FROZEN_GRAPH_SHA256 = "1d0b72582df4735b3d22dd325687b0375a624bd9ab5760c9589171049cd715a7"
+ EXPECTED_FROZEN_GRAPH_BYTES = 569902
+-EXPECTED_CANDIDATE_CONTRACT_SHA256 = "7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894"
+-EXPECTED_CANDIDATE_CONTRACT_BYTES = 609824
++EXPECTED_CANDIDATE_CONTRACT_SHA256 = "0fc5dcc051a5af98882f9b54057263030c3dd9e58f95fb5746e3f583f32f587b"
++EXPECTED_CANDIDATE_CONTRACT_BYTES = 610511
+ EXPECTED_FIXTURE_SHA256 = "a1a730623e5385a6214a6f3e18b8cef56acd0d227028b2236e56d586d822fa14"
+ PRODUCTION_SELECTION_AUTHORITY_LINE = (
+     "Selection authority: The GCFPE Membership and Release Register exclusively determines "
+@@ -1421,7 +1438,11 @@
+ 
+     writers = contract.get("plan_writer_contract")
+     writer_ids = writers.get("evaluated_prompt_ids") if isinstance(writers, dict) else None
+-    if not isinstance(writer_ids, list) or len(writer_ids) != 14 or set(writer_ids) != EXPECTED_WRITERS:
++    writer_set_ok = (
++        isinstance(writer_ids, list) and len(writer_ids) == 14
++        and set(writer_ids) == EXPECTED_WRITERS
++    )
++    if not writer_set_ok:
+         errors.append("PLAN_WRITER_SET")
+     errors += subset_errors(writers, {
+         "current_pf10_markdown_required": True, "applicable_overlay_links_required": True,
+@@ -1430,6 +1451,21 @@
+         "pf10_lineage_required_in_complete_handoff": True,
+     }, "PLAN_WRITER_CONTRACT")
+ 
++    # The per-obligation rosters are validated as a COMPLETE roster each, and fail closed: an
++    # absent block, a missing obligation, a non-list value, an id outside `evaluated_prompt_ids`,
++    # or any drift from the expected set is an error rather than a skipped check. A body
++    # obligation whose roster cannot be read is not thereby owed by nobody.
++    scope = writers.get("body_obligation_ids") if isinstance(writers, dict) else None
++    if not isinstance(scope, dict) or set(scope) != set(EXPECTED_BODY_OBLIGATION_IDS):
++        errors.append("PLAN_WRITER_BODY_OBLIGATION_SET")
++    else:
++        for obligation, expected_ids in sorted(EXPECTED_BODY_OBLIGATION_IDS.items()):
++            declared = scope.get(obligation)
++            if not isinstance(declared, list) or set(declared) != expected_ids:
++                errors.append(f"PLAN_WRITER_BODY_OBLIGATION:{obligation}")
++            elif writer_set_ok and not set(declared) <= set(writer_ids):
++                errors.append(f"PLAN_WRITER_BODY_OBLIGATION_SCOPE:{obligation}")
++
+     addendum = contract.get("pf10_addendum_contract")
+     producer_list = addendum.get("exact_producer_set") if isinstance(addendum, dict) else None
+     producers = addendum.get("producers") if isinstance(addendum, dict) else None
+@@ -2182,7 +2218,9 @@
+                     errors.append(f"PROMPT_PRODUCER:{prompt_id}:{marker}")
+         if prompt_id in EXPECTED_WRITERS:
+             lower = text.lower()
+-            if not (
++            owes = {obligation for obligation, ids in EXPECTED_BODY_OBLIGATION_IDS.items()
++                    if prompt_id in ids}
++            if "current_pf10_markdown_required" in owes and not (
+                 "current controlled pf10 markdown" in lower
+                 or (
+                     "current controlled pf10" in lower
+@@ -2190,7 +2228,7 @@
+                 )
+             ):
+                 errors.append(f"PROMPT_WRITER:{prompt_id}:CURRENT_PF10_MARKDOWN")
+-            if "active addend" not in lower:
++            if "active_addenda_required" in owes and "active addend" not in lower:
+                 errors.append(f"PROMPT_WRITER:{prompt_id}:ACTIVE_ADDENDA")
+             exact_context = any(
+                 marker in text
+@@ -2204,7 +2242,7 @@
+                 and "approved" in lower
+                 and any(marker in lower for marker in ("immutable", "wrong-route", "wrong route", "must not rewrite", "never revises"))
+             )
+-            if not (exact_context or semantic_contexts):
++            if "authoring_context_required" in owes and not (exact_context or semantic_contexts):
+                 errors.append(f"PROMPT_WRITER:{prompt_id}:AUTHORING_CONTEXT")
+     exact_markers = {
+         "PR-30": ("PR_CANDIDATE_PUBLISHED", "PR-35", "PR_RETURN_PHASE: PR-30_PREPUBLICATION"),
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_current.py work/flowmaster-validate/scripts/validate_gcfpe_current.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-09-21 01:29:44.100933595 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-09-21 01:39:55.442222564 +0000
+@@ -630,8 +630,8 @@
+     for token in ACTIVE_LEGACY_TOKENS:
+         if token in active:
+             errors.append(f"LEGACY_ACTIVE:{token}")
+-    if skill_text.count("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6") != 1:
+-        errors.append("ACTIVE_CONTRACT_MISSING:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6")
++    if skill_text.count("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.7") != 1:
++        errors.append("ACTIVE_CONTRACT_MISSING:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.7")
+     for marker in (
+         "docs/ephemeral",
+         "NEXT_PROMPT_HANDOFF", "glow-hde-pr-development", "PF10_BUILD_NOTES_ADDENDUM",
