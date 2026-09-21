@@ -45,6 +45,23 @@ Release-scoped run evidence, batch reports, ledgers and checkpoints. Those are
 `docs/ephemeral/`. A document that names a release in its identity and dies with it
 is ephemeral, not infrastructure.
 
+That test is mechanical. Apply it before choosing a path, not after — a session working
+in `docs/ephemeral/gcfpe.roundNN/` writes everything into that folder because that is
+where its hands already are, and **round-scoped is where the work happened, not what the
+artifact is.**
+
+| this | goes here |
+|---|---|
+| a procedure, convention, schema, registry, tool or decision record | `docs/prompt_ecosystem_management/` |
+| a round report, freeze snapshot, §10 verdict, ledger, filled prompt instance, dated finding | `docs/ephemeral/` |
+| maintained machine-readable graph source | `docs/graph/` |
+| PFCanon | `docs/pfcanon/`, read-only |
+| prompt behaviour | Notion, authored in place |
+
+**For a procedure, the repository document is normative and the Notion entry is the
+operational index** that helps someone find it and know when it applies. Where the two
+disagree, the repository governs and the Notion entry is a defect to be corrected.
+
 ## Validation posture
 
 This material is **not part of the Glow application runtime**. It is excluded from
@@ -85,4 +102,12 @@ the application's.
 | `project-prompt-contract-registry.md` | The approved machine-readable per-prompt contract registry |
 | `execution-and-delegation-model.md` | How work is divided: the coordinator's role, what may be delegated, the reporting contract, and verification isolation |
 | `ecosystem-change-management.md` | **How a change to this ecosystem is made routine**: the five-step change lifecycle, the defect-class catalogue, the standing instruments, the definition of done, and what needs Product Owner authorization |
+| `postflight-procedure.md` | **How an independent post-flight is run**: scope set by what stops the change flow, cheap checks before bodies, bodies streamed and never persisted, the struck checks and their rulings |
+| `skill-identity-and-freeze.md` | Skill digests, what each identity proves, and why an install is not complete until its digest is compared |
+| `freeze.py` | The digest recipe itself. Root it at a skill directory, never at the synced tree |
+| `prompt-corpus-policy.md` | **The Prompt Corpus Storage and Fidelity Policy**, recorded verbatim — the prompt corpus is never mirrored, exported, hashed or cached to disk |
+| `prompt-validation-procedure.md` | How prompt bodies are validated without a corpus mirror — read the page, pipe the body on stdin — and the rule that a recorded identity must be compared, not printed |
+| `skill-packaging-and-delivery.md` | How a skill is packaged and handed over, mandatory independent validation, and why every delivered artifact except a `.skill` file must be uniquely named |
+| `reviewer-prompt-template.md` | The canonical reviewer prompt. Every skill handover fills this template rather than composing one |
+| `session-working-rules.md` | How a session works rather than what it produces: source-read minimalism, tracking as part of the work, and the worker communication rules |
 | `pe-succession/` | Session succession records, newest last |

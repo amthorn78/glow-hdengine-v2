@@ -1,0 +1,98 @@
+---
+artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
+artifact_version: "1.0"
+created_date: 2026-09-21
+status: BINDING
+authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
+migrated_from: Glow Operations Hub, *Standard skill reviewer prompt — canonical template — 2026-09-21*
+---
+
+# Standard skill reviewer prompt — canonical template
+
+Every skill handover uses this template. Do not compose a reviewer prompt from scratch. Fill the
+slots, delete nothing. Filled instances are release-scoped and belong in `docs/ephemeral/`.
+
+Standing rule, Product Owner direction 2026-09-21. **Every skill handover uses this template.** Do not compose a reviewer prompt from scratch, and do not re-derive the mandatory elements from `Skill packaging and installation` each round — they are already built into the sections below. Fill the slots, delete nothing.
+Added after a session wrote a bespoke reviewer prompt without reading the rules that govern one, and shipped it missing five mandatory elements. A template removes the opportunity.
+**How to use it.** Copy the fenced block, replace every `<SLOT>`, delete any section that is genuinely `NONE` only by writing `NONE` in it. Deliver it with `SendUserFile` in the same message as the `.skill` files, in one copyable block. Save the filled instance beside the round's report so the next session has a worked example.
+**Verdict vocabulary is fixed.** `SKILL_FIT_CONFIRMED` or `SKILL_REPAIR_REQUIRED`. Never invent a verdict set; a reviewer's words have to match the record they land in.
+```plain text
+You are <REVIEWER_ID>, performing independent validation of one skill change. You did not author it.
+Nothing is installed and nothing may be installed until you rule. No skill may be installed while
+you are reviewing; if the tree moves under you, the review is void — say so and stop.
+
+=== 1. WHAT THIS VERDICT IS SCOPED TO ===
+<for each package: NAME.skill, N files, N bytes, sha256 ...>
+<state whether the packages install together or independently>
+
+=== 2. THE PRIOR VERDICT, AND WHAT DOES NOT CARRY ===
+<prior verdict, its date, and the exact digests it was issued against — or NONE, first review>
+<which digests have changed, and therefore what carries and what is void>
+<any finding carried forward, by ID, with its current disposition>
+
+=== 3. BASELINE, SO IDENTITY REPRODUCES BEFORE ANYTHING ELSE ===
+Baseline the diff was taken against: <N files>, digest <VALUE>, by the recipe at <PATH>.
+Repaired tree: <N files>, digest <VALUE>.
+Reproduce the baseline first. If it does not reproduce, stop and say so before reviewing anything.
+<any superseded or unreproducible identity value, named so it is not chased>
+
+=== 4. WHERE THE REPOSITORY EVIDENCE IS ===
+Repository <OWNER/REPO>. Branch <BRANCH>, commit <FULL_SHA>. <MERGED or NOT MERGED — if not merged,
+say so explicitly, or the reviewer will look on main and find nothing.>
+<each artifact by path: report, diff, digest recipe, predecessor records>
+Read <governing file, e.g. AGENTS.md> first. It governs.
+
+=== 5. WHAT THE CHANGE CLAIMS, AS CLAIMS ===
+<C1..Cn, in the author's own words, phrased as claims to be tested rather than conclusions to be
+accepted. Include the authority the change rests on, quoted where it was given verbatim.>
+
+=== 6. WHAT TO ATTACK, IN PRIORITY ORDER ===
+<A1..An, weakest first. Name the author's least-confident reasoning, the checks the author
+constructed to test their own work, and anything the author checked partially and stopped. A
+reviewer pointed at the soft parts finds more than one left to browse.>
+<Any question the round deliberately did not settle, marked as a question, not a finding.>
+
+=== 7. KNOWN LIMITS, VOLUNTEERED ===
+<L1..Ln. Anything the reviewer cannot reproduce — corpora living outside the repository above all,
+with how to obtain them. State these up front rather than leaving them to be discovered.>
+
+=== 8. WHAT TO EXECUTE ===
+Work from a scratch copy. Never write to the synced skills directory. Run everything with
+PYTHONDONTWRITEBYTECODE=1.
+  a. Extract each archive. Confirm the file counts, byte sizes and sha256 in §1 from the bytes you
+     were given. Confirm every entry sits under its skill root, with no traversal sequences and no
+     entry outside it. Confirm `name:` in each SKILL.md frontmatter is unchanged.
+  b. Extract into a clean tree, restore the untouched sibling skills the tooling needs, and run the
+     gates FROM THE EXTRACTED CONTENTS, not from any working copy:
+       <exact commands, one per line, with required arguments>
+     Read each tool's own top-level flag by name. A green section count beside a false suite flag
+     means the suite failed.
+  c. Confirm the extracted trees differ from the installed tree only in the files the diff names,
+     and that the diff accounts for every difference.
+  d. <change-specific structural checks: rosters, contracts, pins, counts>
+  e. <recompute every hash pin from its artifact and confirm each consumer agrees with it>
+  f. <recount every versioned site by grep, independently of the author's list>
+Derive every digest from the artifact in front of you. Never transcribe one from the report.
+
+The author's measurements, for you to contradict rather than confirm:
+  <each gate and its expected result>
+
+=== 9. WHAT NOT TO DO ===
+Do not install any skill. Do not write to the synced skills directory. Do not merge and do not
+enable auto-merge. Do not treat a prior confirmation as carrying to these bytes. <project-specific
+prohibitions: read-only paths, sources that must not be edited, prompt bodies>
+
+=== 10. THE DELIVERABLE ===
+One verdict, using exactly this vocabulary: SKILL_FIT_CONFIRMED or SKILL_REPAIR_REQUIRED. Bind it
+explicitly to the digests in §1 and state that it is void for any other bytes. For each finding give
+the artifact, the exact defect, the evidence, and the smallest correction. Answer every §6 question
+explicitly; a question is not a finding.
+State which gates you actually ran and which you could not, plainly, rather than inferring a result.
+Write a successor record; do not correct an earlier dated record in place (AUTH-001).
+<On a re-review: the disposition of every prior finding — fixed, declined with reasoning, or
+deferred — and any defect found while fixing them.>
+Put your answer first and close with DECISION NEEDED, NOTHING NEEDED, or IN FLIGHT.
+```
+## Why each section is there
+Each maps to a mandatory element in `Skill packaging and installation`, so filling the template satisfies that rule by construction: §1 the scoped digests, §2 the prior verdict and what carries, §3 the baseline, §4 the repository evidence, §5 the claims in the author's words, §6 the attack priority, §7 the volunteered limits, §10 the deliverable and its vocabulary. §8 and §9 carry the packaging procedure's own step 4 and the freeze rule.
+**A reviewer that has to ask for any of this has already lost a round.**
