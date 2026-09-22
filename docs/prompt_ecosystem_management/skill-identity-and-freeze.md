@@ -72,6 +72,35 @@ filename the packager requires, and ran for a full round behind green gates. **T
 for the same skill are always indistinguishable by name**, so the digest comparison is the control,
 and delivery hygiene — digest first in the caption, one package per message — only reduces the odds.
 
+## Advertised identity must be unspent
+
+**Before packaging, diff every advertised identity value against the previous package. A match is a
+defect, not a convenience.** Run it as a command, not as a memory:
+
+```
+grep -rn 'FLOWMASTER_VALIDATE_REVISION\|validator_revision\|SKILL_TREE_SHA256' <new>/ > /tmp/new.ids
+grep -rn 'FLOWMASTER_VALIDATE_REVISION\|validator_revision\|SKILL_TREE_SHA256' <prev>/ > /tmp/prev.ids
+diff /tmp/prev.ids /tmp/new.ids   # a revision that did not move, beside content that did, is the defect
+```
+
+A **spent** identity is one already bound to a published §10 verdict, an install, or a delivered
+package. Corrected bytes never reuse one. `SKILL_TREE_SHA256` does not satisfy this on its own: it
+moves automatically with content, so it will differ even when the declared revisions did not, and
+**no report emits it** — which is exactly why it cannot be the thing that distinguishes two
+packages in anyone's hands.
+
+**This rule has been broken three times, twice under a `SKILL.md` that states it.** Round 23 shipped
+new validation behaviour still emitting `validator_revision: 3.2.8`; round 24's `F1` established the
+rule. Rounds 28 and 29 then shipped **mutually incompatible** validators — each rejects the other's
+profile — both advertising `3.2.15` / `3.2.13`, while the author edited the narrative of round 24's
+finding in that same file. Round 30's §10 review, which raised the point, put the reason plainly: a
+narrative *"narrates rather than prescribes"*, so a reader learns the rule was broken and is not
+told what to do. The command above is what to do.
+
+Rounds 28 and 29 remain separable only by tree hash. That cannot be repaired — both are published
+and both carry `SKILL_REPAIR_REQUIRED`, so confusing them costs nothing — but it is the shape of the
+damage, and it is permanent.
+
 ## Recording the values
 
 A round's report names the baseline digest, the repaired digest, the package digest and

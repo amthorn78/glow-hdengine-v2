@@ -37,8 +37,12 @@ Reproduce the baseline first. If it does not reproduce, stop and say so before r
 <any superseded or unreproducible identity value, named so it is not chased>
 
 === 4. WHERE THE REPOSITORY EVIDENCE IS ===
-Repository <OWNER/REPO>. Branch <BRANCH>, commit <FULL_SHA>. <MERGED or NOT MERGED — if not merged,
-say so explicitly, or the reviewer will look on main and find nothing.>
+Repository <OWNER/REPO>. Branch <BRANCH> — read its HEAD, not a pinned commit.
+<MERGED or NOT MERGED — if not merged, say so explicitly, or the reviewer will look on main and
+find nothing.>
+**If that branch does not exist when you look, it merged and was deleted.** Read the same paths on
+main. <name the pull request the branch is expected to merge as, if it is open, so the reviewer can
+confirm rather than guess.>
 <each artifact by path: report, diff, digest recipe, predecessor records>
 Read <governing file, e.g. AGENTS.md> first. It governs.
 
@@ -67,8 +71,11 @@ PYTHONDONTWRITEBYTECODE=1.
        <exact commands, one per line, with required arguments>
      Read each tool's own top-level flag by name. A green section count beside a false suite flag
      means the suite failed.
-  c. Confirm the extracted trees differ from the installed tree only in the files the diff names,
-     and that the diff accounts for every difference.
+  c. Confirm the extracted trees differ from the installed tree only in the files listed here, and
+     that the list accounts for every difference:
+       <every changed file, DERIVED by `diff -rq` or `git diff --name-only` against the baseline
+       tree and pasted, never typed from memory. A revision bump touches every revision site, so a
+       file whose only change is the version string still belongs on this list.>
   d. <change-specific structural checks: rosters, contracts, pins, counts>
   e. <recompute every hash pin from its artifact and confirm each consumer agrees with it>
   f. <recount every versioned site by grep, independently of the author's list>
