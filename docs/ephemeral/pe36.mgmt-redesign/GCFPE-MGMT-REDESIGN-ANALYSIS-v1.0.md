@@ -6,7 +6,7 @@ session: PE36
 status: LANDED_ON_BRANCH_DESIGN_COMPLETE_NOT_IMPLEMENTED
 authority: Product Owner request, 2026-09-22 — full review of the GCFPE MGMT change-process ecosystem
 committed: true — branch docs/20260922-pe36-mgmt-redesign
-pull_request: none — the Product Owner authorized the branch, not a pull request
+pull_request: 468 — https://github.com/amthorn78/glow-hdengine-v2/pull/468
 blocking_decisions: 0 — D-A, D-B and D-C answered by the Product Owner 2026-09-22 (§10)
 decisions_recorded_durably: true — D20, gcfpe.decision-record.md, on this branch
 revision_note: |
@@ -727,8 +727,8 @@ is the one input I cannot recover from the record.
 **Nothing has been implemented.** This document is design only — no prompt, skill, graph part,
 registry row or Notion prompt body has been changed by it.
 
-It is committed on branch `docs/20260922-pe36-mgmt-redesign`. **No pull request exists**: the
-Product Owner authorized the branch and has not authorized a pull request.
+It is committed on branch `docs/20260922-pe36-mgmt-redesign` and open as **pull request #468**.
+Nathan merges; this session does not.
 
 **The three decisions in §10 are recorded as `D20`** in
 `docs/prompt_ecosystem_management/gcfpe.decision-record.md`, on this branch — scope, artifact form
