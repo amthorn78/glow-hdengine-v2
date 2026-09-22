@@ -786,6 +786,17 @@ named branch is where the Modification lives. This gives MGMT-10 an upstream tha
 cannot see, because triage sits outside the release and has no graph part; that is by design,
 and the handoff's shape is checked by the MGMT-10 entry contract rather than by the graph.
 
+### Stage 4 began, 2026-09-22 — a triage comparison, and the handoff loses its branch
+
+The open Alpha Feedback items went through the triage prompt twice, independently, as the first
+real use. The two runs grouped identically and disagreed only on whether three parts of AF-011
+are already true. Both found the same two tooling defects, now fixed. Full record:
+`TRIAGE-COMPARISON-v1.0.md`, beside this document.
+
+**Superseding the handoff shape recorded above:** per the Product Owner's AF-008 ruling of the
+same day, the triage handoff carries no branch and no commit, and the MGMT-10 draft finds a
+Modification by its id: on `main`, then on every open intake branch.
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage

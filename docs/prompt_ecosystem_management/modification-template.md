@@ -69,7 +69,7 @@ would only make the record lie.
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260922-example-slug
 status: INTAKE            # INTAKE ANALYZING ANALYZED PLANNING PLANNED EXECUTING COMPLETE BLOCKED ABANDONED
-coupling: INDEPENDENT     # ATOMIC = one act, a failure stops all. INDEPENDENT = per-item.
+coupling:                 # ATOMIC = one act, a failure stops all. INDEPENDENT = per-item. No default: someone decides it
 targets: []               # any of: prompt skill rule graph registry notion_control
 gate_tier:                # 0 1 2 — computed from closure.py and the rebuilt part, never judged
 closure:                  # computed; do not type these by hand

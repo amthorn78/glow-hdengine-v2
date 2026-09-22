@@ -165,17 +165,27 @@ def check(path):
                 bad.append(f"section {marker} is present but empty")
 
     # --- the Product Owner's override, if one is recorded ---
+    # The template ships this block with every field empty and says to keep the keys, so an
+    # all-empty block is the template, not an override. Treating it as one failed every
+    # Modification the moment it left INTAKE -- found by both runs of the 2026-09-22 triage
+    # comparison test, and missed by the fixture below because it was hand-written (PAIR-001).
     override = fm.get("override") or {}
-    waived = []
-    if override:
-        if not str(override.get("by") or "").strip():
+    if not isinstance(override, dict):
+        bad.append("override must be a block with by, overrides and reason")
+        override = {}
+    raw = override.get("overrides") or []
+    waived = [raw] if isinstance(raw, str) else list(raw)
+    by = str(override.get("by") or "").strip()
+    reason = str(override.get("reason") or "").strip()
+    if by or waived or reason:
+        if not by:
             bad.append("override present but has no 'by'; an unattributed override is not one")
-        raw = override.get("overrides") or []
-        waived = [raw] if isinstance(raw, str) else list(raw)
+        if not waived:
+            bad.append("override present but names no gate; say which policy gate it waives")
         for w in waived:
             if w not in OVERRIDABLE:
                 bad.append(f"override names {w!r}, which is not a policy gate; overridable: {OVERRIDABLE}")
-        if not str(override.get("reason") or "").strip():
+        if not reason:
             bad.append("override present but has no 'reason'; the record needs to say it was deliberate")
 
     # --- scope freeze ---
@@ -267,6 +277,15 @@ _REGRESSIONS = [
      lambda s: s.replace("item_count_at_approval: 1",
                          'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: [missing_sections]\n  reason: "x"'),
      "not a policy gate"),
+    ("override that names no gate",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: []\n  reason: "x"'),
+     "names no gate"),
+    ("the template's empty override block wrongly treated as an override",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  by: ""\n  overrides: []\n  reason: ""'),
+     None),  # must PASS: the template ships this block empty
+
     ("item has no disposition at COMPLETE",
      lambda s: s.replace("    disposition: VERIFIED", '    disposition: ""'), "no disposition"),
     ("actual cost missing at COMPLETE",
@@ -318,8 +337,42 @@ def selftest():
             else:
                 print(f"SELFTEST FAIL: NOT caught: {name} (expected {expect!r}, got {found})")
                 failures += 1
-    print(f"\n{len(_REGRESSIONS) + 1 - failures}/{len(_REGRESSIONS) + 1} selftest cases passed")
+        # PAIR-001: every fixture above is hand-written, so none of them can notice the shipped
+        # template drifting away from this script. Validate the template itself: as shipped at
+        # INTAKE, and filled in the minimum ANALYZE fills, at ANALYZING.
+        template_cases = _template_cases()
+        for name, text in template_cases:
+            f = Path(td) / "MODIFICATION-template.md"
+            if text is None:
+                print(f"SELFTEST FAIL: {name}")
+                failures += 1
+                continue
+            f.write_text(text, encoding="utf-8")
+            found = check(f)
+            if found:
+                print(f"SELFTEST FAIL: the shipped template fails validation: {name} -> {found}")
+                failures += 1
+            else:
+                print(f"ok    shipped template passes: {name}")
+    total = len(_REGRESSIONS) + 1 + len(template_cases)
+    print(f"\n{total - failures}/{total} selftest cases passed")
     return 1 if failures else 0
+
+
+def _template_cases():
+    """The fenced template in modification-template.md, as (name, text) cases."""
+    import re
+    path = Path(__file__).resolve().with_name("modification-template.md")
+    try:
+        doc = path.read_text(encoding="utf-8")
+        text = doc.split("## TEMPLATE BEGINS", 1)[1].split("```markdown\n", 1)[1].split("\n```\n", 1)[0] + "\n"
+    except (OSError, IndexError):
+        return [("template not found or not fenced where expected in " + path.name, None)]
+    filled = text.replace("status: INTAKE", "status: ANALYZING", 1)
+    for key, value in (("coupling", "ATOMIC"), ("targets", "[prompt]"), ("gate_tier", "1"),
+                       ("readiness", "READY"), ("modification_class", "B")):
+        filled = re.sub(rf"^{key}:[^\n]*", f"{key}: {value}", filled, count=1, flags=re.M)
+    return [("as shipped, at INTAKE", text), ("minimally filled, at ANALYZING", filled)]
 
 
 def main(argv):
