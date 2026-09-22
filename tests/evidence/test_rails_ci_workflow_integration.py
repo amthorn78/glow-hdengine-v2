@@ -670,6 +670,7 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
         "tests/http/test_endpoint_catalog.py",
         "tests/http/test_reader_a7_transport.py",
         "tests/http/test_reader_post_v1.py",
+        "tests/runtime/test_emit_public_legacy_helper.py",
         "tests/transport/test_aux_narrative.py",
         "tests/transport/test_ops_rails_refusal.py",
         "tests/transport/test_writers_errors_headers.py",
