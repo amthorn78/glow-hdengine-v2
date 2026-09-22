@@ -141,11 +141,19 @@ def check(path):
                 bad.append(f"section {marker} is present but empty")
 
     # --- scope freeze ---
+    # The field is REQUIRED once scope is frozen. Without that, the guard is opt-in: a
+    # Modification that simply never sets it can grow items freely after approval, and scope
+    # freeze is the rule that bounds the review loops. Found by the stage 4 pilot; PAIR-001.
     frozen_at = fm.get("item_count_at_approval")
-    if status in FROZEN and frozen_at is not None and len(items) != frozen_at:
-        bad.append(
-            f"SCOPE FREEZE: {len(items)} items but item_count_at_approval is {frozen_at}; "
-            "new scope is a new Modification with spawned_from set, never a wider one")
+    if status in FROZEN:
+        if frozen_at in (None, ""):
+            bad.append(
+                f"SCOPE FREEZE: status {status} requires item_count_at_approval; without it the "
+                "freeze is unenforced and items can be added after approval")
+        elif len(items) != frozen_at:
+            bad.append(
+                f"SCOPE FREEZE: {len(items)} items but item_count_at_approval is {frozen_at}; "
+                "new scope is a new Modification with spawned_from set, never a wider one")
 
     if status == "COMPLETE":
         for item in items:
@@ -200,6 +208,8 @@ _REGRESSIONS = [
      lambda s: s.replace("  - id: ITEM-01",
                          '  - id: ITEM-00\n    statement: "smuggled in"\n    disposition: VERIFIED\n  - id: ITEM-01'),
      "SCOPE FREEZE"),
+    ("scope freeze unenforced because the field was never set",
+     lambda s: s.replace("item_count_at_approval: 1\n", ""), "requires item_count_at_approval"),
     ("item has no disposition at COMPLETE",
      lambda s: s.replace("    disposition: VERIFIED", '    disposition: ""'), "no disposition"),
     ("actual cost missing at COMPLETE",
