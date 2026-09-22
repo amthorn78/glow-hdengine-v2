@@ -313,6 +313,17 @@ now a standing pre-push check for this work unit**, not a one-off.
 Neither fix weakens, skips, disables or quarantines anything: each keeps its original subject and
 assertions and now reaches them.
 
+Re-run at the corrective head as the standing pre-push check: **72 failures at base → 74 at head,
+regressions exactly the two `test_dev_conjunction_identity.py` cases (F07 / O-19), none fixed**. The
+two repaired files left the uncovered set entirely — editing them made them changed-test targets, so
+they are now covered by the CI step as well.
+
+One note on running the sweep, since it is meant to be repeatable: 14 of the uncovered files fail at
+*collection* (missing modules for retired subsystems) at both base and head, and a collection error
+aborts the whole pytest run before any test body executes. `--continue-on-collection-errors` is
+required, or the sweep silently reports 14 failures at both refs and no regressions — which is what a
+first attempt at the re-run did before the flag was added.
+
 
 ## 9. Limitations
 
