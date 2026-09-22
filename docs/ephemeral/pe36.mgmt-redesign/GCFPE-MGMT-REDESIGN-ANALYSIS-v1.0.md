@@ -3,7 +3,7 @@ artifact_type: GCFPE_MGMT_PROCESS_AUDIT_RCA_AND_REDESIGN_PLAN
 artifact_version: "1.1"
 created_date: 2026-09-22
 session: PE36
-status: LANDED_ON_BRANCH_DESIGN_COMPLETE_NOT_IMPLEMENTED
+status: STAGE_1_BUILT_STAGES_2_ONWARD_NOT_STARTED
 authority: Product Owner request, 2026-09-22 — full review of the GCFPE MGMT change-process ecosystem
 committed: true — branch docs/20260922-pe36-mgmt-redesign
 pull_request: 468 — https://github.com/amthorn78/glow-hdengine-v2/pull/468
@@ -305,10 +305,22 @@ downstream consumers, and prompts sharing a result state. Measured on this corpu
 declared result states, every prompt carrying outbound handoffs:
 
 ```
-PR-30           upstream 5   downstream 4   share-a-state 3
-QA-10           upstream 3   downstream 4   share-a-state 0
-GCFPE-MGMT-10   upstream 0   downstream 3   share-a-state 0
+PR-30           upstream 4   downstream 3   state-sharers 3   radius 7
+QA-10           upstream 3   downstream 2   state-sharers 0   radius 4
+GCFPE-MGMT-10   upstream 0   downstream 1   state-sharers 0   radius 1
 ```
+
+> **Corrected 2026-09-22, by the script this section proposes.** v1.1 published
+> `PR-30 upstream 5 / downstream 4`, `QA-10 downstream 4` and `GCFPE-MGMT-10 downstream 3`. Those
+> came from a throwaway prototype that made two errors `closure.py` does not: it counted
+> **boundaries** — `NATHAN_TERMINAL_RETURN`, `ORIGINAL_NATIVE_STAGE` — as downstream consumers,
+> and it counted a prompt's **self-edges**. A terminal return to Nathan is not a consumer, and
+> overstating it inflates the blast radius of every prompt in the corpus.
+>
+> The point is not the arithmetic. **The design was validated against its own author within
+> minutes of the script existing** — which is precisely the argument for `closure.py` being a
+> script rather than an instruction in a prompt body, and precisely `DERIV-001`: a fact a
+> machine-readable source already carries is generated, never typed.
 
 **The graph part is the interface contract, so "did the interface move?" is a diff on one JSON
 file.**
@@ -632,7 +644,7 @@ to execute; stage 0 is the only one complete.
 | stage | what | output | risk |
 |---|---|---|---|
 | **0** | Answer the three decisions in §10 | **answered 2026-09-22; D-number not yet landed** | none |
-| **1** | Modification format, template, `modification_validate.py`, `closure.py`, and the triage prompt | 3 files in the repo, one PR | low — additive, nothing depends on it yet |
+| **1** | Modification format, template, `modification_validate.py`, `closure.py`, and the triage prompt | 5 files | **DONE** 2026-09-22 — 13/13 injected regressions caught; nothing governed touched |
 | **2** | Author the new prompt body: spine + three modes | the new `GCFPE-MGMT-10` body | **highest** — it is a selected release member |
 | **3** | Reconcile graph part and registry row to the new body; close the six-inputs-vs-one contradiction (RC3); remove the retired batch method (RC2) | graph parts + registry, rebuilt not hand-edited | medium — must use `glow-graph-contract` |
 | **4** | **Pilot on one real, small, already-known change** end to end, all three modes | one completed Modification | low — chosen small on purpose |
