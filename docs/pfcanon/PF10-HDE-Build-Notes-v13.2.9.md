@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
-**Name:** PF10-HDE-Build-Notes   
+**Name:** PF10-HDE-Build-Notes  
 **Version: v13.2.9**  
-Effective Date: Sep 17, 2026  
+Effective Date: Sep 22, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -165,21 +165,21 @@ Agents must apply PF10 in this order:
 
 ## Cross-references
 
- Inside this file, all references to PF documents MUST be **titles-only** (for example “HDE-Phased Epics”, “Glow QA Guide”), never file names or version numbers in the body text.
+Inside this file, all references to PF documents MUST be **titles-only** (for example “HDE-Phased Epics”, “Glow QA Guide”), never file names or version numbers in the body text.
 
 When editing or extending this file, ChatGPT sessions must:
 
-* Not restate PF content here.
-
+* Not restate PF content here.  
+    
 * Link by **document title and section only**.
 
 # 1\) TEMPLATE
 
 TEMPLATE Addendum Entry (do not edit/remove)  
- \<number\>. \<short, action-oriented title\>
+\<number\>. \<short, action-oriented title\>
 
- Timestamp: \<mmddyy hh:mm\> (autofill from system info)  
- Details: \<specific information to drain to canon, its origin, and any evidence available\>
+Timestamp: \<mmddyy hh:mm\> (autofill from system info)  
+Details: \<specific information to drain to canon, its origin, and any evidence available\>
 
 ## **1.1 Addendum Index**
 
@@ -195,7 +195,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 * 2.10 HDE-EPIC040-PR02-F03 — Existing Serializer Manifest Binding Refresh  
 * 2.11 HDE-EPIC040-PR02 — PR Work-Unit Lineage Review v1.0  
 * 2.12 HDE-EPIC040-PR03-R02 — Bind Executing Mechanics to the Admitted Release  
-* 2.13 HDE-EPIC040-PR03 — PR Work-Unit Lineage Review v1.0
+* 2.13 HDE-EPIC040-PR03 — PR Work-Unit Lineage Review v1.0  
+* 2.14 Specification format authority  
+* 2.15 HDE-EPIC040-PR04-F01 — Truthful Non-Admitted Gate Outcome for the PR04-to-PR06 Interval
 
 # **2\) Numbered Addenda**
 
@@ -339,7 +341,7 @@ The approved HDE-EPIC040 Specification remains the sole native baseline for IA-1
 Later drainage is complete only when the applicable owner records source-specific evidence:
 
 | Decision | Permanent home | Minimum completion record |
-| ----- | ----- | ----- |
+| :---- | :---- | :---- |
 | C040-01 | **HDE Build Checklist — Separation**, phase Notes | Actual revised source identity; Notes aligned with explicit `Done` rows; confirmation that no task or subtask status, acceptance or HDE-EPIC040 scope changed |
 | C040-02 | **HDE Schemas & Artifacts** §0.1 and its stored identity | Actual revision-history basis; resulting aligned identity/header; confirmation of metadata-only treatment or a separately routed substantive ADR |
 | C040-03 | **HDE Mechanics Guide** §0.1 and its stored identity | Actual revision-history basis; resulting aligned identity/header; confirmation of metadata-only treatment or a separately routed substantive ADR |
@@ -422,7 +424,7 @@ Timestamp: 090926 04:43 UTC
 The Product Owner reports that C040-01 through C040-04 were resolved in flight by PO action. Subsequent read-only inspection of the current controlled Markdown documents, selected through Glow / Core Docs / PFCanon, confirms that each of the four recorded conflict conditions has been corrected. Attribution to PO action comes from the PO's explicit instruction; the inspection independently establishes the resulting document state, not an unobserved edit author or complete revision history.
 
 | Conflict | Source and observed correction | Current disposition |
-| ----- | ----- | ----- |
+| :---- | :---- | :---- |
 | C040-01 | HDE-Build Checklist — Separation, Phase III Notes: HDE-SEPA001 through HDE-SEPA004 explicitly retain their recorded Done statuses and scoped qualifications. The Notes no longer call HDE-SEPA003 and HDE-SEPA004 extracted non-done rows. | Prior Thoth-approved decision preserved; recorded Notes/status conflict resolved. |
 | C040-02 | HDE-Schemas & Artifacts, stored Markdown filename and front-matter Version now agree. | Prior Thoth-approved decision preserved; recorded filename/body version discrepancy resolved. |
 | C040-03 | HDE Mechanics Guide, stored Markdown filename and front-matter Version now agree. | Prior Thoth-approved decision preserved; recorded filename/body version discrepancy resolved. |
@@ -454,7 +456,7 @@ Details:
 ### Exact approval and source lineage
 
 | Object | Actual identity and decision |
-| ----- | ----- |
+| :---- | :---- |
 | Approved Plan | HDE-EPIC040-implementation-plan-v2.1.md; HDE-EPIC040-IMPLEMENTATION-PLAN v2.1; libfile\_11c992cda3f0819199827e86584e41f1; SHA-256 10732f9338b209e3ce19e81936119e47c9551ea912298a27c731c9e60e2a61be |
 | Exact approving review | HDE-EPIC040-implementation-plan-review-v2.1.md; HDE-EPIC040-IMPLEMENTATION-PLAN-REVIEW v2.1; libfile\_b85b81651a508191abdfd8f81803caf8; APPROVE by Isis-50, 2026-09-09T13:36:43Z; no remaining material redline |
 | Original C040-06 decision | APPROVED alternative A exactly by Isis-50 at 2026-09-09T11:48:08Z in HDE-EPIC040-IMPLEMENTATION-PLAN-REVIEW v2.0, libfile\_aecae34a83e88191a205d22fd0348b62, §§7–8, against exact Plan v2.0 and original ADR v1.0 |
@@ -492,7 +494,7 @@ No response weight, cap, formula, rounding, band threshold, signal ID, category 
 #### Complete approved thirty-six-row catalog assignment
 
 | Channel | Gates | Gate-derived Center set | circuit\_primary | substream | Channel-membership source |
-| ----- | ----- | ----- | ----- | ----- | ----- |
+| :---- | :---- | :---- | :---- | :---- | :---- |
 | 01-08 | 1, 8 | g, throat | individual | knowing | Module 2, physical PDF page 38, printed page 15 |
 | 02-14 | 2, 14 | g, sacral | individual | knowing | Module 2, physical PDF page 38, printed page 15 |
 | 03-60 | 3, 60 | root, sacral | individual | knowing | Module 2, physical PDF page 38, printed page 15 |
@@ -537,7 +539,7 @@ The first Gate is numerically lower than the second even where the original sour
 #### Complete retained 64-Gate/Center facts
 
 | Center | Gate IDs |
-| ----- | ----- |
+| :---- | :---- |
 | ajna | 4, 11, 17, 24, 43, 47 |
 | ego | 21, 26, 40, 51 |
 | g | 1, 2, 7, 10, 13, 15, 25, 46 |
@@ -555,7 +557,7 @@ Every Gate fact is supported by the corresponding PF11 Gate header, with complet
 For one fixed canonical Channel, each two-character presence string means lower endpoint followed by higher endpoint. 10 means only the lower endpoint; 01 means only the higher. This is not a Gate-mask serialization and does not create numeric scoring inputs.
 
 | Case | A endpoints | B endpoints | State | Full-Channel owner before pair normalization |
-| ----- | ----- | ----- | ----- | ----- |
+| :---- | :---- | :---- | :---- | :---- |
 | CS-01 | 00 | 00 | none | absent |
 | CS-02 | 00 | 10 | none | absent |
 | CS-03 | 00 | 01 | none | absent |
@@ -584,7 +586,7 @@ This table expands the existing PF01 predicates into an exhaustive regression or
 The following is the retained original ADR source ledger, not a claim that this preparation repeated the research. Its exact row/page bindings and qualifications remain part of the approved decision. Current technical sources were independently re-established for Review v2.1; the original PDF/image and PO research inspections remain attributed to their actual source authors and Review v2.0.
 
 | Ref | Exact source and access identity | What it proves / limitation |
-| ----- | ----- | ----- |
+| :---- | :---- | :---- |
 | PF08 | PF08 — Human Design System, controlled Markdown Drive 1BhLsOTIliAyeP7ZQgHT2uvm2Ym\_QmTK7 | Complete Channel-pair/Center-group corroboration from the designated doctrinal root; transformed source, not an original scanned Ra manuscript |
 | PF11 | PF11 — The Rave I Ching, controlled Markdown Drive 1Ou6zy\_vm\_6jMQSP1Znwrc7\_3ER1YQAQy | Gate endpoint, Center and harmonic/Channel facts; individual Gate circuit captions are not mechanically inherited by every incident Channel |
 | RAVE | Rave ABC 2 3 6 — Level I Student Modules, Drive 1jDumjx09Ybta84GM9xXxkuaLN1NTGj6b; Library libfile\_afa9424479148191a4138ce525ddd91d | Theresa Blanding training derivative based on Ra Uru Hu teaching; original pages/diagrams inspected, not falsely presented as a direct Ra transcript |
@@ -633,7 +635,7 @@ Before-state mutation expectations remain 32 affected rows, 24 primary-field cor
 ### Permanent drainage targets and owners
 
 | Home | Bounded content | Existing owner / completion evidence |
-| ----- | ----- | ----- |
+| :---- | :---- | :---- |
 | HDE-Schemas & Artifacts §2.1, topology catalogs / Channels | Broad primary-group meaning, full 36-row classification/topology table, Gate-derived Center sets, source-specific provenance and exceptions; no schema expansion beyond the approved existing vocabulary | Governed HDE-Schemas & Artifacts maintainer through separately authorized Canon maintenance. Record actual revised controlled source identity and exact placement, table completeness, metadata/schema boundary preservation and approved-decision lineage. |
 | HDE-Math-Spec §§6.1–6.2 | Existing-predicate sixteen-case conformance clarification, single Channel classification, normalized full-owner attribution and no independent HG contribution; route static taxonomy to its owning home | Governed HDE-Math-Spec maintainer through separately authorized Canon maintenance. Record actual controlled source revision and affected clauses; demonstrate no formula/response/weight/rounding/public-contract change. |
 
@@ -672,7 +674,7 @@ The current PR-40 contract used for onward routing is `PR-40 — Review PR Work-
 ### **Retained decisions and requirements**
 
 | Input | State and verified SHA-256 |
-| ----- | ----- |
+| :---- | :---- |
 | PR01 Instruction v2.0, `libfile_68be4bc4c4b88191aab5f5c7062c774b` | INSTRUCTION\_READY; `dc556774202196b7d94f09870ff5b0d2c3fc47195e997f071ff4897ffb39e9fa` |
 | Detailed Plan v1.1, `libfile_7960d01d117881919c0004545ae3a4d7` | Original AWAITING\_PO\_PROCEED body preserved; `a77d453aa2a8b50b8e559cb8f6e5e2098f667760802366646f539a772769916e` |
 | Implementation Result v1.0, `libfile_dbc2c204e99c8191a4179b022697bb00` | Historical MERGE\_PENDING checkpoint preserved; `5dc65f1a775f34fb92d9afa79b3d788258b2f6daedaf1df52657052f6f7b8551` |
@@ -703,7 +705,7 @@ This is local data/schema contract delivery only. It does not claim PR03/PR04 ca
 Direct review of the changed implementation and its dedicated test homes confirms the intended boundaries:
 
 | Area | Reviewed delivery and adverse coverage |
-| ----- | ----- |
+| :---- | :---- |
 | F07 / loader | Duplicate-aware raw JSON handling; canonical-byte/schema/relational checks; strict numeric/type/domain checks; source capture/recheck; exact channel/config relations; explicit ledger-only aliases. Tests cover duplicate/noncanonical input, unsafe roots, schema references, source races, invalid Gate forms, unknown/duplicate Gate IDs, and forbidden authoritative aliases. |
 | F08–F12 / selected-root projections | Registry report, config-artifact and FE/BE bundle paths derive from selected captured sources; paired bundles validate before publication and checks are read-only. Tests cover two-root isolation, stale/missing primary refusal, consumer-schema validation, paired rollback, destination races, symlink refusal, and post-replacement conflict preservation. |
 | F13–F14 / Gate integration | The canonical gate retains `EXPECTED_SET_RULES`; the Channel-Gate path is subject to numeric endpoint/order validation, while unrelated set behavior remains separately covered. Arrays and canonical-gate tests include reversed/noncanonical, schema-pin, identity-substitution, count-drift, raw duplicate-key and type-coercion refusals. |
@@ -721,7 +723,7 @@ This review relies on actual current-head source retrieval, path/proof/index con
 ### **Epic, task, and status effects**
 
 | Point | Commit / tree | Verified fact |
-| ----- | ----- | ----- |
+| :---- | :---- | :---- |
 | Original base | `9065e6f0c01ad82a65c78687cd6c55e26ca33a1f` / `e07c4e4297c75fe83e0f286aa1cee46ffca6c62e` | Original PR base |
 | Initial branch commit | `924ae36a0bfe320f81fc9b6e4fd3891436096f27` / `543ea921385410c6eda57404b8038b2d90f896e7` | Initial tested/published candidate |
 | Corrected reviewed/tested head | `75ddaf2c94c2190c6b9d6a1e6e9894ba4591e950` / `529306a74268f2a46765bf40defdae49026d103e` | Token-reader repair included; final CI and current-head reviews apply here |
@@ -767,7 +769,7 @@ No unresolved attributable defect, required-evidence gap, or later-main divergen
 ##### **5.1 Requirement/proof completion**
 
 | Proof group | Completion basis |
-| ----- | ----- |
+| :---- | :---- |
 | T01–T03 | Exact 36-row direct comparison, unchanged 108 metadata values, closed Channel schema, loader/catalog/alias tests, Gate-order/arrays/canonical-gate adverse cases |
 | T04–T07 | Exact mechanics structure/defaults/profiles/signals/memberships/category weights/sources, closed schemas, result-contract and strict-domain tests |
 | T08–T10 | Selected-root report/config/bundle source review; check-mode, paired publication, race/recovery, generated-output and updater-convergence tests; governed companions and index/proof presence |
@@ -817,7 +819,7 @@ The earlier rejected RS-20 review and rejected PF10 addendum are historical and 
 ### 2\. Exact approval and source lineage
 
 | Role | Exact source |
-| ----- | ----- |
+| :---- | :---- |
 | Rescope request reviewed | `HDE-EPIC040-PR02-rescope-proposal-v1.0.md`, pending original proposal: [https://drive.google.com/file/d/1nbkt7F4td7keMifg582PFiscWna5oRkH/view?usp=drivesdk](https://drive.google.com/file/d/1nbkt7F4td7keMifg582PFiscWna5oRkH/view?usp=drivesdk) |
 | Native decision | `HDE-EPIC040-PR02-rescope-review-v2.0.md`; `APPROVE` by the Product Owner-assigned continuing whole-change HDE-EPIC040 Implementation Agent; created 2026-09-13; exact Drive identity returned with the RS-20 result |
 | Approved Specification | `HDE-EPIC040-specification-v1.1-approved.md`; Thoth-17 `APPROVE`, 2026-09-08T13:23:24Z: [https://drive.google.com/file/d/11N2WhmgAf-xpSODZdAGYobJN-0F2yqt-/view?usp=drivesdk](https://drive.google.com/file/d/11N2WhmgAf-xpSODZdAGYobJN-0F2yqt-/view?usp=drivesdk) |
@@ -860,7 +862,7 @@ The approved requirement text is unchanged. The overlay changes only the impleme
 ### 5\. Work-unit and dependency effects
 
 | Unit | Effect |
-| ----- | ----- |
+| :---- | :---- |
 | PR01 / PR \#403 | Accepted and final. No rerun, reopening, repair, or new acceptance is authorized. |
 | PR02 / PR \#404 | Resume the same suspended work after verified drain. Implement the explicit 42-member owning-schema overlay and ordinary in-scope repairs in the existing PR; do not create another PR, workspace, Plan, instruction, or Proceed. |
 | PR03 | Still not executed and still depends on accepted PR02. Pure Gate mechanics and intrinsic identity scope are unchanged. |
@@ -889,7 +891,7 @@ No open review thread is declared resolved by this addendum. Review-thread dispo
 ### 7\. Alternatives and decision rationale
 
 | Alternative | Disposition |
-| ----- | ----- |
+| :---- | :---- |
 | Add the owning Gate schema as manifest-bound member 42 and execute its existing validator | Approved. This is the smallest complete correction satisfying schema ownership, same-root capture, exact admission, and fail-closed behavior. |
 | Keep 41 members and rely on handwritten Gate checks | Rejected. It cannot prove the owning schema executed and conflicts with the no-alternate-validator contract. |
 | Load the Gate schema outside the captured manifest-bound source set | Rejected. It creates unbound authority and breaks source/payload identity. |
@@ -907,7 +909,7 @@ Rollback restores a coherent PR02 loader/Gate/test set and leaves the previously
 ### 9\. Carried Canon-conflict register
 
 | ID | Carried decision/state |
-| ----- | ----- |
+| :---- | :---- |
 | C040-01 | `CANON_RECONCILIATION / APPROVED` by Thoth-17, 2026-09-08T13:23:24Z; source predicate resolved; PF10 Addenda 2.2/2.4 retained. |
 | C040-02 | `CANON_RECONCILIATION / APPROVED` by Thoth-17, same decision; PF12 identity correction history and Addenda 2.2/2.4 retained. |
 | C040-03 | `CANON_RECONCILIATION / APPROVED` by Thoth-17, same decision; PF14 identity correction history and Addenda 2.2/2.4 retained. |
@@ -964,7 +966,7 @@ PR01 and merged PR \#403 remain accepted and final. No accepted PR is rerun or r
 ### **Exact decision and source lineage**
 
 | Role | Exact source |
-| ----- | ----- |
+| :---- | :---- |
 | Reviewed request | `HDE-EPIC040-PR02-F02-RESCOPE-REQUEST` v1.0, SHA-256 `cbfe94dd0530a6dbc052de5e9c9e67ddce8f1a878a9d16d1726cd53234d11b38`: [https://drive.google.com/file/d/1nlCOzR3y9QvyynxFIFt9KU6U3urdUpCW/view?usp=drivesdk](https://drive.google.com/file/d/1nlCOzR3y9QvyynxFIFt9KU6U3urdUpCW/view?usp=drivesdk) |
 | Resumed implementation Result | `HDE-EPIC040-PR02-PR-IMPLEMENTATION-RESULT` v2.0, `RESCOPE_PENDING`, SHA-256 `33061285197b364a85d742a8faab36e839233df149be3859956d2d42bf06ebd2`: [https://drive.google.com/file/d/16uYvir9dGnz8rp8fzoj1v\_y67cQ\_Wyc1/view?usp=drivesdk](https://drive.google.com/file/d/16uYvir9dGnz8rp8fzoj1v_y67cQ_Wyc1/view?usp=drivesdk) |
 | Native decision | `HDE-EPIC040-PR02-F02-RESCOPE-REVIEW` v1.0, `APPROVE`, by the Product Owner-assigned continuing whole-change HDE-EPIC040 Implementation Agent, 2026-09-13 |
@@ -1000,7 +1002,7 @@ For HDE-EPIC040-PR02 only, the following requirements apply together with the ex
 The approved Specification and requirement wording remain unchanged. The overlay adds implementation and evidence needed to satisfy these existing obligations:
 
 | Requirement | F02 effect |
-| ----- | ----- |
+| :---- | :---- |
 | `K040-REQ-006` | The single immutable manifest-bound active configuration includes the complete first-party implementation closure required for active admission; no partial or unbound implementation source qualifies. |
 | `K040-REQ-007` | The strict schema-loaded immutable admission boundary verifies that its four named already executing implementation modules are equivalent to their captured, manifest-bound sources before returning a bundle. |
 | `K040-REQ-008` | Stale bytecode, replaced source, missing provenance, missing helper members, origin mismatch, compilation mismatch, or code mismatch fails closed without fallback or a returned active handle. |
@@ -1013,7 +1015,7 @@ The approved Specification and requirement wording remain unchanged. The overlay
 ### **Work-unit and dependency effects**
 
 | Unit | Effect |
-| ----- | ----- |
+| :---- | :---- |
 | PR01 / PR \#403 | Accepted and final. No rerun, reopening, correction, or new acceptance. |
 | PR02 / PR \#404 | The same engineer completes F01, F02, and ordinary in-scope repairs coherently in the existing branch and draft PR under the original Proceed. No replacement Plan, Instruction, workspace, branch, PR, or Proceed. |
 | PR03 | Dependency and mechanics scope are unchanged. It consumes only an accepted PR02 bundle and adopts the effective 44-member complete-fixture contract where applicable. |
@@ -1058,7 +1060,7 @@ The explicit detailed-Plan limitation on process-death atomicity, multi-file ato
 ### **Review findings and owners**
 
 | Finding | Current authority and owner |
-| ----- | ----- |
+| :---- | :---- |
 | `3997320377` / `3997320916` | F01 authority is approved and drained in PF10 §2.7. The PR02 engineer owns completed schema implementation and corrected-code proof. |
 | `3997320380` | Preserve the existing symlink correction. Final current-head disposition remains with the repository review owner. |
 | `3997320917` | Preserve the bounded inter-read correction and the approved non-atomicity limitation. Corrected-code proof remains with the engineer and reviewer. |
@@ -1072,7 +1074,7 @@ No review thread is declared resolved by this addendum. Historical tests and CI 
 ### **Alternatives and rationale**
 
 | Alternative | Disposition |
-| ----- | ----- |
+| :---- | :---- |
 | Four-module retained-code/compiled-captured-source comparison plus two manifest-bound helper members | Approved as the smallest bounded source/execution closure that preserves existing owners and the immutable release-bound design. |
 | Import-time disk hash | Rejected. A valid stale bytecode cache can execute A while the disk hash and admitted manifest represent B. |
 | Duplicate serializer and copied category order in the loader | Rejected. It changes ownership to avoid dependency closure and does not establish executing-code identity. |
@@ -1094,7 +1096,7 @@ The actual 15-member release remains unchanged and incomplete for this Epic. PR0
 ### **Carried Canon-conflict register**
 
 | ID | Carried decision/state |
-| ----- | ----- |
+| :---- | :---- |
 | C040-01 | `CANON_RECONCILIATION / APPROVED` by Thoth-17, 2026-09-08T13:23:24Z; PF10 §§2.2/2.4 retained. |
 | C040-02 | `CANON_RECONCILIATION / APPROVED` by Thoth-17; PF12 identity history and PF10 §§2.2/2.4 retained. |
 | C040-03 | `CANON_RECONCILIATION / APPROVED` by Thoth-17; PF14 identity history and PF10 §§2.2/2.4 retained. |
@@ -1125,7 +1127,7 @@ PR01 and merged PR \#403 remain accepted and final. No accepted PR is rerun or r
 ### **Exact decision and source lineage**
 
 | Role | Exact source |
-| ----- | ----- |
+| :---- | :---- |
 | Reviewed request | `HDE-EPIC040-PR02-F03-RESCOPE-REQUEST` v1.0, SHA-256 `3939035a85b3697d2816e9d0b799326d746b0b878f2aa08fce7c386eca1a294f`: [https://drive.google.com/file/d/1iKB5nFqGNXM8fbAZiC2tItvP8nVA3LaZ/view?usp=drivesdk](https://drive.google.com/file/d/1iKB5nFqGNXM8fbAZiC2tItvP8nVA3LaZ/view?usp=drivesdk) |
 | Resumed Result | `HDE-EPIC040-PR02-PR-IMPLEMENTATION-RESULT` v3.0, `RESCOPE_PENDING`, SHA-256 `20523b967bb4ba266c5f223e78b4abc9ebef0afcef09a6513905774fb3d66518`: [https://drive.google.com/file/d/18yYnDiXGZWKLMLtH31ysn69Gr1hw-XeP/view?usp=drivesdk](https://drive.google.com/file/d/18yYnDiXGZWKLMLtH31ysn69Gr1hw-XeP/view?usp=drivesdk) |
 | Native decision | `HDE-EPIC040-PR02-F03-RESCOPE-REVIEW` v1.0, `APPROVE`, by the Product Owner-assigned continuing whole-change HDE-EPIC040 Implementation Agent, 2026-09-13 |
@@ -1165,7 +1167,7 @@ This is a bounded in-flight implementation and evidence-maintenance correction w
 ### **Requirements and acceptance effects**
 
 | Requirement | F03 effect |
-| ----- | ----- |
+| :---- | :---- |
 | `K040-REQ-007` | The immutable admission boundary may retain F02's required provenance-bearing serializer wrapper while remaining exactly bound by the actual PR02 manifest. |
 | `K040-REQ-008` | Stale or mismatched wrapper/manifest identities continue to fail closed; the correction updates the owned binding rather than weakening refusal. |
 | `K040-REQ-009` | Source, configuration, exact manifest-byte, and release identities remain distinct and are recomputed from actual bytes. |
@@ -1179,7 +1181,7 @@ All other approved requirement and acceptance-criterion text, allocation, and co
 ### **Work-unit and dependency effects**
 
 | Unit | Effect |
-| ----- | ----- |
+| :---- | :---- |
 | PR01 / PR \#403 | Accepted and final. No rerun, reopening, repair, or new acceptance. |
 | PR02 / PR \#404 | After verified PF10 drain, the same engineer applies the one-existing-row refresh and owner-generated evidence convergence together with the preserved F01/F02 correction and ordinary repairs. No new Plan, Instruction, Proceed, workspace, branch, or PR. |
 | PR03 | Scope and dependency remain unchanged. It begins only after PR02 acceptance. |
@@ -1223,7 +1225,7 @@ The approved detailed-Plan limitation on process-death atomicity, multi-file ato
 ### **Review findings and owners**
 
 | Finding | Preserved authority and owner |
-| ----- | ----- |
+| :---- | :---- |
 | `3997320377` / `3997320916` | F01 authority is approved and drained. The PR02 engineer owns complete schema implementation and corrected-code proof; the repository review owner retains final thread disposition. |
 | `3997320380` | Preserve the existing symlink correction. Final current-head disposition remains with the repository review owner. |
 | `3997320917` | Preserve the bounded inter-read correction and explicit non-atomicity limit. Corrected-code proof and final disposition remain with the engineer and reviewer. |
@@ -1238,7 +1240,7 @@ All seven existing repository review threads remain unresolved at this decision 
 ### **Alternatives and rationale**
 
 | Alternative | Disposition |
-| ----- | ----- |
+| :---- | :---- |
 | Rebind the one existing serializer row and regenerate only owner-governed affected evidence | Approved. This is the smallest complete correction that satisfies F02 while preserving strict manifest identity, current roster size, writer ownership, and PR06 boundaries. |
 | Restore the 485-byte serializer wrapper | Rejected. It removes the top-level execution provenance required by approved F02 and reproduces `EXECUTION_PROVENANCE_UNAVAILABLE`. |
 | Keep the stale row and waive or narrow integrity checks | Rejected. It breaks exact source/manifest identity and turns a valid fail-closed gate into a bypass. |
@@ -1258,7 +1260,7 @@ The actual release remains the existing 15-member release. This approval changes
 ### **Carried Canon-conflict register**
 
 | ID | Carried decision/state |
-| ----- | ----- |
+| :---- | :---- |
 | C040-01 | `CANON_RECONCILIATION / APPROVED` by Thoth-17, 2026-09-08T13:23:24Z; PF10 §§2.2/2.4 retained. |
 | C040-02 | `CANON_RECONCILIATION / APPROVED` by Thoth-17; PF12 identity history and PF10 §§2.2/2.4 retained. |
 | C040-03 | `CANON_RECONCILIATION / APPROVED` by Thoth-17; PF14 identity history and PF10 §§2.2/2.4 retained. |
@@ -1286,7 +1288,7 @@ This review was performed read-only by the retained Product Owner-assigned whole
 ### 2\. Inputs, bases, and approved overlays
 
 | Role | Exact artifact / outcome |
-| ----- | ----- |
+| :---- | :---- |
 | PR instruction | [HDE-EPIC040-PR02 PR Work-Unit Instruction v1.0](https://drive.google.com/file/d/15XLW2D-E3Ke_dXKAtxIdytYErhIBz_Ki/view?usp=drivesdk), `INSTRUCTION_READY`, SHA-256 `429cda8e7f00bedc0509e9d00a16c72b37a49f5592054b2b8e069308e812047c` |
 | Detailed PR Plan | [HDE-EPIC040-PR02 PR Implementation Plan v1.0](https://drive.google.com/file/d/1iOcCUsOMNuofrPboOyry7c-FDJWASvHQ/view?usp=drivesdk), original Proceed preserved, SHA-256 `496488109e3fc080dd238145f28edf0a0824b5bb1ff068432e209813df9998e0` |
 | Final engineering checkpoint | [HDE-EPIC040-PR02 PR Implementation Result v4.0](https://drive.google.com/file/d/1rv9fHc5p8eW6AQFyNyCJ1xdHV_bdvMk4/view?usp=drivesdk), historical `MERGE_PENDING` before the later manual merge |
@@ -1298,7 +1300,7 @@ This review was performed read-only by the retained Product Owner-assigned whole
 The immutable Specification, Plan, Plan review, Instruction, detailed Plan, and original Proceed remain valid. The following are separate effective PF10 overlays, not rewrites of those bases:
 
 | Overlay | Approved and drained bounded effect |
-| ----- | ----- |
+| :---- | :---- |
 | F01 | [Review v2.0](https://drive.google.com/file/d/1rNSVietXHUCA8OG2xUWHeOHcQbFsUmKK/view?usp=drivesdk) and [addendum v2.0](https://drive.google.com/file/d/17-TV-9KeP0c0KmHuhogik_uyYXyBqNPV/view?usp=drivesdk): captured, manifest-bound owning Gate schema; intermediate synthetic roster 42\. |
 | F02 | [Review v1.0](https://drive.google.com/file/d/18JGk0EwtaA5_ZD3WWZHJmacK139utjWa/view?usp=drivesdk) and [addendum v1.0](https://drive.google.com/file/d/1I1O6_r4FVrE29m902lUqndR9uMXBiove/view?usp=drivesdk): executable-code equivalence for exactly four named modules; synthetic roster 44\. |
 | F03 | [Review v1.0](https://drive.google.com/file/d/1LXaVM3vdhigZMcrCXpVkELe3pJa8yzUB/view?usp=drivesdk) and [addendum v1.0](https://drive.google.com/file/d/1IFhTWWknjcpGasRCqF4hY8juh3HSPXRl/view?usp=drivesdk): one existing serializer manifest-row hash/size refresh and owned evidence convergence, preserving the actual roster at 15\. |
@@ -1308,7 +1310,7 @@ Current authority was independently resolved as the unique Markdown [PF10-HDE-Bu
 ### 3\. Actual landed lineage and attribution
 
 | Stage | Commit / tree / observation |
-| ----- | ----- |
+| :---- | :---- |
 | Accepted PR01 base | `3828d4b3454259841a3e48d13039dd1475754f2f` / `529306a74268f2a46765bf40defdae49026d103e` |
 | PR02 commit 1 | `3dda87853466fa18247654ffe5bb67561364b0f4` / `083a787c16a06328622cde0ca93f22508f16146b` |
 | PR02 commit 2 | `eed8a63807f573abc29de6f6d5ceac54f0c8da85` / `b0cc12ae82b597bd4f7f226b4812a8cf7dfa7a8d` |
@@ -1322,7 +1324,7 @@ The landing is a squash commit, so its commit identity differs from the reviewed
 The unit delivers the PR02 allocation of K040-REQ-001 through K040-REQ-013: strict captured-byte/source/manifest identity, actual local schema and relational validation, fail-closed complete-release admission, deep immutable bundle construction, the shared strict Gate normalizer, distinct configuration/source/manifest/release identities, owner-generated evidence, and exact lineage. It preserves PR01 catalog ownership and does not claim PR03–PR07 or OPS01 work.
 
 | Coverage area | Evidence and conclusion |
-| ----- | ----- |
+| :---- | :---- |
 | Admission, schemas, and Gate ingress | F01 makes `schemas/gates_v1.schema.json` captured/manifest-bound and executes the owning validator before active admission. Gate normalization and its malformed/duplicate/out-of-domain refusals are covered by the 663-pass targeted suite and repository review. |
 | Immutable fail-closed boundary | The merged code retains one capture/validation/identity pipeline, lexical symlink refusal, source-change checks, no partial or stale-success fallback, and recursive immutable returned structures. Existing partial 15-member release still refuses `INCOMPLETE_RELEASE_ROSTER`. |
 | Source/execution coherence | F02 covers only `registry_loader.py`, `serializer/canon.py`, `stable/sercanon.py`, and `categories/registry.py` using passive compilation versus retained executing code; it neither reloads modules nor claims historical imported-byte identity or universal runtime integrity. |
@@ -1336,7 +1338,7 @@ Synthetic 44-member admission proves only the approved fixture contract. PR06 re
 ### 5\. Findings, review state, and evidence limits
 
 | Finding | PR-40 disposition |
-| ----- | ----- |
+| :---- | :---- |
 | 3997320377 and 3997320916 — Gate schema | Addressed through approved/drained F01 and current-head repository disposition. |
 | 3997320380 — symlink | Addressed; lexical source-root protection and relevant adverse coverage retained. |
 | 3997320917 — inter-read mutation | Addressed within the bounded check mechanism; no stronger atomicity claim. |
@@ -1484,7 +1486,7 @@ The review applies the immutable Specification v1.1, Whole-Change Implementation
 ### 2\. Inputs and controlling lineage
 
 | Role | Authoritative record |
-| ----- | ----- |
+| :---- | :---- |
 | PR03 instruction | [HDE-EPIC040-PR03-PR-INSTRUCTION v1.0](https://drive.google.com/file/d/1Zj5BResRRxtGarmZ2d3sIAfIVeLD42rs/view?usp=drivesdk) — `INSTRUCTION_READY` |
 | PR03 detailed plan | [HDE-EPIC040-PR03-PR-IMPLEMENTATION-PLAN v1.0](https://drive.google.com/file/d/1wPpcIQkDLVNwdvK2ujfDpkssUh4KwAoO/view?usp=drivesdk) — original Proceed preserved |
 | Final engineering checkpoint | [HDE-EPIC040-PR03-PR-IMPLEMENTATION-RESULT v1.3](https://drive.google.com/file/d/1sZqXeBlLL2Nh5ByZzLlsNdSY5aTMufcv/view?usp=drivesdk), `MERGE_PENDING`, SHA-256 `27aee65c02281071cb9c1883074bc6866909a23769ee4970cb0623a48d22e580` — truthful pre-merge record |
@@ -1500,7 +1502,7 @@ PR01/\#403 and PR02/\#404 remain accepted-final dependencies. Their integration 
 Repository: `amthorn78/glow-hdengine-v2`; target: `main`; sole PR: [\#405](https://github.com/amthorn78/glow-hdengine-v2/pull/405).
 
 | Attribution item | Verified state |
-| ----- | ----- |
+| :---- | :---- |
 | Accepted baseline | `5b2fb8d70924a6710b6261fc0c93d3869fed6380`; tree `e43c2063599e7bc449f20d4ab045d32d95581bf4` |
 | Reviewed branch commits | `dd52ba0dc1224abd629a31d5618104dc5a605832` → `b33c41721ad2320f71c2cdaf00616e27d36945da` → `2badc3c5b87e40ddcc984865420e91a2f9695cd1` |
 | Reviewed candidate tree | `cbc6f35834253dcee3907bf4669bc7cdd1e396a2` |
@@ -1514,7 +1516,7 @@ The candidate is not a graph ancestor of the landed commit because GitHub squash
 ### 4\. Work-unit requirement and evidence coverage
 
 | Controlled obligation | Delivered and reviewed evidence |
-| ----- | ----- |
+| :---- | :---- |
 | Pure four-argument core / no legacy success path | `compute_core(member_a, member_b, mechanics_bundle, release_id)` is the canonical closure. The precomputed-score, `CoreConfig`, three-argument and directional legacy success paths were removed from successful PR03 behavior. |
 | Mechanics and identity | The landed scope supplies the 36-channel five-state classifier, 20 ordered integer signals, 10 ordered capped category scores/bands, intrinsic chart fingerprints, numeric-mask pair identity, and closed six-field `magic10_result.v1` result. Fixed G004 q values and category scores remained unchanged. |
 | Pure-boundary discipline | Core consumes the immutable admitted bundle and injected release ID; it does not load, select, repair, mutate, or replace inputs. No application, persistence, transport, cache, narrative, vendor, database, clock, randomness, environment, filesystem-loader, or I/O ownership was moved into core. |
@@ -1543,7 +1545,7 @@ The following are preserved, not waived:
 The complete register remains carried from the immutable Plan v2.1 §11, Plan Review v2.1 §6, PR03 Instruction/Plan, Result v1.3, and effective PF10.
 
 | Entry | Preserved decision |
-| ----- | ----- |
+| :---- | :---- |
 | `C040-01`–`C040-04` | `CANON_RECONCILIATION`, approved by Thoth-17 at `2026-09-08T13:23:24Z` |
 | `C040-05` | `CANON_RECONCILIATION`, Isis-49 approved alternative A at `2026-09-09T03:57:16Z`; the legacy precomputed-score path remains removed and HDE-DIST008.1 remains separate. |
 | `C040-06` | `NEW_CANON`, Isis-50 approved alternative A at `2026-09-09T11:48:08Z`; the accepted 36-row taxonomy and Integration exceptions remain conformance-only, without new weights/formulas. |
@@ -1591,60 +1593,168 @@ Create only one complete PR04 `PR_INSTRUCTION` for the immutable Plan §6.4 boun
 
 ## 2.14 Specification format authority
 
-Specification formatting comes from referenced canon. A Specification becomes a permanent governed record, so its format belongs to the canon that governs it and is not a prompt's to define.
-
-Two distinct things govern each artifact below, and conflating them is what this addendum exists to prevent. **Content authority** establishes what the artifact may and may not contain. **Structure authority** establishes the shape it is written in. They are not always the same document.
+Specification formatting comes from referenced canon. A Specification becomes a permanent governed record, so its format belongs to the register it lands in and is not a prompt's to define.
 
 ### Binding
 
-| Artifact | Content authority | Structure authority |
-| :---- | :---- | :---- |
-| Epic Specification | PF04 §9.1.1 | PF27 — the HDE Epic record template, normative |
-| CRD Specification | PF04 §9.1.1 | PF27 — the HDE-CRD-Plan profile and its compact PF30 record contract |
-| Epic or CRD Implementation Plan | PF04 §9.1.1 | PF27 — the General Implementation Plan template, unless a more specific PF27 template controls the artifact class |
-| Specification delta | the canon governing the base it modifies | the canon governing the base it modifies |
-| Specification kickoff | PF04 §9.1.1 | the producing prompt, within the kickoff boundary below |
+| Artifact | Format authority |
+| :---- | :---- |
+| CRD Specification | PF30 — the CRD record contract and CRD record template |
+| Epic Specification | PF27 — the HDE Epic record template, normative |
+| Specification delta | the canon governing the base Specification it modifies |
+| Specification kickoff | the producing prompt may state its format |
+| Implementation plan | the producing prompt may state its format |
 
-PF27 is the project-wide home for plan and runbook template shape. Where PF27 and PF30 still name a Specification a Plan, the Specification is that artifact under its current name.
+The dividing line is permanence. A Specification is a permanent governed record and must match its register. A kickoff is transient scaffolding between two stages and an implementation plan is working direction; neither becomes the permanent record, so a prompt may carry their shape.
 
-**PF30 is the CRD register, not a structure home.** It owns persistent CRD identity, ID allocation, concise registration, recorded status, phase-block structure, record order and volume rules. It does not own reusable plan and runbook structures; PF30 assigns those to PF27 itself. PF04 §9.1.1 further holds that HDE CRD Records and HDE Phased Epics are historical and reference homes, and that the active workflow must not create, update or synchronize their entries. A prompt that resolved CRD Specification structure from PF30 would be reading a register that canon forbids the active workflow to write.
-
-### The kickoff boundary
-
-A kickoff is transient scaffolding between two stages. No canon defines its shape, so the producing prompt may state its field list. That permission is bounded by PF04 §9.1.1: a kickoff is a class-bound substantive handoff and carries no Specification, no Implementation Plan, no work-unit structure and no mutation authorization. A prompt-stated kickoff format that reaches any of those is out of scope for the artifact, whatever the prompt says.
-
-The kickoff is the only artifact in the table whose shape a prompt may carry. Where canon defines a structure, the prompt resolves it and does not restate it.
+A CRD Specification and an Epic Specification are Specifications, not Plans. Where PF27 and PF30 still name the corresponding artifact a Plan, the Specification is that artifact under its current name.
 
 ### Prompt obligations
 
-A prompt that produces a Specification, a Specification delta, or an Implementation Plan:
+A prompt that produces a Specification or a Specification delta:
 
-1. Resolves the governing canon at run time through its own PFCanon source contract, and cites the exact canon and section it resolved in the artifact it produces.
-2. May name a governing PF document, and names it by its canonical document name and section, never by a versioned filename. `PF27-Canon-Plan-Templates` is correct; `PF27-Canon-Plan-Templates-v2.0.4.md` is a defect. PF02 and PF04 already route by title without version numbers, and this addendum adds no prohibition beyond that.
-3. Declares no `schema_version` for a Specification, a delta, an Implementation Plan, or any other permanent governed record.
-4. Does not restate a governed artifact's section or field structure.
+1. Resolves the governing canon at run time through its own PFCanon source contract, and cites the exact canon and section it resolved in the artifact it produces.  
+2. Does not name PF30 or PF27 in its body. The binding lives here so it moves in one place rather than in every prompt.  
+3. Declares no `schema_version` for a Specification, a delta, or any other permanent governed record.  
+4. Does not restate a Specification's section or field structure.  
 5. Returns `SOURCE_RESOLUTION_ERROR` with the failed predicate and recovery owner when the governing canon cannot be resolved and read. It does not author against an assumed format, reuse a neighbouring artifact's token, or mint one.
 
 ### Retired vocabulary
 
 `glow-specification`, `glow-kickoff` and any other `glow-<kind>/<version>` token are retired as artifact schema identifiers. They are not a canon namespace, no canon defines them, and nothing validates against them. The thirteen-section GCFPE Specification structure is superseded for both classes; it matches neither register, and a Specification authored in it will not seat.
 
-These tokens appear in this section because this section retires them. Their presence here is a retirement notice and is not a definition, and a search that finds them here has not found canon that defines them.
-
 PFCanon's schema convention is namespaced to the PF that defines the artifact.
 
 ### Reference posture
 
-Cite PF documents by canonical document name and section in a prompt body, and in any reference whose purpose is to route a reader to current canon. Naming the document is expected; pinning its file version is the defect. Versions move, and a pinned version is stale the moment they do. Each PF document carries its canonical name in its own header, which is the name to use.
-
-This is a routing rule, not a records rule. Run artifacts, reports, ledgers and historical evidence retain the exact resolved version and identity of what they actually read, as PF04 requires of use and provenance records. Recording what was resolved is not pinning it, and stripping those records does not serve this rule.
+Cite PF documents by name and section only. Do not pin a PF file version in a prompt, artifact, plan, ledger, report, or addendum. Versions move, and a pinned version is stale the moment they do.
 
 ### Terminology
 
 Replace *CRD Plan* and *Epic Plan* with *CRD Specification* and *Epic Specification* in prompts, plans, ledgers, reports and controls. PF27 and PF30 adopt the same terms on their next revision.
 
-### Revision note
+## **2.15 HDE-EPIC040-PR04-F01 — Truthful Non-Admitted Gate Outcome for the PR04-to-PR06 Interval**
 
-This addendum was first issued with a binding table that routed CRD Specification structure to PF30 and left the Implementation Plan's structure to the producing prompt. Both were wrong: PF30 disclaims reusable structures in favour of PF27, and PF27 carries a General Implementation Plan template. The reference posture also read as an unqualified ban on PF versions in any document, which conflicted with PF04's requirement that use and provenance records retain exact resolved identities. It also forbade prompts from naming PF27 or PF30 at all, which is stricter than PF02 and PF04, both of which route by title and forbid only version numbers; prompts may name the governing document by its canonical name. Anything authored against the earlier table should be rechecked against this one. No prompt body needs to change on account of this revision, because prompts resolve the binding here rather than restating it.
+### **Status and authority**
 
-\<eof\>
+`HDE-EPIC040-PR04-F01-RESCOPE-REVIEW v2.0` approves a bounded implementation overlay for finding `PR04-F01` against the immutable HDE-EPIC040 Specification v1.1, Implementation Plan v2.1, approving Plan Review v2.1, and PR04 Instruction v1.0.
+
+The approved bases remain immutable and valid. The overlay does not replace or revise an approved base, create a Product Owner Proceed, reopen accepted PR01, PR02 or PR03, change the whole-change dependency order, or authorize implementation beyond the stated delta. The overlays effective in PF10 §§2.7, 2.9, 2.10, 2.12 and 2.13 remain approved within their exact scopes and are not reopened; §2.10 in particular remains scoped to HDE-EPIC040-PR02 alone.
+
+No Product Owner Proceed exists for HDE-EPIC040-PR04. The overlay confers none, and confers no merge, PF09, QA, acceptance or closure authority.
+
+### **Evidence-supported boundary**
+
+PR04's approved completion condition requires its integration paths and proofs to pass actual code review, security review and ordinary CI, with no inherited CI exception. PR04's approved behavior requires deleting every legacy success path — `compat_public` hash scoring, the `ts_v0` band and UID-only substitutes — and consuming only the admitted mechanics bundle through the admission owner in `engine/config/registry_loader.py` established by PF10 §2.12.
+
+The actual repository release is the incomplete fifteen-member `catalog/manifest.json`, against the forty-four-member `ADMITTED_RELEASE_ROSTER` pinned by the import-time invariant in `engine/config/registry_loader.py`. `load_active_mechanics_bundle()` refuses with `SchemaValidationError INCOMPLETE_RELEASE_ROSTER`, and `_validate_admitted_manifest` raises on any strict subset. Complete release admission is HDE-EPIC040-PR06's owned work, as PF10 §2.13 independently records. Between PR04's consumer switch and PR06's admission there is therefore no real CLI, HTTP or evidence-generator success path.
+
+Three ordinary-CI chains execute exactly such live success paths and are selected for every PR04 candidate: the rails lane through `ci/jobs/rails_open_conformance.yml`; the release lane through `tools/evidence/build_release_attestation.py`, its gate wrapper `tools/evidence/run_sanity_pipeline_gate.py`, and release-sanity stages 04 and 05; and the full-validation supplemental roster, which a PR04 candidate selects because its plan changes `ci/checks/classify_ci_changes.py`.
+
+A PR04-shaped change confined to PR04's own approved loci — `engine/runtime/public.py` banding through the admission owner instead of `ts_v0`, and `adapter/http_reader.py` implementing the contracted Reader `POST` success path at its existing declared route — turns all three chains red. Every failure observed falls inside the enumerated set below or inside loci PR04 already owns.
+
+This is a bounded mismatch between an approved completion condition and approved loci. It is not a defect in PR01 through PR03, which passed these gates lawfully while their consumers still used `ts_v0`. It changes no product objective, requirement text, exclusion, mathematics, taxonomy, public contract, identity formula, work-unit order or Product Owner scope.
+
+### **Approved bounded overlay**
+
+PR04's approved loci extend to the files enumerated below, for one purpose only: the affected gates express a truthful, explicit non-admitted outcome instead of an ambiguous failure, and ordinary CI accepts that one outcome while the active release is not admitted.
+
+1. **Explicit non-admitted outcome, never a pass.** When the active release is not admitted, the affected gates and release-sanity stages each record an explicit `RELEASE_NOT_ADMITTED` outcome. That outcome is never `PASS`, never `top_level_pass: true`, and never a frozen-byte substitute presented as a live result. Frozen captures remain frozen and retain their existing nonclaims.  
+2. **The attestation withholds its success value.** `tools/evidence/build_release_attestation.py` continues to refuse, emits no success attestation and no `PR06R_B_FINAL_PASS`, and writes its existing canonical failure receipt under `hde.release_attestation.failure.v1` carrying a distinct code — `release_not_admitted` — and its stage. The receipt's `code` and `stage` are open lowercase-token strings, so this requires no PF12 schema or wire-value change.  
+3. **Bounded ordinary-CI acceptance with an explicit end.** `.github/workflows/ci.yml` and `ci/jobs/rails_open_conformance.yml` accept that one explicit outcome as non-blocking, keyed on the outcome itself and on the observed non-admitted state of the active release, and on nothing else. The acceptance is conditioned on a runtime-observable fact rather than a fixed window, so it self-extinguishes: once PR06 admits the complete forty-four-member roster the branch is never taken.
+
+### **Bounded implementation and test loci**
+
+Production and CI configuration, nine files:
+
+* `tools/evidence/generate_open_rails_abba_proof.py` — the rails lane invokes it directly, so the discrimination lives in this file; it is also reached inside release-sanity stages 04 and 06\.  
+* `tools/evidence/generate_a7_transport_proofs.py` — its `capture()` hard-requires `POST /reader` → 405 and `GET /reader` → 200, and its live `build()` is release-sanity stage 05\.  
+* `tools/evidence/generate_determinism_gate_proofs.py` — release-sanity stage 04 calls its `build()`, which emits a live Reader envelope and runs a real CLI `showcompat --dump-reader` subprocess.  
+* `tools/evidence/run_sanity_pipeline.py` — its log renderer collapses every stage status to `OK` or `FAIL` and the summary to `PASS` or `FAIL`; both binary collapses admit the third state, and stages 04 and 05's in-process validators live here.  
+* `tools/evidence/run_sanity_pipeline_gate.py` — `build_release_attestation.py` invokes this wrapper rather than the pipeline directly, and it requires byte equality with a log in which all fifteen stages read `:OK` with `first_failed_stage:NONE` and `summary:PASS`. It is a second, independent pass pin between the stages and the attestation.  
+* `tools/evidence/build_release_attestation.py` — bounded by the ownership limit below.  
+* `tools/evidence/run_canonical_json_gate.py` — its `--check-only` result is a direct predicate input to the rails-lane gate through `canonical_gate()` and the `canonical_gate_success` predicate, and it is likewise invoked by the determinism builder. Its existing treatment as a PR04 necessary dependent, validating against the frozen generated hashes, is unchanged and unaffected; this overlay adds only the permission to express the non-admitted outcome in this file where implementation establishes it must live there.  
+* `.github/workflows/ci.yml` — the rails and release lane steps accept the one explicit outcome under the stated condition.  
+* `ci/jobs/rails_open_conformance.yml` — the job definition's step and `proves` list match the gate's corrected behavior. The job-definition runner parses this shape natively and needs no change.
+
+Test homes that pin the above and lie outside the work unit's owned test homes, four files:
+
+* `tests/evidence/test_sanity_pipeline.py` — pins the gate wrapper's byte-exact pass log and the rendered status tokens.  
+* `tests/evidence/test_open_rails_abba_proof.py` — asserts `top_level_pass is True` in its positive matrix.  
+* `tests/evidence/test_rails_ci_workflow_integration.py` — pins the workflow's rails-lane shape and asserts equality between the exact set of test targets named in the workflow and a fixed set.  
+* `tests/transport/test_a7_transport_proofs.py` — calls the live A7 build.
+
+Governed evidence affected by the corrected renders is regenerated by its existing owning writers and is never hand-edited. This includes the tracked `audit/gates/sanity_pipeline/sanity_pipeline.log` with its path-proof companion, and the six outputs of the determinism builder: `audit/gates/parity/reader_cli/ab.json`, `audit/gates/parity/reader_cli/ba.json`, `audit/gates/parity/reader_cli/summary.json`, `audit/gates/determinism/abba.bytes`, `audit/gates/determinism/tworun_identity.sha256` and `artifacts/cards/a3/IDENTITY_OK.txt`. Regeneration through an owning writer is an evidence obligation and extends no loci. The release lane's clean-tree assertions remain in force.
+
+### **Binding conditions**
+
+The overlay is valid only as bounded by all four of the following.
+
+1. The explicit outcome is never a pass in any surface: never `PASS`, never `top_level_pass: true`, never a frozen-byte substitute presented as a live result.  
+2. The ordinary-CI acceptance keys on that one explicit outcome and on the observed non-admitted state of the active release. It never keys on a generic failure, a lane name, a job name or a time window, and it never accepts an unrelated failure in those lanes.  
+3. The acceptance is self-extinguishing by construction, conditioned on a runtime-observable fact. No later removal is owed, no unit receives scope for one, and no cleanup work unit or pull request is created.  
+4. No change to the `hde.release_attestation.v1` success schema or to the `PR06R_B_FINAL_PASS` wire value is authorized. Any such need is a separate PF12 canon decision for the governed PF12 maintainer and is not pre-authorized.
+
+Beyond these, no legacy success path is retained, the manifest is neither expanded nor activated, admission is neither bypassed, relocated nor weakened, no synthetic or test-only release is fed to a governed gate or to the attestation, no gate is converted to frozen-byte comparison while still emitting a pass, and no test is skipped, disabled or quarantined.
+
+### **Ownership limits**
+
+PR04's touch on `tools/evidence/build_release_attestation.py` transfers no attestation ownership from HDE-EPIC040-PR06. That touch is bounded to emitting the distinct non-admitted code on the existing failure-receipt path and to the withholding the builder already performs. Authority over the success attestation, the promoted roster, release identity, the manifest cut and the owning attestation validator remains PR06's.
+
+The distinction that bounds this overlay is what a change does to a gate, not where a file sits. Changes that alter gate semantics and what ordinary CI certifies as a passing candidate require this overlay. Changes that alter coherence registration — which lane a path selects — or that validate against an existing frozen capture do not, and remain ordinary necessary dependents of the approved work unit.
+
+### **Requirements and acceptance effects**
+
+The overlay rewrites no requirement and no acceptance criterion. It makes the existing completion condition satisfiable rather than altering it.
+
+| Requirement or criterion | Effect |
+| ----- | ----- |
+| `K040-REQ-012` | The affected gates and the attestation express the actual admission state through their existing owning writers, with no new evidence family and no fabricated passing snapshot. |
+| `AC040-08` | Evidence coherence holds across the interval: a non-admitted release yields an explicit non-admitted outcome and a canonical failure receipt, not an ambiguous failure or a false pass. |
+| PR04 completion, CI clause | Satisfiable on a truthful candidate. The requirement that all selected lanes pass on the exact candidate head is unchanged; no inherited CI exception applies and none is created. |
+
+All other approved requirement and criterion text, allocation and completion burden are unchanged. The overlay satisfies no later unit in advance.
+
+### **Work-unit, dependency and status effects**
+
+The dependency order `PR01 → PR02 → PR03 → PR04 → PR05 → PR06 → PR07 → OPS01` is unchanged.
+
+HDE-EPIC040-PR05 is covered by this overlay and requires no separate overlay and no new loci. PR05's owned loci classify to the lane union `evidence`, `product` and `release`; the release lane is where sanity stages 04 and 05 run; PR05 owns none of the enumerated files; and PR05 precedes PR06. PR05 inherits the condition through the release lane alone. Because the acceptance keys on the non-admitted state of the active release rather than on a particular candidate, it covers every candidate in the interval and extinguishes for all of them when PR06 lands.
+
+HDE-EPIC040-PR06 owns convergence: complete release admission, the forty-four-member materialization, identity recomputation and promotion. Adding the enumerated files to PR04's loci selects no additional CI lane, because a PR04 candidate already selects full validation and all seven lanes through its change to `ci/checks/classify_ci_changes.py`.
+
+There is no effect on HDE-EPIC040-PR07, OPS01, independent QA, release promotion, PF09 status movement or Epic closure. No Ops task, environment, deployment, vendor or database operation is created or required. No PF-Canon document is edited.
+
+### **Preserved exclusions and nonclaims**
+
+The overlay creates no public route, public flag, public payload field or transport change; no new evidence family, schema, writer, loader, serializer or calculator; no new persistent infrastructure; and no release promotion, activation or deployment.
+
+It establishes no QA verdict, no acceptance, no PF09 status movement, no Product Owner closeout and no Epic closure. It does not claim that PR04 is implemented, reviewed, merged or complete. Local and CI proof is not live vendor smoke, production readiness, independent QA or approval.
+
+Accepted-final HDE-EPIC040-PR01, PR02 and PR03 remain final and are not rerun, reopened, revised or reaccepted. Proposal v1.0 of this finding and the RS-20 decision v1.0 that returned it are preserved unchanged as decision history.
+
+### **Separate boundary recorded and not decided**
+
+`adapter/http_reader.py` is simultaneously an approved PR04 locus that PR04 is required to change and one of the fifteen committed members of `catalog/manifest.json`. The release lane's manifest content binding asserts that every committed manifest entry's hash and size equal the repository bytes, and it fails on a PR04-shaped change, while PR04 may not refresh the manifest.
+
+This is the class PF10 §2.10 addressed for HDE-EPIC040-PR02 and `engine/serializer/canon.py`, under an overlay scoped to that work unit alone and reserving complete member refresh and final identity recomputation to PR06. It is independent of release admission and would occur with a fully admitted release, so it lies outside this finding and outside this overlay.
+
+It is recorded as the candidate finding `HDE-EPIC040-PR04-F02` for the PR04 work unit, and is neither decided, scoped nor pre-approved here. It does not gate this overlay, which is complete on its own terms.
+
+### **Unresolved items and owners**
+
+| Item | Owner | State |
+| ----- | ----- | ----- |
+| `HDE-EPIC040-PR04-F02` — manifest binding refresh for `adapter/http_reader.py` | Session `PR04-HDE-EPIC040-1`, through its ordinary rescope route | Candidate finding; undecided |
+| PR04 plan decision D-03 — the valid self-pair exit-0 carrier | Session `PR04-HDE-EPIC040-1` | Deliberately unbundled; not raised |
+| PF12 version currency, repository-resolved v2.9.5 against the register's v2.9.6 | The governed PF12 maintainer | Ordinary maintenance; non-gating |
+| Permanent PF14 §6.7 correction carried by `C040-05` | Its governed maintainer | Pending; non-gating |
+| Permanent PF12 §2.1 and PF01 §§6.1–6.2 drainage carried by `C040-06` | Their governed maintainers | Pending; non-gating |
+| PF10 Addendum Index currency — the index lists through `2.13` while the body carries `2.14` | The PF10 drain owner | Observation; non-gating |
+| Repository prompt-provenance persistence | The authorized repository writer, once a procedure is installed | `PENDING`; non-gating |
+
+### **Canon-conflict continuity**
+
+`CANON_CONFLICT_REGISTER` entries `C040-01` through `C040-06` are carried unchanged with their existing classifications, decision lineage, carried effects and remaining owners. No entry is reopened, relabeled, omitted, newly decided or resolved. Neither `HDE-EPIC040-PR04-F01` nor the `HDE-EPIC040-PR04-F02` candidate is a register entry.
+
+\<eof\>  
