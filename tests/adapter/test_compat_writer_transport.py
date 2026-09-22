@@ -4,6 +4,23 @@ import pytest
 
 from adapter.app import create_app
 from engine.compat.categories import CATEGORIES_ORDER_V1
+from tests.support.pr04_fixtures import (
+    GATES_A,
+    GATES_B,
+    UUID_A,
+    UUID_B,
+    build_bundle,
+    build_pack,
+    complete_chart,
+    inject_seams,
+)
+
+
+@pytest.fixture(autouse=True)
+def _seams(monkeypatch, tmp_path):
+    """The success case needs an admitted release; its subject is the transport headers."""
+
+    inject_seams(monkeypatch, build_bundle(tmp_path), build_pack(tmp_path))
 
 
 @pytest.fixture()
@@ -14,10 +31,12 @@ def compat_client():
 
 
 def _payload():
+    # Seam inputs: complete mapped charts under canonical UUID identities. Legacy
+    # ``person_uid`` aliases are refused at the boundary (PF05 §5.2.3).
     weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
     return {
-        "a": {"person_uid": "alice"},
-        "b": {"person_uid": "bob"},
+        "a": complete_chart(UUID_A, GATES_A),
+        "b": complete_chart(UUID_B, GATES_B),
         "viewer_prefs": {"top_category": CATEGORIES_ORDER_V1[0], "weights": weights},
     }
 

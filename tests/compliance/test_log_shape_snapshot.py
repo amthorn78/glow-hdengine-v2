@@ -1,13 +1,18 @@
 import os, json, hashlib, pathlib
 from adapter.wsgi import create_app
 from engine.stable.sercanon import serialize
+from tests.support.pr04_fixtures import build_bundle, build_pack, inject_seams
 
 ART = pathlib.Path("artifacts/logs")
 SNAP = ART / "keys_only_sample.jsonl"
 SUM = pathlib.Path(str(SNAP) + ".sha256")
 
-def test_keys_only_log_snapshot_and_sha256(monkeypatch):
+def test_keys_only_log_snapshot_and_sha256(monkeypatch, tmp_path):
     monkeypatch.setenv("APP_ENV", "dev")
+    # The subject is the keys-only log shape, so the request has to reach a
+    # served response: without an admitted release the route refuses 503 and
+    # never emits the line under test.
+    inject_seams(monkeypatch, build_bundle(tmp_path), build_pack(tmp_path))
     ART.mkdir(parents=True, exist_ok=True)
 
     app = create_app()
