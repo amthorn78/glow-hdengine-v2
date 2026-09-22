@@ -15,7 +15,8 @@ Durable checkpoint saved at the PR-35 coherent corrective publication, as the ph
 | PR-35 entry checkpoint commit | `73b9812ab09124333a313b2cbf1c638412d17468` (docs-only) |
 | PR-35 corrective commit | `7b2bc5c95aa558961069a0a904ad7e4869a8469f` |
 | PR-35 records commit | the commit adding this file and the result-record/ledger updates (a commit cannot embed its own SHA); the remote head read back after the push is recorded below |
-| Remote head read back after the corrective push | `__REMOTE_HEAD__` |
+| Remote head read back after the corrective push | `ed432acd50bcaf3dc39b089b9ddc83430f294923` (`git ls-remote`, equal to local `HEAD`) |
+| Final branch head | This checkpoint was completed with that verbatim SHA in one follow-up docs-only commit, which becomes the final branch head. A commit cannot embed its own SHA, so that head is read back after its push and recorded in the PR #467 body and in ledger L-23 — the same convention the PR-30 records commit used. Because `pull_request` events evaluate `paths-ignore` against the whole PR diff, this push still runs CI, and `cancel-in-progress` supersedes the run on `ed432ac`, so exact-head CI evidence lands on the final head rather than on a superseded revision |
 
 ## What the corrective push contains
 
