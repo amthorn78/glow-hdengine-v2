@@ -66,6 +66,7 @@ anything.
      ALREADY_RULED <D-nn>    the Product Owner has decided this; name the D-number
      NOT_A_CHANGE            a question, or already true; say which, and answer it if it is a question
      NEEDS_YOU               the intent is genuinely ambiguous; state the ambiguity as a question
+                             (item-level only; distinct from the readiness value NEEDS_RULING)
 
 5. NAME THE APPARENT SURFACE for each item in one line — which prompt, skill, rule or document it
    looks like it touches. Mark it explicitly as unmeasured. You are not computing closure.

@@ -14,10 +14,11 @@ scope: findings about the process, not about AF-005
 `AF-005` was run through `MODE = ANALYZE` as the stage 4 pilot, on the Product Owner's
 instruction that this is a test and no prompt is promoted. The Modification is
 `docs/ephemeral/modifications/MODIFICATION-20260922-af005-workspace-currency-hardening.md`,
-at `status: ANALYZED`, `readiness: BLOCKED_ON_YOU`.
+at `status: ANALYZED`, `readiness: NEEDS_RULING`.
 
-**Four findings, one of them serious.** Three are gaps in the stage 1 tooling; one is the pilot
-working exactly as intended.
+**Five findings, two of them serious and both fixed.** Three are gaps in the stage 1 tooling, one
+is the pilot working exactly as intended, and one is the Product Owner catching the design with
+the authority inverted.
 
 ---
 
@@ -73,7 +74,7 @@ Harmless, and not worth a rule. Recorded so a future session does not spend time
 
 ## P4 — `ANALYZE` refused the change, and that is the pilot succeeding
 
-The Modification came back `BLOCKED_ON_YOU` with one open ruling, because `AF-005`'s own deferral
+The Modification came back `NEEDS_RULING` with one open question, because `AF-005`'s own deferral
 condition says *"apply it in the next change that touches `glow-workspace-currency` for some other
 reason"* — and no such change exists. Running it standalone spends exactly the review round the
 deferral was created to avoid.
@@ -89,6 +90,43 @@ process had no step at which that question got asked.
 
 It also produced the number the deferral was reasoning about intuitively: **five round trips for
 one sentence.**
+
+## P5 — `readiness` read as a refusal, and there was no override. **FIXED**
+
+Raised by the Product Owner on seeing the pilot's result: *"I need to be able to override of
+course, I don't want to be told I have to wait if I need the modification."*
+
+Correct, and the design had the authority backwards in two ways.
+
+**The name.** `BLOCKED_ON_YOU` reads as *the system is refusing you*. It never blocked anything
+mechanically — `readiness` was only ever vocabulary-checked — but the token, the document and this
+session's own reporting all made it sound like a gate. Renamed **`NEEDS_RULING`**, which says what
+it is: a conclusion, not a refusal. It also removes a near-collision with the triage disposition
+`NEEDS_YOU`, which is a different, item-level thing.
+
+**The missing mechanism.** Some gates genuinely do fail closed — scope freeze most of all, and P1
+had just made it mandatory. There was no way for the Product Owner to say *do it anyway*, so the
+only routes were to argue with the validator or bypass it. Both are worse than a recorded waiver.
+
+An `override` block now waives a policy gate and records that the waiver was deliberate:
+
+```yaml
+override:
+  by: Nathan
+  overrides: [scope_freeze]
+  reason: "needed now"
+```
+
+Accepted for `scope_freeze`, `readiness`, `modification_class`, `gate_tier` and `deferral`.
+Rejected when unattributed, unreasoned, or when it claims to waive a **well-formedness** check —
+an override waives policy, but it cannot make a malformed record well-formed, because a missing
+section is the document failing to say what happened and waiving that only makes the record lie.
+
+Three injected regressions assert those rejections. The selftest is 17/17.
+
+**The principle, now written into the template and the plan:** every gate in this design exists to
+stop a **session** proceeding on its own judgement. None exists to stop Nathan. A process that
+tells the Product Owner to wait for his own change has the authority inverted, and this one did.
 
 ---
 

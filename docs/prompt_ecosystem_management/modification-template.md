@@ -37,6 +37,29 @@ Copy everything between the markers. Delete the comments; keep the keys.
 5. **Every §E step and item carries a disposition.** A skipped step is a recorded disposition,
    never an omission. Silence is impossible by construction.
 
+## The Product Owner is never blocked by any of this
+
+**`readiness` is advisory.** It reports what `ANALYZE` concluded. It does not refuse, and
+`NEEDS_RULING` means *this wants your decision*, not *you must wait*.
+
+Every gate here exists to stop a **session** proceeding on its own judgement. None of them exists
+to stop Nathan. Where a policy gate would otherwise fail — scope freeze above all — an `override`
+block waives it:
+
+```yaml
+override:
+  by: Nathan
+  overrides: [scope_freeze]
+  reason: "needed now"
+```
+
+The `reason` is so a successor session knows the waiver was deliberate. **It is not a
+justification anyone is owed** — "I need it" is a complete reason.
+
+An override waives a **policy** gate. It cannot make a malformed record well-formed: a missing
+section or an absent disposition is the document failing to say what happened, and waiving that
+would only make the record lie.
+
 ---
 
 ## TEMPLATE BEGINS
@@ -53,7 +76,11 @@ closure:                  # computed; do not type these by hand
   upstream: []
   downstream: []
   state_sharers: []
-readiness:                # READY | SPLIT_RECOMMENDED | BLOCKED_ON_YOU
+readiness:                # READY | SPLIT_RECOMMENDED | NEEDS_RULING -- ADVISORY, never blocks
+override:                 # optional; the Product Owner waiving a policy gate
+  by: ""                  # overridable: scope_freeze readiness modification_class gate_tier deferral
+  overrides: []
+  reason: ""              # for a successor reading the record, not a justification owed to anyone
 modification_class:       # A B C D E — ecosystem-change-management.md §2
 interaction_cost_predicted:
 interaction_cost_actual:  # filled in §E; this is what calibrates the prediction
@@ -101,7 +128,7 @@ Including any defect class from `ecosystem-change-management.md` §4 this matche
 ### Open questions for the Product Owner
 
 Each one is a round trip and can invalidate planned work. If this list is non-empty, readiness
-is `BLOCKED_ON_YOU`.
+is `NEEDS_RULING` — which is advice, not a refusal.
 
 ### Readiness and interaction cost
 

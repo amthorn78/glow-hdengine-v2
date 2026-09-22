@@ -24,6 +24,18 @@ What it checks, and the rule each check enforces:
   COMPLETE requires interaction_cost_actual to be set, which is what calibrates the prediction
   a Modification citing new scope sets spawned_from rather than widening its own items
 
+readiness is ADVISORY and never blocks. It reports what ANALYZE concluded; it does not refuse.
+The gates here exist to stop a SESSION proceeding on its own judgement, never to stop the Product
+Owner. A policy gate -- scope freeze above all -- is waived by a recorded override block:
+
+    override:
+      by: Nathan
+      overrides: [scope_freeze]
+      reason: "needed now"
+
+The reason is for a successor session reading the record, not a justification anyone is owed.
+An override waives a policy gate; it cannot make a malformed record well-formed.
+
 An INTAKE stub is held to the triage contract only: id, one statement per item, request,
 disposition. Nothing more -- triage names an apparent surface, it does not measure scope. That is
 why the intake prompt needs no contract of its own.
@@ -40,7 +52,10 @@ except ImportError:
 STATUSES = ["INTAKE", "ANALYZING", "ANALYZED", "PLANNING", "PLANNED",
             "EXECUTING", "COMPLETE", "BLOCKED", "ABANDONED"]
 COUPLINGS = ["ATOMIC", "INDEPENDENT"]
-READINESS = ["READY", "SPLIT_RECOMMENDED", "BLOCKED_ON_YOU"]
+READINESS = ["READY", "SPLIT_RECOMMENDED", "NEEDS_RULING"]
+# Policy gates the Product Owner may waive with a recorded override. Everything else this
+# script checks is well-formedness: an override cannot make a malformed record well-formed.
+OVERRIDABLE = ["scope_freeze", "readiness", "modification_class", "gate_tier", "deferral"]
 TARGETS = ["prompt", "skill", "rule", "graph", "registry", "notion_control"]
 DISPOSITIONS = ["APPLIED", "VERIFIED", "BLOCKED", "NOT_APPLICABLE"]
 
@@ -140,12 +155,28 @@ def check(path):
             if len(seg.strip()) < 40:
                 bad.append(f"section {marker} is present but empty")
 
+    # --- the Product Owner's override, if one is recorded ---
+    override = fm.get("override") or {}
+    waived = []
+    if override:
+        if not str(override.get("by") or "").strip():
+            bad.append("override present but has no 'by'; an unattributed override is not one")
+        raw = override.get("overrides") or []
+        waived = [raw] if isinstance(raw, str) else list(raw)
+        for w in waived:
+            if w not in OVERRIDABLE:
+                bad.append(f"override names {w!r}, which is not a policy gate; overridable: {OVERRIDABLE}")
+        if not str(override.get("reason") or "").strip():
+            bad.append("override present but has no 'reason'; the record needs to say it was deliberate")
+
     # --- scope freeze ---
     # The field is REQUIRED once scope is frozen. Without that, the guard is opt-in: a
     # Modification that simply never sets it can grow items freely after approval, and scope
     # freeze is the rule that bounds the review loops. Found by the stage 4 pilot; PAIR-001.
     frozen_at = fm.get("item_count_at_approval")
-    if status in FROZEN:
+    if status in FROZEN and "scope_freeze" in waived:
+        pass  # waived by the Product Owner, and the override block records it
+    elif status in FROZEN:
         if frozen_at in (None, ""):
             bad.append(
                 f"SCOPE FREEZE: status {status} requires item_count_at_approval; without it the "
@@ -210,6 +241,18 @@ _REGRESSIONS = [
      "SCOPE FREEZE"),
     ("scope freeze unenforced because the field was never set",
      lambda s: s.replace("item_count_at_approval: 1\n", ""), "requires item_count_at_approval"),
+    ("override with no attribution",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  overrides: [scope_freeze]\n  reason: "x"'),
+     "no 'by'"),
+    ("override with no reason",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: [scope_freeze]'),
+     "no 'reason'"),
+    ("override claiming to waive a well-formedness check",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: [missing_sections]\n  reason: "x"'),
+     "not a policy gate"),
     ("item has no disposition at COMPLETE",
      lambda s: s.replace("    disposition: VERIFIED", '    disposition: ""'), "no disposition"),
     ("actual cost missing at COMPLETE",

@@ -397,10 +397,36 @@ The section closes with one verdict, derived from the predicates above:
 |---|---|
 | **`READY`** | zero open rulings, every item's scope measured, no sequential discovery, one gate tier |
 | **`SPLIT_RECOMMENDED`** | with the exact split points and the reason for each |
-| **`BLOCKED_ON_YOU`** | N decisions are needed before this can be planned at all |
+| **`NEEDS_RULING`** | N decisions would improve this; **advisory only, it never refuses** |
 
 **Open questions are therefore the expensive thing**, which is correct and slightly
 counterintuitive: three items and two rulings is a worse round than twenty items and none.
+
+#### None of this blocks the Product Owner
+
+**`readiness` is advisory and always has been.** It reports a conclusion; it does not refuse.
+Every gate in this design exists to stop a **session** proceeding on its own judgement — none of
+them exists to stop Nathan, and a process that tells him to wait for his own change has the
+authority backwards.
+
+Where a policy gate would otherwise fail, an `override` block waives it and records that the
+waiver was deliberate:
+
+```yaml
+override:
+  by: Nathan
+  overrides: [scope_freeze]
+  reason: "needed now"
+```
+
+`modification_validate.py` accepts it for `scope_freeze`, `readiness`, `modification_class`,
+`gate_tier` and `deferral`, and rejects an override that is unattributed, unreasoned, or that
+claims to waive a **well-formedness** check. That last line is the only limit: an override waives
+a policy gate, but it cannot make a malformed record well-formed — a missing section is the
+document failing to say what happened, and waiving it would only make the record lie.
+
+The `reason` exists for a successor reading the record. **It is not a justification anyone is
+owed**; "I need it" is complete.
 
 ### `MODE = PLAN`
 
@@ -531,7 +557,11 @@ coupling: ATOMIC | INDEPENDENT           # §3.2 — decides the failure semanti
 targets: [prompt, skill, rule, graph, registry, notion_control]   # §3.3 — decides the gates
 gate_tier: 0 | 1 | 2                     # §3.4 — computed, never judged
 closure: {upstream: [], downstream: [], state_sharers: []}        # computed from docs/graph/parts
-readiness: READY | SPLIT_RECOMMENDED | BLOCKED_ON_YOU
+readiness: READY | SPLIT_RECOMMENDED | NEEDS_RULING    # advisory; never blocks
+override:                                # the Product Owner waiving a policy gate
+  by: ""
+  overrides: []                          # scope_freeze readiness modification_class gate_tier deferral
+  reason: ""
 interaction_cost_predicted: 0
 interaction_cost_actual: 0               # filled in §E; calibrates the prediction
 modification_class: A | B | C | D | E    # classes A–E per ecosystem-change-management.md §2

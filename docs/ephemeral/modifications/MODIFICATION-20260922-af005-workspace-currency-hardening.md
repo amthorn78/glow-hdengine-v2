@@ -10,7 +10,7 @@ closure:
   downstream: []
   state_sharers: []
   note: "NOT COMPUTED — closure.py covers prompts only; this targets a skill, which has no graph part. See finding A3."
-readiness: BLOCKED_ON_YOU
+readiness: NEEDS_RULING
 modification_class: B
 modification_class_note: "B or E is genuinely ambiguous, and E means do not do it. See finding A1 — this is the open ruling."
 interaction_cost_predicted: 5
@@ -144,7 +144,11 @@ exactly what `AF-005` asked for.
     ----------------------------------------
     interaction_cost_predicted       5   with Q1 answered; 6 counting the ruling itself
 
-**Readiness: `BLOCKED_ON_YOU`** — one open ruling, and it is not evidence-resolvable.
+**Readiness: `NEEDS_RULING`** — one open question, and it is not evidence-resolvable.
+
+**This does not block you.** `readiness` is advisory: it reports what `ANALYZE` concluded and has
+no power to refuse. If you want this shipped now, say so and it ships — an `override` block
+records that the deferral was waived deliberately, and nothing here argues with you.
 
 Splitting saves nothing; there is one item. **What would save the whole cost is waiting**, which is
 what `AF-005` already decided. Five round trips for one sentence is the arithmetic that entry was
