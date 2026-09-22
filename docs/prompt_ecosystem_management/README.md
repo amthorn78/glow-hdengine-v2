@@ -112,4 +112,4 @@ the application's.
 | `skill-packaging-and-delivery.md` | How a skill is packaged and handed over, mandatory independent validation, and why every delivered artifact except a `.skill` file must be uniquely named |
 | `reviewer-prompt-template.md` | The canonical reviewer prompt. Every skill handover fills this template rather than composing one |
 | `session-working-rules.md` | How a session works rather than what it produces: source-read minimalism, tracking as part of the work, and the worker communication rules |
-| `pe-succession/` | Session succession records, newest last |
+| `pe-succession/` | Session succession records, newest last. **`pe35-to-pe36.md` is current** — it carries the charter change from repair campaign to general maintenance |
