@@ -716,30 +716,55 @@ written to disk, and `prompt-corpus-policy.md` forbids copying prompt bodies to 
 automated body-versus-graph check must read Notion in memory.** That is a requirement on future
 tooling, recorded here so it is not rediscovered.
 
+### Superseded the same day: both routes removed, by Product Owner ruling
+
+Asked why the prompt would need any handoff at all, the Product Owner ruled, 2026-09-22: **"it
+needs no automatic consumers other than its own mode changes."** The restoration above is kept as
+the record of what happened; this subsection supersedes it.
+
+The ruling is right on the evidence, and restoring the routes was the error — they were restored
+because the graph had them, without asking whether they still had a reason to exist:
+
+- **Native continuation** returned work to the stage that invoked `GCFPE-MGMT-10` mid-flow.
+  `closure.py` reports **no upstream** for this prompt: nothing routes into it. It is invoked by
+  the Product Owner through the intake and triage prompt, so there is no originating stage to
+  return to.
+- **The `PR-10` handoff** was a one-off built for the `HDE-EPIC040` Alpha preparation — exactly one
+  invocation, for `HDE-EPIC040-PR04`. `D18` has since recorded Alpha as resumed and that `PR-10`
+  invocation as authorised, so the case it existed for is discharged. `PR-10`'s graph part does
+  not reference `GCFPE-MGMT-10` at all; nothing on the receiving side depends on the route.
+- **Moving between modes is not routing.** `ANALYZE` → `PLAN` → `EXECUTE` passes through the
+  Modification record and a recorded approval, and the next mode starts only when the Product
+  Owner invokes it. The graph models prompt-to-prompt routes, so modes do not appear in it.
+
+The proposed body in Notion now says so explicitly — it hands off to no other prompt, every result
+returns to the Product Owner, and its only continuation is its own next mode — and was read back.
+
 ### Stage 3, prepared — and it is small
 
-With routing restored, the graph part and the approved body now agree on every state and every
-destination. So stage 3 is much smaller than the plan assumed:
+Applied at promotion only; nothing here is applied now.
 
 | surface | change at promotion | why |
 |---|---|---|
-| graph part — edges, states, destinations | **none** | routing is unchanged |
-| graph part — `source_evidence.section` | relabel two provenance citations to `Result routing` | they cite sections that no longer exist; metadata only, applied by rebuild via `glow-graph-contract`, never by hand |
+| graph part — edges | **remove two**: `→ ORIGINAL_NATIVE_STAGE` and `→ PR-10`. Keep `→ NATHAN_TERMINAL_RETURN` with its three states | the ruling above. Rebuilt via `glow-graph-contract`, never by hand |
+| graph part — `source_evidence.section` | the surviving edge's citations relabelled to `Result routing` | they cite section headings that do not exist in either body; metadata only, applied by rebuild |
 | registry — `inputs` | one line → **two**: `MODE`, and the subject | the entry contract changed |
+| registry — states | four → **three**: `READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION` removed | no route emits it any longer |
+| registry — `consumers`, `required_interfaces` | `PR-10` → **none** | the prompt has no downstream |
 | registry — output artifact | `GCFPE_SUCCESSOR_RELEASE / CHANGE_RECORD` → **`GCFPE_MODIFICATION_RECORD`** | closes the name collision recorded in §5 |
-| registry — states, consumers, `required_interfaces` | **none** | same four states, `PR-10` still the consumer |
 | registry — `evidence_contract` | restamped from the promoted body | it describes the body's extraction |
 
-**Measured blast radius** — from `closure.py`, used here as a measurement and not as the process
-being built: radius **1**, `PR-10`. The routing interface is unchanged, but the body changes what
-the prompt *produces* — a Modification record where there was a change report — so by the §3.4
-rule this is **Tier 1**, and the promotion gate must cover `PR-10`, not all 55.
+**Measured blast radius** — from `closure.py`, used as a measurement and not as the process being
+built: radius **1** today (`PR-10`), **0** after the change. The graph part changes, so this is
+**Tier 1**, and the gate covers `PR-10` — specifically, confirming that removing an edge `PR-10`
+never referenced leaves `PR-10`'s own routing and the graph closure clean. The retired Alpha state
+is also named, as vocabulary, in `D18` of the decision record; that is a dated record and is not
+touched.
 
 **Pre-existing drift, found in passing and not caused by this work.** Two of the graph part's
 `source_evidence` labels — *"Required result and routing"* and *"Separate EPIC040 Alpha preparation
 branch and Result routing"* — do not match any section heading in the **live** `091426.1` body
-either. The provenance metadata was already stale against the selected release. Recorded, not
-touched: it belongs to the live release, and the stage 3 rebuild corrects it anyway.
+either. The first is corrected by the rebuild; the second leaves with the edge it labelled.
 
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
