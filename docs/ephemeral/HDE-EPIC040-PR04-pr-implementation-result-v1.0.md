@@ -325,6 +325,41 @@ required, or the sweep silently reports 14 failures at both refs and no regressi
 first attempt at the re-run did before the flag was added.
 
 
+
+### §8.9 CI run 35770839639 failed on the clean-tree check, not on a test
+
+`a225c79` ran **2407 passed** across the changed-test targets and then failed
+`git diff --exit-code` in the same step:
+
+```
+ artifacts/logs/keys_only_sample.jsonl
+-{"at":"2026-09-22T18:42:31Z", ... "status":200}
++{"at":"2026-09-22T19:00:10Z", ... "status":200}
+ artifacts/logs/keys_only_sample.jsonl.sha256
+```
+
+Cause, and it is the §8.8 fix's own consequence: `test_keys_only_log_snapshot_and_sha256`
+round-trips its record through `SNAP.write_bytes(b)` into the **tracked tree**. Before the seam
+fix the test failed at `assert r.status_code in (200, 304)` and never reached that write; fixing
+it let the write happen for the first time, and the record carries a wall-clock `"at"`, so the
+bytes differ on every run.
+
+**I had seen this locally and misread it.** The same two files appeared modified after a local
+run and I cleared them with `git checkout -- artifacts/`, treating a nondeterministic tracked
+write as test-run noise rather than as the defect it is. The clean-tree assertion is precisely
+the check that does not forgive that, and it caught what I had waved off.
+
+The sample now round-trips through `tmp_path`. Every assertion is unchanged — required keys, no
+`Authorization` or `Cookie` in the serialized record, one-line canonical JSONL, the sha256
+sidecar, and the re-read and re-hash — only the location moves. The repository has no other
+reader or writer of `artifacts/logs/keys_only_sample.jsonl`, and it appears in neither the Index
+nor the Mirror; the governed EPIC031 artifact is the separate
+`artifacts/logs/keys_only.sample.jsonl` (dot, not underscore), which is untouched.
+
+Reproduced the failing step exactly before pushing — detached worktree at the candidate head,
+same rails, same `-p no:cacheprovider` invocation, same target list: **2407 passed**,
+`git diff --exit-code` clean, `git status --short --untracked-files=all` empty.
+
 ## 9. Limitations
 
 - No admitted release exists: every live gate ends `RELEASE_NOT_ADMITTED`; the frozen families keep capture-time bytes with nonclaims; PR06 owns convergence and the reverse (NOT_ADMITTED → PASS) transition of the sanity log, which needs the owner's canonical run plus the updater exactly as performed here (O-07).
