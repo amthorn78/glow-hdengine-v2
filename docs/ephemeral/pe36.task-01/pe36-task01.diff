@@ -1,0 +1,192 @@
+diff -ruN --label a/glow-workspace-currency --label b/glow-workspace-currency a/glow-workspace-currency b/glow-workspace-currency
+--- a/glow-workspace-currency
++++ b/glow-workspace-currency
+@@ -1,6 +1,6 @@
+ ---
+ name: glow-workspace-currency
+-description: Keeps the Glow workspace's system of record true. Open every task by searching BOTH Notion and the repository - docs/pfcanon and docs/ephemeral - for existing state on the subject, and close every task by writing any state change back to Notion and reading it back before reporting it. Use this whenever working on Glow, GCFPE, HDE, Change Flow, prompt repair, batches, ledgers, reports, verdicts, plans, checklists, releases, PF10, or Alpha — and whenever a task produces a verdict, status, disposition, blocker, or completion claim, or asks "what's the state of X". Use it even when the user only asks a question, because answering from conversation memory instead of the record is how stale state survives. Do not skip it because the task looks read-only, looks small, or the answer seems already known.
++description: Keeps the Glow workspace's system of record true. Open every task by searching BOTH Notion and the repository - docs/pfcanon and docs/ephemeral - for existing state on the subject, and close every task by recording any state change at the destination that holds it - Notion for ecosystem-maintenance surfaces, docs/ephemeral otherwise - and reading it back before reporting it. Use this whenever working on Glow, GCFPE, HDE, Change Flow, prompt repair, batches, ledgers, reports, verdicts, plans, checklists, releases, PF10, or Alpha — and whenever a task produces a verdict, status, disposition, blocker, or completion claim, or asks "what's the state of X". Use it even when the user only asks a question, because answering from conversation memory instead of the record is how stale state survives. Do not skip it because the task looks read-only, looks small, or the answer seems already known.
+ ---
+ 
+ # Glow Workspace Currency
+@@ -11,6 +11,13 @@
+ run evidence. Neither is a passive archive. Work that leaves them stale has not
+ been finished, however good the work itself was.
+ 
++**Which of them you write to depends on which kind of session you are — "Where it lands",
++below, decides it.**
++Reading Notion is unrestricted, always. Writing to it is not: a Notion write needs explicit
++task-level authorization or an established destination rule, and absent either the posture is
++read-only. `docs/prompt_ecosystem_management/notion-write-boundary.md` governs. **This never
++relaxes the obligation to record.** It decides only where the record lands.
++
+ Drive holds human reference copies Nathan maintains for his own reading,
+ including of PFCanon. **It is not a source of record.** Never resolve canon or
+ current state from Drive, and never reconcile a repository file against a Drive
+@@ -53,8 +60,8 @@
+ **Consult before you act.** Search both systems before doing anything —
+ including before answering a question.
+ 
+-**Record what changed.** Any state change goes to Notion in the session that
+-produced it. Not "at the end", not in chat only.
++**Record what changed.** Any state change is recorded in the session that produced
++it, at the destination that already holds it. Not "at the end", not in chat only.
+ 
+ **Verify before you claim.** Read the page back and confirm the change landed
+ before telling anyone it is done.
+@@ -113,7 +120,7 @@
+ 
+ ## 2. Record — what counts as a state change
+ 
+-Write to Notion, in the session that produced it, when any of these happen:
++Record it, in the session that produced it, when any of these happen:
+ 
+ - a verdict, disposition, or status is issued or reissued — **including an
+   unchanged one**
+@@ -123,6 +130,28 @@
+ - a previously recorded claim turns out to be wrong
+ - a task stops early, is abandoned, or is handed to another session
+ 
++### Where it lands
++
++**The obligation is absolute. The destination is conditional.** Product Owner policy,
++2026-09-22, `notion-write-boundary.md`:
++
++| session | tracking destination |
++|---|---|
++| **Maintaining the ecosystem** — a `GCFPE-MGMT-10` run, a prompt-repair round, a release transaction | Notion, on the maintenance surfaces that already name it: the round-tracking page, the release register, the Alpha feedback list, the release controls. These are established destination rules, so the write is authorized by rule. Plus the repository. |
++| **Executing the ecosystem flow** — planning, implementing, reviewing or QA-ing a work unit | `docs/ephemeral/` in the repository, landed by pull request. **Read-only with respect to Notion** unless that specific task's instruction directs a Notion write. |
++
++**A session that cannot tell which kind it is treats itself as executing.** Read-only is the
++safe default, and the policy says so.
++
++**The triggers above say what counts as a state change. None of them authorizes a Notion
++write.** That a handoff occurred, a task completed, or an output exists is on the policy's
++explicit list of things that are *not* an authorization; read that list there rather than
++inferring it. **A plausible destination is not a destination rule.**
++
++**Recording never licenses a new Notion page.** The rule is about not leaving a record false.
++If no existing record claims the thing, nothing has gone stale, and the record belongs in
++`docs/ephemeral/`, landed by pull request — a complete outcome, not a lesser one.
++
+ **An unchanged verdict still needs recording.** This is the one most often
+ skipped, and the plan-page failure above is exactly what it costs. "Nothing
+ changed" and "nobody checked" are indistinguishable in a record unless you write
+@@ -149,10 +178,11 @@
+ 
+ ## 3. Verify — read back before you claim
+ 
+-A write that returned success is not a verified write. Fetch the page again and
+-confirm before reporting.
++A write that returned success is not a verified write. Read it back from wherever it
++landed and confirm before reporting. **This obligation does not vary by destination** — a
++repository file gets exactly the same treatment as a Notion page.
+ 
+-Check on readback:
++Where the record landed in Notion, fetch the page again. Check on readback:
+ 
+ - the intended text is actually present
+ - surrounding structure survived — list nesting, checkbox state, table rows,
+@@ -235,7 +265,10 @@
+ 
+ ## Worked example
+ 
+-*A validation pass reruns and reaches the same blocked verdict as before.*
++*A validation pass reruns and reaches the same blocked verdict as before.* This is an
++**ecosystem-maintenance** session, so the plan and report pages are its destination by
++established rule. A development-flow session doing comparable work would record the same
++facts in `docs/ephemeral/` and read them back from there.
+ 
+ **Consult.** Search Notion for the plan and report; search Drive for anything
+ citing the two ledger IDs. The Drive search shows both ledgers are cited by the
+diff -ruN --label a/glow-workspace-currency --label b/glow-workspace-currency a/glow-workspace-currency b/glow-workspace-currency
+--- a/glow-workspace-currency
++++ b/glow-workspace-currency
+@@ -132,6 +132,7 @@
+   An authorized retirement belongs in the designated archive with the original
+   intact.
+ - Don't restructure a page while recording a state change. One concern per edit.
+-- Don't author a prompt as a local file and transfer it in. Prompts are authored
+-  and revised directly in Notion — see `glow-artifact-storage`.
++- Don't author a prompt as a local file and transfer it in. A prompt that belongs
++  in Notion is authored and revised there directly — see `glow-artifact-storage`
++  for which prompts those are.
+ - Don't record a state you merely expect to become true.
+diff -ruN --label a/glow-artifact-storage --label b/glow-artifact-storage a/glow-artifact-storage b/glow-artifact-storage
+--- a/glow-artifact-storage
++++ b/glow-artifact-storage
+@@ -1,6 +1,6 @@
+ ---
+ name: glow-artifact-storage
+-description: Route each stored artifact to its correct system and author it the correct way. The repository is the persistent storage and versioning authority, Notion is the operational and indexing layer, and Google Drive is not a storage authority at all. Prompts are authored and revised directly in Notion. Ephemeral and working files are authored in the repository at docs/ephemeral and land through a pull request; persistent ecosystem-management infrastructure such as registries and decision records lives at docs/prompt_ecosystem_management; maintained machine-readable source such as graph parts lives at docs/graph. PFCanon is read from docs/pfcanon and never written. Derived output is never committed. Google Drive is used only when Nathan directs a specific file there, through a local round trip. Use whenever a file or prompt is created, revised, replaced, or stored. Do not use to decide what an artifact should say, only where it belongs and how it is authored.
++description: Route each stored artifact to its correct system and author it the correct way. The repository is the persistent storage and versioning authority, Notion is the operational and indexing layer, and Google Drive is not a storage authority at all. Only durable, Notion-managed prompts are authored and revised directly in Notion. Ephemeral and working files are authored in the repository at docs/ephemeral and land through a pull request; persistent ecosystem-management infrastructure such as registries and decision records lives at docs/prompt_ecosystem_management; maintained machine-readable source such as graph parts lives at docs/graph. PFCanon is read from docs/pfcanon and never written. Derived output is never committed. Google Drive is used only when Nathan directs a specific file there, through a local round trip. Use whenever a file or prompt is created, revised, replaced, or stored. Do not use to decide what an artifact should say, only where it belongs and how it is authored.
+ ---
+ 
+ # Glow Artifact Storage
+@@ -13,7 +13,8 @@
+ 
+ | Artifact | Destination |
+ |---|---|
+-| Prompt | Notion, authored in place |
++| Durable, Notion-managed prompt — a member of the selected release, or a control the register binds | Notion, authored in place |
++| One-off, handoff, correction, recovery, review or development-flow prompt | **Not Notion.** `docs/ephemeral/` if a durable record is wanted; otherwise it lives in the task it serves |
+ | Ephemeral, working, planning file; report, ledger, run evidence | `docs/ephemeral/` in the repository |
+ | Persistent ecosystem-management infrastructure — registry, decision record, architecture or surface map | `docs/prompt_ecosystem_management/` in the repository |
+ | Maintained machine-readable source, such as graph parts | `docs/graph/` in the repository |
+@@ -94,7 +95,13 @@
+ 
+ ## Notion: author in place
+ 
+-Notion is the authoring surface for prompts. Markdown files cannot be uploaded to
++**This section governs durable, Notion-managed prompts only** — the members of the selected
++release and the controls the register binds. A one-off, handoff, correction, recovery, review or
++development-flow prompt is not stored in Notion at all, and executing a prompt never itself
++produces a Notion write. `docs/prompt_ecosystem_management/notion-write-boundary.md` governs which
++prompts belong there and when any Notion write is authorized.
++
++Notion is the authoring surface for those prompts. Markdown files cannot be uploaded to
+ Notion, so there is no local round trip and no file to keep in sync. Create and
+ revise the prompt directly in Notion, in the page and directory the governing
+ prompt or register designates.
+diff -ruN --label a/glow-write-boundary --label b/glow-write-boundary a/glow-write-boundary b/glow-write-boundary
+--- a/glow-write-boundary
++++ b/glow-write-boundary
+@@ -10,7 +10,7 @@
+ 
+ | Destination | What goes there |
+ |---|---|
+-| **Notion** | prompts, plans, checklists, state, verdicts, context |
++| **Notion** | durable Notion-managed prompts; plans, checklists, state and verdicts on the surfaces that already hold them |
+ | **Google Drive** | human reference copies Nathan keeps for himself |
+ | **An installed skill** | reusable behaviour |
+ | **`docs/ephemeral/`** | ephemeral and working files — read and write |
+@@ -60,6 +60,15 @@
+ Nathan transfers canon documents manually; a canon change is his action, never a
+ side effect of a task. If a task appears to require a canon edit, stop and say so.
+ 
++**Notion is a destination for durable prompt assets and for the records that already live
++there — not for everything a session produces.** Reading it is unrestricted. Writing to it
++requires explicit task-level authorization, or an established destination rule that already names
++the page; absent either, the posture is read-only. One-off, handoff, correction, recovery, review
++and development-flow prompts do not belong in Notion at all. The rule, the five excluded
++categories, and the list of things that are **not** an authorization — a prompt was used, a
++handoff occurred, a task completed, an output exists — are in
++`docs/prompt_ecosystem_management/notion-write-boundary.md`, which governs.
++
+ **Google Drive is not a storage authority in this workspace.** It is not a default,
+ not a fallback, and not a place anything is resolved from. It holds reference copies
+ Nathan maintains for his own reading, including of PFCanon, and those copies carry
+@@ -112,7 +121,12 @@
+   decision record, an architecture or surface map?** `docs/prompt_ecosystem_management/`.
+ - **Derived output rebuilt from source?** Nowhere. Build it to the scratchpad and
+   represent it by a proof token; do not commit a build artifact.
+-- **A prompt, plan, or state?** Notion.
++- **A durable, reusable prompt asset — a member of the selected release, or a control the
++  register binds?** Notion, authored in place.
++- **A one-off, handoff, correction, recovery, review or development-flow prompt?** Not Notion.
++  `docs/ephemeral/` if it is worth keeping, and the handoff itself if it is not.
++- **A plan, status or verdict?** Notion only where a destination rule already names the page that
++  holds it; otherwise `docs/ephemeral/`. A plausible page is not a destination rule.
+ - **PFCanon?** Read it from `docs/pfcanon/`. You do not write it.
+ - **A script or reusable behaviour?** It becomes a skill, or it stays local and
+   you hand Nathan the file.
