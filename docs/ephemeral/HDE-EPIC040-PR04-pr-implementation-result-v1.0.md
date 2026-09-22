@@ -188,6 +188,30 @@ The container had no project dependencies at PR-35 entry; `requirements.txt`, `r
 
 A prior `--check-only` reading of the canonical gate recorded as 0 in an intermediate PR-35 step was an artifact of capturing `$?` after a pipe; re-run directly the gate reported stale artifacts, which is why the owner write above was performed. Every exit code in this table was captured directly from the command.
 
+### 8.2 Exact-head hosted CI (run 35750570817, `ci.yml` #3595, head `7fe363069bcd9471fe7146dadcfc9b3cced85817`)
+
+**Conclusion `success`**, 16/16 steps green, 15:55:23–16:06:46 UTC. Final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`; every lane reported `_OUTCOME: success`.
+
+| Step | Result |
+| --- | --- |
+| Run affected behavioral tests in isolation (the step that failed at PR-30) | success (15:55:43 → 15:58:22) |
+| product / compat / db lanes | success |
+| rails policy and secret-safety lane | success (accepted `RAILS_LANE:RELEASE_NOT_ADMITTED`) |
+| governed evidence integrity lane | success (15:59:14 → 16:06:03) |
+| approved generic QA subsystem lane in isolation | success |
+| build and verify exact-source release attestation | success (accepted `RELEASE_LANE:RELEASE_NOT_ADMITTED`) |
+| Verify truthful applicability and clean candidate tree | success |
+
+The runs on `e7c5323a` (35741951421) and `73b9812a` (35742775464) both failed at the changed-tests step and are superseded. The run on `ed432ac` was superseded by `cancel-in-progress` before producing a result, so no CI capacity was spent on an intermediate revision.
+
+### 8.3 F03 — a verified review finding deferred by Product Owner decision
+
+Codex's code review on the exact head raised a second P1: the production Reader is not served at `POST /api/reader`, the route PF05 marks **Required-Now**. This session verified it by execution against the Procfile entry point `adapter.factory:create_app()` under closed rails — `POST /reader?v=1` → 503 (reaches the handler), `POST /api/reader?v=1` → **404**, `app.url_map` holding only `/reader` and `/dev/reader/conjunction`.
+
+Plan v1.2 item 5, risk R-18 and observation O-11 decided this on the premise that the two spellings "name the same existing declared route in this application". That premise is disproven: they are distinct routes, one 404s, and PF05's alias posture is conditional on an `/api` mount that neither `adapter/factory.py` nor `adapter/wsgi.py` configures. `@bp.post("/reader")` existed at the base commit as a 405 stub and the route declarations are identical base-to-head, so PR04 did not move the route — it made that path serve the production handler.
+
+No fix existed inside the approved scope, so none was attempted. The finding was put to the Product Owner with three options; **Nathan decided to defer it to PR07**, which already owns the adjacent endpoint-catalog gap (O-03). PR04 therefore merges as implemented, and the deviation is accepted, owned and recorded — see `docs/ephemeral/HDE-EPIC040-PR04-F03-deferral-decision-v1.0.md`, with the inherited work in its §6. No `RESCOPE_REQUEST` was issued and no approved scope changed. Everything in §8.1 and §8.2 is unaffected.
+
 ## 9. Limitations
 
 - No admitted release exists: every live gate ends `RELEASE_NOT_ADMITTED`; the frozen families keep capture-time bytes with nonclaims; PR06 owns convergence and the reverse (NOT_ADMITTED → PASS) transition of the sanity log, which needs the owner's canonical run plus the updater exactly as performed here (O-07).
@@ -207,6 +231,8 @@ A prior `--check-only` reading of the canonical gate recorded as 0 in an interme
 | O-09 | `tools/cli/generate_cli_conformance_artifacts.py` and the showcompat capture generator cannot regenerate their birth-only captures even after admission without a stored BodyGraph source; convergence requires a source decision | PR06 / PO |
 | O-10 | `scripts/cli/canonical_harness.py`, `scripts/make_compat_determinism_artifacts.py`, `tools/presenter/generate_presenter_artifacts.py` remain import-safe, known-stale write-mode scripts (plan §6.2) | PR06 |
 | O-11 | `tools/evidence/generate_evidence_index_snapshot.py --check` reports `FAIL_BEHAVIOR issues=INPUT_SHA_HUMAN,INPUT_SHA_MIRROR`: the 2026-01-21 snapshot records input digests that already differ from `origin/main`'s `docs/evidence/INDEX.json` and mirror, so the mismatch pre-exists this PR and sits outside every CI lane. The EPIC024 D23 recorder (`tools/evidence/check_d23_evidence_index_snapshot_contract.py`) writes into `audit/qa/hde-epic024/` by default; one exploratory run here was reverted with `git checkout` and nothing of it is in the candidate | evidence owner / PR06 |
+| O-13 | Plan v1.2 item 5 / risk R-18 / observation O-11 state that `POST /reader` and `POST /api/reader?v=1` "name the same existing declared route in this application". Disproven by execution (§8.3): they are distinct routes and `/api/reader` returns 404. Supersede or correct the note so no later work unit relies on it | PR-10 author / whole-change IA |
+| O-14 | F03: the PF05 Required-Now production route `POST /api/reader?v=1` is not served (404) and the production handler sits outside `/api`-scoped ingress policy. Verified, put to the Product Owner, and **deferred to PR07 by his decision** rather than rescoped; full record and inherited work in `docs/ephemeral/HDE-EPIC040-PR04-F03-deferral-decision-v1.0.md` | PR07 (with the O-03 catalog row) |
 | O-12 | Codex P2 on `73b9812` (`engine/compat/compute.py:329`): `pyproject.toml` packages only `engine*`, `adapter*`, `presenter*`, `catalog*`, `math*` with JSON package data for `catalog` and `math`, while `ADMITTED_RELEASE_ROSTER` requires top-level `schemas/`, `errors/` and `tools/` entries, so a non-editable wheel install could never admit a release. Verified accurate and **not fixed here**: neither `pyproject.toml` nor `engine/config/registry_loader.py` is in this PR's diff, the roster predates this branch (2026-09-20, #418), and the shapes in use do not hit it — CI installs with `pip install -e .` and the `Procfile` runs `gunicorn 'adapter.factory:create_app()'` from the deployed repository tree. Changing the distribution surface is outside this work unit's bounded scope | packaging / release owner (PR06 / PO) |
 | O-03 (carried) | `docs/ENDPOINTS_CATALOG.json` lacks a `POST /reader` success row; committed A7 artifacts frozen | PR07 / PO |
 

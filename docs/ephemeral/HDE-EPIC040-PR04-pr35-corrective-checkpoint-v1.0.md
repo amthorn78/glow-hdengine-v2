@@ -41,11 +41,19 @@ All under `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHON
 - The five pre-existing failures outside the CI lanes are unchanged; no test was skipped, disabled, quarantined or weakened.
 - The container had no project dependencies at PR-35 entry; `requirements.txt`, `requirements-dev.txt`, `-e .` and a PyPI `setuptools` (84.0.0) were installed exactly as CI does before any figure above. The PyPI `setuptools` removes the PR-30 §9 limitation that had forced a separate venv for the attestation rehearsal.
 
+## Outcome after the corrective push
+
+**Exact-head CI is green.** Run 35750570817 (`ci.yml` #3595, head `7fe3630`) concluded `success`: 16/16 steps, all seven lanes `_OUTCOME: success`, final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, including the changed-tests step that failed at PR-30.
+
+**F03 was raised, verified and deferred.** Codex's code review on the exact head raised a second P1 — the production Reader is not served at the PF05 Required-Now route `POST /api/reader`. Verified by execution; no fix existed inside the approved scope. Put to the Product Owner, who **deferred it to PR07**. Recorded as `docs/ephemeral/HDE-EPIC040-PR04-F03-deferral-decision-v1.0.md` and observation O-14. No rescope was raised and no approved scope changed.
+
 ## Still owed before `MERGE_PENDING`
 
-1. Exact-head hosted CI: the changed-tests step plus all seven lanes on the corrective head.
-2. Current-head Codex **code** review (the previous one was on `73b9812`).
-3. Current-head Codex **security** review — the last completed one is on `e927ed0`, the PR-open head; request `@codex security review` once if it does not re-run for new commits.
+
+
+1. ~~Exact-head hosted CI~~ — **done**: run 35750570817 `success` on `7fe3630`. Re-confirm on the records head, which this commit creates.
+2. ~~Current-head Codex **code** review~~ — **done** on `7fe3630`; it raised F03, now deferred.
+3. Current-head Codex **security** review — **still owed**. The last completed one is on `e927ed0`; the `@codex security review` request was parsed as a Code Review ("Manual request"), so it must be re-issued with the bare trigger phrase.
 4. Mergeability read back on the corrective head.
 
 Nathan / Product Owner merges manually. Nothing in this phase enables, schedules or requests a merge.
