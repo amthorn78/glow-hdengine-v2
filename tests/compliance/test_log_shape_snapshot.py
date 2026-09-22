@@ -1,14 +1,20 @@
-import os, json, hashlib, pathlib
+import json, hashlib
 from adapter.wsgi import create_app
 from engine.stable.sercanon import serialize
+from tests.support.pr04_fixtures import build_bundle, build_pack, inject_seams
 
-ART = pathlib.Path("artifacts/logs")
-SNAP = ART / "keys_only_sample.jsonl"
-SUM = pathlib.Path(str(SNAP) + ".sha256")
-
-def test_keys_only_log_snapshot_and_sha256(monkeypatch):
+def test_keys_only_log_snapshot_and_sha256(monkeypatch, tmp_path):
     monkeypatch.setenv("APP_ENV", "dev")
-    ART.mkdir(parents=True, exist_ok=True)
+    # The canonical-bytes round trip below writes its own sample, and the record
+    # carries a wall-clock "at", so the bytes differ on every run. Writing them
+    # into the tracked tree would leave the candidate dirty; this test is the
+    # only reader or writer of that path, and nothing indexes it.
+    snap = tmp_path / "keys_only_sample.jsonl"
+    total = tmp_path / "keys_only_sample.jsonl.sha256"
+    # The subject is the keys-only log shape, so the request has to reach a
+    # served response: without an admitted release the route refuses 503 and
+    # never emits the line under test.
+    inject_seams(monkeypatch, build_bundle(tmp_path), build_pack(tmp_path))
 
     app = create_app()
     sink = []
@@ -43,11 +49,11 @@ def test_keys_only_log_snapshot_and_sha256(monkeypatch):
 
     # Canonical one-line JSONL + sha256 sidecar
     b = serialize(rec)
-    SNAP.write_bytes(b)
+    snap.write_bytes(b)
     h = hashlib.sha256(b).hexdigest()
-    SUM.write_text(h + "\n", encoding="utf-8")
+    total.write_text(h + "\n", encoding="utf-8")
 
     # Re-open and verify
-    b2 = SNAP.read_bytes()
+    b2 = snap.read_bytes()
     assert b2.endswith(b"\n")
     assert hashlib.sha256(b2).hexdigest() == h

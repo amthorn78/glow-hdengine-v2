@@ -14,6 +14,56 @@
     "message": "viewer_prefs.weights must include all 10 categories as integers 0..100"
   },
   {
+    "aliases": [],
+    "code": "ERR_M10_BODYGRAPH_INCOMPLETE",
+    "message": "BodyGraph is incomplete"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_CONFIG_MISMATCH",
+    "message": "Magic10 configuration mismatch"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_GATES_INVALID",
+    "message": "Gate data is invalid"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_GATES_MISSING",
+    "message": "Gate data is required"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_LEGACY_INPUT_UNSUPPORTED",
+    "message": "legacy scoring input is unsupported"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_MANIFEST_MISMATCH",
+    "message": "Magic10 release manifest mismatch"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_PERSON_UNRESOLVED",
+    "message": "BodyGraph not found"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_RESOLVER_UNAVAILABLE",
+    "message": "BodyGraph resolver unavailable"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_RESULT_SCHEMA_MISMATCH",
+    "message": "Magic10 result schema mismatch"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_M10_STALE_RESULT",
+    "message": "Magic10 cached result is stale"
+  },
+  {
     "aliases": [
       "missing_narrative_key"
     ],
@@ -40,6 +90,11 @@
     ],
     "code": "ERR_READER_INVALID_CHART",
     "message": "invalid reader payload"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_READER_INVALID_INPUT",
+    "message": "invalid Reader request"
   },
   {
     "aliases": [

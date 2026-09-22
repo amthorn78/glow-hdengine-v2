@@ -1,5 +1,5 @@
 path: errors/token_map/token_map.json
-size_bytes: 2667
-sha256: 87ca921a09ea25775b55321dce393ed200febf5c1104b1a020363486cb9c7280
+size_bytes: 3919
+sha256: f536744a29cfc143535d30133b12b088f5bdd6e173c8e4bf65acde342310ca61
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z

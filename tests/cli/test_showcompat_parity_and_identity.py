@@ -80,20 +80,24 @@ def _run_showcompat(payload: dict[str, object], extra_args: list[str] | None = N
 
 
 def _canonical_reader_bytes(pair: dict) -> bytes:
+    """Reader bytes for a pair of complete charts through the current seams."""
+    from engine.compat.compute import evaluate_pair, evaluation_party, harmony_band, is_ineligible_carrier
+
     left_norm = cli_main._normalize_party(pair["left"], "left")
     right_norm = cli_main._normalize_party(pair["right"], "right")
-    left_person, left_chart = cli_main._party_from_normalized(left_norm)
-    right_person, right_chart = cli_main._party_from_normalized(right_norm)
-    left_person, right_person, left_chart, right_chart = cli_main._canonical_pair(
-        left_person, right_person, left_chart, right_chart
-    )
+    left_resolved = cli_main._resolve_party(left_norm, source_policy="local")
+    right_resolved = cli_main._resolve_party(right_norm, source_policy="local")
+    result = evaluate_pair(evaluation_party(left_resolved), evaluation_party(right_resolved))
+    eligible = not is_ineligible_carrier(result)
     meta = identity_meta()
     reader_bytes, _ = emit_reader_public_envelope(
-        left_chart,
-        right_chart,
+        None,
+        None,
         engine_tag=meta["engine_tag"],
         invocation_tag=meta["invocation_tag"],
-        release_id=meta["release_id"],
+        release_id=result["release_id"] if eligible else meta["release_id"],
+        eligible=eligible,
+        harmony_band=harmony_band(result) if eligible else None,
     )
     return reader_bytes
 
@@ -199,6 +203,8 @@ def test_preimage_artifact_matches_log():
     assert log_parts.get("match") == str(digest == envelope["idempotence_hash"]).lower()
 
 def test_governed_showcompat_capture_uses_immutable_identity(monkeypatch):
+    """The EPIC022 D2 captures are frozen; generation refuses truthfully while not admitted."""
+
     paths = [
         Path("artifacts/cli/showcompat/stdout.json"),
         Path("artifacts/cli/showcompat/stdout.json.sha256"),
@@ -209,32 +215,37 @@ def test_governed_showcompat_capture_uses_immutable_identity(monkeypatch):
     monkeypatch.setenv("ENGINE_TAG", "poison-engine-tag")
     monkeypatch.setenv("RELEASE_ID", "f" * 64)
     monkeypatch.setenv("PRODUCT_INVOCATION_TAG", "POISON-INVOCATION")
-    current = capture_generator._capture_outputs()
+    monkeypatch.setattr(capture_generator.subprocess, "run", lambda *a, **k: pytest.fail("CLI subprocess spawned"))
+    with pytest.raises(SystemExit) as excinfo:
+        capture_generator._capture_outputs()
+    assert str(excinfo.value) == capture_generator.REQUIRES_ADMITTED_RELEASE
+    with pytest.raises(SystemExit, match=capture_generator.REQUIRES_ADMITTED_RELEASE):
+        capture_generator.main([])
 
     assert {path: path.read_bytes() for path in paths} == before
-
-    current_args = json.loads(current[capture_generator.ARGS_PATH])
-    assert set(current_args["env"]) == {
-        "SAFE_MODE",
-        "ALLOW_NETWORK",
-        "LC_ALL",
-        "LANG",
-        "TZ",
-    }
-    assert current_args["identity"] == {
-        "source": "engine.runtime.identity",
-        "meta": identity_meta(),
-    }
-    current_stdout = json.loads(current[capture_generator.STDOUT_PATH])
-    assert current_stdout["compat"]["meta"] == identity_meta()
+    assert capture_generator.main(["--check"]) == 0
+    assert capture_generator.validate_frozen_captures() == []
+    assert {
+        rel: hashlib.sha256(Path(rel).read_bytes()).hexdigest()
+        for rel in capture_generator.FROZEN_SHA256
+    } == capture_generator.FROZEN_SHA256
 
     frozen_args = json.loads(before[paths[2]])
     frozen_stdout = json.loads(before[paths[0]])
+    assert set(frozen_args["env"]) == {"SAFE_MODE", "ALLOW_NETWORK", "LC_ALL", "LANG", "TZ"}
     assert frozen_args["identity"]["source"] == "engine.runtime.identity"
     assert frozen_args["identity"]["meta"] == frozen_stdout["compat"]["meta"]
     assert before[paths[1]] == (
         hashlib.sha256(before[paths[0]]).hexdigest() + "\n"
     ).encode("utf-8")
+
+
+def test_governed_showcompat_check_reports_frozen_drift(monkeypatch, tmp_path):
+    drifted = tmp_path / "stdout.json"
+    drifted.write_bytes(b'{"drift":true}\n')
+    monkeypatch.setitem(capture_generator.FROZEN_SHA256, "artifacts/cli/showcompat/stdout.json", "0" * 64)
+    with pytest.raises(SystemExit, match="DRIFT:artifacts/cli/showcompat/stdout.json"):
+        capture_generator.main(["--check"])
 
 
 def test_governed_showcompat_generator_uses_active_interpreter(monkeypatch):
@@ -256,6 +267,8 @@ def test_governed_showcompat_generator_uses_active_interpreter(monkeypatch):
         )
 
     monkeypatch.setattr(capture_generator.subprocess, "run", fake_run)
+    # Interpreter/argv/env pins are independent of admission; simulate an admitted release.
+    monkeypatch.setattr(capture_generator, "_require_admitted_release", lambda: None)
 
     outputs = capture_generator._capture_outputs()
     args_payload = json.loads(outputs[capture_generator.ARGS_PATH])

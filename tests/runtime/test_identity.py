@@ -22,10 +22,14 @@ def test_identity_shapes_and_reader_cli_shared_identity():
     assert list(admin) == FIELDS
     assert set(identity_meta()) == {"engine_tag","invocation_tag","release_id"}
     assert _engine_identity() == (admin["engine_tag"], admin["release_id"], admin["invocation_tag"])
-    body, payload = emit_reader_public_envelope({"person_uid":"a","mechanics":{"type":"Generator"}},{"person_uid":"b","mechanics":{"type":"Projector"}})
+    body, payload = emit_reader_public_envelope(eligible=True, harmony_band="Open")
     assert payload["meta"] == {"engine_tag": admin["engine_tag"], "invocation_tag": admin["invocation_tag"]}
     assert payload["release_id"] == admin["release_id"]
+    assert payload["categories"] == [{"id": "harmony", "band": "Open"}]
     assert body.endswith(b"\n")
+    ineligible_body, ineligible = emit_reader_public_envelope(eligible=False)
+    assert ineligible["categories"] == [] and ineligible["release_id"] == admin["release_id"]
+    assert ineligible_body.endswith(b"\n")
 
 
 def test_release_identity_is_derived_from_the_packaged_manifest():
@@ -92,15 +96,18 @@ def test_reader_injected_emitter_receives_identity_kwargs(tmp_path, monkeypatch)
     from flask import Flask
     import adapter.http_reader as http_reader
     from adapter.http_reader import get_reader_bp
+    from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, build_bundle, build_pack, complete_chart, inject_seams
 
+    bundle = build_bundle(tmp_path / "bundle")
+    inject_seams(monkeypatch, bundle, build_pack(tmp_path / "pack"))
     a_path = tmp_path / "a.json"
     b_path = tmp_path / "b.json"
-    a_path.write_text('{"person_uid":"a","mechanics":{"type":"Generator"}}', encoding="utf-8")
-    b_path.write_text('{"person_uid":"b","mechanics":{"type":"Projector"}}', encoding="utf-8")
+    a_path.write_text(json.dumps(complete_chart(UUID_A, GATES_A)), encoding="utf-8")
+    b_path.write_text(json.dumps(complete_chart(UUID_B, GATES_B)), encoding="utf-8")
     seen = {}
 
-    def injected(a, b, *, engine_tag, invocation_tag, release_id):
-        seen.update({"engine_tag": engine_tag, "invocation_tag": invocation_tag, "release_id": release_id})
+    def injected(a, b, *, engine_tag, invocation_tag, release_id, eligible, harmony_band):
+        seen.update({"engine_tag": engine_tag, "invocation_tag": invocation_tag, "release_id": release_id, "eligible": eligible, "harmony_band": harmony_band})
         return b'{"ok":true}\n'
 
     monkeypatch.setattr(http_reader, "ALLOWED_ROOT", tmp_path.resolve())
@@ -109,4 +116,10 @@ def test_reader_injected_emitter_receives_identity_kwargs(tmp_path, monkeypatch)
     monkeypatch.setenv("APP_ENV", "dev")
     resp = app.test_client().get(f"/reader?v=1&a={a_path}&b={b_path}&a_tz=UTC&b_tz=UTC")
     assert resp.status_code == 200
-    assert seen == identity_meta()
+    meta = identity_meta()
+    assert (seen["engine_tag"], seen["invocation_tag"]) == (meta["engine_tag"], meta["invocation_tag"])
+    # An eligible pair carries the admitted bundle's release identity, which the
+    # runtime identity equals under real admission and differs from only for the
+    # isolated synthetic fixture release.
+    assert seen["release_id"] == bundle.release_id
+    assert seen["eligible"] is True and seen["harmony_band"] in {"Cool", "Open", "Warm", "Glow"}

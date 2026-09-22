@@ -167,10 +167,34 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          probe_release_not_admitted() {
+            # Independent read-only admission probe (PF10 §2.15): succeeds only when
+            # the admission owner refuses the active release with INCOMPLETE_RELEASE_ROSTER.
+            python - <<'PY'
+          import sys
+          from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
+          try:
+              load_active_mechanics_bundle()
+          except SchemaValidationError as exc:
+              sys.exit(0 if getattr(exc, "code", None) == "INCOMPLETE_RELEASE_ROSTER" else 1)
+          sys.exit(1)
+          PY
+          }
+          # The runner surfaces exactly one accepted non-zero outcome: exit 3 after
+          # RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED.  It is accepted here only when
+          # the probe above observes the non-admitted state; any other non-zero exit
+          # fails as before.
+          rails_rc=0
           python ci/checks/run_rails_job_definitions.py \
             ci/jobs/rails_closed_refusal.yml \
             ci/jobs/rails_open_conformance.yml \
-            ci/jobs/logs_keys_only_redaction.yml
+            ci/jobs/logs_keys_only_redaction.yml || rails_rc=$?
+          if [ "$rails_rc" -eq 3 ]; then
+            probe_release_not_admitted
+            echo "RAILS_LANE:RELEASE_NOT_ADMITTED"
+          elif [ "$rails_rc" -ne 0 ]; then
+            exit "$rails_rc"
+          fi
           python -m pytest -q tests/evidence/test_rails_ci_workflow_integration.py
 
       - name: Run governed evidence integrity lane
@@ -256,12 +280,42 @@ jobs:
           cleanup
           trap - EXIT
           test -z "$(git status --short --untracked-files=all)"
+          probe_release_not_admitted() {
+            # Independent read-only admission probe (PF10 §2.15): succeeds only when
+            # the admission owner refuses the active release with INCOMPLETE_RELEASE_ROSTER.
+            python - <<'PY'
+          import sys
+          from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
+          try:
+              load_active_mechanics_bundle()
+          except SchemaValidationError as exc:
+              sys.exit(0 if getattr(exc, "code", None) == "INCOMPLETE_RELEASE_ROSTER" else 1)
+          sys.exit(1)
+          PY
+          }
+          # PF10 §2.15: the only accepted non-zero builder exit is the failure receipt
+          # whose code is release_not_admitted, and only when the probe above observes
+          # INCOMPLETE_RELEASE_ROSTER.  No bundle exists then, so --verify is skipped;
+          # the clean-tree assertions below still hold.  Any other non-zero exit fails.
+          release_rc=0
           python tools/evidence/build_release_attestation.py \
             --output "$attestation_root" \
-            --require-clean
-          python tools/evidence/build_release_attestation.py \
-            --verify "$attestation_root" \
-            --require-clean
+            --require-clean || release_rc=$?
+          if [ "$release_rc" -ne 0 ]; then
+            if [ ! -f "$attestation_root/failure.json" ]; then
+              exit "$release_rc"
+            fi
+            receipt_code="$(python -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["code"])' "$attestation_root/failure.json")"
+            if [ "$receipt_code" != "release_not_admitted" ]; then
+              exit "$release_rc"
+            fi
+            probe_release_not_admitted
+            echo "RELEASE_LANE:RELEASE_NOT_ADMITTED"
+          else
+            python tools/evidence/build_release_attestation.py \
+              --verify "$attestation_root" \
+              --require-clean
+          fi
           # No active release or deployment workflow consumes this bundle.
           # Keep it ephemeral instead of adding an unconsumed artifact transfer.
           git diff --exit-code

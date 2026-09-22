@@ -14,12 +14,14 @@ from typing import Any, Mapping
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from engine.bodygraph.resolver import resolve_compat_chart
 from engine.bodygraph.v2_adapter import CHART_RESULT_REQUIRED_FIELDS, V2ChartAdapterContext, adapt_v2_chart_payload
-from engine.compat.categories import CATEGORIES_ORDER_V1
-from engine.compat.compute import conjunction_public
+from engine.categories.registry import FROZEN_MAGIC10_ORDER
+from engine.compat.compute import evaluate_pair, evaluation_party, harmony_band, orient
 from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 from engine.runtime.public import emit_reader_public_envelope
 from tools.evidence import update_evidence_index
+from tools.evidence.run_sanity_pipeline import ReleaseNotAdmitted, probe_release_admission
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "artifacts" / "vendor" / "hdapi_v2"
@@ -28,6 +30,8 @@ TWO_RUN = OUT / "hde_epic037_v2_to_compat_two_run.json"
 PAIR_ORDER = OUT / "hde_epic037_v2_to_compat_pair_order.json"
 BOUNDARY = OUT / "hde_epic037_admin_public_boundary.json"
 PF09_DOCUMENT = "PF09.5 — HDE Build Checklist Fermentation"
+REQUIRES_ADMITTED_RELEASE = "HDE_EPIC037_PR04_REQUIRES_ADMITTED_RELEASE"
+FROZEN_CHECK_LINE = "checked frozen HDE-EPIC037 PR-04 v2-to-compat artifacts (release not admitted; capture-time records with nonclaims)"
 CLOSED_RAILS_ENV = {"ALLOW_NETWORK": "0", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}
 INTERNAL_LOCI = (
     "engine/bodygraph/v2_adapter.py",
@@ -164,9 +168,10 @@ def chart_result_payload(*, kind: str) -> dict[str, Any]:
 
 
 def context(kind: str) -> V2ChartAdapterContext:
+    user_id = f"123e4567-e89b-12d3-a456-42661417400{0 if kind == 'a' else 1}"
     return V2ChartAdapterContext(
-        person_uid=f"person-epic037-pr04-{kind}",
-        user_id=f"123e4567-e89b-12d3-a456-42661417400{0 if kind == 'a' else 1}",
+        person_uid=f"person-{user_id}",
+        user_id=user_id,
         vendor="hdapi",
         vendor_version=2,
         input_fingerprint=("a" if kind == "a" else "b") * 64,
@@ -186,8 +191,18 @@ def _mapped_pair() -> dict[str, Mapping[str, Any]]:
     return pair
 
 
+def _party(mapped: Mapping[str, Any]):
+    """Bind one mapped adapter result to its trusted cache identity and validate it as a party."""
+
+    resolved = dict(mapped["resolved"])
+    resolved["user_id"] = str(mapped["cache"]["user_id"])
+    return evaluation_party(resolve_compat_chart(resolved, source_policy="local", env=None))
+
+
 def _compat(left: Mapping[str, Any], right: Mapping[str, Any]) -> dict[str, object]:
-    return conjunction_public(left, right, viewer_top="harmony", viewer_weights={}, engine_tag="hde-compat-v1", release_id="0" * 64, invocation_tag="epic037-pr04-fixture")
+    """Evaluate two mapped adapter results through the admitted mechanics bundle (PF01 §4/§5)."""
+
+    return evaluate_pair(_party(left), _party(right))
 
 
 def _assert_shape(result: Mapping[str, Any]) -> dict[str, Any]:
@@ -210,12 +225,9 @@ def _assert_shape(result: Mapping[str, Any]) -> dict[str, Any]:
     return checks
 
 
-def _reader_chart(resolved: Mapping[str, Any]) -> dict[str, object]:
-    return {"mechanics": {"type": resolved["bodygraph"]["type"]}}
-
-
 def _boundary(mapped: dict[str, Mapping[str, Any]], produced_at: str, common: dict[str, Any]) -> dict[str, Any]:
-    public_bytes, public_envelope = emit_reader_public_envelope(_reader_chart(mapped["a"]["resolved"]), _reader_chart(mapped["b"]["resolved"]), engine_tag="hde-compat-v1", invocation_tag="epic037-pr04-fixture", release_id="0" * 64)
+    result = _compat(mapped["a"], mapped["b"])
+    public_bytes, public_envelope = emit_reader_public_envelope(None, None, engine_tag="hde-compat-v1", invocation_tag="epic037-pr04-fixture", release_id=str(result["release_id"]), eligible=True, harmony_band=harmony_band(result))
     text = public_bytes.decode("utf-8")
     forbidden_hits = [term for term in FORBIDDEN_PUBLIC_TERMS if term in text]
     category_keys = sorted(public_envelope["categories"][0].keys()) if public_envelope.get("categories") else []
@@ -244,9 +256,9 @@ def _boundary(mapped: dict[str, Mapping[str, Any]], produced_at: str, common: di
 
 def _proof_payload(produced_at: str) -> dict[str, Any]:
     mapped = _mapped_pair()
-    compat = _compat(mapped["a"]["resolved"], mapped["b"]["resolved"])
-    category_ids = [item["id"] for item in compat["conjunction"]["compat"]["categories"]]
-    if category_ids != list(CATEGORIES_ORDER_V1):
+    compat = _compat(mapped["a"], mapped["b"])
+    category_ids = [item["category_id"] for item in compat["categories"]]
+    if category_ids != list(FROZEN_MAGIC10_ORDER):
         raise SystemExit("HDE_EPIC037_PR04_CATEGORY_ORDER_DRIFT")
     common = _common(produced_at)
     return {
@@ -257,7 +269,7 @@ def _proof_payload(produced_at: str) -> dict[str, Any]:
         "fixture_count": 2,
         "adapter_results": {kind: {"status": item["status"], "code": item["code"], "payload_family": item["payload_family"], "shape_sufficiency": _assert_shape(item)} for kind, item in mapped.items()},
         "cache_payload_posture": {kind: item["cache"]["payload_posture"] for kind, item in mapped.items()},
-        "compat_acceptance": {"function": "engine.compat.compute.conjunction_public", "accepted_mapped_resolved_parties": True, "category_count": len(category_ids), "category_ids": category_ids, "meta_keys": sorted(compat["conjunction"]["compat"]["meta"].keys())},
+        "compat_acceptance": {"function": "engine.compat.compute.evaluate_pair", "accepted_mapped_resolved_parties": True, "category_count": len(category_ids), "category_ids": category_ids, "result_schema": compat["schema"], "result_keys": sorted(compat.keys())},
         "compat_output_sha256": _sha256_bytes(canonical_json_bytes(compat)),
         "raw_request_response_vendor_bodies_absent": True,
         "tokens": ["ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
@@ -272,15 +284,16 @@ def build_outputs(produced_at: str) -> dict[Path, bytes]:
     proof_bytes_2 = canonical_json_bytes(_proof_payload(produced_at))
     if proof_bytes_1 != proof_bytes_2:
         raise SystemExit("HDE_EPIC037_PR04_TWO_RUN_DRIFT")
-    ab = _compat(mapped["a"]["resolved"], mapped["b"]["resolved"])
-    ba = _compat(mapped["b"]["resolved"], mapped["a"]["resolved"])
+    ab = _compat(mapped["a"], mapped["b"])
+    ba = _compat(mapped["b"], mapped["a"])
+    lo, hi = orient(_party(mapped["a"]), _party(mapped["b"]))
     ab_bytes = canonical_json_bytes(ab)
     ba_bytes = canonical_json_bytes(ba)
     pair_identity = ab_bytes == ba_bytes
     if not pair_identity:
         raise SystemExit("HDE_EPIC037_PR04_PAIR_ORDER_DRIFT")
     two_run = {**common, "artifact_kind": "hde_epic037_v2_to_compat_two_run", "input_references": _input_refs(), "inspected_internal_loci": _loci(), "first_run_sha256": _sha256_bytes(proof_bytes_1), "second_run_sha256": _sha256_bytes(proof_bytes_2), "canonical_bytes_identical": True, "rails_and_locale_pins": CLOSED_RAILS_ENV, "no_time_random_network_database_write_dependency": True, "tokens": ["TWO_RUN_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"]}
-    pair_order = {**common, "artifact_kind": "hde_epic037_v2_to_compat_pair_order", "input_references": _input_refs(), "inspected_internal_loci": _loci(), "pair_order_rule": "engine.compat.ordering.normalize_pair sorts by person_uid before pair_key construction", "ab_sha256": _sha256_bytes(ab_bytes), "ba_sha256": _sha256_bytes(ba_bytes), "canonical_ab_ba_bytes_identical": pair_identity, "normalized_left_person_uid": ab["conjunction"]["left"]["person_uid"], "normalized_right_person_uid": ab["conjunction"]["right"]["person_uid"], "tokens": ["COMPOSITE_ABBA_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"]}
+    pair_order = {**common, "artifact_kind": "hde_epic037_v2_to_compat_pair_order", "input_references": _input_refs(), "inspected_internal_loci": _loci(), "pair_order_rule": "engine.compat.compute.orient sorts by canonical_person_id before the intrinsic pair_key", "ab_sha256": _sha256_bytes(ab_bytes), "ba_sha256": _sha256_bytes(ba_bytes), "canonical_ab_ba_bytes_identical": pair_identity, "normalized_left_person_uid": lo.canonical_person_id, "normalized_right_person_uid": hi.canonical_person_id, "tokens": ["COMPOSITE_ABBA_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"]}
     boundary = _boundary(mapped, produced_at, common)
     return {PROOF: proof_bytes_1, TWO_RUN: canonical_json_bytes(two_run), PAIR_ORDER: canonical_json_bytes(pair_order), BOUNDARY: canonical_json_bytes(boundary)}
 
@@ -288,6 +301,34 @@ def build_outputs(produced_at: str) -> dict[Path, bytes]:
 def _write_path_proof(path: Path, produced_at: str, *, check: bool) -> None:
     stat = path.stat()
     update_evidence_index._write_path_proof(path.relative_to(ROOT).as_posix(), sha256=_sha256_path(path), size_bytes=stat.st_size, mtime_utc=None, produced_at=produced_at, default_produced_at=produced_at, check=check, stat_mtime=stat.st_mtime)
+
+
+def validate_frozen_outputs(produced_at: str) -> None:
+    """Frozen-byte validation of the committed capture-time artifacts (no regeneration).
+
+    Each artifact must exist, be canonical JSON with one final LF, bind the
+    EPIC037 identity and match its owner-recorded path proof.  This is a check of
+    frozen records with nonclaims, never a live evaluation claim.
+    """
+
+    stale = []
+    for path in (PROOF, TWO_RUN, PAIR_ORDER, BOUNDARY):
+        rel = path.relative_to(ROOT).as_posix()
+        if not path.is_file():
+            stale.append(rel)
+            continue
+        raw = path.read_bytes()
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except (UnicodeError, json.JSONDecodeError):
+            stale.append(rel)
+            continue
+        if canonical_json_bytes(payload) != raw or payload.get("epic_id") != "HDE-EPIC037":
+            stale.append(rel)
+            continue
+        _write_path_proof(path, produced_at, check=True)
+    if stale:
+        raise SystemExit("STALE_HDE_EPIC037_PR04_V2_TO_COMPAT:" + ",".join(stale))
 
 
 def write_outputs(outputs: dict[Path, bytes], *, produced_at: str, check: bool) -> None:
@@ -319,6 +360,17 @@ def main(argv: list[str] | None = None) -> None:
     produced_at = _existing_generated_at(PROOF) if args.check else None
     if produced_at is None:
         produced_at = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+    try:
+        probe_release_admission()
+    except ReleaseNotAdmitted as exc:
+        # PF10 §2.15: no admitted release, so the current evaluation cannot be
+        # regenerated truthfully.  Check mode validates the frozen records; write
+        # mode refuses.  Neither claims a live result.
+        if not args.check:
+            raise SystemExit(REQUIRES_ADMITTED_RELEASE) from exc
+        validate_frozen_outputs(produced_at)
+        print(FROZEN_CHECK_LINE)
+        return
     write_outputs(build_outputs(produced_at), produced_at=produced_at, check=args.check)
     print("checked HDE-EPIC037 PR-04 v2-to-compat artifacts" if args.check else "generated HDE-EPIC037 PR-04 v2-to-compat artifacts")
 

@@ -1,4 +1,13 @@
-"""Generate deterministic showcompat CLI capture artifacts for EPIC022 D2."""
+"""Generate deterministic showcompat CLI capture artifacts for EPIC022 D2.
+
+The captures under ``artifacts/cli/showcompat/`` are frozen capture-time records
+(EPIC022 D2).  ``--check`` validates them by SHA-256 against the recorded frozen
+digests and the sidecar.  Generation requires an admitted release: under
+PF10 — HDE Build Notes §2.15 it refuses truthfully with ``REQUIRES_ADMITTED_RELEASE``
+while the admission owner refuses the active release (``INCOMPLETE_RELEASE_ROSTER``).
+This generator is not a live CI gate; convergence of the captures belongs to the
+release that admits the complete roster.
+"""
 from __future__ import annotations
 
 import argparse
@@ -13,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
 from engine.runtime import identity_meta
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer.canon import sercanon
@@ -21,6 +31,14 @@ ARTIFACTS_DIR = ROOT / "artifacts" / "cli" / "showcompat"
 STDOUT_PATH = ARTIFACTS_DIR / "stdout.json"
 SHA_PATH = ARTIFACTS_DIR / "stdout.json.sha256"
 ARGS_PATH = ARTIFACTS_DIR / "args.json"
+
+# Frozen capture-time digests of the governed EPIC022 D2 captures (bytes on disk).
+FROZEN_SHA256 = {
+    "artifacts/cli/showcompat/stdout.json": "a7b54915a59cbaaf700036ec28ee21f20dbd60eec82c059869934b8016f5ef3f",
+    "artifacts/cli/showcompat/stdout.json.sha256": "0f89f6fed21d88a935ee2b3a42b0cd21b87ae4d9888a8eb72c91e754c0882652",
+    "artifacts/cli/showcompat/args.json": "b78276f1801661615f56bea1653cf216d3f953ddc9ed4911a999741369c02722",
+}
+REQUIRES_ADMITTED_RELEASE = "REQUIRES_ADMITTED_RELEASE"
 
 ENV_PINS = {
     "SAFE_MODE": "1",
@@ -54,7 +72,34 @@ def _stdin_bytes() -> bytes:
     return (json.dumps(PAIR, separators=(",", ":")) + "\n").encode("utf-8")
 
 
+def _require_admitted_release() -> None:
+    """Refuse generation truthfully while the active release is not admitted."""
+
+    try:
+        load_active_mechanics_bundle()
+    except SchemaValidationError as exc:
+        if getattr(exc, "code", None) == "INCOMPLETE_RELEASE_ROSTER":
+            raise SystemExit(REQUIRES_ADMITTED_RELEASE) from exc
+        raise
+
+
+def validate_frozen_captures() -> list[str]:
+    """Return the frozen capture paths whose bytes drifted from their recorded digests."""
+
+    drift = []
+    for rel, expected in FROZEN_SHA256.items():
+        path = ROOT / rel
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            drift.append(rel)
+    if STDOUT_PATH.is_file() and SHA_PATH.is_file():
+        sidecar = SHA_PATH.read_text(encoding="utf-8").strip()
+        if sidecar != hashlib.sha256(STDOUT_PATH.read_bytes()).hexdigest():
+            drift.append(SHA_PATH.relative_to(ROOT).as_posix() + ":sidecar")
+    return drift
+
+
 def _capture_outputs() -> dict[Path, bytes]:
+    _require_admitted_release()
     env = _cli_env()
     recorded_cmd = ["python", "scripts/hdctl.py", "showcompat"]
     execution_cmd = [sys.executable, *recorded_cmd[1:]]
@@ -110,18 +155,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
-    expected = _capture_outputs()
 
     if args.check:
-        drift = [
-            path.relative_to(ROOT).as_posix()
-            for path, body in expected.items()
-            if not path.exists() or path.read_bytes() != body
-        ]
+        drift = validate_frozen_captures()
         if drift:
             raise SystemExit("DRIFT:" + ",".join(drift))
         return 0
 
+    expected = _capture_outputs()
     for path, body in expected.items():
         _write_bytes(path, body)
     return 0

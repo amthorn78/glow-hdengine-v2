@@ -61,7 +61,11 @@ def _truthy(value: object) -> bool:
     return bool(value)
 
 
-def _append_jsonl(path: Path, record: Mapping[str, Any]) -> None:
+def _append_jsonl(path: Path | None, record: Mapping[str, Any]) -> None:
+    # A ``None`` target is the value-free posture used by the no-user dry-run
+    # seam: no success or retry record carrying ``user_id`` is written at all.
+    if path is None:
+        return
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         text = json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
@@ -131,8 +135,8 @@ def ingest_vendor_bodygraph(
     dry_run: bool = False,
     client: HdApiClient | None = None,
     db_access: DBAccess | None = None,
-    retry_log: Path = RETRY_LOG,
-    success_log: Path = SUCCESS_LOG,
+    retry_log: Path | None = RETRY_LOG,
+    success_log: Path | None = SUCCESS_LOG,
     canon_log: Path | None = None,
     vendor_version: int = 1,
 ) -> IngestOutcome:

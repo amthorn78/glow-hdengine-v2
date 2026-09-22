@@ -1,16 +1,69 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
 
 from engine.bodygraph.ingest import CANON_COMPARE_LOG, RETRY_LOG, SUCCESS_LOG
 from engine.bodygraph.vendor_client import VendorError
+from engine.cli.main import cli
+from engine.compat import compute
+from engine.config.registry_loader import SchemaValidationError
+from tests.support.pr04_fixtures import GATES_A, GATES_B, build_bundle, build_pack, complete_chart, inject_seams
 from tools.evidence import generate_open_rails_abba_proof as proof
+from tools.evidence import run_sanity_pipeline as release_sanity
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+@pytest.fixture(scope="module")
+def bundle(tmp_path_factory):
+    return build_bundle(tmp_path_factory.mktemp("pr04-open-rails-bundle"))
+
+
+@pytest.fixture(scope="module")
+def pack(tmp_path_factory):
+    return build_pack(tmp_path_factory.mktemp("pr04-open-rails-pack"))
+
+
+def _in_process_cli_reader_bytes(left, right, *, rails) -> bytes:
+    """The CLI file path in-process under the requested rails (a subprocess cannot receive the injected bundle)."""
+
+    previous = {key: os.environ.get(key) for key in rails}
+    os.environ.update(rails)
+    try:
+        with tempfile.TemporaryDirectory(prefix="hde-open-rails-abba-test-") as raw:
+            td = Path(raw)
+            a_path, b_path, dump = td / "a.json", td / "b.json", td / "reader.json"
+            a_path.write_bytes(proof.canonical_json_bytes(left))
+            b_path.write_bytes(proof.canonical_json_bytes(right))
+            assert cli(["showcompat", "--a-file", str(a_path), "--b-file", str(b_path), "--dump-reader", str(dump)]) == 0
+            return dump.read_bytes()
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
+@pytest.fixture
+def admitted(monkeypatch, bundle, pack):
+    """Inject the synthetic complete release through the evaluation seam; never a gate."""
+
+    inject_seams(monkeypatch, bundle, pack)
+    monkeypatch.setattr(proof, "cli_reader_bytes", _in_process_cli_reader_bytes)
+    return bundle
+
+
+def _repo_state() -> tuple[str, str]:
+    diff = subprocess.run(["git", "diff", "--exit-code"], cwd=ROOT, text=True, capture_output=True)
+    status = subprocess.run(["git", "status", "--porcelain=v1", "--untracked-files=all"], cwd=ROOT, text=True, capture_output=True, check=True)
+    return (str(diff.returncode), status.stdout)
 
 
 def _current_live_payload() -> dict[str, object]:
@@ -157,13 +210,19 @@ def test_bounded_client_refuses_closed_rails_before_client_creation(monkeypatch:
         proof._bounded_live_client({"attempted": 0})
 
 
-def test_fixture_backed_open_rails_abba_positive_matrix() -> None:
+def test_fixture_backed_open_rails_abba_positive_matrix(admitted) -> None:
     payload = proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": True})
     assert payload["top_level_pass"] is True
+    assert payload["outcome"] == proof.OUTCOME_EVALUATED
     assert payload["transport_call_count"] == 0
     assert payload["acceptance_token_satisfied"] is False
     assert payload["abba_contract_mode"] == "raw_byte_identity_after_existing_canonical_pair_normalization"
+    assert payload["abba_contract_locus"].startswith("engine.compat.compute.evaluate_pair")
+    assert payload["fixtures"] == {"a": "fixtures/charts/alice.json", "b": "fixtures/charts/bob.json", "materially_distinct": True}
+    assert set(payload["predicates"]) == set(proof.FIXTURE_PREDICATES)
     assert all(payload["predicates"].values())
+    envelope = json.loads(proof.reader_bytes(proof.A_FIXTURE, proof.B_FIXTURE))
+    assert envelope["eligible"] is True and envelope["release_id"] == admitted.release_id
 
 
 @pytest.mark.parametrize(
@@ -179,7 +238,7 @@ def test_fixture_backed_open_rails_abba_positive_matrix() -> None:
         ("ab_reader_open", lambda b: b.replace(b'"idempotence_hash":', b'"zz":0,"idempotence_hash":', 1), "preimage_ab_match"),
     ],
 )
-def test_fixture_backed_open_rails_negative_matrix(override_key: str, mutator, predicate: str) -> None:
+def test_fixture_backed_open_rails_negative_matrix(admitted, override_key: str, mutator, predicate: str) -> None:
     baseline = proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": True})
     # Rebuild the original compared bytes by using hashes indirectly is not enough; call helpers for exact target.
     originals = {
@@ -198,13 +257,13 @@ def test_fixture_backed_open_rails_negative_matrix(override_key: str, mutator, p
     assert payload["predicates"][predicate] is False
 
 
-def test_canonical_gate_failure_is_negative() -> None:
+def test_canonical_gate_failure_is_negative(admitted) -> None:
     payload = proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": False})
     assert payload["top_level_pass"] is False
     assert payload["predicates"]["canonical_gate_success"] is False
 
 
-def test_attempted_fixture_transport_is_negative() -> None:
+def test_attempted_fixture_transport_is_negative(admitted) -> None:
     def probe() -> None:
         proof.HdApiClient._default_request(None, object(), 1.0)  # type: ignore[arg-type]
 
@@ -212,12 +271,74 @@ def test_attempted_fixture_transport_is_negative() -> None:
         proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": True}, transport_probe=probe)
 
 
-def test_fixture_producer_check_writes_only_primary(tmp_path: Path) -> None:
+def test_fixture_producer_check_writes_only_primary(admitted, tmp_path: Path) -> None:
     payload = proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": True})
     data = proof.canonical_json_bytes(payload)
     assert data.endswith(b"\n") and not data.endswith(b"\n\n") and b"\r" not in data
     assert data == proof.canon.sercanon(payload)
     assert json.loads(data)["top_level_pass"] is True
+
+
+# --- PF10 §2.15: the explicit RELEASE_NOT_ADMITTED outcome with the real admission owner ------
+
+def _forbid_live_capture(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(proof, "reader_bytes", lambda *a, **k: pytest.fail("live Reader capture attempted"))
+    monkeypatch.setattr(proof, "cli_reader_bytes", lambda *a, **k: pytest.fail("live CLI capture attempted"))
+    monkeypatch.setattr(proof, "canonical_gate", lambda *a, **k: pytest.fail("canonical gate spawned"))
+    monkeypatch.setattr(proof.HdApiClient, "_default_request", lambda *a, **k: pytest.fail("vendor transport attempted"))
+
+
+def test_not_admitted_fixture_proof_shape_without_live_capture(monkeypatch: pytest.MonkeyPatch) -> None:
+    _forbid_live_capture(monkeypatch)
+    assert release_sanity.release_not_admitted_observed() is True
+    payload = proof.build_fixture_proof()
+    assert payload["outcome"] == "RELEASE_NOT_ADMITTED"
+    assert payload["top_level_pass"] is False
+    assert payload["transport_call_count"] == 0
+    assert payload["acceptance_token_satisfied"] is False
+    assert payload["admission"] == {"refusal_code": "INCOMPLETE_RELEASE_ROSTER", "live_capture_performed": False}
+    assert set(payload["predicates"]) == set(proof.FIXTURE_PREDICATES)
+    assert not any(payload["predicates"].values())
+    assert payload["hashes"] == {} and payload["idempotence_hashes"] == {} and payload["canonical_gate"] is None
+    data = proof.canonical_json_bytes(payload)
+    assert data.endswith(b"\n") and json.loads(data)["outcome"] == "RELEASE_NOT_ADMITTED"
+
+
+def test_check_current_ends_not_admitted_with_distinct_code_and_frozen_primary_check(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    _forbid_live_capture(monkeypatch)
+    monkeypatch.setattr(proof, "_write_primary", lambda *a, **k: pytest.fail("primary written"))
+    state_before = _repo_state()
+    assert proof.main(["--check-current"]) == release_sanity.RELEASE_NOT_ADMITTED_EXIT_CODE == 3
+    assert capsys.readouterr().out == "OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED\n"
+    assert _repo_state() == state_before
+    frozen = (proof.ROOT / proof.OPEN_ABBA_REL).read_bytes()
+    assert proof.sha(frozen) == proof.FROZEN_OPEN_ABBA_SHA256
+    assert json.loads(frozen)["top_level_pass"] is True  # a frozen capture-time record, never presented as live
+
+    monkeypatch.setattr(proof, "FROZEN_OPEN_ABBA_SHA256", "0" * 64)
+    with pytest.raises(SystemExit, match="FROZEN_PRIMARY_DRIFT"):
+        proof.main(["--check-current"])
+
+
+def test_fixture_generation_and_check_refuse_without_writing_when_not_admitted(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    _forbid_live_capture(monkeypatch)
+    monkeypatch.setattr(proof, "_write_primary", lambda *a, **k: pytest.fail("primary written"))
+    for argv in ([], ["--check"]):
+        with pytest.raises(SystemExit) as excinfo:
+            proof.main(argv)
+        assert excinfo.value.code == release_sanity.RELEASE_NOT_ADMITTED_EXIT_CODE
+        assert capsys.readouterr().out == "OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED\n"
+
+
+def test_other_admission_refusals_are_not_classified_as_non_admitted(monkeypatch: pytest.MonkeyPatch) -> None:
+    _forbid_live_capture(monkeypatch)
+
+    def other_refusal():
+        raise SchemaValidationError("SCHEMA_INVALID", "unrelated refusal")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", other_refusal)
+    with pytest.raises(SchemaValidationError, match="unrelated refusal"):
+        proof.build_fixture_proof()
 
 
 def test_canonical_json_bytes_preserves_utf8_unicode() -> None:
@@ -228,6 +349,12 @@ def test_canonical_json_bytes_preserves_utf8_unicode() -> None:
     assert b"\\u2014" not in data
 
 
+def _acquired_chart(label: str, user_id: str, *, gates=None) -> dict[str, object]:
+    """A complete mapped chart carrying the acquisition identity label (no raw vendor payload)."""
+
+    return complete_chart(f"person-{user_id}", gates if gates is not None else (GATES_A if label == "a" else GATES_B))
+
+
 def _configure_individual_live_fake(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     _configure_authorized_live_env(monkeypatch)
     monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v1")
@@ -236,8 +363,8 @@ def _configure_individual_live_fake(monkeypatch: pytest.MonkeyPatch) -> list[str
         monkeypatch.delenv(key, raising=False)
 
     class FakeOutcome:
-        def __init__(self, label: str) -> None:
-            self.payload = {"person_uid": f"person-{label}", "mechanics": {"type": ("Generator" if label == "a" else "Projector")}}
+        def __init__(self, label: str, user_id: str) -> None:
+            self.payload = _acquired_chart(label, user_id)
             self.input_fingerprint = label * 64
             self.payload_sha256 = proof.sha(proof.emitter.emit_public(self.payload))
 
@@ -252,19 +379,19 @@ def _configure_individual_live_fake(monkeypatch: pytest.MonkeyPatch) -> list[str
         if len(calls) > 2:
             raise VendorError("PROVIDER_REQUEST_BOUND_EXCEEDED", "too many")
         kwargs["client"].counter["attempted"] += 1
-        return FakeOutcome("a" if len(calls) == 1 else "b")
+        return FakeOutcome("a" if len(calls) == 1 else "b", inputs.user_id)
 
     monkeypatch.setattr(proof, "ingest_vendor_bodygraph", fake_ingest)
     monkeypatch.setattr(proof, "_bounded_live_client", FakeClient)
     return calls
 
 
-def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_live_harness_individual_mode_request_bound_and_secret_safe(admitted, monkeypatch: pytest.MonkeyPatch) -> None:
     calls = _configure_individual_live_fake(monkeypatch)
-    reader_calls: list[tuple[dict[str, object], dict[str, object]]] = []
+    reader_calls: list[tuple[str, str]] = []
 
     def tracked_reader(left, right):
-        reader_calls.append((dict(left), dict(right)))
+        reader_calls.append((left.canonical_person_id, right.canonical_person_id))
         return proof._emit_live_reader_bytes(left, right)
 
     payload = proof.build_live_proof(reader_emitter=tracked_reader)
@@ -295,6 +422,7 @@ def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch:
     ],
 )
 def test_live_harness_rejects_second_reader_emission_drift(
+    admitted,
     monkeypatch: pytest.MonkeyPatch,
     drift_call: int,
     predicate: str,
@@ -325,7 +453,7 @@ def test_live_harness_rejects_second_reader_emission_drift(
 
 
 @pytest.mark.parametrize("duplicate", ["fingerprint", "payload"])
-def test_live_harness_rejects_duplicate_acquisitions(monkeypatch: pytest.MonkeyPatch, duplicate: str) -> None:
+def test_live_harness_rejects_duplicate_acquisitions(admitted, monkeypatch: pytest.MonkeyPatch, duplicate: str) -> None:
     _configure_authorized_live_env(monkeypatch)
     monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v1")
     monkeypatch.setattr(proof, "CANONICAL_LIVE_VENDOR_BASE", "https://sandbox.vendor.test/v1")
@@ -334,12 +462,10 @@ def test_live_harness_rejects_duplicate_acquisitions(monkeypatch: pytest.MonkeyP
 
 
     class FakeOutcome:
-        def __init__(self, label: str) -> None:
+        def __init__(self, label: str, user_id: str) -> None:
+            # A duplicate payload repeats party a's gates under each party's own identity.
             payload_label = "a" if duplicate == "payload" else label
-            self.payload = {
-                "person_uid": f"person-{payload_label}",
-                "mechanics": {"type": "Generator" if payload_label == "a" else "Projector"},
-            }
+            self.payload = _acquired_chart(payload_label, user_id)
             self.input_fingerprint = "same-input" if duplicate == "fingerprint" else label * 64
             self.payload_sha256 = proof.sha(proof.emitter.emit_public(self.payload))
 
@@ -352,7 +478,7 @@ def test_live_harness_rejects_duplicate_acquisitions(monkeypatch: pytest.MonkeyP
     def fake_ingest(inputs, **kwargs):
         calls.append(inputs.user_id)
         kwargs["client"].counter["attempted"] += 1
-        return FakeOutcome("a" if len(calls) == 1 else "b")
+        return FakeOutcome("a" if len(calls) == 1 else "b", inputs.user_id)
 
     monkeypatch.setattr(proof, "ingest_vendor_bodygraph", fake_ingest)
     monkeypatch.setattr(proof, "_bounded_live_client", FakeClient)
@@ -377,7 +503,7 @@ def test_live_harness_missing_config_is_inconclusive(monkeypatch: pytest.MonkeyP
     assert payload["requests_attempted"] == 0
 
 
-def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(admitted, monkeypatch: pytest.MonkeyPatch) -> None:
     _configure_authorized_live_env(monkeypatch)
     for key in [
         "OPEN_RAILS_VENDOR_ABBA_A_USER_ID",
@@ -417,20 +543,20 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
     class FakeAdapter:
         calls = 0
 
+        def __init__(self, context) -> None:
+            self.context = context
+
         def as_dict(self):
             FakeAdapter.calls += 1
             label = "a" if FakeAdapter.calls == 1 else "b"
             return {
                 "status": "mapped",
                 "code": "ADAPTER_MAPPED",
-                "resolved": {
-                    "person_uid": f"person-{label}",
-                    "bodygraph": {"type": "Generator" if label == "a" else "Projector"},
-                },
+                "resolved": _acquired_chart(label, self.context.user_id),
             }
 
     monkeypatch.setattr(proof, "_bounded_live_client", lambda counter: FakeClient(counter))
-    monkeypatch.setattr(proof, "adapt_v2_chart_payload", lambda payload, context: FakeAdapter())
+    monkeypatch.setattr(proof, "adapt_v2_chart_payload", lambda payload, context: FakeAdapter(context))
 
     payload = proof.build_live_proof()
     assert payload["top_level_pass"] is True
@@ -446,7 +572,7 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
     assert payload["predicates"]["two_run_ba_identity"] is True
 
 
-def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_legacy_live_harness_isolates_ingest_logs(admitted, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _configure_authorized_live_env(monkeypatch)
     monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v1")
     monkeypatch.setattr(proof, "CANONICAL_LIVE_VENDOR_BASE", "https://sandbox.vendor.test/v1")
@@ -474,12 +600,8 @@ def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatc
                 raise VendorError("PROVIDER_REQUEST_BOUND_EXCEEDED", "too many")
             self.counter["attempted"] += 1
             label = "a" if request.input_fingerprint.startswith("a") else "b"
-            return FakeResult(
-                {
-                    "person_uid": f"person-{label}",
-                    "mechanics": {"type": "Generator" if label == "a" else "Projector"},
-                }
-            )
+            inputs = proof.LIVE_SYNTHETIC_A if label == "a" else proof.LIVE_SYNTHETIC_B
+            return FakeResult(_acquired_chart(label, inputs.user_id))
 
     governed_logs = tuple(proof.ROOT / path for path in (RETRY_LOG, SUCCESS_LOG, CANON_COMPARE_LOG))
     before = {path: path.read_bytes() if path.exists() else None for path in governed_logs}

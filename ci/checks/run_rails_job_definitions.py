@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-"""Strict runner for reusable SAFE-rails CI job definitions."""
+"""Strict runner for reusable SAFE-rails CI job definitions.
+
+PF10 — HDE Build Notes §2.15 (HDE-EPIC040-PR04 F01 overlay): a step may declare
+``accepted_release_not_admitted_exit_code: 3`` in the job definition's native
+shape.  When that step exits with exactly that code, the runner accepts the
+outcome only after its own independent read-only admission probe observes the
+``INCOMPLETE_RELEASE_ROSTER`` refusal; every remaining step and job still runs,
+the run ends with ``RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED`` and exits with
+the same distinct code (never 0).  Any other non-zero exit fails as before, and a
+failing step that merely happens to exit with that same code -- pytest uses it for
+an internal error -- is remapped so the distinct code can only ever mean the
+accepted outcome for a caller that checks the number.
+The acceptance is self-extinguishing: once the complete roster is admitted the
+probe returns a bundle and a non-zero step exit is an ordinary failure.
+"""
 from __future__ import annotations
 
 import ast
@@ -12,7 +26,19 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 REQUIRED_IDENTITIES = {"rails_closed_refusal", "rails_open_conformance", "logs_keys_only_redaction"}
+# Distinct non-admitted exit code; tests pin it equal to
+# tools.evidence.run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE.
+RELEASE_NOT_ADMITTED_EXIT_CODE = 3
+# Callers accept exit 3 on the number alone, so a failure that did not establish
+# the accepted outcome must never leave through that code.  pytest, for one, uses
+# exit 3 for an internal error.
+UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE = 1
+RELEASE_NOT_ADMITTED_REFUSAL_CODE = "INCOMPLETE_RELEASE_ROSTER"
+ACCEPTED_RELEASE_NOT_ADMITTED_KEY = "accepted_release_not_admitted_exit_code"
+RELEASE_NOT_ADMITTED_MARKER = "RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED"
 REQUIRED_TOP_LEVEL = {"name", "rails", "scope", "live_vendor_calls", "steps"}
 RAIL_KEYS = {"SAFE_MODE", "ALLOW_NETWORK", "LC_ALL", "LANG", "TZ"}
 DETERMINISM = {"LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
@@ -91,12 +117,21 @@ def load_closed_yaml(path: Path) -> dict[str, Any]:
                 if not step_line.startswith("command:"):
                     raise DefinitionError("each step must start with command")
                 step: dict[str, Any] = {"command": str(_parse_scalar(step_line.split(":", 1)[1]))}
-                if i < len(lines) and lines[i].strip() == "proves:":
-                    i += 1
-                    proves: list[str] = []
-                    while i < len(lines) and lines[i].startswith("      - "):
-                        proves.append(lines[i].split("- ", 1)[1].strip()); i += 1
-                    step["proves"] = proves
+                while i < len(lines) and lines[i].startswith("    ") and not lines[i].startswith("      - "):
+                    sub = lines[i].strip()
+                    if sub == "proves:":
+                        i += 1
+                        proves: list[str] = []
+                        while i < len(lines) and lines[i].startswith("      - "):
+                            proves.append(lines[i].split("- ", 1)[1].strip()); i += 1
+                        step["proves"] = proves
+                    elif sub.startswith(ACCEPTED_RELEASE_NOT_ADMITTED_KEY + ":"):
+                        if ACCEPTED_RELEASE_NOT_ADMITTED_KEY in step:
+                            raise DefinitionError("duplicate accepted outcome declaration")
+                        step[ACCEPTED_RELEASE_NOT_ADMITTED_KEY] = _parse_scalar(sub.split(":", 1)[1])
+                        i += 1
+                    else:
+                        raise DefinitionError(f"unsupported step key: {sub}")
                 steps.append(step)
             data[key] = steps
         elif key.lower().replace("-", "_") in CREDENTIAL_KEYS:
@@ -157,6 +192,34 @@ def _reject_credential_argv(argv: list[str]) -> None:
             raise DefinitionError("env wrapper is forbidden in rails job commands")
 
 
+def _validate_accepted_outcome(step: dict[str, Any]) -> None:
+    """The only declarable accepted non-zero outcome is the distinct non-admitted code."""
+
+    if ACCEPTED_RELEASE_NOT_ADMITTED_KEY not in step:
+        return
+    raw = step[ACCEPTED_RELEASE_NOT_ADMITTED_KEY]
+    text = str(raw).strip()
+    if isinstance(raw, bool) or not text.isdigit() or int(text) != RELEASE_NOT_ADMITTED_EXIT_CODE:
+        raise DefinitionError(
+            f"{ACCEPTED_RELEASE_NOT_ADMITTED_KEY} must equal {RELEASE_NOT_ADMITTED_EXIT_CODE}"
+        )
+    step[ACCEPTED_RELEASE_NOT_ADMITTED_KEY] = RELEASE_NOT_ADMITTED_EXIT_CODE
+
+
+def release_not_admitted_observed() -> bool:
+    """Independent read-only admission probe: true only for ``INCOMPLETE_RELEASE_ROSTER``."""
+
+    from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
+
+    try:
+        load_active_mechanics_bundle()
+    except SchemaValidationError as exc:
+        return getattr(exc, "code", None) == RELEASE_NOT_ADMITTED_REFUSAL_CODE
+    except Exception:
+        return False
+    return False
+
+
 def _validate_allowed_argv(job_name: str, argv: list[str]) -> None:
     normalized = tuple("python" if arg == sys.executable else arg for arg in argv)
     allowed = ALLOWED_ARGV.get(job_name, ())
@@ -204,6 +267,7 @@ def validate(path: Path) -> dict[str, Any]:
             raise DefinitionError("step command must be non-empty single-line string")
         if "proves" in step and (not isinstance(step["proves"], list) or not all(isinstance(x, str) for x in step["proves"])):
             raise DefinitionError("proves must be list of strings")
+        _validate_accepted_outcome(step)
         try:
             argv = shlex.split(cmd)
         except ValueError as exc:
@@ -213,7 +277,20 @@ def validate(path: Path) -> dict[str, Any]:
     return job
 
 
-def run_job(job: dict[str, Any]) -> int:
+def run_job(job: dict[str, Any], *, outcomes: list[str] | None = None) -> int:
+    """Run one job; return 0 or the first failing step's exit code.
+
+    A step that exits with its declared ``accepted_release_not_admitted_exit_code``
+    while the independent probe observes the non-admitted state is accepted: the
+    remaining steps still run, and ``RELEASE_NOT_ADMITTED`` is appended to
+    ``outcomes`` so the caller can end with the distinct code instead of 0.
+
+    Any other failing step that happens to exit with that same code is remapped to
+    ``UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE``, so a returned
+    ``RELEASE_NOT_ADMITTED_EXIT_CODE`` always means the accepted outcome and never an
+    ordinary failure that merely shares the number.
+    """
+
     env = dict(os.environ)
     for key in CREDENTIAL_ENV_NAMES:
         env.pop(key, None)
@@ -225,8 +302,37 @@ def run_job(job: dict[str, Any]) -> int:
         _reject_credential_argv(argv)
         _validate_allowed_argv(str(job["name"]), argv)
         result = subprocess.run(argv, cwd=ROOT, env=env, text=True)
-        if result.returncode != 0:
-            return result.returncode
+        if result.returncode == 0:
+            continue
+        accepted = step.get(ACCEPTED_RELEASE_NOT_ADMITTED_KEY)
+        if (
+            accepted is not None
+            and result.returncode == accepted
+            and release_not_admitted_observed()
+        ):
+            print(
+                f"ACCEPTED {job['name']}: RELEASE_NOT_ADMITTED (exit {accepted}; "
+                f"{RELEASE_NOT_ADMITTED_REFUSAL_CODE} observed): {cmd}",
+                flush=True,
+            )
+            if outcomes is not None:
+                outcomes.append("RELEASE_NOT_ADMITTED")
+            continue
+        if result.returncode == RELEASE_NOT_ADMITTED_EXIT_CODE:
+            # This step did not establish the accepted non-admitted outcome, so it must
+            # not be able to exit with the code that means exactly that.  Returning it
+            # raw would let an ordinary internal failure be read as RELEASE_NOT_ADMITTED
+            # by a caller that checks the number and an independent admission probe --
+            # and that probe succeeds for the whole pre-admission period.
+            print(
+                f"UNACCEPTED_EXIT_{RELEASE_NOT_ADMITTED_EXIT_CODE} {job['name']}: "
+                f"remapped to {UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE}; this is an "
+                f"ordinary failure, not RELEASE_NOT_ADMITTED: {cmd}",
+                file=sys.stderr,
+                flush=True,
+            )
+            return UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE
+        return result.returncode
     return 0
 
 
@@ -246,10 +352,14 @@ def main(argv: list[str] | None = None) -> int:
             raise DefinitionError(f"required identities mismatch: {sorted(REQUIRED_IDENTITIES - seen)}")
     except Exception as exc:
         print(f"RAILS_JOB_DEFINITION_INVALID: {exc}", file=sys.stderr); return 2
+    outcomes: list[str] = []
     for job in jobs:
-        code = run_job(job)
+        code = run_job(job, outcomes=outcomes)
         if code:
             return code
+    if outcomes:
+        print(RELEASE_NOT_ADMITTED_MARKER)
+        return RELEASE_NOT_ADMITTED_EXIT_CODE
     print("RAILS_JOB_DEFINITIONS_OK")
     return 0
 

@@ -1,37 +1,33 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import importlib.metadata
 import json
-import math
 import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
 
 from engine.bodygraph import resolve_bodygraph
-from engine.bodygraph.ingest import (
-    VendorInputs,
-    ingest_vendor_bodygraph,
-    resolve_db_user_id,
-)
-from engine.compat import ts_v0
+from engine.bodygraph.ingest import resolve_db_user_id
+from engine.bodygraph.mapped_cache import MappedBodyGraphRow, MappedCacheError, read_current_mapped_bodygraph
+from engine.bodygraph.projection import BodyGraphProjectionError, canonical_uuid
+from engine.bodygraph.resolver import ResolvedCompatChart, projection_refusal, resolve_compat_chart
 from engine.compat.categories import CATEGORIES_ORDER_V1
-from engine.compat.compute import compat_public, band_for
-from engine.compat.compute import conjunction_public_resolved
-from engine.compat.ordering import normalize_pair, pair_key
+from engine.compat.compute import (
+    EvaluationParty,
+    conjunction_public_resolved,
+    evaluate_pair,
+    evaluation_party,
+    harmony_band,
+    is_ineligible_carrier,
+    orient,
+)
+from engine.compat.error_tokens import CompatBoundaryError
 from engine.compat.thresholds import THRESHOLDS_V1
+from engine.config.registry_loader import RegistryConfigError
 from engine.db import DBAccess
 from engine.db.errors import AdapterError
-from engine.constants import (
-    COMP_MAX,
-    EM_MAX,
-    MIND_THROAT_MAX,
-    MOTOR_THROAT_MAX,
-    THROAT_EM_MAX,
-    CENTER_MAX,
-)
 from engine.presenter import emitter
 from engine.runtime import emit_reader_public_envelope, identity_meta
 from engine.serializer.canon import sercanon
@@ -43,13 +39,9 @@ from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_ran
 
 from ._admin_dump import canon_dump
 
-_TYPE_SEQUENCE = (
-    "Generator",
-    "Manifesting Generator",
-    "Projector",
-    "Manifestor",
-    "Reflector",
-)
+_PROJECTION_KEYS = ("bodygraph", "person", "person_uid", "source")
+_IDENTITY_KEYS = ("user_id", "canonical_person_id")
+_BIRTH_KEYS = ("birthdate", "birthtime", "location")
 
 
 class CliError(Exception):
@@ -260,6 +252,17 @@ def cli(argv: list[str] | None = None) -> int:
     except CliError as err:
         sys.stderr.write(f"{err.code}\n")
         return err.exit_code
+    except CompatBoundaryError as exc:
+        # PF05 §4.1.4: the stderr code string equals the error_v1 code for the same failure.
+        sys.stderr.write(f"{exc.token}\n")
+        return 1
+    except VendorError as exc:
+        sys.stderr.write(f"{exc.code}\n")
+        return 1
+    except RegistryConfigError as exc:
+        # Admission refusal (for example INCOMPLETE_RELEASE_ROSTER) propagates unchanged.
+        sys.stderr.write(f"{exc.code}\n")
+        return 1
     except Exception as exc:  # pragma: no cover - defensive guard
         sys.stderr.write(f"CLI_UNEXPECTED:{exc}\n")
         return 1
@@ -277,36 +280,28 @@ def _parse_input(raw: str) -> Dict[str, Any]:
     return data
 
 
-def _fingerprint(payload: Dict[str, Any]) -> str:
-    canon_bytes = sercanon(payload)
-    return hashlib.sha256(canon_bytes).hexdigest()
-
-
-def _derive_uid(fields: Dict[str, Any]) -> str:
-    existing = fields.get("person_uid")
-    if isinstance(existing, str) and existing.strip() and len(existing.strip()) <= 64:
-        return existing.strip()
-    base = {k: fields[k] for k in ("birthdate", "birthtime", "location", "tz") if k in fields}
-    digest = _fingerprint(base)
-    return f"cli-{digest[:32]}"
-
-
 def _normalize_party(obj: Any, label: str) -> Dict[str, Any]:
+    """Normalize one file/stdin party into the resolver's input shape.
+
+    A complete mapped chart passes through with its identity slots; declared
+    birth fields (top-level or under ``birth``) are lifted to the top level for
+    the birth-seed identity route.  No chart is synthesized and no ``cli-``
+    identity is derived; the resolver refuses incomplete or legacy input.
+    """
+
     if not isinstance(obj, dict):
         raise CliError(f"INVALID_PARTY_{label.upper()}")
-    required = ("birthdate", "birthtime", "location")
     normalized: Dict[str, Any] = {}
-    for key in required:
+    for key in _PROJECTION_KEYS:
+        if key in obj:
+            normalized[key] = obj[key]
+    for key in _IDENTITY_KEYS:
         value = obj.get(key)
-        if not isinstance(value, str) or not value.strip():
-            raise CliError(f"MISSING_FIELD_{label.upper()}_{key.upper()}")
-        normalized[key] = value.strip()
-    tz_val = obj.get("tz")
-    if isinstance(tz_val, str) and tz_val.strip():
-        normalized["tz"] = tz_val.strip()
-    if isinstance(obj.get("person_uid"), str):
-        normalized["person_uid"] = obj["person_uid"].strip()
-    normalized["person_uid"] = _derive_uid(normalized)
+        if isinstance(value, str) and value.strip():
+            normalized[key] = value.strip()
+    for key, value in _birth_fields_from_payload(obj).items():
+        if key in _BIRTH_KEYS:
+            normalized[key] = value
     return normalized
 
 
@@ -333,110 +328,108 @@ def _birth_fields_from_payload(payload: Mapping[str, Any]) -> Dict[str, str]:
     return birth
 
 
+def _resolve_party(
+    payload: Mapping[str, Any] | str,
+    *,
+    source_policy: str,
+    local_lookup=None,
+) -> ResolvedCompatChart:
+    return resolve_compat_chart(
+        payload,
+        source_policy=source_policy,
+        env=_resolver_env(),
+        local_lookup=local_lookup,
+    )
+
+
 def _person_and_chart_from_payload(payload: Mapping[str, Any], *, uid_hint: str | None) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    birth = _birth_fields_from_payload(payload)
-    uid = payload.get("person_uid")
-    if not uid and birth:
-        uid = _derive_uid(birth)
-    if not uid:
-        uid = uid_hint or _derive_uid({"person_uid": "fallback"})
-    mapped_bodygraph = payload.get("bodygraph")
-    if not isinstance(mapped_bodygraph, Mapping):
-        mapped_bodygraph = {}
-    mechanics = payload.get("mechanics") or mapped_bodygraph
-    if not isinstance(mechanics, Mapping):
-        mechanics = {}
-    mech_type = mechanics.get("type") or payload.get("type")
-    if not isinstance(mech_type, str) or not mech_type.strip():
-        raise CliError("MISSING_MECHANICS_TYPE")
-    chart = {"person_uid": uid, "mechanics": {"type": mech_type.strip()}}
-    if birth:
-        chart["birth"] = dict(birth)
-    person = {"person_uid": uid}
-    if birth:
-        person["birth"] = dict(birth)
-    return person, chart
+    """Bind a stored payload to its trusted row identity (``uid_hint``) and return ``(person, chart)``."""
+
+    party: Dict[str, Any] = dict(payload)
+    if uid_hint:
+        party["user_id"] = uid_hint
+    resolved = _resolve_party(party, source_policy="local")
+    return {"person_uid": resolved.canonical_person_id}, dict(resolved.mapped_chart)
 
 
 def _party_from_normalized(payload: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    chart = _chart_for(payload["person_uid"])
-    bodygraph = _bodygraph(payload, chart)
-    birth = {k: payload[k] for k in ("birthdate", "birthtime", "location", "tz") if k in payload}
-    person = {"person_uid": payload["person_uid"]}
-    if birth:
-        person["birth"] = birth
-    return person, bodygraph
+    """Return ``(person, complete_chart)`` for one normalized file party without I/O."""
+
+    resolved = _resolve_party(payload, source_policy="local")
+    return {"person_uid": resolved.canonical_person_id}, dict(resolved.mapped_chart)
 
 
-def _fetch_db_bodygraph(user_id: str, db_access: DBAccess | None = None) -> Tuple[Mapping[str, Any], str]:
+def _fetch_db_bodygraph(user_id: str, db_access: DBAccess | None = None) -> Tuple[MappedBodyGraphRow, str]:
+    """Read-only current-row lookup for an engine user key; returns the bound row and canonical UUID."""
+
     normalized = resolve_db_user_id(user_id)
+    canonical = canonical_uuid(normalized)
+    if canonical is None:
+        raise CliError("INVALID_DB_USER")
     if os.environ.get("HDE_FORCE_DB_UNAVAILABLE") == "1":
         raise CliError("DB_QUERY_FAILED")
     try:
         db = db_access or DBAccess.for_current_env()
-        rows = db.query(
-            """
-            SELECT payload::text
-            FROM hde.body_graphs_current
-            WHERE user_id = %s
-            ORDER BY vendor_version DESC
-            LIMIT 1
-            """,
-            (normalized,),
-        )
     except AdapterError as exc:
         raise CliError("DB_QUERY_FAILED") from exc
-    if not rows:
-        raise CliError("BODYGRAPH_NOT_FOUND")
     try:
-        payload = json.loads(rows[0][0])
-    except json.JSONDecodeError as exc:
+        row = read_current_mapped_bodygraph(db, canonical)
+    except MappedCacheError as exc:
+        if exc.code == "DB_QUERY_FAILED":
+            raise CliError("DB_QUERY_FAILED") from exc
         raise CliError("INVALID_BODYGRAPH_PAYLOAD") from exc
-    return payload, normalized
+    except BodyGraphProjectionError as exc:
+        raise projection_refusal(exc) from None
+    if row is None:
+        raise CliError("BODYGRAPH_NOT_FOUND")
+    return row, canonical
 
 
-def _vendor_inputs_from_args(args: argparse.Namespace, prefix: str) -> VendorInputs:
+def _resolve_db_party(user_id: str) -> ResolvedCompatChart:
+    row, canonical = _fetch_db_bodygraph(user_id)
+    return _resolve_party(
+        {"user_id": user_id},
+        source_policy="local",
+        local_lookup=lambda key: row if key == canonical else None,
+    )
+
+
+def _vendor_inputs_from_args(args: argparse.Namespace, prefix: str) -> Dict[str, str]:
+    """Return the complete birth tuple for one party (input class 3); identity is never derived here."""
+
     birthdate = getattr(args, f"birthdate_{prefix}", None)
     birthtime = getattr(args, f"birthtime_{prefix}", None)
     location = getattr(args, f"location_{prefix}", None)
     missing = [name for name, value in (("birthdate", birthdate), ("birthtime", birthtime), ("location", location)) if not (value and value.strip())]
     if missing:
         raise CliError("MISSING_VENDOR_INPUT")
-    base = {"birthdate": birthdate.strip(), "birthtime": birthtime.strip(), "location": location.strip()}
-    user_id = _derive_uid(base)
-    return VendorInputs(
-        user_id=user_id,
-        birthdate=base["birthdate"],
-        birthtime=base["birthtime"],
-        location=base["location"],
-    )
+    return {"birthdate": birthdate.strip(), "birthtime": birthtime.strip(), "location": location.strip()}
 
 
-def _conjunction_party_from_payload(raw: Any, label: str) -> Dict[str, str]:
+def _conjunction_party_from_payload(raw: Any, label: str) -> Dict[str, Any]:
+    """Normalize one conjunction party: a complete chart, an engine key, or a birth tuple.
+
+    The complete chart and its trusted identity slots pass through unchanged
+    for the resolver; a bare ``person_uid``/``user_id`` is a stored-user key;
+    a complete birth tuple alone is the no-user route.  Nothing else is accepted.
+    """
+
     if not isinstance(raw, Mapping):
         raise CliError(f"MISSING_CONJUNCTION_{label.upper()}")
-    party: Dict[str, str] = {}
-    person_uid = raw.get("person_uid")
-    user_id = raw.get("user_id")
-    if isinstance(person_uid, str) and person_uid.strip():
-        party["person_uid"] = person_uid.strip()
-    elif isinstance(user_id, str) and user_id.strip():
-        party["user_id"] = user_id.strip()
-    else:
+    party: Dict[str, Any] = {}
+    for key in _PROJECTION_KEYS:
+        if key in raw:
+            party[key] = raw[key]
+    for key in ("person_uid", *_IDENTITY_KEYS):
+        value = raw.get(key)
+        if isinstance(value, str) and value.strip():
+            party[key] = value.strip()
+    birth = {key: value for key, value in _birth_fields_from_payload(raw).items() if key in _BIRTH_KEYS}
+    party.update(birth)
+    has_identity = any(key in party for key in ("person_uid", *_IDENTITY_KEYS))
+    if "bodygraph" not in party and not has_identity and len(birth) != len(_BIRTH_KEYS):
         raise CliError(f"MISSING_CONJUNCTION_{label.upper()}")
-    for key, value in _birth_fields_from_payload(raw).items():
-        if key in ("birthdate", "birthtime", "location"):
-            party[key] = value
     return party
-
-
-def _chart_for(uid: str) -> Dict[str, Any]:
-    digest = hashlib.sha256(uid.encode("utf-8")).digest()[0]
-    mech_type = _TYPE_SEQUENCE[digest % len(_TYPE_SEQUENCE)]
-    chart = {"person_uid": uid, "mechanics": {"type": mech_type}}
-    ts = ts_v0.extract_ts(chart)
-    chart["mechanics"]["strategy"] = ts["strategy"]
-    return chart
 
 
 def _engine_identity() -> tuple[str, str, str]:
@@ -448,83 +441,43 @@ def _viewer_weights() -> Dict[str, int]:
     return {cat: 50 for cat in CATEGORIES_ORDER_V1}
 
 
-def _signals(features: Dict[str, Any]) -> list[Dict[str, Any]]:
-    return [
-        {"name": name, "value": features[name]}
-        for name in sorted(features.keys())
-    ]
+def _admin_bodygraph(party: EvaluationParty) -> Dict[str, Any]:
+    """Complete normalized projection with the verified canonical identity."""
+
+    return dict(party.projection)
 
 
-def _per_category_proof(categories: Iterable[Dict[str, Any]], weights: Dict[str, int]) -> Dict[str, Dict[str, Any]]:
-    proof: Dict[str, Dict[str, Any]] = {}
-    for cat in CATEGORIES_ORDER_V1:
-        match = next((c for c in categories if c["id"] == cat), None)
-        if match is None:
-            continue
-        score = int(match.get("score", 0))
-        clamped = max(0, min(100, score))
-        proof[cat] = {
-            "raw": score,
-            "normalized": score,
-            "clamped": clamped,
-            "rounded": clamped,
-            "band": match.get("band", "Cool"),
-            "proof": [
-                {"step": "hash_score", "value": score},
-                {"step": "weight", "value": weights.get(cat, 0)},
-                {"step": "band_threshold", "value": match.get("band", "Cool")},
-            ],
-        }
-    return proof
-
-
-def _overall_from(proof: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
-    if not proof:
-        return {"percent": 0, "band": band_for(0)}
-    total = sum(item["rounded"] for item in proof.values())
-    avg = total / len(proof)
-    percent = int(math.floor(avg + 0.5))
-    return {"percent": percent, "band": band_for(percent)}
-
-
-def _bodygraph(payload: Dict[str, Any], chart: Dict[str, Any]) -> Dict[str, Any]:
-    birth_keys = ("birthdate", "birthtime", "location", "tz")
-    birth_payload = payload.get("birth") if isinstance(payload.get("birth"), Mapping) else {}
-    birth = {}
-    for key in birth_keys:
-        if key in payload:
-            birth[key] = payload[key]
-        elif key in birth_payload:
-            birth[key] = birth_payload[key]
-    return {
-        "person_uid": payload["person_uid"],
-        "mechanics": chart["mechanics"],
-        "birth": birth,
+def _composite_bodygraph(lo: EvaluationParty, hi: EvaluationParty, result: Mapping[str, Any]) -> Dict[str, Any]:
+    composite: Dict[str, Any] = {
+        "left_person_uid": lo.canonical_person_id,
+        "right_person_uid": hi.canonical_person_id,
+        "eligible": not is_ineligible_carrier(result),
     }
+    if composite["eligible"]:
+        composite.update(
+            {
+                "pair_key": result["pair_key"],
+                "config_id": result["config_id"],
+                "release_id": result["release_id"],
+                "left_chart_fingerprint": lo.chart_fingerprint,
+                "right_chart_fingerprint": hi.chart_fingerprint,
+            }
+        )
+    return composite
 
 
-def _composite_bodygraph(a: Dict[str, Any], b: Dict[str, Any], features: Dict[str, Any]) -> Dict[str, Any]:
-    pk = pair_key({"person_uid": a["person_uid"]}, {"person_uid": b["person_uid"]})
+def _compat_proof(result: Mapping[str, Any]) -> Dict[str, Any]:
+    """Admin proof derived only from the validated complete result."""
+
+    if is_ineligible_carrier(result):
+        return {"eligible": False, "categories": [], "signals": []}
     return {
-        "pair_key": pk,
-        "left_person_uid": a["person_uid"],
-        "right_person_uid": b["person_uid"],
-        "features": features,
-        "band": ts_v0.band_v0(features),
-    }
-
-
-def _compat_proof(categories: Iterable[Dict[str, Any]], features: Dict[str, Any], weights: Dict[str, int]) -> Dict[str, Any]:
-    per_category = _per_category_proof(categories, weights)
-    return {
-        "constants": {
-            "EM_MAX": EM_MAX,
-            "THROAT_EM_MAX": THROAT_EM_MAX,
-            "CENTER_MAX": CENTER_MAX,
-            "MIND_THROAT_MAX": MIND_THROAT_MAX,
-            "MOTOR_THROAT_MAX": MOTOR_THROAT_MAX,
-            "COMP_MAX": COMP_MAX,
-        },
+        "schema": result["schema"],
+        "config_id": result["config_id"],
+        "release_id": result["release_id"],
+        "pair_key": result["pair_key"],
+        "signals": [dict(row) for row in result["signals"]],
+        "categories": [dict(row) for row in result["categories"]],
         "thresholds": {
             "edges": [
                 THRESHOLDS_V1["cool_max"],
@@ -535,10 +488,6 @@ def _compat_proof(categories: Iterable[Dict[str, Any]], features: Dict[str, Any]
             "rounding": "round_half_up",
             "clamp": "0..100",
         },
-        "categories_frozen_order": list(CATEGORIES_ORDER_V1),
-        "signals": _signals(features),
-        "per_category": per_category,
-        "overall": _overall_from(per_category),
     }
 
 
@@ -570,50 +519,43 @@ def _emit_stdout_bytes(payload: bytes) -> None:
 def _emit_admin_dumps(
     args: argparse.Namespace,
     case_name: str,
-    left_payload: Dict[str, Any],
-    right_payload: Dict[str, Any],
-    a_chart: Dict[str, Any],
-    b_chart: Dict[str, Any],
-    categories: Iterable[Dict[str, Any]],
-    features: Dict[str, Any],
-    weights: Dict[str, int],
+    lo: EvaluationParty,
+    hi: EvaluationParty,
+    result: Mapping[str, Any],
 ) -> None:
     if not getattr(args, "dump_admin_dir", None):
         return
     admin_dir = Path(args.dump_admin_dir)
-    left = _bodygraph(left_payload, a_chart)
-    right = _bodygraph(right_payload, b_chart)
-    composite = _composite_bodygraph(left, right, features)
-    proof = _compat_proof(categories, features, weights)
-
-    canon_dump(admin_dir / f"{case_name}.left.bodygraph.json", left)
-    canon_dump(admin_dir / f"{case_name}.right.bodygraph.json", right)
-    canon_dump(admin_dir / f"{case_name}.composite.bodygraph.json", composite)
-    canon_dump(admin_dir / f"{case_name}.compat.proof.json", proof)
+    canon_dump(admin_dir / f"{case_name}.left.bodygraph.json", _admin_bodygraph(lo))
+    canon_dump(admin_dir / f"{case_name}.right.bodygraph.json", _admin_bodygraph(hi))
+    canon_dump(admin_dir / f"{case_name}.composite.bodygraph.json", _composite_bodygraph(lo, hi, result))
+    canon_dump(admin_dir / f"{case_name}.compat.proof.json", _compat_proof(result))
 
 
 def aux_preview(args: argparse.Namespace) -> int:
     pack = get_pack()
 
     def _resolve_from_pair_file() -> Tuple[str, str, str, str, Dict[str, Any]]:
+        # The pair file is the canonical ``magic10_compat_result.v1`` document
+        # written by ``showcompat`` (or a conjunction payload carrying one).
         raw = _read_file(args.pair_file)
         data = _parse_input(raw)
-        compat = data.get("compat") or {}
+        compat: Any = data
+        if isinstance(data.get("conjunction"), Mapping):
+            compat = data["conjunction"].get("compat")
         if not isinstance(compat, Mapping):
             raise CliError("INVALID_COMPAT_INPUT")
-        categories = compat.get("categories") or []
+        categories = [row for row in (compat.get("categories") or []) if isinstance(row, Mapping)]
         if not categories:
             raise CliError("MISSING_COMPAT_CATEGORY")
-        viewer_prefs = data.get("viewer_prefs") or {}
-        category = viewer_prefs.get("top_category") if isinstance(viewer_prefs, Mapping) else None
+        category = args.category
         if not isinstance(category, str):
-            category = categories[0].get("id")
-        band = next((c.get("band") for c in categories if c.get("id") == category), None) or categories[0].get("band")
-        if not isinstance(band, str):
+            category = categories[0].get("category_id")
+        band = next((row.get("band") for row in categories if row.get("category_id") == category), None)
+        if not isinstance(category, str) or not isinstance(band, str):
             raise CliError("MISSING_COMPAT_CATEGORY")
         perspective = args.perspective or "shared"
-        meta = compat.get("meta") or {}
-        release_id = meta.get("release_id") or identity_meta()["release_id"]
+        release_id = compat.get("release_id") or identity_meta()["release_id"]
         return category, band, perspective, release_id, data
 
     def _resolve_inputs() -> Tuple[str, str, str, str, Dict[str, Any] | None]:
@@ -647,31 +589,16 @@ def aux_preview(args: argparse.Namespace) -> int:
             "pack_sha": emission.pack_sha,
             "release_id": release_id,
         }
-        if isinstance(data, Mapping):
-            a = data.get("a") or {}
-            b = data.get("b") or {}
-            if isinstance(a, Mapping) and isinstance(b, Mapping):
-                sidecar["pair"] = {
-                    "a_person_uid": a.get("person_uid"),
-                    "b_person_uid": b.get("person_uid"),
-                }
+        if isinstance(data, Mapping) and isinstance(data.get("conjunction"), Mapping):
+            conjunction = data["conjunction"]
+            left = conjunction.get("left") if isinstance(conjunction.get("left"), Mapping) else {}
+            right = conjunction.get("right") if isinstance(conjunction.get("right"), Mapping) else {}
+            sidecar["pair"] = {
+                "a_person_uid": left.get("person_uid"),
+                "b_person_uid": right.get("person_uid"),
+            }
         canon_dump(args.admin_out, sidecar)
     return 0
-
-
-def _canonical_pair(
-    left_person: Dict[str, Any],
-    right_person: Dict[str, Any],
-    left_chart: Dict[str, Any],
-    right_chart: Dict[str, Any],
-) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
-    ordered_people = list(normalize_pair(left_person, right_person))
-    charts = {
-        left_person["person_uid"]: left_chart,
-        right_person["person_uid"]: right_chart,
-    }
-    ordered_charts = [charts[p["person_uid"]] for p in ordered_people]
-    return ordered_people[0], ordered_people[1], ordered_charts[0], ordered_charts[1]
 
 
 def showcompat(_: argparse.Namespace) -> int:
@@ -737,16 +664,16 @@ def showcompat(_: argparse.Namespace) -> int:
             return left_from_args, right_from_args
         return _conjunction_from_files_or_stdin()
 
-    def _lookup_local_conjunction(user_id: str) -> Mapping[str, Any] | None:
+    def _lookup_local_conjunction(user_id: str) -> MappedBodyGraphRow | None:
         try:
-            payload, _ = _fetch_db_bodygraph(user_id)
-            return payload
+            row, _canonical = _fetch_db_bodygraph(user_id)
+            return row
         except CliError as exc:
             if exc.code == "BODYGRAPH_NOT_FOUND":
                 return None
             raise
 
-    def _load_from_source() -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+    def _load_from_source() -> Tuple[ResolvedCompatChart, ResolvedCompatChart]:
         source = getattr(_, "source", None)
         if not source:
             return _load_from_files_or_stdin()
@@ -755,33 +682,23 @@ def showcompat(_: argparse.Namespace) -> int:
         if source == "db":
             if not (_.user_a and _.user_b):
                 raise CliError("MISSING_DB_USER")
-            left_payload, left_uid = _fetch_db_bodygraph(_.user_a)
-            right_payload, right_uid = _fetch_db_bodygraph(_.user_b)
-            left_person, left_chart = _person_and_chart_from_payload(left_payload, uid_hint=left_uid)
-            right_person, right_chart = _person_and_chart_from_payload(right_payload, uid_hint=right_uid)
-            return left_person, right_person, left_chart, right_chart
+            return _resolve_db_party(_.user_a), _resolve_db_party(_.user_b)
         if source == "vendor":
-            left_inputs = _vendor_inputs_from_args(_, "a")
-            right_inputs = _vendor_inputs_from_args(_, "b")
-            try:
-                left_outcome = ingest_vendor_bodygraph(left_inputs, env=_resolver_env(), dry_run=True)
-                right_outcome = ingest_vendor_bodygraph(right_inputs, env=_resolver_env(), dry_run=True)
-            except VendorError as exc:
-                raise CliError(exc.code, exit_code=1) from exc
-            left_person, left_chart = _person_and_chart_from_payload(left_outcome.payload, uid_hint=left_inputs.user_id)
-            right_person, right_chart = _person_and_chart_from_payload(right_outcome.payload, uid_hint=right_inputs.user_id)
-            return left_person, right_person, left_chart, right_chart
+            # PF05 §4.1.2: vendor only, birth tuple explicit, rails decide inside the resolver.
+            left_birth = _vendor_inputs_from_args(_, "a")
+            right_birth = _vendor_inputs_from_args(_, "b")
+            return (
+                _resolve_party(left_birth, source_policy="vendor"),
+                _resolve_party(right_birth, source_policy="vendor"),
+            )
         if source == "auto":
+            # PF05 §4.1.2: auto is DB-only; the birth-based vendor fallback is prohibited.
             if _.user_a and _.user_b:
-                _.source = "db"
-                return _load_from_source()
-            if _.birthdate_a or _.birthdate_b:
-                _.source = "vendor"
-                return _load_from_source()
+                return _resolve_db_party(_.user_a), _resolve_db_party(_.user_b)
             raise CliError("AUTO_SOURCE_UNRESOLVED")
         raise CliError("UNSUPPORTED_SOURCE")
 
-    def _load_from_files_or_stdin() -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+    def _load_from_files_or_stdin() -> Tuple[ResolvedCompatChart, ResolvedCompatChart]:
         left_payload: Dict[str, Any]
         right_payload: Dict[str, Any]
         if _.pair_file:
@@ -801,80 +718,53 @@ def showcompat(_: argparse.Namespace) -> int:
             data = _parse_input(raw)
             left_payload = _normalize_party(data.get("left"), "left")
             right_payload = _normalize_party(data.get("right"), "right")
-        left_person, left_chart = _party_from_normalized(left_payload)
-        right_person, right_chart = _party_from_normalized(right_payload)
-        return left_person, right_person, left_chart, right_chart
+        # File and stdin modes perform no DB or vendor access (PF05 §4.1.2 B/C).
+        return (
+            _resolve_party(left_payload, source_policy="local"),
+            _resolve_party(right_payload, source_policy="local"),
+        )
 
     if getattr(_, "conjunction", False):
         if getattr(_, "dump_reader", None) or getattr(_, "dump_admin_dir", None):
             raise CliError("CONJUNCTION_DUMPS_UNSUPPORTED")
         left, right = _conjunction_inputs()
-        try:
-            conjunction_payload = conjunction_public_resolved(
-                left,
-                right,
-                viewer_top=viewer_prefs["top_category"],
-                viewer_weights=viewer_prefs["weights"],
-                engine_tag=engine_tag,
-                release_id=release_id,
-                invocation_tag=invocation_tag,
-                env=_resolver_env(),
-                local_lookup=_lookup_local_conjunction,
-            )
-        except VendorError as exc:
-            raise CliError(exc.code, exit_code=1) from exc
+        source = getattr(_, "source", None)
+        conjunction_payload = conjunction_public_resolved(
+            left,
+            right,
+            env=_resolver_env(),
+            local_lookup=_lookup_local_conjunction,
+            source_policy="local" if source in ("db", "auto") else "vendor",
+        )
         _emit_stdout_bytes(emitter.emit_public(conjunction_payload))
         return 0
 
-    left_person, right_person, a_chart, b_chart = _load_from_source()
-    left_person, right_person, a_chart, b_chart = _canonical_pair(
-        left_person, right_person, a_chart, b_chart
-    )
-    a_ts = ts_v0.extract_ts(a_chart)
-    b_ts = ts_v0.extract_ts(b_chart)
-    features = ts_v0.compute_features(a_ts, b_ts)
-    compat_full = compat_public(
-        left_person,
-        right_person,
-        viewer_prefs["top_category"],
-        viewer_prefs["weights"],
-        engine_tag=engine_tag,
-        release_id=release_id,
-        invocation_tag=invocation_tag,
-    )
-    compat_payload = {
-        "a": left_person,
-        "b": right_person,
-        "viewer_prefs": viewer_prefs,
-        "compat": compat_full,
-    }
-    compat_bytes = emitter.emit_public(compat_payload)
-
-    reader_bytes, reader_envelope = emit_reader_public_envelope(
-        a_chart,
-        b_chart,
+    left_resolved, right_resolved = _load_from_source()
+    a_party = evaluation_party(left_resolved)
+    b_party = evaluation_party(right_resolved)
+    result = evaluate_pair(a_party, b_party)
+    lo, hi = orient(a_party, b_party)
+    eligible = not is_ineligible_carrier(result)
+    # Eligible pairs carry the admitted bundle's release identity; the vacuous
+    # self-pair emits the runtime's manifest-derived identity (no bundle is read).
+    reader_bytes, _reader_envelope = emit_reader_public_envelope(
+        None,
+        None,
         engine_tag=engine_tag,
         invocation_tag=invocation_tag,
-        release_id=release_id,
+        release_id=result["release_id"] if eligible else release_id,
+        eligible=eligible,
+        harmony_band=harmony_band(result) if eligible else None,
     )
 
     if getattr(_, "dump_reader", None):
         _dump_reader_bytes(_.dump_reader, reader_bytes)
 
-    case_name = _case_name(_)
-    _emit_admin_dumps(
-        _,
-        case_name,
-        left_person,
-        right_person,
-        a_chart,
-        b_chart,
-        compat_full.get("categories", []),
-        features,
-        viewer_prefs["weights"],
-    )
+    _emit_admin_dumps(_, _case_name(_), lo, hi, result)
 
-    _emit_stdout_bytes(compat_bytes)
+    # PF05 §4.1.3: stdout is exactly the canonical ``magic10_compat_result.v1``
+    # document (or the PF01 §4.7 carrier for a valid self-pair) plus one LF.
+    _emit_stdout_bytes(emitter.emit_public(result))
     return 0
 
 

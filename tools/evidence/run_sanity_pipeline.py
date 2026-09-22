@@ -21,6 +21,63 @@ from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determin
 SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PIPELINE_ID = "hde-release-sanity-v1"
 
+# PF10 — HDE Build Notes §2.15 (HDE-EPIC040-PR04 F01 overlay): the one explicit
+# non-admitted outcome.  A gate that cannot truthfully evaluate because the
+# admission owner refuses the active release with ``INCOMPLETE_RELEASE_ROSTER``
+# raises ``ReleaseNotAdmitted`` and exits with this distinct code: never 0
+# (PASS), never the generic failure 1, never argparse's usage code 2.  Every
+# other refusal, and every failure after a successful admission, remains an
+# ordinary failure.  The acceptance is self-extinguishing: once the complete
+# roster is admitted the probe returns a bundle and this branch is never taken.
+RELEASE_NOT_ADMITTED_EXIT_CODE = 3
+RELEASE_NOT_ADMITTED_REFUSAL_CODE = "INCOMPLETE_RELEASE_ROSTER"
+NOT_ADMITTED_STATUS = "NOT_ADMITTED"
+
+
+class ReleaseNotAdmitted(RuntimeError):
+    """The active release is not admitted (``INCOMPLETE_RELEASE_ROSTER``)."""
+
+    def __init__(
+        self,
+        message: str = "release manifest does not yet contain the complete adopted roster",
+    ) -> None:
+        super().__init__(message)
+        self.code = RELEASE_NOT_ADMITTED_REFUSAL_CODE
+
+
+def probe_release_admission():
+    """Read-only admission probe; returns the admitted bundle.
+
+    The probe reads the evaluation provider seam
+    (``engine.compat.compute.admitted_bundle``), whose default is the admission
+    owner's public entry ``load_active_mechanics_bundle``.  Exactly one refusal
+    is classified as the non-admitted state: ``SchemaValidationError`` carrying
+    ``code == "INCOMPLETE_RELEASE_ROSTER"``.  Nothing here relaxes, bypasses or
+    relocates admission, and no synthetic release is ever fed to a gate.
+    """
+
+    from engine.compat import compute
+    from engine.config.registry_loader import SchemaValidationError
+
+    try:
+        return compute.admitted_bundle()
+    except SchemaValidationError as exc:
+        if getattr(exc, "code", None) == RELEASE_NOT_ADMITTED_REFUSAL_CODE:
+            raise ReleaseNotAdmitted(str(exc)) from exc
+        raise
+
+
+def release_not_admitted_observed() -> bool:
+    """True only when the probe observes the non-admitted state."""
+
+    try:
+        probe_release_admission()
+    except ReleaseNotAdmitted:
+        return True
+    except Exception:
+        return False
+    return False
+
 @dataclass(frozen=True)
 class SanityStep:
     name: str
@@ -49,6 +106,10 @@ STAGE_NAMES = (
     "13 Mirror schema and index/mirror hash validation",
     "14 Topology orientation validation", "15 Final-LF validation",
 )
+# Stages whose current-behavior checks cannot be evaluated while the active
+# release is not admitted; their exact NOT_ADMITTED rendering is the third log
+# model beside PASS and FAIL (``run_sanity_pipeline_gate.py`` pins it).
+RELEASE_ADMISSION_GATED_STAGES = (STAGE_NAMES[3], STAGE_NAMES[4], STAGE_NAMES[5])
 
 
 def _py(path: str, *args: str) -> tuple[str, ...]:
@@ -179,47 +240,81 @@ def validate_current_mapped_cache() -> None:
         raise ValueError("current mapped-cache behavior failed")
 
 
+_VALIDATORS = {
+    ("__validate_direct_selection__",): (validate_direct_selection_contract, "direct_selection_contract_validation_failed"),
+    ("__validate_reader_cli_determinism__",): (validate_current_reader_cli_determinism, "reader_cli_determinism_validation_failed"),
+    ("__validate_a7_transport__",): (validate_current_a7_transport, "a7_transport_validation_failed"),
+    ("__validate_mapped_cache__",): (validate_current_mapped_cache, "mapped_cache_validation_failed"),
+}
+
+
+def _run_validator(validator, failure_message: str) -> int:
+    """0 on success, the distinct code for a typed non-admitted outcome, 1 otherwise."""
+
+    try:
+        validator()
+    except ReleaseNotAdmitted:
+        return RELEASE_NOT_ADMITTED_EXIT_CODE
+    except Exception:
+        print(failure_message, file=sys.stderr)
+        return 1
+    return 0
+
+
 def _run_stage(step: SanityStep) -> int:
+    """Run one stage: 0 (OK), ``RELEASE_NOT_ADMITTED_EXIT_CODE`` (NOT_ADMITTED) or a failure code.
+
+    Every command of the stage still executes after a non-admitted outcome; a
+    failing command turns the stage into FAIL.  A subprocess exiting with the
+    distinct code is accepted as NOT_ADMITTED only when the read-only admission
+    probe observes the non-admitted state itself; otherwise it is a failure.
+    """
+
+    gated = step.name in RELEASE_ADMISSION_GATED_STAGES
+    outcome = 0
     for command in step.commands:
-        if command == ("__validate_direct_selection__",):
-            try:
-                validate_direct_selection_contract()
-            except Exception:
-                print("direct_selection_contract_validation_failed", file=sys.stderr)
-                return 1
-        elif command == ("__validate_reader_cli_determinism__",):
-            try:
-                validate_current_reader_cli_determinism()
-            except Exception:
-                print("reader_cli_determinism_validation_failed", file=sys.stderr)
-                return 1
-        elif command == ("__validate_a7_transport__",):
-            try:
-                validate_current_a7_transport()
-            except Exception:
-                print("a7_transport_validation_failed", file=sys.stderr)
-                return 1
-        elif command == ("__validate_mapped_cache__",):
-            try:
-                validate_current_mapped_cache()
-            except Exception:
-                print("mapped_cache_validation_failed", file=sys.stderr)
-                return 1
+        validator = _VALIDATORS.get(tuple(command))
+        if validator is not None:
+            code = _run_validator(*validator)
         else:
             result = _run_command(command)
-            if result.returncode:
+            code = result.returncode
+            if code == RELEASE_NOT_ADMITTED_EXIT_CODE and not release_not_admitted_observed():
                 print(
-                    f"{step.name}: command exited {result.returncode}: {' '.join(command)}",
+                    f"{step.name}: command exited {code} without the non-admitted state: {' '.join(command)}",
                     file=sys.stderr,
                 )
-                return result.returncode or 1
-    return 0
+                return 1
+            if code not in (0, RELEASE_NOT_ADMITTED_EXIT_CODE):
+                print(
+                    f"{step.name}: command exited {code}: {' '.join(command)}",
+                    file=sys.stderr,
+                )
+                return code or 1
+        if code == RELEASE_NOT_ADMITTED_EXIT_CODE and not gated:
+            # Only the admission-gated stages have a NOT_ADMITTED outcome to express.
+            # Every other stage runs ordinary --check tools, where this code can only
+            # be an internal failure -- and the probe above succeeds for the whole
+            # pre-admission period, so it cannot tell the two apart.  Returning the
+            # code itself would let the attestation turn the whole release_sanity
+            # stage into a release_not_admitted receipt and mask the real failure.
+            print(
+                f"{step.name}: command exited {code} outside an admission-gated stage; "
+                f"this is an ordinary failure, not RELEASE_NOT_ADMITTED: {' '.join(command)}",
+                file=sys.stderr,
+            )
+            return 1
+        if code == RELEASE_NOT_ADMITTED_EXIT_CODE:
+            outcome = RELEASE_NOT_ADMITTED_EXIT_CODE
+        elif code:
+            return code
+    return outcome
 
 
 def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
     lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log"]
     for name, status in results:
-        canonical_status = "OK" if status == "OK" else "FAIL"
+        canonical_status = status if status in ("OK", NOT_ADMITTED_STATUS) else "FAIL"
         lines.append(f"check {name}:{canonical_status}")
         if status.startswith("NOT_EXECUTED_EARLIER_FAILURE:"):
             lines.append(f"not_executed {name}:earlier_mandatory_failure={status.split(':', 1)[1]}")
@@ -263,8 +358,11 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
     for index, step in enumerate(roster):
         # The final updater must bind the final sanity bytes, not an interim
         # version.  Render the prospective PASS log before that updater runs;
-        # the normal final render below is byte-identical on success.
-        if canonical_run and index == sealing_index and failure == "NONE":
+        # the normal final render below is byte-identical on success.  A
+        # NOT_ADMITTED stage never renders a prospective PASS: that would present
+        # a frozen-byte substitute as a live result (PF10 §2.15).
+        not_admitted_so_far = any(status == NOT_ADMITTED_STATUS for _, status in results)
+        if canonical_run and index == sealing_index and failure == "NONE" and not not_admitted_so_far:
             prospective_pass = _write_log(
                 log_path,
                 [*results, *((later.name, "OK") for later in roster[index:])],
@@ -272,14 +370,22 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
                 "PASS",
             )
         code = _run_stage(step)
-        status = "OK" if code == 0 else "FAIL"
+        if code == 0:
+            status = "OK"
+        elif code == RELEASE_NOT_ADMITTED_EXIT_CODE:
+            status = NOT_ADMITTED_STATUS
+        else:
+            status = "FAIL"
         results.append((step.name, status))
-        if code:
+        if status == "FAIL":
             failure = step.name
             results.extend((later.name, f"NOT_EXECUTED_EARLIER_FAILURE:{step.name}") for later in roster[index + 1:])
             break
-    passed = code == 0 and len(results) == len(roster) and all(status == "OK" for _, status in results)
-    final_bytes = _render_log(results, failure, "PASS" if passed else "FAIL")
+    failed = failure != "NONE"
+    not_admitted = any(status == NOT_ADMITTED_STATUS for _, status in results)
+    passed = code == 0 and not failed and not not_admitted and len(results) == len(roster) and all(status == "OK" for _, status in results)
+    summary = "PASS" if passed else (NOT_ADMITTED_STATUS if not failed and not_admitted else "FAIL")
+    final_bytes = _render_log(results, failure, summary)
     if passed and canonical_run:
         try:
             current_bytes = log_path.read_bytes()
@@ -307,13 +413,19 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         prior_final_bytes = log_path.read_bytes()
     except OSError:
         prior_final_bytes = None
-    _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
-    if not passed and canonical_run and prior_final_bytes != final_bytes:
+    _write_log(log_path, results, failure, summary)
+    if failed and canonical_run and prior_final_bytes != final_bytes:
         seal_code = _rebind_failure_log()
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
             return seal_code
-    return 0 if passed else (code or 1)
+    if passed:
+        return 0
+    if not failed:
+        # summary:NOT_ADMITTED — the distinct code, never 0.  The tracked log is
+        # regenerated only by this owner; the sole updater binds it afterwards.
+        return RELEASE_NOT_ADMITTED_EXIT_CODE
+    return code or 1
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -324,4 +436,9 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # Execute through the package-qualified module: the generators raise the
+    # ``ReleaseNotAdmitted`` class of ``tools.evidence.run_sanity_pipeline``, and a
+    # script-mode ``__main__`` instance would otherwise catch a different class.
+    from tools.evidence import run_sanity_pipeline as _pipeline  # noqa: E402
+
+    raise SystemExit(_pipeline.main())

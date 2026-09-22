@@ -5,9 +5,9 @@ env_pins:audit/gates/determinism/env_pins.log
 check 01 Environment pins:OK
 check 02 Identity and release provenance:OK
 check 03 Canonical JSON:OK
-check 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:OK
-check 05 A7 Catalog transport:OK
-check 06 CI rails:OK
+check 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:NOT_ADMITTED
+check 05 A7 Catalog transport:NOT_ADMITTED
+check 06 CI rails:NOT_ADMITTED
 check 07 Direct DB selection contract:OK
 check 08 Direct DB posture artifacts:OK
 check 09 BodyGraph policy:OK
@@ -18,4 +18,4 @@ check 13 Mirror schema and index/mirror hash validation:OK
 check 14 Topology orientation validation:OK
 check 15 Final-LF validation:OK
 first_failed_stage:NONE
-summary:PASS
+summary:NOT_ADMITTED

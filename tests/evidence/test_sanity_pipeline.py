@@ -199,3 +199,276 @@ def test_sanity_gate_rejects_stale_log_when_fresh_run_fails(tmp_path, monkeypatc
     )
     assert run_sanity_pipeline_gate._valid_log() is True
     assert run_sanity_pipeline_gate.main() == 1
+
+
+# --- PF10 §2.15: the explicit NOT_ADMITTED outcome (HDE-EPIC040-PR04 F01 overlay) -------------
+
+from tools.evidence import build_release_attestation as attestation  # noqa: E402
+
+NOT_ADMITTED = run_sanity_pipeline.NOT_ADMITTED_STATUS
+DISTINCT = run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE
+_GATED_READER, _GATED_A7, _GATED_RAILS = run_sanity_pipeline.RELEASE_ADMISSION_GATED_STAGES
+
+
+def _not_admitted_model() -> bytes:
+    return run_sanity_pipeline._render_log(
+        [
+            (name, NOT_ADMITTED if name in run_sanity_pipeline.RELEASE_ADMISSION_GATED_STAGES else "OK")
+            for name in run_sanity_pipeline.STAGE_NAMES
+        ],
+        "NONE",
+        NOT_ADMITTED,
+    )
+
+
+def test_distinct_code_and_gated_stages_are_pinned_across_pipeline_gate_and_runner():
+    from ci.checks import run_rails_job_definitions as runner
+
+    assert DISTINCT == 3
+    assert DISTINCT not in (0, 1, 2)
+    assert run_sanity_pipeline_gate.RELEASE_NOT_ADMITTED_EXIT_CODE == DISTINCT
+    assert runner.RELEASE_NOT_ADMITTED_EXIT_CODE == DISTINCT
+    assert attestation.RELEASE_NOT_ADMITTED_EXIT_CODE == DISTINCT
+    assert run_sanity_pipeline.RELEASE_ADMISSION_GATED_STAGES == (
+        "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks",
+        "05 A7 Catalog transport",
+        "06 CI rails",
+    )
+    assert run_sanity_pipeline_gate.RELEASE_ADMISSION_GATED_STAGES == run_sanity_pipeline.RELEASE_ADMISSION_GATED_STAGES
+    assert run_sanity_pipeline_gate._expected_not_admitted_log() == _not_admitted_model()
+    assert run_sanity_pipeline_gate._expected_log() == _final_pass_log()
+
+
+def test_probe_classifies_exactly_the_incomplete_roster_refusal(monkeypatch):
+    from engine.compat import compute
+    from engine.config.registry_loader import SchemaValidationError
+
+    # Real admission owner: the active release is not admitted.
+    with pytest.raises(run_sanity_pipeline.ReleaseNotAdmitted) as excinfo:
+        run_sanity_pipeline.probe_release_admission()
+    assert excinfo.value.code == "INCOMPLETE_RELEASE_ROSTER"
+    assert run_sanity_pipeline.release_not_admitted_observed() is True
+
+    def other_refusal():
+        raise SchemaValidationError("SCHEMA_INVALID", "unrelated")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", other_refusal)
+    with pytest.raises(SchemaValidationError):
+        run_sanity_pipeline.probe_release_admission()
+    assert run_sanity_pipeline.release_not_admitted_observed() is False
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", lambda: object())
+    assert run_sanity_pipeline.probe_release_admission() is not None
+    assert run_sanity_pipeline.release_not_admitted_observed() is False
+
+
+def test_subprocess_distinct_code_renders_not_admitted_only_with_the_observed_state(tmp_path, monkeypatch):
+    log_path = tmp_path / "sanity.log"
+    # The stage that renders NOT_ADMITTED must be one that has such an outcome to
+    # express; only the admission-gated stages do.
+    gated = run_sanity_pipeline.RELEASE_ADMISSION_GATED_STAGES[0]
+    steps = [
+        run_sanity_pipeline.SanityStep("step-one", ["echo", "one"]),
+        run_sanity_pipeline.SanityStep(gated, ["echo", "two"]),
+        run_sanity_pipeline.SanityStep("step-three", ["echo", "three"]),
+    ]
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([0, DISTINCT, 0]))
+    monkeypatch.setattr(run_sanity_pipeline, "release_not_admitted_observed", lambda: True)
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == DISTINCT
+    lines = log_path.read_text(encoding="utf-8").splitlines()
+    assert "check step-one:OK" in lines
+    assert f"check {gated}:NOT_ADMITTED" in lines
+    assert "check step-three:OK" in lines  # later stages still execute
+    assert not any(line.startswith("not_executed") for line in lines)
+    assert lines[-2:] == ["first_failed_stage:NONE", "summary:NOT_ADMITTED"]
+
+    # The same distinct code without the non-admitted state is an ordinary failure.
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([0, DISTINCT, 0]))
+    monkeypatch.setattr(run_sanity_pipeline, "release_not_admitted_observed", lambda: False)
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == 1
+    lines = log_path.read_text(encoding="utf-8").splitlines()
+    assert f"check {gated}:FAIL" in lines
+    assert lines[-2:] == [f"first_failed_stage:{gated}", "summary:FAIL"]
+
+
+def test_distinct_code_outside_an_admission_gated_stage_is_a_failure(tmp_path, monkeypatch):
+    """A non-gated stage has no NOT_ADMITTED outcome, so exit 3 there is a failure.
+
+    Those stages run ordinary --check tools, where the code can only be an internal
+    error, and the admission probe succeeds throughout pre-admission so it cannot
+    separate the two. Returning the distinct code would let the attestation convert
+    the whole release_sanity stage into a release_not_admitted receipt and mask it.
+    """
+
+    log_path = tmp_path / "sanity.log"
+    steps = [
+        run_sanity_pipeline.SanityStep("03 Canonical JSON", ["echo", "one"]),
+        run_sanity_pipeline.SanityStep("step-two", ["echo", "two"]),
+    ]
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([DISTINCT, 0]))
+    # The probe observes non-admission, exactly as it does all through pre-admission.
+    monkeypatch.setattr(run_sanity_pipeline, "release_not_admitted_observed", lambda: True)
+    rc = run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps)
+    assert rc == 1
+    assert rc != DISTINCT
+    lines = log_path.read_text(encoding="utf-8").splitlines()
+    assert "check 03 Canonical JSON:FAIL" in lines
+    assert not any(line.endswith(":NOT_ADMITTED") for line in lines)
+    assert lines[-2:] == ["first_failed_stage:03 Canonical JSON", "summary:FAIL"]
+
+
+def test_validator_release_not_admitted_is_the_third_status(tmp_path, monkeypatch):
+    log_path = tmp_path / "sanity.log"
+    steps = [
+        run_sanity_pipeline.SanityStep(_GATED_READER, ["__validate_reader_cli_determinism__"]),
+        run_sanity_pipeline.SanityStep(_GATED_A7, ["__validate_a7_transport__"]),
+        run_sanity_pipeline.SanityStep("tail", ["echo", "tail"]),
+    ]
+
+    def not_admitted():
+        raise run_sanity_pipeline.ReleaseNotAdmitted()
+
+    monkeypatch.setitem(
+        run_sanity_pipeline._VALIDATORS, ("__validate_reader_cli_determinism__",), (not_admitted, "reader_failed")
+    )
+    monkeypatch.setitem(run_sanity_pipeline._VALIDATORS, ("__validate_a7_transport__",), (not_admitted, "a7_failed"))
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([0]))
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == DISTINCT
+    lines = log_path.read_text(encoding="utf-8").splitlines()
+    assert lines[4:7] == [f"check {_GATED_READER}:NOT_ADMITTED", f"check {_GATED_A7}:NOT_ADMITTED", "check tail:OK"]
+    assert lines[-1] == "summary:NOT_ADMITTED"
+
+
+def test_not_admitted_mixed_with_a_failure_renders_fail(tmp_path, monkeypatch):
+    log_path = tmp_path / "sanity.log"
+    steps = [
+        run_sanity_pipeline.SanityStep(_GATED_READER, ["echo", "one"]),
+        run_sanity_pipeline.SanityStep("step-two", ["echo", "two"]),
+        run_sanity_pipeline.SanityStep("step-three", ["echo", "three"]),
+    ]
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([DISTINCT, 1]))
+    monkeypatch.setattr(run_sanity_pipeline, "release_not_admitted_observed", lambda: True)
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == 1
+    lines = log_path.read_text(encoding="utf-8").splitlines()
+    assert f"check {_GATED_READER}:NOT_ADMITTED" in lines
+    assert "check step-two:FAIL" in lines
+    assert "not_executed step-three:earlier_mandatory_failure=step-two" in lines
+    assert lines[-2:] == ["first_failed_stage:step-two", "summary:FAIL"]
+
+
+def test_all_ok_renders_pass_byte_identically_to_the_current_model(tmp_path, monkeypatch):
+    log_path = tmp_path / "sanity.log"
+    steps = [run_sanity_pipeline.SanityStep(name, ["ok"]) for name in run_sanity_pipeline.STAGE_NAMES]
+    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([0] * 15))
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == 0
+    assert log_path.read_bytes() == _final_pass_log() == run_sanity_pipeline_gate._expected_log()
+
+
+def test_sanity_gate_accepts_exactly_the_two_models(tmp_path, monkeypatch, capsys):
+    log = tmp_path / "sanity_pipeline.log"
+    monkeypatch.setattr(run_sanity_pipeline_gate, "LOG", log)
+
+    def run_with(code: int, stdout: str = "", stderr: str = ""):
+        proc = _FakeCompletedProcess(code)
+        proc.stdout, proc.stderr = stdout, stderr
+        monkeypatch.setattr(run_sanity_pipeline_gate.subprocess, "run", lambda *_a, **_k: proc)
+        return run_sanity_pipeline_gate.main()
+
+    log.write_bytes(_not_admitted_model())
+    assert run_sanity_pipeline_gate._valid_not_admitted_log() is True
+    assert run_sanity_pipeline_gate._valid_log() is False
+    assert run_with(DISTINCT) == DISTINCT
+    assert capsys.readouterr().out == "SANITY_PIPELINE_GATE:RELEASE_NOT_ADMITTED\n"
+    # PASS exit with a NOT_ADMITTED log, or the distinct code with a PASS log, or noise: failure.
+    assert run_with(0) == 1
+    log.write_bytes(_final_pass_log())
+    assert run_with(DISTINCT) == 1
+    assert run_with(0) == 0
+    log.write_bytes(_not_admitted_model())
+    assert run_with(DISTINCT, stdout="noise\n") == 1
+    for old, new in (
+        ("summary:NOT_ADMITTED", "summary:PASS"),
+        ("summary:NOT_ADMITTED", "summary:FAIL"),
+        ("check 07 Direct DB selection contract:OK", "check 07 Direct DB selection contract:NOT_ADMITTED"),
+        ("check 06 CI rails:NOT_ADMITTED", "check 06 CI rails:OK"),
+    ):
+        log.write_bytes(_not_admitted_model().replace(old.encode(), new.encode(), 1))
+        assert run_sanity_pipeline_gate._valid_not_admitted_log() is False
+        assert run_with(DISTINCT) == 1
+    log.write_bytes(_not_admitted_model() + b"unexpected:claim\n")
+    assert run_with(DISTINCT) == 1
+
+
+def test_attestation_maps_the_release_sanity_distinct_code_to_release_not_admitted(tmp_path, monkeypatch):
+    def fake_run(argv, **kwargs):
+        return subprocess.CompletedProcess(args=list(argv), returncode=DISTINCT, stdout="", stderr="")
+
+    monkeypatch.setattr(attestation.subprocess, "run", fake_run)
+    log: list[str] = []
+    with pytest.raises(attestation.AttestationBuildError) as excinfo:
+        attestation._run_stage(tmp_path, "release_sanity", ("python", "tools/evidence/run_sanity_pipeline_gate.py"), log, attestation_bin=tmp_path)
+    assert excinfo.value.code == "release_not_admitted"
+    assert excinfo.value.stage == "release_sanity" and excinfo.value.returncode == DISTINCT
+    with pytest.raises(attestation.AttestationBuildError) as other:
+        attestation._run_stage(tmp_path, "build_package_wheel", ("python", "x.py"), log, attestation_bin=tmp_path)
+    assert other.value.code == "isolated_stage_failed"
+
+    receipt_dir = tmp_path / "receipt"
+    receipt_dir.mkdir()
+    attestation._write_failure(receipt_dir, excinfo.value)
+    receipt = json.loads((receipt_dir / "failure.json").read_bytes())
+    assert receipt == {
+        "schema": "hde.release_attestation.failure.v1",
+        "code": "release_not_admitted",
+        "stage": "release_sanity",
+        "returncode": DISTINCT,
+        "secret_values_recorded": False,
+    }
+    assert {path.name for path in receipt_dir.iterdir()} == {"failure.json"}
+    assert attestation.SCHEMA == "hde.release_attestation.v1"
+
+
+def test_isolated_closure_refuses_with_the_distinct_code_before_any_producer(monkeypatch, capsys):
+    from tools.evidence import regenerate_identity_closure as closure
+
+    assert closure.RELEASE_NOT_ADMITTED_EXIT_CODE == DISTINCT
+    monkeypatch.setattr(closure, "_write_closure", lambda: pytest.fail("producer ran"))
+    monkeypatch.setattr(closure, "_check_closure", lambda: pytest.fail("closure check ran"))
+    monkeypatch.setattr(closure.subprocess, "run", lambda *a, **k: pytest.fail("subprocess spawned"))
+    # The isolation guards still come first.
+    monkeypatch.delenv("HDE_ISOLATED_RELEASE_BUILD", raising=False)
+    with pytest.raises(SystemExit, match="SOURCE_TREE_RELEASE_CLOSURE_REFUSED"):
+        closure.main(["--in-place-isolated"])
+    monkeypatch.setenv("HDE_ISOLATED_RELEASE_BUILD", "1")
+    with pytest.raises(SystemExit, match="ISOLATED_RELEASE_BUILD_MODE_REQUIRED"):
+        closure.main([])
+    # Real admission owner: INCOMPLETE_RELEASE_ROSTER → explicit line, distinct code, no producer.
+    assert closure.release_not_admitted_observed() is True
+    assert closure.main(["--in-place-isolated"]) == DISTINCT
+    assert closure.main(["--in-place-isolated", "--check"]) == DISTINCT
+    assert capsys.readouterr().out == "IDENTITY_CLOSURE:RELEASE_NOT_ADMITTED\n" * 2
+    # Any other refusal is not classified as non-admitted.
+    from engine.config.registry_loader import SchemaValidationError
+
+    def other_refusal():
+        raise SchemaValidationError("SCHEMA_INVALID", "unrelated")
+
+    monkeypatch.setattr("engine.config.registry_loader.load_active_mechanics_bundle", other_refusal)
+    assert closure.release_not_admitted_observed() is False  # fail-closed: never accepted as non-admitted
+    monkeypatch.setattr("engine.config.registry_loader.load_active_mechanics_bundle", lambda: object())
+    assert closure.release_not_admitted_observed() is False
+
+
+def test_attestation_maps_every_admission_gated_isolated_stage(tmp_path, monkeypatch):
+    def fake_run(argv, **kwargs):
+        return subprocess.CompletedProcess(args=list(argv), returncode=DISTINCT, stdout="", stderr="")
+
+    monkeypatch.setattr(attestation.subprocess, "run", fake_run)
+    assert attestation._RELEASE_ADMISSION_GATED_STAGES == {"closure_write_and_check", "closure_fixed_point_check", "release_sanity"}
+    for stage in sorted(attestation._RELEASE_ADMISSION_GATED_STAGES):
+        with pytest.raises(attestation.AttestationBuildError) as excinfo:
+            attestation._run_stage(tmp_path, stage, ("python", "x.py"), [], attestation_bin=tmp_path)
+        assert (excinfo.value.code, excinfo.value.stage, excinfo.value.returncode) == ("release_not_admitted", stage, DISTINCT)
+    with pytest.raises(attestation.AttestationBuildError) as other:
+        attestation._run_stage(tmp_path, "build_package_wheel", ("python", "x.py"), [], attestation_bin=tmp_path)
+    assert other.value.code == "isolated_stage_failed"

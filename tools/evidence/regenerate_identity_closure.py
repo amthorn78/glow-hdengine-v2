@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Regenerate and verify the complete identity and release evidence closure."""
+"""Regenerate and verify the complete identity and release evidence closure.
+
+PF10 — HDE Build Notes §2.15 (HDE-EPIC040-PR04 F01 overlay): release-bound
+derivatives can be regenerated only for an admitted release.  While the
+admission owner refuses the active release with ``INCOMPLETE_RELEASE_ROSTER``
+the isolated closure build prints ``IDENTITY_CLOSURE:RELEASE_NOT_ADMITTED`` and
+exits with the distinct code before running any producer, so nothing partial or
+frozen is presented as a live closure.  Every other refusal is an ordinary failure.
+"""
 from __future__ import annotations
 
 import argparse
@@ -11,6 +19,11 @@ from pathlib import Path
 from typing import Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
+# Distinct non-admitted exit code; tests pin it equal to
+# tools.evidence.run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE.
+RELEASE_NOT_ADMITTED_EXIT_CODE = 3
+RELEASE_NOT_ADMITTED_REFUSAL_CODE = "INCOMPLETE_RELEASE_ROSTER"
+NOT_ADMITTED_LINE = "IDENTITY_CLOSURE:RELEASE_NOT_ADMITTED"
 
 CLOSED_RAILS = {
     "SAFE_MODE": "1",
@@ -368,6 +381,18 @@ def _check_closure() -> None:
     )
 
 
+def release_not_admitted_observed() -> bool:
+    """Independent read-only admission probe: true only for ``INCOMPLETE_RELEASE_ROSTER``."""
+
+    from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
+
+    try:
+        load_active_mechanics_bundle()
+    except SchemaValidationError as exc:
+        return getattr(exc, "code", None) == RELEASE_NOT_ADMITTED_REFUSAL_CODE
+    return False
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
@@ -380,6 +405,10 @@ def main(argv: list[str] | None = None) -> int:
         )
     if not args.in_place_isolated:
         raise SystemExit("ISOLATED_RELEASE_BUILD_MODE_REQUIRED")
+    if release_not_admitted_observed():
+        # PF10 §2.15: no producer runs and nothing is written; the distinct code is never 0.
+        print(NOT_ADMITTED_LINE, flush=True)
+        return RELEASE_NOT_ADMITTED_EXIT_CODE
     if args.check:
         _check_closure()
     else:

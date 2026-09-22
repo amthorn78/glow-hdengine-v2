@@ -13,11 +13,13 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.compat.categories import CATEGORIES_ORDER_V1
-from engine.compat.compute import compat_public
+from engine.bodygraph.resolver import resolve_compat_chart
+from engine.categories.registry import FROZEN_MAGIC10_ORDER
+from engine.compat.compute import evaluate_pair, evaluation_party
 from engine.order import normalize_channel_id
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer.canon import sercanon
+from tools.evidence.run_sanity_pipeline import ReleaseNotAdmitted, probe_release_admission
 
 OUT_DIR = ROOT / "audit" / "qa" / "hde-epic030" / "pr-05"
 CHANNELS_PATH = ROOT / "catalog" / "channels_v1.json"
@@ -25,6 +27,9 @@ COMPAT_AB_PATH = ROOT / "artifacts" / "compat" / "AB.json"
 READER_A7_PATH = ROOT / "artifacts" / "audit" / "a7" / "reader_200_body.json"
 INDEX_PATH = ROOT / "docs" / "evidence" / "INDEX.json"
 MIRROR_PATH = ROOT / "artifacts" / "evidence_index.jsonl"
+# Complete mapped fixture charts for the internal-admin compat evaluation.
+ADMIN_FIXTURE_PATHS = (ROOT / "fixtures" / "charts" / "alice.json", ROOT / "fixtures" / "charts" / "bob.json")
+REQUIRES_ADMITTED_RELEASE = "HDE_EPIC030_PR05_REQUIRES_ADMITTED_RELEASE"
 
 PR05_ARTIFACT_KEYS = (
     "epic030.pr05.category_framework_binding",
@@ -94,8 +99,8 @@ def _build_per_channel_mechanics(produced_at: str) -> dict[str, Any]:
         "task_id": "HDE-DISS006",
         "subtask_id": "HDE-DISS006.3",
         "produced_at_utc": produced_at,
-        "category_order_source": "engine.compat.categories.CATEGORIES_ORDER_V1",
-        "categories_order": list(CATEGORIES_ORDER_V1),
+        "category_order_source": "engine.categories.registry.FROZEN_MAGIC10_ORDER",
+        "categories_order": list(FROZEN_MAGIC10_ORDER),
         "channel_catalog_source": "catalog/channels_v1.json",
         "channels": channels,
         "channel_count": len(channels),
@@ -157,27 +162,34 @@ def _mirror_has_pr05_bindings() -> bool:
     return all(key in found for key in PR05_ARTIFACT_KEYS)
 
 
+def _admin_compat_result() -> dict[str, Any]:
+    """Evaluate the two complete fixture charts through the admitted mechanics bundle."""
+
+    parties = [
+        evaluation_party(resolve_compat_chart(_load_json(path), source_policy="local", env=None))
+        for path in ADMIN_FIXTURE_PATHS
+    ]
+    return evaluate_pair(parties[0], parties[1])
+
+
 def generate() -> None:
     ensure_determinism_env()
+    try:
+        probe_release_admission()
+    except ReleaseNotAdmitted as exc:
+        # PF10 §2.15: the admin compat evaluation needs an admitted release; refuse truthfully.
+        raise SystemExit(REQUIRES_ADMITTED_RELEASE) from exc
 
     produced_at = _iso_now()
     per_channel = _build_per_channel_mechanics(produced_at)
     per_channel_path = OUT_DIR / "per_channel_mechanics.json"
     _write_bytes(per_channel_path, sercanon(per_channel, sort_keys=True))
 
-    compat_admin = compat_public(
-        {"person_uid": "alpha"},
-        {"person_uid": "beta"},
-        viewer_top=CATEGORIES_ORDER_V1[0],
-        viewer_weights={category: 10 for category in CATEGORIES_ORDER_V1},
-        engine_tag="dev",
-        release_id="dev",
-        invocation_tag="INV-DEV",
-    )
+    compat_admin = _admin_compat_result()
     compat_categories = compat_admin.get("categories") if isinstance(compat_admin, dict) else None
     category_order_ok = isinstance(compat_categories, list) and [
-        str(item.get("id", "")) for item in compat_categories if isinstance(item, dict)
-    ] == list(CATEGORIES_ORDER_V1)
+        str(item.get("category_id", "")) for item in compat_categories if isinstance(item, dict)
+    ] == list(FROZEN_MAGIC10_ORDER)
 
     compare_targets = [per_channel_path, COMPAT_AB_PATH]
     compare_lines = [
