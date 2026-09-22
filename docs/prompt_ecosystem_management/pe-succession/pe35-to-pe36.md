@@ -6,7 +6,7 @@ status: BINDING
 predecessor: PE35
 successor: PE36
 authority: Product Owner instruction, 2026-09-22
-baseline: main @ 3e943ad (PR #455, merged). Zero open pull requests.
+baseline: main @ 3e943ad (PR #455, merged) at authorship; PE36 initialized against main @ 76689ac.
 role_change: true
 ---
 
@@ -15,7 +15,7 @@ role_change: true
 | | |
 |---|---|
 | Predecessor | **PE35** — `session_01WRuFH1x24NoYSsjoLJ4zGt` — **RETIRED 2026-09-22** |
-| Successor | **PE36** — session id recorded at initialization |
+| Successor | **PE36** — `session_01Aniz3abekzoEbAax1UbWar` — initialized 2026-09-22 |
 | Charter | **General prompt engineering and maintenance.** Not a repair campaign |
 | Baseline | `main @ 3e943ad`, **zero open pull requests** |
 | Installed | `change-flow` `80e877c2…` · `flowmaster-validate` `b9ca212a…` — round 30, digest-verified 2026-09-22 |
