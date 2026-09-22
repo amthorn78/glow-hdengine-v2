@@ -68,6 +68,15 @@ Each item is a repository fact that differed from the plan text; each fix is the
 | P-16 | §6.7 governed-evidence paragraph: "then `update_evidence_index.py` once" | Under the canonical run the tracked sanity log transitions from the PASS model to the NOT_ADMITTED model; the updater had to bind the regenerated gate outputs before the run (stage 11 validates them) and the transitioned log after it | Two owner runs of the sole updater; recorded in §7 |
 | P-17 | §5.6 / §6.7 row 7 | The gate's showcompat/conjunction captures and `args.json` cannot be recomputed live; the five original frozen digests were extended with the EPIC022 D2 showcompat `stdout.json`/`args.json` and the CLI conformance `ab.json`/`ba.json` digests, and the `args.json` `person_uid` derivation check was replaced by the frozen digest | `run_canonical_json_gate.py --check-only` returns 0 with the existing 26 targets and six set rules unchanged |
 
+The four rows below were found by hosted CI on the PR-30 candidate and repaired in the PR-35 corrective revision (commit `7b2bc5c95aa558961069a0a904ad7e4869a8469f`). Each is a test-side collision inside the approved work unit — no scope change, no runtime behaviour weakened, no test skipped, disabled or quarantined.
+
+| # | Plan statement | Repository fact | Applied fix |
+| --- | --- | --- | --- |
+| P-18 | §6.5/§10.2 converted the plan's named suites; `tests/compat/test_abba_parity.py` was not among them | It posts legacy `{"person_uid": …}` aliases to `/api/compat/v1`, which the switched handler now refuses per PF05 §5.2.3 (`ERR_M10_LEGACY_INPUT_UNSUPPORTED`, 422). It is a registered owner test of the changed handler, so CI runs it | Converted to seam inputs — `complete_chart(UUID_A, GATES_A)` / `complete_chart(UUID_B, GATES_B)` under the synthetic complete-release seam (`inject_seams`) — keeping the AB/BA canonical byte-identity purpose. Its legacy `{categories, keys, meta}` shape assertion was replaced by the actual canonical envelope `{schema, config_id, release_id, pair_key, signals, categories}` plus `jsonschema` validation of both responses against `schemas/magic10_compat_result_v1.schema.json`. No handler change |
+| P-19 | not in plan | `tests/compliance/test_logging_filter_keys_only_and_redactions.py` GETs the fixture reader route on the real app, which returns `ERR_M10_MANIFEST_MISMATCH` (503) because no release is admitted (F01 posture). Every positive PR04 test injects the synthetic complete release; this pre-existing compliance test does not | Added the same `inject_seams(monkeypatch, build_bundle(tmp_path), build_pack(tmp_path))` injection. Its subject — the keys-only log line and the header redactions — is unchanged. No runtime change |
+| P-20 | not in plan | P-13 moved `tests/evidence/test_epic030_pr05_category_framework_evidence.py`'s test root to `tmp_path` (outside the repository), but `_canonical_compare_line` in `tools/evidence/generate_epic030_pr05_category_framework_evidence.py` renders paths with `path.relative_to(ROOT)`, raising `ValueError` for both binding tests | `monkeypatch.setattr(mod, "ROOT", test_root)` alongside the path constants the tests already patch. `ROOT` is read at runtime only by the compare line; `ADMIN_FIXTURE_PATHS` was bound at import and still resolves to the real read-only fixtures. No generator change |
+| P-21 | not in plan (Codex P1 on `73b9812`) | `_parse_reader_post_body` called `request.get_data()`, buffering the whole body before the 32 KiB limit was evaluated. A chunked request — or any request omitting `Content-Length` — skips the preliminary check, so an unauthenticated oversized stream on this production POST route could consume unbounded worker memory | `request.stream.read(_READER_MAX_BODY_BYTES + 1)` bounds the read itself; one byte past the limit keeps oversize detectable and the existing 422 refusal unchanged. Measured on a 5 MB `Content-Length`-less body: 5,000,102 bytes consumed before, 32,769 after. Covered by the new `tests/http/test_reader_post_v1.py::test_body_without_content_length_is_bounded_before_buffering`, which asserts the 422 and that the stream is not drained |
+
 ## 5. F01 overlay implemented (PF10 §2.15; plan §6.7, §8.7)
 
 Admission-state discriminator: `tools/evidence/run_sanity_pipeline.py` owns `RELEASE_NOT_ADMITTED_EXIT_CODE = 3`, `ReleaseNotAdmitted`, `probe_release_admission()` (reads `engine.compat.compute.admitted_bundle()`, whose default is `load_active_mechanics_bundle()`; exactly `SchemaValidationError.code == "INCOMPLETE_RELEASE_ROSTER"` is classified) and `release_not_admitted_observed()`. Verified attribute: `SchemaValidationError.code` (`engine/config/registry_loader.py`). Every other exception, and every failure after admission, stays an ordinary failure; the probe never relaxes or relocates admission, and no synthetic release is fed to any gate or the attestation.
@@ -98,6 +107,16 @@ Test homes updated: `tests/evidence/test_sanity_pipeline.py`, `tests/evidence/te
 | Manifest SHA-256 = `release_id` | before `e0d5c9805408640a987c757426937be90c770e55ee949f962aa1a2154af49856`; after `5fd293bf64f1196b8fba4e2856ed4cf2dcd9069d2a368a0fb6e331aafa16e360` (1,981 bytes) |
 | Checks | `cut_release_manifest.py … --check` 0; `scripts/release_id_recompute.py --check-manifest-only` 0; `tests/evidence/test_release_manifest_content_binding.py` passed |
 | Boundary | The release remains the incomplete 15-member manifest; nothing admits, activates or promotes it; PR06 retains complete materialization and promotion |
+
+**PR-35 re-cut.** P-21 changed `adapter/http_reader.py` again, so the manifest was re-cut through the same owner with the same pinned arguments. One row changed; the other fourteen rows, their order, `root`, `version` and `built_at_utc` are preserved.
+
+| Fact | Value |
+| --- | --- |
+| Only row changed | `adapter/http_reader.py`: sha256 `7d1cb8fdbf784a580e66f1f07b6604f7b9574992e2fe8ec7aff794b0983ed4e8` / 41,933 bytes → `72d3afc319e2ebdfdd5866926f3fb73eb65acd0476a597fc7b94ac2325f41b6b` / 42,264 bytes |
+| Manifest SHA-256 = `release_id` | `5fd293bf64f1196b8fba4e2856ed4cf2dcd9069d2a368a0fb6e331aafa16e360` → `a6db01063cc9150ff753263d6b0481ef7da42d4391a2d6d0ba41920d7dcd0796` |
+| Consequent owner writes | `run_canonical_json_gate.py` once (the gate embeds the manifest's invariant digest; `--check-only` had gone stale and returns 0 after the write), then `update_evidence_index.py` once as the sole Index/Mirror writer |
+| Checks | `cut_release_manifest.py … --check` 0; `release_id_recompute.py --check-manifest-only` 0; `run_canonical_json_gate.py --check-only` 0; `update_evidence_index.py --check` 0 |
+| Boundary | Unchanged: the release remains the incomplete 15-member manifest; nothing admits, activates or promotes it |
 
 ## 7. Governed evidence: regenerated by owners, or frozen
 
@@ -143,6 +162,32 @@ Nothing governed was hand-edited.
 
 Post-commit §10.3 classifier dry-run against the exact head: exit 0, `CI_CHANGE_CLASSIFICATION:event=pull_request;reason=selected_lanes;paths=81;lanes=product,compat,db,rails,evidence,qa,release` (base = merge-base `3b8084d09e974f15c2b71112e5a596af01b1a371`, head = `881cc2df6ca79ab8564bba9d9e20013807ecf077`; all seven lanes true, `needs_python=true`, `changed_tests=true`, 95 changed-test targets).
 
+### 8.1 PR-35 corrective-revision validation (same closed rails, commit `7b2bc5c95aa558961069a0a904ad7e4869a8469f`)
+
+The container had no project dependencies at PR-35 entry; `requirements.txt`, `requirements-dev.txt`, `-e .` and a PyPI `setuptools` were installed exactly as the CI workflow does before any figure below. Installing `-e .` is what CI does and is what puts the `hdctl` console script on `PATH`; without it seven `tests/cli` modules fail on a missing executable, which is an environment gap and not a code result.
+
+| Command / suite | Exit | Outcome |
+| --- | --- | --- |
+| **CI changed-tests step, reproduced exactly** — detached worktree at the corrective head, `PYTHONPATH` = worktree, the classifier's 95 targets | 0 | **2397 passed** (PR-30 candidate: 2392 passed / 4 failed). The +5 is C-1…C-4 now passing plus the new P-21 regression test. `git diff --exit-code` 0 and `git status --short --untracked-files=all` empty, the step's two post-conditions |
+| Classifier at the corrective head (`--event-name pull_request`, base = merge-base) | 0 | `paths=87`, all seven lanes true, `needs_python=true`, `changed_tests=true`, 95 targets — the same lane and target selection as the PR-30 candidate |
+| Configured roster `python -m pytest -q -p no:cacheprovider --ignore=tests/em` | 0 | **1916 passed, 3 skipped** — identical to the PR-30 baseline |
+| Five pre-existing failures of plan §3.2 item 8, by node ID | 1 | 5 failed, the same five node IDs, unchanged; no new tree changes from the run |
+| Product lane: `generate_ordering_artifacts.py --check` + `tests/order`, `tests/mech/test_order_properties.py`, `tests/evidence/test_architecture_snapshot.py` | 0 | 20 passed |
+| Compat lane: `check_cli_help.sh`, `serializer_grep_guard.py`, `emitter_symbol_proof.py` + the ten listed modules | 0 | 70 passed, 3 skipped, 2 xfailed |
+| DB lane: `check_direct_db_contract.py` + the seven listed modules | 0 | 249 passed |
+| Rails lane: `run_rails_job_definitions.py` over the three job definitions | 3 | `ACCEPTED rails_open_conformance: RELEASE_NOT_ADMITTED (exit 3; INCOMPLETE_RELEASE_ROSTER observed)`; `RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED`; `tests/evidence/test_rails_ci_workflow_integration.py` 132 passed → `RAILS_LANE:RELEASE_NOT_ADMITTED` |
+| Evidence lane: `update_evidence_index.py --check`, `orientation_demo.py --check`, `refresh_step_logs_manifest.py --check`, `check_evidence_index_hash.sh`, `validate_evidence_paths.py`, `check_mirror_schema.sh`, `check_final_lf.sh`, `check_lf_endings.py` + the six listed modules | 0 each | 111 passed |
+| QA lane in its own detached worktree: the seven listed modules | 0 | 488 passed; `git diff --exit-code` 0; tree clean |
+| Release lane: `git diff --exit-code`, `release_id_recompute.py --check-manifest-only`, then the four regression modules in a detached worktree | 0 | 62 passed; diff 0; tree clean |
+| Release lane: `build_release_attestation.py --output <external> --require-clean` | 1 | `RELEASE_ATTESTATION_FAILED:release_not_admitted`; receipt `{"code":"release_not_admitted","returncode":3,"schema":"hde.release_attestation.failure.v1","secret_values_recorded":false,"stage":"closure_write_and_check"}`; independent probe observes `INCOMPLETE_RELEASE_ROSTER`; tree clean → the step's acceptance conditions hold (`RELEASE_LANE:RELEASE_NOT_ADMITTED`). Ran with PyPI `setuptools` 84.0.0, which removes the §9 limitation that forced a separate venv rehearsal at PR-30 |
+| `run_canonical_json_gate.py --check-only`; `generate_error_artifacts.py --check`; `generate_bodygraph_policy_proofs.py --check`; `generate_rails_gate_evidence.py --check`; `generate_db_runtime_posture.py --check`; `generate_v2_mapped_cache_evidence.py --check`; `generate_ordering_artifacts.py --check`; `check_env_pins.sh` | 0 each | current after the owner writes |
+| `run_sanity_pipeline_gate.py` | 3 | `SANITY_PIPELINE_GATE:RELEASE_NOT_ADMITTED`; the sanity log was already at its fixed point, so no pipeline write was needed |
+| `generate_open_rails_abba_proof.py --check-current`; `generate_determinism_gate_proofs.py --check`; `generate_a7_transport_proofs.py --check` | 3 each | explicit `…:RELEASE_NOT_ADMITTED`; nothing written |
+| `generate_showcompat_artifacts.py --check`; `generate_cli_conformance_artifacts.py --check`; `generate_hde_epic037_v2_to_compat.py --check` | 0 each | frozen-digest / frozen-record validation |
+| `git status --short --untracked-files=all` before each commit | — | only the intended change set |
+
+A prior `--check-only` reading of the canonical gate recorded as 0 in an intermediate PR-35 step was an artifact of capturing `$?` after a pipe; re-run directly the gate reported stale artifacts, which is why the owner write above was performed. Every exit code in this table was captured directly from the command.
+
 ## 9. Limitations
 
 - No admitted release exists: every live gate ends `RELEASE_NOT_ADMITTED`; the frozen families keep capture-time bytes with nonclaims; PR06 owns convergence and the reverse (NOT_ADMITTED → PASS) transition of the sanity log, which needs the owner's canonical run plus the updater exactly as performed here (O-07).
@@ -162,11 +207,14 @@ Post-commit §10.3 classifier dry-run against the exact head: exit 0, `CI_CHANGE
 | O-09 | `tools/cli/generate_cli_conformance_artifacts.py` and the showcompat capture generator cannot regenerate their birth-only captures even after admission without a stored BodyGraph source; convergence requires a source decision | PR06 / PO |
 | O-10 | `scripts/cli/canonical_harness.py`, `scripts/make_compat_determinism_artifacts.py`, `tools/presenter/generate_presenter_artifacts.py` remain import-safe, known-stale write-mode scripts (plan §6.2) | PR06 |
 | O-11 | `tools/evidence/generate_evidence_index_snapshot.py --check` reports `FAIL_BEHAVIOR issues=INPUT_SHA_HUMAN,INPUT_SHA_MIRROR`: the 2026-01-21 snapshot records input digests that already differ from `origin/main`'s `docs/evidence/INDEX.json` and mirror, so the mismatch pre-exists this PR and sits outside every CI lane. The EPIC024 D23 recorder (`tools/evidence/check_d23_evidence_index_snapshot_contract.py`) writes into `audit/qa/hde-epic024/` by default; one exploratory run here was reverted with `git checkout` and nothing of it is in the candidate | evidence owner / PR06 |
+| O-12 | Codex P2 on `73b9812` (`engine/compat/compute.py:329`): `pyproject.toml` packages only `engine*`, `adapter*`, `presenter*`, `catalog*`, `math*` with JSON package data for `catalog` and `math`, while `ADMITTED_RELEASE_ROSTER` requires top-level `schemas/`, `errors/` and `tools/` entries, so a non-editable wheel install could never admit a release. Verified accurate and **not fixed here**: neither `pyproject.toml` nor `engine/config/registry_loader.py` is in this PR's diff, the roster predates this branch (2026-09-20, #418), and the shapes in use do not hit it — CI installs with `pip install -e .` and the `Procfile` runs `gunicorn 'adapter.factory:create_app()'` from the deployed repository tree. Changing the distribution surface is outside this work unit's bounded scope | packaging / release owner (PR06 / PO) |
 | O-03 (carried) | `docs/ENDPOINTS_CATALOG.json` lacks a `POST /reader` success row; committed A7 artifacts frozen | PR07 / PO |
 
 ## 11. Publication
 
 PR #467 reused (no new PR). Implementation commit `881cc2df6ca79ab8564bba9d9e20013807ecf077` (tree `475ba9b440fbcac6336e49cca2739097991dea88`); the records commit (adding this file, the ledger and the checkpoint) is the branch head pushed once with `git push -u origin claude/peaceful-gauss-jhyezn`; the remote head was read back with `git ls-remote` and is recorded verbatim in the PR #467 body and in the ledger's PR-35 entry update; PR title/body updated to the candidate. Code and security review come from Codex on the PR; no reviewer product was installed, triggered or configured by this session. Merge, auto-merge and `[skip ci]` were not used.
+
+**PR-35 corrective publication.** PR #467 reused again; no second PR, branch, Proceed or session. Corrective commit `7b2bc5c95aa558961069a0a904ad7e4869a8469f` (source, tests, re-cut manifest, owner-written gate outputs and Index/Mirror) plus the PR-35 records commit adding this update, the ledger entries L-13… and the PR-35 checkpoint; both pushed in one `git push -u origin claude/peaceful-gauss-jhyezn`. The remote head and PR state were read back after the push and are recorded verbatim in the ledger. No merge, auto-merge, `[skip ci]`, test skip or admission bypass was used; `docs/pfcanon/` was not written; PF12 wire values, `PR06R_B_FINAL_PASS` and `hde.release_attestation.v1` are unchanged.
 
 ## 12. Continuation
 
