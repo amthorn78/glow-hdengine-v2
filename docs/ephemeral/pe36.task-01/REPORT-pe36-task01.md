@@ -193,7 +193,9 @@ directs no Notion write — which is `notion-write-boundary.md` applied to its o
   first review.
 - **Nothing is installed.** Only Nathan installs. An install is complete when the installed
   tree measures the repaired digest the verdict names — not when anything returns green.
-- **Nothing is merged.** Nathan merges.
+- **Nothing is merged.** Nathan merges. The branch is
+  `docs/20260922-pe36-task01-skill-write-boundary` and the pull request is **#461**, open, four
+  changed files, read back from the API rather than inferred from having pushed.
 
 ## Out of scope, untouched
 

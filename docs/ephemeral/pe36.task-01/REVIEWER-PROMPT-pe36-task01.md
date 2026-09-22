@@ -66,12 +66,11 @@ Superseded or unreproducible identity values, named so you do not chase them:
 === 4. WHERE THE REPOSITORY EVIDENCE IS ===
 Repository amthorn78/glow-hdengine-v2.
 Branch docs/20260922-pe36-task01-skill-write-boundary — read its HEAD, not a pinned commit.
-NOT MERGED at the time this prompt was written. Nathan merges; PE36 never does.
-If that branch does not exist when you look, it merged and was deleted — read the same paths on
-main. If a pull request is open for it, confirm the branch HEAD against the PR rather than
-guessing; PE36 could not open the PR itself (no GitHub CLI or PR tool in its session), so the PR
-may have been opened by Nathan under a number PE36 never saw. Do not treat a missing PR as a
-finding about the change.
+It is expected to merge as PULL REQUEST #461, https://github.com/amthorn78/glow-hdengine-v2/pull/461
+— OPEN and NOT MERGED at the time this prompt was written. Nathan merges; PE36 never does.
+Confirm the branch HEAD against that PR rather than guessing.
+If that branch does not exist when you look, #461 merged and the branch was deleted — read the
+same paths on main instead, and say in your record that you read main rather than the branch.
 
 Artifacts, by path:
   docs/ephemeral/pe36.task-01/TASK-01-skill-write-boundary-revision.md  the authorizing brief
@@ -160,8 +159,10 @@ L2. The 55 prompt bodies live in Notion and are never mirrored to disk
     (prompt-corpus-policy.md). Reading them is unrestricted and requires no authorization;
     copying, hashing or byte-comparing them is absolutely prohibited. No prompt body was touched
     by this change and none needs to be read to review it.
-L3. PE36's session had no GitHub CLI and no PR tool, so it could not open a pull request. The
-    branch is pushed. If you cannot find a PR, that is an environment limit, not a defect.
+L3. The branch is pushed and PR #461 is open; both were read back from the remote rather than
+    inferred from having pushed. No .skill file is in the repository — the packages are delivered
+    to Nathan directly, so the PR carries the evidence and not the artifacts under review. You
+    must review the .skill bytes you were handed, not the repository.
 L4. PE35's transcript is not available and is not a system of record. Neither is PE36's.
 L5. The author cannot measure skill trigger rates from its own session, so A2 cannot be settled
     empirically by either of us. Judge it by reading.
