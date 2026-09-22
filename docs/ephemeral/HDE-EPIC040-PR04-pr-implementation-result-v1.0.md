@@ -438,15 +438,15 @@ Historical pre-merge evidence for PR #467 at the remote head this records commit
 | Predicate | State |
 | --- | --- |
 | Approved implementation scope complete | Yes — plan v1.2 under the original Proceed; no scope added or dropped |
-| Required local checks pass on the candidate | Yes — §8.1, §8.4, §8.5 |
+| Required local checks pass on the candidate | Yes — §8.1, §8.4, §8.5, §8.8, §8.9, §8.10; the CI changed-tests step reproduced verbatim in a detached worktree at **2407 passed**, `git diff` clean, tree clean |
 | Commits pushed; PR reflects the exact remote head | Yes — read back with `git ls-remote` after each push |
-| Code review findings and threads resolved on the current head | Yes — six threads replied to and resolved; one left open **by design** (O-12 packaging, for the packaging owner) |
+| Code review findings and threads resolved on the current head | Yes — all twelve findings verified against primary sources and dispositioned; seven resolved, **four left open by design** for their named owners (O-12 packaging, O-19/F07, O-20 and O-21 capture generators), one carried in place (O-16) |
 | Required CI passes on the current candidate | Yes — see below |
-| No unresolved material rescope, dependency or repository-state conflict | Yes — no `RESCOPE_REQUEST` was issued; both deferrals are Product Owner decisions |
-| Result and handoff artifacts saved and read back | Yes — this record, the ledger, the checkpoint and the two deferral-decision files |
+| No unresolved material rescope, dependency or repository-state conflict | Yes — no `RESCOPE_REQUEST` was issued; all three deferrals (F03, F05, F07) are Product Owner decisions |
+| Result and handoff artifacts saved and read back | Yes — this record, the ledger, the checkpoint and the three deferral-decision files (F03, F05, F07) |
 | Current-head **security** review | **No — see the limitation below.** The one stated exception |
 
-### Review findings, all eight dispositioned
+### Review findings, all twelve dispositioned
 
 | # | Finding | Disposition |
 | --- | --- | --- |
@@ -457,13 +457,29 @@ Historical pre-merge evidence for PR #467 at the remote head this records commit
 | P2 | F06 — stored-row Gate defects returned 422 instead of PF05's 503 | Fixed, `ca063c1` (§4 P-23); resolved |
 | P2 | F05 — Reader response fails `schemas/reader.v1.schema.json` | **Deferred to PR07 by Product Owner decision**; F05 record, O-15; resolved |
 | P2 | O-16 — `ERR_M10_GATES_MISSING` registered but unreachable | Not changed: plan decision D-04 settled this tension and routed it to PF01/PF05 maintainers as plan observation O-01; carried as O-16; resolved |
+| P2 | Legacy Reader emitter call contract broken by the required `eligible` keyword | Fixed, `dc348a0` (§4 P-24, §8.6); resolved |
+| P2 | O-18 — narrative pack mounts from the request path (cold read-only worker) | Verified; pre-existing and outside this diff, unreachable until admission; carried to the narrative loader owner / PR06; resolved |
+| P2 | Configuration failures from the core boundary reported as `gates_invalid` | Fixed, `eec6b8e` (§4 P-25); resolved |
+| P2 | F07 — dev conjunction evidence capture unrunnable, two tests failing | **Deferred to PR07 by Product Owner decision**; F07 record, O-19; thread left open |
+| P2 | O-20 — capture generators still parse the retired `compat.meta` shape | Verified; unreachable and unprovable under F01; carried to the capture-generator owner / PR06; thread left open |
+| P2 | Admission classifier put source and registry-roster codes in the manifest class | Fixed, `5d29bb8` (§4 P-26, §8.10); resolved |
+| P2 | O-21 — canonical parity harness aborts on its own birth-only inputs | Verified; cannot complete under F01 and its outputs are governed; carried with O-20 to PR06; thread left open |
 | P2 | O-12 — admission roster not shipped with installed packages | Pre-existing, outside this diff, unreachable in the shapes in use; **thread deliberately left open** for the packaging owner |
 
-Two of the findings exposed defects in the approved plan itself, both recorded rather than silently overwritten: **O-13** (plan item 5 / R-18 / O-11 claimed `/reader` and `/api/reader` "name the same existing declared route", disproven by execution) and **§4 P-23** (plan §10.4 and its §7.2 table specified the 422 that PF05 §5.2.3 contradicts).
+Four of the findings exposed defects in the approved plan itself, all recorded rather than silently overwritten: **O-13** (plan item 5 / R-18 / O-11 claimed `/reader` and `/api/reader` "name the same existing declared route", disproven by execution), **§4 P-23** (plan §10.4 and its §7.2 table specified the 422 that PF05 §5.2.3 contradicts), **§4 P-24** (plan §10.3's check on `engine/emit_public.py` looked for removed helpers, not a changed signature) and **O-18** (plan O-07 / R-09 framed the narrative mount as CI tree-hygiene when it is a production failure mode).
 
 ### CI on the current head
 
-`ci.yml` run on the exact remote head concluded **`success`**: 16/16 steps, all seven lanes `_OUTCOME: success`, final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, including the changed-tests step that failed at PR-30 and the accepted `RAILS_LANE:RELEASE_NOT_ADMITTED` and `RELEASE_LANE:RELEASE_NOT_ADMITTED` outcomes. Every prior head in this phase that carried code also concluded `success` (`7fe3630` #3595, `730208c` #3596, `aa5c3cc` #3597, `d4c6d8f` #3598, `dca3a93` #3599).
+The last head verified before this records commit, `c0cd4e06e1d5bddd8169e47d5ed17334282f7a05`, carries `ci.yml` run **35774815350** at conclusion **`success`**: all seven lanes `_OUTCOME: success`, final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, including the changed-tests step and the accepted `RAILS_LANE:RELEASE_NOT_ADMITTED` and `RELEASE_LANE:RELEASE_NOT_ADMITTED` outcomes. This records commit carries no code change — it differs from `c0cd4e0` only in this file and the ledger — and its own run is verified after the push and recorded verbatim in the PR #467 body and in the ledger, by the same convention as the rest of this record.
+
+Two runs in this phase failed and both were this session's own defects, fixed rather than explained away:
+
+| Run | Head | Failure | Fix |
+| --- | --- | --- | --- |
+| 35763461703 | `caec701` | rails lane — the `http_reader` owner-guard tuple omitted the newly registered consumer | `e355bba`; §8.7 |
+| 35770839639 | `a225c79` | 2407 tests passed, then `git diff --exit-code` — a test wrote a wall-clock timestamp into a tracked artifact | `74214ac`; §8.9 |
+
+Every other head in this phase that carried code also concluded `success` (`7fe3630` #3595, `730208c` #3596, `aa5c3cc` #3597, `d4c6d8f` #3598, `dca3a93` #3599, `c147e76` #3600).
 
 ### Stated limitation: no current-head security review
 
