@@ -5,7 +5,7 @@ created_date: 2026-09-22
 session: PE36
 stage: 4 — pilot
 vehicle: MODIFICATION-20260922-af005-workspace-currency-hardening
-status: ANALYZE_RUN_AWAITING_PRODUCT_OWNER_RULING
+status: TRIAL_CLOSED_FINDINGS_KEPT
 scope: findings about the process, not about AF-005
 ---
 
@@ -138,12 +138,28 @@ Product Owner approval between modes, and self-approving would have tested nothi
 **Interaction cost prediction is uncalibrated.** This is the first Modification; predicted is 5 and
 actual is empty. One data point will not calibrate anything, and three or four will begin to.
 
-## Recommended next step
+## P6 — the trial itself was the wrong shape, and that is the largest finding here
 
-**Run the pilot to `PLAN` and stop there.** It exercises both approval gates and the planning
-discipline, produces a plan whose cost is visible and whose steps are mechanical, and **spends no
-review round** — the plan then sits until other work touches the skill, which is exactly what
-`AF-005` asked for.
+**You cannot build a structure using the structure you are building.** The Product Owner, on
+reading the above: *"This is becoming conflated… This improvement needs to sit outside the
+structure."*
 
-That tests two of three modes, respects the deferral, and leaves a ready-to-execute plan attached
-to the deferred item. `EXECUTE` gets tested by the first real change that has a reason to ship.
+Correct, and the redesign plan had already named this as the bootstrap risk — *"accept one last
+improvised change to end improvisation"* — before this session did the opposite.
+
+Two errors compounded:
+
+1. **An unrelated skill improvement was conscripted as a test fixture.** It was chosen because it
+   was small and well-specified, not because anyone wanted it done. That put a real deferred item
+   into a pipeline it had no business being in.
+2. **The trial was then allowed to gate the actual work.** The redesign stalled behind a question
+   about a sentence in an unrelated skill. The redesign is the priority; the sentence is not.
+
+**Disposition.** The trial is closed. The skill improvement returns to where it was deferred, with
+its original trigger intact and nothing waiting on it. The redesign work proceeds outside the
+structure it is building, as ordinary session work, until the structure is finished and can take
+its first real change from someone who actually wants one.
+
+**The rule this establishes for the rest of the redesign:** the new process is validated by
+building it carefully and reviewing it, not by running it on a change invented for the purpose. A
+manufactured test case measures the manufacturer.

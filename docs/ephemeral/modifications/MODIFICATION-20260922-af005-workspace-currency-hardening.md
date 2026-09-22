@@ -1,7 +1,7 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260922-af005-workspace-currency-hardening
-status: ANALYZED
+status: ABANDONED
 coupling: ATOMIC
 targets: [skill, notion_control]
 gate_tier: 1
@@ -11,6 +11,7 @@ closure:
   state_sharers: []
   note: "NOT COMPUTED — closure.py covers prompts only; this targets a skill, which has no graph part. See finding A3."
 readiness: NEEDS_RULING
+abandoned_reason: "Used as a tooling trial, not as a change anyone asked for. The skill improvement it describes remains deferred on the Alpha Feedback page, untouched. Retained as evidence for the five findings it produced."
 modification_class: B
 modification_class_note: "B or E is genuinely ambiguous, and E means do not do it. See finding A1 — this is the open ruling."
 interaction_cost_predicted: 5
@@ -36,8 +37,16 @@ Close `AF-005` — the asymmetric safe default in `glow-workspace-currency` — 
 clause, so a session that treats itself as executing also learns that a Notion surface already
 naming its item is a destination rule.
 
-**This is the stage 4 pilot.** It is a test of the process. Its findings about the process itself
-are recorded separately in `../pe36.mgmt-redesign/PILOT-FINDINGS-stage4.md`.
+> **ABANDONED as a change, retained as evidence.** This was used as a trial fixture for the new
+> tooling, which was a mistake: the redesign should not be built using the structure it is
+> building, and an unrelated skill improvement should not have been conscripted as its test case.
+>
+> **The skill improvement remains deferred exactly where the Product Owner put it**, on the Alpha
+> Feedback page, with its original trigger — apply it when other work touches that skill. Nothing
+> here changes that, and nothing here is waiting on a decision.
+>
+> The file is kept because the trial produced five findings about the tooling, two of them serious
+> and both fixed. Those are in `../pe36.mgmt-redesign/PILOT-FINDINGS-stage4.md`.
 
 ## §A — Analysis
 

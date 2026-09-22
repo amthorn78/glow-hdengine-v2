@@ -65,6 +65,10 @@ NEEDS_ANALYZE_APPROVAL = ["PLANNING", "PLANNED", "EXECUTING", "COMPLETE"]
 NEEDS_PLAN_APPROVAL = ["EXECUTING", "COMPLETE"]
 # statuses at or past the point where scope is frozen
 FROZEN = ["PLANNING", "PLANNED", "EXECUTING", "COMPLETE"]
+# Terminal states can be reached from ANY point -- a Modification can be abandoned during
+# analysis. They carry no progression, so the ordered checks below must not treat their position
+# in STATUSES as meaning every earlier stage was completed.
+TERMINAL = ["BLOCKED", "ABANDONED"]
 
 REQUIRED_ALWAYS = ["artifact_type", "modification_id", "status", "request", "items"]
 REQUIRED_BEYOND_INTAKE = ["coupling", "targets", "gate_tier", "modification_class", "readiness"]
@@ -137,6 +141,11 @@ def check(path):
     for tgt in fm.get("targets") or []:
         if tgt not in TARGETS:
             bad.append(f"target {tgt!r} not in {TARGETS}")
+
+    if status in TERMINAL:
+        # Nothing further is asserted: an abandoned or blocked Modification is a record of where
+        # it stopped, and demanding the sections it never reached would be demanding a lie.
+        return bad
 
     # --- the entry gates: this is the whole point of the script ---
     if status in NEEDS_ANALYZE_APPROVAL and not str(fm.get("analyze_approved_by") or "").strip():
@@ -241,6 +250,11 @@ _REGRESSIONS = [
      "SCOPE FREEZE"),
     ("scope freeze unenforced because the field was never set",
      lambda s: s.replace("item_count_at_approval: 1\n", ""), "requires item_count_at_approval"),
+    ("terminal state wrongly required to carry every section",
+     lambda s: s.replace("status: COMPLETE", "status: ABANDONED")
+                .replace("## §P — Plan\nenough text here to clear the emptiness check on this section, comfortably.\n", "")
+                .replace("## §E — Execution\nenough text here to clear the emptiness check on this section, comfortably.\n", ""),
+     None),  # None = this must PASS, not fail
     ("override with no attribution",
      lambda s: s.replace("item_count_at_approval: 1",
                          'item_count_at_approval: 1\noverride:\n  overrides: [scope_freeze]\n  reason: "x"'),
@@ -293,7 +307,13 @@ def selftest():
             f = Path(td) / "MODIFICATION-regression.md"
             f.write_text(mutate(_GOOD), encoding="utf-8")
             found = check(f)
-            if any(expect in pr for pr in found):
+            if expect is None:                       # must PASS
+                if found:
+                    print(f"SELFTEST FAIL: should have passed: {name} -> {found}")
+                    failures += 1
+                else:
+                    print(f"ok    correctly allowed: {name}")
+            elif any(expect in pr for pr in found):
                 print(f"ok    caught: {name}")
             else:
                 print(f"SELFTEST FAIL: NOT caught: {name} (expected {expect!r}, got {found})")
