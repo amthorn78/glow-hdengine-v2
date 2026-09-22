@@ -7,7 +7,7 @@ One file per Modification, the unit of approval in the GCFPE MGMT change process
 Format and rules: `docs/prompt_ecosystem_management/modification-template.md`
 Validate:         `docs/prompt_ecosystem_management/modification_validate.py`
 Closure and tier: `docs/prompt_ecosystem_management/closure.py`
-Intake:           `docs/prompt_ecosystem_management/modification-intake-triage-prompt.md`
+Intake:           Notion — "Modification Intake and Triage", a child of the redesign tracking page (a persistent prompt, so not kept in the repository)
 
 `status` makes "what is open" a query rather than a reading exercise:
 
