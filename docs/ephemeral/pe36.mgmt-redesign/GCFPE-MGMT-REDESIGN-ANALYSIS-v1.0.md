@@ -692,6 +692,55 @@ package/review/install cycle without risking anything.
 
 ---
 
+## 9A. Stage 2 and stage 3 — status and the prepared stage 3 specification
+
+**Stage 2: the proposed body is authored in Notion and approved by the Product Owner for testing,
+2026-09-22.** It is a child of the redesign tracking page — not in the Flow Index, not in the
+register, and the live `091426.1` page is untouched. Nothing is promoted.
+
+### A defect in the approved draft, caught before stage 3 and fixed
+
+The first draft of the new body **dropped two of the prompt's three outbound connections.** The graph
+part gives `GCFPE-MGMT-10` three edges; the draft kept only the return to Nathan and silently lost:
+
+- the **native continuation** back to the stage that raised a change, and
+- the **handoff to `PR-10`** on `READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION` — the *only*
+  downstream prompt `closure.py` reports for this prompt.
+
+That is precisely the failure this ecosystem exists to prevent: changing one prompt and breaking its
+relationship to another. Both routes are restored, worded to match what the graph part already
+carries, and checked against the graph part state by state and destination by destination.
+
+That check was done **by reading, not by script**, deliberately: a script would need the body
+written to disk, and `prompt-corpus-policy.md` forbids copying prompt bodies to disk. **Any
+automated body-versus-graph check must read Notion in memory.** That is a requirement on future
+tooling, recorded here so it is not rediscovered.
+
+### Stage 3, prepared — and it is small
+
+With routing restored, the graph part and the approved body now agree on every state and every
+destination. So stage 3 is much smaller than the plan assumed:
+
+| surface | change at promotion | why |
+|---|---|---|
+| graph part — edges, states, destinations | **none** | routing is unchanged |
+| graph part — `source_evidence.section` | relabel two provenance citations to `Result routing` | they cite sections that no longer exist; metadata only, applied by rebuild via `glow-graph-contract`, never by hand |
+| registry — `inputs` | one line → **two**: `MODE`, and the subject | the entry contract changed |
+| registry — output artifact | `GCFPE_SUCCESSOR_RELEASE / CHANGE_RECORD` → **`GCFPE_MODIFICATION_RECORD`** | closes the name collision recorded in §5 |
+| registry — states, consumers, `required_interfaces` | **none** | same four states, `PR-10` still the consumer |
+| registry — `evidence_contract` | restamped from the promoted body | it describes the body's extraction |
+
+**Measured blast radius** — from `closure.py`, used here as a measurement and not as the process
+being built: radius **1**, `PR-10`. The routing interface is unchanged, but the body changes what
+the prompt *produces* — a Modification record where there was a change report — so by the §3.4
+rule this is **Tier 1**, and the promotion gate must cover `PR-10`, not all 55.
+
+**Pre-existing drift, found in passing and not caused by this work.** Two of the graph part's
+`source_evidence` labels — *"Required result and routing"* and *"Separate EPIC040 Alpha preparation
+branch and Result routing"* — do not match any section heading in the **live** `091426.1` body
+either. The provenance metadata was already stale against the selected release. Recorded, not
+touched: it belongs to the live release, and the stage 3 rebuild corrects it anyway.
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage
