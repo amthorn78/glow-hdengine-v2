@@ -65,6 +65,10 @@ class V2ChartAdapterResult:
     missing_vendor_detail_fields: tuple[str, ...]
     resolved: Mapping[str, Any] | None = None
     cache: Mapping[str, Any] | None = None
+    # The verified caller context that produced ``resolved``; retained for the
+    # compat resolution seam and deliberately absent from ``as_dict()`` so the
+    # governed adapter snapshots keep their exact shape.
+    context: V2ChartAdapterContext | None = None
 
     def as_dict(self) -> dict[str, Any]:
         payload: dict[str, Any] = {
@@ -295,6 +299,16 @@ def adapt_v2_chart_payload(
         "vendor": "hdapi",
         "vendor_version": _context_value(context, "vendor_version"),
     }
+    verified_context = V2ChartAdapterContext(
+        person_uid=str(person_uid),
+        user_id=str(_context_value(context, "user_id")),
+        vendor="hdapi",
+        vendor_version=int(_context_value(context, "vendor_version")),
+        input_fingerprint=str(_context_value(context, "input_fingerprint")),
+        route_family=str(_context_value(context, "route_family")),
+        route=route_value,
+        payload_family="ChartResult",
+    )
     return V2ChartAdapterResult(
         status="mapped",
         code="ADAPTER_MAPPED",
@@ -303,4 +317,5 @@ def adapt_v2_chart_payload(
         missing_vendor_detail_fields=(),
         resolved=resolved,
         cache=cache,
+        context=verified_context,
     )

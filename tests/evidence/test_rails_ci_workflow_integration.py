@@ -56,6 +56,35 @@ def test_workflow_contains_one_conditional_closed_default_rails_lane() -> None:
         assert needle in text
     assert "secrets:" not in lane
     assert "${{ secrets." not in lane.lower()
+    # PF10 §2.15: exactly one accepted non-zero runner outcome, keyed on the distinct
+    # code and an independent read-only admission probe in the same step.
+    assert 'if [ "$rails_rc" -eq 3 ]; then' in lane
+    assert "probe_release_not_admitted" in lane
+    assert "INCOMPLETE_RELEASE_ROSTER" in lane
+    assert "load_active_mechanics_bundle()" in lane
+    assert 'echo "RAILS_LANE:RELEASE_NOT_ADMITTED"' in lane
+    assert 'elif [ "$rails_rc" -ne 0 ]; then\n            exit "$rails_rc"' in lane
+    assert lane.index("|| rails_rc=$?") < lane.index('if [ "$rails_rc" -eq 3 ]') < lane.index("python -m pytest -q tests/evidence/test_rails_ci_workflow_integration.py")
+
+
+def test_workflow_release_lane_accepts_only_the_release_not_admitted_receipt_with_probe() -> None:
+    text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    step = text[
+        text.index("      - name: Build and verify exact-source release attestation") :
+        text.index("      - name: Verify truthful applicability and clean candidate tree")
+    ]
+    assert step.count("python tools/evidence/build_release_attestation.py") == 2
+    assert "--require-clean || release_rc=$?" in step
+    assert 'if [ "$release_rc" -ne 0 ]; then' in step
+    assert 'if [ ! -f "$attestation_root/failure.json" ]; then\n              exit "$release_rc"' in step
+    assert 'if [ "$receipt_code" != "release_not_admitted" ]; then\n              exit "$release_rc"' in step
+    assert "probe_release_not_admitted" in step and "INCOMPLETE_RELEASE_ROSTER" in step
+    assert 'echo "RELEASE_LANE:RELEASE_NOT_ADMITTED"' in step
+    # --verify runs only on the success branch (no bundle exists otherwise).
+    verify = step.index('--verify "$attestation_root"')
+    assert step.index("else\n") < verify < step.index("# No active release or deployment workflow consumes this bundle.")
+    assert step.rstrip().endswith('test -z "$(git status --short --untracked-files=all)"')
+    assert "git diff --exit-code" in step[verify:]
 
 
 def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
@@ -640,6 +669,7 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
         "tests/http/test_dev_conjunction_http.py",
         "tests/http/test_endpoint_catalog.py",
         "tests/http/test_reader_a7_transport.py",
+        "tests/http/test_reader_post_v1.py",
         "tests/transport/test_aux_narrative.py",
         "tests/transport/test_ops_rails_refusal.py",
         "tests/transport/test_writers_errors_headers.py",
@@ -1547,6 +1577,126 @@ def test_job_definitions_are_reusable_secret_free_and_live_forbidden() -> None:
         assert "${{ secrets." not in text
     open_job = runner.validate(DEFS[1])
     assert "fixture-backed" in open_job["scope"] and "non-live" in open_job["scope"]
+    # PF10 §2.15: only the --check-current step declares the distinct non-admitted exit code.
+    declared = {
+        step["command"]: step.get(runner.ACCEPTED_RELEASE_NOT_ADMITTED_KEY)
+        for job in (runner.validate(path) for path in DEFS)
+        for step in job["steps"]
+    }
+    assert declared == {
+        "python -m pytest tests/bodygraph/test_resolver_vendor.py -q": None,
+        "python -m pytest tests/bodygraph/test_vendor_client.py tests/evidence/test_open_rails_abba_proof.py -q": None,
+        "python tools/evidence/generate_open_rails_abba_proof.py --check-current": runner.RELEASE_NOT_ADMITTED_EXIT_CODE,
+        "python tools/evidence/generate_rails_gate_evidence.py --check": None,
+        "python -m pytest tests/bodygraph/test_vendor_client.py tests/bodygraph/test_resolver_vendor.py -q": None,
+    }
+    assert runner.RELEASE_NOT_ADMITTED_EXIT_CODE == release_sanity.RELEASE_NOT_ADMITTED_EXIT_CODE == 3
+    check_step = [step for step in open_job["steps"] if step["command"].endswith("--check-current")][0]
+    assert any("RELEASE_NOT_ADMITTED" in line for line in check_step["proves"])
+
+
+def _write_def_with_accepted_outcome(path: Path, command: str, declared: str, second_command: str | None = None) -> None:
+    steps = f"  - command: {command}\n    {runner.ACCEPTED_RELEASE_NOT_ADMITTED_KEY}: {declared}\n    proves:\n      - local proof\n"
+    if second_command is not None:
+        steps += f"  - command: {second_command}\n    proves:\n      - later step\n"
+    path.write_text(
+        f'name: rails_open_conformance\nrails:\n  SAFE_MODE: "0"\n  ALLOW_NETWORK: "1"\n  LC_ALL: C\n  LANG: C\n  TZ: UTC\nscope: reusable-fixture-backed-mocked-non-live\nlive_vendor_calls: forbidden\nsteps:\n{steps}',
+        encoding="utf-8",
+    )
+
+
+def test_runner_accepts_declared_non_admitted_exit_only_with_the_observed_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    probe = tmp_path / "probe.py"
+    out = tmp_path / "out.txt"
+    probe.write_text("import sys,pathlib\npathlib.Path(sys.argv[1]).open('a').write(sys.argv[2]+'\\n')\nraise SystemExit(int(sys.argv[3]))\n", encoding="utf-8")
+    definition = tmp_path / "open.yml"
+    _write_def_with_accepted_outcome(definition, f"{sys.executable} {probe} {out} first 3", "3", f"{sys.executable} {probe} {out} second 0")
+    old = runner.ALLOWED_ARGV
+    try:
+        runner.ALLOWED_ARGV = {
+            "rails_open_conformance": (
+                ("python", str(probe), str(out), "first", "3"),
+                ("python", str(probe), str(out), "second", "0"),
+            ),
+        }
+        job = runner.validate(definition)
+        assert job["steps"][0][runner.ACCEPTED_RELEASE_NOT_ADMITTED_KEY] == 3
+        assert runner.ACCEPTED_RELEASE_NOT_ADMITTED_KEY not in job["steps"][1]
+
+        monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: True)
+        outcomes: list[str] = []
+        assert runner.run_job(job, outcomes=outcomes) == 0
+        assert outcomes == ["RELEASE_NOT_ADMITTED"]
+        assert out.read_text(encoding="utf-8").splitlines() == ["first", "second"]  # later steps still run
+        captured = capsys.readouterr().out
+        assert "ACCEPTED rails_open_conformance: RELEASE_NOT_ADMITTED (exit 3; INCOMPLETE_RELEASE_ROSTER observed)" in captured
+
+        # Without the observed non-admitted state the same exit is an ordinary failure.
+        out.write_text("", encoding="utf-8")
+        monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: False)
+        outcomes = []
+        assert runner.run_job(job, outcomes=outcomes) == 3
+        assert outcomes == []
+        assert out.read_text(encoding="utf-8").splitlines() == ["first"]
+
+        # An undeclared step exiting 3 is never accepted, even with the observed state.
+        undeclared = tmp_path / "undeclared.yml"
+        _write_def(undeclared, "rails_open_conformance", "0", "1", f"{sys.executable} {probe} {out} first 3")
+        monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: True)
+        assert runner.run_job(runner.validate(undeclared)) == 3
+    finally:
+        runner.ALLOWED_ARGV = old
+
+
+def test_runner_main_ends_with_the_distinct_code_and_marker_after_running_every_job(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    probe = tmp_path / "probe.py"
+    out = tmp_path / "out.txt"
+    probe.write_text("import sys,pathlib\npathlib.Path(sys.argv[1]).open('a').write(sys.argv[2]+'\\n')\nraise SystemExit(int(sys.argv[3]))\n", encoding="utf-8")
+    a, b, c = tmp_path / "a.yml", tmp_path / "b.yml", tmp_path / "c.yml"
+    _write_def(a, "rails_closed_refusal", "1", "0", f"{sys.executable} {probe} {out} closed 0", "reusable-closed")
+    _write_def_with_accepted_outcome(b, f"{sys.executable} {probe} {out} open 3", "3")
+    _write_def(c, "logs_keys_only_redaction", "1", "0", f"{sys.executable} {probe} {out} logs 0", "reusable-logs")
+    old = runner.ALLOWED_ARGV
+    try:
+        runner.ALLOWED_ARGV = {
+            "rails_closed_refusal": (("python", str(probe), str(out), "closed", "0"),),
+            "rails_open_conformance": (("python", str(probe), str(out), "open", "3"),),
+            "logs_keys_only_redaction": (("python", str(probe), str(out), "logs", "0"),),
+        }
+        monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: True)
+        assert runner.main([str(a), str(b), str(c)]) == runner.RELEASE_NOT_ADMITTED_EXIT_CODE
+        lines = capsys.readouterr().out.splitlines()
+        assert lines[-1] == "RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED"
+        assert "RAILS_JOB_DEFINITIONS_OK" not in lines
+        assert out.read_text(encoding="utf-8").splitlines() == ["closed", "open", "logs"]
+    finally:
+        runner.ALLOWED_ARGV = old
+
+
+@pytest.mark.parametrize(
+    "declared, expected",
+    [("4", "must equal 3"), ("0", "must equal 3"), ("three", "must equal 3"), ("true", "must equal 3")],
+)
+def test_runner_rejects_any_other_declared_accepted_outcome(tmp_path: Path, declared: str, expected: str) -> None:
+    path = tmp_path / "bad.yml"
+    _write_def_with_accepted_outcome(path, "python -m pytest tests/bodygraph/test_vendor_client.py tests/evidence/test_open_rails_abba_proof.py -q", declared)
+    with pytest.raises(Exception) as excinfo:
+        runner.validate(path)
+    assert expected in str(excinfo.value)
+
+
+def test_runner_rejects_unknown_step_keys_and_duplicate_declarations(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yml"
+    _write_def_with_accepted_outcome(path, "python -m pytest tests/bodygraph/test_vendor_client.py tests/evidence/test_open_rails_abba_proof.py -q", "3")
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace("    proves:", "    retries: 2\n    proves:"), encoding="utf-8")
+    with pytest.raises(Exception) as excinfo:
+        runner.validate(path)
+    assert "unsupported step key" in str(excinfo.value)
+    path.write_text(text.replace("    proves:", f"    {runner.ACCEPTED_RELEASE_NOT_ADMITTED_KEY}: 3\n    proves:"), encoding="utf-8")
+    with pytest.raises(Exception) as excinfo:
+        runner.validate(path)
+    assert "duplicate accepted outcome" in str(excinfo.value)
 
 
 def _write_def(path: Path, name: str, safe: str, allow: str, command: str, scope: str = "reusable-fixture-backed-mocked-non-live") -> None:
@@ -1746,13 +1896,18 @@ def test_feature_producers_do_not_reference_path_proof_writer() -> None:
         assert "evidence_index.jsonl" not in text
 
 
-def test_open_rails_producer_check_mode_has_no_repo_residue() -> None:
+def test_open_rails_producer_check_mode_has_no_repo_residue(capsys: pytest.CaptureFixture[str]) -> None:
+    """Under the real admission owner (INCOMPLETE_RELEASE_ROSTER) the check ends
+    RELEASE_NOT_ADMITTED with the distinct code, its explicit line and no residue."""
+
     from tools.evidence import generate_open_rails_abba_proof as open_proof
 
+    assert release_sanity.release_not_admitted_observed() is True
     state_before = _repo_state()
-    assert open_proof.main(["--check-current"]) == 0
+    assert open_proof.main(["--check-current"]) == release_sanity.RELEASE_NOT_ADMITTED_EXIT_CODE
     state_after = _repo_state()
     assert state_before == state_after
+    assert capsys.readouterr().out == "OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED\n"
 
 
 @pytest.mark.parametrize('source,expected', [

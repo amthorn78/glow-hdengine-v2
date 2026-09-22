@@ -278,6 +278,7 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/http/test_dev_conjunction_http.py",
     "tests/http/test_endpoint_catalog.py",
     "tests/http/test_reader_a7_transport.py",
+    "tests/http/test_reader_post_v1.py",
     "tests/runtime/test_identity.py",
     "tests/transport/test_aux_narrative.py",
     "tests/transport/test_internal_version_contract.py",
@@ -375,6 +376,67 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/qa/test_generate_epic_close_pack.py",
     ),
     "adapter/http_reader.py": _HTTP_READER_TEST_OWNERS,
+    # HDE-EPIC040-PR04 application, identity and consumer loci.
+    "engine/compat/compute.py": (
+        "tests/compat/test_evaluate_pair_eligibility.py",
+        "tests/compat/test_conjunction_no_user_boundary.py",
+        "tests/compat/test_hde_epic037_v2_adapter_to_compat.py",
+    ),
+    "engine/bodygraph/resolver.py": (
+        "tests/bodygraph/test_resolve_compat_chart.py",
+        "tests/cli/test_bg_resolve.py",
+        "tests/bodygraph/test_bg_resolve_v2_mapped_cache.py",
+    ),
+    "engine/bodygraph/projection.py": (
+        "tests/bodygraph/test_projection_gate_ingress.py",
+        "tests/bodygraph/test_resolve_compat_chart.py",
+        "tests/bodygraph/test_projection.py",
+    ),
+    "engine/bodygraph/v2_adapter.py": (
+        "tests/compat/test_hde_epic037_v2_adapter_to_compat.py",
+        "tests/bodygraph/test_resolve_compat_chart.py",
+        "tests/bodygraph/test_v2_adapter.py",
+    ),
+    "engine/bodygraph/mapped_cache.py": (
+        "tests/bodygraph/test_bg_resolve_v2_mapped_cache.py",
+        "tests/bodygraph/test_resolve_compat_chart.py",
+        "tests/bodygraph/test_v2_mapped_cache.py",
+    ),
+    "engine/bodygraph/ingest.py": (
+        "tests/bodygraph/test_ingest.py",
+        "tests/compat/test_conjunction_no_user_boundary.py",
+    ),
+    "engine/runtime/public.py": (
+        "tests/runtime/test_identity.py",
+        "tests/http/test_reader_post_v1.py",
+    ),
+    "engine/config/__init__.py": (
+        "tests/config/test_typed_bundles.py",
+        "tests/cli/test_cli_install_help.py",
+    ),
+    "engine/cli/main.py": (
+        "tests/cli/test_showcompat_sources.py",
+        "tests/cli/test_showcompat_parity_and_identity.py",
+        "tests/cli/test_cli_file_inputs.py",
+        "tests/cli/test_cli_usage_and_errors.py",
+        "tests/cli/test_cli_canonical_bytes.py",
+        "tests/qa/test_cli_admin_dumps.py",
+        "tests/qa/test_cli_admin_parity.py",
+    ),
+    "engine/http/compat_handler.py": (
+        "tests/http/test_compat_endpoint_contract.py",
+        "tests/adapter/test_compat_http_dev.py",
+        "tests/adapter/test_compat_http_parity.py",
+    ),
+    "presenter/reader_v1/emitter.py": (
+        "tests/reader_v1/test_goldens.py",
+        "tests/reader_v1/test_schema.py",
+        "tests/runtime/test_identity.py",
+    ),
+    "engine/compat/error_tokens.py": (
+        "tests/cli/test_errors_parity.py",
+        "tests/http/test_reader_post_v1.py",
+    ),
     "engine/__init__.py": ("tests/runtime/test_identity.py",),
     "engine/constants.py": ("tests/mech/test_constants.py",),
     "engine/bodygraph/vendor_client.py": (
@@ -427,6 +489,25 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
         "tests/evidence/test_hde_epic037_v2_adapter.py",
     ),
     "tools/evidence/generate_narrative_registry_diff.py": _NARRATIVE_TEST_OWNERS,
+    # HDE-EPIC040-PR04: generators exercised through pytest and the F01 overlay gates.
+    "tools/evidence/generate_open_rails_abba_proof.py": (
+        "tests/evidence/test_open_rails_abba_proof.py",
+    ),
+    "tools/evidence/generate_hde_epic037_v2_to_compat.py": (
+        "tests/compat/test_hde_epic037_v2_adapter_to_compat.py",
+    ),
+    "tools/evidence/generate_epic030_pr05_category_framework_evidence.py": (
+        "tests/evidence/test_epic030_pr05_category_framework_evidence.py",
+    ),
+    "tools/evidence/generate_determinism_gate_proofs.py": (
+        "tests/evidence/test_determinism_gate_proofs.py",
+    ),
+    "tools/evidence/generate_bodygraph_policy_proofs.py": (
+        "tests/evidence/test_bodygraph_policy_proofs.py",
+    ),
+    "tools/evidence/generate_a7_transport_proofs.py": (
+        "tests/transport/test_a7_transport_proofs.py",
+    ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
     "tests/evidence/test_evidence_tool_ownership.py"
@@ -599,7 +680,42 @@ _CONFIG_WRITER_TEST_OWNERS = {
         "tests/config/test_typed_bundles.py",
     ),
 }
+# Governed chart fixtures consumed by the dev GET /reader route and its tests.
+_FIXTURE_LANE_PREFIXES = (
+    ("fixtures/charts/", {"product", "compat", "release"}),
+)
+_FIXTURE_TEST_OWNER_PREFIXES = (
+    (
+        "fixtures/charts/",
+        (
+            "tests/http/test_reader_a7_transport.py",
+            "tests/http/test_reader_post_v1.py",
+        ),
+    ),
+)
 _TEST_SUPPORT_OWNER_PATHS = {
+    # HDE-EPIC040-PR04 shared support: complete-chart builders and the fixture
+    # bundle/pack seams consumed by the converted consumer tests.
+    "tests/support/pr04_fixtures.py": (
+        "tests/compat/test_evaluate_pair_eligibility.py",
+        "tests/compat/test_conjunction_no_user_boundary.py",
+        "tests/compat/test_compat_public_ab_ba_identity.py",
+        "tests/compat/test_compat_public_lf_bom.py",
+        "tests/epic003/test_meta_invocation_ok.py",
+        "tests/cli/test_showcompat_sources.py",
+        "tests/cli/test_cli_file_inputs.py",
+        "tests/cli/test_cli_canonical_bytes.py",
+        "tests/cli/test_cli_usage_and_errors.py",
+        "tests/qa/test_cli_admin_dumps.py",
+        "tests/qa/test_cli_admin_parity.py",
+        "tests/http/test_compat_endpoint_contract.py",
+        "tests/http/test_reader_post_v1.py",
+        "tests/http/test_reader_a7_transport.py",
+        "tests/http/test_dev_conjunction_http.py",
+        "tests/adapter/test_compat_http_dev.py",
+        "tests/adapter/test_compat_http_parity.py",
+        "tests/runtime/test_identity.py",
+    ),
     "tests/config/helpers.py": (
         "tests/config/test_execution_coherence.py",
         "tests/config/test_registry_catalog_contract.py",
@@ -781,6 +897,8 @@ def _registered_owner_test_paths() -> set[str]:
         paths.update(targets)
     for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)
+    for _prefix, targets in _FIXTURE_TEST_OWNER_PREFIXES:
+        paths.update(targets)
     return paths
 
 
@@ -870,6 +988,26 @@ def _product_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
         path,
         targets,
         error_code="CI_PRODUCT_OWNER_TEST_INVALID",
+    )
+
+
+def _fixture_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve governed fixture families to the tests that consume them."""
+    targets = next(
+        (
+            owner_targets
+            for prefix, owner_targets in _FIXTURE_TEST_OWNER_PREFIXES
+            if path.startswith(prefix)
+        ),
+        None,
+    )
+    if targets is None:
+        return ()
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_FIXTURE_OWNER_TEST_INVALID",
     )
 
 
@@ -1297,6 +1435,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
             continue
         targets.update(_http_reader_control_owner_targets(repo_root, path))
         targets.update(_product_owner_targets(repo_root, path))
+        targets.update(_fixture_owner_targets(repo_root, path))
         targets.update(_config_writer_owner_targets(repo_root, path))
         targets.update(
             _evidence_generator_owner_targets(
@@ -1364,6 +1503,13 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith(_DOCUMENTATION_PREFIXES):
         return set()
+
+    fixture_lanes = next(
+        (lanes for prefix, lanes in _FIXTURE_LANE_PREFIXES if path.startswith(prefix)),
+        None,
+    )
+    if fixture_lanes is not None:
+        return set(fixture_lanes)
 
     historical_namespace = path.startswith(("audit/", "artifacts/", "docs/", "reports/"))
     if path in _HISTORICAL_PATHS or path.startswith(_HISTORICAL_PREFIXES) or (

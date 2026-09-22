@@ -12,11 +12,19 @@ from engine.db import DBAccess, Statement
 from engine.db.errors import AdapterError
 from engine.serializer.canon import sercanon
 
-from .projection import BodyGraphProjectionError, project_bodygraph
+from .projection import BodyGraphProjectionError, CanonicalBodyGraph, project_bodygraph, strict_canonical_uuid
 
 _FINGERPRINT = re.compile(r"^[0-9a-f]{64}$")
 _EXPECTED_VENDOR = "hdapi"
 _EXPECTED_POSTURE = "adapter_mapped_no_raw_vendor_payload"
+
+# PF05 §5.1.0 read-only current-row lookup.  The vendor literal is fixed in the
+# statement and only the canonical UUID is a bound parameter.
+CURRENT_ROW_VIEW = "public.hde_body_graphs_current"
+CURRENT_ROW_SQL = (
+    "SELECT user_id, vendor, vendor_version, input_fingerprint, payload "
+    f"FROM {CURRENT_ROW_VIEW} WHERE user_id = %s AND vendor = '{_EXPECTED_VENDOR}'"
+)
 
 
 class MappedCacheError(RuntimeError):
@@ -141,3 +149,70 @@ WHERE user_id = %s AND vendor = %s AND vendor_version = %s AND input_fingerprint
     if len(rows) != 1:
         raise MappedCacheError("DB_PAYLOAD_MISSING", "mapped cache row missing")
     return rows[0][0]
+
+
+@dataclass(frozen=True)
+class MappedBodyGraphRow:
+    """One current-view row whose identity is bound to the requested canonical key."""
+
+    user_id: str
+    vendor: str
+    vendor_version: int
+    input_fingerprint: str | None
+    payload: CanonicalBodyGraph
+
+
+def read_current_mapped_bodygraph(db: DBAccess, canonical_user_id: str) -> MappedBodyGraphRow | None:
+    """Read one complete current BodyGraph row for a canonical UUID, or ``None``.
+
+    Read-only: exactly one parameterized ``SELECT`` on the current view, no
+    write, no vendor call and no UUID5 conversion.  A row whose identity,
+    metadata or payload violates the current-view contract refuses with a
+    value-free ``MappedCacheError``; an incomplete or invalid mapped payload
+    surfaces the projection's own ``BodyGraphProjectionError``.
+    """
+
+    if strict_canonical_uuid(canonical_user_id) is None:
+        raise MappedCacheError("PROVIDER_INPUT_INVALID", "current-row lookup requires a canonical UUID")
+    try:
+        rows = db.query(CURRENT_ROW_SQL, (canonical_user_id,))
+    except AdapterError as exc:
+        raise MappedCacheError("DB_QUERY_FAILED", "current-row lookup failed") from exc
+    if rows is None:
+        raise MappedCacheError("DB_QUERY_FAILED", "current-row lookup returned no result set")
+    rows = list(rows)
+    if not rows:
+        return None
+    if len(rows) != 1:
+        raise MappedCacheError("DB_ROW_CONTRACT_VIOLATED", "current view returned more than one row")
+    row = rows[0]
+    if not isinstance(row, (list, tuple)) or len(row) != 5:
+        raise MappedCacheError("DB_ROW_CONTRACT_VIOLATED", "current-row shape is invalid")
+    row_user_id, vendor, vendor_version, fingerprint, payload = row
+    if isinstance(row_user_id, uuid.UUID):
+        row_user_id = str(row_user_id)
+    if row_user_id != canonical_user_id:
+        raise MappedCacheError("DB_ROW_CONTRACT_VIOLATED", "current-row identity does not match the request")
+    if vendor != _EXPECTED_VENDOR:
+        raise MappedCacheError("DB_ROW_CONTRACT_VIOLATED", "current-row vendor is unsupported")
+    if isinstance(vendor_version, bool) or not isinstance(vendor_version, int) or vendor_version <= 0:
+        raise MappedCacheError("DB_ROW_CONTRACT_VIOLATED", "current-row vendor version is invalid")
+    if fingerprint is not None and (not isinstance(fingerprint, str) or _FINGERPRINT.fullmatch(fingerprint) is None):
+        raise MappedCacheError("DB_ROW_CONTRACT_VIOLATED", "current-row fingerprint is invalid")
+    if isinstance(payload, (str, bytes, bytearray)):
+        try:
+            decoded = json.loads(payload)
+        except (ValueError, TypeError) as exc:
+            raise MappedCacheError("DB_PAYLOAD_INVALID", "current-row payload is not JSON") from exc
+    else:
+        decoded = payload
+    if not isinstance(decoded, Mapping):
+        raise MappedCacheError("DB_PAYLOAD_INVALID", "current-row payload is not an object")
+    projected = project_bodygraph(decoded)
+    return MappedBodyGraphRow(
+        user_id=canonical_user_id,
+        vendor=_EXPECTED_VENDOR,
+        vendor_version=int(vendor_version),
+        input_fingerprint=fingerprint,
+        payload=projected,
+    )

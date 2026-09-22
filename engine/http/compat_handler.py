@@ -4,9 +4,15 @@ from typing import Dict, Any
 from flask import Blueprint, request, Response
 from adapter.env_guard import _compute_env_mode
 from engine.presenter import emit_public
+from engine.bodygraph.mapped_cache import MappedCacheError, read_current_mapped_bodygraph
+from engine.bodygraph.projection import BodyGraphProjectionError
+from engine.bodygraph.resolver import ResolvedCompatChart, projection_refusal, resolve_compat_chart
+from engine.compat.compute import evaluate_pair, evaluation_party
+from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError
 from engine.compat.errors import error_envelope
-from engine.compat.identity import dev_compat_identity
-from engine.compat.compute import compat_public
+from engine.config.registry_loader import RegistryConfigError
+from engine.db import DBAccess
+from engine.db.errors import AdapterError
 from engine.validation.viewer_prefs import normalize_viewer_prefs, validate_viewer_prefs
 from engine.compat.ordering import UID_RE
 
@@ -69,16 +75,37 @@ def _writer_options_response() -> Response:
     return resp
 
 
-def _collect_keys_list(body: Dict[str, Any]) -> list[str]:
-    keys: list[str] = []
-    for cat in body.get("categories", []):
-        if not isinstance(cat, dict):
-            continue
-        for key_name in ("personal_key", "shared_key"):
-            value = cat.get(key_name)
-            if isinstance(value, str) and value and not value.isdigit():
-                keys.append(value)
-    return keys
+def _boundary_status(exc: CompatBoundaryError) -> int:
+    if exc.token == "ERR_NOT_FOUND":
+        return 404
+    return MAGIC10_HTTP_STATUS.get(exc.token, 422)
+
+
+def _admission_token(exc: RegistryConfigError) -> str:
+    code = str(getattr(exc, "code", "") or "")
+    if any(marker in code for marker in ("MANIFEST", "ROSTER", "RELEASE", "SOURCE")):
+        return "ERR_M10_MANIFEST_MISMATCH"
+    return "ERR_M10_CONFIG_MISMATCH"
+
+
+def _current_row_lookup(canonical_user_id: str):
+    """Input class 2: one parameterized read-only current-row lookup, no fallback."""
+
+    try:
+        db = DBAccess.for_current_env()
+    except AdapterError as exc:
+        raise CompatBoundaryError("resolver_unavailable", detail=str(getattr(exc, "code", "adapter"))) from exc
+    try:
+        return read_current_mapped_bodygraph(db, canonical_user_id)
+    except MappedCacheError as exc:
+        reason = "resolver_unavailable" if exc.code in {"DB_QUERY_FAILED", "DB_ROW_CONTRACT_VIOLATED"} else "chart_invalid"
+        raise CompatBoundaryError(reason, detail=exc.code) from exc
+    except BodyGraphProjectionError as exc:
+        raise projection_refusal(exc) from None
+
+
+def _resolve_stored_party(person_id: str) -> ResolvedCompatChart:
+    return resolve_compat_chart({"user_id": person_id}, source_policy="local", env=None, local_lookup=_current_row_lookup)
 
 
 @compat_blueprint.before_app_request
@@ -94,10 +121,6 @@ def _compat_writer_transport_guard():
     if request.method == "OPTIONS":
         return _writer_options_response()
     return None
-
-# Minimal id resolver (fixtures/people.json optional). Fallback: build from ids.
-def _resolve_person_by_id(pid: str) -> Dict[str,Any]:
-    return {"person_uid": pid}
 
 @compat_blueprint.get("")
 def get_ids_only():
@@ -116,7 +139,8 @@ def post_json():
     if (a and a_id) or (b and b_id) or ((a_id or b_id) and (a or b)):
         env = error_envelope("invalid_json")
         return _writer_payload(env, status=400)
-    if a_id or b_id:
+    stored_ids = bool(a_id or b_id)
+    if stored_ids:
         if (
             not isinstance(a_id, str)
             or not isinstance(b_id, str)
@@ -125,29 +149,31 @@ def post_json():
         ):
             env = error_envelope("invalid_json")
             return _writer_payload(env, status=400)
-        a = _resolve_person_by_id(a_id)
-        b = _resolve_person_by_id(b_id)
-    if not isinstance(a, dict) or not isinstance(b, dict) or "person_uid" not in a or "person_uid" not in b:
+    elif not isinstance(a, dict) or not isinstance(b, dict) or "person_uid" not in a or "person_uid" not in b:
         env = error_envelope("invalid_json")
         return _writer_payload(env, status=400)
     vp = data.get("viewer_prefs") or {}
     err = validate_viewer_prefs(vp)
     if err:
         return _writer_payload(err, status=400)
-    vp = normalize_viewer_prefs(vp)
-    compat_identity = dev_compat_identity()
-    body = compat_public(
-        a,
-        b,
-        vp["top_category"],
-        vp["weights"],
-        engine_tag=compat_identity["engine_tag"],
-        release_id=compat_identity["release_id"],
-        invocation_tag=compat_identity["invocation_tag"],
-    )
-    body = dict(body)
-    body["keys"] = _collect_keys_list(body)
-    return _writer_payload(body, status=200)
+    # Viewer preferences are an input-side handoff only; they never enter scoring.
+    normalize_viewer_prefs(vp)
+    try:
+        if stored_ids:
+            left = _resolve_stored_party(a_id)
+            right = _resolve_stored_party(b_id)
+        else:
+            # Inline parties must be complete mapped charts (input class 1).
+            left = resolve_compat_chart(a, source_policy="local", env=None)
+            right = resolve_compat_chart(b, source_policy="local", env=None)
+        body = evaluate_pair(evaluation_party(left), evaluation_party(right))
+    except CompatBoundaryError as exc:
+        return _writer_payload(error_envelope(exc.token), status=_boundary_status(exc))
+    except RegistryConfigError as exc:
+        return _writer_payload(error_envelope(_admission_token(exc)), status=503)
+    # PF05 §5.5: the canonical ``magic10_compat_result.v1`` document (or the PF01
+    # §4.7 carrier for a valid self-pair); no ``keys`` list and no Reader bytes.
+    return _writer_payload(dict(body), status=200)
 
 
 @compat_blueprint.route("", methods=["HEAD"], provide_automatic_options=False)

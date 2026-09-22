@@ -9,13 +9,22 @@ from engine.presenter.emitter import emit_public
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes, identity_admin, identity_meta
 from engine.narratives import emit_public_aux, get_pack
+from engine.bodygraph.mapped_cache import MappedCacheError, read_current_mapped_bodygraph
+from engine.bodygraph.projection import BodyGraphProjectionError, strict_canonical_uuid
+from engine.bodygraph.resolver import projection_refusal, resolve_compat_chart
 from engine.compat.categories import CATEGORIES_ORDER_V1
-from engine.compat.compute import conjunction_public_resolved
-from engine.compat.identity import dev_compat_identity
+from engine.compat.compute import (
+    conjunction_public_resolved,
+    evaluate_pair,
+    evaluation_party,
+    harmony_band,
+    is_ineligible_carrier,
+)
+from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError
+from engine.config.registry_loader import RegistryConfigError
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
-from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.vendor_client import VendorError
 from engine.http.compat_handler import compat_blueprint
 from engine.db import DBAccess, Statement
@@ -339,6 +348,98 @@ def _require_tz_or_raise(chart: dict, label: str, tz_flag: str | None) -> None:
         chart["tz"] = tz_flag; return
     raise ValueError(f"ERR_READER_MISSING_TZ_{label}")
 
+
+_READER_POST_KEYS = frozenset({"a_id", "b_id"})
+_READER_MAX_BODY_BYTES = 32_768
+
+
+class _ReaderFailure(Exception):
+    """Internal carrier for a governed Reader failure token and status."""
+
+    def __init__(self, token: str, status: int) -> None:
+        super().__init__(token)
+        self.token = token
+        self.status = status
+
+
+def _admission_failure(exc: RegistryConfigError) -> _ReaderFailure:
+    code = str(getattr(exc, "code", "") or "")
+    if any(marker in code for marker in ("MANIFEST", "ROSTER", "RELEASE", "SOURCE")):
+        return _ReaderFailure("ERR_M10_MANIFEST_MISMATCH", MAGIC10_HTTP_STATUS["ERR_M10_MANIFEST_MISMATCH"])
+    return _ReaderFailure("ERR_M10_CONFIG_MISMATCH", MAGIC10_HTTP_STATUS["ERR_M10_CONFIG_MISMATCH"])
+
+
+def _reader_failure(exc: BaseException) -> _ReaderFailure:
+    """Map a boundary refusal to the PF05 §5.2.3 Reader token and status."""
+
+    if isinstance(exc, _ReaderFailure):
+        return exc
+    if isinstance(exc, CompatBoundaryError):
+        return _ReaderFailure(exc.reader_token, exc.reader_status)
+    if isinstance(exc, BodyGraphProjectionError):
+        return _reader_failure(projection_refusal(exc))
+    if isinstance(exc, RegistryConfigError):
+        return _admission_failure(exc)
+    if isinstance(exc, MappedCacheError):
+        if exc.code in {"DB_QUERY_FAILED", "DB_ROW_CONTRACT_VIOLATED", "PROVIDER_INPUT_INVALID"}:
+            return _ReaderFailure("ERR_M10_RESOLVER_UNAVAILABLE", 503)
+        return _ReaderFailure("ERR_M10_BODYGRAPH_INCOMPLETE", 503)
+    if isinstance(exc, AdapterError):
+        return _ReaderFailure("ERR_M10_RESOLVER_UNAVAILABLE", 503)
+    raise exc
+
+
+def _evaluate_reader_pair(left_resolved, right_resolved) -> tuple[bool, str | None, str | None]:
+    """Eligibility before core, cache and router; returns ``(eligible, band, release_id)``."""
+
+    result = evaluate_pair(evaluation_party(left_resolved), evaluation_party(right_resolved))
+    if is_ineligible_carrier(result):
+        return False, None, None
+    return True, harmony_band(result), str(result["release_id"])
+
+
+def _parse_reader_post_body() -> tuple[str, str]:
+    """PF05 §5.1.0: exactly ``{a_id, b_id}`` with exact lowercase canonical UUIDs."""
+
+    content_length = request.content_length
+    if content_length is not None and content_length > _READER_MAX_BODY_BYTES:
+        raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
+    raw = request.get_data(cache=False)
+    if not raw or len(raw) > _READER_MAX_BODY_BYTES:
+        raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
+    try:
+        text = raw.decode("utf-8")
+        if text.startswith("\ufeff"):
+            raise ValueError("bom")
+        data = json.loads(text)
+    except (UnicodeDecodeError, ValueError):
+        raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422) from None
+    if not isinstance(data, dict) or set(data) != _READER_POST_KEYS:
+        raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
+    a_id = strict_canonical_uuid(data.get("a_id"))
+    b_id = strict_canonical_uuid(data.get("b_id"))
+    if a_id is None or b_id is None:
+        raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
+    return a_id, b_id
+
+
+def _reader_current_rows(ids: tuple[str, ...]) -> dict[str, object]:
+    """One read-only current-view lookup per identity through the DB abstraction."""
+
+    try:
+        db = DBAccess.for_current_env()
+    except AdapterError as exc:
+        raise _ReaderFailure("ERR_M10_RESOLVER_UNAVAILABLE", 503) from exc
+    rows: dict[str, object] = {}
+    for canonical_id in ids:
+        if canonical_id in rows:
+            continue
+        row = read_current_mapped_bodygraph(db, canonical_id)
+        if row is None:
+            raise _ReaderFailure("ERR_M10_PERSON_UNRESOLVED", 404)
+        rows[canonical_id] = row
+    return rows
+
 def get_reader_bp(emit_fn=None):
     """
     Factory: returns a Blueprint exposing /reader (to be mounted under /api).
@@ -371,13 +472,26 @@ def get_reader_bp(emit_fn=None):
         except ValueError as e:
             return _error(str(e))
 
+        # ``tz`` is consumed by the route contract above and stripped before the
+        # resolution seam; fixtures must be complete mapped charts with identities.
+        a.pop("tz", None)
+        b.pop("tz", None)
         meta = identity_meta()
+        try:
+            left_resolved = resolve_compat_chart(a, source_policy="local", env=None)
+            right_resolved = resolve_compat_chart(b, source_policy="local", env=None)
+            eligible, band, result_release_id = _evaluate_reader_pair(left_resolved, right_resolved)
+        except (CompatBoundaryError, BodyGraphProjectionError, RegistryConfigError) as exc:
+            failure = _reader_failure(exc)
+            return _error(failure.token, failure.status)
         body = emit_fn(
             a,
             b,
             engine_tag=meta["engine_tag"],
             invocation_tag=meta["invocation_tag"],
-            release_id=meta["release_id"],
+            release_id=result_release_id or meta["release_id"],
+            eligible=eligible,
+            harmony_band=band,
         )
         etag = "\"" + _sha256_hex(body) + "\""
         tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
@@ -458,8 +572,36 @@ def get_reader_bp(emit_fn=None):
 
     @bp.post("/reader")
     def reader_v1_post():
-        # Explicit POST posture: typed JSON error, no-store, no ETag
-        return _error("method_not_allowed", 405)
+        """PF05 §5.1.0 production Reader: read-only current-row resolution, then
+        eligibility, then the single emitter.  POST is non-conditional (§5.3):
+        no ETag, ``If-*`` ignored, errors ``no-store``."""
+
+        if request.args.get("v") != "1":
+            return _error("ERR_READER_INVALID_VERSION")
+        try:
+            a_id, b_id = _parse_reader_post_body()
+            rows = _reader_current_rows((a_id, b_id))
+            left_resolved = resolve_compat_chart({"user_id": a_id}, source_policy="local", env=None, local_lookup=rows.get)
+            right_resolved = resolve_compat_chart({"user_id": b_id}, source_policy="local", env=None, local_lookup=rows.get)
+            eligible, band, result_release_id = _evaluate_reader_pair(left_resolved, right_resolved)
+        except (_ReaderFailure, CompatBoundaryError, BodyGraphProjectionError, RegistryConfigError, MappedCacheError, AdapterError) as exc:
+            failure = _reader_failure(exc)
+            return _error(failure.token, failure.status)
+        meta = identity_meta()
+        body = emit_fn(
+            None,
+            None,
+            engine_tag=meta["engine_tag"],
+            invocation_tag=meta["invocation_tag"],
+            release_id=result_release_id or meta["release_id"],
+            eligible=eligible,
+            harmony_band=band,
+        )
+        resp = Response(body, status=200)
+        _set_reader_200_headers(resp)
+        resp.headers.pop("ETag", None)
+        resp.headers["Content-Length"] = str(len(body))
+        return resp, 200
 
     def _rails_state() -> str:
         safe_mode = os.getenv("SAFE_MODE", "1")
@@ -662,29 +804,26 @@ def get_reader_bp(emit_fn=None):
             "SAFE_MODE": os.getenv("SAFE_MODE", "1"),
             "ALLOW_NETWORK": os.getenv("ALLOW_NETWORK", "0"),
         }
-        local_people: dict[str, dict[str, str]] = {}
-        if rails_env["SAFE_MODE"] == "0" and rails_env["ALLOW_NETWORK"] == "1":
-            left_uid = resolve_db_user_id(left["user_id"])
-            right_uid = resolve_db_user_id(right["user_id"])
-            local_people[left_uid] = {"person_uid": left_uid}
-            local_people[right_uid] = {"person_uid": right_uid}
-
-        def _local_lookup(user_id: str) -> dict[str, str] | None:
-            return local_people.get(user_id)
-
-        compat_identity = dev_compat_identity()
+        # No local store is fabricated: closed rails refuse a missing chart and
+        # open rails may acquire read-only through the resolver seam only.
         try:
             payload = conjunction_public_resolved(
                 left,
                 right,
                 viewer_top=CATEGORIES_ORDER_V1[0],
                 viewer_weights=_default_viewer_weights(),
-                engine_tag=compat_identity["engine_tag"],
-                release_id=compat_identity["release_id"],
-                invocation_tag=compat_identity["invocation_tag"],
                 env=rails_env,
-                local_lookup=_local_lookup,
+                local_lookup=None,
             )
+        except CompatBoundaryError as exc:
+            return _writer_error(
+                exc.token,
+                status=404 if exc.token == "ERR_NOT_FOUND" else MAGIC10_HTTP_STATUS.get(exc.token, 422),
+                envelope_type=envelope_type,
+            )
+        except RegistryConfigError as exc:
+            failure = _admission_failure(exc)
+            return _writer_error(failure.token, status=failure.status, envelope_type=envelope_type)
         except VendorError as exc:
             details = {
                 "provider_code": exc.code,

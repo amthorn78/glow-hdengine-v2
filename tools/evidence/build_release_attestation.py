@@ -27,6 +27,12 @@ if str(ROOT) not in sys.path:
 from engine.serializer import canon
 from tools.evidence.regenerate_identity_closure import ATTESTATION_GENERATED_OUTPUTS
 from tools.evidence.retained_evidence_safety import validate_retained_text_safety
+from tools.evidence.run_sanity_pipeline import RELEASE_NOT_ADMITTED_EXIT_CODE
+
+# Isolated stages whose distinct exit code is the explicit non-admitted outcome.
+_RELEASE_ADMISSION_GATED_STAGES = frozenset(
+    {"closure_write_and_check", "closure_fixed_point_check", "release_sanity"}
+)
 
 SCHEMA = "hde.release_attestation.v1"
 SCHEMA_PATH = ROOT / "schemas/hde_release_attestation.v1.json"
@@ -477,6 +483,16 @@ def _run_stage(
         ]
     )
     if proc.returncode != 0:
+        if stage in _RELEASE_ADMISSION_GATED_STAGES and proc.returncode == RELEASE_NOT_ADMITTED_EXIT_CODE:
+            # PF10 §2.15: the isolated closure or release-sanity gate ended
+            # NOT_ADMITTED.  The existing failure-receipt path records the distinct
+            # code; no bundle, no success attestation and no PR06R_B_FINAL_PASS are
+            # produced.
+            raise AttestationBuildError(
+                "release_not_admitted",
+                stage=stage,
+                returncode=proc.returncode,
+            )
         raise AttestationBuildError(
             "isolated_stage_failed",
             stage=stage,

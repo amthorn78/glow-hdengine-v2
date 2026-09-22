@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Generate deterministic CLI conformance artifacts for hdctl."""
+"""Generate deterministic CLI conformance artifacts for hdctl.
+
+The CLI conformance captures under ``artifacts/cli/`` are frozen capture-time
+records: their conjunction pairs are birth-only inputs whose current resolution
+requires an admitted release and a stored BodyGraph source.  ``--check`` validates
+the frozen bytes by SHA-256; generation requires an admitted release and refuses
+truthfully with ``REQUIRES_ADMITTED_RELEASE`` while the admission owner refuses the
+active release (PF10 — HDE Build Notes §2.15).  Convergence belongs to the release
+that admits the complete roster.
+"""
 from __future__ import annotations
 
 import argparse
@@ -17,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from engine.config.registry_loader import SchemaValidationError, load_active_mechanics_bundle
 from engine.presenter import emitter
 from engine.runtime import identity_meta
 from engine.runtime.determinism_env import ensure_determinism_env
@@ -32,6 +42,40 @@ SHOWCOMPAT_HELP_PATH = HELP_DIR / "showcompat_help.txt"
 REJECT_NONJSON_PATH = HELP_DIR / "reject_nonjson.txt"
 ENTRYPOINTS_PATH = INSTALL_DIR / "entrypoints.txt"
 INSTALLABILITY_SUMMARY_PATH = INSTALL_DIR / "installability_summary.json"
+REQUIRES_ADMITTED_RELEASE = "REQUIRES_ADMITTED_RELEASE"
+# Frozen capture-time digests of the governed CLI conformance artifacts (bytes on disk).
+FROZEN_SHA256 = {
+    "artifacts/cli/help/hdctl_help.txt": "3dfb564807a9a2bc0358c6f4db4edb20d9c454ef476e33161cce9c92629fba6a",
+    "artifacts/cli/help/showcompat_help.txt": "f9cdc8861dee7e3fb5f34c244e56a66f4660f679f29e6cd0badf28690ea82035",
+    "artifacts/cli/help/reject_nonjson.txt": "0a51d40addd8810b3c0a3d9e8fab0784a05cdee4c2d6ff58c8a198be3b9b9288",
+    "artifacts/cli/ab.json": "5582da30c13f4194e6e09de24839b98eaf79e2a49dc5cfde46f930c1c216d6f9",
+    "artifacts/cli/ba.json": "5582da30c13f4194e6e09de24839b98eaf79e2a49dc5cfde46f930c1c216d6f9",
+    "artifacts/cli/install/entrypoints.txt": "5fb3ce59e35e1899109183ca9405260cdfa81c147d44ba4fd4de5646165c15bd",
+    "artifacts/cli/summary.json": "99438fb0f1cdfef6346d6792bf2d9d1a172717226d0ba0e224fd4298bb7cc2cd",
+    "artifacts/cli/install/installability_summary.json": "bf15c44014a6d98d6f2856e5ef89bfdf79359f31527b7336898fb7b993cd548e",
+}
+
+
+def _require_admitted_release() -> None:
+    """Refuse generation truthfully while the active release is not admitted."""
+
+    try:
+        load_active_mechanics_bundle()
+    except SchemaValidationError as exc:
+        if getattr(exc, "code", None) == "INCOMPLETE_RELEASE_ROSTER":
+            raise SystemExit(REQUIRES_ADMITTED_RELEASE) from exc
+        raise
+
+
+def validate_frozen_captures() -> list[str]:
+    """Return the frozen capture paths whose bytes drifted from their recorded digests."""
+
+    drift = []
+    for rel, expected in FROZEN_SHA256.items():
+        path = ROOT / rel
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            drift.append(rel)
+    return drift
 
 CONJUNCTION_AB = {
     "left": {
@@ -169,6 +213,7 @@ def _conjunction_meta(body: bytes) -> dict[str, object]:
 
 
 def _capture_outputs() -> dict[Path, bytes]:
+    _require_admitted_release()
     env = _env()
     module_cmd = ["python", "-m", "engine.cli"]
     module_execution_cmd = [sys.executable, *module_cmd[1:]]
@@ -426,17 +471,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
-    expected = _capture_outputs()
 
     if args.check:
-        drift = [
-            path.relative_to(ROOT).as_posix()
-            for path, body in expected.items()
-            if not path.exists() or path.read_bytes() != body
-        ]
+        drift = validate_frozen_captures()
         if drift:
             raise SystemExit("DRIFT:" + ",".join(drift))
         return 0
+
+    expected = _capture_outputs()
 
     for path, body in expected.items():
         _write_bytes(path, body)

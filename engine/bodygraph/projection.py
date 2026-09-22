@@ -3,8 +3,12 @@ from __future__ import annotations
 
 import copy
 import math
+import re
 from collections.abc import Mapping
-from typing import Any, TypedDict
+from typing import Any, Iterable, TypedDict
+from uuid import UUID
+
+from .gates import GateNormalizationError, NormalizedGates, normalize_gates
 
 
 class BodyGraphFields(TypedDict):
@@ -122,6 +126,10 @@ def project_bodygraph(mapped: Mapping[str, Any]) -> CanonicalBodyGraph:
         raise BodyGraphProjectionError("INVALID_SHAPE", "root.person")
     _require_exact_keys(bodygraph, _BODYGRAPH_KEYS, _BODYGRAPH_KEYS, "root.bodygraph")
     _require_exact_keys(person, _PERSON_KEYS, _PERSON_KEYS, "root.person")
+    # PF01 §4.2 raw Gate ingress: strict validation before any deduplication,
+    # sorting, persistence or evaluation.  The projection keeps the source
+    # spelling; normalization to the ascending tuple belongs to the evaluator.
+    validate_raw_gates(bodygraph["gates"], "root.bodygraph.gates")
 
     top_uid = mapped["person_uid"]
     person_uid = person["person_uid"]
@@ -138,3 +146,96 @@ def project_bodygraph(mapped: Mapping[str, Any]) -> CanonicalBodyGraph:
         "person_uid": top_uid,
     }
 
+
+_GATES_INGRESS_CODES = frozenset({"GATES_NOT_LIST", "GATES_EMPTY", "GATE_VALUE_INVALID", "GATE_DUPLICATE"})
+_CANONICAL_UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.ASCII)
+_PERSON_LABEL_PREFIX = "person-"
+
+
+def validate_raw_gates(value: object, path: str = "root.bodygraph.gates") -> NormalizedGates:
+    """Strict raw-Gate ingress (PF01 §4.2) delegating to the PR02 normalizer.
+
+    Accepts only a nonempty list of exact integers ``1..64`` or canonical
+    decimal strings ``"1"``..``"64"``; booleans, whitespace, signs, leading
+    zeroes, floats, duplicates (including integer/string equivalents) and
+    out-of-domain values refuse with the normalizer's own value-free code.
+    """
+
+    try:
+        return normalize_gates(value)
+    except GateNormalizationError as exc:
+        raise BodyGraphProjectionError(exc.code, path) from None
+
+
+def is_gate_ingress_code(code: str) -> bool:
+    return code in _GATES_INGRESS_CODES
+
+
+def canonical_uuid(value: object) -> str | None:
+    """Return the lowercase hyphenated RFC 4122 spelling of any UUID input, else None."""
+
+    if isinstance(value, UUID):
+        return str(value)
+    if not isinstance(value, str):
+        return None
+    candidate = value.strip()
+    if not candidate:
+        return None
+    try:
+        return str(UUID(candidate))
+    except (ValueError, AttributeError, TypeError):
+        return None
+
+
+def strict_canonical_uuid(value: object) -> str | None:
+    """Return the value only when it is already the exact lowercase hyphenated spelling."""
+
+    if not isinstance(value, str) or _CANONICAL_UUID.fullmatch(value) is None:
+        return None
+    return value if canonical_uuid(value) == value else None
+
+
+def accepted_identity_labels(canonical_person_id: str, seeds: Iterable[str] = ()) -> frozenset[str]:
+    """Labels a mapped chart may carry for one verified canonical identity.
+
+    ``person-…`` labels are resolver provenance, never identity: they are
+    accepted only when they name the verified UUID or the trusted seed that the
+    sanctioned resolver mapped to that UUID.
+    """
+
+    labels = {canonical_person_id, f"{_PERSON_LABEL_PREFIX}{canonical_person_id}"}
+    for seed in seeds:
+        if isinstance(seed, str) and seed.strip():
+            labels.add(seed.strip())
+            labels.add(f"{_PERSON_LABEL_PREFIX}{seed.strip()}")
+    return frozenset(labels)
+
+
+def bind_projection_identity(
+    projection: Mapping[str, Any],
+    canonical_person_id: str,
+    *,
+    accepted_labels: Iterable[str] = (),
+) -> CanonicalBodyGraph:
+    """Return the projection with both label slots replaced by the verified UUID.
+
+    The caller supplies the trusted canonical identity and the labels its
+    provenance permits.  A label that is neither an accepted label nor another
+    spelling of the same UUID is an independently conflicting identity and
+    refuses; no prefix is stripped with assumed ownership.
+    """
+
+    if strict_canonical_uuid(canonical_person_id) is None:
+        raise BodyGraphProjectionError("IDENTITY_INVALID", "root.person_uid")
+    label = projection["person_uid"]
+    nested = projection["person"]["person_uid"]
+    if label != nested:
+        raise BodyGraphProjectionError("PERSON_UID_MISMATCH", "root.person_uid")
+    accepted = set(accepted_labels) | {canonical_person_id, f"{_PERSON_LABEL_PREFIX}{canonical_person_id}"}
+    if label not in accepted and canonical_uuid(label) != canonical_person_id:
+        raise BodyGraphProjectionError("IDENTITY_CONFLICT", "root.person_uid")
+    return {
+        "bodygraph": copy.deepcopy(dict(projection["bodygraph"])),
+        "person": {"person_uid": canonical_person_id},
+        "person_uid": canonical_person_id,
+    }

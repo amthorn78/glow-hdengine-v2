@@ -1,30 +1,34 @@
+"""Canonical LF-terminated, BOM-free bytes for the complete internal result."""
 from __future__ import annotations
-import importlib
+
+import pytest
+
+from engine.bodygraph.resolver import ResolvedCompatChart
+from engine.compat.compute import evaluate_pair, evaluation_party
 from engine.stable.sercanon import serialize
-from engine.charts.loader import load_chart
-from engine.compat.categories import CATEGORIES_ORDER_V1
+from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, build_bundle, build_pack, complete_chart, inject_seams
 
 
-VIEWER_TOP = CATEGORIES_ORDER_V1[0]
-VIEWER_WEIGHTS = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+@pytest.fixture(scope="module")
+def bundle(tmp_path_factory):
+    return build_bundle(tmp_path_factory.mktemp("pr04-lfbom-bundle"))
+
+
+@pytest.fixture(scope="module")
+def pack(tmp_path_factory):
+    return build_pack(tmp_path_factory.mktemp("pr04-lfbom-pack"))
+
+
+@pytest.fixture(autouse=True)
+def _seams(monkeypatch, bundle, pack):
+    inject_seams(monkeypatch, bundle, pack)
+
 
 def test_public_bytes_lf_and_no_bom():
-    mod = importlib.import_module("engine.compat.compute")
-    # Use tz from pinned IANA list.
-    ca = load_chart("1990-05-04","14:22","Austin, US", tz="Europe/Amsterdam")
-    cb = load_chart("1992-07-19","08:05","New York, US", tz="Europe/Amsterdam")
-    ca["person_uid"] = "lfbom_a"
-    cb["person_uid"] = "lfbom_b"
-    out = serialize(
-        mod.compat_public(
-            ca,
-            cb,
-            VIEWER_TOP,
-            VIEWER_WEIGHTS,
-            engine_tag="test-engine",
-            release_id="test-release",
-            invocation_tag="INV-TEST",
-        )
-    )
+    left = evaluation_party(ResolvedCompatChart(UUID_A, complete_chart(UUID_A, GATES_A), "resolved", None, None, None, None))
+    right = evaluation_party(ResolvedCompatChart(UUID_B, complete_chart(UUID_B, GATES_B), "resolved", None, None, None, None))
+    out = serialize(evaluate_pair(left, right))
     assert out.endswith(b"\n")
+    assert out.count(b"\n") == 1
+    assert b"\r" not in out
     assert not out.startswith(b"\xef\xbb\xbf")

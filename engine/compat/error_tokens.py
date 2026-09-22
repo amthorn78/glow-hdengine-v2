@@ -85,7 +85,112 @@ ERROR_TOKEN_MAP: Dict[str, Dict[str, object]] = {
         "message": "not found",
         "aliases": ("not_found",),
     },
+
+    # Magic-10 Reader and internal failure contract (PF05 §5.2.3).  Registered
+    # here first and regenerated into errors/token_map/token_map.json only through
+    # tools/errors/generate_error_artifacts.py.  Existing tokens keep their
+    # messages; the transport status lives in MAGIC10_HTTP_STATUS below.
+    "ERR_READER_INVALID_INPUT": {
+        "message": "invalid Reader request",
+    },
+    "ERR_M10_PERSON_UNRESOLVED": {
+        "message": "BodyGraph not found",
+    },
+    "ERR_M10_RESOLVER_UNAVAILABLE": {
+        "message": "BodyGraph resolver unavailable",
+    },
+    "ERR_M10_BODYGRAPH_INCOMPLETE": {
+        "message": "BodyGraph is incomplete",
+    },
+    "ERR_M10_GATES_MISSING": {
+        "message": "Gate data is required",
+    },
+    "ERR_M10_GATES_INVALID": {
+        "message": "Gate data is invalid",
+    },
+    "ERR_M10_LEGACY_INPUT_UNSUPPORTED": {
+        "message": "legacy scoring input is unsupported",
+    },
+    "ERR_M10_CONFIG_MISMATCH": {
+        "message": "Magic10 configuration mismatch",
+    },
+    "ERR_M10_MANIFEST_MISMATCH": {
+        "message": "Magic10 release manifest mismatch",
+    },
+    "ERR_M10_RESULT_SCHEMA_MISMATCH": {
+        "message": "Magic10 result schema mismatch",
+    },
+    "ERR_M10_STALE_RESULT": {
+        "message": "Magic10 cached result is stale",
+    },
 }
+
+
+# PF05 §5.2.3 transport statuses for the production Reader route.  Application
+# boundaries (CLI, /api/compat/v1, conjunction) keep their existing carriers.
+MAGIC10_HTTP_STATUS: Dict[str, int] = {
+    "ERR_READER_INVALID_INPUT": 422,
+    "ERR_READER_INVALID_CHART": 422,
+    "ERR_M10_PERSON_UNRESOLVED": 404,
+    "ERR_M10_RESOLVER_UNAVAILABLE": 503,
+    "ERR_M10_BODYGRAPH_INCOMPLETE": 503,
+    "ERR_M10_GATES_MISSING": 422,
+    "ERR_M10_GATES_INVALID": 422,
+    "ERR_M10_LEGACY_INPUT_UNSUPPORTED": 422,
+    "ERR_M10_CONFIG_MISMATCH": 503,
+    "ERR_M10_MANIFEST_MISMATCH": 503,
+    "ERR_M10_RESULT_SCHEMA_MISMATCH": 503,
+    "ERR_M10_STALE_RESULT": 503,
+}
+
+
+# Stable private failure classes raised at the Magic-10 application boundary.
+# Each maps to the governed application-boundary token used by CLI, compat and
+# conjunction carriers, and to the PF05 §5.2.3 token/status used by POST /reader.
+BOUNDARY_REASONS: Dict[str, tuple[str, str, int]] = {
+    # reason: (application token, Reader transport token, Reader status)
+    "input_invalid": ("ERR_COMPAT_INVALID_JSON", "ERR_READER_INVALID_INPUT", 422),
+    "chart_missing": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+    "chart_incomplete": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+    "chart_invalid": ("ERR_READER_INVALID_CHART", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+    "gates_missing": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+    "gates_invalid": ("ERR_READER_INVALID_CHART", "ERR_M10_GATES_INVALID", 422),
+    "identity_unresolved": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+    "identity_invalid": ("ERR_READER_INVALID_CHART", "ERR_READER_INVALID_INPUT", 422),
+    "identity_conflict": ("ERR_READER_INVALID_CHART", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+    "provenance_mismatch": ("ERR_READER_INVALID_CHART", "ERR_M10_RESOLVER_UNAVAILABLE", 503),
+    "inconsistent_self": ("ERR_READER_INVALID_CHART", "ERR_READER_INVALID_CHART", 422),
+    "person_unresolved": ("ERR_NOT_FOUND", "ERR_M10_PERSON_UNRESOLVED", 404),
+    "resolver_unavailable": ("ERR_M10_RESOLVER_UNAVAILABLE", "ERR_M10_RESOLVER_UNAVAILABLE", 503),
+    "legacy_input": ("ERR_M10_LEGACY_INPUT_UNSUPPORTED", "ERR_M10_LEGACY_INPUT_UNSUPPORTED", 422),
+    "admission_config": ("ERR_M10_CONFIG_MISMATCH", "ERR_M10_CONFIG_MISMATCH", 503),
+    "admission_manifest": ("ERR_M10_MANIFEST_MISMATCH", "ERR_M10_MANIFEST_MISMATCH", 503),
+    "result_schema": ("ERR_M10_RESULT_SCHEMA_MISMATCH", "ERR_M10_RESULT_SCHEMA_MISMATCH", 503),
+    "stale_result": ("ERR_M10_STALE_RESULT", "ERR_M10_STALE_RESULT", 503),
+    "narrative_key": ("ERR_MISSING_NARRATIVE_KEY", "ERR_M10_RESULT_SCHEMA_MISMATCH", 503),
+}
+
+
+class CompatBoundaryError(Exception):
+    """Typed, value-free refusal raised at the Magic-10 application boundary.
+
+    ``reason`` is the stable private failure class from ``BOUNDARY_REASONS``;
+    ``token`` is the governed application-boundary token; ``reader_token`` and
+    ``reader_status`` carry the PF05 §5.2.3 transport mapping used only by the
+    production Reader route.  No chart, identity, Gate, path or database value
+    is attached: ``detail`` is a short static label such as a projection code.
+    """
+
+    def __init__(self, reason: str, *, detail: str | None = None) -> None:
+        if reason not in BOUNDARY_REASONS:
+            raise ValueError(f"unknown boundary reason: {reason}")
+        token, reader_token, reader_status = BOUNDARY_REASONS[reason]
+        self.reason = reason
+        self.token = token
+        self.reader_token = reader_token
+        self.reader_status = reader_status
+        self.detail = detail
+        super().__init__(f"{token}:{reason}" if detail is None else f"{token}:{reason}:{detail}")
 
 
 def canonical_token_for(code: str) -> str:

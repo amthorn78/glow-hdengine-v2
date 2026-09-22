@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""A7 Catalog transport proofs for the governed Reader success route (release-sanity stage 05).
+
+PF10 — HDE Build Notes §2.15 (HDE-EPIC040-PR04 F01 overlay): ``capture()`` probes
+the admission owner before any live request.  While the active release is not
+admitted ``build()`` raises the typed ``ReleaseNotAdmitted`` (never an
+``AssertionError``), ``main --check`` prints ``A7_TRANSPORT_CHECK:RELEASE_NOT_ADMITTED``
+and exits with the distinct code, and write mode refuses.  The committed A7
+artifacts stay frozen capture-time records with a nonclaim until their owner can
+truthfully regenerate them.  The POST requirement is the PF05 §5.3 non-conditional
+POST fact: query-only input is 422 ``ERR_READER_INVALID_INPUT``, ``no-store``,
+no ETag, ``If-None-Match`` ignored.
+"""
 from __future__ import annotations
 import argparse, copy, hashlib, json, os, re, sys
 from pathlib import Path
@@ -8,6 +20,9 @@ if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer import canon
 from adapter.http_reader import create_app
+from tools.evidence.run_sanity_pipeline import RELEASE_NOT_ADMITTED_EXIT_CODE, ReleaseNotAdmitted, probe_release_admission
+NOT_ADMITTED_LINE='A7_TRANSPORT_CHECK:RELEASE_NOT_ADMITTED'
+POST_ERROR_CODE='ERR_READER_INVALID_INPUT'
 TS=json.loads((ROOT/'catalog/manifest.json').read_text()).get('built_at_utc','2026-01-01T00:00:00Z')
 DOC=ROOT/'docs/ENDPOINTS_CATALOG.json'; DOCSHA=ROOT/'docs/ENDPOINTS_CATALOG.json.sha256'; AUD=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json'; AUDSHA=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json.sha256'; SNAP=ROOT/'artifacts/reader/endpoints_snapshot.json'
 PROOFS=[ROOT/'artifacts/proofs/endpoints_env_gate_proof.log',ROOT/'artifacts/proofs/success_get.txt',ROOT/'artifacts/proofs/success_head.txt',ROOT/'artifacts/proofs/success_304.txt',ROOT/'artifacts/proofs/success_writers_errors.txt',ROOT/'artifacts/proofs/success_encoding_invariance.txt',ROOT/'artifacts/proofs/reader_success_get_head_304.json']
@@ -65,6 +80,7 @@ def q():
 def require(cond,msg):
  if not cond: raise AssertionError(msg)
 def capture(client_factory=create_app):
+ probe_release_admission()  # raises ReleaseNotAdmitted before any live GET /reader request
  cat=catalog_obj(); target=validate_catalog(cat); app=client_factory(); c=app.test_client(); old=os.environ.get('APP_ENV')
  os.environ['APP_ENV']='dev'
  try:
@@ -72,7 +88,8 @@ def capture(client_factory=create_app):
   require(get.status_code==200,'get status'); require(body.endswith(b'\n') and body,'get canonical body'); require(hb.get('content-type')=='application/json; charset=utf-8','ct'); require(hb.get('cache-control')=='private, max-age=0, must-revalidate','cache'); require('Authorization' in hb.get('vary','') and 'Accept-Encoding' in hb.get('vary',''),'vary'); require(hb.get('etag')==et,'etag'); require(hb.get('content-length')==str(len(body)),'cl')
   head=c.head(target['path'],query_string=q(),headers={'Accept-Encoding':'identity'}); hh=headers(head); require(head.status_code==200 and head.data==b'','head'); require(hh.get('etag')==et and hh.get('content-length')==str(len(body)) and hh.get('content-type')==hb.get('content-type') and hh.get('cache-control')==hb.get('cache-control') and hh.get('vary')==hb.get('vary'),'head parity')
   r304=c.get(target['path'],query_string=q(),headers={'If-None-Match':et}); h304=headers(r304); require(r304.status_code==304 and r304.data==b'','304'); require(h304.get('etag')==et and h304.get('cache-control')==hb.get('cache-control') and h304.get('vary')==hb.get('vary') and 'content-type' not in h304 and 'content-length' not in h304,'304 headers')
-  post=c.post(target['path'],query_string=q(),headers={'If-None-Match':et}); hp=headers(post); require(post.status_code==405 and hp.get('cache-control')=='no-store' and 'etag' not in hp and post.data.endswith(b'\n') and canon.sercanon(json.loads(post.data))==post.data,'writer')
+  post=c.post(target['path'],query_string=q(),headers={'If-None-Match':et}); hp=headers(post); post_body=json.loads(post.data) if post.data else None
+  require(post.status_code==422 and hp.get('cache-control')=='no-store' and 'etag' not in hp and post.data.endswith(b'\n') and isinstance(post_body,dict) and canon.sercanon(post_body)==post.data and post_body.get('code')==POST_ERROR_CODE and post_body.get('ok') is False,'writer')
   enc=[]
   for ae in ['identity','gzip','br']:
    r=c.get(target['path'],query_string=q(),headers={'Accept-Encoding':ae}); hr=headers(r); require(hr.get('etag')==et,'encoding etag')
@@ -118,10 +135,15 @@ def build():
  enc=comp['tested_encodings']
  enc_equal=all(e['etag']==comp['etag'] and e['head_identity_length']==comp['get_200']['content_length'] for e in enc)
  enc_text="ENCODING_INVARIANCE\n"+"\n".join(f"{e['accept_encoding']}_etag={e['etag']}\n{e['accept_encoding']}_head_identity_length={e['head_identity_length']}" for e in enc)+f"\netag_equal=true\nhead_identity_length_equal={str(enc_equal).lower()}\npass={str(enc_equal).lower()}\n"
- outs={DOC:catb,DOCSHA:(f"{sha(catb)}  docs/ENDPOINTS_CATALOG.json\n").encode(),AUD:catb,AUDSHA:(f"{sha(catb)}  artifacts/audit/ENDPOINTS_CATALOG.json\n").encode(),SNAP:snap,PROOFS[0]:b'APP_ENV=prod\n/reader_success_unreachable=true\ncache_control=no-store\netag_absent=true\n',PROOFS[1]:(f"status=200\nbody_sha256={comp['get_200']['body_sha256']}\netag={comp['etag']}\ncontent-type={comp['get_200']['content_type']}\ncache-control={comp['get_200']['cache_control']}\nvary={comp['get_200']['vary']}\ncontent-length={comp['get_200']['content_length']}\n").encode(),PROOFS[2]:(f"status=200\nbody_empty=true\ncontent_length={comp['head_200']['content_length']}\netag={comp['etag']}\ncontent-type={comp['head_200']['content_type']}\ncache-control={comp['head_200']['cache_control']}\nvary={comp['head_200']['vary']}\ncontent-length={comp['head_200']['content_length']}\n").encode(),PROOFS[3]:(f"status=304\nbody_empty=true\ncontent_type_absent=true\ncontent_length_absent=true\netag={comp['etag']}\ncache-control={comp['after_304']['cache_control']}\nvary={comp['after_304']['vary']}\n").encode(),PROOFS[4]:b'POST /reader\nstatus=405\ncache_control=no-store\netag_absent=true\nconditional_not_304=true\ncanonical_body=true\n',PROOFS[5]:enc_text.encode(),PROOFS[6]:cjson(comp)}
+ outs={DOC:catb,DOCSHA:(f"{sha(catb)}  docs/ENDPOINTS_CATALOG.json\n").encode(),AUD:catb,AUDSHA:(f"{sha(catb)}  artifacts/audit/ENDPOINTS_CATALOG.json\n").encode(),SNAP:snap,PROOFS[0]:b'APP_ENV=prod\n/reader_success_unreachable=true\ncache_control=no-store\netag_absent=true\n',PROOFS[1]:(f"status=200\nbody_sha256={comp['get_200']['body_sha256']}\netag={comp['etag']}\ncontent-type={comp['get_200']['content_type']}\ncache-control={comp['get_200']['cache_control']}\nvary={comp['get_200']['vary']}\ncontent-length={comp['get_200']['content_length']}\n").encode(),PROOFS[2]:(f"status=200\nbody_empty=true\ncontent_length={comp['head_200']['content_length']}\netag={comp['etag']}\ncontent-type={comp['head_200']['content_type']}\ncache-control={comp['head_200']['cache_control']}\nvary={comp['head_200']['vary']}\ncontent-length={comp['head_200']['content_length']}\n").encode(),PROOFS[3]:(f"status=304\nbody_empty=true\ncontent_type_absent=true\ncontent_length_absent=true\netag={comp['etag']}\ncache-control={comp['after_304']['cache_control']}\nvary={comp['after_304']['vary']}\n").encode(),PROOFS[4]:(f'POST /reader\nstatus=422\ncode={POST_ERROR_CODE}\ncache_control=no-store\netag_absent=true\nconditional_not_304=true\ncanonical_body=true\n').encode(),PROOFS[5]:enc_text.encode(),PROOFS[6]:cjson(comp)}
  return outs
-def main():
- ap=argparse.ArgumentParser(); ap.add_argument('--check',action='store_true'); ns=ap.parse_args(); ensure_determinism_env(); outs=build()
+def main(argv=None):
+ ap=argparse.ArgumentParser(); ap.add_argument('--check',action='store_true'); ns=ap.parse_args(argv); ensure_determinism_env()
+ try:
+  outs=build()
+ except ReleaseNotAdmitted:
+  # PF10 §2.15: no live request happened; write mode refuses and nothing is written.
+  print(NOT_ADMITTED_LINE); raise SystemExit(RELEASE_NOT_ADMITTED_EXIT_CODE)
  if ns.check:
   bad=[str(p.relative_to(ROOT)) for p,b in outs.items() if not p.exists() or p.read_bytes()!=b]
   if bad: raise SystemExit('DRIFT:'+','.join(bad))

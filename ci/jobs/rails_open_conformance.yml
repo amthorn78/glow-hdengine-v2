@@ -16,8 +16,10 @@ steps:
       - redirects are not followed and Retry-After parsing is deterministic
       - established ABBA contract Reader CLI coherence two-run identity open-versus-closed identity canonical JSON single LF and zero transport calls are tested
   - command: python tools/evidence/generate_open_rails_abba_proof.py --check-current
+    accepted_release_not_admitted_exit_code: 3
     proves:
-      - current fixture-backed open-rails ABBA proof rebuilds canonically without rewriting the frozen capture
+      - current fixture-backed open-rails ABBA proof rebuilds canonically without rewriting the frozen capture once the active release is admitted
+      - while the active release is not admitted (INCOMPLETE_RELEASE_ROSTER) the check prints OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED and exits 3 after validating the frozen primary by hash, writing nothing and performing no live Reader or CLI capture
       - live vendor calls are forbidden in CI
       - Reader and CLI outputs match for both orders
       - two-run identity holds for both orders

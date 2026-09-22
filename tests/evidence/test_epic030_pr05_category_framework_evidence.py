@@ -4,16 +4,36 @@ import importlib
 import json
 from pathlib import Path
 
+import pytest
+
+from tests.support.pr04_fixtures import build_bundle, build_pack, inject_seams
+
+
+@pytest.fixture(scope="module")
+def bundle(tmp_path_factory):
+    return build_bundle(tmp_path_factory.mktemp("pr04-epic030-bundle"))
+
+
+@pytest.fixture(scope="module")
+def pack(tmp_path_factory):
+    return build_pack(tmp_path_factory.mktemp("pr04-epic030-pack"))
+
+
+@pytest.fixture
+def admitted(monkeypatch, bundle, pack):
+    inject_seams(monkeypatch, bundle, pack)
+    return bundle
+
 
 def _write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
 
 
-def test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts(monkeypatch):
+def test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts(admitted, monkeypatch, tmp_path):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
 
-    test_root = mod.ROOT / "tmp" / "pytest_epic030_pr05_binding"
+    test_root = tmp_path / "pytest_epic030_pr05_binding"  # never under the repository tree
     out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-05"
 
     _write(
@@ -24,7 +44,7 @@ def test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts(monkey
         test_root / "artifacts" / "compat" / "AB.json",
         json.dumps(
             {
-                "categories": [{"id": category, "band": "Cool", "score": 1, "personal_key": "a", "shared_key": "b"} for category in mod.CATEGORIES_ORDER_V1],
+                "categories": [{"id": category, "band": "Cool", "score": 1, "personal_key": "a", "shared_key": "b"} for category in mod.FROZEN_MAGIC10_ORDER],
                 "meta": {"engine_tag": "dev", "release_id": "dev", "invocation_tag": "INV-DEV"},
             },
             separators=(",", ":"),
@@ -58,14 +78,15 @@ def test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts(monkey
 
     assert "status: PASS\n" in binding
     assert "canonical_compare_status: PASS\n" in binding
+    assert "magic10_order_preserved_admin_compat: True\n" in binding
     assert mechanics["channels"][0]["channel_id"] == "10-20"
     assert mechanics["channels"][0]["compromise_direction"] == "10->20"
 
 
-def test_pr05_binding_fails_when_canonical_compare_fails(monkeypatch):
+def test_pr05_binding_fails_when_canonical_compare_fails(admitted, monkeypatch, tmp_path):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
 
-    test_root = mod.ROOT / "tmp" / "pytest_epic030_pr05_binding_compare_fail"
+    test_root = tmp_path / "pytest_epic030_pr05_binding_compare_fail"  # never under the repository tree
     out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-05"
 
     _write(
@@ -104,3 +125,11 @@ def test_pr05_binding_fails_when_canonical_compare_fails(monkeypatch):
     assert "status: FAIL\n" in compare_log
     assert "canonical_compare_status: FAIL\n" in binding
     assert "status: FAIL\n" in binding
+
+
+def test_pr05_generation_refuses_truthfully_without_an_admitted_release(monkeypatch):
+    mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
+    monkeypatch.setattr(mod, "ensure_determinism_env", lambda: None)
+    monkeypatch.setattr(mod, "_write_bytes", lambda *a, **k: pytest.fail("write attempted"))
+    with pytest.raises(SystemExit, match=mod.REQUIRES_ADMITTED_RELEASE):
+        mod.generate()

@@ -1048,7 +1048,8 @@ def test_conjunction_capture_rejects_coherent_same_band_score_forgery(
             for target in run_canonical_json_gate.TARGETS
             if target.rel_path == f"artifacts/cli/{name}.json"
         )
-        with pytest.raises(ValueError, match="conjunction_source_mismatch"):
+        # Frozen capture-time record: a coherent same-band score forgery breaks the frozen digest.
+        with pytest.raises(ValueError, match="frozen_generated_capture_mismatch"):
             run_canonical_json_gate._validate_target(target, payloads[name])
 
 
@@ -1062,7 +1063,8 @@ def test_showcompat_capture_rejects_coherent_same_band_score_forgery():
         (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
     )
     payload["compat"]["categories"][0]["score"] = 22
-    with pytest.raises(ValueError, match="showcompat_capture_source_mismatch"):
+    # Frozen capture-time record: a coherent same-band score forgery breaks the frozen digest.
+    with pytest.raises(ValueError, match="frozen_generated_capture_mismatch"):
         run_canonical_json_gate._validate_target(target, payload)
 
 

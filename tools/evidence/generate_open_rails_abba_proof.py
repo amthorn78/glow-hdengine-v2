@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Generate open-rails fixture-backed and bounded live AB/BA determinism proofs."""
+"""Generate open-rails fixture-backed and bounded live AB/BA determinism proofs.
+
+PF10 — HDE Build Notes §2.15 (HDE-EPIC040-PR04 F01 overlay): ``build_fixture_proof``
+probes the admission owner first.  While the active release is not admitted it
+returns the explicit ``RELEASE_NOT_ADMITTED`` proof (``top_level_pass`` false,
+every live predicate false, zero transport calls, no live Reader or CLI capture);
+``--check-current`` prints ``OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED``, exits
+with the distinct code, writes nothing and validates the frozen primary against
+its recorded hash — a frozen-byte check, never a live proof.  Once the release is
+admitted the behavior is unchanged.
+"""
 from __future__ import annotations
 
 import argparse
@@ -28,13 +38,46 @@ from engine.bodygraph.vendor_client import (  # noqa: E402
     classify_bg_resolve_route_policy,
 )
 from engine.cli import main as cli_main  # noqa: E402
+from engine.compat.compute import evaluate_pair, evaluation_party, harmony_band, is_ineligible_carrier  # noqa: E402
 from engine.presenter import emitter  # noqa: E402
 from engine.runtime import emit_reader_public_envelope, identity_meta  # noqa: E402
 from engine.serializer import canon  # noqa: E402
+from tools.evidence.run_sanity_pipeline import (  # noqa: E402
+    RELEASE_NOT_ADMITTED_EXIT_CODE,
+    ReleaseNotAdmitted,
+    probe_release_admission,
+)
 
 OPEN_ABBA_REL = "audit/gates/determinism/open_rails_abba.json"
 LIVE_ABBA_REL = "audit/gates/determinism/open_rails_vendor_abba.json"
 PRODUCED_AT = "2026-07-14T00:00:00Z"
+# Frozen capture-time primary (HDE-EPIC038 PR-03).  This producer never rewrites
+# it while the active release is not admitted; ``--check-current`` validates it
+# by this recorded hash instead.
+FROZEN_OPEN_ABBA_SHA256 = "cfae96f8e663dfb79ff3159e65fd20f92fd5ea15fd838f1591261916f4c5772b"
+NOT_ADMITTED_LINE = "OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED"
+OUTCOME_EVALUATED = "EVALUATED"
+OUTCOME_RELEASE_NOT_ADMITTED = "RELEASE_NOT_ADMITTED"
+ABBA_CONTRACT_LOCUS = (
+    "engine.compat.compute.evaluate_pair orients the pair through engine.compat.compute.orient "
+    "(canonical_person_id order) before the intrinsic pair_key; "
+    "tests/cli/test_showcompat_parity_and_identity.py asserts AB and BA stdout byte identity"
+)
+FIXTURE_PREDICATES = (
+    "abba_byte_identity",
+    "reader_cli_ab_identity",
+    "reader_cli_ba_identity",
+    "two_run_ab_identity",
+    "two_run_ba_identity",
+    "open_closed_ab_identity",
+    "open_closed_ba_identity",
+    "canonical_json_all",
+    "single_lf_all",
+    "preimage_ab_match",
+    "preimage_ba_match",
+    "canonical_gate_success",
+    "zero_vendor_transport_calls",
+)
 CANONICAL_LIVE_VENDOR_BASE = "https://api.humandesignapi.nl/v2"
 CANONICAL_LIVE_VENDOR_BASE_SHA256 = hashlib.sha256(CANONICAL_LIVE_VENDOR_BASE.encode("utf-8")).hexdigest()
 CANONICAL_LIVE_VENDOR_TARGET_ID = "humandesignapi_canonical_v2"
@@ -141,8 +184,12 @@ SENSITIVE_ENV = (
 )
 RAILS_OPEN = {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 RAILS_CLOSED = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
-A_FIXTURE = {"person_uid": "hde-epic038-pr03-alpha", "birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US", "tz": "America/Chicago"}
-B_FIXTURE = {"person_uid": "hde-epic038-pr03-bravo", "birthdate": "1992-03-04", "birthtime": "08:15", "location": "Berlin, DE", "tz": "Europe/Berlin"}
+# Complete mapped fixture charts with UUID identities (the CLI file path refuses
+# birth-only or type-only legacy input under PF05 §5.2.3).
+A_FIXTURE_REL = "fixtures/charts/alice.json"
+B_FIXTURE_REL = "fixtures/charts/bob.json"
+A_FIXTURE = json.loads((ROOT / A_FIXTURE_REL).read_text(encoding="utf-8"))
+B_FIXTURE = json.loads((ROOT / B_FIXTURE_REL).read_text(encoding="utf-8"))
 LIVE_SYNTHETIC_A = VendorInputs(resolve_db_user_id("hde-epic038-live-alpha"), "1990-01-01", "12:00", "Amsterdam, NL")
 LIVE_SYNTHETIC_B = VendorInputs(resolve_db_user_id("hde-epic038-live-bravo"), "1992-03-04", "08:15", "Berlin, DE")
 
@@ -388,26 +435,87 @@ def clean_env(rails: Mapping[str, str]) -> dict[str, str]:
     return env
 
 
-def reader_bytes(left: Mapping[str, Any], right: Mapping[str, Any]) -> bytes:
-    left_norm = cli_main._normalize_party(dict(left), "left")
-    right_norm = cli_main._normalize_party(dict(right), "right")
-    left_person, left_chart = cli_main._party_from_normalized(left_norm)
-    right_person, right_chart = cli_main._party_from_normalized(right_norm)
-    left_person, right_person, left_chart, right_chart = cli_main._canonical_pair(left_person, right_person, left_chart, right_chart)
-    meta = identity_meta()
-    return emit_reader_public_envelope(left_chart, right_chart, engine_tag=meta["engine_tag"], invocation_tag=meta["invocation_tag"], release_id=meta["release_id"])[0]
+def _resolved_party(party: Mapping[str, Any], label: str):
+    """Resolve one complete file-shaped party exactly as the CLI file path does."""
+
+    return cli_main._resolve_party(cli_main._normalize_party(dict(party), label), source_policy="local")
 
 
-def _emit_live_reader_bytes(left_chart: Mapping[str, Any], right_chart: Mapping[str, Any]) -> bytes:
-    """Perform one complete Reader identity acquisition and emission."""
+def _reader_envelope_bytes(left_resolved, right_resolved) -> bytes:
+    """Evaluate two resolved parties and emit the Reader envelope through the single emitter."""
+
+    result = evaluate_pair(evaluation_party(left_resolved), evaluation_party(right_resolved))
+    eligible = not is_ineligible_carrier(result)
     meta = identity_meta()
     return emit_reader_public_envelope(
-        dict(left_chart),
-        dict(right_chart),
+        None,
+        None,
         engine_tag=meta["engine_tag"],
         invocation_tag=meta["invocation_tag"],
-        release_id=meta["release_id"],
+        release_id=str(result["release_id"]) if eligible else meta["release_id"],
+        eligible=eligible,
+        harmony_band=harmony_band(result) if eligible else None,
     )[0]
+
+
+def reader_bytes(left: Mapping[str, Any], right: Mapping[str, Any]) -> bytes:
+    return _reader_envelope_bytes(_resolved_party(left, "left"), _resolved_party(right, "right"))
+
+
+def _emit_live_reader_bytes(left_resolved, right_resolved) -> bytes:
+    """Perform one complete Reader evaluation and emission for two resolved parties."""
+
+    return _reader_envelope_bytes(left_resolved, right_resolved)
+
+
+def _normalized_payload_sha(payload: Mapping[str, Any]) -> str:
+    """Hash of the identity-free normalized mechanics of an acquired complete chart.
+
+    Two acquisitions that return the same mechanics for different identities are
+    duplicate acquisitions; the identity label itself never enters the hash.
+    """
+
+    mechanics = payload.get("bodygraph") if isinstance(payload, Mapping) else None
+    return sha(emitter.emit_public(dict(mechanics) if isinstance(mechanics, Mapping) else dict(payload)))
+
+
+def _resolve_acquired_party(payload: Mapping[str, Any], user_id: str):
+    """Bind an acquired complete mapped chart to its trusted acquisition identity."""
+
+    party = dict(payload)
+    party["user_id"] = user_id
+    return cli_main._resolve_party(party, source_policy="local")
+
+
+def _not_admitted_fixture_proof(exc: ReleaseNotAdmitted) -> dict[str, Any]:
+    """The explicit non-admitted proof: no live capture, no PASS, zero transport calls."""
+
+    return {
+        "acceptance_token_satisfied": False,
+        "abba_contract_locus": ABBA_CONTRACT_LOCUS,
+        "abba_contract_mode": "raw_byte_identity_after_existing_canonical_pair_normalization",
+        "admission": {"refusal_code": exc.code, "live_capture_performed": False},
+        "artifact_kind": "hde_epic038_pr03_open_rails_abba_proof",
+        "canonical_gate": None,
+        "fixtures": {"a": A_FIXTURE_REL, "b": B_FIXTURE_REL, "materially_distinct": True},
+        "generated_at_utc": PRODUCED_AT,
+        "hashes": {},
+        "idempotence_hashes": {},
+        "outcome": OUTCOME_RELEASE_NOT_ADMITTED,
+        "pf09_mapping": {"title": "PF09.6 — HDE-Build-Checklist-Distillation", "task": "HDE-DIST001", "subtask": "HDE-DIST001.3", "status": "Partial"},
+        "predicates": {name: False for name in FIXTURE_PREDICATES},
+        "rails": {"open": dict(RAILS_OPEN), "closed_baseline": dict(RAILS_CLOSED)},
+        "transport_call_count": 0,
+        "top_level_pass": False,
+    }
+
+
+def validate_frozen_fixture_primary() -> None:
+    """Byte-identity of the frozen primary against its recorded hash (never a live proof)."""
+
+    path = ROOT / OPEN_ABBA_REL
+    if not path.is_file() or sha(path.read_bytes()) != FROZEN_OPEN_ABBA_SHA256:
+        raise SystemExit(f"FROZEN_PRIMARY_DRIFT:{OPEN_ABBA_REL}")
 
 
 def cli_reader_bytes(left: Mapping[str, Any], right: Mapping[str, Any], *, rails: Mapping[str, str]) -> bytes:
@@ -450,6 +558,10 @@ def canonical_gate(runner: Callable[..., subprocess.CompletedProcess] | None = N
 
 
 def build_fixture_proof(*, canon_gate_result: Mapping[str, Any] | None = None, transport_probe: Callable[[], None] | None = None, overrides: Mapping[str, bytes] | None = None) -> dict[str, Any]:
+    try:
+        probe_release_admission()
+    except ReleaseNotAdmitted as exc:
+        return _not_admitted_fixture_proof(exc)
     calls = {"count": 0}
     original_default = HdApiClient._default_request
 
@@ -503,13 +615,14 @@ def build_fixture_proof(*, canon_gate_result: Mapping[str, Any] | None = None, t
     }
     return {
         "acceptance_token_satisfied": False,
-        "abba_contract_locus": "engine.compat.compute.compat_public normalizes pair via engine.compat.ordering.normalize_pair; tests/cli/test_showcompat_parity_and_identity.py asserts AB and BA stdout byte identity",
+        "abba_contract_locus": ABBA_CONTRACT_LOCUS,
         "abba_contract_mode": "raw_byte_identity_after_existing_canonical_pair_normalization",
         "artifact_kind": "hde_epic038_pr03_open_rails_abba_proof",
         "canonical_gate": gate,
-        "fixtures": {"a": "hde-epic038-pr03-alpha", "b": "hde-epic038-pr03-bravo", "materially_distinct": True},
+        "fixtures": {"a": A_FIXTURE_REL, "b": B_FIXTURE_REL, "materially_distinct": True},
         "generated_at_utc": PRODUCED_AT,
         "hashes": {key + "_sha256": sha(value) for key, value in sorted(data.items())},
+        "outcome": OUTCOME_EVALUATED,
         "idempotence_hashes": {
             "ab": {"stored": stored_ab, "recomputed": recomputed_ab},
             "ba": {"stored": stored_ba, "recomputed": recomputed_ba},
@@ -534,6 +647,12 @@ def _write_primary(rel: str, data: bytes, *, check: bool) -> None:
 
 def generate_fixture(*, check: bool = False) -> dict[str, Any]:
     proof = build_fixture_proof()
+    if proof.get("outcome") == OUTCOME_RELEASE_NOT_ADMITTED:
+        # PF10 §2.15: nothing is written and no PASS is claimed; the frozen primary
+        # is only validated against its recorded hash.
+        validate_frozen_fixture_primary()
+        print(NOT_ADMITTED_LINE)
+        raise SystemExit(RELEASE_NOT_ADMITTED_EXIT_CODE)
     if proof["top_level_pass"] is not True:
         raise SystemExit("OPEN_RAILS_ABBA_PREDICATES_FAILED")
     _write_primary(OPEN_ABBA_REL, canonical_json_bytes(proof), check=check)
@@ -541,9 +660,17 @@ def generate_fixture(*, check: bool = False) -> dict[str, Any]:
 
 
 def validate_current_fixture() -> dict[str, Any]:
-    """Rebuild and validate the current proof without touching frozen capture bytes."""
+    """Rebuild and validate the current proof without touching frozen capture bytes.
+
+    Under PF10 §2.15 a non-admitted release yields the explicit
+    ``RELEASE_NOT_ADMITTED`` proof: no live capture ran, nothing is written and
+    the frozen primary is validated against its recorded hash.
+    """
 
     proof = build_fixture_proof()
+    if proof.get("outcome") == OUTCOME_RELEASE_NOT_ADMITTED:
+        validate_frozen_fixture_primary()
+        return proof
     if proof["top_level_pass"] is not True:
         raise SystemExit("OPEN_RAILS_ABBA_PREDICATES_FAILED")
     encoded = canonical_json_bytes(proof)
@@ -796,12 +923,11 @@ def build_live_proof(
             if adapter.get("status") != "mapped" or not isinstance(adapter.get("resolved"), Mapping):
                 raise VendorError(str(adapter.get("code") or "ADAPTER_UNSUPPORTED"), "v2 chart adapter could not map vendor payload")
             resolved = dict(adapter["resolved"])
-            bodygraph = resolved.get("bodygraph") if isinstance(resolved.get("bodygraph"), Mapping) else {}
-            mech_type = bodygraph.get("type") if isinstance(bodygraph, Mapping) else None
-            if not isinstance(mech_type, str) or not mech_type.strip():
-                raise VendorError("ADAPTER_CONTEXT_INSUFFICIENT", "mapped v2 payload missing HDE mechanics type")
-            payload = {"person_uid": str(resolved.get("person_uid") or context.person_uid), "mechanics": {"type": mech_type.strip()}}
-            return payload, request.input_fingerprint, sha(emitter.emit_public(payload))
+            bodygraph = resolved.get("bodygraph") if isinstance(resolved.get("bodygraph"), Mapping) else None
+            if not bodygraph or not isinstance(bodygraph.get("gates"), list) or not bodygraph.get("gates"):
+                raise VendorError("ADAPTER_CONTEXT_INSUFFICIENT", "mapped v2 payload is not a complete chart")
+            # The complete mapped chart is the normalized payload; no raw vendor payload is retained.
+            return resolved, request.input_fingerprint, _normalized_payload_sha(resolved)
         # The legacy ingest helper writes dry-run logs even though it does not
         # write database state. Keep those helper side effects outside the repo
         # so this producer owns only its governed primary proof artifact.
@@ -816,7 +942,7 @@ def build_live_proof(
                 success_log=temp_root / "ingest_success.log",
                 canon_log=temp_root / "json_canon_compare.log",
             )
-        return outcome.payload, outcome.input_fingerprint, outcome.payload_sha256
+        return outcome.payload, outcome.input_fingerprint, _normalized_payload_sha(outcome.payload)
 
     for label, inputs in (("a", a_inputs), ("b", b_inputs)):
         try:
@@ -833,19 +959,18 @@ def build_live_proof(
         return proof
     a_payload = outcomes[0][1]
     b_payload = outcomes[1][1]
-    a_hash = sha(emitter.emit_public(a_payload))
-    b_hash = sha(emitter.emit_public(b_payload))
+    a_hash = _normalized_payload_sha(a_payload)
+    b_hash = _normalized_payload_sha(b_payload)
     proof["normalized_a_sha256"] = a_hash
     proof["normalized_b_sha256"] = b_hash
-    a_person, a_chart = cli_main._person_and_chart_from_payload(a_payload, uid_hint=a_inputs.user_id)
-    b_person, b_chart = cli_main._person_and_chart_from_payload(b_payload, uid_hint=b_inputs.user_id)
-    a_person2, b_person2, a_chart2, b_chart2 = cli_main._canonical_pair(a_person, b_person, a_chart, b_chart)
-    b_person3, a_person3, b_chart3, a_chart3 = cli_main._canonical_pair(b_person, a_person, b_chart, a_chart)
+    probe_release_admission()  # typed ReleaseNotAdmitted before any Reader evaluation
+    a_resolved = _resolve_acquired_party(a_payload, a_inputs.user_id)
+    b_resolved = _resolve_acquired_party(b_payload, b_inputs.user_id)
     reader_emitter = reader_emitter or _emit_live_reader_bytes
-    ab_reader = reader_emitter(a_chart2, b_chart2)
-    ba_reader = reader_emitter(b_chart3, a_chart3)
-    ab_reader_run2 = reader_emitter(a_chart2, b_chart2)
-    ba_reader_run2 = reader_emitter(b_chart3, a_chart3)
+    ab_reader = reader_emitter(a_resolved, b_resolved)
+    ba_reader = reader_emitter(b_resolved, a_resolved)
+    ab_reader_run2 = reader_emitter(a_resolved, b_resolved)
+    ba_reader_run2 = reader_emitter(b_resolved, a_resolved)
     emitted_reader_bytes = (ab_reader, ba_reader, ab_reader_run2, ba_reader_run2)
     reader_hashes = {
         "ab_sha256": sha(ab_reader),
@@ -856,7 +981,7 @@ def build_live_proof(
     proof["reader_hashes"] = reader_hashes
     predicates = {
         "request_bound_ok": counter["attempted"] <= 2,
-        "same_normalized_inputs_reused": a_hash == sha(emitter.emit_public(a_payload)) and b_hash == sha(emitter.emit_public(b_payload)),
+        "same_normalized_inputs_reused": a_hash == _normalized_payload_sha(a_payload) and b_hash == _normalized_payload_sha(b_payload),
         "abba_byte_identity": ab_reader == ba_reader,
         "canonical_json": all(_assert_canonical("live_reader", value) for value in emitted_reader_bytes),
         "single_lf": all(value.endswith(b"\n") and not value.endswith(b"\n\n") and b"\r" not in value for value in emitted_reader_bytes),
@@ -944,6 +1069,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if ready else 1
     if args.check_current:
         proof = validate_current_fixture()
+        if proof.get("outcome") == OUTCOME_RELEASE_NOT_ADMITTED:
+            print(NOT_ADMITTED_LINE)
+            return RELEASE_NOT_ADMITTED_EXIT_CODE
     else:
         proof = generate_live(check=args.check) if args.live else generate_fixture(check=args.check)
     print(json.dumps({"status": "OK", "path": LIVE_ABBA_REL if args.live else OPEN_ABBA_REL, "top_level_pass": proof.get("top_level_pass"), "result": proof.get("result", "pass")}, sort_keys=True))
