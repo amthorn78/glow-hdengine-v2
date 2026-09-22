@@ -8,7 +8,7 @@ from engine.bodygraph.mapped_cache import MappedCacheError, read_current_mapped_
 from engine.bodygraph.projection import BodyGraphProjectionError
 from engine.bodygraph.resolver import ResolvedCompatChart, projection_refusal, resolve_compat_chart
 from engine.compat.compute import evaluate_pair, evaluation_party
-from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError
+from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError, admission_token_for
 from engine.compat.errors import error_envelope
 from engine.config.registry_loader import RegistryConfigError
 from engine.db import DBAccess
@@ -82,10 +82,7 @@ def _boundary_status(exc: CompatBoundaryError) -> int:
 
 
 def _admission_token(exc: RegistryConfigError) -> str:
-    code = str(getattr(exc, "code", "") or "")
-    if any(marker in code for marker in ("MANIFEST", "ROSTER", "RELEASE", "SOURCE")):
-        return "ERR_M10_MANIFEST_MISMATCH"
-    return "ERR_M10_CONFIG_MISMATCH"
+    return admission_token_for(getattr(exc, "code", None))
 
 
 def _current_row_lookup(canonical_user_id: str):

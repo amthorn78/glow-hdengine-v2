@@ -20,7 +20,7 @@ from engine.compat.compute import (
     harmony_band,
     is_ineligible_carrier,
 )
-from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError
+from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError, admission_token_for
 from engine.config.registry_loader import RegistryConfigError
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
@@ -363,10 +363,8 @@ class _ReaderFailure(Exception):
 
 
 def _admission_failure(exc: RegistryConfigError) -> _ReaderFailure:
-    code = str(getattr(exc, "code", "") or "")
-    if any(marker in code for marker in ("MANIFEST", "ROSTER", "RELEASE", "SOURCE")):
-        return _ReaderFailure("ERR_M10_MANIFEST_MISMATCH", MAGIC10_HTTP_STATUS["ERR_M10_MANIFEST_MISMATCH"])
-    return _ReaderFailure("ERR_M10_CONFIG_MISMATCH", MAGIC10_HTTP_STATUS["ERR_M10_CONFIG_MISMATCH"])
+    token = admission_token_for(getattr(exc, "code", None))
+    return _ReaderFailure(token, MAGIC10_HTTP_STATUS[token])
 
 
 def _reader_failure(exc: BaseException) -> _ReaderFailure:

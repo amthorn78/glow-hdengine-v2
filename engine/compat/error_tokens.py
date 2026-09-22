@@ -208,3 +208,29 @@ def canonical_token_for(code: str) -> str:
             if alias == code or alias.upper() == code_upper:
                 return token
     return code_upper
+
+
+# PF05 §5.2.3 splits admission failures in two. A defect in the release manifest
+# or the admitted release roster -- its identity, version, timestamp, member
+# hashes or completeness -- is ERR_M10_MANIFEST_MISMATCH. Everything else the
+# registry loader refuses is configuration, ERR_M10_CONFIG_MISMATCH: that
+# includes source-hash and source-binding disagreement (MECHANICS_SOURCE_MISMATCH,
+# SOURCE_CHANGED, UNBOUND_SOURCE, INVALID_JSON_SOURCE, ...) and registry content
+# rosters (CHANNEL_ID_ROSTER_MISMATCH, PROFILE_ROSTER_MISMATCH, ...), none of
+# which say anything about the manifest.
+#
+# Matching "SOURCE" or a bare "ROSTER" captures exactly those, so the markers are
+# "MANIFEST" and "RELEASE": every genuine release-roster code carries RELEASE
+# (ADMITTED_RELEASE_ROSTER_INVALID, INCOMPLETE_RELEASE_ROSTER,
+# RELEASE_ROSTER_MISMATCH, RELEASE_TIMESTAMP_MISMATCH, RELEASE_VERSION_MISMATCH),
+# so dropping the bare ROSTER marker loses none of them.
+_MANIFEST_ADMISSION_MARKERS = ("MANIFEST", "RELEASE")
+
+
+def admission_token_for(code: str | None) -> str:
+    """The PF05 §5.2.3 token for a registry-loader admission refusal."""
+
+    text = str(code or "")
+    if any(marker in text for marker in _MANIFEST_ADMISSION_MARKERS):
+        return "ERR_M10_MANIFEST_MISMATCH"
+    return "ERR_M10_CONFIG_MISMATCH"
