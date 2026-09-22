@@ -8,7 +8,7 @@ authority: Product Owner request, 2026-09-22 — full review of the GCFPE MGMT c
 committed: true — branch docs/20260922-pe36-mgmt-redesign
 pull_request: none — the Product Owner authorized the branch, not a pull request
 blocking_decisions: 0 — D-A, D-B and D-C answered by the Product Owner 2026-09-22 (§10)
-decisions_recorded_durably: false — D20 is still unwritten; see §11
+decisions_recorded_durably: true — D20, gcfpe.decision-record.md, on this branch
 revision_note: |
   v1.1, 2026-09-22 — adds the Modification Intake and Triage entrypoint (§6.0); the Modification
   naming and its measured collision (§5); the batching correction, a Modification is the unit of
@@ -730,11 +730,12 @@ registry row or Notion prompt body has been changed by it.
 It is committed on branch `docs/20260922-pe36-mgmt-redesign`. **No pull request exists**: the
 Product Owner authorized the branch and has not authorized a pull request.
 
-**The three decisions in §10 are answered but are not yet recorded durably.** They exist in this
-uncommitted file and in conversation, and *a conversation is not a record*
-(`ecosystem-change-management.md` §2 Step 5). Until they land as a decision-record entry — `D20`,
-covering scope, artifact form and the `EXECUTE` boundary together — a successor session has no
-authority to rely on them and would re-litigate all three.
+**The three decisions in §10 are recorded as `D20`** in
+`docs/prompt_ecosystem_management/gcfpe.decision-record.md`, on this branch — scope, artifact form
+and the `EXECUTE` boundary together, with the consequences that bind any session implementing
+them. A successor session now has durable authority for all three.
 
-Landing `D20` is one small addition to the decision record. It is the recommended next action and
-it is not implementation.
+What remains unauthorized is implementation. Stage 1 — the Modification format, its template,
+`modification_validate.py`, `closure.py` and the triage prompt — is additive and touches nothing
+governed, which makes it the safe first build. Stage 2, the Class A prompt rewrite, is the one that
+needs its own explicit authorization.

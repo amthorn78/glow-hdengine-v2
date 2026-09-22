@@ -997,3 +997,77 @@ The rule itself, for the skills that do advertise a revision — `flowmaster-val
 `change-flow` — is untouched and still absolute. Delivery hygiene is untouched: digest first in
 the caption, one package per message, and the post-install digest comparison remains the only
 control for the wrong-package case.
+
+---
+
+## D20 — The GCFPE MGMT change process is redesigned as one prompt with three modes
+
+**Product Owner, 2026-09-22**, commissioning the work: *"It is time for a full review of the GCFPE
+MGMT change-process ecosystem… My ideal end state is one persistent GCFPE MGMT prompt with three
+explicit operating modes… This must remain one prompt, not three separate prompts."*
+
+The audit, its measurements and the full design are
+`docs/ephemeral/pe36.mgmt-redesign/GCFPE-MGMT-REDESIGN-ANALYSIS-v1.0.md`. This entry records the
+rulings, not the analysis.
+
+### What the audit established, in one line
+
+**The change-management prompt lost its method.** `GCFPE-MGMT-10` went from 52,009 characters in
+`091226.3` to 8,015 in `091426.1`; the sections that carried the procedure — *Execute the change*,
+*Quality-control contract* — were deleted and relocated nowhere. Its only surviving procedure is a
+*Batch method* for the sequence `D12` retired, so **the live path through the prompt contains no
+procedure at all**, and every change since has been improvised.
+
+### The three rulings
+
+**D20-A — Scope.** The redesign covers `GCFPE-MGMT-10` **and the skill-change loop**. Packaging,
+the reviewer prompt, the §10 verdict and install verification become named `EXECUTE` steps inside
+one record rather than a parallel improvised process. Scoping to the prompt alone was rejected
+because the measured friction — 30 repair rounds, 20 review rounds on PR #425, 11 versions of one
+guard — lives in that loop.
+
+**D20-B — The artifact is a Notion prompt body, not a skill.** It replaces the current
+`GCFPE-MGMT-10` in place. It is explicitly invoked rather than probabilistically triggered
+(`AF-003`), and the register, graph and registry already model it. **Consequence:** rewriting it is
+a Class A change to a selected release member, its graph part and registry row move with it and are
+rebuilt by script never hand-edited (`D13`), and `prompt-body-content-policy.md` governs what may
+go in it — a `MODE` input is behaviour and qualifies; governance state does not.
+
+**D20-C — `EXECUTE` applies changes directly.** Notion body edits, repository commits, pushes and
+opening a pull request. **It stops at merge and install, both of which remain the Product Owner's**
+and are recorded as remaining actions with their verification. Preparing a changeset and applying
+nothing was rejected: it roughly doubles the cycle and reintroduces the hand-off cost the redesign
+exists to remove.
+
+### Consequences that bind any session implementing this
+
+- **The record is a Modification**, never a "Change Record" or `CR`. Measured collision: `CRD`
+  appears 2,694 times in `docs/`, "Change Flow" 733, bare `CR` 53 — and `CHANGE_RECORD` is already
+  `GCFPE-MGMT-10`'s own declared output artifact at `project-prompt-contract-registry.md:2310`.
+  Spelled out rather than abbreviated to `MOD`, which sits one letter from `MODE`.
+- **A Modification is the unit of approval, not of "one thing."** Items batch when they share a
+  rule, a verification or a package/review/install cycle. `coupling: ATOMIC` work must never be
+  split across authorizations — that is the `D12` error — and `INDEPENDENT` items take a per-item
+  disposition so one blocker does not hold the rest.
+- **A Modification may target prompts, skills, rules or any combination**, and the target set
+  derives the required gates rather than a session recalling them.
+- **The gate is tiered by computed blast radius**, not applied at corpus scale to everything. The
+  graph part is the interface contract, so tier entry is a diff on one JSON file. **Tier 0 means
+  routing provably unaffected, not provably harmless** — anything changing what a prompt *produces*
+  rather than how it *routes* is Tier 1 regardless.
+- **Scope freezes at `ANALYZE` approval.** A mode may not expand its own scope; work discovered
+  later becomes a new Modification. This is the rule that bounds the review loops, and it is
+  independent of how much a Modification contains.
+- **Readiness is decided by predicates, never a score.** Sequential discovery and unmeasured scope
+  force a split; everything else is cost, counted in round trips through the Product Owner, with
+  the prediction recorded against actual every time.
+
+### What this does not decide
+
+**It authorizes no implementation.** No prompt, skill, graph part, registry row or Notion prompt
+body is changed by this ruling. The staged plan — the Modification format and its two scripts, the
+prompt rewrite, the graph and registry reconciliation, and a pilot on one real small change — each
+needs its own authorization, and the Class A prompt rewrite needs it most.
+
+**The pilot is not optional.** *"The new process works"* is a claim, and this ecosystem's failures
+are uniformly claims made before the measurement that would have checked them.
