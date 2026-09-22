@@ -270,6 +270,7 @@ def _run_stage(step: SanityStep) -> int:
     probe observes the non-admitted state itself; otherwise it is a failure.
     """
 
+    gated = step.name in RELEASE_ADMISSION_GATED_STAGES
     outcome = 0
     for command in step.commands:
         validator = _VALIDATORS.get(tuple(command))
@@ -290,6 +291,19 @@ def _run_stage(step: SanityStep) -> int:
                     file=sys.stderr,
                 )
                 return code or 1
+        if code == RELEASE_NOT_ADMITTED_EXIT_CODE and not gated:
+            # Only the admission-gated stages have a NOT_ADMITTED outcome to express.
+            # Every other stage runs ordinary --check tools, where this code can only
+            # be an internal failure -- and the probe above succeeds for the whole
+            # pre-admission period, so it cannot tell the two apart.  Returning the
+            # code itself would let the attestation turn the whole release_sanity
+            # stage into a release_not_admitted receipt and mask the real failure.
+            print(
+                f"{step.name}: command exited {code} outside an admission-gated stage; "
+                f"this is an ordinary failure, not RELEASE_NOT_ADMITTED: {' '.join(command)}",
+                file=sys.stderr,
+            )
+            return 1
         if code == RELEASE_NOT_ADMITTED_EXIT_CODE:
             outcome = RELEASE_NOT_ADMITTED_EXIT_CODE
         elif code:
