@@ -18,7 +18,7 @@ stable home rather than being scattered among release-specific artifacts.
 
 | Layer | Home | Why |
 |---|---|---|
-| Prompt behaviour | Notion, authored in place | The prompt is the behaviour. It is edited where it lives. |
+| Durable prompt behaviour | Notion, authored in place | The prompt is the behaviour. It is edited where it lives. **Only prompts intended as durable, reusable Notion-managed assets** — see `notion-write-boundary.md`. |
 | Machine-readable prompt contracts and ecosystem-management infrastructure | **here** | Versioned, diffable, reviewable through pull request |
 | Ephemeral run artifacts, reports, ledgers | `docs/ephemeral/` | Working store, pruned manually |
 | Maintained machine-readable graph source | `docs/graph/` | Per-prompt parts, rebuilt by script |
@@ -56,7 +56,8 @@ artifact is.**
 | a round report, freeze snapshot, §10 verdict, ledger, filled prompt instance, dated finding | `docs/ephemeral/` |
 | maintained machine-readable graph source | `docs/graph/` |
 | PFCanon | `docs/pfcanon/`, read-only |
-| prompt behaviour | Notion, authored in place |
+| durable, reusable prompt behaviour | Notion, authored in place |
+| a one-off, handoff, correction, recovery or development-flow prompt | **not Notion.** The handoff itself, or `docs/ephemeral/` if worth keeping — see `notion-write-boundary.md` |
 
 **For a procedure, the repository document is normative and the Notion entry is the
 operational index** that helps someone find it and know when it applies. Where the two
@@ -106,6 +107,7 @@ the application's.
 | `skill-identity-and-freeze.md` | Skill digests, what each identity proves, and why an install is not complete until its digest is compared |
 | `freeze.py` | The digest recipe itself. Root it at a skill directory, never at the synced tree |
 | `prompt-corpus-policy.md` | **The Prompt Corpus Storage and Fidelity Policy**, recorded verbatim — the prompt corpus is never mirrored, exported, hashed or cached to disk |
+| `notion-write-boundary.md` | **Which prompts belong in Notion and when a Notion write is authorized** — the default is read-only; executing a prompt is not a reason to write |
 | `prompt-validation-procedure.md` | How prompt bodies are validated without a corpus mirror — read the page, pipe the body on stdin — and the rule that a recorded identity must be compared, not printed |
 | `skill-packaging-and-delivery.md` | How a skill is packaged and handed over, mandatory independent validation, and why every delivered artifact except a `.skill` file must be uniquely named |
 | `reviewer-prompt-template.md` | The canonical reviewer prompt. Every skill handover fills this template rather than composing one |
