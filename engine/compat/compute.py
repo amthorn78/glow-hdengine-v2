@@ -17,7 +17,7 @@ from engine.bodygraph.resolver import (
 from engine.compat.error_tokens import CompatBoundaryError
 from engine.compat.thresholds import THRESHOLDS_V1
 from engine.config.registry_loader import AdmittedMechanicsBundle, load_active_mechanics_bundle
-from engine.core.core import _chart_fingerprint, _digest, compute_core
+from engine.core.core import _chart_fingerprint, _digest, _validate_member, compute_core
 from engine.narratives.constants import MISSING_NARRATIVE_KEY
 from engine.narratives.router import route_keys
 from engine.serializer.canon import sercanon
@@ -345,7 +345,20 @@ def evaluate_pair(
         try:
             core = compute_core(lo.gates, hi.gates, bundle, release_id)
         except ValueError:
-            raise CompatBoundaryError("stale_result" if stale_hit else "gates_invalid", detail="core") from None
+            if stale_hit:
+                raise CompatBoundaryError("stale_result", detail="core") from None
+            # ``compute_core`` validates both members before it reads the bundle,
+            # registry or mechanics, so a ValueError that survives member
+            # validation here came from the admitted configuration, not the
+            # charts.  Reporting it as ``gates_invalid`` would blame a stored
+            # BodyGraph -- ERR_M10_BODYGRAPH_INCOMPLETE on the Reader transport --
+            # for a server-side roster, mechanics or identity defect.
+            try:
+                _validate_member(lo.gates)
+                _validate_member(hi.gates)
+            except ValueError:
+                raise CompatBoundaryError("gates_invalid", detail="core") from None
+            raise CompatBoundaryError("admission_config", detail="core") from None
         pure = core.to_payload()
         if pure["pair_key"] != pair_key:
             raise CompatBoundaryError("result_schema", detail="pair_key")

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import dataclasses
 import hashlib
 import json
 from pathlib import Path
@@ -286,6 +287,26 @@ def test_cache_hit_stale_with_invalid_gate_set_is_stale_result():
     with pytest.raises(CompatBoundaryError) as raised:
         evaluate_pair(a, forged)
     assert raised.value.reason == "gates_invalid"
+
+
+def test_core_config_defect_is_admission_config_not_a_blamed_bodygraph(monkeypatch, bundle):
+    """``compute_core`` raises a bare ValueError for member defects and for
+    bundle, registry and mechanics defects alike.  Only the first is the stored
+    chart's fault, so the second must not surface as a blamed BodyGraph.
+    """
+
+    broken_registry = dataclasses.replace(bundle.registry, magic10_order=())
+    broken = dataclasses.replace(bundle, registry=broken_registry)
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", lambda: broken)
+
+    a = _party(UUID_1, [5, 19, 20, 34, 43, 49])
+    b = _party(UUID_2, [9, 12, 15, 22, 23, 52])
+    with pytest.raises(CompatBoundaryError) as raised:
+        evaluate_pair(a, b)
+    assert raised.value.reason == "admission_config"
+    assert raised.value.token == "ERR_M10_CONFIG_MISMATCH"
+    assert raised.value.reader_token == "ERR_M10_CONFIG_MISMATCH"
+    assert raised.value.reader_status == 503
 
 
 def test_identity_independent_pair_key_and_cache_value_binds_fingerprints():
