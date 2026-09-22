@@ -83,6 +83,13 @@ grep -rn 'FLOWMASTER_VALIDATE_REVISION\|validator_revision\|SKILL_TREE_SHA256' <
 diff /tmp/prev.ids /tmp/new.ids   # a revision that did not move, beside content that did, is the defect
 ```
 
+**Where a skill advertises no identity value at all, the diff is vacuous, not failing.** Prose
+skills — `glow-workspace-currency`, `glow-artifact-storage`, `glow-write-boundary`,
+`glow-po-reporting` — carry only `name` and `description`, declare no revision, and their identity
+is the freeze digest. Run the diff, record that it returned nothing, and package on the digest.
+**Do not add a version field in order to have something to bump** — `D19` rules that out, and an
+instruction to "bump the version" does not authorise inventing one.
+
 A **spent** identity is one already bound to a published §10 verdict, an install, or a delivered
 package. Corrected bytes never reuse one. `SKILL_TREE_SHA256` does not satisfy this on its own: it
 moves automatically with content, so it will differ even when the declared revisions did not, and

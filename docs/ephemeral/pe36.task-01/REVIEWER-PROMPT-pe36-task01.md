@@ -114,10 +114,14 @@ C8. No advertised identity value was bumped because these three skills have none
 C9. No Notion write was made and none was authorized for this task.
 
 === 6. WHAT TO ATTACK, IN PRIORITY ORDER ===
-A1. C8 is the author's least-confident reasoning and it departs from a literal line in the
-    authorizing brief, which says "Bump each skill's own version." Decide whether the digest
-    alone is sufficient identity for these packages, or whether the brief meant something the
-    author has read away. This is the finding most likely to be real.
+A1. C8 departed from a literal line in the authorizing brief, which says "Bump each skill's own
+    version." The Product Owner has since ruled on the substance — D19, no version field, the
+    digest is the identity — so the DECISION is settled and you are not being asked to reopen it.
+    What is still yours to attack is the EXECUTION: confirm the author's measurement that the set
+    of advertised identity values really is empty in all three packages (grep for
+    SKILL_TREE_SHA256, _REVISION, validator_revision, ^version: yourself), and confirm that no
+    version field was quietly added anywhere. A claim of "nothing to bump" is falsifiable in one
+    command; run it.
 A2. glow-workspace-currency's DESCRIPTION is permanently in every session's context, so a
     triggering regression is the most expensive possible defect here and no gate tests for it.
     AF-003 records that skill triggering is probabilistic and that four very different
@@ -143,9 +147,12 @@ A7. glow-artifact-storage's description sits 29 characters below a hard 1,024 li
     count yourself. A first attempt at this edit ran to 1,069 and was rejected by the validator.
 
 Questions the round deliberately did not settle — these are questions, not findings:
-Q1. Should these three prose skills acquire a durable advertised identity (a version: key, or a
-    revision constant) as a standing convention, so future packages are distinguishable without
-    the digest? PE36 says no and gives its reason; the question is open for the Product Owner.
+Q1. SETTLED, do not re-answer. The Product Owner ruled NO on 2026-09-22 — these prose skills
+    acquire no version: key and no revision constant; the freeze digest is the identity. Recorded
+    as D19 in docs/prompt_ecosystem_management/gcfpe.decision-record.md, with the consequence
+    written into skill-identity-and-freeze.md. If you were going to raise "these packages carry
+    no advertised identity" as a finding, D19 is the answer and it is not a finding. Do NOT
+    recommend adding a version field.
 Q2. Should the remaining installed skills be swept for the same unqualified "prompts are
     authored in Notion" sentence? PE36 did not, because the brief scoped this to three.
 

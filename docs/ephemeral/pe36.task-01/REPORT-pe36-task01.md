@@ -173,6 +173,13 @@ This is a coordinator-level implementation consequence of a ruling already made
 (`ecosystem-change-management.md` §6), not a policy question. It is recorded here because it
 departs from a literal line in an authorized brief, and that should not be found by a reviewer.
 
+**Settled by the Product Owner, 2026-09-22.** Asked whether these prose skills should acquire a
+durable advertised identity as a standing convention: **no**. Recorded as **`D19`** in
+`gcfpe.decision-record.md`, with the consequence for the "advertised identity must be unspent"
+rule written into `skill-identity-and-freeze.md`: where the set of advertised values is empty the
+diff is vacuous rather than failing, and a version field is never invented to satisfy it. The
+reviewer prompt's `Q1` is marked settled so the reviewer does not re-answer it.
+
 ## Notion
 
 **No Notion write was made, and none is authorized for this task.**

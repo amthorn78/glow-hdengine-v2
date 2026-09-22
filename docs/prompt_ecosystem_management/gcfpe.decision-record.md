@@ -942,3 +942,58 @@ ever disagree, the Flow Index block governs and the others are defects to correc
 `PR01`–`PR03` remain `ACCEPTED_FINAL` and are not rerun. The approved Specification `v1.1`, the
 Implementation Audit `v2.0` and the Implementation Plan `v2.1` remain immutable; resuming Alpha
 progresses the current Plan, it does not re-author it. Merge and abort remain Nathan-only actions.
+
+---
+
+## D19 — A prose skill carries no advertised identity; its freeze digest is its identity
+
+**Product Owner, 2026-09-22.** Asked whether the three prose skills revised in PE36's Task 01
+should acquire a durable advertised identity — a `version:` frontmatter key or a revision
+constant — as a standing convention, so future packages are distinguishable without the digest:
+**"no"**.
+
+### What was actually asked
+
+`glow-workspace-currency`, `glow-artifact-storage` and `glow-write-boundary` carry no advertised
+identity value of any kind. Measured, not assumed:
+
+```
+grep -rnE 'SKILL_TREE_SHA256|_REVISION|validator_revision|^version:' <the three skills>
+→ no matches
+frontmatter keys, all three: name, description
+```
+
+No skill in this workspace carries a `version:` field. The `FLOWMASTER_VALIDATE_REVISION` /
+`validator_revision` mechanism belongs to `flowmaster-validate` and `change-flow`, which declare
+revisions that reports quote.
+
+### The ruling, and why it is the right one
+
+**The digest is the identity. Nothing else is added.** This is the general form already stated in
+`prompt-body-content-policy.md`: *"Governance state belongs to the artifact that governs it …
+Skill identity belongs to the skill's own digest."* A `version:` line in frontmatter that loads
+into every session is a second identity surface that can disagree with the digest, and the
+disagreement surfaces at the worst moment — mid-handover, with two packages in hand.
+
+It is also `NORM-001`: structure added for symmetry, with no consumer. Nothing reads a prose
+skill's version. What distinguishes two packages in anyone's hands is the sha256 in the delivery
+caption and the post-install digest comparison, and those already exist.
+
+### The consequence for the packaging rule — read this before you invent a version
+
+`skill-identity-and-freeze.md` requires that **advertised identity must be unspent**, diffed
+against the previous package before packaging, with a match treated as a defect. That rule has
+been broken three times and it is not weakened here.
+
+**For a skill whose set of advertised identity values is empty, the diff is vacuous, not failing.**
+Run it, record that it returned nothing, and package. **Do not create a version field in order to
+have something to bump** — that is the specific action this ruling forbids, and a task brief
+instructing a session to "bump each skill's own version" does not authorise it where there is no
+version to bump. Report the discrepancy and proceed on the digest.
+
+### What it does not change
+
+The rule itself, for the skills that do advertise a revision — `flowmaster-validate`,
+`change-flow` — is untouched and still absolute. Delivery hygiene is untouched: digest first in
+the caption, one package per message, and the post-install digest comparison remains the only
+control for the wrong-package case.
