@@ -112,3 +112,42 @@ and their *machine-readable restatement* (graph parts), not their text.
 | The assembled graph contract | Derived output. Built on demand to a scratchpad, represented downstream by its proof token, **never committed** |
 | Any pre-merge report, ledger or plan copy | Superseded by the merged baseline. Dated records are history, not instruction |
 | Conversation context from any prior session | Not a system of record. If it matters, it is written here |
+
+## Stale-state sweep — 2026-09-22
+
+The Product Owner found the **Epic Alpha Run Notes — 20260914.1** still reading
+`ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR`, a day after `D18` resumed Alpha. A sweep for the
+same literal across the workspace found it was not alone.
+
+| surface | what it said | disposition |
+|---|---|---|
+| Epic Alpha Run Notes — 20260914.1 | `ALPHA_STOPPED_…`, `NOT_YET_APPROVED`, and frontmatter `status: UNSELECTED_CANDIDATE_DRAFT` / `promotion_authorized: false` | **corrected** — points at the Flow Index, frontmatter `REGISTER_CONTROLLED` |
+| **HDE Change Flow Overview** | declared `GCFPE-20260913.1` / `091326.2` / **54** the current selection, Alpha stopped, and navigated to archived `091326.2` pages | **corrected** — worse than the reported page, and a top-level surface |
+| ⛔ Epic Alpha Run Notes (predecessor) | first section not labelled historical, read as current | **bannered**, body untouched |
+| ⛔ Alpha Establishment Checklist (predecessor) | "Current GCFPE contract maintenance — 091326.2" | **bannered**, body untouched |
+| Membership and Release Register | correct | verified, unchanged |
+| Glow Operations Hub | correct | verified, unchanged |
+
+**The register and the hub were right; the navigation was wrong.** That is the more dangerous
+arrangement of the two, because an agent reaches navigation first and has no reason to distrust it.
+
+### The rule this establishes
+
+**A release transaction is not complete until every page that *names* the release has been swept,
+not only every page the transaction *touched*.** Promotion on 2026-09-21 updated ten bindings and
+archived 56 pages, all read back — and still left a top-level navigation page asserting the
+superseded release, because that page was not in the binding set and not a member.
+
+Sweep by literal, not by inventory: search the workspace for the **predecessor's** release id,
+version family and member count, and for every Alpha-state token. A page that restates state it
+does not own is a defect even when the owning authority is correct.
+
+### Restating is allowed; asserting is not
+
+Several pages legitimately restate the Alpha state for convenience. Each must say, in the same
+breath, that the Flow Index holds it and governs any disagreement. A heading that calls itself
+"Sole operative Alpha state" on a page that is not the Flow Index is the defect — two pages made
+that claim, and one of them was stale.
+
+Predecessor pages are **bannered, never rewritten**. Their bodies are dated evidence under
+`AUTH-001`; the banner states what superseded them and points at the current authority.
