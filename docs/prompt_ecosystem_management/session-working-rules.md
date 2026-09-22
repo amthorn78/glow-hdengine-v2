@@ -43,14 +43,23 @@ This is measurable, so measure it. A session that reads a corpus into context st
 
 ## Tracking is part of the work
 
-Standing rule, Product Owner direction 2026-09-21, after the same instruction was given to every session and followed by none of them. **Every step is tracked in Notion.** Not the outcome only — the step.
+Standing rule, Product Owner direction 2026-09-21, after the same instruction was given to every session and followed by none of them. **Every step is tracked — the step, not the outcome only.**
+
+**Where it is tracked depends on which kind of session you are.** Product Owner policy, 2026-09-22, `notion-write-boundary.md`:
+
+| session | tracking destination |
+|---|---|
+| **Maintaining the ecosystem** — a `GCFPE-MGMT-10` run, a prompt-repair round, a release transaction | Notion, on the maintenance surfaces that already name it: the round-tracking page, the release register, the Alpha feedback list, the release controls. These are established destination rules, so the write is authorized by rule. Plus the repository, per `README.md`. |
+| **Executing the ecosystem flow** — planning, implementing, reviewing or QA-ing a work unit | `docs/ephemeral/` in the repository, landed by pull request. **Read-only with respect to Notion** unless that specific task's instruction directs a Notion write. |
+
+**Tracking is not a Notion-write requirement.** A development session that completes a task, produces a report or hands off to the next session has tracked its work correctly by landing it in the repository. Do not infer a Notion write from the work having happened — see `notion-write-boundary.md` for the list of things that are **not** an authorization.
 The damage this repairs, measured rather than asserted:
 - The governing repair plan's checklists stood at **101 boxes unchecked against 11 checked**, with unchecked items that were demonstrably complete and a `BATCH_2_BLOCKED` verdict from 2026-09-16 that nothing in twenty-plus later rounds either resolved or reaffirmed.
 - The round-tracking page's own `status` and `gate` header stayed **twenty rounds stale**, still declaring a gate blocked that had been satisfied.
 - `D5` landed in round 21 exactly as planned and **was never written down**, so a later session read the record correctly, concluded the item was open, and reported it to the Product Owner as a loose end. The record caused the error.
 The through-line: work that lands without being recorded is indistinguishable from work that never happened, and the next session pays for it.
 ### The rule
-**If your work changes the truth of anything written down, you change what is written down, in the same session.** That includes a checkbox, a status field, a frontmatter line, a verdict, a dated status sentence, and an item another page lists as open.
+**If your work changes the truth of anything written down, you change what is written down, in the same session — at the destination that already holds it.** That includes a checkbox, a status field, a frontmatter line, a verdict, a dated status sentence, and an item another page lists as open. The rule is about *not leaving a record false*; it never licenses creating a new Notion page to hold something nothing was tracking. If no existing record claims the thing, nothing has gone stale, and there is nothing to correct.
 1. **Record steps, not just conclusions.** A round entry says what was done, measured, decided and deferred — each with its evidence. A conclusion with no visible step cannot be checked by anyone later.
 2. **Update the artifact that tracks it, not only your own report.** Writing a round report is not tracking. If a plan, checklist or register holds the item, that is where the change belongs. A report the tracker does not point at will be missed.
 3. **Close every deferral by name.** An item deferred into a later change is closed *in the record* when that change lands. Round 21 carried `D5` and did not say so; that silence cost a cycle.
