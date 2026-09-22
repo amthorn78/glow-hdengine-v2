@@ -84,6 +84,8 @@ The four rows below were found by hosted CI on the PR-30 candidate and repaired 
 | P-24 | §10.3: "`engine/emit_public.py` was checked and does not use any removed helper; it is unchanged" | The check was too narrow. The helper uses no *removed helper*, but it calls `emit_reader_public_bytes`, whose signature this PR changed by making `eligible` required (it was `eligible: bool = True`). So `emit_public_envelope` raised `TypeError: emit_reader_public_bytes() missing 1 required keyword-only argument: 'eligible'`, breaking `VERIFY.sh` at its first step and the `dev/reader_harness` injection — which the routes additionally call **with** `eligible=`/`harmony_band=`, keywords the helper did not accept. Invisible to CI: `VERIFY.sh` is in no workflow or lane, and the file had no registered owner test | `emit_public_envelope` accepts and forwards both keywords, defaulting to the ineligible envelope (`categories: []`) — not a fabricated eligible one, since the band it once derived came from the retired `_compute_harmony_band`. `get_reader_bp`'s docstring now states the real `emit_fn` contract. Changing the file made the classifier refuse with `CI_PRODUCT_OWNER_TEST_MISSING`, so `tests/runtime/test_emit_public_legacy_helper.py` now owns both call shapes and is registered against `engine/emit_public.py` and `adapter/http_reader.py`. See §8.6 |
 | P-25 | not in plan (Codex P2 on `6f5aeed`, `engine/compat/compute.py:348`) | `compute_core` raises a bare `ValueError` for member/Gate defects **and** for bundle, registry, mechanics, release-identity and source-identity defects alike (`engine/core/core.py` "invalid admitted bundle", "incoherent release identity", "incomplete registry", …). The single `except ValueError` mapped all of them to `gates_invalid`, so a server-side configuration defect was reported as the chart's fault. Correction P-23 made this worse in effect, not in kind: `gates_invalid` now carries `ERR_M10_BODYGRAPH_INCOMPLETE`/503 on the Reader transport, so a config defect blamed a stored BodyGraph | `compute_core` validates both members *before* it reads the bundle (`core.py:211–214`), so a `ValueError` that survives re-running `_validate_member` on both parties is a configuration defect. It now raises `admission_config` → `ERR_M10_CONFIG_MISMATCH`/503. The member and `stale_result` paths are unchanged — the existing forged-mask test still asserts `gates_invalid`. Owned by a new test, `test_core_config_defect_is_admission_config_not_a_blamed_bodygraph`. See §8.8 |
 
+| P-26 | not in plan (Codex P2 on `d7478be`, `adapter/http_reader.py:367`) | The admission classifier this PR introduced matched the substrings `MANIFEST`, `ROSTER`, `RELEASE` and `SOURCE`; the last two over-capture. `SOURCE` catches `MECHANICS_SOURCE_MISMATCH`, `INVALID_JSON_SOURCE`, `SOURCE_CHANGED`, `SOURCE_READ_FAILED`, `UNBOUND_SOURCE` and `UNSAFE_SOURCE_PATH`; a bare `ROSTER` catches `CHANNEL_ID_ROSTER_MISMATCH`, `FROZEN_CHANNEL_CENTER_ROSTER_MISMATCH` and `PROFILE_ROSTER_MISMATCH`. None of those nine concern the manifest — PF05 §5.2.3 assigns source-hash and config disagreement to `ERR_M10_CONFIG_MISMATCH` — yet all were reported as `ERR_M10_MANIFEST_MISMATCH`. The logic was also **duplicated verbatim** in `engine/http/compat_handler.py::_admission_token`, so `/api/compat/v1` misreported identically | The markers are now `MANIFEST` and `RELEASE`. Every genuine release-roster code carries `RELEASE` (`ADMITTED_RELEASE_ROSTER_INVALID`, `INCOMPLETE_RELEASE_ROSTER`, `RELEASE_ROSTER_MISMATCH`, `RELEASE_TIMESTAMP_MISMATCH`, `RELEASE_VERSION_MISMATCH`), so dropping the bare `ROSTER` marker loses none and the F01 posture is unchanged. The duplicated logic now lives once in the governed token module as `admission_token_for()`. Both classes carry 503, so the defect was a wrong governed token rather than a wrong status — which is why tests now pin all 16 manifest codes, 13 config codes, their disjointness, the unknown-code default and the shared 503. See §8.10 |
+
 
 ## 5. F01 overlay implemented (PF10 §2.15; plan §6.7, §8.7)
 
@@ -359,6 +361,38 @@ nor the Mirror; the governed EPIC031 artifact is the separate
 Reproduced the failing step exactly before pushing — detached worktree at the candidate head,
 same rails, same `-p no:cacheprovider` invocation, same target list: **2407 passed**,
 `git diff --exit-code` clean, `git status --short --untracked-files=all` empty.
+
+
+### §8.10 The admission classifier fix, and a repeated exit-code mistake
+
+Codex's P2 on `d7478be` is a sibling of P-25: same conflation of a configuration defect with
+something else, on the separate `RegistryConfigError` classifier rather than the `compute_core`
+path. Enumerating every code the registry loader raises made the over-capture exact — nine codes
+in three families, listed in P-26 — and showed the same logic duplicated in `compat_handler.py`.
+`git show 3b8084d0:adapter/http_reader.py` has neither function, so both are this PR's.
+
+After the fix, `adapter/http_reader.py` had changed, so `catalog/manifest.json` was re-cut through
+its owner. **That recut invalidated the canonical JSON gate outputs and the Index/Mirror rows bound
+to them, and I reported the gate as clean when it was not.** The post-recut check was
+
+```
+python tools/evidence/run_canonical_json_gate.py --check-only 2>&1 | tail -3; echo "json_gate=$?"
+```
+
+which prints `tail`'s status, not the gate's. Re-run as `out=$(...); rc=$?` the gate returns **1**.
+This is the pipeline trap `AGENTS.md` names, and the second time this session I have hit it — the
+first is recorded in §8.1. The lesson that did not take the first time: a corrected habit has to
+replace the command form, not just the one command.
+
+It was caught anyway, by `tests/evidence/test_canonical_json_gate_check_outputs.py::test_full_gate_outputs_remain_current_after_metadata_only_release_cut`
+in a local reproduction of the CI changed-tests step — 1 failed, 2406 passed — before any push. The
+gate and the Index/Mirror were then regenerated through their owners only
+(`run_canonical_json_gate.py`, then `update_evidence_index.py` as the sole index writer), and every
+read-only check re-verified clean with the producer's own status: index, orientation, step-logs
+manifest, index hash, path validation, mirror schema, final LF and `release_id_recompute
+--check-manifest-only` all 0.
+
+Re-verified after the regeneration: **2407 passed**, `git diff --exit-code` clean, tree clean.
 
 ## 9. Limitations
 
