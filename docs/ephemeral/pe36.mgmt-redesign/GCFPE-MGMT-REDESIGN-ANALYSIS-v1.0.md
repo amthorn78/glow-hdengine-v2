@@ -766,6 +766,18 @@ touched.
 branch and Result routing"* — do not match any section heading in the **live** `091426.1` body
 either. The first is corrected by the rebuild; the second leaves with the edge it labelled.
 
+### The triage prompt moved to Notion, 2026-09-22
+
+Stage 1 put the intake and triage prompt in the repository. It is a persistent prompt the Product
+Owner reuses, so by the same rule that put the MGMT-10 body in Notion it belongs there, and the
+repository copy is removed rather than mirrored. It is now **"Modification Intake and Triage —
+PROPOSED"**, a child of the redesign tracking page, status proposed for testing.
+
+Two gaps fixed in the move: the old text wrote draft Modifications but forbade opening a branch,
+so its output would have died with the session — drafts are now committed and pushed on an intake
+branch; and it now ends by naming the next step, `GCFPE-MGMT-10` with `MODE = ANALYZE`, for the
+Product Owner to take, never invoking it itself.
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage
