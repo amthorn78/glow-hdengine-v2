@@ -778,6 +778,14 @@ so its output would have died with the session — drafts are now committed and 
 branch; and it now ends by naming the next step, `GCFPE-MGMT-10` with `MODE = ANALYZE`, for the
 Product Owner to take, never invoking it itself.
 
+**Triage now hands off to `GCFPE-MGMT-10`, 2026-09-22, at the Product Owner's direction.** It emits
+one paste-ready `NEXT_PROMPT_HANDOFF` block per Modification — `MODE = ANALYZE`, the Modification
+id, its file and its intake branch — and never executes it. The MGMT-10 draft's entry contract
+gained the matching sentence: a handoff's subject is a Modification id even in `ANALYZE`, and a
+named branch is where the Modification lives. This gives MGMT-10 an upstream that `closure.py`
+cannot see, because triage sits outside the release and has no graph part; that is by design,
+and the handoff's shape is checked by the MGMT-10 entry contract rather than by the graph.
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage
