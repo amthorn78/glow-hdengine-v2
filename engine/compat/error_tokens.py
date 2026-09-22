@@ -154,7 +154,13 @@ BOUNDARY_REASONS: Dict[str, tuple[str, str, int]] = {
     "chart_incomplete": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
     "chart_invalid": ("ERR_READER_INVALID_CHART", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
     "gates_missing": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
-    "gates_invalid": ("ERR_READER_INVALID_CHART", "ERR_M10_GATES_INVALID", 422),
+    # PF05 §5.2.3: a stored BodyGraph whose Gate array is duplicate, malformed,
+    # noncanonical or outside 1..64 is ERR_M10_BODYGRAPH_INCOMPLETE/503 on the Reader
+    # transport -- the request identities were valid and the server-side chart is
+    # unusable, so 422 would blame the client.  ERR_M10_GATES_INVALID/422 belongs to
+    # the separate internal/CLI Gate-value row, which the application token above
+    # still serves.
+    "gates_invalid": ("ERR_READER_INVALID_CHART", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
     "identity_unresolved": ("ERR_READER_MISSING_PARAM", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
     "identity_invalid": ("ERR_READER_INVALID_CHART", "ERR_READER_INVALID_INPUT", 422),
     "identity_conflict": ("ERR_READER_INVALID_CHART", "ERR_M10_BODYGRAPH_INCOMPLETE", 503),

@@ -176,11 +176,15 @@ def test_row_contract_violations_are_503(monkeypatch):
         (lambda c: c["bodygraph"].pop("profile"), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
         (lambda c: c["bodygraph"].update(gates=[]), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
         (lambda c: c["bodygraph"].pop("gates"), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
-        (lambda c: c["bodygraph"].update(gates=["10", "10"]), "ERR_M10_GATES_INVALID", 422),
-        (lambda c: c["bodygraph"].update(gates=[10, "10"]), "ERR_M10_GATES_INVALID", 422),
-        (lambda c: c["bodygraph"].update(gates=[True]), "ERR_M10_GATES_INVALID", 422),
-        (lambda c: c["bodygraph"].update(gates=["010"]), "ERR_M10_GATES_INVALID", 422),
-        (lambda c: c["bodygraph"].update(gates=[65]), "ERR_M10_GATES_INVALID", 422),
+        # PF05 §5.2.3: every stored-row Gate defect -- duplicate, malformed,
+        # noncanonical or outside 1..64 -- is ERR_M10_BODYGRAPH_INCOMPLETE/503, the
+        # same as the other stored-row defects here. 422 would blame the client for
+        # a chart the server stored.
+        (lambda c: c["bodygraph"].update(gates=["10", "10"]), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+        (lambda c: c["bodygraph"].update(gates=[10, "10"]), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+        (lambda c: c["bodygraph"].update(gates=[True]), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+        (lambda c: c["bodygraph"].update(gates=["010"]), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
+        (lambda c: c["bodygraph"].update(gates=[65]), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
         (lambda c: c.update(person_uid=UUID_C, person={"person_uid": UUID_C}), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
         (lambda c: c["bodygraph"].update(headers={"x": 1}), "ERR_M10_BODYGRAPH_INCOMPLETE", 503),
     ],
