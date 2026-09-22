@@ -309,6 +309,34 @@ def test_core_config_defect_is_admission_config_not_a_blamed_bodygraph(monkeypat
     assert raised.value.reader_status == 503
 
 
+def test_core_config_defect_outranks_a_stale_cache_hit(monkeypatch, bundle, pack):
+    """PF05 §5.2.3 reserves the stale-result token for valid Gate inputs being
+    unavailable for recomputation. A server-side configuration defect must not
+    borrow it merely because a mismatched cache entry happens to be present, so
+    member validity is asked before ``stale_hit``.
+    """
+
+    a = _party(UUID_1, [5, 19, 20, 34, 43, 49])
+    b = _party(UUID_2, [9, 12, 15, 22, 23, 52])
+
+    # Seed a real entry, then force a mismatch so the hit is stale. Both parties
+    # keep valid Gates throughout.
+    cache = _Cache()
+    evaluate_pair(a, b, cache=cache)
+    key = next(iter(cache.store))
+    cache.store[key] = dict(cache.store[key], release_id="f" * 64)
+
+    broken_registry = dataclasses.replace(bundle.registry, magic10_order=())
+    monkeypatch.setattr(
+        compute, "_BUNDLE_PROVIDER", lambda: dataclasses.replace(bundle, registry=broken_registry)
+    )
+
+    with pytest.raises(CompatBoundaryError) as raised:
+        evaluate_pair(a, b, cache=cache)
+    assert raised.value.reason == "admission_config"
+    assert raised.value.token == "ERR_M10_CONFIG_MISMATCH"
+
+
 def test_identity_independent_pair_key_and_cache_value_binds_fingerprints():
     first = evaluate_pair(_party(UUID_1, [1, 8]), _party(UUID_2, [8, 64]), cache=(cache := _Cache()))
     second = evaluate_pair(_party(UUID_3, [1, 8]), _party(UUID_4, [8, 64]), cache=cache)

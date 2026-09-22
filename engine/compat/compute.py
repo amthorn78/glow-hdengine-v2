@@ -345,19 +345,25 @@ def evaluate_pair(
         try:
             core = compute_core(lo.gates, hi.gates, bundle, release_id)
         except ValueError:
-            if stale_hit:
-                raise CompatBoundaryError("stale_result", detail="core") from None
             # ``compute_core`` validates both members before it reads the bundle,
-            # registry or mechanics, so a ValueError that survives member
-            # validation here came from the admitted configuration, not the
-            # charts.  Reporting it as ``gates_invalid`` would blame a stored
-            # BodyGraph -- ERR_M10_BODYGRAPH_INCOMPLETE on the Reader transport --
-            # for a server-side roster, mechanics or identity defect.
+            # registry or mechanics, so member validity is what separates a chart
+            # defect from a configuration one.  It is therefore asked first, and
+            # ahead of ``stale_hit``: PF05 §5.2.3 reserves the stale-result token
+            # for valid Gate inputs being unavailable for recomputation, so a
+            # server-side defect must not borrow it just because a mismatched
+            # cache entry happened to be present.  Reporting either as
+            # ``gates_invalid`` would blame a stored BodyGraph --
+            # ERR_M10_BODYGRAPH_INCOMPLETE on the Reader transport -- for a
+            # roster, mechanics or identity defect.
             try:
                 _validate_member(lo.gates)
                 _validate_member(hi.gates)
             except ValueError:
-                raise CompatBoundaryError("gates_invalid", detail="core") from None
+                # The members themselves are unusable. A mismatched cache entry
+                # is then the reason the cached result could not stand in.
+                raise CompatBoundaryError(
+                    "stale_result" if stale_hit else "gates_invalid", detail="core"
+                ) from None
             raise CompatBoundaryError("admission_config", detail="core") from None
         pure = core.to_payload()
         if pure["pair_key"] != pair_key:
