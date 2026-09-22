@@ -40,7 +40,7 @@ The finding is real and its classification is settled: `HDE-EPIC040-PR04-F01` is
 | Implementation Audit v2.0 | `docs/ephemeral/HDE-EPIC040-implementation-audit-v2.0.md` |
 | Current controlled PF10 | `docs/pfcanon/PF10-HDE-Build-Notes-v13.2.9.md` (read-only) |
 
-Storage pull request for this stage's three artifacts: **PR #459**, branch `claude/nice-mayer-tf9l4c`. **Nathan alone merges.**
+Storage pull request for this stage's three artifacts: **PR #462**, branch `claude/nice-mayer-tf9l4c`. **Nathan alone merges.**
 
 ## What Nathan does next
 
@@ -79,8 +79,8 @@ RS-20 decided REVISION_REQUIRED on 2026-09-22T06:48:06Z, by Isis-50, against
 HDE-EPIC040-PR04-F01-RESCOPE-PROPOSAL v1.0. No PF10 addendum was created and none may be drafted,
 numbered or implied by this invocation.
 Decision artifact: docs/ephemeral/HDE-EPIC040-PR04-F01-rescope-review-v1.0.md in
-amthorn78/glow-hdengine-v2, stored through PR #459 on branch claude/nice-mayer-tf9l4c. Read it
-completely from that branch if #459 has not merged when you run, otherwise from main at the same
+amthorn78/glow-hdengine-v2, stored through PR #462 on branch claude/nice-mayer-tf9l4c. Read it
+completely from that branch if #462 has not merged when you run, otherwise from main at the same
 path. Its §6 carries the exact redlines, §2 the independent verification, §4 the proof that the
 submitted delta is incomplete, §5 the confirmation of candidate D, §7 the PR05 answer, §9 the
 evidence against each excluded decision, §10 the carried register and §11 the unresolved facts.
@@ -219,7 +219,7 @@ Plan, restart IA-30 or IA-40, edit PF10, allocate a PF10 number, claim canonical
 addendum, merge, enable auto-merge, or invoke or route to PR-50 — PR-50 is Nathan-only and merge is
 a Product Owner action. Repository paths outside docs/ephemeral/ and docs/graph/ are not written;
 docs/pfcanon/ is read-only. Google Drive is not a source, store or authority for this work.
-Manual prerequisites: none beyond the operator selecting the RS-10 proposal author session. PR #459
+Manual prerequisites: none beyond the operator selecting the RS-10 proposal author session. PR #462
 is open and unmerged; the RS-20 decision is readable on branch claude/nice-mayer-tf9l4c either way.
 
 === GCFPE_PROMPT_USES (carried) ===
