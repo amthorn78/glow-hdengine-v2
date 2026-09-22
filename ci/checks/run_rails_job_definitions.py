@@ -7,7 +7,10 @@ shape.  When that step exits with exactly that code, the runner accepts the
 outcome only after its own independent read-only admission probe observes the
 ``INCOMPLETE_RELEASE_ROSTER`` refusal; every remaining step and job still runs,
 the run ends with ``RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED`` and exits with
-the same distinct code (never 0).  Any other non-zero exit fails as before.
+the same distinct code (never 0).  Any other non-zero exit fails as before, and a
+failing step that merely happens to exit with that same code -- pytest uses it for
+an internal error -- is remapped so the distinct code can only ever mean the
+accepted outcome for a caller that checks the number.
 The acceptance is self-extinguishing: once the complete roster is admitted the
 probe returns a bundle and a non-zero step exit is an ordinary failure.
 """
@@ -29,6 +32,10 @@ REQUIRED_IDENTITIES = {"rails_closed_refusal", "rails_open_conformance", "logs_k
 # Distinct non-admitted exit code; tests pin it equal to
 # tools.evidence.run_sanity_pipeline.RELEASE_NOT_ADMITTED_EXIT_CODE.
 RELEASE_NOT_ADMITTED_EXIT_CODE = 3
+# Callers accept exit 3 on the number alone, so a failure that did not establish
+# the accepted outcome must never leave through that code.  pytest, for one, uses
+# exit 3 for an internal error.
+UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE = 1
 RELEASE_NOT_ADMITTED_REFUSAL_CODE = "INCOMPLETE_RELEASE_ROSTER"
 ACCEPTED_RELEASE_NOT_ADMITTED_KEY = "accepted_release_not_admitted_exit_code"
 RELEASE_NOT_ADMITTED_MARKER = "RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED"
@@ -277,6 +284,11 @@ def run_job(job: dict[str, Any], *, outcomes: list[str] | None = None) -> int:
     while the independent probe observes the non-admitted state is accepted: the
     remaining steps still run, and ``RELEASE_NOT_ADMITTED`` is appended to
     ``outcomes`` so the caller can end with the distinct code instead of 0.
+
+    Any other failing step that happens to exit with that same code is remapped to
+    ``UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE``, so a returned
+    ``RELEASE_NOT_ADMITTED_EXIT_CODE`` always means the accepted outcome and never an
+    ordinary failure that merely shares the number.
     """
 
     env = dict(os.environ)
@@ -306,6 +318,20 @@ def run_job(job: dict[str, Any], *, outcomes: list[str] | None = None) -> int:
             if outcomes is not None:
                 outcomes.append("RELEASE_NOT_ADMITTED")
             continue
+        if result.returncode == RELEASE_NOT_ADMITTED_EXIT_CODE:
+            # This step did not establish the accepted non-admitted outcome, so it must
+            # not be able to exit with the code that means exactly that.  Returning it
+            # raw would let an ordinary internal failure be read as RELEASE_NOT_ADMITTED
+            # by a caller that checks the number and an independent admission probe --
+            # and that probe succeeds for the whole pre-admission period.
+            print(
+                f"UNACCEPTED_EXIT_{RELEASE_NOT_ADMITTED_EXIT_CODE} {job['name']}: "
+                f"remapped to {UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE}; this is an "
+                f"ordinary failure, not RELEASE_NOT_ADMITTED: {cmd}",
+                file=sys.stderr,
+                flush=True,
+            )
+            return UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE
         return result.returncode
     return 0
 

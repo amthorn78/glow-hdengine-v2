@@ -1631,19 +1631,26 @@ def test_runner_accepts_declared_non_admitted_exit_only_with_the_observed_state(
         captured = capsys.readouterr().out
         assert "ACCEPTED rails_open_conformance: RELEASE_NOT_ADMITTED (exit 3; INCOMPLETE_RELEASE_ROSTER observed)" in captured
 
-        # Without the observed non-admitted state the same exit is an ordinary failure.
+        # Without the observed non-admitted state the same exit is an ordinary failure,
+        # and must not be returned as the distinct accepted code: the caller accepts that
+        # code on the number plus its own probe, which succeeds all through pre-admission.
         out.write_text("", encoding="utf-8")
         monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: False)
         outcomes = []
-        assert runner.run_job(job, outcomes=outcomes) == 3
+        rc = runner.run_job(job, outcomes=outcomes)
+        assert rc == runner.UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE
+        assert rc != runner.RELEASE_NOT_ADMITTED_EXIT_CODE
         assert outcomes == []
         assert out.read_text(encoding="utf-8").splitlines() == ["first"]
 
-        # An undeclared step exiting 3 is never accepted, even with the observed state.
+        # An undeclared step exiting 3 is never accepted, even with the observed state,
+        # and is likewise remapped off the distinct code.
         undeclared = tmp_path / "undeclared.yml"
         _write_def(undeclared, "rails_open_conformance", "0", "1", f"{sys.executable} {probe} {out} first 3")
         monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: True)
-        assert runner.run_job(runner.validate(undeclared)) == 3
+        rc = runner.run_job(runner.validate(undeclared))
+        assert rc == runner.UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE
+        assert rc != runner.RELEASE_NOT_ADMITTED_EXIT_CODE
     finally:
         runner.ALLOWED_ARGV = old
 
@@ -1669,6 +1676,51 @@ def test_runner_main_ends_with_the_distinct_code_and_marker_after_running_every_
         assert lines[-1] == "RAILS_JOB_DEFINITIONS:RELEASE_NOT_ADMITTED"
         assert "RAILS_JOB_DEFINITIONS_OK" not in lines
         assert out.read_text(encoding="utf-8").splitlines() == ["closed", "open", "logs"]
+    finally:
+        runner.ALLOWED_ARGV = old
+
+
+def test_runner_main_never_reports_an_undeclared_internal_failure_as_release_not_admitted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """An undeclared step exiting 3 must not reach the caller as the accepted outcome.
+
+    pytest uses exit 3 for an internal error, and the CI rails lane accepts exit 3
+    after its own admission probe -- a probe that succeeds for the whole
+    pre-admission period. So an internal failure in a rails pytest command must not
+    be able to exit 3 or print the marker, or the lane would read it as
+    non-admission and report success.
+    """
+
+    probe = tmp_path / "probe.py"
+    out = tmp_path / "out.txt"
+    probe.write_text(
+        "import sys,pathlib\npathlib.Path(sys.argv[1]).open('a').write(sys.argv[2]+'\\n')\nraise SystemExit(int(sys.argv[3]))\n",
+        encoding="utf-8",
+    )
+    a, b, c = tmp_path / "a.yml", tmp_path / "b.yml", tmp_path / "c.yml"
+    _write_def(a, "rails_closed_refusal", "1", "0", f"{sys.executable} {probe} {out} closed 0", "reusable-closed")
+    # Undeclared: no accepted_release_not_admitted_exit_code, yet it exits 3.
+    _write_def(b, "rails_open_conformance", "0", "1", f"{sys.executable} {probe} {out} open 3")
+    _write_def(c, "logs_keys_only_redaction", "1", "0", f"{sys.executable} {probe} {out} logs 0", "reusable-logs")
+    old = runner.ALLOWED_ARGV
+    try:
+        runner.ALLOWED_ARGV = {
+            "rails_closed_refusal": (("python", str(probe), str(out), "closed", "0"),),
+            "rails_open_conformance": (("python", str(probe), str(out), "open", "3"),),
+            "logs_keys_only_redaction": (("python", str(probe), str(out), "logs", "0"),),
+        }
+        # The admission probe observes the non-admitted state, exactly as it does
+        # throughout pre-admission -- so only the exit code separates the two cases.
+        monkeypatch.setattr(runner, "release_not_admitted_observed", lambda: True)
+        rc = runner.main([str(a), str(b), str(c)])
+        assert rc == runner.UNDECLARED_RELEASE_NOT_ADMITTED_EXIT_CODE
+        assert rc != runner.RELEASE_NOT_ADMITTED_EXIT_CODE
+        assert rc != 0
+        captured = capsys.readouterr()
+        assert runner.RELEASE_NOT_ADMITTED_MARKER not in captured.out
+        assert "RAILS_JOB_DEFINITIONS_OK" not in captured.out
+        assert "UNACCEPTED_EXIT_3 rails_open_conformance" in captured.err
     finally:
         runner.ALLOWED_ARGV = old
 
@@ -1778,17 +1830,20 @@ def test_runner_rejects_invalid_definitions(tmp_path: Path, mutate, expected: st
 
 
 def test_runner_rejects_duplicate_and_stops_on_failure(tmp_path: Path) -> None:
+    # An ordinary failure code, deliberately not RELEASE_NOT_ADMITTED_EXIT_CODE: this
+    # test is about duplicate identity and stopping on failure, while the reserved
+    # code's semantics are covered by the accepted-outcome tests above.
     a, b = tmp_path / "a.yml", tmp_path / "b.yml"
-    _write_def(a, "rails_closed_refusal", "1", "0", f"{sys.executable} -c 'raise SystemExit(3)'", "reusable-closed")
+    _write_def(a, "rails_closed_refusal", "1", "0", f"{sys.executable} -c 'raise SystemExit(4)'", "reusable-closed")
     _write_def(b, "rails_closed_refusal", "1", "0", f"{sys.executable} -c 'print(1)'", "reusable-closed")
     old = runner.ALLOWED_ARGV
     try:
-        runner.ALLOWED_ARGV = {"rails_closed_refusal": (("python", "-c", "raise SystemExit(3)"), ("python", "-c", "print(1)"))}
+        runner.ALLOWED_ARGV = {"rails_closed_refusal": (("python", "-c", "raise SystemExit(4)"), ("python", "-c", "print(1)"))}
         assert runner.main([str(a), str(b)]) == 2
         c, d = tmp_path / "c.yml", tmp_path / "d.yml"
-        _write_def(c, "rails_closed_refusal", "1", "0", f"{sys.executable} -c 'raise SystemExit(3)'", "reusable-closed")
+        _write_def(c, "rails_closed_refusal", "1", "0", f"{sys.executable} -c 'raise SystemExit(4)'", "reusable-closed")
         _write_def(d, "rails_open_conformance", "0", "1", f"{sys.executable} -c 'print(1)'")
-        assert runner.run_job(runner.validate(c)) == 3
+        assert runner.run_job(runner.validate(c)) == 4
     finally:
         runner.ALLOWED_ARGV = old
 
