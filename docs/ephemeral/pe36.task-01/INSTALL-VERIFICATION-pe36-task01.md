@@ -57,7 +57,7 @@ the three extracted-tree digests, **void for any other bytes**. No findings. Evi
 The reviewer contradicted none of the eight published measurements, and independently ran the
 `Q2` sweep this round had deferred.
 
-## Observation 1 — the asymmetric safe default. **Open, and it is Nathan's call.**
+## Observation 1 — the asymmetric safe default. **Deferred by the Product Owner as `AF-005`.**
 
 `A session that cannot tell which kind it is treats itself as executing.` fully prevents a
 wrongful Notion write. It does not, by itself, prevent a maintenance session that misclassifies
@@ -72,16 +72,23 @@ the trigger surface:
 > …and if the Consult step found a Notion surface that already names your item, that surface is a
 > destination rule and the record belongs there too.
 
-**PE36's recommendation: do not take it now; carry it.** Any byte change voids a clean
-`SKILL_FIT_CONFIRMED` and costs a full independent review round for one clause that hardens a gap
-already closed elsewhere in the same skill. `skill-packaging-and-delivery.md` is explicit:
+**Product Owner, 2026-09-22:** *"we're not doing that now, add it to alpha feedback for later
+review."* Recorded as **`AF-005`** on **GCFPE Alpha Feedback — Deferred Items — 091426.1**
+(`3df4590a05eb8111a6a5f67cb82f96f6`), written and read back 2026-09-22T07:40:38Z. The entry
+carries the clause verbatim, the trigger, what closing it involves, and what must not be mistaken
+for closing it.
+
+PE36 recommended carrying rather than taking it, and the reasoning stands: any byte change voids a
+clean `SKILL_FIT_CONFIRMED` and costs a full independent review round for one clause that hardens
+a gap already closed elsewhere in the same skill. `skill-packaging-and-delivery.md` is explicit:
 *"batch small corrections into one change rather than shipping them one at a time. Three separate
 one-line fixes cost three independent reviews; one change carrying all three costs one."*
 
-This is **not** parked as "non-blocking" (`DISP-001`). It is a named item with recorded text, a
-recommendation, and a trigger: **apply it in the next change that touches
-`glow-workspace-currency` for any other reason.** If no such change arrives, it stays as recorded
-here and in the succession record, and costs nothing.
+This is **not** parked as "non-blocking" (`DISP-001`). The Alpha Feedback page's own standing
+rule is that *"an item earns a place here only when the Product Owner has explicitly deferred
+it"* — which is exactly what happened. It is a named item with recorded text, an explicit
+deferral, and a trigger: **apply it in the next change that touches `glow-workspace-currency` for
+any other reason.** If no such change arrives, it stays as recorded and costs nothing.
 
 ## Observation 2 — the provenance nit. **Confirmed, and resolved here.**
 
@@ -114,6 +121,25 @@ installed skills, which nobody has asked for.
 - The three skills are installed, verified by digest, and their revised behaviour is live.
 - `notion-write-boundary.md`'s conflicts table is updated from *awaiting review* to installed.
 - `D19` is recorded, with its consequence in `skill-identity-and-freeze.md`.
-- No Notion write was made at any point in this task, by PE36 or by the reviewer. Searched again
-  after the install: no Notion page records this task's state, so nothing there went stale. The
-  policy's own routing table sends verdicts to `docs/ephemeral/`, and that is where they went.
+- **One Notion write was made, and it is the only one in this task.** `AF-005` was added to the
+  Alpha Feedback list on the Product Owner's explicit instruction, to a surface that already
+  carries an established destination rule for deferred items — both forms of authorization the
+  policy recognises. Everything else in Task 01 went to `docs/ephemeral/`, which is where the
+  policy's own routing table sends verdicts and run artifacts. The verdict, the report, the diff
+  and this record were never candidates for Notion.
+- The write was read back in full before being claimed: `AF-005` present with all five sections,
+  both fenced blocks intact, `AF-001`–`AF-004` and the page's own *Source records* table
+  untouched. One cosmetic Markdown round-trip artifact is present and is **deliberately not
+  chased** — see below.
+
+## A round-trip artifact, left alone on purpose
+
+On readback, one `AF-005` bullet returned as `- **A passing ****\`quick_validate\`****.**` —
+inline code inside a bold run, which Notion re-serialises with extra asterisks. It renders
+correctly and the substance is intact.
+
+`references/notion-operations.md` says to compare on substance rather than byte equality and
+**not** to chase cosmetic asterisk drift with follow-up edits, because each edit is another chance
+to damage the page. So it is recorded here rather than corrected. The same file's other advice —
+keep inline code adjacent to, not inside, a bold run — is what would have avoided it, and is worth
+remembering when writing the next entry.
