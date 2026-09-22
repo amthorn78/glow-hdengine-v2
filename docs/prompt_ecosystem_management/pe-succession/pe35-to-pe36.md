@@ -39,6 +39,16 @@ open a round because rounds are what the predecessor did. **Do not open a repair
 defect that someone can name.** The deferred items below are deferred *by the Product Owner*, with
 owners; they are not a backlog to burn down on your own initiative.
 
+### You have one authorized task, and it is named
+
+> **Correction, 2026-09-22.** This record originally said the queue was empty by design. That was
+> true when it was written and stopped being true the same day: the Product Owner authorized the
+> skill revision round that item 1 below had recorded as needing authorization.
+
+**`docs/ephemeral/pe36.task-01/TASK-01-skill-write-boundary-revision.md` is your first task.** It
+is authorized, scoped, and has a definition of done. Start there rather than asking what the work
+is. Everything else in "Open — carried" remains deferred with its existing owner.
+
 ## Where the work stands
 
 | | |
@@ -56,8 +66,8 @@ touch it.
 ## Open — carried, with owners
 
 1. **Three skills contradict the Notion write-boundary policy** (`notion-write-boundary.md`, PO
-   2026-09-22). Identified and deliberately **not modified**, per the instruction that created the
-   policy. `glow-workspace-currency` is the serious one: *"close every task by writing any state
+   2026-09-22). **Now authorized as PE36's Task 01** — see the brief above. Identified by PE35 and
+   deliberately **not modified** then, per the instruction that created the policy. `glow-workspace-currency` is the serious one: *"close every task by writing any state
    change back to Notion"* makes a Notion write the default close-out of every task, and its
    description is permanently in context. `glow-artifact-storage` and `glow-write-boundary` carry
    milder versions. **The documentation now says the right thing and the skills still say the old
@@ -160,11 +170,14 @@ checked it.** The measurement was always cheap.
    `3e943ad` or later and that nothing is open that you did not open.
 2. **Read the three policies before touching anything** — corpus, prompt-body content, Notion write
    boundary. Two of them exist because a predecessor got the rule wrong.
-3. **Do not start a repair round.** Ask the Product Owner what the work is. The campaign is over and
-   the queue is empty by design.
-4. **When work arrives, find out what already exists first** — search both Notion and the
-   repository before writing anything. Most defects in this ecosystem's history were a second copy
-   of something that already existed.
+3. **Read `docs/ephemeral/pe36.task-01/TASK-01-skill-write-boundary-revision.md` and do it.**
+   It is your authorized first task. Read the three skills yourself before trusting the brief's
+   quotations of them — PE35 quoted them from the installed tree, but a brief is not the artifact.
+4. **Find out what already exists before writing anything** — search both Notion and the
+   repository. Most defects in this ecosystem's history were a second copy of something that
+   already existed.
+5. **After Task 01, do not invent the next one.** Ask. The campaign is over; the deferred items
+   have owners and are not yours to start unbidden.
 
 ## How to work
 
