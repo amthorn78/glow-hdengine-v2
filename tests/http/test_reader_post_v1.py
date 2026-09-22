@@ -1,6 +1,7 @@
 """PF05 §5.1.0 / §5.3 production Reader POST and the dev GET fixture route (HDE-EPIC040-PR04)."""
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 
@@ -108,6 +109,29 @@ def test_missing_version_is_the_existing_version_error(db):
 )
 def test_invalid_input_is_422_no_store_and_performs_no_lookup(db, raw):
     _assert_error(_post(_client(), raw=raw), "ERR_READER_INVALID_INPUT", 422, db)
+
+
+def test_body_without_content_length_is_bounded_before_buffering(db):
+    """A chunked / Content-Length-less body must not be buffered past the limit.
+
+    Without Content-Length the preliminary size check cannot fire, so the read
+    itself is what bounds memory: this production route must never buffer an
+    unbounded unauthenticated stream.
+    """
+
+    oversized = (
+        b'{"a_id":"' + UUID_A.encode() + b'","b_id":"' + UUID_B.encode()
+        + b'","pad":"' + b"x" * 5_000_000 + b'"}'
+    )
+    stream = io.BytesIO(oversized)
+    resp = _client().post(
+        "/reader?v=1",
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        environ_overrides={"wsgi.input": stream, "wsgi.input_terminated": True, "CONTENT_LENGTH": ""},
+    )
+    _assert_error(resp, "ERR_READER_INVALID_INPUT", 422, db)
+    assert stream.tell() <= http_reader._READER_MAX_BODY_BYTES + 1
+    assert stream.tell() < len(oversized)
 
 
 def test_alias_bridge_is_unreachable_from_the_public_reader(db, monkeypatch):

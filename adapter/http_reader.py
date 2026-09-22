@@ -404,7 +404,11 @@ def _parse_reader_post_body() -> tuple[str, str]:
     content_length = request.content_length
     if content_length is not None and content_length > _READER_MAX_BODY_BYTES:
         raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
-    raw = request.get_data(cache=False)
+    # Bound the read itself. A chunked request, or any request that omits
+    # Content-Length, skips the check above; buffering the whole body first would
+    # let an unauthenticated client consume unbounded worker memory on this
+    # production route. One byte past the limit still makes oversize detectable.
+    raw = request.stream.read(_READER_MAX_BODY_BYTES + 1)
     if not raw or len(raw) > _READER_MAX_BODY_BYTES:
         raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
     try:

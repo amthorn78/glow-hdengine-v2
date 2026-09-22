@@ -63,6 +63,9 @@ def test_pr05_binding_passes_when_index_and_mirror_include_pr05_artifacts(admitt
     mirror_rows = "\n".join(json.dumps({"artifact_key": key}, separators=(",", ":"), sort_keys=True) for key in mod.PR05_ARTIFACT_KEYS) + "\n"
     _write(test_root / "artifacts" / "evidence_index.jsonl", mirror_rows)
 
+    # The generator renders compare lines relative to its own ROOT; the test root is
+    # outside the repository, so ROOT must move with the other path constants.
+    monkeypatch.setattr(mod, "ROOT", test_root)
     monkeypatch.setattr(mod, "OUT_DIR", out_dir)
     monkeypatch.setattr(mod, "CHANNELS_PATH", test_root / "catalog" / "channels_v1.json")
     monkeypatch.setattr(mod, "COMPAT_AB_PATH", test_root / "artifacts" / "compat" / "AB.json")
@@ -109,6 +112,9 @@ def test_pr05_binding_fails_when_canonical_compare_fails(admitted, monkeypatch, 
     mirror_rows = "\n".join(json.dumps({"artifact_key": key}, separators=(",", ":"), sort_keys=True) for key in mod.PR05_ARTIFACT_KEYS) + "\n"
     _write(test_root / "artifacts" / "evidence_index.jsonl", mirror_rows)
 
+    # The generator renders compare lines relative to its own ROOT; the test root is
+    # outside the repository, so ROOT must move with the other path constants.
+    monkeypatch.setattr(mod, "ROOT", test_root)
     monkeypatch.setattr(mod, "OUT_DIR", out_dir)
     monkeypatch.setattr(mod, "CHANNELS_PATH", test_root / "catalog" / "channels_v1.json")
     monkeypatch.setattr(mod, "COMPAT_AB_PATH", test_root / "artifacts" / "compat" / "AB.json")

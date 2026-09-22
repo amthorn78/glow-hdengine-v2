@@ -1,10 +1,15 @@
 import json
 from adapter.wsgi import create_app
+from tests.support.pr04_fixtures import build_bundle, build_pack, inject_seams
 
 ALLOW_KEYS = {"at","route","status","duration_ms","idempotence_hash","release_id"}
 
-def test_keys_only_log_and_redactions_and_echo_cid(monkeypatch):
-    monkeypatch.setenv("APP_ENV", "dev")
+def test_keys_only_log_and_redactions_and_echo_cid(monkeypatch, tmp_path):
+    # The fixture reader route serves an eligible pair only against an admitted
+    # release; inject the synthetic complete release through the same seam every
+    # positive PR04 test uses. The subject here is the keys-only log line and the
+    # header redactions, not admission.
+    inject_seams(monkeypatch, build_bundle(tmp_path), build_pack(tmp_path))
     app = create_app()
     sink = []
     app.config["LOG_SINK"] = sink
