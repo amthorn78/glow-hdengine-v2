@@ -447,7 +447,7 @@ def _reader_current_rows(ids: tuple[str, ...]) -> dict[str, object]:
 def get_reader_bp(emit_fn=None):
     """
     Factory: returns a Blueprint exposing /reader (to be mounted under /api).
-    emit_fn(a,b,engine_tag,invocation_tag,release_id) -> bytes
+    emit_fn(a, b, *, engine_tag, invocation_tag, release_id, eligible, harmony_band) -> bytes
     """
     if emit_fn is None:
         emit_fn = emit_reader_public_bytes

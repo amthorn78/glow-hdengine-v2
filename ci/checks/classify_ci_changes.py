@@ -279,6 +279,7 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/http/test_endpoint_catalog.py",
     "tests/http/test_reader_a7_transport.py",
     "tests/http/test_reader_post_v1.py",
+    "tests/runtime/test_emit_public_legacy_helper.py",
     "tests/runtime/test_identity.py",
     "tests/transport/test_aux_narrative.py",
     "tests/transport/test_internal_version_contract.py",
@@ -410,6 +411,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/runtime/test_identity.py",
         "tests/http/test_reader_post_v1.py",
     ),
+    "engine/emit_public.py": ("tests/runtime/test_emit_public_legacy_helper.py",),
     "engine/config/__init__.py": (
         "tests/config/test_typed_bundles.py",
         "tests/cli/test_cli_install_help.py",
