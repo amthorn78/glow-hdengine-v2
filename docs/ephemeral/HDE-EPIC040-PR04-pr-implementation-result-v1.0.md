@@ -258,6 +258,27 @@ Manifest consequence: `adapter/http_reader.py` changed, so `catalog/manifest.jso
 
 Validation at the corrective head: CI changed-tests step reproduced → **2402 passed** (96 targets, up from 95 for the new owner suite), `git diff --exit-code` 0, tree clean; roster **1916 passed, 3 skipped**; five pre-existing failures unchanged; reader/compat/transport 137 passed; release-lane regression 63 passed; sanity gate 3; rails runner 3; every read-only evidence check 0.
 
+### 8.7 The one CI failure this phase caused, and the validation gap behind it
+
+CI run 35763461703 (`ci.yml` #3601, head `caec701`) failed the **rails policy and secret-safety lane**. Changed-tests, product, compat and db had passed; evidence, qa and release were skipped in consequence.
+
+Cause: `tests/evidence/test_rails_ci_workflow_integration.py::test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication` asserts the exact tuple `changed_test_targets()` returns for `adapter/http_reader.py`. Registering `tests/runtime/test_emit_public_legacy_helper.py` as a consumer (§8.6) legitimately adds one entry to that tuple. Fixed by pinning the new owner in its sorted position; the guard keeps its decisive meaning — it still pins the exact tuple, and its companion assertion that the new owner is not already fixed-lane covered was passing and is unchanged.
+
+**The validation gap is the part worth recording.** That module is not one of the classifier's changed-test targets — it is the rails lane's own final command — so the changed-tests reproduction never executed it. After the final classifier edit this phase re-ran the changed-test targets and the ownership suites, but not each lane's own commands, and pushed on that basis. Every lane is now reproduced directly before a push, not only the changed-test set:
+
+| Lane | Reproduced at `e355bba42dbd462035260a02c07bf2b4da9d49ab` |
+| --- | --- |
+| changed-tests (96 targets, detached worktree) | 2402 passed; `git diff --exit-code` 0; tree clean |
+| product | `generate_ordering_artifacts.py --check` 0; 20 passed |
+| compat | `check_cli_help.sh`, `serializer_grep_guard.py`, `emitter_symbol_proof.py` all 0; 70 passed, 3 skipped, 2 xfailed |
+| db | `check_direct_db_contract.py` 0; 249 passed |
+| rails | runner exit 3 with the marker; 133 passed |
+| evidence | all seven read-only checks 0; 111 passed |
+| qa (isolated worktree) | 488 passed; diff 0; tree clean |
+| release | `git diff` 0; `release_id_recompute.py --check-manifest-only` 0; 63 passed; attestation receipt `{"code":"release_not_admitted","stage":"closure_write_and_check","returncode":3,"secret_values_recorded":false}` |
+
+No test was skipped, disabled, quarantined or weakened to reach this, and no governed artifact changed for the guard fix.
+
 ## 9. Limitations
 
 - No admitted release exists: every live gate ends `RELEASE_NOT_ADMITTED`; the frozen families keep capture-time bytes with nonclaims; PR06 owns convergence and the reverse (NOT_ADMITTED → PASS) transition of the sanity log, which needs the owner's canonical run plus the updater exactly as performed here (O-07).
