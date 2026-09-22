@@ -86,6 +86,8 @@ The four rows below were found by hosted CI on the PR-30 candidate and repaired 
 
 | P-26 | not in plan (Codex P2 on `d7478be`, `adapter/http_reader.py:367`) | The admission classifier this PR introduced matched the substrings `MANIFEST`, `ROSTER`, `RELEASE` and `SOURCE`; the last two over-capture. `SOURCE` catches `MECHANICS_SOURCE_MISMATCH`, `INVALID_JSON_SOURCE`, `SOURCE_CHANGED`, `SOURCE_READ_FAILED`, `UNBOUND_SOURCE` and `UNSAFE_SOURCE_PATH`; a bare `ROSTER` catches `CHANNEL_ID_ROSTER_MISMATCH`, `FROZEN_CHANNEL_CENTER_ROSTER_MISMATCH` and `PROFILE_ROSTER_MISMATCH`. None of those nine concern the manifest — PF05 §5.2.3 assigns source-hash and config disagreement to `ERR_M10_CONFIG_MISMATCH` — yet all were reported as `ERR_M10_MANIFEST_MISMATCH`. The logic was also **duplicated verbatim** in `engine/http/compat_handler.py::_admission_token`, so `/api/compat/v1` misreported identically | The markers are now `MANIFEST` and `RELEASE`. Every genuine release-roster code carries `RELEASE` (`ADMITTED_RELEASE_ROSTER_INVALID`, `INCOMPLETE_RELEASE_ROSTER`, `RELEASE_ROSTER_MISMATCH`, `RELEASE_TIMESTAMP_MISMATCH`, `RELEASE_VERSION_MISMATCH`), so dropping the bare `ROSTER` marker loses none and the F01 posture is unchanged. The duplicated logic now lives once in the governed token module as `admission_token_for()`. Both classes carry 503, so the defect was a wrong governed token rather than a wrong status — which is why tests now pin all 16 manifest codes, 13 config codes, their disjointness, the unknown-code default and the shared 503. See §8.10 |
 
+| P-27 | not in plan (Codex P2 on `e6f51ac`, `engine/compat/compute.py:349`) — **a gap in P-25, this session's own fix** | P-25 introduced member re-validation as the discriminator between a chart defect and a configuration one, but left the pre-existing `stale_hit` check *ahead* of it. So the same server-side configuration defect that P-25 correctly reports as `ERR_M10_CONFIG_MISMATCH` was still reported as `ERR_M10_STALE_RESULT` whenever a mismatched cache entry happened to be present — with both parties' Gates valid throughout. PF05 §5.2.3 reserves the stale-result token for valid Gate inputs being unavailable for recomputation, so a configuration defect must not borrow it | Member validity is asked first, and only the invalid-member branch consults `stale_hit`. That branch is preserved exactly — a forged mask still yields `stale_result` with a stale hit and `gates_invalid` without one, which the existing test continues to assert. A new test pins the case Codex named: valid Gates, a genuinely stale cache entry and a registry the core rejects now yield `admission_config`. `engine/compat/compute.py` is not a `catalog/manifest.json` member, so no re-cut was needed; the manifest, canonical gate and Index/Mirror all re-check clean |
+
 
 ## 5. F01 overlay implemented (PF10 §2.15; plan §6.7, §8.7)
 
@@ -440,13 +442,13 @@ Historical pre-merge evidence for PR #467 at the remote head this records commit
 | Approved implementation scope complete | Yes — plan v1.2 under the original Proceed; no scope added or dropped |
 | Required local checks pass on the candidate | Yes — §8.1, §8.4, §8.5, §8.8, §8.9, §8.10; the CI changed-tests step reproduced verbatim in a detached worktree at **2407 passed**, `git diff` clean, tree clean |
 | Commits pushed; PR reflects the exact remote head | Yes — read back with `git ls-remote` after each push |
-| Code review findings and threads resolved on the current head | Yes — all twelve findings verified against primary sources and dispositioned; seven resolved, **four left open by design** for their named owners (O-12 packaging, O-19/F07, O-20 and O-21 capture generators), one carried in place (O-16) |
+| Code review findings and threads resolved on the current head | Yes — all thirteen findings verified against primary sources and dispositioned; eight resolved, **four left open by design** for their named owners (O-12 packaging, O-19/F07, O-20 and O-21 capture generators), one carried in place (O-16) |
 | Required CI passes on the current candidate | Yes — see below |
 | No unresolved material rescope, dependency or repository-state conflict | Yes — no `RESCOPE_REQUEST` was issued; all three deferrals (F03, F05, F07) are Product Owner decisions |
 | Result and handoff artifacts saved and read back | Yes — this record, the ledger, the checkpoint and the three deferral-decision files (F03, F05, F07) |
 | Current-head **security** review | **No — see the limitation below.** The one stated exception |
 
-### Review findings, all twelve dispositioned
+### Review findings, all thirteen dispositioned
 
 | # | Finding | Disposition |
 | --- | --- | --- |
@@ -463,6 +465,7 @@ Historical pre-merge evidence for PR #467 at the remote head this records commit
 | P2 | F07 — dev conjunction evidence capture unrunnable, two tests failing | **Deferred to PR07 by Product Owner decision**; F07 record, O-19; thread left open |
 | P2 | O-20 — capture generators still parse the retired `compat.meta` shape | Verified; unreachable and unprovable under F01; carried to the capture-generator owner / PR06; thread left open |
 | P2 | Admission classifier put source and registry-roster codes in the manifest class | Fixed, `5d29bb8` (§4 P-26, §8.10); resolved |
+| P2 | Core config failures classified behind a stale-cache hit — a gap in P-25 | Fixed, at the head below (§4 P-27); resolved |
 | P2 | O-21 — canonical parity harness aborts on its own birth-only inputs | Verified; cannot complete under F01 and its outputs are governed; carried with O-20 to PR06; thread left open |
 | P2 | O-12 — admission roster not shipped with installed packages | Pre-existing, outside this diff, unreachable in the shapes in use; **thread deliberately left open** for the packaging owner |
 
@@ -470,7 +473,7 @@ Four of the findings exposed defects in the approved plan itself, all recorded r
 
 ### CI on the current head
 
-The last head verified before this records commit, `c0cd4e06e1d5bddd8169e47d5ed17334282f7a05`, carries `ci.yml` run **35774815350** at conclusion **`success`**: all seven lanes `_OUTCOME: success`, final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, including the changed-tests step and the accepted `RAILS_LANE:RELEASE_NOT_ADMITTED` and `RELEASE_LANE:RELEASE_NOT_ADMITTED` outcomes. This records commit carries no code change — it differs from `c0cd4e0` only in this file and the ledger — and its own run is verified after the push and recorded verbatim in the PR #467 body and in the ledger, by the same convention as the rest of this record.
+The last head verified before this records commit, `e6f51ac44bd521412110101ecdb9c1f3b0803631`, carries `ci.yml` run **35776200017** at conclusion **`success`** (and `c0cd4e0` before it, run 35774815350, likewise): all seven lanes `_OUTCOME: success`, final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, including the changed-tests step and the accepted `RAILS_LANE:RELEASE_NOT_ADMITTED` and `RELEASE_LANE:RELEASE_NOT_ADMITTED` outcomes. This records commit carries no code change — it differs from `c0cd4e0` only in this file and the ledger — and its own run is verified after the push and recorded verbatim in the PR #467 body and in the ledger, by the same convention as the rest of this record.
 
 Two runs in this phase failed and both were this session's own defects, fixed rather than explained away:
 
