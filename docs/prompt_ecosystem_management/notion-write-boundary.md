@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_POLICY
-artifact_version: "1.1"
+artifact_version: "1.2"
 created_date: 2026-09-22
 status: BINDING
 authority: Product Owner, 2026-09-22 — "Policy Update — Notion Storage and Write Boundaries"
@@ -134,20 +134,26 @@ maintenance surfaces that already name it. Neither one may borrow the other's au
 Per the Product Owner's direction, prompts and skills were **not** modified by this amendment.
 The three below conflicted with it and were recorded for separate later review.
 
-**All three are now revised.** The Product Owner authorized the revision round on 2026-09-22 and
-it was executed as PE36's Task 01 — `docs/ephemeral/pe36.task-01/`, report
-`REPORT-pe36-task01.md`, diff `pe36-task01.diff`. The packages are built and **await independent
-§10 review; none is installed.** Until Nathan installs them the installed skills still carry the
-conflicting language, so the *why it conflicts* column still describes live behaviour.
+**All three are revised, independently reviewed, installed and verified — these conflicts are
+closed.** The Product Owner authorized the revision round on 2026-09-22 and it was executed as
+PE36's Task 01 (`docs/ephemeral/pe36.task-01/`). Independent §10 review returned
+**`SKILL_FIT_CONFIRMED` for all three with no findings**
+(`SECTION-10-REVIEW-pe36-task01.md`), Nathan installed them, and each installed tree was measured
+against the digest the verdict named (`INSTALL-VERIFICATION-pe36-task01.md`). `change-flow` and
+`flowmaster-validate` were proved unchanged in the same pass.
+
+**The *why it conflicts* column below is history, not live behaviour.** It records what the
+installed skills said before 2026-09-22 and is preserved as written.
 
 | artifact | the conflicting language | why it conflicts | disposition |
 |---|---|---|---|
-| **`glow-workspace-currency`** (skill) | *"close every task by writing any state change back to Notion and reading it back before reporting it"* · *"Any state change goes to Notion in the session that produced it"* | States a Notion write as the **default close-out of every task**, which is the exact inference this policy forbids. Its description is always in context, so it applies to every session including development-flow ones. **Highest priority.** | **Revised, awaiting review.** Destination scoped by session kind, converging on `session-working-rules.md`'s wording; the obligation to record and to read back is unchanged, and the six state-change triggers are byte-identical to the baseline. Repaired digest `3 5f2b4ae0…` |
-| **`glow-artifact-storage`** (skill) | *"Prompts are authored and revised directly in Notion"* | True of Notion-managed members; stated without qualification it reads as true of every prompt. Needs the durable-asset carve-out. | **Revised, awaiting review.** Now *"Only durable, Notion-managed prompts are authored and revised directly in Notion"*, with a routing row for the five excluded categories. Repaired digest `1 502b4ecf…` |
-| **`glow-write-boundary`** (skill) | *"A prompt, plan, or state? Notion."* | A routing rule that sends every prompt to Notion, with no category for the five kinds that do not belong there. | **Revised, awaiting review.** Split into three routed questions that give the excluded categories a destination; description unchanged, as it states no Notion-write obligation. Repaired digest `1 662f9647…` |
+| **`glow-workspace-currency`** (skill) | *"close every task by writing any state change back to Notion and reading it back before reporting it"* · *"Any state change goes to Notion in the session that produced it"* | States a Notion write as the **default close-out of every task**, which is the exact inference this policy forbids. Its description is always in context, so it applies to every session including development-flow ones. **Highest priority.** | **Closed — installed and verified**, `3 5f2b4ae0…`. Destination scoped by session kind, converging on `session-working-rules.md`'s wording; the obligation to record and to read back is unchanged, and the six state-change triggers are byte-identical to the baseline. The reviewer confirmed the trigger-bearing half of the description is byte-identical too. |
+| **`glow-artifact-storage`** (skill) | *"Prompts are authored and revised directly in Notion"* | True of Notion-managed members; stated without qualification it reads as true of every prompt. Needs the durable-asset carve-out. | **Closed — installed and verified**, `1 502b4ecf…`. Now *"Only durable, Notion-managed prompts are authored and revised directly in Notion"*, with a routing row for the five excluded categories. |
+| **`glow-write-boundary`** (skill) | *"A prompt, plan, or state? Notion."* | A routing rule that sends every prompt to Notion, with no category for the five kinds that do not belong there. | **Closed — installed and verified**, `1 662f9647…`. Split into three routed questions that give the excluded categories a destination; description unchanged, as it states no Notion-write obligation. |
 
 **A fourth instance of the same conflict was found while revising** — in an in-scope skill's
-reference file, not a fourth skill. `glow-workspace-currency/references/notion-operations.md`
+reference file, not a fourth skill. A sweep of the other 24 installed skills, run independently
+during §10 review, found **no fifth instance** anywhere. `glow-workspace-currency/references/notion-operations.md`
 repeated *"Prompts are authored and revised directly in Notion"* verbatim under *What not to do*,
 and it was corrected in the same change. The three quotations above were checked against the
 installed bytes and are accurate; they were simply not exhaustive.
