@@ -266,6 +266,7 @@ Validation at `ca063c1f61bfc0229b34bc7b42a383c29bde6ff7`, same closed rails: CI 
 | O-13 | Plan v1.2 item 5 / risk R-18 / observation O-11 state that `POST /reader` and `POST /api/reader?v=1` "name the same existing declared route in this application". Disproven by execution (§8.3): they are distinct routes and `/api/reader` returns 404. Supersede or correct the note so no later work unit relies on it | PR-10 author / whole-change IA |
 | O-14 | F03: the PF05 Required-Now production route `POST /api/reader?v=1` is not served (404) and the production handler sits outside `/api`-scoped ingress policy. Verified, put to the Product Owner, and **deferred to PR07 by his decision** rather than rescoped; full record and inherited work in `docs/ephemeral/HDE-EPIC040-PR04-F03-deferral-decision-v1.0.md` | PR07 (with the O-03 catalog row) |
 | O-15 | F05: the production Reader response fails `schemas/reader.v1.schema.json` (emits `harmony`; the schema admits only the four `*_leader` identities), and `goldens/reader/v1/*` still pin the legacy set. Verified by execution and jsonschema validation; **deferred to PR07 by Product Owner decision** — `docs/ephemeral/HDE-EPIC040-PR04-F05-deferral-decision-v1.0.md`. Settle alongside O-14/F03: both concern the same production Reader surface | PR07 |
+| O-16 | Codex P2 on `dca3a93` (`engine/compat/error_tokens.py:156`): PF05 §5.2.3 names `ERR_M10_GATES_MISSING`/422 for an internal or CLI complete-chart input with no or empty Gate array, but `gates_missing`'s application token is `ERR_READER_MISSING_PARAM`, so the registered `ERR_M10_GATES_MISSING` is defined in `error_tokens.py` and in the governed token map yet **emitted nowhere**. Verified by reading the table and `projection_refusal()`. **Not changed here**: this is exactly the tension plan decision D-04 settled — application boundaries keep the instruction §6.6 `ERR_READER_*` mapping while the §5.2.3 tokens are registered, with the naming tension "recorded as observation O-01 and decided by no one here". Overriding it in PR-35 would contradict the approved plan. Carried to the same owner as the plan's O-01; the change, if wanted, is one tuple element plus an owner-run token-map regeneration | Governed PF01/PF05 maintainers (plan O-01) |
 | O-12 | Codex P2 on `73b9812` (`engine/compat/compute.py:329`): `pyproject.toml` packages only `engine*`, `adapter*`, `presenter*`, `catalog*`, `math*` with JSON package data for `catalog` and `math`, while `ADMITTED_RELEASE_ROSTER` requires top-level `schemas/`, `errors/` and `tools/` entries, so a non-editable wheel install could never admit a release. Verified accurate and **not fixed here**: neither `pyproject.toml` nor `engine/config/registry_loader.py` is in this PR's diff, the roster predates this branch (2026-09-20, #418), and the shapes in use do not hit it — CI installs with `pip install -e .` and the `Procfile` runs `gunicorn 'adapter.factory:create_app()'` from the deployed repository tree. Changing the distribution surface is outside this work unit's bounded scope | packaging / release owner (PR06 / PO) |
 | O-03 (carried) | `docs/ENDPOINTS_CATALOG.json` lacks a `POST /reader` success row; committed A7 artifacts frozen | PR07 / PO |
 
@@ -274,6 +275,48 @@ Validation at `ca063c1f61bfc0229b34bc7b42a383c29bde6ff7`, same closed rails: CI 
 PR #467 reused (no new PR). Implementation commit `881cc2df6ca79ab8564bba9d9e20013807ecf077` (tree `475ba9b440fbcac6336e49cca2739097991dea88`); the records commit (adding this file, the ledger and the checkpoint) is the branch head pushed once with `git push -u origin claude/peaceful-gauss-jhyezn`; the remote head was read back with `git ls-remote` and is recorded verbatim in the PR #467 body and in the ledger's PR-35 entry update; PR title/body updated to the candidate. Code and security review come from Codex on the PR; no reviewer product was installed, triggered or configured by this session. Merge, auto-merge and `[skip ci]` were not used.
 
 **PR-35 corrective publication.** PR #467 reused again; no second PR, branch, Proceed or session. Corrective commit `7b2bc5c95aa558961069a0a904ad7e4869a8469f` (source, tests, re-cut manifest, owner-written gate outputs and Index/Mirror) plus the PR-35 records commit adding this update, the ledger entries L-13… and the PR-35 checkpoint; both pushed in one `git push -u origin claude/peaceful-gauss-jhyezn`. The remote head and PR state were read back after the push and are recorded verbatim in the ledger. No merge, auto-merge, `[skip ci]`, test skip or admission bypass was used; `docs/pfcanon/` was not written; PF12 wire values, `PR06R_B_FINAL_PASS` and `hde.release_attestation.v1` are unchanged.
+
+## 11A. PR-35 result — `MERGE_PENDING`
+
+Historical pre-merge evidence for PR #467 at the remote head this records commit creates. A commit cannot embed its own SHA, so that head is read back with `git ls-remote` after the push and recorded verbatim in the PR #467 body and in ledger L-45 — the same convention the PR-30 records commit used. The head it supersedes, `dca3a93fca49c79205f72ce165cc92c3d2912188`, carries CI run 35758782167 (`ci.yml` #3599) at conclusion `success`; this commit changes only `docs/ephemeral/`, and its own CI run is verified after the push. This is not a claim that the PR is merged, nor a QA verdict, acceptance, release admission, PF09 movement, Ops or deployment. Nathan / Product Owner merges manually as a separate action; nothing here enables, schedules or requests a merge.
+
+| Predicate | State |
+| --- | --- |
+| Approved implementation scope complete | Yes — plan v1.2 under the original Proceed; no scope added or dropped |
+| Required local checks pass on the candidate | Yes — §8.1, §8.4, §8.5 |
+| Commits pushed; PR reflects the exact remote head | Yes — read back with `git ls-remote` after each push |
+| Code review findings and threads resolved on the current head | Yes — six threads replied to and resolved; one left open **by design** (O-12 packaging, for the packaging owner) |
+| Required CI passes on the current candidate | Yes — see below |
+| No unresolved material rescope, dependency or repository-state conflict | Yes — no `RESCOPE_REQUEST` was issued; both deferrals are Product Owner decisions |
+| Result and handoff artifacts saved and read back | Yes — this record, the ledger, the checkpoint and the two deferral-decision files |
+| Current-head **security** review | **No — see the limitation below.** The one stated exception |
+
+### Review findings, all eight dispositioned
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| P1 | Unbounded request-body buffering on the production POST route | Fixed, `7b2bc5c` (§4 P-21); resolved |
+| P1 | F03 — production Reader not served at PF05's Required-Now `POST /api/reader` | **Deferred to PR07 by Product Owner decision**; F03 record, O-14; resolved |
+| P1 | F04 — rails runner's unaccepted exit 3 readable as `RELEASE_NOT_ADMITTED` | Fixed, `49296cf` (§8.3); resolved |
+| P1 | Sanity pipeline accepted exit 3 in all fifteen stages (`RELEASE_ADMISSION_GATED_STAGES` was dead code) | Fixed, `d4c6d8f` (§8.5); resolved |
+| P2 | F06 — stored-row Gate defects returned 422 instead of PF05's 503 | Fixed, `ca063c1` (§4 P-23); resolved |
+| P2 | F05 — Reader response fails `schemas/reader.v1.schema.json` | **Deferred to PR07 by Product Owner decision**; F05 record, O-15; resolved |
+| P2 | O-16 — `ERR_M10_GATES_MISSING` registered but unreachable | Not changed: plan decision D-04 settled this tension and routed it to PF01/PF05 maintainers as plan observation O-01; carried as O-16; resolved |
+| P2 | O-12 — admission roster not shipped with installed packages | Pre-existing, outside this diff, unreachable in the shapes in use; **thread deliberately left open** for the packaging owner |
+
+Two of the findings exposed defects in the approved plan itself, both recorded rather than silently overwritten: **O-13** (plan item 5 / R-18 / O-11 claimed `/reader` and `/api/reader` "name the same existing declared route", disproven by execution) and **§4 P-23** (plan §10.4 and its §7.2 table specified the 422 that PF05 §5.2.3 contradicts).
+
+### CI on the current head
+
+`ci.yml` run on the exact remote head concluded **`success`**: 16/16 steps, all seven lanes `_OUTCOME: success`, final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, including the changed-tests step that failed at PR-30 and the accepted `RAILS_LANE:RELEASE_NOT_ADMITTED` and `RELEASE_LANE:RELEASE_NOT_ADMITTED` outcomes. Every prior head in this phase that carried code also concluded `success` (`7fe3630` #3595, `730208c` #3596, `aa5c3cc` #3597, `d4c6d8f` #3598, `dca3a93` #3599).
+
+### Stated limitation: no current-head security review
+
+Codex's **Security Review is completed only on `e927ed0`**, the PR-open head. It is triggered on PR open and did not re-run for new commits. Two `@codex security review` requests were made — one with explanatory prose, one the bare trigger phrase — and **both were routed to the Code Review track** (the second merely restarted a code review the push had already begun). No further requests were made, to avoid spending remote actions on a mechanism that does not respond.
+
+The connector's own metadata records `"mergeGateEnabled": false`, so the security review is not configured as a merge gate on this repository. The **code** review is current-head and fully dispositioned, and the two security-relevant findings it raised (the unbounded body buffer, and the unprefixed production handler outside `/api` ingress scope) were respectively fixed and explicitly accepted by Product Owner decision.
+
+This is recorded as a limitation, not a satisfied predicate. Whether to merge without a current-head security review is the Product Owner's call.
 
 ## 12. Continuation
 
