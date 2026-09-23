@@ -1138,3 +1138,55 @@ review stays independent, by its own rule.
 Each check has an injected must-fail regression. Of the 39 selftest cases, 6 fail with the parts
 checks disabled and 2 fail with the half-applied check disabled. A Modification abandoned at
 INTAKE is not asked for analysis fields it never reached, and a must-pass case holds that.
+
+## D22 — A transient file the tooling makes in order to read a prompt body is a read, not a copy
+
+**Product Owner, 2026-09-23:** *"allow save to disk, and re-write the rule where needed so it is
+rationally conditional and not automatic."*
+
+### What was wrong
+
+`prompt-corpus-policy.md` prohibited, "absolutely", persisting a prompt body anywhere outside
+Notion. The Claude Code harness saves any tool result above roughly 30 KB to a session file on
+its own, before the session sees it. Thirteen of the 55 `091426.1` bodies are over that size,
+among them `PR-10`, `PR-20`, `PR-30`, `PR-40`, `OPS-30` and `QA-10`. Read literally, the rule
+made those thirteen unreadable. That blocked `AF-004`'s scan and the scope measurement for
+`MODIFICATION-20260923-alpha-feedback-open-entries`. The policy exists to stop a parallel
+corpus: a mirror, a cache, a backup, a byte-identity check. It never meant to stop a read, and
+its own text says so: *"I just don't want them copied to disk. How will you ever do any work if
+you cannot read them."*
+
+### The ruling
+
+**The test is what a file is for, not where the bytes happen to sit.** A file that exists only
+because the tooling delivered or needed the body that way is part of the read. It is allowed
+under five conditions, and all five must hold:
+
+1. it is outside the repository and outside any shared, synced or uploaded store;
+2. it serves only the read or check in hand, and is never a source for later work — the next
+   read goes back to Notion;
+3. it is never hashed, byte-compared or otherwise used as the body's identity;
+4. it is deleted when that read or check is done, and at the latest when the task ends;
+5. the session says in its report that it happened.
+
+Everything the policy was written against stays prohibited, without exception: mirrors,
+exports, snapshots, backups, a cache reused across tasks or sessions, a committed or uploaded
+body, accumulation into a corpus, body hashes or byte comparison, and any procedure that
+requires a local corpus before work can proceed.
+
+### Consequences
+
+- `prompt-corpus-policy.md` carries the amendment as a successor section. The 2026-09-21
+  directive is preserved verbatim above it (`AUTH-001`).
+- `prompt-validation-procedure.md` steps 3 and 6 and `postflight-procedure.md` are corrected in
+  place. A scratch file feeding `--bodies-stdin` is permitted under the same five conditions. The
+  validator still has no path option, because a path option invites a standing directory.
+- The auto-saved Notion fetch files from 2026-09-23 in this session were ordinary operational
+  pages, not prompt bodies. No correction is owed for them.
+
+### The tested guard (`D14`)
+
+**None yet, and this is recorded rather than implied.** The conditions govern session behaviour,
+and no repository check can see a harness session directory. The standing guard is condition 5:
+the report makes every such file visible. A guard that fires is owed to the next change that
+touches a validator or skill. Until then, this ruling is applied but not guarded.

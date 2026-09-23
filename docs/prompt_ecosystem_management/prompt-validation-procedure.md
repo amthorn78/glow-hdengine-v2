@@ -21,10 +21,10 @@ Standing procedure, Product Owner approved 2026-09-21. This is how prompt valida
 2. **Read those pages from Notion.** That is the operative source, and reading it is sufficient evidence.
 3. **Pipe the bodies in as JSON on stdin**, `{"PROMPT-ID": "<text>"}`:
    `echo "$bodies" | python3 flowmaster-validate/scripts/validate_gcfpe_20260914.py change-flow --contract <contract> --bodies-stdin`
-   There is **no path option and there will not be one**. A file persists, and a persisted corpus is what the policy forbids.
+   There is **no path option and there will not be one**: a path option invites a standing directory, and a standing corpus is what the policy forbids. A scratch file that feeds stdin, or one the harness saved because the page was large, is part of the read under `prompt-corpus-policy.md`'s five conditions (`D22`). It lives outside the repository, serves this check only, is never hashed, is deleted when the check is done, and is disclosed in the report.
 4. **Read the coverage fields, not just ****`ok`****.** `prompt_bodies_validated` lists the ids checked; `prompt_body_checks_not_evaluated` names the set-scoped checks that could not run. A run that validated nothing still returns `ok: true`, correctly — it found no fault in nothing. **`ok`**** alone is not evidence of coverage.**
 5. **Report what was checked.** "IA-10 and IA-30 validated, class-map checks not evaluated" is a true statement. "0 errors" on its own is not, and never was.
-6. **Do not write the bodies anywhere.** Not to a scratch file, not to the repository, not as an appendix to a report. Quote the specific clause your finding rests on and nothing more.
+6. **Do not keep the bodies anywhere.** Not in the repository, not as an appendix to a report, not in a directory a later task could read. A transient read file is deleted when the check is done (`D22`). Quote the specific clause your finding rests on and nothing more.
 ### What replaced what
 | before | now |
 |---|---|
