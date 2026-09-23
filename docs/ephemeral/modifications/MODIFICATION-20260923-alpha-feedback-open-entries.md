@@ -76,6 +76,10 @@ items:
     statement: "When a prompt ecosystem is modified, prompts that do not change only have their version number bumped, the version number alone tracking membership of the current iteration, and sibling bodies are created only for prompts that actually change, across all prompt ecosystems in the repository."
     source: AF-012
     disposition: ""
+  - id: ITEM-20
+    statement: "The flowmaster-validate skill states the prompt-corpus rule as D22 now has it: a transient file the tooling makes in order to read a body is part of the read, and only a standing copy is prohibited."
+    source: "Product Owner, 2026-09-23, added at ANALYZE (D22)"
+    disposition: ""
 parts:
   - id: PART-01
     name: "Scan the 40 unread bodies for a decorated governance line, and repair what it finds"
@@ -135,6 +139,11 @@ parts:
   - id: PART-12
     name: "Version bump instead of a sibling for unchanged prompts"
     items: [ITEM-19]
+    class:
+    after: []
+  - id: PART-13
+    name: "flowmaster-validate states the D22 corpus rule"
+    items: [ITEM-20]
     class:
     after: []
 request: |
