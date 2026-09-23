@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.2.9**  
-Effective Date: Sep 22, 2026  
+**Version: v13.3**  
+Effective Date: Sep 23, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -197,7 +197,11 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.12 HDE-EPIC040-PR03-R02 — Bind Executing Mechanics to the Admitted Release  
 * 2.13 HDE-EPIC040-PR03 — PR Work-Unit Lineage Review v1.0  
 * 2.14 Specification format authority  
-* 2.15 HDE-EPIC040-PR04-F01 — Truthful Non-Admitted Gate Outcome for the PR04-to-PR06 Interval
+* 2.15 HDE-EPIC040-PR04-F01 — Truthful Non-Admitted Gate Outcome for the PR04-to-PR06 Interval  
+* 2.16 HDE-EPIC040-PR04-F03 — Production Reader route gap: Product Owner deferral decision v1.0  
+* 2.17 HDE-EPIC040-PR04-F05 — Reader response vs published schema: Product Owner deferral decision v1.0  
+* 2.18 HDE-EPIC040-PR04-F07 — Dev conjunction evidence capture unrunnable: Product Owner deferral decision v1.0  
+* 2.19 HDE-EPIC040-PR04-LINEAGE-001 — Bounded Application, Identity, and Consumer Integration
 
 # **2\) Numbered Addenda**
 
@@ -1756,5 +1760,397 @@ It is recorded as the candidate finding `HDE-EPIC040-PR04-F02` for the PR04 work
 ### **Canon-conflict continuity**
 
 `CANON_CONFLICT_REGISTER` entries `C040-01` through `C040-06` are carried unchanged with their existing classifications, decision lineage, carried effects and remaining owners. No entry is reopened, relabeled, omitted, newly decided or resolved. Neither `HDE-EPIC040-PR04-F01` nor the `HDE-EPIC040-PR04-F02` candidate is a register entry.
+
+## 2.16 HDE-EPIC040-PR04-F03 — Production Reader route gap: Product Owner deferral decision v1.0
+
+```
+
+artifact_type: PRODUCT_OWNER_DEFERRAL_DECISION
+DECISION_ID: HDE-EPIC040-PR04-F03-DEFERRAL
+version: v1.0
+state: DECIDED
+repository_path: docs/ephemeral/HDE-EPIC040-PR04-F03-deferral-decision-v1.0.md
+change_class: EPIC
+change_id: HDE-EPIC040
+work_unit_id: HDE-EPIC040-PR04
+finding_ref: HDE-EPIC040-PR04-F03
+finding_title: The production Reader is not served at the PF05 Required-Now route POST /api/reader
+raised_by: Codex code review on head 7fe363069bcd9471fe7146dadcfc9b3cced85817 (P1, adapter/http_reader.py:577)
+verified_by: dedicated PR04 PR-development session, PR-35 phase, by execution against the Procfile entry point
+decision: DEFER — PR04 merges as implemented; the gap is an accepted, owned deviation
+decided_by: Nathan / Product Owner, 2026-09-22
+return_point: PR07 (already owns the adjacent endpoint-catalog gap O-03)
+rescope_raised: NO — no RESCOPE_REQUEST was issued; PR_RETURN_PHASE remains PR-35
+```
+
+### 1\. Decision
+
+The Product Owner decided to defer. HDE-EPIC040-PR04 merges as implemented; the production Reader continues to be served at POST /reader. The divergence from PF05's Required-Now POST /api/reader?v=1 is recorded here as an accepted deviation with a named owner and return point (PR07), not as a rescope. No corrective push was made for this finding and no approved scope changed.  
+This record exists so no later work unit has to rediscover the finding, and so the disproven premise in plan v1.2 does not silently propagate.
+
+### 2\. The finding, as verified
+
+Measured on the deployed entry point adapter.factory:create\_app() (Procfile: gunicorn 'adapter.factory:create\_app()') under closed rails LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 APP\_ENV=dev:
+
+| Request | Result |
+| :---- | :---- |
+| POST /reader?v=1 | 503 — reaches the production handler (expected F01 non-admitted posture) |
+| POST /api/reader?v=1 | 404 — no such route |
+| GET /reader?v=1 | 400 — reaches the dev fixture handler |
+
+app.url\_map contains exactly /reader (GET, POST) and /dev/reader/conjunction. adapter/http\_reader.py:963 binds bp \= get\_reader\_bp(); adapter/factory.py registers it with url\_prefix="" and adapter/wsgi.py with no prefix. Neither file is touched by this PR.
+
+### 3\. What PF05 says
+
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.2.md, SHA-256 a12574965dc98c96c53822c4151db38bad48c91a00e3851e973e6a7ffa33d11e:
+
+* §"CLI commands" (line 107), Required-Now: "POST /api/reader?v=1 is the adopted production application route. … The existing file-path GET Reader remains development-only and non-authoritative."  
+* §5.1.0 "Production POST request and resolution (normative)" (line 2065): "POST /api/reader?v=1 accepts one JSON object with exactly a\_id and b\_id."  
+* §5.6 Endpoint Catalog route table (line 2481): | /api/reader | POST | production application Reader v1 … |, listed separately from | /reader | GET, HEAD | internal dev-harness … |.  
+* §"Route and gate (must)" (line 2357): the /api/reader alias holds "when the Reader blueprint is mounted under an /api prefix in a runtime configuration" — a mount this runtime does not configure.  
+* §"Route and gate (must)" (line 2353): GET /reader is the canonical Reader route for the v1 dev/proof surface — correct as implemented.
+
+### 4\. Consequences accepted by this decision
+
+1. The PF05 Required-Now production route POST /api/reader?v=1 is not reachable; a client calling it receives 404\.  
+2. The production Reader handler is served unprefixed, so ingress policy scoped to /api does not cover it. This is the security-relevant half of the finding and is accepted knowingly, under the standing posture that no release is admitted yet (F01) and every production path currently ends RELEASE\_NOT\_ADMITTED.  
+3. Plan v1.2's justification (item 5, risk R-18, observation O-11) — that the two spellings "name the same existing declared route in this application" — remains in the approved plan text but is factually wrong. Recorded as O-13 for correction.
+
+### 5\. Why PR04 did not cause it, and why no in-scope fix existed
+
+@bp.post("/reader") already existed at the approved base 3b8084d0 as a 405 method\_not\_allowed stub. The route-declaration set is identical between base and head — same fifteen declarations, same paths and methods, line numbers shifted only. What PR04 changed is that this path now serves the real production handler, converting a dormant mount discrepancy into a live one.
+
+| Candidate fix | Why it exceeded this work unit |
+| :---- | :---- |
+| Add a second @bp.post("/api/reader") decorator | Plan v1.2 states "PR04 adds no route"; PF05's mechanism is a mount-prefix alias, not a duplicate declaration; it would need a docs/ENDPOINTS\_CATALOG.json row governed by PR07 (O-03) |
+| Mount the blueprint under /api | Moves GET /reader — the PF05 canonical dev/proof surface — plus /internal/version, /ops/\* and /dev/\*; breaks the A7 transport proofs, the endpoint catalog and the determinism/parity families |
+
+### 6\. What PR07 inherits
+
+| Item | Detail |
+| :---- | :---- |
+| Serve the production Reader at /api/reader | By the mechanism PR07 / the IA selects, consistent with PF05 §5.6 and the alias posture |
+| docs/ENDPOINTS\_CATALOG.json | Already owed a POST success row (O-03); a production /api/reader row would join it |
+| Ingress scope | Confirm the production route falls inside /api-scoped policy once moved |
+| Plan note correction | Supersede plan v1.2 item 5 / R-18 / O-11 (O-13) |
+
+### 7\. Status of this finding on the PR
+
+Codex thread \#discussion\_r4073702876 carries the verification and this disposition. The finding is real, dispositioned and owned; it is not fixed in PR04 by Product Owner decision. Nothing in the PR was reverted, and the rest of the PR-35 work is unaffected and verified on the current head.
+
+## 2.17 HDE-EPIC040-PR04-F05 — Reader response vs published schema: Product Owner deferral decision v1.0
+
+```
+
+artifact_type: PRODUCT_OWNER_DEFERRAL_DECISION
+DECISION_ID: HDE-EPIC040-PR04-F05-DEFERRAL
+version: v1.0
+state: DECIDED
+repository_path: docs/ephemeral/HDE-EPIC040-PR04-F05-deferral-decision-v1.0.md
+change_class: EPIC
+change_id: HDE-EPIC040
+work_unit_id: HDE-EPIC040-PR04
+finding_ref: HDE-EPIC040-PR04-F05
+finding_title: The production Reader response fails schemas/reader.v1.schema.json
+raised_by: Codex code review on head aa5c3ccf33df367dbaadec490e12de99bb89fd95 (P2, adapter/http_reader.py:602)
+verified_by: dedicated PR04 PR-development session, PR-35 phase, by execution plus jsonschema validation
+decision: DEFER — PR04 merges as implemented; the mismatch is an accepted, owned deviation
+decided_by: Nathan / Product Owner, 2026-09-22 (option 3 — fix F06, defer F05)
+return_point: PR07
+rescope_raised: NO — no RESCOPE_REQUEST was issued; PR_RETURN_PHASE remains PR-35
+```
+
+### 1\. Decision
+
+The Product Owner chose option 3: fix the stored-row Gate error contract (F06) in PR04, and defer this one. The production Reader keeps emitting the admitted magic10 category identities, and schemas/reader.v1.schema.json plus goldens/reader/v1/\* keep the legacy identities. The divergence is recorded here as an accepted deviation with a named owner, not a rescope. No corrective push was made for this finding.
+
+### 2\. The finding, as verified
+
+Executed against the production POST /reader route under closed rails, with the synthetic complete release injected so the route returns a success body:
+
+```
+
+POST /reader?v=1  ->  200
+categories emitted:   ['harmony']
+jsonschema validate:  FAIL — 'harmony' is not one of
+                     ['open_leader', 'warm_leader', 'cool_leader', 'glow_leader']
+```
+
+The dev GET /reader surface emits the same harmony identity. goldens/reader/v1/g03\_open\_leader.json still carries open\_leader.
+
+### 3\. Why it is this PR's doing
+
+adapter/http\_reader.py at the approved base 3b8084d0 contained zero occurrences of harmony: the identity is not hardcoded, it comes from the admitted mechanics order. PR04 switched the Reader onto the PR03 magic10 core, whose authority is engine.categories.registry.FROZEN\_MAGIC10\_ORDER (plan correction P-10), and that changed the emitted category identities away from the legacy \*\_leader set of the retired scorer.  
+Plan v1.2 §7 lists schemas/reader.v1.schema.json and goldens/reader/v1/\* as unchanged by PR04, so they were left describing the retired scorer's identities. The result is a public Reader success body that does not validate against the repository's own published Reader schema.
+
+### 4\. Consequence accepted by this decision
+
+A schema-validating client or SDK rejects a successful production Reader response. This is accepted knowingly under the current posture, in which no release is admitted and every production path ends RELEASE\_NOT\_ADMITTED, so no client is served today.
+
+### 5\. Why no in-scope fix was attempted
+
+Correcting it means changing schemas/reader.v1.schema.json — the published public Reader contract — together with the goldens/reader/v1/\* fixtures that pin it. Plan v1.2 §7 explicitly holds both unchanged, and a published-schema change is a public-contract decision rather than an implementation detail. The alternative, reverting the Reader to the legacy identities, would contradict P-10 and the admitted mechanics authority.
+
+### 6\. What PR07 inherits
+
+| Item | Detail |
+| :---- | :---- |
+| schemas/reader.v1.schema.json | Admit the magic10 category identities, or otherwise reconcile the published contract with the admitted mechanics order |
+| goldens/reader/v1/\* | Regenerate the pinned fixtures alongside the schema, through their owner |
+| Any published SDK or client contract | Confirm consumers move with the identity set |
+| Relationship to F03 | F03 (production route path) is also deferred to PR07; both concern the same production Reader surface and should be settled together |
+
+### 7\. Status of this finding on the PR
+
+Codex thread \#discussion\_r4074095779 carries the verification and this disposition. The finding is real, dispositioned and owned; it is not fixed in PR04 by Product Owner decision. Nothing in the PR was reverted, and the rest of the PR-35 work is unaffected and verified on the current head.
+
+## 2.18 HDE-EPIC040-PR04-F07 — Dev conjunction evidence capture unrunnable: Product Owner deferral decision v1.0
+
+```
+
+artifact_type: PRODUCT_OWNER_DEFERRAL_DECISION
+DECISION_ID: HDE-EPIC040-PR04-F07-DEFERRAL
+version: v1.0
+state: DECIDED
+repository_path: docs/ephemeral/HDE-EPIC040-PR04-F07-deferral-decision-v1.0.md
+change_class: EPIC
+change_id: HDE-EPIC040
+work_unit_id: HDE-EPIC040-PR04
+finding_ref: HDE-EPIC040-PR04-F07
+finding_title: The dev conjunction writer evidence capture can no longer run, so tests/evidence/test_dev_conjunction_identity.py fails
+raised_by: base-vs-head sweep of the uncovered test set (this session), and independently by Codex code review on head 6f5aeed68a60551013f23ba49fa7909225d90cc3 (P2, adapter/http_reader.py:820)
+verified_by: dedicated PR04 PR-development session, PR-35 phase, by execution against the dev writer route under its own open-dev rails
+decision: DEFER — PR04 merges as implemented; the two failing tests are an accepted, owned deviation
+decided_by: Nathan / Product Owner, 2026-09-22 ("defer F07 to PR07")
+return_point: PR07
+rescope_raised: NO — no RESCOPE_REQUEST was issued; PR_RETURN_PHASE remains PR-35
+```
+
+### 1\. Decision
+
+The Product Owner chose to defer. PR04 keeps the dev conjunction route as implemented — no fabricated local person store, no dev\_compat\_identity() stamp, real release admission — and tools/evidence/generate\_conjunction\_writer\_evidence.py together with its two owning tests remains unrunnable until a release is admitted. This is recorded as an accepted deviation with a named owner, not a rescope. No corrective push was made for this finding.
+
+### 2\. The finding, as verified
+
+tests/evidence/test\_dev\_conjunction\_identity.py fails on two of its three tests:
+
+* test\_dev\_conjunction\_identity\_evidence\_is\_current\_and\_nonwriting  
+* test\_check\_mode\_neutralizes\_database\_url\_and\_preserves\_artifacts
+
+Both fail inside the generator's \_capture\_outputs(), which refuses unless the writer, the two-run writer and the reader all return 200\. Measured directly under the tests' own open-dev rails (SAFE\_MODE=0 ALLOW\_NETWORK=1 APP\_ENV=dev), GET /dev/writer/conjunction:
+
+| configuration | status | code |
+| :---- | :---- | :---- |
+| as implemented (local\_lookup=None) | 503 | ERR\_WRITER\_RAILS\_CLOSED / PROVIDER\_CONFIG\_MISSING, missing: \["HD\_API\_KEY"\] |
+| \+ deterministic mapped-row seam | 503 | ERR\_M10\_MANIFEST\_MISMATCH |
+| \+ synthetic complete release injected | 200 | — |
+
+The three rows are the whole finding. Row one is the vendor dependency Codex identified. Row two shows a resolver seam removes that dependency but does not make the capture runnable, because the route then goes through real release admission and refuses under the F01 posture. Row three shows a 200 is reachable only with an admitted release.
+
+### 3\. Why it is this PR's doing
+
+At the approved base the route sidestepped admission entirely: git show 3b8084d0:adapter/http\_reader.py carries compat\_identity \= dev\_compat\_identity() at line 675, alongside a local person store fabricated under open rails. This PR removed both — correctly, since a dev route stamping a dev identity is an admission bypass on a surface that reaches the compat core. The evidence generator was built on that bypass and is collateral.  
+The sweep recorded in the result record §8.8 found these two among four regressions in the 132 test files that no CI lane and no changed-test target covers. The other two were fixed in 1e02823. Codex independently raised this one.
+
+### 4\. Consequence accepted by this decision
+
+1. tools/evidence/generate\_conjunction\_writer\_evidence.py cannot produce or re-check its capture. The frozen artifacts/writer/conjunction\_write\_readback.log and artifacts/writer/conjunction\_writer\_summary.json remain capture-time records that no current run can reproduce or refute.  
+2. Two tests fail at the candidate head. They are invisible to CI — the file is in neither a lane nor the changed-test targets — so CI is green with a known-failing test in the tree. This is stated plainly rather than relied on: the failure is real, it is simply not gating.
+
+Both are accepted under the current posture, where no release is admitted and every gate ends RELEASE\_NOT\_ADMITTED.
+
+### 5\. Why no in-scope fix was attempted
+
+The seam in row two of the table above was implemented and then reverted: a dev-only current\_app.config\["DEV\_CONJUNCTION\_LOCAL\_LOOKUP"\], absent by default so the route still fabricates nothing, with the generator supplying deterministic mapped rows for its own two identities. It was reverted because it does not make the tests pass, and because registering the changed generator with the CI classifier would have promoted the failing test into the changed-test targets — turning an invisible failure into a red lane with no fix available.  
+Reaching row three inside PR04 would mean fabricating an admitted release inside a governed evidence generator. That is an admission bypass, which this work unit's constraints forbid, and it would re-introduce in the generator exactly what the PR removed from the route.  
+There is also a contract question that is not this phase's to settle. The test asserts
+
+```
+
+assert summary["checks"]["writer_dev_identity"] is True
+assert dev_compat_identity() == {"engine_tag": "dev", "release_id": "dev", "invocation_tag": "INV-DEV"}
+```
+
+— the dev identity stamp the PR removed. So "make the capture valid again" requires deciding what identity the dev conjunction route should carry now, which is a contract decision of the same kind as F03 and F05.
+
+### 6\. What PR07 inherits
+
+1. Decide the dev conjunction route's identity now that it no longer stamps a dev one, and update the generator's assertions to match.  
+2. Land the resolver seam (or an equivalent) so the capture does not depend on live vendor credentials. The reverted shape is described in §5 and in the reply on the Codex thread.  
+3. Register the generator with \_EVIDENCE\_GENERATOR\_TEST\_OWNERS in ci/checks/classify\_ci\_changes.py so tests/evidence/test\_dev\_conjunction\_identity.py becomes a changed-test target and this class of failure stops being invisible.  
+4. Regenerate the frozen writer artifacts through their owner once a release is admitted.
+
+Gated on PR06 for admission: until the roster is admitted, item 4 cannot run and items 1–3 cannot be proven by execution.  
+Settle alongside F03 (O-14) and F05 (O-15) — all three are deferred findings on surfaces this PR moved onto the admitted magic10 core.
+
+### 7\. Status of this finding on the PR
+
+The Codex thread at adapter/http\_reader.py:820 (comment 4075000425\) is left open, with the measurements above and the reverted seam recorded on it. Observation O-19 in docs/ephemeral/HDE-EPIC040-PR04-pr-implementation-result-v1.0.md §10 carries it; the sweep that found it is §8.8.
+
+## 2.19 HDE-EPIC040-PR04-LINEAGE-001 — Bounded Application, Identity, and Consumer Integration
+
+### Acceptance and source record
+
+| Field | Record |
+| :---- | :---- |
+| Artifact type | PR\_WORK\_UNIT\_LINEAGE\_REVIEW |
+| Logical identity | HDE-EPIC040-PR04-PR-WORK-UNIT-LINEAGE-REVIEW / 1.0 |
+| Change | EPIC / HDE-EPIC040 — Separation Pass 3 |
+| Work unit | HDE-EPIC040-PR04 |
+| Decision | ACCEPT, recorded 2026-09-22T21:35:55Z; final work-unit state: ACCEPTED\_FINAL |
+| Reviewed PR | \#467, manually merged by amthorn78 |
+| Review role | The retained whole-change HDE-EPIC040 Implementation Architect in its established read-only PR-40 lineage-review role; not the PR04 engineer and not Isis-50 |
+| Session and binding | RETAIN\_EXISTING; HDE-EPIC040 / HDE-EPIC040-PR04 / PR-40 (GCF-17.LINEAGE) |
+| Context conflict | NONE established |
+| Continuing role | The retained whole-change HDE-EPIC040 Implementation Architect holds the current immutable-Plan progression role. |
+
+HDE-EPIC040-PR04 — Bounded application, identity and consumer integration — is accepted as the landed, attributable PR work unit for its approved scope. The decision is a read-only PR-40 determination after the manual merge of PR \#467.
+
+The acceptance is qualified, not unconditional. Three written, accepted, PR07-owned deviations remain: F03, the unserved Required-Now production Reader route; F05, the Reader response that fails its published schema; and F07, two failing evidence tests. The current-head security-review absence is a stated limitation. None is waived, converted to a pass, or treated as undiscovered.
+
+### Corrected route record
+
+The reviewer’s earlier instruction HDE-EPIC040-PR04-PR-INSTRUCTION v1.0 §6.5 conflated POST /api/reader?v=1 with the distinct route observed in its own §3.2, POST /reader. At approved base 3b8084d09e974f15c2b71112e5a596af01b1a371, adapter/http\_reader.py:459 defines @bp.post("/reader") returning 405; adapter/factory.py:11 and adapter/http\_reader.py:913 register the blueprint with url\_prefix="". The served path is /reader and /api/reader is not mounted.
+
+The conflation originated in immutable Implementation Plan v2.1 §5.8, was restated in Plan v1.2 item 5, risk R-18, and observation O-11, and was disproved in execution by F03. It does not alter this acceptance: the handler described by the instruction was delivered. It does establish the serving-location gap represented by F03. The instruction remains historical and unchanged.
+
+### Landed attribution and merge state
+
+| Fact | Verified state |
+| :---- | :---- |
+| Pull request | \#467; merged: true; state: closed |
+| Merge record | merged\_at 2026-09-22T21:12:30Z; merged\_by amthorn78 |
+| Approved base | 3b8084d09e974f15c2b71112e5a596af01b1a371 |
+| Reviewed and CI-tested head | 106496971fe46ef7a0414a00944bb034d508b9e2; tree 72f0868de3635494916097b36656af302b914003 |
+| Landed commit | cd6f9e6ca4541f448f77b206269f3882cb919f36; same tree; committed 2026-09-22T22:12:30+01:00 |
+| Merge method | SQUASH; cd6f9e6 has the approved base as its sole parent |
+| Attribution rule | The review head is not an ancestor of main; the landed commit is. Tree identity, not head ancestry, establishes attribution. git diff 1064969..cd6f9e6 is empty. |
+| Attributed delta | 98 files; 9,509 insertions; 2,072 deletions; 33 branch commits from 3b8084d0 to 1064969 |
+| Comparison cutoff | main at 71511b99fe1e96898ffdbfc8426f39f2e113de4a; tree d259b760 |
+| Reconciliation | Direct PR delta and landed delta are EXACT. The working tree was clean before and after every observation. |
+
+Exactly one later commit is excluded from PR04 attribution: 71511b9, “docs: GCFPE MGMT change-process audit, RCA and redesign \- plus D20 (\#468),” comprising 9 documentation files and 2,058 insertions. No revert, interstage non-lineage commit, or worktree-only divergence was found.
+
+The handoff’s branch-preservation statement is corrected: claude/peaceful-gauss-jhyezn is absent from origin. The reviewed head remains reachable at refs/pull/467/head, so no evidence was lost and branch deletion is non-gating.
+
+Every handoff-supplied merge fact was independently reproduced and matched.
+
+### Controlling lineage and retained source record
+
+The accepted work unit retains the following source lineage and does not rewrite it:
+
+- HDE-EPIC040-PR04-PR-INSTRUCTION v1.0, INSTRUCTION\_READY: docs/ephemeral/HDE-EPIC040-PR04-pr-instruction-v1.0.md; recomputed SHA-256 8769d12f8e4df82eed9f4869e4a48ca53ae8a99d7a6b6497df526036f30ffdcf.  
+- HDE-EPIC040-PR04-PR-IMPLEMENTATION-PLAN v1.2, the proceeded plan: docs/ephemeral/HDE-EPIC040-PR04-pr-implementation-plan-v1.2.md; recomputed SHA-256 dc005adc9ec0acd4541241f1893712d5c780f01632a09284aa6bd3d779779160.  
+- PR-30 / PR-35 continuous result: docs/ephemeral/HDE-EPIC040-PR04-pr-implementation-result-v1.0.md, SHA-256 734e69f24cc4891dfb72c10d10137c774af7e3a586384df1a462bcb6313243e5; PR-30 state PR\_CANDIDATE\_PUBLISHED at implementation commit 881cc2df6ca79ab8564bba9d9e20013807ecf077, tree 475ba9b440fbcac6336e49cca2739097991dea88; PR-35 state MERGE\_PENDING on head 1064969\.  
+- Original Proceed: PR-30 — PR Implementation Proceed — 091426.1, for Plan v1.2 only; it authorizes implementation only, remained unchanged through PR-35, and has no second Proceed.  
+- Immutable whole-change sources: HDE-EPIC040-SPECIFICATION v1.1, SPECIFICATION\_APPROVED by Thoth-17 at 2026-09-08T13:23:24Z; Implementation Audit v2.0, AUDIT\_COMPLETE; Implementation Plan v2.1, SHA-256 10732f9338b209e3ce19e81936119e47c9551ea912298a27c731c9e60e2a61be; and Plan Review v2.1, Isis-50 APPROVE at 2026-09-09T13:36:43Z, redline R040-IA30-02.  
+- Accepted dependencies: PR01 / \#403, PR02 / \#404, and PR03 / \#405, including PR03 ACCEPTED\_FINAL. None is rerun, reopened, or revised here.  
+- Checkpoint and action record: the PR-30 checkpoint; PR-35 entry and corrective checkpoints; and remote-action ledger L-01 through L-72, all 72 rows verified.
+
+### Retained implementation, behavior, and interim contracts
+
+Instruction v1.0 §8.1 allocated K040-REQ-001, \-004, \-005, \-007, \-008, \-010, \-011, \-012, and \-013, plus the PR04 portions of AC040-03, \-04, \-06, \-07, \-08, and \-09. The following remains the accepted bounded implementation state:
+
+| Area | Retained outcome |
+| :---- | :---- |
+| Admitted inputs and chart-bearing resolution | engine/bodygraph/resolver.py::resolve\_compat\_chart delivers all three admitted input classes, guarded dry-run acquisition, and projection\_refusal. \_resolve\_party no longer has UID-only returns. |
+| Canonical identity | engine/bodygraph/projection.py delivers birth-seed identity via bind\_projection\_identity, resolve\_db\_user\_id, and canonical and strict UUID helpers. |
+| Normalized projection and one core | engine/compat/compute.py delivers EvaluationParty, the PF01 §4 carrier, orient, intrinsic pair\_key, cache seam, bidirectional router augmentation, and evaluate\_pair. ts\_v0 is absent from engine/runtime/public.py; evaluate\_pair and admitted\_bundle delegate to load\_active\_mechanics\_bundle. |
+| Admission | Landed gates truthfully refuse INCOMPLETE\_RELEASE\_ROSTER. No synthetic release reaches a governed gate or the attestation. |
+| PF05 §5.2.3 boundary surface | Eleven tokens, MAGIC10\_HTTP\_STATUS, BOUNDARY\_REASONS, CompatBoundaryError, errors/token\_map, and owner-generated token\_map.json are delivered. |
+| Reader success path | A POST /reader handler is delivered. POST /api/reader?v=1 remains unserved under F03. |
+| Reader output | The existing single emitter delivers the numeric-free six-key envelope, but emitted categories identity fails the published schema under F05. |
+| R040-IA30-02 no-user proof classes | Boundary, acquisition-seam, closed-rails-miss, invalid-identity, source/side-effect, and separate-Reader classes are delivered; the former stable-hash fixture is a truthful negative case. |
+| Evidence ownership | Every touched evidence family is mapped to its declared writer. Frozen families retain capture-time bytes with nonclaims; no governed artifact was hand-edited. Owner regeneration covers token\_map.json, catalog/manifest.json, canonical-JSON gate outputs, the sanity log’s PASS-to-NOT\_ADMITTED model and 799-to-837-byte change, and Index/Mirror. |
+| Operational safety | No DDL, backfill, account creation, new vendor route, credential, production mutation, or rail opening is introduced. P-21 bounds the production POST body read from 5,000,102 to 32,769 bytes, with a regression test. |
+
+The bounded approved scope is delivered. F03 and F05 are the two partially delivered production-surface requirements under their explicit deferrals; no allocated requirement is silently dropped and no scope is added.
+
+The approved F01 overlay remains exact. It was approved by Isis-50 in HDE-EPIC040-PR04-F01-rescope-review-v2.0 after an earlier REVISION\_REQUIRED against proposal v1.0. Its implemented file set exactly matches the approved enumeration, including run\_sanity\_pipeline\_gate.py and generate\_determinism\_gate\_proofs.py; four pinning-test homes were updated. run\_canonical\_json\_gate.py correctly remains outside the RELEASE\_NOT\_ADMITTED expression because it validates frozen digests and \--check-only exits 0\. tests/evidence/test\_release\_attestation.py was not edited and passes. No thirteenth or fourteenth file is required.
+
+The F01 conditions remain:
+
+- generate\_open\_rails\_abba\_proof.py \--check-current, run under its declared rails at the landed tree, exits 3 and prints OPEN\_RAILS\_ABBA\_CHECK:RELEASE\_NOT\_ADMITTED; it writes nothing and leaves the working tree clean. NOT\_ADMITTED is the third pipeline state, and summary:PASS still requires every required result to be OK.  
+- ci.yml accepts exit 3 only with the independent probe; the release step accepts a nonzero builder exit only when failure.json has code release\_not\_admitted and the probe observes INCOMPLETE\_RELEASE\_ROSTER.  
+- The discriminator is limited to SchemaValidationError.code \== "INCOMPLETE\_RELEASE\_ROSTER". Every other exception and each post-admission failure remains an ordinary failure. The branch self-extinguishes after PR06 admits the roster.  
+- No change is made to hde.release\_attestation.v1 or PR06R\_B\_FINAL\_PASS. The landed release\_admission remains {"const": "PR06R\_B\_FINAL\_PASS"} and validation\_result remains {"const": "PASS"}; the non-admitted outcome uses hde.release\_attestation.failure.v1 with the open token release\_not\_admitted.
+
+No permanent-canon decision is consumed by the F01 conditions.
+
+The F02 direct decision for HDE-EPIC040-PR04-F02-rescope-proposal-v1.0.md §5 is retained without an RS-20 decision, additional overlay, or new Proceed. At base and landed, catalog/manifest.json retains top-level keys {built\_at\_utc, files, root, version}; root catalog/, version 1.0.0, built\_at\_utc 2025-12-26T00:00:00Z; 15 rows; and identical order. The 15-member release remains incomplete; nothing is admitted, activated, or promoted by F02. Only adapter/http\_reader.py changes, from 9f0cde20… to 3a6bd46a…. release\_id changes from e0d5c9805408640a987c757426937be90c770e55ee949f962aa1a2154af49856 to a5f06ae3fcc964c41bb80c3630f455d9c246d9f87fcad500a5b74bf79b96bc01 and equals the SHA-256 of canonical bytes. Four owner-script re-cuts occurred; result v1.0 §6 records only the first two, ending a6db0106…, while the PR body and ledger record the final two. The landed manifest is correct; the omission is record completeness only.
+
+### Review, CI, and governed evidence
+
+Codex review rounds on 73b9812, 7fe3630, 730208c, aa5c3cc, dca3a93, c147e76, caec701, and 6f5aeed match the recorded sequence. Sixteen threads exist: twelve resolved and four intentionally open. Thirteen findings were dispositioned; eight were corrected in scope: P-21, F04, sanity-stage gating, F06/P-23, P-24, P-25, P-26, and P-27. No review event is APPROVED or CHANGES\_REQUESTED; all are COMMENTED, consistent with advisory review. This record does not infer an approval from those events.
+
+Hosted CI run 35777936856 is the exact-head result: completed / success, event pull\_request, workflow .github/workflows/ci.yml, head\_sha 106496971fe46ef7a0414a00944bb034d508b9e2, zero failed jobs, all seven lanes, and final marker CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK. The accepted RAILS\_LANE:RELEASE\_NOT\_ADMITTED and RELEASE\_LANE:RELEASE\_NOT\_ADMITTED results are F01’s defined state, not a waiver. Tree equality attaches this result to landed commit cd6f9e6.
+
+Two earlier phase runs are history rather than current state: 35763461703 failed on the http\_reader owner-guard tuple and 35770839639 on a test that wrote a wall-clock timestamp into a tracked artifact. Both defects were corrected before the final head. No scoped CI waiver was requested, granted, or used.
+
+### Deferred obligations, limitations, and open review work
+
+| Item | Current state | Return point or limitation |
+| :---- | :---- | :---- |
+| F03 / O-14 / O-03 | POST /api/reader?v=1 returns 404\. POST /reader is served because the blueprint mounts at url\_prefix="". The 2026-09-22 decision record HDE-EPIC040-PR04-F03-deferral-decision-v1.0 records: “PR04 merges as implemented; the gap is an accepted, owned deviation.” | PR07 |
+| F05 / O-15 | schemas/reader.v1.schema.json does not contain harmony and admits only open\_leader, warm\_leader, cool\_leader, and glow\_leader; goldens/reader/v1/\* retain legacy identities. The 2026-09-22 option-3 record fixes F06 and defers F05. | PR07 |
+| F07 / O-19 | tests/evidence/test\_dev\_conjunction\_identity.py has 2 failed and 1 passed at the landed tree, failing at tools/evidence/generate\_conjunction\_writer\_evidence.py:85 with SystemExit. The two paths have an empty base..landed diff, so this is consequential rather than an edit. No CI lane executes it: its evidence-lane mapping is absent from that lane’s pytest list and \_FULL\_VALIDATION\_SUPPLEMENTAL\_TESTS, and it was not a changed-test target. The 2026-09-22 F07 record accepts the deviation. | PR07, after PR06 admits the roster |
+| Current-head security review | The only security review ran on PR-open head e927ed0fa2e737f96d47e0cf7b238033484e4006. It did not rerun on later commits; both requests routed to Code Review and mergeGateEnabled is false. The final-session “no findings” outcome on 1064969 has no independently visible reviews-API event. | Stated non-gating limitation; no satisfied security predicate is inferred. Whether a current-head review is required before PR05–PR07 or QA remains outside this record. |
+
+The four intentionally open threads are O-12 (installed-package roster, packaging/release ownership), O-19/F07 (PR07), O-20 (capture generators parse retired compat.meta), and O-21 (canonical parity harness aborts on its birth-only inputs). O-20 and O-21 belong to PR06, where capture write mode first becomes reachable. Carried observations are O-16, O-17, O-18, O-03, and O-06 through O-11. O-13, P-23, P-24, and O-18’s sharpening of O-07/R-09 remain recorded plan defects; none changes scope or opens an RS-10 or RS-20 route.
+
+The base-to-head sweep covers 132 test files reached by neither a CI lane nor a changed-test target. It found four regressions and no fixes: two were corrected in this work unit and two are F07. Fourteen files fail collection at both base and head, requiring \--continue-on-collection-errors. The standing pre-push coverage check is identified as proportionate; the fourteen pre-existing collection errors and five pre-existing failures remain outside CI lanes and are not claimed fixed.
+
+### Canon-conflict register and permanent-canon maintenance
+
+The six-entry CANON\_CONFLICT\_REGISTER is retained unchanged. No entry is reopened, relabeled, omitted, newly decided, or resolved by PR04.
+
+| ID | Classification and decision | Retained effect | Permanent state |
+| :---- | :---- | :---- | :---- |
+| C040-01 | CANON\_RECONCILIATION / APPROVED exactly as proposed by Thoth-17 at 2026-09-08T13:23:24Z | Explicit Done exclusions and current PF09.3 agreement remain preserved. | Source correction resolved; no remaining permanent-canon maintenance item. |
+| C040-02 | CANON\_RECONCILIATION / APPROVED by the same Thoth decision | Current controlled PF12 Markdown remains the source; historical identity mismatch is history only. | Resolved; PF12 currency is ordinary maintenance, U-04. |
+| C040-03 | CANON\_RECONCILIATION / APPROVED by the same Thoth decision | Current PF14 v3.5.7 is retained; C040-05 controls contradictory core-test text. | Historical mismatch resolved. |
+| C040-04 | CANON\_RECONCILIATION / APPROVED by the same Thoth decision | QA identity history remains preserved; PR04 performed engineering checks, not independent QA. | Historical mismatch resolved. |
+| C040-05 | CANON\_RECONCILIATION / APPROVED, alternative A exactly, by Isis-49 at 2026-09-09T03:57:16Z | The four-argument Gate core supersedes precomputed-score passages; PR04 introduced no second calculator and removed ts\_v0. | PF14 §6.7 correction remains governed, unperformed, and non-gating. |
+| C040-06 | NEW\_CANON / APPROVED, alternative A exactly, by Isis-50 at 2026-09-09T11:48:08Z | The 36-row taxonomy and 16-case conformance are consumed through PR01–PR03 with no changed weights. | PF12 §2.1 and PF01 §§6.1–6.2 maintenance remains governed, unperformed, and non-gating. |
+
+The PF01 §4.5 versus PF05 §5.2.3 token-naming tension remains plan observation O-01 and result observation O-16. It is a naming conflict between canon owners, not an implementation defect: Plan decision D-04 retains the instruction §6.6 ERR\_READER\_\* mapping at application boundaries while §5.2.3 tokens remain registered. No new register entry or overriding canon decision is established. The recorded remedy is a one-tuple-plus-owner-regeneration change under the named owners.
+
+### Review findings and status effects
+
+| Finding | Retained conclusion |
+| :---- | :---- |
+| N-01 | Instruction v1.0 §6.5’s route conflation is the root of O-13 and the framing gap behind F03. It has no additional effect on this acceptance because the described handler was delivered. |
+| N-02 | Result v1.0 §6 omits the final two F02 manifest re-cuts. The final a5f06ae3… is present in the PR body and ledger; the manifest is correct. This is record completeness only. |
+| N-03 | The branch-preservation handoff statement is false, but refs/pull/467/head preserves the evidence needed for complete attribution. |
+| N-04 | The two landed failing tests are a written PR07-owned deviation, not a silent waiver. |
+| N-05 | No current-head security review exists. This is a stated limitation, not a satisfied predicate. |
+
+No finding is a precise, substantiated defect requiring bounded-owner return. No material scope, architecture, requirement, or design-boundary defect is discovered.
+
+HDE-EPIC040-PR04 remains ACCEPTED\_FINAL and is never rerun, reopened, revised, or given a duplicate acceptance receipt. The fixed work-unit order remains PR01 → PR02 → PR03 → PR04 → PR05 → PR06 → PR07 → OPS01. PR05 — full golden comparison and read-only Gate readiness — is the next planned unit; its PR-10 instruction-authoring stage is eligible, while this acceptance authorizes no PR05 implementation, Proceed, or merge. PR06 retains complete release admission and convergence. PR07 carries F03, F05, and F07. OPS01 retains final external verification.
+
+### Scope boundaries and nonclaims
+
+This acceptance establishes neither independent QA nor a QA verdict, acceptance-token satisfaction, OPS execution, deployment, release admission, promotion, activation, PF09 status movement, closeout, or epic closure. It establishes no PR05, PR06, PR07, or OPS01 implementation, merge, execution result, or artifact.
+
+The immutable Specification v1.1, Audit v2.0, Plan v2.1, Plan Review v2.1, approved F01 overlay, F02 direct decision, accepted-final PR01 through PR03, original Proceed, checkpoints, ledger entries, deferral records, and the truthful pre-merge PR-35 MERGE\_PENDING record remain unchanged. PR-35 is not restated as a post-merge fact.
+
+### Evidence and traceability
+
+- Primary review source: HDE-EPIC040-PR04 — PR Work-Unit Lineage Review v1.0.  
+- Repository: amthorn78/glow-hdengine-v2.  
+- Attribution proof: API merge record for \#467; refs/pull/467/head; git tree equality between 1064969 and cd6f9e6; direct-delta reconciliation EXACT at cutoff 71511b99.  
+- Exact hosted-CI proof: run 35777936856, head 106496971fe46ef7a0414a00944bb034d508b9e2, .github/workflows/ci.yml, CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK, seven lanes, zero failed jobs.  
+- Direct landed-tree executions: generate\_open\_rails\_abba\_proof.py \--check-current under declared rails; tests/evidence/test\_dev\_conjunction\_identity.py; and catalog/manifest.json parsing. Each ran with a clean working tree before and after and made no repository mutation.  
+- Review scope: the full CI suite, seven lanes, and attestation builder were not rerun. Hosted CI identity, result, and head binding were verified through the authorized API; targeted source reading and execution established requirement coverage without exhaustively re-deriving every acceptance criterion.  
+- Permanent-source lookup in the lineage review was limited to docs/pfcanon/. No Google Doc, .doc, .docx, export, archive result, or search hit was opened, compared, or cited by that review.
+
+GCFPE\_PROMPT\_USES retains GCFPE-USE-HDE-EPIC040-PR-40-20260922-PR04-01: EPIC / HDE-EPIC040 / Separation Pass 3; HDE-EPIC040-SPECIFICATION v1.1, SPECIFICATION\_APPROVED; work unit HDE-EPIC040-PR04; ecosystem release GCFPE-20260914.1, selected contract 091426.1, 55 members; prompt PR-40 — Review PR Work-Unit Lineage — 091426.1; prompt page [https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204](https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204); retrieved revision timestamp 2026-09-21T22:56:56.431Z; MANUAL\_PROMPT\_EXECUTION; capture time 2026-09-22T21:35:55Z; supporting skill glow-merged-change-attribution-lock, evidence-only and non-authoritative. Earlier exact references remain GCFPE-USE-HDE-EPIC040-RS-30-20260922-PR04-F01-01, GCFPE-USE-HDE-EPIC040-RS-20-20260922-PR04-F01-01, GCFPE-USE-HDE-EPIC040-RS-10-20260922-PR04-F01-01, and GCFPE-USE-HDE-EPIC040-PR-20-20260922-PR04-01. PR-30 and PR-35 entries remain in the implementation result. Repository provenance persistence is not installed and is non-gating.
+
+### Relationship to existing guidance
+
+This record preserves the approved F01 interim gate condition and the F02 manifest decision without reopening either. It also preserves the accepted-final status of PR01, PR02, and PR03, the immutable whole-change sources, the fixed PR01 through OPS01 order, and the six-item canon-conflict register.
+
+It adds the final PR04 lineage determination only: the exact landed attribution for \#467; the qualified ACCEPT / ACCEPTED\_FINAL state; the source-route correction; the no-waiver treatment of F03, F05, and F07; the stated current-head security-review limitation; the retained open-review and coverage facts; and the PR05, PR06, PR07, and OPS01 boundaries. It does not supersede unrelated guidance.
 
 \<eof\>  
