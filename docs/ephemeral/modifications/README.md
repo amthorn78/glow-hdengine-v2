@@ -1,6 +1,7 @@
 # Modifications
 
-One file per Modification, the unit of approval in the GCFPE MGMT change process (`D20`).
+One file per run. Everything handed in together is one Modification, with its changes grouped
+into parts: a part lands whole or not at all (`D21`, which refines `D20`).
 
     MODIFICATION-<yyyymmdd>-<slug>.md
 

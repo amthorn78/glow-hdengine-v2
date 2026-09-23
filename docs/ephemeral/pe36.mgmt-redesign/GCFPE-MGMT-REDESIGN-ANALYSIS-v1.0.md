@@ -808,6 +808,29 @@ group identically; they differ only in how finely they split off already-true pa
 intake record and six drafts are adopted. The rerun also found an unfilled template section
 passing as filled, now fixed. Record: `TRIAGE-RERUN-COMPARISON-v1.0.md`.
 
+### Corrected, 2026-09-23 — one run is one Modification (`D21`)
+
+**The design this document set out made a Modification one rule, and that was wrong.** §3.2 had
+items batching only when they shared a rule, a verification or a cycle, each Modification with one
+coupling. The rerun turned one list into six Modifications — six analyses, six plans, six
+executions and twelve approvals — which is the one-at-a-time processing the Product Owner rejected
+on 2026-09-22. The shared-package rule added that morning treated the symptom.
+
+`D21` replaces it:
+
+- **One run is one Modification.** Everything handed in together moves through the three modes
+  together, with one approval per mode and one handoff.
+- **Parts carry failure.** A part is what must land together, and it lands whole or not at all;
+  parts are independent unless ordered. `coupling` is retired.
+- **A merge preserves; it never approves.**
+- **One session can carry the whole process**, pausing for approval between modes.
+- **Workers are delegated by workload, never one per change.**
+
+The template, the validator, the triage prompt and the MGMT-10 draft all changed to match. The six
+drafts from the rerun are superseded; their item-level findings stand as evidence in
+`TRIAGE-RERUN-COMPARISON-v1.0.md`.
+
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage

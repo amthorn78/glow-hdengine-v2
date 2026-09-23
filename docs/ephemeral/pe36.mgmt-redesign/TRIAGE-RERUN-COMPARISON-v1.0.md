@@ -4,7 +4,7 @@ artifact_version: "1.0"
 created_date: 2026-09-23
 session: PE36
 stage: 4 — first real use, intake step
-status: TEST_COMPLETE_RUN_D_ADOPTED
+status: DRAFTS_SUPERSEDED_BY_D21_FINDINGS_STAND
 authority: Product Owner ruling, 2026-09-23 — "if the triage prompt is invalid, the results are invalid"; rerun after the fixes
 prompt_under_test: "Modification Intake and Triage — PROPOSED (D20 redesign)", Notion 3e34590a05eb81bfbf1ed0651e6b6ddf, as revised 2026-09-23
 repository_state: PR #471 head 6a3ee19, whose docs match main cacd5a1 exactly; one git worktree per run
@@ -157,3 +157,18 @@ else. Run D did this step itself, so the prompt's own commit-and-push instructio
 
 Read back from GitHub for this record, not from the run's copy: the validator passes 7/7 on the
 pushed files, with the version on `main` and with this pull request's fix.
+
+## 10. Superseded, 2026-09-23 — `D21`
+
+**The six drafts are superseded, not adopted.** They were built under a model that made each rule
+its own Modification. The Product Owner ruled that one run is one Modification, with its changes in
+parts: *"We should be able to group multiple changes in a single run, that is the WHOLE POINT of all
+this."*
+
+**What still stands** is the item-level work: two independent runs agreed on every disposition,
+with the evidence cited above. A triage run under `D21` will reach the same items, and group them
+into parts of one Modification rather than into six.
+
+**The branch.** The six drafts on `docs/20260923-modification-intake-alpha-feedback-open-items`
+are marked `ABANDONED`, so the next triage run's duplicate check skips them. The branch is not
+merged; the Product Owner may merge it to preserve the record, or delete it.

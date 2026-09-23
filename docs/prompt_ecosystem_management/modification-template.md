@@ -1,17 +1,23 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.0"
+artifact_version: "2.0"
 created_date: 2026-09-22
+revised_date: 2026-09-23
 status: BINDING
-authority: Product Owner decision D20, 2026-09-22
+authority: Product Owner decisions D20 (2026-09-22) and D21 (2026-09-23)
 validated_by: docs/prompt_ecosystem_management/modification_validate.py
 ---
 
 # The Modification — template and format
 
-One Modification per change. It is the unit of **approval and verification**, not the unit of
-"one thing" — items batch into it when they share a rule, a verification, or a
-package/review/install cycle (`D20`, and §3.2 of the redesign plan).
+**One run is one Modification** (`D21`). Everything handed in together goes through `ANALYZE`,
+`PLAN` and `EXECUTE` together, with one approval per mode. A list of six unrelated changes is one
+Modification, not six.
+
+**Parts carry failure.** Inside a Modification, a part is the changes that must land together —
+one rule across its surfaces, above all. A part lands whole or not at all. Parts land
+independently of each other unless one is ordered `after` another. A Modification with no
+`parts` is a single part.
 
 **Not a "Change Record", never `CR`.** `CRD` appears 2,694 times in `docs/`, and `CHANGE_RECORD`
 is already `GCFPE-MGMT-10`'s own declared output artifact at
@@ -28,23 +34,24 @@ Copy everything between the markers. Delete the comments; keep the keys.
    and returns — it does not edit upstream (`AUTH-001` applied to this document's internal
    structure).
 2. **Approval is a recorded field, not a remembered fact.** `analyze_approved_by` empty blocks
-   `PLAN`; `plan_approved_by` empty blocks `EXECUTE`. That is what makes a Modification survive a
-   session ending mid-change.
-3. **Scope freezes at `ANALYZE` approval.** The `items` list may not grow afterwards. New scope is
-   a new Modification with `spawned_from` set — never a wider one. This is what bounds the review
-   loops.
+   `PLAN`; `plan_approved_by` empty blocks `EXECUTE`. That is what lets one session carry the
+   whole process and a fresh one resume it. **A merge preserves the record; it approves nothing**
+   (`D21-C`).
+3. **Scope freezes at `ANALYZE` approval.** The `items` list may not grow afterwards. A part may
+   still be dropped, with the reason recorded as its items' disposition. New scope is a new
+   Modification with `spawned_from` set — never a wider one. This is what bounds the review loops.
 4. **Every §P step carries a verification that could fail.** A step whose check is "read it and
    see" is not a step (`CHK-001`, `D11`).
 5. **Every §E step and item carries a disposition.** A skipped step is a recorded disposition,
    never an omission. Silence is impossible by construction.
-6. **Modifications that change the same skill share one package, one review and one install.**
-   Product Owner decision, 2026-09-23. `PLAN` names the others in `shares_package_with`, and the
-   shared package is built only once every sharing Modification's plan is approved. Each
-   Modification keeps its own approval, coupling, steps and dispositions. The shared review,
-   install and merge are counted once in `interaction_cost`, on the first Modification named,
-   and as 0 on the rest. If the review rejects one Modification's edit, that Modification is
-   blocked. By default the package is fixed and reviewed again; Nathan may instead ship the others
-   without it.
+6. **A part lands whole or not at all.** A part with some items applied and others blocked fails
+   validation. Roll back what was applied, or unblock the rest.
+7. **Every part that changes the same skill ships in one package, one review and one install.**
+   Across separate runs, `PLAN` may share a package too: it names the other Modifications in
+   `shares_package_with`, the shared package is built only once every sharing plan is approved,
+   and its review, install and merge are counted once in `interaction_cost`. If the review
+   rejects one part's edit, that part is blocked. By default the package is fixed and reviewed
+   again; Nathan may instead ship the rest without it.
 
 ## The Product Owner is never blocked by any of this
 
@@ -76,12 +83,10 @@ would only make the record lie.
 ```markdown
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
-modification_id: MODIFICATION-20260922-example-slug
+modification_id: MODIFICATION-20260923-example-slug
 status: INTAKE            # INTAKE ANALYZING ANALYZED PLANNING PLANNED EXECUTING COMPLETE BLOCKED ABANDONED
-intake_record: ""         # INTAKE-<yyyymmdd>-<slug>.md beside this file, written by triage; empty if none
-coupling:                 # ATOMIC = one act, a failure stops all. INDEPENDENT = per-item. No default: someone decides it
-targets: []               # any of: prompt skill rule graph registry notion_control
-gate_tier:                # 0 1 2 — computed from closure.py and the rebuilt part, never judged
+targets: []               # union across parts: prompt skill rule graph registry notion_control
+gate_tier:                # 0 1 2 -- the highest across parts, computed from closure.py, never judged
 closure:                  # computed; do not type these by hand
   upstream: []
   downstream: []
@@ -91,14 +96,19 @@ override:                 # optional; the Product Owner waiving a policy gate
   by: ""                  # overridable: scope_freeze readiness modification_class gate_tier deferral
   overrides: []
   reason: ""              # for a successor reading the record, not a justification owed to anyone
-modification_class:       # A B C D E — ecosystem-change-management.md §2
 interaction_cost_predicted:
 interaction_cost_actual:  # filled in §E; this is what calibrates the prediction
 items:
-  - id: ITEM-01
+  - id: ITEM-01           # numbered once across the run
     statement: "one sentence of requested outcome"
     source: ""            # the entry it came from, e.g. AF-008; empty for a new request
     disposition: ""       # filled in §E: APPLIED VERIFIED BLOCKED NOT_APPLICABLE
+parts:                    # every item in exactly one part; a part lands whole or not at all
+  - id: PART-01
+    name: "what this part changes, in a few words"
+    items: [ITEM-01]
+    class:                # A B C D E -- set by ANALYZE; ecosystem-change-management.md §2
+    after: []             # parts that must land before this one
 request: "the request, as received, verbatim -- never a copy of an entry's text; source names it"
 requested_by: Nathan
 analyze_approved_by: ""   # empty blocks PLAN
@@ -107,31 +117,30 @@ plan_approved_by: ""      # empty blocks EXECUTE
 plan_approved_date: ""
 supersedes: ""
 spawned_from: ""          # the Modification that found this scope, if any
-shares_package_with: []   # set by PLAN: other Modifications changing the same skill (rule 6)
+shares_package_with: []   # set by PLAN, rarely: another run changing the same skill (rule 7)
 ---
 
-# MODIFICATION-20260922-example-slug
+# MODIFICATION-20260923-example-slug
 
 One sentence: what this changes and why.
 
 ## Intake
 
-*Written by triage at INTAKE: why these items belong together, and any link to another group — a
-shared skill, an order, a tension. Absent when the Modification did not come through triage.*
+*Written by triage at INTAKE. Every item handed in, whatever its disposition, with its evidence —
+an item that does not become part of the work lives only here. Then the parts: why each part's
+items must land together, and any order or tension between parts. Absent when the Modification
+did not come through triage.*
 
 ## §A — Analysis
 
 *Written by MODE = ANALYZE. Frozen once approved.*
 
-### Closure and gate tier
+### Per part: closure, tier, class and targets
 
-Output of `closure.py`, pasted. Which tier, and why — including whether anything here changes
-what a prompt *produces* rather than how it *routes*, which forces Tier 1 regardless of the
-graph part.
-
-### Targets and coupling
-
-What this touches, and the gates each target implies. Why ATOMIC or INDEPENDENT.
+For each part: the output of `closure.py` for every prompt it touches, pasted; its tier, and why —
+anything that changes what a prompt *produces* rather than how it *routes* is Tier 1 regardless
+of the graph part; its class A–E; and its targets, with the gates each implies. The
+Modification's tier is the highest of its parts'.
 
 ### Scope, and how it was measured
 
@@ -151,18 +160,20 @@ is `NEEDS_RULING` — which is advice, not a refusal.
 
     interaction_cost = open rulings + 2 + review cycles + installs + merges
 
-State the number, its breakdown, and what a split would save. No threshold, no score.
+State the number, its breakdown, and what moving a part to a separate run would save. No
+threshold, no score.
 
 ## §P — Plan
 
 *Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
 
-Ordered steps. Each names its target, the exact edit, its authority, its verification and its
-rollback. A plan is complete when it could be executed mechanically with no interpretation.
+Ordered steps, grouped by part. Each names its part, its target, the exact edit, its authority,
+its verification and its rollback. A plan is complete when it could be executed mechanically with
+no interpretation.
 
-| # | target | edit | authority | verification | rollback |
-|---|---|---|---|---|---|
-| 1 | | | | | |
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| 1 | | | | | | |
 
 ### Product Owner actions
 
@@ -174,9 +185,13 @@ Merge, install, promote — named, with how each is verified.
 
 *Written by MODE = EXECUTE. Requires plan_approved_by.*
 
-| step | disposition | evidence |
-|---|---|---|
-| 1 | | |
+| step | part | disposition | evidence |
+|---|---|---|---|
+| 1 | | | |
+
+### Parts
+
+Each part's outcome: landed whole, or blocked with its applied steps rolled back.
 
 ### Artifacts produced
 
@@ -191,56 +206,6 @@ the estimate is a measurement rather than an opinion.
 ```
 
 ## TEMPLATE ENDS
-
----
-
-## The intake record — one per triage run
-
-Triage writes one intake record per run, at
-`docs/ephemeral/modifications/INTAKE-<yyyymmdd>-<slug>.md`, beside the drafts it creates, and
-commits them together. **It is the only home for an item that does not become a Modification** —
-a duplicate, an already-ruled item, an already-true one. Without it, those answers exist only in a
-chat that ends. Each draft's `intake_record` names it, and the validator checks that the record
-exists and lists that draft.
-
-## INTAKE RECORD BEGINS
-
-```markdown
----
-artifact_type: GCFPE_INTAKE_RECORD
-intake_id: INTAKE-20260922-example-slug
-created_date: 2026-09-22
-requested_by: Nathan
-request: "what Nathan pasted, verbatim"
-modifications: [MODIFICATION-20260922-example-slug]
----
-
-# INTAKE-20260922-example-slug
-
-## A. Items
-
-Every item, whatever its disposition.
-
-| # | source | statement | disposition | evidence | apparent surface (unmeasured) |
-|---|---|---|---|---|---|
-| 1 | AF-008 | one sentence of requested outcome | NEW | | |
-
-Evidence is required for NOT_A_CHANGE (the file and line, or field, showing it is already true),
-DUPLICATE_OF (the id) and ALREADY_RULED (the D-number).
-
-## B. Grouping
-
-| Modification | items | coupling | why these belong together |
-|---|---|---|---|
-
-Links between groups: a shared skill (rule 6), an order, a tension.
-
-## Validator output
-
-Pasted, not described.
-```
-
-## INTAKE RECORD ENDS
 
 ---
 

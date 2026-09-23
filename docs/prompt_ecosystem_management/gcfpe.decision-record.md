@@ -1071,3 +1071,70 @@ needs its own authorization, and the Class A prompt rewrite needs it most.
 
 **The pilot is not optional.** *"The new process works"* is a claim, and this ecosystem's failures
 are uniformly claims made before the measurement that would have checked them.
+
+## D21 — One run is one Modification; parts carry failure; one session can carry the whole process
+
+**Product Owner, 2026-09-23**, on the first triage run turning one list into six Modifications:
+*"why do I need 6 handoffs?? We have a serious issue. We should be able to group multiple changes
+in a single run, that is the WHOLE POINT of all this."* Then: *"really it would be ideal if a
+prompt could do the whole process in one session with subagents, but even then, having one agent
+per change seems like overkill."* And, on whether a merge approves anything: *"I merge to preserve
+documentation."*
+
+### What was wrong
+
+`D20` made a Modification the unit of approval: items batched only when they shared a rule, a
+verification or a cycle, and each Modification had one `coupling`. A list of six different rules
+therefore became six Modifications — six analyses, six plans, six executions and twelve approvals.
+That is one-at-a-time processing at a coarser grain, which the Product Owner had already rejected
+on 2026-09-22: *"one change at a time through the system is just not realistic."* The shared-package
+rule added the same morning cut review cycles but not the round trips; it treated the symptom.
+
+### The rulings
+
+**D21-A — One run is one Modification.** Everything handed in together goes through `ANALYZE`,
+`PLAN` and `EXECUTE` together, with one approval per mode, and triage emits one handoff. `ANALYZE`
+may still recommend moving a part to a separate run. That is advice, never a refusal.
+
+**D21-B — Parts carry failure; the Modification does not.** A part is the changes that must land
+together — one rule across its surfaces, above all, so splitting a rule stays the `D12` error. A
+part lands whole or not at all. Parts land independently unless one is ordered `after` another.
+Each part carries its own class A–E, because a batch mixes them. **`coupling` is retired.**
+
+**D21-C — A merge preserves the record; it approves nothing.** Approval is the recorded field in
+the Modification. Triage opens a pull request so its output can be merged whenever the Product
+Owner wants it preserved.
+
+**D21-D — One session can carry the whole process.** Triage, then `ANALYZE`, `PLAN` and `EXECUTE`,
+pausing for the Product Owner's approval between modes and continuing in the same session once it
+is recorded. A handoff is needed only when a fresh session takes over.
+
+**D21-E — Delegate by workload, never by change.** A worker takes a measured slice of the work — a
+lane of prompt bodies, a set of files — when parallel reading or independent verification pays for
+it. Most Modifications need no worker, and none gets one agent per change. The independent §10 skill
+review stays independent, by its own rule.
+
+### Consequences that bind any session implementing this
+
+- **This supersedes one consequence of `D20`**: "A Modification is the unit of approval, not of
+  'one thing' … `coupling: ATOMIC` … `INDEPENDENT` items take a per-item disposition." Everything
+  else in `D20` stands.
+- Within one Modification, every part that changes a skill ships in one package, one review and
+  one install. `shares_package_with` remains for two separate runs touching the same skill.
+- The six drafts pushed on `docs/20260923-modification-intake-alpha-feedback-open-items` were
+  produced under the superseded model. They are superseded, not adopted.
+
+### The tested guard (`D14`)
+
+`modification_validate.py` enforces the structure:
+
+- every item is in exactly one part;
+- a part names only real items;
+- `after` names real parts and never forms a cycle;
+- each part carries a class once past INTAKE;
+- a part may not be partly applied and partly blocked, at `COMPLETE` or when the Modification
+  stops.
+
+Each check has an injected must-fail regression. Of the 39 selftest cases, 6 fail with the parts
+checks disabled and 2 fail with the half-applied check disabled. A Modification abandoned at
+INTAKE is not asked for analysis fields it never reached, and a must-pass case holds that.
