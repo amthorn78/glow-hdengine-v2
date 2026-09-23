@@ -74,6 +74,10 @@ touch it.
    thing, and skills are what load into a session.** A revision round needs Product Owner
    authorization; it has not been given.
 
+   > **Closed, 2026-09-22.** PE36 Task 01 revised all three skills; the independent §10 review
+   > returned `SKILL_FIT_CONFIRMED` for each, and Nathan installed them, digest-verified
+   > (`docs/ephemeral/pe36.task-01/`; `notion-write-boundary.md`, *Conflicts identified*).
+
 2. **`AF-004`** — 40 of 55 prompt bodies have never been scanned for a decorated governance line.
    Deferred by the Product Owner, 2026-09-21, to the next `GCFPE-MGMT-10` run. Round 30 widened
    what such a scan would catch in **both** directions: it catches every good-faith rendering now,
@@ -82,9 +86,16 @@ touch it.
    governance *value* after the key, or exempt a line containing a prohibition word — **never a
    looser strip.**
 
+   > **Closed, 2026-09-23.** `MODIFICATION-20260923-alpha-feedback-open-entries` PART-01 (ITEM-01
+   > `VERIFIED`) validated the 40 remaining bodies with 0 `PROMPT_BODY_GOVERNANCE_STATE` hits, so all
+   > 55 `091426.1` bodies have been checked (`docs/ephemeral/modifications/evidence/PART-01-scan.md`).
+
 3. **`AF-001`, `AF-002`, `AF-003`** stand as recorded on the Alpha Feedback page. All Product
    Owner-deferred. `AF-002` carries the release-scope trap `SCOPE-002` — older-release contracts
    correctly still contain the retired drainage lifecycle and **must not be "fixed"**.
+
+   > **Disposed, 2026-09-22.** The Product Owner marked `AF-001`, `AF-002` and `AF-003` WON'T DO on
+   > the Alpha Feedback page; `SCOPE-002` still applies to `AF-002`'s older-release contracts.
 
 4. **`reconciliation-backlog.md`** holds the surfaces still carrying retired drainage, Drive
    storage and struck-check language. The `HDE Change Flow Overview`'s operating paragraphs were

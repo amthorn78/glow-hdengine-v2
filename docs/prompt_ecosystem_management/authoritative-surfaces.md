@@ -4,7 +4,7 @@ artifact_version: "1.0"
 created_date: 2026-09-18
 status: BINDING
 authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21
-baseline: main @ bf8f74d
+baseline: main @ aeb256e
 ---
 
 # Authoritative surfaces
@@ -25,8 +25,8 @@ the repository wins and the Notion page is the thing to correct.
 | Selection status | `SELECTED` — promoted 2026-09-21 by Product Owner decision `D17` |
 | Selection authority | The **GCFPE Membership and Release Register** in Notion, and nothing else. Every control page reads `REGISTER_CONTROLLED` and asserts no selection of its own |
 | Predecessor | `GCFPE-20260913.1` / `091326.2` / 54 — superseded, **archived intact** (56 pages moved, never copied or rewritten) |
-| Repository baseline | `main` @ `bf8f74d` |
-| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…`, as measured before `D23` |
+| Repository baseline | `main` @ `aeb256e` |
+| Graph proof token | `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…`, as measured after `D23` |
 
 The graph proof token is reproduced by building from the committed parts. A session that
 builds and gets the same token has proved agreement; nothing needs a stored copy.

@@ -140,7 +140,7 @@ routine; keep them working rather than rebuilding them.
 |---|---|---|
 | **Contract registry with behavioural assertions** | `project-prompt-contract-registry.md` | `required_regex` binds the Canon source and the `D23` canonical wordings; `forbidden_regex` guards `D7`, the `D23` reversals and session creation. |
 | **Governance audit** | `amthor-workspace-governance-audit` skill | Executes the registry assertions on demand. Not on push — this material is outside application CI by design (see `README.md`). |
-| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…`, as measured before `D23`, proves a rebuild matched. |
+| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…`, as measured after `D23`, proves a rebuild matched. |
 | **Isolated-readback harness** | pattern, `execution-and-delegation-model.md` §7 | Proves an applied change landed, without the verifier knowing the expectation. |
 | **Regression-injection test** | pattern, D11 | Proves a guard actually catches what it claims. The D7 guard was tested against five injected regressions and a clean control. |
 | **Succession record** | `pe-succession/` | Lets a session be replaced without losing the inheritance. |
