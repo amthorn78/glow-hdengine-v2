@@ -1282,6 +1282,26 @@ PR-20 for a new plan, in a new dedicated implementor session that Nathan seeds, 
 Each ruling gets a registry assertion with an injected must-fail regression, as listed in the
 Modification's §P. **Until those land, `D23` is ruled but not applied.**
 
+### Correction, 2026-09-23 — D23-F names the wrong R1 row
+
+Found by the EXECUTE preflight of the plan and confirmed against the bundled oracle
+(`flowmaster-validate/references/glow-hde-canonical-change-flow-r1.json`). D23-F above is left as
+written (`AUTH-001`); this is its successor.
+
+- **`STOP_SECOND_APPROVAL_OBJECT_REQUESTED` is on GCF-16, not GCF-15.** GCF-15's stop conditions are
+  `STOP_PLAN_IDENTITY_MISMATCH or STOP_PO_PROCEED_NOT_INVOKED`.
+- **GCF-16 already allows the re-plan.** Its approval contract is "bounded to one Plan; it does not
+  authorize … another Plan", and its recovery owner is "remove the invented gate or replan/reinvoke".
+  A new Proceed on a new plan is therefore a new traversal, not a second approval object. GCF-16 needs
+  no change.
+- **The re-plan does change GCF-17.LINEAGE, PR-40's row.** Its `next` rows are GCF-19 and GCF-20
+  only, so PR-40 has no R1 transition back to planning. D23-F therefore re-pins **GCF-17.LINEAGE**,
+  whose `next` gains GCF-14, and not GCF-15. It is revised in one oracle revision together with
+  GCF-17 (D23-D).
+
+This corrects a fact, not a ruling. How the oracle revision is made, whether by a successor oracle
+or an in-place re-pin, is a proposal in the Modification's plan amendment and awaits approval.
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
