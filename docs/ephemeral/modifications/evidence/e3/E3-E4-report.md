@@ -1,6 +1,6 @@
-# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 5
+# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 6
 
-Revisions 3, 4 and 5 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
+Revisions 3 to 6 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
 E4, re-ran E4 items 7–9, and measured four G06 alternatives. Items 1–6 and 10 do not read bodies, and nothing
 they read has changed since the first run, so their results below are those of that run (2026-09-23).
 
@@ -27,6 +27,23 @@ Every command ran with `PYTHONDONTWRITEBYTECODE=1`. No `__pycache__` was created
 
 Usage: `<bodies JSON> | PYTHONDONTWRITEBYTECODE=1 python3 <script> /tmp/claude-0/e2/skills`
 
+
+## Revision 6 (after hardening round a3, `evidence/repair-a3/`)
+
+**What changed.** Nothing E3 reads. The edited skill tree gained the round-a3 hardening. Item 7's validator
+now expects the D23-E sentence in `route_graph_semantics.pr40_entry`, and the contract it reads carries it. That
+is why E4 was re-run.
+
+**What was re-run.** E4 items 7, 8 and 9, with the same session fetch results, in memory, on the hardened tree.
+
+| check | result |
+|---|---|
+| item 7 | PASS: `prompt_bodies_validated` 55 (all members), `prompt_body_checks_not_evaluated` `[]`, `errors` `[]`, exit 0 |
+| item 8 | PASS: 0 findings on 55 rows, 1 484 assertions |
+| whole result | equal, key for key, to the revision-4 result |
+
+No body text or hash was written, nothing was written to Notion, and nothing was committed by the run. No
+`__pycache__` was created.
 
 ## Revision 5 (after repair round a2, `evidence/repair-a2/`)
 
