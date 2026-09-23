@@ -81,7 +81,7 @@ never committed. **A session that cannot find the builder has not lost it — it
 | Page | ID | Role |
 |---|---|---|
 | Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1 | `3db4590a05eb81de9736ea69bac61016` | Operational mapping index: families, actors, artifacts, lifecycle, selected topology. `REGISTER_CONTROLLED` |
-| GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | `3dc4590a05eb81a9adf1d8f800863937` | The live repair plan and batch checklists |
+| GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | `3dc4590a05eb81a9adf1d8f800863937` | **Closed 2026-09-23** (Product Owner): historical repair plan and batch checklists. Parent of the live Alpha Feedback page |
 | GCFPE Membership and Release Register | `3d24590a05eb81ce942ad994cfca9fa1` | **Sole selection authority.** Selection is resolved only here |
 | Register entry — GCFPE-20260914.1 | `3db4590a05eb816f925ef3b0659de3b8` | The promotion transaction and its archival receipt |
 | Glow HDE Complete Prompt Set — 091426.1 | `3db4590a05eb81738ef1d846e3c0df8c` | The 55-member selected catalog. `REGISTER_CONTROLLED` |
@@ -150,6 +150,11 @@ Several pages legitimately restate the Alpha state for convenience. Each must sa
 breath, that the Flow Index holds it and governs any disagreement. A heading that calls itself
 "Sole operative Alpha state" on a page that is not the Flow Index is the defect — two pages made
 that claim, and one of them was stale.
+
+**Superseded for Alpha state, 2026-09-23 (`D18` successor).** No Notion page holds or restates the
+Alpha state now. The Flow Index section *Alpha state — recorded in the repository, not here* points
+to the Epic's artifacts under `docs/ephemeral/`, and the other pages point to that section. The
+restating rule above still applies to other state.
 
 Predecessor pages are **bannered, never rewritten**. Their bodies are dated evidence under
 `AUTH-001`; the banner states what superseded them and points at the current authority.
