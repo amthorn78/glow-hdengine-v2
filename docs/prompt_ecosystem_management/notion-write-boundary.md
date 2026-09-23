@@ -158,6 +158,13 @@ repeated *"Prompts are authored and revised directly in Notion"* verbatim under 
 and it was corrected in the same change. The three quotations above were checked against the
 installed bytes and are accurate; they were simply not exhaustive.
 
+> **Correction, 2026-09-23.** "No fifth instance" was wrong. `session-relay-flowmaster/SKILL.md:268`
+> read *"Notion is the preferred live control plane for current task, assignment, dependency,
+> decision, and handoff state"*, the same conflict in a fifth place. It was found by the intake of
+> `MODIFICATION-20260923-alpha-feedback-open-entries` (ITEM-03) and replaced with C-NOTION in that
+> Modification's PART-02. The relay 3.1.0 package carrying the fix was installed at E6. The
+> paragraph above is left as written (`AUTH-001`).
+
 The machine-readable prompt contracts in `docs/graph/parts/` were searched and carry **no**
 Notion-write instruction, so the prompt layer does not mandate writes at the contract level. What
 any individual prompt body says was not audited, because this amendment is explicitly not a prompt

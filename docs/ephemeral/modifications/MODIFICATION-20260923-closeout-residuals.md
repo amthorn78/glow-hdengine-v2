@@ -108,6 +108,14 @@ items:
     statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY (D20 redesign) reserves no release-bound header line (D23-G), so it can be promoted without one."
     source: "CLOSE-OUT-20260923 §4.D; Notion page 3e34590a05eb811b93d2da9b4ef8106d, a child of the redesign tracking page"
     disposition: ""
+  - id: ITEM-24
+    statement: "When a maintenance or repair session's message to the Product Owner carries a NEXT_PROMPT_HANDOFF block, the named state (DECISION NEEDED / NOTHING NEEDED / IN FLIGHT) is the line immediately before the block, so the handoff-last ruling and the named-state rule agree in glow-po-reporting, the Hub worker communication rules and session-working-rules.md."
+    source: "Product Owner ruling 2026-09-23 (a maintenance session's handoff goes last; gcfpe.decision-record.md D23 successor) against glow-po-reporting 'end in one of exactly three named states' and Hub 'Worker communication rules' §2"
+    disposition: ""
+  - id: ITEM-25
+    statement: "glow-graph-contract says that the graph copies bundled in skills are validator fixtures built from docs/graph/parts, not sources."
+    source: "Parent Modification Amendment 1 'Noticed, not in scope' (spec S-3); glow-graph-contract/SKILL.md:59"
+    disposition: ""
 parts:
   - id: PART-01
     name: "Skill handoff wording follows D23-B"
@@ -121,7 +129,7 @@ parts:
     after: []
   - id: PART-03
     name: "Stale statements in skill text"
-    items: [ITEM-03, ITEM-07, ITEM-09, ITEM-10, ITEM-14]
+    items: [ITEM-03, ITEM-07, ITEM-09, ITEM-10, ITEM-14, ITEM-25]
     class:
     after: []
   - id: PART-04
@@ -162,6 +170,11 @@ parts:
   - id: PART-11
     name: "MGMT-10 proposed body header"
     items: [ITEM-23]
+    class:
+    after: []
+  - id: PART-12
+    name: "Named state sits immediately before a handoff block"
+    items: [ITEM-24]
     class:
     after: []
 request: |
