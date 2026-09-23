@@ -1,6 +1,6 @@
-# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 4
+# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 5
 
-Revisions 3 and 4 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
+Revisions 3, 4 and 5 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
 E4, re-ran E4 items 7–9, and measured four G06 alternatives. Items 1–6 and 10 do not read bodies, and nothing
 they read has changed since the first run, so their results below are those of that run (2026-09-23).
 
@@ -27,6 +27,24 @@ Every command ran with `PYTHONDONTWRITEBYTECODE=1`. No `__pycache__` was created
 
 Usage: `<bodies JSON> | PYTHONDONTWRITEBYTECODE=1 python3 <script> /tmp/claude-0/e2/skills`
 
+
+## Revision 5 (after repair round a2, `evidence/repair-a2/`)
+
+**What changed.** Nothing E3 reads. `body_rules.py`, the canonical texts, the decision record and the
+registry are unchanged since revision 4. The edited skill tree gained the round-a2 checks. Item 7 runs its
+`validate_gcfpe_20260914.py`, whose `validate_contract` now also checks `historical_non_executable_references`
+exactly. That is why E4 was re-run.
+
+**What was re-run.** E4 items 7, 8 and 9, with the same session fetch results, in memory, on the repaired tree.
+
+| check | result |
+|---|---|
+| item 7 | PASS: `prompt_bodies_validated` 55 (all members), `prompt_body_checks_not_evaluated` `[]`, `errors` `[]`, exit 0 |
+| item 8 | PASS: 0 findings on 55 rows, 1 484 assertions |
+| whole result | equal, key for key, to the revision-4 result |
+
+No body text or hash was written, nothing was written to Notion, and nothing was committed by the run. No
+`__pycache__` was created.
 
 ## Revision 4 (after repair round a1, commit `32e04d4`)
 
