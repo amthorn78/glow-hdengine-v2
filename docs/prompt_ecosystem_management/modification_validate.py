@@ -13,16 +13,20 @@ be a script. Requires PyYAML.
 What it checks, and the rule each check enforces:
 
   frontmatter parses, and carries every required key
-  status is in the vocabulary
-  coupling is ATOMIC or INDEPENDENT, and gate_tier is 0, 1 or 2
-  the section for the declared status is present and not empty
+  status is in the vocabulary; gate_tier is 0, 1 or 2
+  one run is one Modification (D21): every item is in exactly one part, each part names only real
+    items, and `after` names real parts without ordering them in a cycle
+  each part carries a class A-E once past INTAKE (a Modification with no parts is one part, and
+    carries modification_class instead)
+  the section for the declared status is present, and says something beyond the template's own
+    headings and guidance
   ENTRY GATE  analyze_approved_by is non-empty before PLANNING or later
   ENTRY GATE  plan_approved_by is non-empty before EXECUTING or later
   every item has an id and a statement
   every item has a disposition once status is COMPLETE
+  a part lands whole or not at all: no part may be partly applied and partly blocked
   scope freeze: items may not be added after approval -- checked by item_count_at_approval
   COMPLETE requires interaction_cost_actual to be set, which is what calibrates the prediction
-  a Modification citing new scope sets spawned_from rather than widening its own items
 
 readiness is ADVISORY and never blocks. It reports what ANALYZE concluded; it does not refuse.
 The gates here exist to stop a SESSION proceeding on its own judgement, never to stop the Product
@@ -37,9 +41,9 @@ The reason is for a successor session reading the record, not a justification an
 An override waives a policy gate; it cannot make a malformed record well-formed.
 
 An INTAKE draft is held to what triage writes, and nothing more: the required keys, one statement
-per item, triage's proposed coupling, an `## Intake` section saying why the items belong
-together, and an intake_record that exists beside it and lists it. Triage names an apparent
-surface; it does not measure scope. That is why the intake prompt needs no contract of its own.
+per item, the parts, and an `## Intake` section holding every item handed in and why the parts
+are shaped as they are. Triage names an apparent surface; it does not measure scope. That is why
+the intake prompt needs no contract of its own.
 
 --selftest runs the injected regressions, then validates the shipped templates themselves, so the
 templates cannot drift away from this script unnoticed (PAIR-001).
@@ -55,7 +59,9 @@ except ImportError:
 
 STATUSES = ["INTAKE", "ANALYZING", "ANALYZED", "PLANNING", "PLANNED",
             "EXECUTING", "COMPLETE", "BLOCKED", "ABANDONED"]
-COUPLINGS = ["ATOMIC", "INDEPENDENT"]
+COUPLINGS = ["ATOMIC", "INDEPENDENT"]  # legacy only: D21 retired coupling in favour of parts
+CLASSES = ["A", "B", "C", "D", "E"]
+APPLIED = {"APPLIED", "VERIFIED"}
 READINESS = ["READY", "SPLIT_RECOMMENDED", "NEEDS_RULING"]
 # Policy gates the Product Owner may waive with a recorded override. Everything else this
 # script checks is well-formedness: an override cannot make a malformed record well-formed.
@@ -75,7 +81,7 @@ FROZEN = ["PLANNING", "PLANNED", "EXECUTING", "COMPLETE"]
 TERMINAL = ["BLOCKED", "ABANDONED"]
 
 REQUIRED_ALWAYS = ["artifact_type", "modification_id", "status", "request", "items"]
-REQUIRED_BEYOND_INTAKE = ["coupling", "targets", "gate_tier", "modification_class", "readiness"]
+REQUIRED_BEYOND_INTAKE = ["targets", "gate_tier", "readiness"]
 
 
 def split_frontmatter(text):
@@ -87,33 +93,107 @@ def split_frontmatter(text):
     return text[3:end], text[end + 4:]
 
 
-def _intake_checks(path, fm, body, mid):
-    """What a triage draft must carry at INTAKE, so the run's conclusions live in files."""
+def _template_section(marker):
+    """The shipped template's text for section `marker`, or "" if the template cannot be read."""
+    try:
+        doc = Path(__file__).resolve().with_name("modification-template.md").read_text(encoding="utf-8")
+        text = _fenced(doc, "## TEMPLATE BEGINS")
+    except (OSError, IndexError):
+        return ""
+    return text.split(marker, 1)[1].split("\n## ", 1)[0] if marker in text else ""
+
+
+def _own_text(seg, marker):
+    """What a section says beyond the template's own headings and guidance for that section."""
+    template = {line.strip() for line in _template_section(marker).splitlines() if line.strip()}
+    return "".join(line.strip() for line in seg.splitlines()
+                   if line.strip() and line.strip() not in template)
+
+
+def _intake_checks(fm, body):
+    """What a triage draft must carry at INTAKE, so the run's conclusions live in the file."""
     bad = []
-    if fm.get("coupling") not in COUPLINGS:
-        bad.append(f"INTAKE: coupling must carry triage's proposal, one of {COUPLINGS}; "
-                   f"got {fm.get('coupling')!r}")
+    if not fm.get("parts"):
+        bad.append("INTAKE: parts are absent; triage puts every item into a part, so the run's "
+                   "grouping lives in the file and not only in chat")
     text = "\n" + body
     if "\n## Intake" not in text:
-        bad.append("INTAKE: section '## Intake' is absent; why these items belong together goes in the file")
+        bad.append("INTAKE: section '## Intake' is absent; every item handed in, and why the parts "
+                   "are shaped as they are, goes in the file")
     elif len(text.split("\n## Intake", 1)[1].split("\n## ", 1)[0].strip()) < 40:
         bad.append("INTAKE: section '## Intake' is present but empty")
-    record = str(fm.get("intake_record") or "").strip()
-    if not record:
-        bad.append("INTAKE: intake_record is empty; every triage run writes one, holding every item")
-        return bad
-    record_path = Path(path).parent / Path(record).name
-    if not record_path.is_file():
-        bad.append(f"INTAKE: intake_record {record} is not beside this Modification")
-        return bad
-    rec_text, _ = split_frontmatter(record_path.read_text(encoding="utf-8"))
-    try:
-        rec = yaml.safe_load(rec_text) if rec_text else None
-    except yaml.YAMLError:
-        rec = None
-    listed = rec.get("modifications") if isinstance(rec, dict) else None
-    if not isinstance(listed, list) or mid not in listed:
-        bad.append(f"INTAKE: intake_record {record} does not list {mid}")
+    return bad
+
+
+def _parts_checks(fm, items):
+    """One run is one Modification, and its parts carry failure (D21). Returns (failures, parts)."""
+    parts = fm.get("parts")
+    if parts in (None, [], ""):
+        return [], []  # a Modification with no parts is a single part
+    if not isinstance(parts, list):
+        return ["parts must be a list"], []
+    bad, part_ids, owner = [], [], {}
+    item_ids = [i.get("id") for i in items if isinstance(i, dict) and i.get("id")]
+    for n, part in enumerate(parts, 1):
+        if not isinstance(part, dict) or not part.get("id"):
+            bad.append(f"part {n} has no id")
+            continue
+        pid = part["id"]
+        if pid in part_ids:
+            bad.append(f"part id {pid} is used twice")
+        part_ids.append(pid)
+        members = part.get("items")
+        if not isinstance(members, list) or not members:
+            bad.append(f"part {pid} has no items")
+            continue
+        for iid in members:
+            if iid not in item_ids:
+                bad.append(f"part {pid} names {iid}, which is not an item")
+            elif iid in owner:
+                bad.append(f"{iid} is in both {owner[iid]} and {pid}; an item belongs to exactly one part")
+            else:
+                owner[iid] = pid
+    for iid in item_ids:
+        if iid not in owner:
+            bad.append(f"{iid} is in no part; every item belongs to exactly one part")
+    order = {}
+    for part in parts:
+        if not isinstance(part, dict) or not part.get("id"):
+            continue
+        after = part.get("after") or []
+        if not isinstance(after, list):
+            bad.append(f"part {part['id']} has an 'after' that is not a list")
+            continue
+        for dep in after:
+            if dep == part["id"]:
+                bad.append(f"part {part['id']} is ordered after itself")
+            elif dep not in part_ids:
+                bad.append(f"part {part['id']} is ordered after {dep}, which is not a part")
+        order[part["id"]] = [d for d in after if d in part_ids and d != part["id"]]
+    # Parts ordered in a cycle can never land: peel off parts with nothing left to wait for.
+    waiting = {pid: set(deps) for pid, deps in order.items()}
+    while True:
+        ready = [pid for pid, deps in waiting.items() if not deps]
+        if not ready:
+            break
+        for pid in ready:
+            del waiting[pid]
+        for deps in waiting.values():
+            deps.difference_update(ready)
+    if waiting:
+        bad.append(f"parts are ordered in a cycle and can never land: {sorted(waiting)}")
+    return bad, [p for p in parts if isinstance(p, dict) and p.get("id")]
+
+
+def _half_applied(parts, items):
+    """A part lands whole or not at all (D21-B)."""
+    disposition = {i.get("id"): i.get("disposition") for i in items if isinstance(i, dict)}
+    bad = []
+    for part in parts:
+        seen = {disposition.get(iid) for iid in part.get("items") or []}
+        if seen & APPLIED and "BLOCKED" in seen:
+            bad.append(f"part {part['id']} is half applied; a part lands whole or not at all -- "
+                       "roll back what was applied, or unblock the rest")
     return bad
 
 
@@ -159,16 +239,31 @@ def check(path):
         if not str(item.get("statement") or "").strip():
             bad.append(f"item {item.get('id', n)} has no statement")
 
-    if status == "INTAKE":
-        # A triage draft is held to what triage writes, and nothing further. Everything triage
-        # concludes goes in a file -- the coupling it proposes, why the items belong together, and
-        # an intake record holding every item, including those that did not become drafts. The
-        # 2026-09-22 comparison test found all three living only in chat.
-        return bad + _intake_checks(path, fm, body, mid)
+    parts_bad, parts = _parts_checks(fm, items)
+    bad.extend(parts_bad)
 
-    for key in REQUIRED_BEYOND_INTAKE:
-        if fm.get(key) in (None, ""):
-            bad.append(f"missing required key beyond INTAKE: {key}")
+    if status == "INTAKE":
+        # A triage draft is held to what triage writes, and nothing further: its parts, and an
+        # Intake section holding every item handed in. The 2026-09-22 comparison test found a
+        # run's conclusions living only in chat.
+        return bad + _intake_checks(fm, body)
+
+    # A Modification can stop from any point. One abandoned at INTAKE never had an analysis, so its
+    # stopping is not a reason to demand the analysis fields -- that would be demanding a lie.
+    if status not in TERMINAL:
+        for key in REQUIRED_BEYOND_INTAKE:
+            if fm.get(key) in (None, ""):
+                bad.append(f"missing required key beyond INTAKE: {key}")
+        # A batch mixes classes -- a rule change beside a prompt defect -- so the class is per part.
+        if parts:
+            for part in parts:
+                if part.get("class") in (None, ""):
+                    bad.append(f"part {part['id']} has no class; ANALYZE sets one of {CLASSES}")
+        elif fm.get("modification_class") in (None, ""):
+            bad.append("missing required key beyond INTAKE: modification_class, or parts each with a class")
+    for part in parts:
+        if part.get("class") not in (None, "") and part.get("class") not in CLASSES:
+            bad.append(f"part {part['id']} class {part.get('class')!r} not in {CLASSES}")
 
     if fm.get("coupling") not in COUPLINGS and "coupling" in fm:
         bad.append(f"coupling {fm.get('coupling')!r} not in {COUPLINGS}")
@@ -179,6 +274,9 @@ def check(path):
     for tgt in fm.get("targets") or []:
         if tgt not in TARGETS:
             bad.append(f"target {tgt!r} not in {TARGETS}")
+
+    if status in ("COMPLETE", "BLOCKED"):
+        bad.extend(_half_applied(parts, items))
 
     if status in TERMINAL:
         # Nothing further is asserted: an abandoned or blocked Modification is a record of where
@@ -201,6 +299,11 @@ def check(path):
             seg = body.split(marker, 1)[1].split("\n## ", 1)[0]
             if len(seg.strip()) < 40:
                 bad.append(f"section {marker} is present but empty")
+            elif len(_own_text(seg, marker)) < 40:
+                # The template's own headings and guidance run past 40 characters, so a section
+                # copied from it and never filled passed as written. Found by the 2026-09-23
+                # triage rerun; only what the section says beyond the template counts.
+                bad.append(f"section {marker} holds only the template's placeholder text")
 
     # --- the Product Owner's override, if one is recorded ---
     # The template ships this block with every field empty and says to keep the keys, so an
@@ -333,6 +436,14 @@ _REGRESSIONS = [
     ("declared section present but empty",
      lambda s: s.replace("## §P — Plan\nenough text here to clear the emptiness check on this section, comfortably.",
                          "## §P — Plan\n"), "present but empty"),
+    ("analysis section copied from the template and never filled",
+     lambda s: s.replace("## §A — Analysis\nenough text here to clear the emptiness check on this section, comfortably.",
+                         "## §A" + _template_section("## §A").rstrip("\n")), "only the template's placeholder text"),
+    ("template guidance kept, with real analysis written beneath it",
+     lambda s: s.replace("## §A — Analysis\nenough text here to clear the emptiness check on this section, comfortably.",
+                         "## §A" + _template_section("## §A").rstrip("\n")
+                         + "\nclosure.py returned radius 1 (PR-10); Tier 1, because the output artifact changes."),
+     None),  # must PASS: keeping the guidance is fine; what counts is what was added
     ("bad status vocabulary",
      lambda s: s.replace("status: COMPLETE", "status: DONE"), "not in"),
     ("bad coupling vocabulary",
@@ -345,107 +456,157 @@ _REGRESSIONS = [
      lambda s: s.replace('statement: "a real statement"', 'statement: ""'), "no statement"),
 ]
 
+_GOOD_BATCH = """---
+artifact_type: GCFPE_MODIFICATION_RECORD
+modification_id: MODIFICATION-20260923-selftest-batch
+status: COMPLETE
+targets: [skill, prompt]
+gate_tier: 1
+readiness: READY
+interaction_cost_predicted: 5
+interaction_cost_actual: 5
+item_count_at_approval: 3
+items:
+  - id: ITEM-01
+    statement: "one rule, first surface"
+    disposition: APPLIED
+  - id: ITEM-02
+    statement: "one rule, second surface"
+    disposition: VERIFIED
+  - id: ITEM-03
+    statement: "an unrelated change, blocked"
+    disposition: BLOCKED
+parts:
+  - id: PART-01
+    items: [ITEM-01, ITEM-02]
+    class: B
+  - id: PART-02
+    items: [ITEM-03]
+    class: D
+    after: [PART-01]
+request: "the request"
+analyze_approved_by: Nathan
+plan_approved_by: Nathan
+---
+# t
+## §A — Analysis
+enough text here to clear the emptiness check on this section, comfortably.
+## §P — Plan
+enough text here to clear the emptiness check on this section, comfortably.
+## §E — Execution
+enough text here to clear the emptiness check on this section, comfortably.
+"""
+# The fixture itself proves parts land independently: PART-02 is blocked beside a landed PART-01.
+
+_BATCH_REGRESSIONS = [
+    ("an item in no part",
+     lambda s: s.replace("items: [ITEM-01, ITEM-02]", "items: [ITEM-01]"), "is in no part"),
+    ("an item in two parts",
+     lambda s: s.replace("items: [ITEM-03]", "items: [ITEM-03, ITEM-02]"), "in both"),
+    ("a part naming an item that does not exist",
+     lambda s: s.replace("items: [ITEM-03]", "items: [ITEM-03, ITEM-09]"), "which is not an item"),
+    ("a part ordered after a part that does not exist",
+     lambda s: s.replace("after: [PART-01]", "after: [PART-07]"), "which is not a part"),
+    ("parts ordered in a cycle",
+     lambda s: s.replace("    class: B\n", "    class: B\n    after: [PART-02]\n"), "cycle"),
+    ("a part with no class past INTAKE",
+     lambda s: s.replace("    class: D\n", ""), "has no class"),
+    ("a part half applied",
+     lambda s: s.replace("    disposition: VERIFIED", "    disposition: BLOCKED"), "half applied"),
+    ("a part left half applied when the whole Modification stopped",
+     lambda s: s.replace("status: COMPLETE", "status: BLOCKED")
+                .replace("    disposition: VERIFIED", "    disposition: BLOCKED"), "half applied"),
+    ("a part with one item applied and one not needed",
+     lambda s: s.replace("    disposition: VERIFIED", "    disposition: NOT_APPLICABLE"),
+     None),  # must PASS: NOT_APPLICABLE is not a failure to land
+]
+
 _GOOD_INTAKE = """---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-selftest-intake
 status: INTAKE
-intake_record: docs/ephemeral/modifications/INTAKE-20260923-selftest.md
-coupling: ATOMIC
 items:
   - id: ITEM-01
     statement: "a real statement"
     source: AF-000
+  - id: ITEM-02
+    statement: "another real statement"
+    source: AF-001
+parts:
+  - id: PART-01
+    items: [ITEM-01]
+  - id: PART-02
+    items: [ITEM-02]
+    after: [PART-01]
 request: "what was pasted"
 ---
 # MODIFICATION-20260923-selftest-intake
 One sentence.
 ## Intake
-why these items belong together, in enough words to clear the emptiness check.
-"""
-
-_GOOD_INTAKE_RECORD = """---
-artifact_type: GCFPE_INTAKE_RECORD
-intake_id: INTAKE-20260923-selftest
-modifications: [MODIFICATION-20260923-selftest-intake]
----
-# INTAKE-20260923-selftest
+every item handed in, and why the parts are shaped as they are, in enough words.
 """
 
 _INTAKE_REGRESSIONS = [
-    ("triage left its proposed coupling out of the draft",
-     lambda s: s.replace("coupling: ATOMIC\n", ""), "INTAKE: coupling"),
-    ("the reason for the grouping exists only in chat",
+    ("triage wrote no parts, so its grouping lived only in chat",
+     lambda s: s.split("parts:\n", 1)[0] + "request:" + s.split("request:", 1)[1], "INTAKE: parts are absent"),
+    ("the items handed in, and the reasons, exist only in chat",
      lambda s: s.split("## Intake")[0], "'## Intake' is absent"),
-    ("no intake record named",
-     lambda s: s.replace("docs/ephemeral/modifications/INTAKE-20260923-selftest.md", '""'),
-     "intake_record is empty"),
-    ("intake record named but never written",
-     lambda s: s.replace("INTAKE-20260923-selftest.md", "INTAKE-20260923-missing.md"), "is not beside"),
-    ("intake record does not list this draft",
-     lambda s: s.replace("modification_id: MODIFICATION-20260923-selftest-intake",
-                         "modification_id: MODIFICATION-20260923-another"), "does not list"),
+    ("a draft abandoned at INTAKE, before any analysis existed",
+     lambda s: s.replace("status: INTAKE", "status: ABANDONED"),
+     None),  # must PASS: a record of where it stopped, not a demand for fields it never reached
+    ("an item triage put in no part",
+     lambda s: s.replace("    items: [ITEM-02]\n    after: [PART-01]\n", "    items: [ITEM-01]\n"), "is in no part"),
 ]
+
+
+def _run_cases(td, name, fixture, regressions, filename):
+    """Validate a known-good fixture, then each injected regression against it."""
+    failures = 0
+    f = Path(td) / filename
+    f.write_text(fixture, encoding="utf-8")
+    problems = check(f)
+    if problems:
+        print(f"SELFTEST FAIL: the known-good {name} did not pass: {problems}")
+        failures += 1
+    else:
+        print(f"ok    known-good {name} passes")
+    for case, mutate, expect in regressions:
+        f.write_text(mutate(fixture), encoding="utf-8")
+        found = check(f)
+        if expect is None:                       # must PASS
+            if found:
+                print(f"SELFTEST FAIL: should have passed: {case} -> {found}")
+                failures += 1
+            else:
+                print(f"ok    correctly allowed: {case}")
+        elif any(expect in pr for pr in found):
+            print(f"ok    caught: {case}")
+        else:
+            print(f"SELFTEST FAIL: NOT caught: {case} (expected {expect!r}, got {found})")
+            failures += 1
+    return failures, 1 + len(regressions)
 
 
 def selftest():
     import tempfile
-    failures = 0
+    failures = total = 0
     with tempfile.TemporaryDirectory() as td:
-        good = Path(td) / "MODIFICATION-good.md"
-        good.write_text(_GOOD, encoding="utf-8")
-        problems = check(good)
-        if problems:
-            print("SELFTEST FAIL: the known-good fixture did not pass:")
-            for pr in problems:
-                print(f"        {pr}")
-            failures += 1
-        else:
-            print("ok    known-good fixture passes")
-        for name, mutate, expect in _REGRESSIONS:
-            f = Path(td) / "MODIFICATION-regression.md"
-            f.write_text(mutate(_GOOD), encoding="utf-8")
-            found = check(f)
-            if expect is None:                       # must PASS
-                if found:
-                    print(f"SELFTEST FAIL: should have passed: {name} -> {found}")
-                    failures += 1
-                else:
-                    print(f"ok    correctly allowed: {name}")
-            elif any(expect in pr for pr in found):
-                print(f"ok    caught: {name}")
-            else:
-                print(f"SELFTEST FAIL: NOT caught: {name} (expected {expect!r}, got {found})")
-                failures += 1
-        # A triage draft at INTAKE, beside its intake record.
-        (Path(td) / "INTAKE-20260923-selftest.md").write_text(_GOOD_INTAKE_RECORD, encoding="utf-8")
-        f = Path(td) / "MODIFICATION-intake.md"
-        f.write_text(_GOOD_INTAKE, encoding="utf-8")
-        problems = check(f)
-        if problems:
-            print(f"SELFTEST FAIL: the known-good triage draft did not pass: {problems}")
-            failures += 1
-        else:
-            print("ok    known-good triage draft passes")
-        for name, mutate, expect in _INTAKE_REGRESSIONS:
-            f.write_text(mutate(_GOOD_INTAKE), encoding="utf-8")
-            found = check(f)
-            if any(expect in pr for pr in found):
-                print(f"ok    caught: {name}")
-            else:
-                print(f"SELFTEST FAIL: NOT caught: {name} (expected {expect!r}, got {found})")
-                failures += 1
+        for name, fixture, regressions, filename in (
+                ("record with no parts", _GOOD, _REGRESSIONS, "MODIFICATION-single.md"),
+                ("batch with parts", _GOOD_BATCH, _BATCH_REGRESSIONS, "MODIFICATION-batch.md"),
+                ("triage draft", _GOOD_INTAKE, _INTAKE_REGRESSIONS, "MODIFICATION-intake.md")):
+            f, t = _run_cases(td, name, fixture, regressions, filename)
+            failures += f
+            total += t
         # PAIR-001: every fixture above is hand-written, so none of them can notice the shipped
-        # templates drifting away from this script. Validate the templates themselves: the
-        # Modification filled as triage fills it, beside the intake record as shipped, and filled
-        # in the minimum ANALYZE fills.
-        template_cases = _template_cases()
-        for name, text, extras in template_cases:
+        # template drifting away from this script. Validate the template itself: as shipped, at
+        # INTAKE, and filled in the minimum ANALYZE fills, at ANALYZING.
+        for name, text in _template_cases():
+            total += 1
             if text is None:
                 print(f"SELFTEST FAIL: {name}")
                 failures += 1
                 continue
-            for fname, ftext in extras.items():
-                (Path(td) / fname).write_text(ftext, encoding="utf-8")
             f = Path(td) / "MODIFICATION-template.md"
             f.write_text(text, encoding="utf-8")
             found = check(f)
@@ -454,7 +615,6 @@ def selftest():
                 failures += 1
             else:
                 print(f"ok    shipped template passes: {name}")
-    total = len(_REGRESSIONS) + 1 + len(_INTAKE_REGRESSIONS) + 1 + len(template_cases)
     print(f"\n{total - failures}/{total} selftest cases passed")
     return 1 if failures else 0
 
@@ -465,30 +625,18 @@ def _fenced(doc, begins):
 
 
 def _template_cases():
-    """The shipped templates in modification-template.md, as (name, text, extra files) cases."""
+    """The shipped template in modification-template.md, as (name, text) cases."""
     import re
     path = Path(__file__).resolve().with_name("modification-template.md")
     try:
-        doc = path.read_text(encoding="utf-8")
-        text = _fenced(doc, "## TEMPLATE BEGINS")
-        record = _fenced(doc, "## INTAKE RECORD BEGINS")
+        text = _fenced(path.read_text(encoding="utf-8"), "## TEMPLATE BEGINS")
     except (OSError, IndexError):
-        return [("templates not found, or not fenced where expected, in " + path.name, None, {})]
-
-    def fill(src, pairs):
-        for key, value in pairs:
-            src = re.sub(rf"^{key}:[^\n]*", f"{key}: {value}", src, count=1, flags=re.M)
-        return src
-
-    record_name = re.search(r"^intake_id:\s*(\S+)", record, flags=re.M)
-    record_file = (record_name.group(1) if record_name else "INTAKE-missing") + ".md"
-    at_intake = fill(text, (("coupling", "ATOMIC"), ("intake_record", record_file)))
-    at_analyzing = fill(text.replace("status: INTAKE", "status: ANALYZING", 1),
-                        (("coupling", "ATOMIC"), ("targets", "[prompt]"), ("gate_tier", "1"),
-                         ("readiness", "READY"), ("modification_class", "B")))
-    return [("filled as triage fills it, beside the shipped intake record, at INTAKE",
-             at_intake, {record_file: record}),
-            ("filled as ANALYZE fills it, at ANALYZING", at_analyzing, {})]
+        return [("template not found, or not fenced where expected, in " + path.name, None)]
+    at_analyzing = text.replace("status: INTAKE", "status: ANALYZING", 1)
+    for key, value in (("targets", "[prompt]"), ("gate_tier", "1"), ("readiness", "READY")):
+        at_analyzing = re.sub(rf"^{key}:[^\n]*", f"{key}: {value}", at_analyzing, count=1, flags=re.M)
+    at_analyzing = re.sub(r"^(\s+class:)[^\n]*", r"\1 B", at_analyzing, count=1, flags=re.M)
+    return [("as shipped, at INTAKE", text), ("filled as ANALYZE fills it, at ANALYZING", at_analyzing)]
 
 
 def main(argv):
