@@ -59,7 +59,7 @@ def texts(obj):
 
 
 def latest_body(page):
-    """The body of the most recent fetch of `page` found in the session's harness files, with its fetch time."""
+    """The body of the newest fetch of `page` (by the fetch's own "as of" time) in the session's harness files."""
     page = page.replace("-", "")
     best = None
     for f in candidates():
@@ -79,12 +79,15 @@ def latest_body(page):
                     inner = json.loads(t)["text"]
                 except Exception:
                     inner = t
-                if page not in inner[:800].replace("-", ""):
+                head = re.match(r'Here is the result of "fetch" for the Page with URL https://[^/\s]+/p/([0-9a-f-]{32,36})', inner)
+                if not head or head.group(1).replace("-", "") != page:  # the fetched page itself, never a page it links to
                     continue
                 m = re.search(r"<content>\n?(.*)</content>", inner, re.S)
                 if m:
                     ts = re.search(r"as of (\S+):", inner)
-                    best = (ts.group(1) if ts else "", m.group(1))
+                    cand = (ts.group(1) if ts else "", m.group(1))
+                    if best is None or cand[0] >= best[0]:  # the newest fetch by its own timestamp; file order breaks ties
+                        best = cand
     if best is None:
         raise SystemExit(f"no fetch of {page} found")
     return best
