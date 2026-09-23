@@ -206,3 +206,21 @@ them fails on the installed text and one that lands after leaves them unguarded.
 tooling defects. Each body defect is its own part (PART-05 to PART-09, PART-11), since none depends on
 another. PART-10 is a registry-only change. Whatever the grouping, template rule 7 still sends every change to the same skill through
 one package, one review and one install.
+
+## §A — Analysis
+
+*In progress. Written by MODE = ANALYZE; not yet approved.*
+
+### Product Owner rulings received during ANALYZE
+
+1. **The Candidate CRD Items List lives in Notion** (Nathan, 2026-09-23: *"candidate CRD can live in
+   notion, I don't think it is a huge doc"*). No Notion page for it exists yet. The only copy is the
+   Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`, 31 923 B, last
+   modified 2026-09-08). ITEM-18 therefore needs a Notion page, a destination rule in
+   `notion-write-boundary.md` naming that page, and CL-40 naming it.
+2. **Every prompt commits its output files** (Nathan, 2026-09-23: *"all output files are committed,
+   that is the only way they are ever seen"*). A body that calls itself read-only, or says it does not
+   edit the repository, while it commits its own output artifacts has the wording wrong, not the
+   behaviour. The fix scopes the claim so that it excludes the prompt's own committed outputs (C-ART).
+   The commit stays.
+
