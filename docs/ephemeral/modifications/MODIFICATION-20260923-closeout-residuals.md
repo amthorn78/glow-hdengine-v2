@@ -8,7 +8,7 @@ closure:
   upstream: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, CL-20, CL-30, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, GCFPE-MGMT-10, IA-10, IA-20, IA-30, IA-40, IA-50, MGR-10, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30, RS-40]
   downstream: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, ESC-10, ESC-25, ESC-30, ESC-40, IA-10, IA-40, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30, RS-40]
   state_sharers: "union over the 48 touched prompts: 43 prompts; radius with the touched set: 55 of 55 (§A)"
-readiness: NEEDS_RULING
+readiness: READY
 override:
   by: ""
   overrides: []
@@ -323,7 +323,12 @@ verification) and `ANALYZE-closure.md` (`closure.py` output for each touched pro
    non-implementing roles, and other internal contradictions. An adversarial re-check of every
    finding sets the scope; the new items and parts follow it.
 
-**Pending ruling:** ITEM-37, the C-LAT placement (see *Open questions*).
+4. **ITEM-37: C-LAT in the eight non-implementing bodies takes option (b)** (Nathan, 2026-09-23, on
+   "decide it, implement it, test it" in bodies that implement nothing: *"yes those words don't seem to
+   mean anything do they"*). In PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20 and IA-30, step 2
+   hands an obvious, necessary, consistent change to the implementing PR owner, who decides,
+   implements, tests and records it. The material test (step 1) and step 3 are unchanged. This is a
+   `D23-C` successor and is recorded as one at EXECUTE.
 
 ### Per part: closure, tier, class and targets
 
@@ -500,6 +505,8 @@ Each follows from a ruling already in force, so none waits on the Product Owner:
 
 ### Open questions for the Product Owner
 
+None open. The question below was answered by ruling 4 and is kept as asked.
+
 1. **ITEM-37: C-LAT in the eight bodies that implement nothing** (PR-10, PR-20, PR-40, RS-10, RS-20,
    DOC-10, DOC-20, IA-30).
    - **Today:** its step 2 tells a planner, a reviewer or a documentation checker to "decide it,
@@ -513,7 +520,7 @@ Each follows from a ruling already in force, so none waits on the Product Owner:
 
 ### Readiness and interaction cost
 
-`readiness: NEEDS_RULING` (ITEM-37).
+`readiness: READY`. The one open ruling (ITEM-37) was answered during ANALYZE (ruling 4).
 
     interaction_cost = open rulings 1 + 2 + review cycles 1 + installs 7 + merges 1 = 12
 
