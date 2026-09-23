@@ -223,4 +223,11 @@ one package, one review and one install.
    edit the repository, while it commits its own output artifacts has the wording wrong, not the
    behaviour. The fix scopes the claim so that it excludes the prompt's own committed outputs (C-ART).
    The commit stays.
+3. **This Modification is widened** to the stale body text that D23's placements left in place
+   (Nathan, 2026-09-23: *"yes. we may as well widen. This process seems to be working so far. I want
+   this system tight"*). ANALYZE was not yet approved, so no override is needed. The body sweep
+   measured the classes: handoff content lists next to C-HANDOFF, PR-40 entry without
+   `MERGE_OBSERVED`, read-only claims beside commits, author-only instructions, C-LAT in
+   non-implementing roles, and other internal contradictions. An adversarial re-check of every
+   finding sets the scope; the new items and parts follow it.
 
