@@ -1,7 +1,7 @@
-# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 3
+# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 4
 
-This is revision 2 of the E3/E4 run. It applies the plan's author's six settlements, received after the first
-E4, re-runs E4 items 7–9, and measures four G06 alternatives. Items 1–6 and 10 do not read bodies, and nothing
+Revisions 3 and 4 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
+E4, re-ran E4 items 7–9, and measured four G06 alternatives. Items 1–6 and 10 do not read bodies, and nothing
 they read has changed since the first run, so their results below are those of that run (2026-09-23).
 
 **Inputs:**
@@ -26,6 +26,30 @@ Every command ran with `PYTHONDONTWRITEBYTECODE=1`. No `__pycache__` was created
 | `g06_alternatives.py` | Measures G06 alternatives (a)–(d) |
 
 Usage: `<bodies JSON> | PYTHONDONTWRITEBYTECODE=1 python3 <script> /tmp/claude-0/e2/skills`
+
+
+## Revision 4 (after repair round a1, commit `32e04d4`)
+
+**What changed.**
+- C-DISPATCH now ends with the sentence Nathan approved, "PR-40 is entered once per merge: …". `body_rules.py` reads it from the `D23` successor note in commit `37bf7e1` and appends it; it is not re-authored.
+- The edited validator in `/tmp/claude-0/e2/skills` now carries the new checks from repair round a1.
+
+**What was re-run.** E3 and E4 items 7, 8 and 9, with:
+- the current working-tree registry, including G06 as approved in (b);
+- the same session fetch results, in memory.
+
+| check | result |
+|---|---|
+| C-DISPATCH | placed exactly once in PR-35 and once in RS-40 |
+| other canonical texts | every one a body should carry occurs exactly once |
+| anchors not found | unchanged: only RS-10 and RS-30's artifact-worded `ASK OK?`, as recorded above |
+| totals | unchanged: S42 154, CTOP 54, convergence rewrites 79 |
+| item 7 | PASS: `prompt_bodies_validated` 55 (all members), `prompt_body_checks_not_evaluated` `[]`, `errors` `[]`, exit 0 |
+| item 8 | PASS: 0 findings on 55 rows, 1 484 assertions; role parity clean, and its two negative controls give `ROLE_PARITY` and `ROLE_CLAUSE` |
+| item 9 | PASS: 43 of 43 registry-guard regressions exact, including G24 and G25 on the extended C-DISPATCH; G27's clean control fires on today's PR-20; guard row counts as specified |
+| clean controls | G06, G15, G19, G20 and G21 are silent on all 54 edited main bodies, and so is every other guard |
+
+No body text or hash was written, nothing was written to Notion, and nothing was committed. No `__pycache__` was created.
 
 ## Settlements applied (plan's author, after the first E4)
 
