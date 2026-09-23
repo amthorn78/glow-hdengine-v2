@@ -1302,21 +1302,47 @@ written (`AUTH-001`); this is its successor.
 This corrects a fact, not a ruling. How the oracle revision is made, whether by a successor oracle
 or an in-place re-pin, is a proposal in the Modification's plan amendment and awaits approval.
 
-### Clarification, 2026-09-23 — PR-35 is never a subagent (D23-D)
+### Clarification, 2026-09-23 — no lifecycle session is a subagent or is created automatically (D23-D, D23-E, D23-F)
 
-**Product Owner, 2026-09-23:** *"just to be clear, I definitely do not want PR-35 running as a subagent
-ever"*.
+**Product Owner, 2026-09-23:**
+- *"just to be clear, I definitely do not want PR-35 running as a subagent ever"*;
+- then *"none of these should be subagents … I don't want any automated session creation of any kind
+  in the main ecosystem."*
 
-D23-D's "its own dedicated session" means **a top-level session**, entered from PR-30's handoff. It
-is **never a subagent, forked agent or workflow agent** spawned by PR-30 or by any other session.
+**The rule.** In the main ecosystem, the GCFPE lifecycle prompts that sessions run:
+1. **Every lifecycle prompt runs as its own top-level session.** None ever runs as a subagent, forked
+   agent or workflow agent of another session. This includes PR-35 in its own session (D23-D), PR-40
+   after the merge (D23-E), and PR-20 for a re-plan (D23-F).
+2. **Nothing creates a session automatically.** No lifecycle session creates, launches or schedules
+   another session, by any tool or mechanism. **Nathan creates every session, and starts it by
+   pasting the handoff.**
+3. **A prompt's job ends at the handoff.** It emits a paste-ready `NEXT_PROMPT_HANDOFF` block and
+   returns control.
 
-**What this does not change:**
-- **What PR-35 may do internally.** It governs how PR-35 itself runs.
-- **Maintenance work.** The in-session subagent model of `execution-and-delegation-model.md` covers
-  maintenance work only. It never covers running a lifecycle prompt.
+**What it corrects in this record's own wording:**
+- **D23-E.** "PR-40 is dispatched" means that the subscribed PR-35 session **emits** the PR-40
+  handoff when it observes the merge, and Nathan pastes it into a new session he creates. The
+  observed merge event replaces Nathan's merge *assertion*, the fact PR-40 is entered on. It does
+  not replace his paste.
+- **The PART-11 ruling as first recorded.** It said "dispatch is a paste, or a session launch where
+  the surface provides one", and the plan's C-DISPATCH repeated it. The launch option is withdrawn.
+  Dispatch is a paste.
 
-**Guard.** The Modification's plan amendment carries the wording into every surface that defines
-PR-35's session, each with a guard and an injected must-fail regression (`D14`).
+**What it does not change:**
+- **What a session does inside itself.** PR-35's pull-request subscription wakes the session that
+  made it and creates nothing, so it stays (D23-E).
+- **Maintenance work.** Preflight readers and the `D24` skill reviewers are maintenance subagents,
+  not lifecycle prompts, and `execution-and-delegation-model.md` governs them. That model gains a
+  scope line: it never covers running a lifecycle prompt.
+
+**Guard.** The Modification's plan amendment carries this into:
+- the canonical wording;
+- the R1 row;
+- the graph role and the registry role for each affected prompt;
+- the skills.
+
+Each surface gets a guard with an injected must-fail regression (`D14`), including a corpus-wide
+guard against any instruction that creates a session.
 
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
