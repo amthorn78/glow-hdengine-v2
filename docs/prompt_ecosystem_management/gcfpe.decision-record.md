@@ -1302,6 +1302,22 @@ written (`AUTH-001`); this is its successor.
 This corrects a fact, not a ruling. How the oracle revision is made, whether by a successor oracle
 or an in-place re-pin, is a proposal in the Modification's plan amendment and awaits approval.
 
+### Clarification, 2026-09-23 — PR-35 is never a subagent (D23-D)
+
+**Product Owner, 2026-09-23:** *"just to be clear, I definitely do not want PR-35 running as a subagent
+ever"*.
+
+D23-D's "its own dedicated session" means **a top-level session**, entered from PR-30's handoff. It
+is **never a subagent, forked agent or workflow agent** spawned by PR-30 or by any other session.
+
+**What this does not change:**
+- **What PR-35 may do internally.** It governs how PR-35 itself runs.
+- **Maintenance work.** The in-session subagent model of `execution-and-delegation-model.md` covers
+  maintenance work only. It never covers running a lifecycle prompt.
+
+**Guard.** The Modification's plan amendment carries the wording into every surface that defines
+PR-35's session, each with a guard and an injected must-fail regression (`D14`).
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
