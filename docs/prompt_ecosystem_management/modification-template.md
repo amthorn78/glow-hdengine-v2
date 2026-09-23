@@ -23,9 +23,10 @@ Copy everything between the markers. Delete the comments; keep the keys.
 
 ## Rules the format exists to enforce
 
-1. **Each mode writes only its own section.** `PLAN` never rewrites §A; `EXECUTE` never rewrites
-   §P. A mode that believes an upstream section is wrong records a finding and returns — it does
-   not edit upstream (`AUTH-001` applied to this document's internal structure).
+1. **Each mode writes only its own section.** Triage writes `## Intake`; `PLAN` never rewrites §A;
+   `EXECUTE` never rewrites §P. A mode that believes an upstream section is wrong records a finding
+   and returns — it does not edit upstream (`AUTH-001` applied to this document's internal
+   structure).
 2. **Approval is a recorded field, not a remembered fact.** `analyze_approved_by` empty blocks
    `PLAN`; `plan_approved_by` empty blocks `EXECUTE`. That is what makes a Modification survive a
    session ending mid-change.
@@ -36,6 +37,14 @@ Copy everything between the markers. Delete the comments; keep the keys.
    see" is not a step (`CHK-001`, `D11`).
 5. **Every §E step and item carries a disposition.** A skipped step is a recorded disposition,
    never an omission. Silence is impossible by construction.
+6. **Modifications that change the same skill share one package, one review and one install.**
+   Product Owner decision, 2026-09-23. `PLAN` names the others in `shares_package_with`, and the
+   shared package is built only once every sharing Modification's plan is approved. Each
+   Modification keeps its own approval, coupling, steps and dispositions. The shared review,
+   install and merge are counted once in `interaction_cost`, on the first Modification named,
+   and as 0 on the rest. If the review rejects one Modification's edit, that Modification is
+   blocked. By default the package is fixed and reviewed again; Nathan may instead ship the others
+   without it.
 
 ## The Product Owner is never blocked by any of this
 
@@ -69,7 +78,8 @@ would only make the record lie.
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260922-example-slug
 status: INTAKE            # INTAKE ANALYZING ANALYZED PLANNING PLANNED EXECUTING COMPLETE BLOCKED ABANDONED
-coupling: INDEPENDENT     # ATOMIC = one act, a failure stops all. INDEPENDENT = per-item.
+intake_record: ""         # INTAKE-<yyyymmdd>-<slug>.md beside this file, written by triage; empty if none
+coupling:                 # ATOMIC = one act, a failure stops all. INDEPENDENT = per-item. No default: someone decides it
 targets: []               # any of: prompt skill rule graph registry notion_control
 gate_tier:                # 0 1 2 — computed from closure.py and the rebuilt part, never judged
 closure:                  # computed; do not type these by hand
@@ -87,8 +97,9 @@ interaction_cost_actual:  # filled in §E; this is what calibrates the predictio
 items:
   - id: ITEM-01
     statement: "one sentence of requested outcome"
+    source: ""            # the entry it came from, e.g. AF-008; empty for a new request
     disposition: ""       # filled in §E: APPLIED VERIFIED BLOCKED NOT_APPLICABLE
-request: "the request, as received, verbatim"
+request: "the request, as received, verbatim -- never a copy of an entry's text; source names it"
 requested_by: Nathan
 analyze_approved_by: ""   # empty blocks PLAN
 analyze_approved_date: ""
@@ -96,11 +107,17 @@ plan_approved_by: ""      # empty blocks EXECUTE
 plan_approved_date: ""
 supersedes: ""
 spawned_from: ""          # the Modification that found this scope, if any
+shares_package_with: []   # set by PLAN: other Modifications changing the same skill (rule 6)
 ---
 
 # MODIFICATION-20260922-example-slug
 
 One sentence: what this changes and why.
+
+## Intake
+
+*Written by triage at INTAKE: why these items belong together, and any link to another group — a
+shared skill, an order, a tension. Absent when the Modification did not come through triage.*
 
 ## §A — Analysis
 
@@ -174,6 +191,56 @@ the estimate is a measurement rather than an opinion.
 ```
 
 ## TEMPLATE ENDS
+
+---
+
+## The intake record — one per triage run
+
+Triage writes one intake record per run, at
+`docs/ephemeral/modifications/INTAKE-<yyyymmdd>-<slug>.md`, beside the drafts it creates, and
+commits them together. **It is the only home for an item that does not become a Modification** —
+a duplicate, an already-ruled item, an already-true one. Without it, those answers exist only in a
+chat that ends. Each draft's `intake_record` names it, and the validator checks that the record
+exists and lists that draft.
+
+## INTAKE RECORD BEGINS
+
+```markdown
+---
+artifact_type: GCFPE_INTAKE_RECORD
+intake_id: INTAKE-20260922-example-slug
+created_date: 2026-09-22
+requested_by: Nathan
+request: "what Nathan pasted, verbatim"
+modifications: [MODIFICATION-20260922-example-slug]
+---
+
+# INTAKE-20260922-example-slug
+
+## A. Items
+
+Every item, whatever its disposition.
+
+| # | source | statement | disposition | evidence | apparent surface (unmeasured) |
+|---|---|---|---|---|---|
+| 1 | AF-008 | one sentence of requested outcome | NEW | | |
+
+Evidence is required for NOT_A_CHANGE (the file and line, or field, showing it is already true),
+DUPLICATE_OF (the id) and ALREADY_RULED (the D-number).
+
+## B. Grouping
+
+| Modification | items | coupling | why these belong together |
+|---|---|---|---|
+
+Links between groups: a shared skill (rule 6), an order, a tension.
+
+## Validator output
+
+Pasted, not described.
+```
+
+## INTAKE RECORD ENDS
 
 ---
 

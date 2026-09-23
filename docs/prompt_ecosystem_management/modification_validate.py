@@ -36,9 +36,13 @@ Owner. A policy gate -- scope freeze above all -- is waived by a recorded overri
 The reason is for a successor session reading the record, not a justification anyone is owed.
 An override waives a policy gate; it cannot make a malformed record well-formed.
 
-An INTAKE stub is held to the triage contract only: id, one statement per item, request,
-disposition. Nothing more -- triage names an apparent surface, it does not measure scope. That is
-why the intake prompt needs no contract of its own.
+An INTAKE draft is held to what triage writes, and nothing more: the required keys, one statement
+per item, triage's proposed coupling, an `## Intake` section saying why the items belong
+together, and an intake_record that exists beside it and lists it. Triage names an apparent
+surface; it does not measure scope. That is why the intake prompt needs no contract of its own.
+
+--selftest runs the injected regressions, then validates the shipped templates themselves, so the
+templates cannot drift away from this script unnoticed (PAIR-001).
 """
 import sys
 from pathlib import Path
@@ -81,6 +85,36 @@ def split_frontmatter(text):
     if end == -1:
         return None, text
     return text[3:end], text[end + 4:]
+
+
+def _intake_checks(path, fm, body, mid):
+    """What a triage draft must carry at INTAKE, so the run's conclusions live in files."""
+    bad = []
+    if fm.get("coupling") not in COUPLINGS:
+        bad.append(f"INTAKE: coupling must carry triage's proposal, one of {COUPLINGS}; "
+                   f"got {fm.get('coupling')!r}")
+    text = "\n" + body
+    if "\n## Intake" not in text:
+        bad.append("INTAKE: section '## Intake' is absent; why these items belong together goes in the file")
+    elif len(text.split("\n## Intake", 1)[1].split("\n## ", 1)[0].strip()) < 40:
+        bad.append("INTAKE: section '## Intake' is present but empty")
+    record = str(fm.get("intake_record") or "").strip()
+    if not record:
+        bad.append("INTAKE: intake_record is empty; every triage run writes one, holding every item")
+        return bad
+    record_path = Path(path).parent / Path(record).name
+    if not record_path.is_file():
+        bad.append(f"INTAKE: intake_record {record} is not beside this Modification")
+        return bad
+    rec_text, _ = split_frontmatter(record_path.read_text(encoding="utf-8"))
+    try:
+        rec = yaml.safe_load(rec_text) if rec_text else None
+    except yaml.YAMLError:
+        rec = None
+    listed = rec.get("modifications") if isinstance(rec, dict) else None
+    if not isinstance(listed, list) or mid not in listed:
+        bad.append(f"INTAKE: intake_record {record} does not list {mid}")
+    return bad
 
 
 def check(path):
@@ -126,7 +160,11 @@ def check(path):
             bad.append(f"item {item.get('id', n)} has no statement")
 
     if status == "INTAKE":
-        return bad  # a triage stub is held to nothing further
+        # A triage draft is held to what triage writes, and nothing further. Everything triage
+        # concludes goes in a file -- the coupling it proposes, why the items belong together, and
+        # an intake record holding every item, including those that did not become drafts. The
+        # 2026-09-22 comparison test found all three living only in chat.
+        return bad + _intake_checks(path, fm, body, mid)
 
     for key in REQUIRED_BEYOND_INTAKE:
         if fm.get(key) in (None, ""):
@@ -165,17 +203,27 @@ def check(path):
                 bad.append(f"section {marker} is present but empty")
 
     # --- the Product Owner's override, if one is recorded ---
+    # The template ships this block with every field empty and says to keep the keys, so an
+    # all-empty block is the template, not an override. Treating it as one failed every
+    # Modification the moment it left INTAKE -- found by both runs of the 2026-09-22 triage
+    # comparison test, and missed by the fixture below because it was hand-written (PAIR-001).
     override = fm.get("override") or {}
-    waived = []
-    if override:
-        if not str(override.get("by") or "").strip():
+    if not isinstance(override, dict):
+        bad.append("override must be a block with by, overrides and reason")
+        override = {}
+    raw = override.get("overrides") or []
+    waived = [raw] if isinstance(raw, str) else list(raw)
+    by = str(override.get("by") or "").strip()
+    reason = str(override.get("reason") or "").strip()
+    if by or waived or reason:
+        if not by:
             bad.append("override present but has no 'by'; an unattributed override is not one")
-        raw = override.get("overrides") or []
-        waived = [raw] if isinstance(raw, str) else list(raw)
+        if not waived:
+            bad.append("override present but names no gate; say which policy gate it waives")
         for w in waived:
             if w not in OVERRIDABLE:
                 bad.append(f"override names {w!r}, which is not a policy gate; overridable: {OVERRIDABLE}")
-        if not str(override.get("reason") or "").strip():
+        if not reason:
             bad.append("override present but has no 'reason'; the record needs to say it was deliberate")
 
     # --- scope freeze ---
@@ -267,6 +315,15 @@ _REGRESSIONS = [
      lambda s: s.replace("item_count_at_approval: 1",
                          'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: [missing_sections]\n  reason: "x"'),
      "not a policy gate"),
+    ("override that names no gate",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: []\n  reason: "x"'),
+     "names no gate"),
+    ("the template's empty override block wrongly treated as an override",
+     lambda s: s.replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  by: ""\n  overrides: []\n  reason: ""'),
+     None),  # must PASS: the template ships this block empty
+
     ("item has no disposition at COMPLETE",
      lambda s: s.replace("    disposition: VERIFIED", '    disposition: ""'), "no disposition"),
     ("actual cost missing at COMPLETE",
@@ -286,6 +343,47 @@ _REGRESSIONS = [
      lambda s: s.replace("GCFPE_MODIFICATION_RECORD", "GCFPE_CHANGE_RECORD"), "artifact_type"),
     ("item with no statement",
      lambda s: s.replace('statement: "a real statement"', 'statement: ""'), "no statement"),
+]
+
+_GOOD_INTAKE = """---
+artifact_type: GCFPE_MODIFICATION_RECORD
+modification_id: MODIFICATION-20260923-selftest-intake
+status: INTAKE
+intake_record: docs/ephemeral/modifications/INTAKE-20260923-selftest.md
+coupling: ATOMIC
+items:
+  - id: ITEM-01
+    statement: "a real statement"
+    source: AF-000
+request: "what was pasted"
+---
+# MODIFICATION-20260923-selftest-intake
+One sentence.
+## Intake
+why these items belong together, in enough words to clear the emptiness check.
+"""
+
+_GOOD_INTAKE_RECORD = """---
+artifact_type: GCFPE_INTAKE_RECORD
+intake_id: INTAKE-20260923-selftest
+modifications: [MODIFICATION-20260923-selftest-intake]
+---
+# INTAKE-20260923-selftest
+"""
+
+_INTAKE_REGRESSIONS = [
+    ("triage left its proposed coupling out of the draft",
+     lambda s: s.replace("coupling: ATOMIC\n", ""), "INTAKE: coupling"),
+    ("the reason for the grouping exists only in chat",
+     lambda s: s.split("## Intake")[0], "'## Intake' is absent"),
+    ("no intake record named",
+     lambda s: s.replace("docs/ephemeral/modifications/INTAKE-20260923-selftest.md", '""'),
+     "intake_record is empty"),
+    ("intake record named but never written",
+     lambda s: s.replace("INTAKE-20260923-selftest.md", "INTAKE-20260923-missing.md"), "is not beside"),
+    ("intake record does not list this draft",
+     lambda s: s.replace("modification_id: MODIFICATION-20260923-selftest-intake",
+                         "modification_id: MODIFICATION-20260923-another"), "does not list"),
 ]
 
 
@@ -318,8 +416,79 @@ def selftest():
             else:
                 print(f"SELFTEST FAIL: NOT caught: {name} (expected {expect!r}, got {found})")
                 failures += 1
-    print(f"\n{len(_REGRESSIONS) + 1 - failures}/{len(_REGRESSIONS) + 1} selftest cases passed")
+        # A triage draft at INTAKE, beside its intake record.
+        (Path(td) / "INTAKE-20260923-selftest.md").write_text(_GOOD_INTAKE_RECORD, encoding="utf-8")
+        f = Path(td) / "MODIFICATION-intake.md"
+        f.write_text(_GOOD_INTAKE, encoding="utf-8")
+        problems = check(f)
+        if problems:
+            print(f"SELFTEST FAIL: the known-good triage draft did not pass: {problems}")
+            failures += 1
+        else:
+            print("ok    known-good triage draft passes")
+        for name, mutate, expect in _INTAKE_REGRESSIONS:
+            f.write_text(mutate(_GOOD_INTAKE), encoding="utf-8")
+            found = check(f)
+            if any(expect in pr for pr in found):
+                print(f"ok    caught: {name}")
+            else:
+                print(f"SELFTEST FAIL: NOT caught: {name} (expected {expect!r}, got {found})")
+                failures += 1
+        # PAIR-001: every fixture above is hand-written, so none of them can notice the shipped
+        # templates drifting away from this script. Validate the templates themselves: the
+        # Modification filled as triage fills it, beside the intake record as shipped, and filled
+        # in the minimum ANALYZE fills.
+        template_cases = _template_cases()
+        for name, text, extras in template_cases:
+            if text is None:
+                print(f"SELFTEST FAIL: {name}")
+                failures += 1
+                continue
+            for fname, ftext in extras.items():
+                (Path(td) / fname).write_text(ftext, encoding="utf-8")
+            f = Path(td) / "MODIFICATION-template.md"
+            f.write_text(text, encoding="utf-8")
+            found = check(f)
+            if found:
+                print(f"SELFTEST FAIL: the shipped template fails validation: {name} -> {found}")
+                failures += 1
+            else:
+                print(f"ok    shipped template passes: {name}")
+    total = len(_REGRESSIONS) + 1 + len(_INTAKE_REGRESSIONS) + 1 + len(template_cases)
+    print(f"\n{total - failures}/{total} selftest cases passed")
     return 1 if failures else 0
+
+
+def _fenced(doc, begins):
+    """The first ```markdown block after the heading `begins`."""
+    return doc.split(begins, 1)[1].split("```markdown\n", 1)[1].split("\n```\n", 1)[0] + "\n"
+
+
+def _template_cases():
+    """The shipped templates in modification-template.md, as (name, text, extra files) cases."""
+    import re
+    path = Path(__file__).resolve().with_name("modification-template.md")
+    try:
+        doc = path.read_text(encoding="utf-8")
+        text = _fenced(doc, "## TEMPLATE BEGINS")
+        record = _fenced(doc, "## INTAKE RECORD BEGINS")
+    except (OSError, IndexError):
+        return [("templates not found, or not fenced where expected, in " + path.name, None, {})]
+
+    def fill(src, pairs):
+        for key, value in pairs:
+            src = re.sub(rf"^{key}:[^\n]*", f"{key}: {value}", src, count=1, flags=re.M)
+        return src
+
+    record_name = re.search(r"^intake_id:\s*(\S+)", record, flags=re.M)
+    record_file = (record_name.group(1) if record_name else "INTAKE-missing") + ".md"
+    at_intake = fill(text, (("coupling", "ATOMIC"), ("intake_record", record_file)))
+    at_analyzing = fill(text.replace("status: INTAKE", "status: ANALYZING", 1),
+                        (("coupling", "ATOMIC"), ("targets", "[prompt]"), ("gate_tier", "1"),
+                         ("readiness", "READY"), ("modification_class", "B")))
+    return [("filled as triage fills it, beside the shipped intake record, at INTAKE",
+             at_intake, {record_file: record}),
+            ("filled as ANALYZE fills it, at ANALYZING", at_analyzing, {})]
 
 
 def main(argv):
