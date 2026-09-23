@@ -14,6 +14,7 @@ override:
   overrides: []
   reason: ""
 interaction_cost_predicted: 11
+item_count_at_approval: 40
 interaction_cost_actual:
 items:
   - id: ITEM-01
@@ -265,8 +266,8 @@ parts:
 request: |
   477 merged. yes, fix 1-4. The next action in Alph is planning for PR05. That will be done after this MGMT run is complete.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: Nathan
+analyze_approved_date: 2026-09-23
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -664,6 +665,8 @@ Each applies a ruling or rule already in force.
 ### Readiness and interaction cost
 
 `readiness: READY`. Open questions 1–3 were answered by ruling 5.
+
+**ANALYZE approved** by Nathan, 2026-09-23 (*"yes"*, confirming that his "ok approved" also approved the analysis). Scope froze at 40 items in 17 parts.
 
     interaction_cost = open rulings 3 + 2 + review cycles 1 + installs 1 + merges 2 + freeze 1 + Drive banner 1 = 11
 
