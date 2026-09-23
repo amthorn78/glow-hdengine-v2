@@ -8,7 +8,7 @@ closure:
   upstream: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, CL-20, CL-30, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, GCFPE-MGMT-10, IA-10, IA-20, IA-30, IA-40, IA-50, MGR-10, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30, RS-40]
   downstream: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, ESC-10, ESC-25, ESC-30, ESC-40, IA-10, IA-20, IA-30, IA-40, IA-50, IA-60, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30, RS-40]
   state_sharers: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, DOC-10, DOC-20, ESC-25, ESC-30, ESC-40, IA-10, IA-20, IA-30, IA-40, IA-60, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-100, QA-110, QA-20, QA-50, QA-60, QA-70, QA-90, RS-10, RS-20, RS-30, RS-40, UTIL-10]
-readiness: NEEDS_RULING
+readiness: READY
 override:
   by: ""
   overrides: []
@@ -351,7 +351,18 @@ Evidence, all under `evidence/closeout-residuals/`:*
      owner exists. A different reading would change what he approved, so the question is re-asked
      below. It is not decided here.
 
+5. **Open questions 1–3 answered** (Nathan, 2026-09-23: *"ok approved"*, to the three recommendations):
+   - **Q1 (A):** CL-40 writes the Candidate CRD Items List in Notion, under a destination rule naming that
+     one page.
+   - **Q2 (a):** C-LAT's three-step *Decide it during work* block is removed from PR-10, PR-20, PR-40,
+     RS-10, RS-20, DOC-10, DOC-20 and IA-30; the Material definition and each body's own routing stay.
+   - **Q3 (A):** the graph's and contracts' `alpha_resumption_contract` stays as the promotion-time
+     record; the two validator checks are renamed to promotion-record checks, and the graph does not
+     change.
+
 ### Open questions for the Product Owner
+
+All three were answered by ruling 5 and are kept as asked.
 
 1. **PART-06: does CL-40 write the Candidate CRD Items List in Notion itself?**
    - **What CL-40 does:** it runs at the end of each change, scans for PF09 gaps and CRD candidates, and
@@ -652,7 +663,7 @@ Each applies a ruling or rule already in force.
 
 ### Readiness and interaction cost
 
-`readiness: NEEDS_RULING` (Open questions 1–3).
+`readiness: READY`. Open questions 1–3 were answered by ruling 5.
 
     interaction_cost = open rulings 3 + 2 + review cycles 1 + installs 1 + merges 2 + freeze 1 + Drive banner 1 = 11
 
