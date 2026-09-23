@@ -400,3 +400,17 @@ verdict for every carrier, and that verdict governs.**
 | RS-30 | Controlled sources and boundaries | HANDOFF_RESTATES_CONTENT | carry exact lineage into the revised request/proposal and handoff | SCOPED_CORRECTLY: lineage is bases and overlays by repository path, C-HANDOFF input artifacts |
 | RS-30 | Native identity, source fidelity, and recovery | HANDOFF_RESTATES_CONTENT | preserve complete usage/task/result/attempt mappings in permitted metadata or the handoff | SCOPED_CORRECTLY: provenance fallback with artifact-metadata alternative |
 | RS-40 | Public result and routing | UNDEFINED_REFERENCE | An *In-flight decisions* section, one row per decision taken without a rescope | CANONICAL_TEXT: C-DEC placed in RS-40 by step 20; host is its implementation-result artifact |
+
+## Re-verification of the close-out's body items (ITEMs 17–21, 23)
+
+One read-only analyst re-read each body on 2026-09-23 before the sweep. The adversarial re-check and the census then
+settled ITEMs 20 and 21 (§A, *Items whose premise the verification refuted*).
+
+| item | result | where, in a few words |
+|---|---|---|
+| ITEM-17 QA-10 | VERIFIED | *Role and task*: "a read-only audit and readiness role" beside *Save and hand off* committing three artifacts; *Read-only audit boundary*: "does not edit repository or documentation files" |
+| ITEM-18 CL-40 | VERIFIED | *Required tools, stores*: the list "may be updated in place", no store named; "Do not substitute another store."; "This authoring candidate does not perform that update." Only recorded store: Drive `1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO` (Glow Operations Checklist, *CL-40 — Repair CRD candidate scope definition*) |
+| ITEM-19 CL-20 | DIFFERENT | the board is a runtime input ("recipient and board references supplied by the change context"); step 4 does not name it and gives no state when none is supplied. PF04 §9.1.1 gives board maintenance to "the authorized manual operator and actual receiving owners" |
+| ITEM-20 OPS-10, OPS-20 | VERIFIED by this analyst; NOT_REAL by the re-check | the ban covers authored reusable text (re-check); the census rule for prohibitions settles it as `NOT_APPLICABLE` |
+| ITEM-21 CL-20, CL-30, CL-C-10, CL-E-10 | VERIFIED by this analyst; MISREAD by the re-check | the reference resolves to *Product Owner merge action*, which itself describes entry by assertion alone (A7) |
+| ITEM-23 proposed MGMT-10 body | VERIFIED, 2 of 3 lines | "Prompt version: *(stamped at promotion)*" and "Ecosystem release: *(stamped at promotion)*"; no `Set:` line; its preamble says they "are set when the register promotes it" |
