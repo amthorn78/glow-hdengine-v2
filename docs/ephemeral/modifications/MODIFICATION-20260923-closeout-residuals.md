@@ -105,8 +105,8 @@ items:
     source: "CLOSE-OUT-20260923 §4.D; ESC-10's page sits under the 091426.1 Escalation hub 3db4590a05eb81cd938de84cfffead9c while its row expects 3c74590a05eb8123bc55ca7f99ce176c"
     disposition: ""
   - id: ITEM-23
-    statement: "The PROPOSED BODY carried on GCFPE-MGMT-10 reserves no release-bound header line (D23-G)."
-    source: "CLOSE-OUT-20260923 §4.D"
+    statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY (D20 redesign) reserves no release-bound header line (D23-G), so it can be promoted without one."
+    source: "CLOSE-OUT-20260923 §4.D; Notion page 3e34590a05eb811b93d2da9b4ef8106d, a child of the redesign tracking page"
     disposition: ""
 parts:
   - id: PART-01
