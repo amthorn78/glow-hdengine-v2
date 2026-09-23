@@ -1,4 +1,4 @@
-# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 2
+# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 3
 
 This is revision 2 of the E3/E4 run. It applies the plan's author's six settlements, received after the first
 E4, re-runs E4 items 7–9, and measures four G06 alternatives. Items 1–6 and 10 do not read bodies, and nothing
@@ -47,10 +47,10 @@ Usage: `<bodies JSON> | PYTHONDONTWRITEBYTECODE=1 python3 <script> /tmp/claude-0
 ## Verdict
 
 - **Item 7 passes.** All 55 bodies validated; `errors` is `[]` and `prompt_body_checks_not_evaluated` is `[]`.
-- **Item 8: 3 findings remain, all G06 (TOP-001).** They are on CL-C-10, CL-E-10 and RS-40. Each comes from a pre-existing "contains no `NEXT_PROMPT_HANDOFF`" sentence in the body, not from a canonical text. They are not exempted.
+- **Item 8: 0 findings on all 55 rows (1 484 assertions).** This follows Nathan's approval of G06 alternative (b), which the registry now carries (section "G06, revision 3"). The 3 G06 hits recorded in revision 2 (CL-C-10, CL-E-10 and RS-40) were pre-existing "contains no `NEXT_PROMPT_HANDOFF`" sentences, and they are cleared.
 - **Item 9 passes.** All 43 of 43 regressions give exactly their own finding. The G27 clean control fires on today's PR-20.
 - **Items 1–6 and 10** are unchanged from the first run and pass.
-- **G06 alternatives:** (b) and (d) both clear all three hits and keep both G06 regressions exact. (d) is a weakening. (c) clears the hits but loses the end-of-paragraph regression.
+- **G06 alternatives:** Nathan approved (b), and it is applied to the registry. The measurements below are kept as the record: (b) and (d) cleared all three hits and kept both regressions exact, but (d) is a weakening; (c) lost the end-of-paragraph regression.
 
 ## Anchors not found
 
@@ -210,18 +210,38 @@ Per body:
 | 5 v4 fixtures | PASS (first run) | `fixture_suite_ok: true`, 228/228 |
 | 6 Other packages | PASS (first run) | PR skill PASS; relay self-test 230; `amthor` 34 OK; registry structure valid |
 | 7 Bodies | PASS | `prompt_bodies_validated` 55 (all members); `prompt_body_checks_not_evaluated` `[]`; `errors` `[]`; exit 0 |
-| 8 Registry assertions | **3 findings (G06, TOP-001): CL-C-10, CL-E-10, RS-40** | 55 rows, 1 484 assertions. Every other row has zero findings. G01 on QA-10 and G15 on RS-40, found in the first run, are cleared. §7.7 role parity: clean `[]`; the registry-only removal gives `ROLE_PARITY`; removal from both gives `ROLE_CLAUSE` |
+| 8 Registry assertions | PASS: 0 findings | 55 rows, 1 484 assertions, with G06 as approved in (b). §7.7 role parity: clean `[]`; the registry-only removal gives `ROLE_PARITY`; removal from both gives `ROLE_CLAUSE` |
 | 9 Regressions | PASS | 43/43 registry-guard regressions exact; G27's clean control on unedited PR-20 gives its finding; guard row counts as specified, plus G25B |
 | 10 Closure and records | PASS (first run) | Equal to §4.10 V5; DOC-20 radius 25; `modification_validate.py` 2/2 ok |
 
-### Remaining clean-control hits (not exempted; for Nathan)
+### Clean-control hits
 
-| guard | body | matched phrase (≤12 words) | on the unedited body too | cause |
-|---|---|---|---|---|
-| G06 | CL-C-10, CL-E-10 | "under `docs/ephemeral/` in the repository, committed and pushed on the working branch" | yes | The window of the body's own "contains no `NEXT_PROMPT_HANDOFF` block" sentence runs into the storage boilerplate |
-| G06 | RS-40 | "no session. Resume only PR-35 responsibilities: reverify same vehicle and remote head" | yes | The body's own "contains no `NEXT_PROMPT_HANDOFF`" terminal-stop sentence reaches the PR-35 phase's "remote head" |
+None. No guard hits any of the 54 edited main bodies, and that includes G06, G15, G19, G20 and G21. Revision 2 recorded three G06 hits, on CL-C-10, CL-E-10 and RS-40. Each came from a body's own "contains no `NEXT_PROMPT_HANDOFF`" sentence, and G06 (b) clears all three.
 
-G19, G20 and G21 hit none of the 54 edited bodies, and no other guard hits either.
+## G06, revision 3 (Nathan approved alternative (b), 2026-09-23)
+
+`docs/ephemeral/modifications/evidence/e3/g06_apply.py` applied it to the working-tree registry. The method is the one in `e1_registry_apply.py`:
+- a line-anchored replacement of the exact two-line entry, `value` then `rule_id: TOP-001`;
+- once per row, on the 53 NPH53 rows, with no YAML round trip of the file.
+
+The final G06 value, `forbidden_regex`, `rule_id: TOP-001`:
+
+```
+(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)
+```
+
+Checks, all passing:
+- **Semantic diff through `load_data`:** only the G06 value changes, on exactly 53 rows. Every other key and row is unchanged.
+- **Assertion count:** unchanged at 1 484.
+- **YAML single-quote round trip** of the new entry: equal.
+- **Structure check** (`validate_project_prompt_registry.py`): `{"valid": true, "problems": []}`, exit 0.
+- **D13 drift** against `docs/graph/parts`: `[]`.
+- **G06's clean control over the 54 edited bodies:** 0 hits.
+- **Both §7.3 G06 regressions on PR-35** (the sentence after the token, and the sentence at the end of the C-HANDOFF paragraph): each exact, 1 finding (TOP-001).
+- **Canonical texts:** all 18 of them and the seven combined paragraphs are silent.
+- **Items 7 and 9 after the change:** item 7 still has all 55 bodies validated and no errors; item 9 is still 43 of 43 regressions exact, and G27's clean control still fires.
+
+**Spec-facing change.** This value supersedes spec §7.3's G06 entry. It adds `(?<!\bno )(?<!\bno `)` before the token, so a negated mention of the token no longer opens a window. The term list, the window and its blank-line stop are unchanged. The §7.4 G06 limit gains one line: a `NEXT_PROMPT_HANDOFF` preceded directly by "no " or "no `" does not open a window.
 
 ### G06 alternatives, measured
 
@@ -298,7 +318,7 @@ What each one was measured on:
 | G03 | forbidden_regex | 1 | 0 | 0 | 0 |
 | G04 | forbidden_regex | 10 | 0 | 0 | 0 |
 | G05 | required_regex | 53 | 0 | 0 | 0 |
-| G06 | forbidden_regex | 53 | CL-C-10: "under `docs/ephemeral/` in the repository, committed and pushed on the working branch"; CL-E-10: "under `docs/ephemeral/` in the repository, committed and pushed on the working branch"; RS-40: "no session. Resume only PR-35 responsibilities: reverify same vehicle and remote head" | 0 | 0 |
+| G06 | forbidden_regex | 53 | 0 | 0 | 0 |
 | G07 | required_regex | 53 | 0 | 0 | 0 |
 | G08 | forbidden_regex | 4 | 0 | 0 | 0 |
 | G08A | required_regex | 4 | 0 | 0 | 0 |

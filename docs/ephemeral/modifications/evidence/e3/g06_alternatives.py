@@ -37,6 +37,10 @@ reg = A.load_data(R.REGISTRY)
 rows = {r["prompt_key"]: r for r in reg["prompts"]}
 G06 = next(e["value"] for e in rows["PR-35"]["audit_assertions"]["forbidden_regex"]
            if e.get("rule_id") == "TOP-001")
+REGISTERED = G06
+LB = "(?<!\\bno )(?<!\\bno `)"
+if G06.startswith(LB):  # alternative (b), applied to the registry after Nathan's approval (g06_apply.py)
+    G06 = G06[len(LB):]
 assert G06.startswith("NEXT_PROMPT_HANDOFF(?:[^\\n]|\\n(?![ \\t]*\\n)){0,1500}?")
 HEAD = "NEXT_PROMPT_HANDOFF(?:[^\\n]|\\n(?![ \\t]*\\n)){0,1500}?"
 TAIL = G06[len(HEAD):]
@@ -102,5 +106,6 @@ for key, val in ALT.items():
                 "canonical_and_combined_texts_matched": dirty,
                 "canonical_texts_tested": len(CANON), "combined_paragraphs_tested": len(COMBINED)}
 out["d_is_a_weakening"] = True
+out["registered_value_equals_b"] = REGISTERED == ALT["b"]
 json.dump(out, sys.stdout, indent=1, ensure_ascii=False)
 print()
