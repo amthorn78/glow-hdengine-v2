@@ -172,6 +172,7 @@ if __name__ == "__main__":
         # precheck runs on the text the operations produce, not on the rules output: no body is compared
         print(json.dumps({"pid": pid, "fetched": ts, "ops": ops, "applied": r.get("applied"),
                           "not_found": r.get("not_found"), "notes": r.get("notes"),
-                          "precheck": checks(pid, simulate(body, ops))}, ensure_ascii=False))
+                          # as Notion will store it: a blank line between paragraphs reads back as one line break
+                          "precheck": checks(pid, re.sub(r"\n{2,}", "\n", simulate(body, ops)))}, ensure_ascii=False))
     else:
         print(json.dumps({"pid": pid, "fetched": ts, **checks(pid, body)}, ensure_ascii=False))
