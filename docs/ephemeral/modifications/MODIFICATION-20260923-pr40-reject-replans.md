@@ -1,7 +1,7 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-pr40-reject-replans
-status: ANALYZED
+status: PLANNING
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -14,6 +14,7 @@ override:
   overrides: []
   reason: ""
 interaction_cost_predicted: 2
+item_count_at_approval: 1
 interaction_cost_actual:
 items:
   - id: ITEM-01
@@ -30,8 +31,8 @@ request: |
   Yes, if PR-40 finds a defect, then it must go to remediation and an new PR opened for withi the PR work unit (PR05 for example). That would be the responsibility in this case of a new version of the work unit implementor (PR05-HDE-EPIC040-2) or something, which I would manually seed. then yes it would go through a whole new PR implementation planning process, approval, and review/CI monitoring, then another review.
   I hate to do it, but I need to stick with my plan. if a whole PR cycle fails validation, then it means it was badly executed and yes, needs to route back to PR-20
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: Nathan
+analyze_approved_date: 2026-09-23
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""

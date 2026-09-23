@@ -1201,3 +1201,83 @@ the refusal. Condition 4 as first written could not be met. It now reads: delete
 can delete it; otherwise left to the harness's teardown and never read again. Everything else in the
 ruling stands. The first files left this way were two for `PR-10` and two for `OPS-30`, disclosed in
 the 2026-09-23 ANALYZE record for `MODIFICATION-20260923-alpha-feedback-open-entries`.
+
+## D23 — The Alpha Feedback rule changes: artifacts hold results, handoffs are short, implementors have latitude, PR-35 has its own session, releases stop copying unchanged prompts
+
+**Product Owner, 2026-09-23.** He approved the analysis of
+`MODIFICATION-20260923-alpha-feedback-open-entries` with "approve, all agreed", covering its three
+rulings, and its plan with "yes approve". On the same day he ruled that a PR-40 reject re-plans
+through PR-20: *"if a whole PR cycle fails validation, then it means it was badly executed and yes,
+needs to route back to PR-20."*
+
+This entry records the rulings. **The exact wording each rule is applied with is the canonical
+wording in that Modification's §P** (`docs/ephemeral/modifications/`). It is cited there, not
+restated here, so the two cannot drift (`DERIV-001`).
+
+### The rulings
+
+**D23-A — Results live in the artifact (`AF-008`).** Every result a session produces, test results
+above all, is written to its output artifact before a handoff is emitted. A handoff names the
+artifact and never carries the only copy of a fact.
+
+**D23-B — A handoff is short (`AF-008`).** A handoff carries:
+- the destination prompt by full name, version and direct Notion URL;
+- the receiving role and session;
+- each input artifact by repository path, with a one-line label;
+- the pull request reference when the receiver continues an existing PR;
+- only the minimum context for a condition the artifacts do not record.
+
+It carries no branch or commit, and restates nothing the named prompt, canon or files hold. The
+block ends the response, after at most a few lines. **This reverses the "complete, self-contained
+handoff carrying status, completed work, decisions, constraints" rule** in `handoff_contract`.
+
+**D23-C — Implementors have latitude; "material" is defined (`AF-009`, with `AF-010`'s merged scope).**
+- **"Material" means a change to the Epic-level commitment:** its outcome or objective; approved
+  acceptance criteria; a protected architectural, security, data-model or external-contract
+  boundary; the scope of several planned work units; an accepted dependency or cross-team
+  commitment; or budget, schedule or risk needing Product Owner direction. A planned approach found
+  incomplete, impractical or inferior is not by itself material.
+- **Everything obvious, necessary and consistent with the objective** is decided, implemented and
+  tested by the implementor, and recorded under *In-flight decisions* in `PR_IMPLEMENTATION_RESULT`.
+- **Scope: the PR lane.** The ESC remediation lane keeps its own threshold.
+
+**D23-D — PR-35 runs in its own dedicated session (`AF-011`).** PR-30 and PR-35 remain two phases of
+one work unit, sharing everything except the session. **This reverses the same-session contract,
+and re-pins R1 row GCF-17.**
+
+**D23-E — The PR-35 session subscribes to its pull request** where the surface allows, and PR-40 is
+dispatched when that subscription observes Nathan's merge (`AF-011`). The observed merge event
+replaces Nathan's pasted merge assertion as PR-40's trigger. PR-40 still verifies the merged state
+independently, and no agent merges. **This reverses `direct_PR35_to_PR40_automatic_edge: false`.**
+
+**D23-F — A PR-40 reject re-plans.** An in-scope defect found by PR-40 in landed work goes back to
+PR-20 for a new plan, in a new dedicated implementor session that Nathan seeds, with a new Proceed.
+**This reverses "never a second Proceed" for that case, and re-pins R1 row GCF-15.** Carried by
+`MODIFICATION-20260923-pr40-reject-replans`.
+
+**D23-G — Releases stop copying unchanged prompts (`AF-012`, GCFPE only).**
+- Membership and each member's current version live in the register and the complete-prompt-set
+  catalog.
+- A changed member gets a successor page. An unchanged member keeps its page, and the register
+  records it in the new release.
+- Bodies carry no release-bound header line.
+- **This supersedes the `Prompt version:` and `Ecosystem release:` allowance in
+  `prompt-body-content-policy.md`, and `D11`'s in-body version assertion.**
+
+**Class B, not ruled here:**
+- the Notion read-only message (`AF-006`), which applies the 2026-09-22 policy;
+- the governance-line scan (`AF-004`);
+- PR-35 owning review correction, which applies `D13` and PR-30's own body;
+- the `flowmaster-validate` wording of `D22`.
+
+### What it does not decide
+
+- **It authorizes only what the plans say.** Where a plan proves incomplete, the part returns to
+  PLAN.
+- **The Flow Index Alpha-state block (`D18`) is untouched.**
+- **The TW ecosystem and the PE Metaprompt are outside `D23-G`.**
+
+### The tested guard (`D14`)
+
+Each ruling gets a registry assertion with an injected must-fail regression, as listed in the
+Modification's §P. **Until those land, `D23` is ruled but not applied.**
