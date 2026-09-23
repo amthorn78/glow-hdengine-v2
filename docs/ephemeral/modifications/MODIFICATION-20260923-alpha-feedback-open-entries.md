@@ -157,7 +157,7 @@ plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
 spawned_from: ""
-shares_package_with: []
+shares_package_with: [MODIFICATION-20260923-pr40-reject-replans]
 ---
 
 # MODIFICATION-20260923-alpha-feedback-open-entries
@@ -649,7 +649,7 @@ Conventions:
 | 25 | PART-07 | registry: the 10 rows | `required_regex: 'Decide it during work'` | `D14` | audit passes; injected removal fails | remove |
 | 26 | PART-08 | registry `:3531` | "Implement, test, commit and publish the exact proceeded PR work unit; review findings and CI fixes on the published PR belong to PR-35" | Class B | `grep -c review-correct registry` = 0 | revert |
 | 27 | PART-08 | `glow-hde-pr-development:79` | "Bundle related implementation changes into one locally verified push when practical." | Class B | package review | scratch copy |
-| 28 | PART-08 | `PR-40` `REJECT` → PR-30 route | **No change.** The route runs after merge, when no open PR exists, so the correction is new implementation work, which is PR-30's. Recorded here so EXECUTE records `NOT_APPLICABLE` with this reason | Class B | EXECUTE records the disposition | — |
+| 28 | PART-08 | `PR-40` `REJECT` → PR-30 route | **No change here.** The route runs after merge, when no open PR exists, so it is not PR-35's review work. Nathan ruled on 2026-09-23 that it re-plans through PR-20 in a new session. That change is `MODIFICATION-20260923-pr40-reject-replans`, which shares this package. EXECUTE records `NOT_APPLICABLE` here, with that pointer | Class B | EXECUTE records the disposition | — |
 | 29 | PART-09 | graph `global.json` `pr_continuity_contract` | Remove "dedicated PR-development session" from `shared_exactly_one`; set `added_boundaries.session` = 1 for the PR-30 → PR-35 edge; `PR-35_same_r1_row_as_PR-30` stays true (same R1 row, new session) | `D23` | build passes; new proof token; Tier 2 gate | revert the part |
 | 30 | PART-09 | graph `PR-35.json` | `session_class` = `DEDICATED_PR_REVIEW_SESSION`; `receiving_role` = "You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you continue its existing pull request."; `adds_session` = true | `D23` | build passes | revert |
 | 31 | PART-09 | graph `PR-30.json` (edge to PR-35), `RS-40.json` (PR-35 phase) | The PR-30 → PR-35 handoff targets the PR-35 session; RS-40's `PR_RETURN_PHASE: PR-35` resumes in the PR-35 session | `D23` | build passes; closure over `PR-30` (7) and `PR-35` (6) | revert |
