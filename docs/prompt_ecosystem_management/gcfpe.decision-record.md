@@ -1166,7 +1166,9 @@ under five conditions, and all five must hold:
 2. it serves only the read or check in hand, and is never a source for later work — the next
    read goes back to Notion;
 3. it is never hashed, byte-compared or otherwise used as the body's identity;
-4. it is deleted when that read or check is done, and at the latest when the task ends;
+4. it is deleted when that read or check is done, and at the latest when the task ends. Where
+   the harness does not let the session delete a file in its own session store, the file is left
+   to the harness's teardown and never read again;
 5. the session says in its report that it happened.
 
 Everything the policy was written against stays prohibited, without exception: mirrors,
@@ -1190,3 +1192,12 @@ requires a local corpus before work can proceed.
 and no repository check can see a harness session directory. The standing guard is condition 5:
 the report makes every such file visible. A guard that fires is owed to the next change that
 touches a validator or skill. Until then, this ruling is applied but not guarded.
+
+### Refined the same day — a session cannot always delete its own session file
+
+The first measurement under `D22` found that the Claude Code harness refuses a session's `rm` on
+its own tool-results directory ("Session Transcript Tampering"). The workers did not work around
+the refusal. Condition 4 as first written could not be met. It now reads: deleted where the session
+can delete it; otherwise left to the harness's teardown and never read again. Everything else in the
+ruling stands. The first files left this way were two for `PR-10` and two for `OPS-30`, disclosed in
+the 2026-09-23 ANALYZE record for `MODIFICATION-20260923-alpha-feedback-open-entries`.

@@ -102,7 +102,9 @@ that size. A scratch file can also feed `--bodies-stdin`.
 2. **For the read or check in hand only.** It is never a source for later work; the next read
    goes back to Notion.
 3. **Never an identity.** Not hashed, not byte-compared, not cited as the body.
-4. **Deleted** when that read or check is done, and at the latest when the task ends.
+4. **Deleted** when that read or check is done, and at the latest when the task ends. Where the
+   harness does not let the session delete a file in its own session store, the file is left to
+   the harness's teardown and never read again.
 5. **Disclosed** in the session's report: which bodies, and that the files were deleted.
 
 **Still prohibited, without exception:** mirrors, exports, snapshots, backups, a cache reused
