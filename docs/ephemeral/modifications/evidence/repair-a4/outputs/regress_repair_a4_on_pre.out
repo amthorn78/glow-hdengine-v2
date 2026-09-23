@@ -1,0 +1,12 @@
+OK   clean ('FLOWMASTER_SUITE_PASS', [], 'FLOWMASTER_SUITE_PASS', [])
+BAD  P1 {'default': [], 'candidate': []}
+BAD  P2 {'default': [], 'candidate': []}
+BAD  P3 {'default': [], 'candidate': []}
+BAD  P4 {'default': [], 'candidate': []}
+BAD  M1 {'default': [], 'candidate': []}
+BAD  M2 {'default': [], 'candidate': []}
+BAD  M3 {'default': [], 'candidate': []}
+BAD  M4 {'default': [], 'candidate': []}
+BAD  M5 {'default': [], 'candidate': []}
+OK   K3 ['E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162', 'recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326', 'EQUAL     /tmp/claude-0/e2/skills-a4-pre/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json', 'EQUAL     /tmp/claude-0/e2/skills-a4-pre/change-flow/references/gcfpe-20260914.1-0
+A4_REPAIR_REGRESSIONS 2 of 11 exact

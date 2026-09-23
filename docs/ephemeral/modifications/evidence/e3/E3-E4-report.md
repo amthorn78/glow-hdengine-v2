@@ -1,6 +1,6 @@
-# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 6
+# E3 and E4 report — Amendment 1 (spec v2 §0, §3, §7, §9), revision 7
 
-Revisions 3 to 6 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
+Revisions 3 to 7 are recorded in their own sections. Revision 2 of the E3/E4 run applied the plan's author's six settlements, received after the first
 E4, re-ran E4 items 7–9, and measured four G06 alternatives. Items 1–6 and 10 do not read bodies, and nothing
 they read has changed since the first run, so their results below are those of that run (2026-09-23).
 
@@ -27,6 +27,19 @@ Every command ran with `PYTHONDONTWRITEBYTECODE=1`. No `__pycache__` was created
 
 Usage: `<bodies JSON> | PYTHONDONTWRITEBYTECODE=1 python3 <script> /tmp/claude-0/e2/skills`
 
+
+## Revision 7 (after repair round a4, `evidence/repair-a4/`)
+
+**What changed.** Nothing E3 or E4 reads: round a4 edits `validate_flowmaster.py` only, and E4 runs
+`validate_gcfpe_20260914.py` and the amthor registry audit. E4 was re-run anyway, in memory, on the repaired tree.
+
+| check | result |
+|---|---|
+| item 7 | PASS: `prompt_bodies_validated` 55, `errors` `[]` |
+| item 8 | PASS: 0 findings on 55 rows |
+| whole result | equal, key for key, to the revision-4 result |
+
+No body text or hash was written, nothing was written to Notion, and nothing was committed by the run.
 
 ## Revision 6 (after hardening round a3, `evidence/repair-a3/`)
 
