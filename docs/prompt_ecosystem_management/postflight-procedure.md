@@ -56,7 +56,8 @@ what it concludes. The auditor may not keep prompt bodies on disk, hash them, co
 byte-for-byte, produce an evidence bundle containing body content or body digests, or require a
 complete local corpus. A transient file made in order to read a body is part of the read, under
 the policy's five conditions (`D22`): outside the repository, for that check only, never an
-identity, deleted when done, and disclosed.
+identity, deleted when done (or left to the harness's teardown where the session may not delete
+it), and disclosed.
 
 **If a procedure the auditor is told to follow conflicts with this, that procedure is defective:
 report it and stop. Do not work around it.**
