@@ -1370,6 +1370,17 @@ rows, 229 edges.
 - **The rule on subagents and session creation.** It is carried into every main-ecosystem body by
   C-TOP (A1-8).
 
+### Successor, 2026-09-23 — the triage prompt is also outside the main ecosystem
+
+**Product Owner, 2026-09-23:** *"the triage prompt can also run as subagent"*.
+
+*Modification Intake and Triage* is a maintenance prompt, like `GCFPE-MGMT-10`. The clarification
+above excepts `GCFPE-MGMT-10`, and this adds the triage prompt, so neither rule in that clarification
+binds it: it may run as a subagent.
+
+The triage prompt is not one of the 55 registry members, so no C-TOP guard applies to it and nothing
+in Amendment 1 changes.
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
