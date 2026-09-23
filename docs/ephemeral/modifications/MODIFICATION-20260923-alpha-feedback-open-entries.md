@@ -1,7 +1,7 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-alpha-feedback-open-entries
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 2
 closure:
@@ -10,77 +10,77 @@ closure:
   state_sharers: "closure.py over PR-10 PR-20 PR-30 PR-35 PR-40 RS-10 RS-20 DOC-20 OPS-30 QA-10, pasted in §A; the Tier 2 parts take the release-wide gate instead"
 readiness: NEEDS_RULING
 override:
-  by: ""
-  overrides: []
-  reason: ""
+  by: Nathan
+  overrides: [scope_freeze]
+  reason: "2026-09-23, after the E6 cut-over: 'PE Metaprompt should be fixed. The TW ecosystem is out of your scope for now.' PART-12 (ITEM-19) reaches the PE Metaprompt; the TW ecosystem stays out."
 interaction_cost_predicted: 11
 item_count_at_approval: 16
-interaction_cost_actual:
+interaction_cost_actual: 29
 items:
   - id: ITEM-01
     statement: "Each of the 40 of 55 091426.1 prompt bodies never yet read for a decorated governance line is checked with flowmaster-validate's PROMPT_BODY_GOVERNANCE_STATE, and anything found is repaired: a leftover line is removed, and a false positive is closed by narrowing the check, never by a looser strip."
     source: AF-004
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "The operational guidance, the workflow explanations and future handoffs all communicate the Notion read-only default consistently, so Notion is not crowded with routine lifecycle records."
     source: AF-006
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-04
     statement: "A normal handoff carries only the persistent prompt to run, the target session or role where relevant, the exact input filenames each with a short label, and the minimum context for an exceptional condition, never restating history, architecture, decisions, scope, acceptance criteria, workflow rules or artifact contents that the named prompt, canon or files already hold."
     source: AF-008
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-06
     statement: "Every handoff is visibly presented: the block is not buried inside a long report or surrounded by unnecessary explanation."
     source: AF-008
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-07
     statement: "Every result a session produces, test results above all, is written to that session's output artifact, so a handoff may name the artifact but never carries the only copy of a fact; before handoffs shrink, every kind of fact the handoff rule now makes a handoff carry has a home in the producing prompt's output artifact."
     source: AF-008
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-08
     statement: "A handoff carries no branch or commit; a versioned filename identifies the content, because an issued version is never edited and a correction is a new version."
     source: AF-008
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-09
     statement: "PR implementation agents (the triggering case arose while PR-20 was planning) make the ordinary engineering and design decisions needed to accomplish the accepted work, including ones the plan did not anticipate, without a rescope: a correction that is obvious, necessary to make the approved scope work, and consistent with the Epic's accepted objective and controlling constraints is in scope, and the implementor decides it, implements it and tests it."
     source: AF-009
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-10
     statement: "Formal rescoping is reserved for a genuine change to the Epic-level commitment (its outcome or objective, approved acceptance criteria, a protected architectural, security, data-model or external-contract boundary, a re-baseline across several planned work units, an accepted dependency or cross-team commitment, or budget, schedule or risk needing Product Owner direction), and a planned approach found incomplete, impractical or inferior is not by itself grounds."
     source: AF-009
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-11
     statement: "Implementors have a simple decision tree or matrix they can apply during work to tell implementation latitude from formal rescope."
     source: AF-009 (AF-010 point 3, merged)
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-12
     statement: "Implementation reports record every in-flight design decision: what changed, why it was necessary, and what was tested."
     source: AF-009 (AF-010 point 4, merged)
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-14
     statement: "PR-30 builds the implementation, and PR-35 handles all code-review findings and CI fixes for that existing PR."
     source: AF-011
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-15
     statement: "PR-35 is handed off to a separate dedicated session, because review handling, code-review corrections and CI fixes have different context and model-usage demands from implementation."
     source: AF-011
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-17
     statement: "The PR-35 session subscribes to the existing PR it continues."
     source: AF-011
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-18
     statement: "When PR-35 completes and its PR is merged, PR-35 automatically creates and dispatches a PR-40 handoff, a mechanism the workflow does not have today."
     source: AF-011
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-19
     statement: "When a prompt ecosystem is modified, prompts that do not change only have their version number bumped, the version number alone tracking membership of the current iteration, and sibling bodies are created only for prompts that actually change, across all prompt ecosystems in the repository."
     source: AF-012
-    disposition: ""
+    disposition: APPLIED
   - id: ITEM-20
     statement: "The flowmaster-validate skill states the prompt-corpus rule as D22 now has it: a transient file the tooling makes in order to read a body is part of the read, and only a standing copy is prohibited."
     source: "Product Owner, 2026-09-23, added at ANALYZE (D22)"
-    disposition: ""
+    disposition: APPLIED
 parts:
   - id: PART-01
     name: "Scan the 40 unread bodies for a decorated governance line, and repair what it finds"
@@ -1111,3 +1111,92 @@ Choices made during E2, settled by the plan's author:
 | E4 — gate | PASSED | Items 1–6 and 10 pass. Item 7: all 55 edited bodies validated, none left unevaluated, no errors. Item 8: 0 findings on 55 rows (1 484 assertions). Item 9: 43/43 regressions exact. **G06** was the one guard left hitting pre-existing legitimate text (CL-C-10, CL-E-10, RS-40). Nathan approved option (b) on 2026-09-23: a `NEXT_PROMPT_HANDOFF` preceded directly by "no " no longer opens the guard's window. Nothing else changes, and both G06 regressions stay exact. Applied by `evidence/e3/g06_apply.py` |
 | E5 — independent skill review (D24) | PASSED | **Round a1:** SFR-A1-1 and SFR-A1-2 both returned SKILL_REPAIR_REQUIRED (records `evidence/SECTION-10-REVIEW-a1-*.md`); repaired in `evidence/repair-a1/` (commit `32e04d4`; E3/E4 revision 4). **Round a2** (brief `evidence/REVIEWER-PROMPT-a2.md`, `9c49a65`): SFR-A2-1 and SFR-A2-2 both returned SKILL_REPAIR_REQUIRED (records `evidence/SECTION-10-REVIEW-a2-*.md`). The brief wrongly said the a1 V2 repair reached the relay and tw lists; only the PR skill guarded the fallback predicate and the D23-E sentence. Nathan approved the repair set as listed on 2026-09-23. **Repair a2** (`evidence/repair-a2/`): S1 FMV-GCF-DISPATCH-001 over all nine carrying files, plus an amthor test; the PR-skill literal is anchored to C-DISPATCH. S2 FMV-ORACLE-021 (approved row digests). S3 duplicate JSON keys rejected, plus a fix for the baseline KeyError on an unreadable oracle. S4 FMV-ORACLE-022 (layout and key order), the exact `historical_non_executable_references`, the relay qualifier literals, and the D23-E sentence in the two fixture texts. Gates: every live suite passes; 228 fixture cases, 0 failed; 12 of 12 historical outputs byte-equal; regressions exact (oracle 15, skills 70, contract 53 + 35 + 3, fixtures 2, a1 17, a2 34), with each changed expectation listed in `derive_regressions_a2.py`; E3/E4 revision 5 unchanged from revision 4. **Round a3** (brief `evidence/REVIEWER-PROMPT-a3.md`, `c22bc64`; packages in `/tmp/claude-0/pkg3/new/`: amthor `0070d61c…`, change-flow `97bf899c…`, flowmaster-validate `e8eeda44…`, PR skill `dadf64b2…`, relay `30fdce6a…`, tw `db4cde53…`): SFR-A3-1 and SFR-A3-2 both returned **SKILL_FIT_CONFIRMED** (records `evidence/SECTION-10-REVIEW-a3-*.md`), bound to those digests. Their non-blocking findings are held as optional hardening for a later change: a code fence inside a block quote, list item or `<pre>` escapes FMV-ORACLE-022; FMV-GCF-DISPATCH-001 counts occurrences, not positions, and skips a missing skill; an extra top-level key in the successor map passes; the contract's `merge_observed` conditions do not carry the D23-E void clause. **Hardening a3** (`evidence/repair-a3/`): Nathan chose to fold these findings in now (2026-09-23), which voids the round-a3 confirmation for the new bytes. H1 FMV-ORACLE-022 counts fences inside block quotes and list items and rejects `<pre>`. H2 FMV-GCF-DISPATCH-001 pins positions: the whole C-DISPATCH passage once per carrying site, every other predicate and every fixture-text D23-E sentence by its sentence context, and HTML comments removed before counting. H3 a missing carrying skill is reported. H4 the successor map's top-level keys must be exactly the projection keys. H5 the contract-only `route_graph_semantics.pr40_entry` gains the D23-E sentence (contract `6902924a…`, 613 326 B). The graph stays `ae2bd159…`, and the routing surface stays `fecc319b…`/284, the diff Nathan read. Gates: every live suite passes; 228 fixture cases, 0 failed; 12 of 12 historical outputs byte-equal; all 191 earlier regressions exact with no expectation change; 13 of 13 new regressions exact. Every new case except the controls fails on the round-a3 reviewed tree. E3/E4 revision 6 is unchanged from revision 4. **Round a4** (brief `evidence/REVIEWER-PROMPT-a4.md`, `76912a4`): SFR-A4-1 returned SKILL_FIT_CONFIRMED and SFR-A4-2 returned SKILL_REPAIR_REQUIRED (records `evidence/SECTION-10-REVIEW-a4-*.md`). SFR-A4-2's required finding: round a3's comment stripping let a comment carrying a contradicting instruction sit inside the pinned passage, and let an unclosed `<!--` hide a file's rest. That made the guard weaker than the round-a3 tree, so C8 was false as worded. Nathan approved the repair set on 2026-09-23. **Repair a4** (`evidence/repair-a4/`): R1 counts read the raw file, and any HTML comment other than a whole-line `<!-- FLOWMASTER_* -->` marker in a carrying file is a finding. R2 the successor map's key-order check moves outside the dict-equality guard. R3 FMV-ORACLE-022 also rejects `<xmp>`, `<listing>`, `<textarea>` and `<plaintext>`, and indented code lines outside the fenced blocks. R4 `contract_recipe.py`, a successor step to the unchanged E2 regenerator, reproduces the shipped contract byte for byte. Gates: every live suite passes; 228 fixture cases, 0 failed; 12 of 12 historical outputs byte-equal; all 204 earlier regressions exact, with no expectation change; 11 of 11 new regressions exact. Every new case except K3 fails on the round-a4 reviewed tree. E3/E4 revision 7 is unchanged from revision 4. Correction: "all 204 earlier regressions" above and in the round-a5 brief is a miscount; the earlier harness totals are 242 (oracle 15, skills 70, contract 53 + 35 + 3, fixtures 2, a1 17, a2 34, a3 13), all exact (SFR-A5-2). **Round a5** (brief `evidence/REVIEWER-PROMPT-a5.md`, `b65f754`; packages in `/tmp/claude-0/pkg5/new/`: amthor `0070d61c…`, change-flow `af8cff93…`, flowmaster-validate `394bb1ae…`, PR skill `dadf64b2…`, relay `30fdce6a…`, tw `db4cde53…`): SFR-A5-1 and SFR-A5-2 both returned **SKILL_FIT_CONFIRMED** (records `evidence/SECTION-10-REVIEW-a5-*.md`), bound to those digests. Their non-blocking findings, not repaired, are open for Nathan's decision: indented code after a block-quote or list marker in the matrix is display-only; any `FLOWMASTER_*` marker name is accepted; other text-hiding constructs pass (`<script>`, `<style>`, `<template>`, `<div hidden>`, `<?`, `<!x`, CDATA, `[//]: #`); a plain `-->` prose arrow would be rejected; runtime-map row order is not pinned |
 | E6 — cut-over (spec v2 §11) | APPLIED, freeze pending lift | Installed digests equal the round-a5 reviewed trees; installed suites pass; 55 of 55 bodies landed and read back; all 55 re-scanned together (validator 55 validated, 0 of 1 484 assertions, placement once); control edits (steps 6, 9, 16, 36, 44, C11) read back. Nathan approved the G06 heading stop (registry `9cca37b`) after Notion's paragraph storage exposed a blank-line-only window on 10 bodies. Two adaptations and three residuals are recorded in `evidence/e6/E6-report.md`. Nathan lifts the freeze; step 48 follows |
+| Close-out — residuals and stale-wording sweep | APPLIED | Nathan approved the three E6 residual fixes on 2026-09-23 ("I don't want any loose ends from this"). A read-only sweep then checked every surface D23 could have left stale: 8 finders and 8 adversarial verifiers over the Notion control pages, the management documents, the v4.0.0 procedure and the installed skills. It upheld 102 findings and added 25. Every finding on a Notion control page or an open repository path that this Modification caused was fixed and read back. Predecessor pages were bannered under the 2026-09-22 sweep rule. The operating-procedure binding now points to a v5.0.0 file that restates no rule; v4.0.0 is kept intact and marked superseded. Findings that need a skill change or a ruling are listed for Nathan, not fixed. Detail: `evidence/e6/CLOSE-OUT-20260923.md` |
+| Close-out — PE Metaprompt (override) | APPLIED | Nathan widened PART-12 to the PE Metaprompt after the cut-over (the `override` above) and kept the TW ecosystem out. Seventeen edits in one update converge its GCFPE overlay on the canonical texts: handoff (C-ART, C-HANDOFF, C-PLACE), PR lane (C-SESSION, C-SUB, C-DISPATCH, C-LAT, C-DEC, C-PROCEED, C-REPLAN), `MERGE_OBSERVED` in the result table, R1's successor oracle, the GCFPE identity exception and C-VERSION, and a prompt body never hashed (`D22`). Its own selection rule no longer pins a release, so it needs no successor page when unchanged. The general rules that also govern TW are unchanged. Read back; detail in `evidence/e6/CLOSE-OUT-20260923.md` |
+| 48 — record | APPLIED | Alpha Feedback page `3df4590a05eb8111a6a5f67cb82f96f6`: AF-004, AF-006, AF-008 and AF-009 `RESOLVED`; AF-011 `RESOLVED as ruled` (nothing is dispatched automatically, by Nathan's ruling); AF-012 `RESOLVED for GCFPE`, open for the TW ecosystem and any other non-GCFPE ecosystem (the PE Metaprompt's GCFPE overlay was brought into line; its general rules, which also govern TW, are unchanged). Read back twice, the second time after the corrections (`evidence/e6/CLOSE-OUT-20260923.md` §5) |
+
+### Parts — landed at the cut-over
+
+Every part landed whole. Each part's canonical texts were placed exactly once in each body that
+carries them (E3), passed the gate (E4), shipped in the reviewed packages (E5), and were landed,
+re-scanned and read back (E6).
+
+| part | items | disposition | where it landed |
+|---|---|---|---|
+| PART-01 | ITEM-01 | `VERIFIED` | 40 of 40 bodies scanned, 0 hits; nothing to repair (step 1) |
+| PART-02 | ITEM-03 | `APPLIED` | C-NOTION in 7 bodies and the relay; `QA-10`; 10 handoff rules; `CONTROL_NOTION` guard on 55 rows; Overview prefix |
+| PART-03 | ITEM-07 | `APPLIED` | C-ART in 53 bodies and the PR skill; Hub standard; guard on 53 rows |
+| PART-04 | ITEM-04, ITEM-08 | `APPLIED` | C-HANDOFF in 53 bodies, the skills, the graph's `handoff_contract` and the Hub; branch/commit guard |
+| PART-05 | ITEM-06 | `APPLIED` | C-PLACE in 53 bodies (5 with the `ASK OK?` variant: QA-50, QA-60, QA-80, RS-10, RS-30) and the skills |
+| PART-06 | ITEM-12 | `APPLIED` | C-DEC in PR-30, PR-35 and RS-40, and the PR skill |
+| PART-07 | ITEM-09, ITEM-10, ITEM-11 | `APPLIED` | C-LAT in 10 bodies, two graph conditions and the skills |
+| PART-08 | ITEM-14 | `APPLIED` | registry PR-30 row and PR-skill line; the PR-40 route moved to the child Modification (step 28) |
+| PART-09 | ITEM-15 | `APPLIED` | C-SESSION in 19 bodies; graph and registry session class; R1 successor oracle; register and Flow Index |
+| PART-10 | ITEM-17 | `APPLIED` | C-SUB in PR-35 and RS-40, and the PR skill |
+| PART-11 | ITEM-18 | `APPLIED` | as ruled: the subscribed session returns `MERGE_OBSERVED` with a paste-ready PR-40 handoff, and nothing is created or dispatched automatically (`D23` Clarification). C-DISPATCH in PR-35 and RS-40; `MERGE_OBSERVED` edges; the once-per-merge sentence |
+| PART-12 | ITEM-19 | `APPLIED` | GCFPE: release header lines removed from 55 bodies; C-VERSION in the register, catalog and policy. PE Metaprompt by override (close-out). **TW ecosystem out of scope** (Nathan); AF-012 stays open for it |
+| PART-13 | ITEM-20 | `APPLIED` | C-D22 reason in `flowmaster-validate` |
+
+C-TOP (Amendment 1, A1-8) belongs to no single part: it was placed in the 54 main-ecosystem bodies,
+every GCFPE body except `GCFPE-MGMT-10`, and guarded on each row.
+
+### Artifacts produced
+
+- Decision record: `D23` (with its successors) and `D24`; a `D22` status note (close-out).
+- Graph parts (`docs/graph/parts/`), registry (`project-prompt-contract-registry.md`), and
+  `prompt-body-content-policy.md`, `authoritative-surfaces.md`, `execution-and-delegation-model.md`.
+- Evidence under `docs/ephemeral/modifications/evidence/`: the E1–E6 scripts and reports, the five
+  review rounds' briefs and verdicts, and `e6/CLOSE-OUT-20260923.md`.
+- `docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md`.
+- Six installed skill packages (digests in `evidence/e6/E6-report.md`); 55 Notion bodies edited in
+  place; the Notion control edits listed in `evidence/e6/E6-report.md` and `CLOSE-OUT-20260923.md`.
+
+Each was read back where it landed: repository files from disk and by their validators, Notion
+pages by fetch.
+
+### Interaction cost, actual against predicted
+
+**Predicted 11. Actual 29 at completion: 28 so far, and the close-out PR's merge makes 29.** The count
+is round trips through the Product Owner, as the formula defines it. Status requests and "continue"
+acknowledgements (8) are not counted. The freeze lift is still to come, but it shares one term with
+the freeze start, as the prediction counted them.
+
+| term | predicted | actual |
+|---|---|---|
+| open rulings at ANALYZE | 3 | 3 |
+| ANALYZE and PLAN approvals | 2 | 2 |
+| Amendment 1 approval | 1 | 1 |
+| review cycles | 1 | 5 (a1–a5; a1–a4 each ended in a repair approval) |
+| installs | 1 | 1 |
+| merges | 2 | 3 (#474 and #476; the close-out PR, #477, still to merge) |
+| freeze start and lift | 1 | 1 (started 2026-09-23; the lift is still to come) |
+| rulings and questions not predicted | 0 | 13 |
+
+**Why it differs.**
+- **Four extra review rounds.** Each was needed for the reason given:
+  - a2 because a1 required repairs;
+  - a3 because a2 found the a1 repairs incomplete, and the a2 brief had claimed otherwise;
+  - a4 because Nathan chose to fold a3's non-blocking findings in;
+  - a5 because a4 found a required defect in the a3 guard. a5 confirmed.
+- **Thirteen rulings nobody predicted.**
+  - Seven were new rules raised mid-run: `D22`, `ITEM-20`, the PR-40 re-plan (`D23-F`, the child),
+    `D24`, the rule against subagents and session creation, the triage exception, and the PE
+    Metaprompt scope.
+  - Two were guard rulings on G06.
+  - The rest: the intake continuation, one question explaining PART-08, the E1 "go", and the
+    close-out fixes.
+- **The prediction missed the size of the gate.** A run that re-pins R1 and changes six skills was
+  priced at one review cycle.
+
+### Remaining Product Owner actions
+
+1. **Merge the close-out PR, then lift the freeze** (spec v2 §11, step 8). Merge first: the
+   register's operating-procedure binding now names the v5.0.0 file, which reaches `main` only with
+   that merge.
+2. **Rulings this Modification cannot make.** They are listed in `evidence/e6/CLOSE-OUT-20260923.md`,
+   *For Nathan*:
+   - installed-skill text that still contradicts D23 or D22 (a new Modification with a review and
+     install);
+   - the stale `D18` Alpha-state block;
+   - AF-012 for the TW ecosystem;
+   - four currency items that predate this run.

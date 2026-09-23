@@ -1202,6 +1202,14 @@ can delete it; otherwise left to the harness's teardown and never read again. Ev
 ruling stands. The first files left this way were two for `PR-10` and two for `OPS-30`, disclosed in
 the 2026-09-23 ANALYZE record for `MODIFICATION-20260923-alpha-feedback-open-entries`.
 
+### Status, 2026-09-23 — still unguarded after the first change that touched a validator
+
+`MODIFICATION-20260923-alpha-feedback-open-entries` changed validators and skills, which is the
+trigger named above. Its only `D22` change to a validator or skill was `ITEM-20`: `flowmaster-validate` now gives D22's reason
+in its `SKILL.md` and in two script comments. No check pins that wording, and nothing fires when a
+session keeps a body on disk. The guard is still owed, now to the next change that touches a
+validator or skill (`GUARD-001`). Until then, this ruling is applied but not guarded.
+
 ## D23 — The Alpha Feedback rule changes: artifacts hold results, handoffs are short, implementors have latitude, PR-35 has its own session, releases stop copying unchanged prompts
 
 **Product Owner, 2026-09-23.** He approved the analysis of
@@ -1390,6 +1398,23 @@ C-DISPATCH gains one sentence:
 
 > PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, otherwise
 > the fallback block. Once either has been pasted, the other is void.
+
+### Successor, 2026-09-23 — `D23-G` reaches the PE Metaprompt; the TW ecosystem stays out
+
+**Product Owner, 2026-09-23, after the cut-over:** *"PE Metaprompt should be fixed. The TW ecosystem
+is out of your scope for now."*
+
+*What it does not decide*, above, said the PE Metaprompt was outside `D23-G`; that bullet is left as
+written (`AUTH-001`), and this supersedes it for the PE Metaprompt only.
+- **Its GCFPE overlay now applies the canonical texts.** That includes C-VERSION: a successor page
+  only for a member whose body changes, and no release-bound header line in a GCFPE body.
+- **Its general rules are unchanged.** They also govern the TW ecosystem.
+- **The PE Metaprompt itself follows C-VERSION.** Unchanged, it keeps its page and the register binds
+  it again in the new release; the register's *Release rule* now says so.
+- **The TW ecosystem stays outside `D23-G`.** AF-012 stays open for it.
+
+Recorded in `MODIFICATION-20260923-alpha-feedback-open-entries` as an `override` of the scope
+freeze, and in its close-out, `evidence/e6/CLOSE-OUT-20260923.md`.
 
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 

@@ -67,8 +67,8 @@ predecessor release settles the question of whether it was ever needed: `091326.
 such line at all, and that release ran.
 
 So the machinery would have kept 55 bodies carrying governance metadata forever, and grown it at
-each promotion. The validator is to be changed to match this policy, not the policy bent to match
-the validator.
+each promotion. The validator was changed to match this policy (installed in round 30, 3.2.16),
+not the policy bent to match the validator.
 
 ### Is the line useful?
 
@@ -82,13 +82,15 @@ belongs where it is read once, on the catalog or the index, not replicated acros
 must then be maintained at every release. `091326.2` shipped and ran with no such line on any of
 its 54 bodies.
 
-## Enforcement — BUILT, AWAITING INDEPENDENT REVIEW AND INSTALL
+## Enforcement — INSTALLED
 
 A rule with no consumer that fails on mismatch is decoration — see
-`prompt-validation-procedure.md`. The validator change below **is built and its gates pass**, in
-`change-flow` 3.2.9 and `flowmaster-validate` 3.2.15. It is **not installed**: no skill is trusted
-until a party that did not author it has validated it, so this policy is enforced from the moment
-Nathan installs those packages after a §10 verdict, and not before.
+`prompt-validation-procedure.md`. The validator change below **is installed**. It was built in
+`change-flow` 3.2.9 and `flowmaster-validate` 3.2.15, and installed after a §10 verdict as round
+30's `flowmaster-validate` 3.2.16. The `PROMPT_BODY_RELEASE_HEADER` rejection (`D23-G`) was
+installed with `change-flow` 3.3.0 and `flowmaster-validate` 3.3.0 on 2026-09-23
+(`MODIFICATION-20260923-alpha-feedback-open-entries` §E, stage E6). No skill is trusted until a
+party that did not author it has validated it, and each revision here was.
 
 `prompt_identity_header_valid` now:
 

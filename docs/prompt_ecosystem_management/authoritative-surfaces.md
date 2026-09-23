@@ -3,8 +3,8 @@ artifact_type: PROMPT_ECOSYSTEM_AUTHORITATIVE_SURFACES
 artifact_version: "1.0"
 created_date: 2026-09-18
 status: BINDING
-authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21
-baseline: main @ bf8f74d
+authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21; repository baseline and graph proof token updated 2026-09-23 after D23 (close-out of MODIFICATION-20260923-alpha-feedback-open-entries)
+baseline: main @ aeb256e
 ---
 
 # Authoritative surfaces
@@ -25,8 +25,8 @@ the repository wins and the Notion page is the thing to correct.
 | Selection status | `SELECTED` — promoted 2026-09-21 by Product Owner decision `D17` |
 | Selection authority | The **GCFPE Membership and Release Register** in Notion, and nothing else. Every control page reads `REGISTER_CONTROLLED` and asserts no selection of its own |
 | Predecessor | `GCFPE-20260913.1` / `091326.2` / 54 — superseded, **archived intact** (56 pages moved, never copied or rewritten) |
-| Repository baseline | `main` @ `bf8f74d` |
-| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…`, as measured before `D23` |
+| Repository baseline | `main` @ `aeb256e` |
+| Graph proof token | `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…`, as measured after `D23` |
 
 The graph proof token is reproduced by building from the committed parts. A session that
 builds and gets the same token has proved agreement; nothing needs a stored copy.
@@ -98,7 +98,9 @@ Escalation `3db4590a05eb81cd938de84cfffead9c` · TW `3db4590a05eb811b9c14f2ae89c
 
 **No page asserts its own selection.** Every control above reads `REGISTER_CONTROLLED` and carries
 the register's URL plus the rule that it is operative if and only if the register selects this
-release. If a page ever says `SELECTED` on its own, that is the defect, not the evidence.
+release. The PE Metaprompt is the one exception: it is operative while the register binds it as the
+selected release's prompt-authoring control, and when unchanged it is bound again in the next
+release (`D23-G`, AF-012). If a page ever says `SELECTED` on its own, that is the defect, not the evidence.
 
 **The 55 prompt bodies live in Notion and are authored and revised there in place.** They
 are never mirrored into the repository. The repository holds their *contracts* (registry)

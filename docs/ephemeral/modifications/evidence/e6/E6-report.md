@@ -61,3 +61,11 @@ Stale same-session wording the plan's steps did not name, left unchanged:
 - Flow Index actor table row `PR-30`–`PR-35`: "Same dedicated PR engineer in one session … PR-35 is a same-session phase".
 - Catalog *Release-wide invariants*: "PR-30 and PR-35 are two same-session phases".
 - Hub worker output standard: after step 9, "If it does not fit any section, it is not reported." refers to sections the handoff no longer has.
+
+## Residuals — closed 2026-09-23
+
+Nathan approved the three fixes above ("I don't want any loose ends from this"). All three were
+applied and read back: the Flow Index actor-table row, the catalog invariant, and the Hub sentence
+(removed). A sweep for anything else the cut-over left stale followed. Its method, the fixes, the PE
+Metaprompt convergence, the predecessor banners and what is left for Nathan are in
+`CLOSE-OUT-20260923.md`.

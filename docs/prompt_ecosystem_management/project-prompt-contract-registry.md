@@ -36,7 +36,7 @@ authority_sources:
     catalog is archived intact and is historical evidence only.'
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
   path: candidate/prompts/manifest.json
-  note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path does not exist in the repository. Current prompt bodies are authored in Notion and are resolved through the candidate catalog; the evidence_contract byte count and SHA-256 on each row below are the reproducible identity.'
+  note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path does not exist in the repository. Current prompt bodies are authored in Notion and are resolved through the candidate catalog; the evidence_contract byte count and SHA-256 on each row below identified the bodies before `D23` and no longer do (see body_extraction_convention.body_identity_disposition).'
   disposition: HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH
 body_extraction_convention:
   in_force: STRIP_BOTH_BOUNDARY_NEWLINES
@@ -45,15 +45,15 @@ body_extraction_convention:
     </content>. The markers occupy their own lines, so a literal reading that keeps them yields a
     body two bytes larger on every prompt. This is the convention under which every
     evidence_contract byte count and SHA-256 below was produced, and the only convention under
-    which they reproduce.'
+    which they reproduced the pre-`D23` bodies (see body_identity_disposition).'
   row_wording_disposition: 'All 55 rows carry the dated line "Extraction convention: the exact
     slice between the fetch result''s <content> and </content> markers, with no trailing newline
     added". That wording is incomplete in two ways: it omits the leading newline entirely, and it
     states the trailing treatment as an addition withheld rather than a byte dropped. Read
     literally it describes a different corpus from the one the recorded digests identify. Those 55
     lines are dated evidence statements and are preserved unedited under AUTH-001; this key is the
-    authority for the convention in force, and each row''s recorded byte count and SHA-256 remain
-    the reproducible identity.'
+    authority for the convention in force, and each row''s recorded byte count and SHA-256 were
+    the reproducible identity until `D23` (see body_identity_disposition).'
   evidence:
   - 'Reverse-applied edits reproduce the recorded pre-edit SHA-256 for 21 of 21 repaired bodies
     under strip-both and 0 of 21 under as-extracted, leading-only or trailing-only. Three untouched
@@ -76,11 +76,11 @@ body_extraction_convention:
     it is recorded here as corroboration, never as evidence. It is promoted to evidence only by
     landing the run — per-body digest, byte count and the extraction command — in a repository
     evidence artifact.'
-  applies_to: 'The evidence_contract byte count and SHA-256 on each row below, which are the body
-    identity for validation. This key does not alter, revive or reinterpret any source_snapshot
+  applies_to: 'The evidence_contract byte count and SHA-256 on each row below, which were the body
+    identity for validation until `D23` (see body_identity_disposition). This key does not alter, revive or reinterpret any source_snapshot
     record; those remain the 2026-09-17 pre-merge extraction that authority_sources dispositions as
     HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH.'
-  why_it_matters: 'The convention defines the ecosystem''s tamper-evidence. The ambiguity already
+  why_it_matters: 'The convention defined the ecosystem''s tamper-evidence until `D23` changed the bodies, whose hashing is prohibited. The ambiguity already
     produced one silent two-byte error that no amount of agreement between independent extractions
     would have surfaced, because both extractions were wrong in the same way.'
   body_identity_disposition: 'The `evidence_contract` and `source_snapshot` identities on every row
