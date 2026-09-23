@@ -19,12 +19,16 @@ noticed. Workflow runs `wf_575cf35d-078` (sweep) and `wf_b6c1b6fb-c8b` (re-check
 | `PR40_ENTRY_PRE_D23E` | 28 | 9 | 17: CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-20, RS-40 | PART-14 |
 | `READ_ONLY_SELF_DESCRIPTION` | 19 | 5 | 12: CL-20, CL-30, CL-40, CL-E-20, DOC-20, ESC-25, GCFPE-MGMT-10, OPS-30, PR-20, PR-40, PR-50, QA-10 | PART-05 |
 | `CANDIDATE_AUTHORING_LEFTOVER` | 9 | 26 | 8: CL-20, CL-30, CL-40, CL-C-10, CL-E-10, OPS-30, PR-10, QA-10 | PART-15 |
-| `OTHER_CONTRADICTION` | 5 | 11 | 4: PR-35, PR-40, QA-110, QA-80 | PART-16 |
+| `OTHER_CONTRADICTION` | 5 | 11 | 4: PR-35, PR-40, QA-110, QA-80 | PART-16 (QA-110, QA-80), PART-14 (PR-35, PR-40), PART-05 (PR-35 storage) |
 | `UNDEFINED_REFERENCE` | 0 | 21 | 0: — | none |
 | `LINK_OR_MENTION_BAN` | 0 | 6 | 0: — | none |
 
 `UNDEFINED_REFERENCE` and `LINK_OR_MENTION_BAN` had no REAL finding after the re-check. Two of their rows
-bear on existing items and are dispositioned in §A (ITEM-20, ITEM-21).
+bear on existing items and are dispositioned in §A, *Items whose premise the verification refuted* (ITEM-20,
+ITEM-21).
+
+**Where a shared sentence was judged differently in different lanes, `ANALYZE-anchor-census.md` gives it one
+verdict for every carrier, and that verdict governs.**
 
 ## REAL findings
 

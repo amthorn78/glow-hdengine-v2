@@ -65,9 +65,42 @@ Every installed suite passes today:
 | ITEM-13 | CONFIRMED, wider | the contract regenerator and its recipe (`evidence/regenerate_contract.py`, `evidence/repair-a4/contract_recipe.py`); the registry deriver is the §7.5 rule inside `evidence/e1_registry_apply.py`, not a script | Move both into `glow-graph-contract/scripts/`. The recipe needs the pre-E2 contract `2b78f877…`, which was in scratch only; it is now kept at `evidence/pre-e2-contract/` (commit `245b21b`). A verifier regenerated `6902924a…` byte-identical from it | acceptance test: the kept input regenerates the shipped contract | C / 0 |
 | ITEM-14 | VERIFIED, wider | relay `:273` (Drive the preferred artifact plane), `:358` (`GOOGLE_DRIVE / NONE`), `:265` (a Drive reference location) | Outside GCFPE a project may name Drive; for GCFPE the repository is the plane (D7). The enum gains `REPOSITORY`, and `validate_relay_manifest.py:1095` must accept it: a verifier showed the text-only edit fails the validator. Add a self-test case and update `manifest-v2-examples.md` | `CONTRACT_FORBIDDEN` `preferred artifact plane`; relay self-test | B / 0 |
 | ITEM-15 | CONFIRMED | 5 distinct findings, all in `validate_flowmaster.py`: F2 (`:711`), N1/F3 and N4/F4 (`:757-758`), N2/F1 (`:790-800`), N3 (`:1320-1353`). None fires on today's files | the five fixes and their regressions; plus a dated correction note on the repair-a4 record's C8 and §2 wording, which overstates the guard (the claim-level half of N1/F3) | new regressions | C / 0 |
-| ITEM-16 | **REFUTED as prototyped** | The prototype gave 23 findings before and 9 after, not 29 and 0. It missed 30 of 30 paraphrased violations and flagged the edits' own prohibitions | **Redesign:** (1) `CONTRACT_REQUIRED`: the D22 override sentence in each GCFPE-bound skill; (2) `CONTRACT_FORBIDDEN`: every retired phrase this Modification removes; (3) the governance-audit code fixture (ITEM-05); (4) the limit recorded under `D14`: prose paraphrase is not mechanically detectable, and review holds it | GUARD-001: each guard fires on an injected regression | B / 0 |
+| ITEM-16 | **REFUTED as prototyped** | The prototype gave 23 findings before and 9 after, not 29 and 0. It missed 30 of 30 paraphrased violations and flagged the edits' own prohibitions | **Redesign:** (1) `CONTRACT_REQUIRED`: ITEM-08's override sentence in `change-flow` and `session-relay-flowmaster` (the two carriers; `tw-flowmaster` excluded); (2) `CONTRACT_FORBIDDEN`: every retired phrase this Modification removes; (3) the governance-audit code fixture (ITEM-05); (4) the limit recorded under `D14`: prose paraphrase is not mechanically detectable, and review holds it | GUARD-001: each guard fires on an injected regression | B / 0 |
 | ITEM-24 | VERIFIED | `glow-po-reporting` (end every message in a named state); Hub *Worker communication rules* §2; `session-working-rules.md:83` | the named state is the line immediately before a `NEXT_PROMPT_HANDOFF` block | skill review | B / 0 |
+| ITEM-36 | CONFIRMED | registry: all 55 rows carry the three `\A`-anchored guards with the `{0,7}` window; flowmaster-validate `validate_gcfpe_20260914.py:1145-1149` checks `nonblank[:8]`. A label line after 8 non-blank lines passes both (synthetic bodies; verification B4a-c). The census found 0 such lines in the 55 live bodies and 2 in the proposed MGMT-10 body | line-anchored whole-body patterns in the registry and in `PROMPT_BODY_RELEASE_HEADER`; `prompt-body-content-policy.md` updated | an injected label line past line 8 fails | B / 0 |
+| ITEM-39 | VERIFIED | `flowmaster-validate/SKILL.md:174`, governance-audit `interoperability-contracts.md:96` and `behavioral-fixtures.md:59` say PR04 is not started and Alpha is stopped | replace with a pointer: Alpha state is recorded by the Epic's artifacts under `docs/ephemeral/` (the `D18` successor) | none (prose) | C / 0 |
 | ITEM-25 | VERIFIED | `glow-graph-contract/SKILL.md:59` | the bundled graph copies are validator fixtures built from `docs/graph/parts` | none | C / 0 |
+
+## Registry parent IDs (ITEM-22)
+
+Each registry row's page ID was found among the child pages of the six 091426.1 parent pages. Every row
+matched exactly one parent, and none matched its registry value.
+
+| old ID (registry today) | old title | new ID (actual parent) | new title | lane values | row values |
+|---|---|---|---|---|---|
+| `3c74590a05eb811d8433e7022629e213` | HDE Change Flow | `3db4590a05eb81d59059eb6b95ed5fcf` | HDE Change Flow — GCFPE-20260914.1 — 091426.1 | 7 | 18 |
+| `3c74590a05eb81f2953de712f2adb6fa` | HDE IA | `3db4590a05eb8195a2ccf7c0959a8b6e` | HDE IA — GCFPE-20260914.1 — 091426.1 | 5 | 21 |
+| `3c74590a05eb8149905fd694f6d2901a` | HDE QA | `3db4590a05eb814d96d3dcfa8835f96d` | HDE QA — GCFPE-20260914.1 — 091426.1 | 1 | 10 |
+| `3c74590a05eb8123bc55ca7f99ce176c` | Escalation | `3db4590a05eb81cd938de84cfffead9c` | Escalation — GCFPE-20260914.1 — 091426.1 | 1 | 4 |
+| `3c74590a05eb8176baf8cb59f1631f3c` | HDE TW | `3db4590a05eb811b9c14f2ae89c28df7` | HDE TW — GCFPE-20260914.1 — 091426.1 | 1 | 1 |
+| `3cc4590a05eb8101b5ded32c12616eb6` | Glow HDE Prompt Flow Index | `3db4590a05eb81de9736ea69bac61016` | Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1 | 1 | 1 |
+
+The six IDs cover 16 lane values and 55 row values, 71 in all. The titles are 16 lane titles and 54
+row titles (PR-35's row has no title field). The audit's NAM-002 check (`audit_workspace_governance.py:604`)
+compares the snapshot's `parent` against `expected_parent_id` as a plain string, and skips the
+comparison when `parent` is absent. The PLAN gate therefore supplies a snapshot with undashed parents
+and injects one wrong parent.
+
+## Revisions that must move
+
+| skill | advertised identity | pinned at | new |
+|---|---|---|---|
+| flowmaster-validate | `FLOWMASTER_VALIDATE_REVISION: 3.3.0` | four sites, and `SKILL_TREE_SHA256` | 3.3.1 |
+| change-flow | `CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0` | its own validator `:746`; `validate_flowmaster.py:149`, `:1257`; `validate_gcfpe_current.py:637-638` | 3.3.1 |
+| session-relay-flowmaster | `SESSION_RELAY_FLOWMASTER_SPECIALIZATION_REVISION: 3.1.0` | `validate_flowmaster.py:185` | 3.2.0 |
+| glow-hde-pr-development | `GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.0` | its validator `:26`; `validate_gcfpe_20260914.py:2702`, `:1816`; `validate_gcfpe_current.py:654`; the contract's `primary_skill_revision` | 1.3.1, and the contract is regenerated |
+| amthor-workspace-governance-audit | `WORKSPACE_GOVERNANCE_AUDITOR_REVISION: 1.12.0` | `scripts/run_fixture_suite.py:308` | 1.13.0 |
+| glow-graph-contract, glow-po-reporting | none advertised | — | freeze digest only (`D19`) |
 
 ## Packages
 

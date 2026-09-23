@@ -1,7 +1,7 @@
 # ANALYZE closure — MODIFICATION-20260923-closeout-residuals
 
 `PYTHONDONTWRITEBYTECODE=1 python3 docs/prompt_ecosystem_management/closure.py <ID>` over `docs/graph/parts` at
-`main` `77d98dd`, for each of the 48 prompts this Modification touches, pasted as printed. Every run exited 0.
+`main` `77d98dd`, for each of the 50 live prompts this Modification touches, pasted as printed. Every run exited 0.
 
 ```
 CF-C-10  -- closure over 55 graph parts
@@ -277,6 +277,30 @@ GCFPE-MGMT-10  -- closure over 55 graph parts
 
   radius a Tier 1 gate must cover: 1
   PR-10
+```
+
+```
+IA-10  -- closure over 55 graph parts
+
+  upstream                       3  CF-C-30, CF-E-30, IA-50
+  downstream                     5  IA-10, IA-20, IA-30, IA-50, IA-60
+  state_sharers                 19  CF-C-10, CF-C-20, CF-E-10, CF-E-20, CL-E-20, DOC-10, DOC-20, ESC-25, ESC-30, IA-20, IA-60, OPS-10, OPS-20, PR-10, PR-20, QA-100, QA-20, QA-50, QA-60
+  boundaries (NOT consumers)     1  NATHAN_TERMINAL_RETURN
+
+  radius a Tier 1 gate must cover: 24
+  CF-C-10, CF-C-20, CF-C-30, CF-E-10, CF-E-20, CF-E-30, CL-E-20, DOC-10, DOC-20, ESC-25, ESC-30, IA-10, IA-20, IA-30, IA-50, IA-60, OPS-10, OPS-20, PR-10, PR-20, QA-100, QA-20, QA-50, QA-60
+```
+
+```
+IA-20  -- closure over 55 graph parts
+
+  upstream                       2  IA-10, IA-50
+  downstream                     4  IA-20, IA-30, IA-50, IA-60
+  state_sharers                 19  CF-C-10, CF-C-20, CF-E-10, CF-E-20, CL-E-20, DOC-10, DOC-20, ESC-25, ESC-30, IA-10, IA-60, OPS-10, OPS-20, PR-10, PR-20, QA-100, QA-20, QA-50, QA-60
+  boundaries (NOT consumers)     1  NATHAN_TERMINAL_RETURN
+
+  radius a Tier 1 gate must cover: 22
+  CF-C-10, CF-C-20, CF-E-10, CF-E-20, CL-E-20, DOC-10, DOC-20, ESC-25, ESC-30, IA-10, IA-20, IA-30, IA-50, IA-60, OPS-10, OPS-20, PR-10, PR-20, QA-100, QA-20, QA-50, QA-60
 ```
 
 ```
