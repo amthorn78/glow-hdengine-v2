@@ -154,7 +154,7 @@
             "BLOCKED"
           ],
           "branch_id": "material_boundary",
-          "condition": "a genuine material scope, architecture, requirement, or design boundary is substantiated",
+          "condition": "a material change to the Epic-level commitment (D23-C) is substantiated",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "CONDITIONAL_RECOVERY",

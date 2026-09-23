@@ -1,7 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-21
+revised_date: 2026-09-23 — D24, delivered to reviewer subagents rather than pasted by Nathan
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Standard skill reviewer prompt — canonical template — 2026-09-21*
@@ -14,7 +15,7 @@ slots, delete nothing. Filled instances are release-scoped and belong in `docs/e
 
 Standing rule, Product Owner direction 2026-09-21. **Every skill handover uses this template.** Do not compose a reviewer prompt from scratch, and do not re-derive the mandatory elements from `Skill packaging and installation` each round — they are already built into the sections below. Fill the slots, delete nothing.
 Added after a session wrote a bespoke reviewer prompt without reading the rules that govern one, and shipped it missing five mandatory elements. A template removes the opportunity.
-**How to use it.** Copy the fenced block, replace every `<SLOT>`, delete any section that is genuinely `NONE` only by writing `NONE` in it. Deliver it with `SendUserFile` in the same message as the `.skill` files, in one copyable block. Save the filled instance beside the round's report so the next session has a worked example.
+**How to use it.** Copy the fenced block, replace every `<SLOT>`, and write `NONE` in any section that is genuinely empty. Commit the filled instance under `docs/ephemeral/` beside the round's report **before** the review starts. Then spawn two reviewer subagents with fresh context — never forked or context-inheriting. Give each this filled prompt as its only brief, with its own `<REVIEWER_ID>` and its own record path (`D24`). Each writes its verdict to that file, and the author never edits it.
 **Verdict vocabulary is fixed.** `SKILL_FIT_CONFIRMED` or `SKILL_REPAIR_REQUIRED`. Never invent a verdict set; a reviewer's words have to match the record they land in.
 ```plain text
 You are <REVIEWER_ID>, performing independent validation of one skill change. You did not author it.

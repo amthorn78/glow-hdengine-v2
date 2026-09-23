@@ -30,8 +30,15 @@ into a body that does not need it and cannot be resolved there.
   header makes no such claim
 - any field whose value changes because of a *release event* rather than a *behaviour change*
 
-**Legitimately in a body:** the prompt's title, `Prompt ID:`, `Prompt version:`,
-`Ecosystem release:`, its own `Notion URL:`, and the instructions themselves.
+**Legitimately in a body:** the prompt's title, `Prompt ID:`, its own `Notion URL:`, and the
+instructions themselves.
+
+A release's membership and each member's current version live in the register and the
+complete-prompt-set catalog. A member whose body changes gets a successor page at the new version;
+a member whose body does not change keeps its page, and the register records it in the new
+release. Bodies carry no release-bound header line. It applies from the release after 091426.1;
+091426.1's bodies were edited in place by `MODIFICATION-20260923-alpha-feedback-open-entries`
+(`D23-G`).
 
 The test is mechanical. **Ask what makes the field change.** If the answer is "a promotion, an
 archival, a selection" rather than "someone changed what this prompt does", it does not belong in
@@ -85,8 +92,9 @@ Nathan installs those packages after a §10 verdict, and not before.
 
 `prompt_identity_header_valid` now:
 
-- **requires** identity — title, `Prompt ID:`, `Prompt version:`, `Ecosystem release:`, exactly one
-  `Notion URL:` line whose page identity matches the registry binding;
+- requires identity — title, `Prompt ID:`, exactly one `Notion URL:` line whose page identity
+  matches the registry binding; rejects `Prompt version:`, `Set:` and `Ecosystem release:` in the
+  header window as `PROMPT_BODY_RELEASE_HEADER` (D23-G);
 - **rejects** a body carrying `Selection status:` or `Lifecycle:`, as `PROMPT_BODY_GOVERNANCE_STATE`
   — a separate check with its own code, because a body can be identity-valid and still carry
   governance state;

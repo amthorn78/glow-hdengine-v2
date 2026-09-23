@@ -19,7 +19,7 @@
             "MERGE_PENDING"
           ],
           "branch_id": "merge_pending",
-          "condition": "recorded PR-35 phase result; historical pre-merge evidence",
+          "condition": "recorded PR-35 phase result; historical pre-merge evidence; its conditional PR-40 invocation is usable only where no MERGE_OBSERVED result was returned for this merge",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -101,7 +101,7 @@
             "RECOVERY_PENDING"
           ],
           "branch_id": "recovery_pr30",
-          "condition": "recorded resumed phase is PR-30_POSTPUBLICATION; same session/vehicle re-entry",
+          "condition": "recorded resumed phase is PR-30_POSTPUBLICATION; PR-30 session/vehicle re-entry",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -150,7 +150,7 @@
             "RECOVERY_PENDING"
           ],
           "branch_id": "recovery_pr35",
-          "condition": "recorded resumed phase is PR-35; same session/vehicle re-entry",
+          "condition": "recorded resumed phase is PR-35; PR-35 session/vehicle re-entry",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -220,6 +220,38 @@
       "to": "RS-20",
       "to_kind": "prompt",
       "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MERGE_OBSERVED"
+          ],
+          "branch_id": "merge_observed",
+          "condition": "resumed PR-35 phase; the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MERGE_OBSERVED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "MERGE_OBSERVED"
+      ],
+      "to": "PR-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
     }
   ],
   "id": "RS-40",
@@ -246,11 +278,12 @@
       "RS-20"
     ],
     "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
-    "receiving_role": "You are the same dedicated PR engineering session for the exact suspended work unit.",
+    "receiving_role": "You resume the recorded phase in its own dedicated session: PR-30's session for a PR-30 phase, the PR-35 session for PR_RETURN_PHASE PR-35.",
     "result_states": [
       "SOURCE_RESOLUTION_ERROR",
       "PR_CANDIDATE_PUBLISHED",
       "MERGE_PENDING",
+      "MERGE_OBSERVED",
       "RESCOPE_PENDING",
       "RECOVERY_PENDING",
       "REMOTE_EVIDENCE_PENDING",
@@ -264,6 +297,7 @@
     "source_resolution_error",
     "pr_candidate_published",
     "merge_pending",
+    "merge_observed",
     "rescope_pending",
     "recovery_pr30",
     "recovery_pr35",

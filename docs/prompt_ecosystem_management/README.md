@@ -106,7 +106,7 @@ the application's.
 | `postflight-procedure.md` | **How an independent post-flight is run**: scope set by what stops the change flow, cheap checks before bodies, bodies streamed and never persisted, the struck checks and their rulings |
 | `skill-identity-and-freeze.md` | Skill digests, what each identity proves, and why an install is not complete until its digest is compared |
 | `freeze.py` | The digest recipe itself. Root it at a skill directory, never at the synced tree |
-| `prompt-corpus-policy.md` | **The Prompt Corpus Storage and Fidelity Policy**, recorded verbatim — the prompt corpus is never mirrored, exported, hashed or cached to disk |
+| `prompt-corpus-policy.md` | **The Prompt Corpus Storage and Fidelity Policy**, recorded verbatim — the prompt corpus is never mirrored, exported, hashed or cached; a transient file made in order to read a body is part of the read, under five conditions (`D22`) |
 | `notion-write-boundary.md` | **Which prompts belong in Notion and when a Notion write is authorized** — the default is read-only; executing a prompt is not a reason to write |
 | `prompt-validation-procedure.md` | How prompt bodies are validated without a corpus mirror — read the page, pipe the body on stdin — and the rule that a recorded identity must be compared, not printed |
 | `skill-packaging-and-delivery.md` | How a skill is packaged and handed over, mandatory independent validation, and why every delivered artifact except a `.skill` file must be uniquely named |

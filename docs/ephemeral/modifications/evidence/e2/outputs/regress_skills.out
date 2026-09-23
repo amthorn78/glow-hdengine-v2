@@ -1,0 +1,71 @@
+OK   PR-clean ('PASS: Glow HDE PR development skill structural contract', [])
+OK   R-rev (1, 'FAIL: missing revision contract', ['missing revision contract'])
+OK   R-32 (1, 'FAIL: forbidden or unfinished content present: one dedicated PR-development session', ['forbidden or unfinished content present: one dedicated PR-development session'])
+OK   R-37 (1, 'FAIL: forbidden or unfinished content present: The PR-35 result vocabulary is exactly `MERGE_PENDING', ['forbidden or unfinished content present: The PR-35 result vocabulary is exactly `MERGE_PENDING`, `RESCOPE_PENDING`, `RECOVERY_PEND
+OK   R-38 (1, 'FAIL: forbidden or unfinished content present: same-session `PR-35` handoff', ['forbidden or unfinished content present: same-session `PR-35` handoff'])
+OK   R-44 (1, 'FAIL: forbidden or unfinished content present: Continue in the same dedicated PR session until all a', ['forbidden or unfinished content present: Continue in the same dedicated PR session until all applicable predicates are true'])
+OK   R-55 (1, 'FAIL: forbidden or unfinished content present: The exact ordered ten-field GCF-17 continuity list is', ['forbidden or unfinished content present: The exact ordered ten-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product O
+OK   R-63 (1, 'FAIL: forbidden or unfinished content present: same dedicated PR session, workspace/worktree, branch', ['forbidden or unfinished content present: same dedicated PR session, workspace/worktree, branch, open PR'])
+OK   R-C6-27 (1, 'FAIL: forbidden or unfinished content present: followed in the same session by PR-35', ['forbidden or unfinished content present: followed in the same session by PR-35'])
+OK   R-OLDLIST (1, 'FAIL: forbidden or unfinished content present: `MERGE_PENDING`, `RESCOPE_PENDING`', ['forbidden or unfinished content present: `MERGE_PENDING`, `RESCOPE_PENDING`'])
+OK   R-TENFIELD (1, 'FAIL: forbidden or unfinished content present: ten-field', ['forbidden or unfinished content present: ten-field'])
+OK   R-CART (1, 'FAIL: missing artifact holds results contract', ['missing artifact holds results contract'])
+OK   R-CDEC (1, 'FAIL: missing in-flight decisions contract', ['missing in-flight decisions contract'])
+OK   R-CLAT (1, 'FAIL: missing material latitude contract', ['missing material latitude contract'])
+OK   R-CPROC (1, 'FAIL: missing one Proceed per plan contract', ['missing one Proceed per plan contract'])
+OK   R-TOP (1, 'FAIL: missing top-level PR-35 session contract', ['missing top-level PR-35 session contract'])
+OK   R-SUB (1, 'FAIL: missing subscription is not polling contract', ['missing subscription is not polling contract'])
+OK   R-DISP (1, 'FAIL: missing no agent-created session contract', ['missing no agent-created session contract'])
+OK   R-NOBRANCH (1, 'FAIL: missing handoff carries no branch contract', ['missing handoff carries no branch contract'])
+OK   R-heading (1, 'FAIL: missing behavior case: ## PR-40 rejection re-plan', ['missing behavior case: ## PR-40 rejection re-plan'])
+OK   R-H-DEC (1, 'FAIL: missing behavior case: ## In-flight decisions', ['missing behavior case: ## In-flight decisions'])
+OK   R-H-LAT (1, 'FAIL: missing behavior case: ## Implementor latitude', ['missing behavior case: ## Implementor latitude'])
+OK   R-H-SUB (1, 'FAIL: missing behavior case: ## Pull request subscription', ['missing behavior case: ## Pull request subscription'])
+OK   R-H-OBS (1, 'FAIL: missing behavior case: ## Observed merge', ['missing behavior case: ## Observed merge'])
+OK   A-skill-list ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   A-interop-list ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   A-fixtures-list ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   A-rev ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   A-handoff-kept ([('test_exact_fenced_text_handoff_parity', '__main__.SkillSelfContractFixtures.test_exact_fenced_text_handoff_parity')], 'Ran 34 tests')
+OK   A-inject-skill ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   A-inject-interop ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   A-inject-fixtures ([('test_exact_gcf17_continuity_parity', '__main__.SkillSelfContractFixtures.test_exact_gcf17_continuity_parity')], 'Ran 34 tests')
+OK   clean-cf PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy
+OK   R-CF-RP-1 FAIL: retired skill clause present: one dedicated PR-development session
+OK   R-CF-RP-2 FAIL: retired skill clause present: The exact ordered ten-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product Owner Proceed; dedicated PR-development session; workspace/worktree; branch; pull request; PR instruction; detailed 
+OK   R-CF-RP-3 FAIL: retired skill clause present: same-session PR-30 → PR-35 phase continuation
+OK   R-CF-RP-4 FAIL: retired skill clause present: same-session PR-35 handoff
+OK   R-CF-RP-5 FAIL: retired skill clause present: same-session PR-35 review/readiness
+OK   R-CF-RP-6 FAIL: retired skill clause present: same-session second phase
+OK   R-CF-RP-7 FAIL: retired skill clause present: The PR-35 result vocabulary is exactly `MERGE_PENDING`, `RESCOPE_PENDING`, `RECOVERY_PENDING`, `REMOTE_EVIDENCE_PENDING`, or `PRODUCT_OWNER_DECISION_REQUIRED`
+OK   R-CF-RP-8 FAIL: retired skill clause present: historical pre-merge evidence; Nathan's later invocation asserts that Nathan manually merged
+OK   R-CF-RP-9 FAIL: retired skill clause present: A later Nathan PR-40 invocation asserts that Nathan's separate manual merge occurred
+OK   R-CF-RP-10 FAIL: retired skill clause present: One dedicated session per planned PR work unit; the same session performs both
+OK   R-CF-RP-11 FAIL: retired skill clause present: has only the manual-merge-assertion meaning
+OK   R-CF-RP-12 FAIL: retired skill clause present: The same dedicated PR session implements only that work unit
+OK   R-CF-RP-13 FAIL: retired skill clause present: Only after Nathan later asserts that the identified PR was manually merged may that invocation run
+OK   R-CF-RP-14 FAIL: retired skill clause present: GCF-14 — Create one dedicated PR session for one planned PR work unit
+OK   R-CF-CASE FAIL: retired skill clause present: one dedicated PR-development session
+OK   R-CF-A18 FAIL: missing skill clause: never as a subagent, forked agent or workflow agent of PR-30
+OK   R-CF-NINE FAIL: missing skill clause: The exact ordered nine-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product Owner Proceed; workspace/worktree; branch; pull request; PR instruction; detailed PR plan; primary skill authority; continu
+OK   R-CF-DISP FAIL: missing skill clause: no session is created by an agent
+OK   R-CF-PROC FAIL: missing skill clause: One Proceed per approved per-PR plan
+OK   R-CF-HND FAIL: missing skill clause: It carries no branch and no commit
+OK   R-CF-REV FAIL: specialization revision
+OK   clean-suite ('FLOWMASTER_SUITE_PASS', {}, [])
+OK   R-OV-1 ('FLOWMASTER_SUITE_FAIL', {'change-flow': ["missing specialization contract: For every GCFPE main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never creates, spawns, launches or schedules a session
+OK   R-OV-2 ('FLOWMASTER_SUITE_FAIL', {'session-relay-flowmaster': ["missing specialization contract: For every GCFPE main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never creates, spawns, launches or schedu
+OK   R-OV-3 ('FLOWMASTER_SUITE_FAIL', {'tw-flowmaster': ["missing specialization contract: For every GCFPE main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never creates, spawns, launches or schedules a sessi
+OK   R-TOP-R ({'session-relay-flowmaster': ["missing specialization contract: PR-35 runs as its own top-level session, entered from PR-30's handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other sess
+OK   R-TOP-T ({'tw-flowmaster': ["missing specialization contract: PR-35 runs as its own top-level session, entered from PR-30's handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other session."]}, []
+OK   R-FB-R1 ({'session-relay-flowmaster': ['superseded contract present: same-session PR-35 handoff']}, [])
+OK   R-FB-R2 ({'session-relay-flowmaster': ['superseded contract present: preferred live control plane']}, [])
+OK   R-FB-R3 ({'session-relay-flowmaster': ['superseded contract present: launched as a new session']}, [])
+OK   R-FB-R4 ({'session-relay-flowmaster': ["superseded contract present: The Product Owner's PR-40 invocation supplies merge approval"]}, [])
+OK   R-FB-T1 ({'tw-flowmaster': ['superseded contract present: same-session PR-35 handoff']}, [])
+OK   R-FB-T2 ({'tw-flowmaster': ['superseded contract present: preferred live control plane']}, [])
+OK   R-FB-T3 ({'tw-flowmaster': ['superseded contract present: launched as a new session']}, [])
+OK   R-FB-T4 ({'tw-flowmaster': ["superseded contract present: The Product Owner's PR-40 invocation supplies merge approval"]}, [])
+OK   R-REV-R ({'session-relay-flowmaster': ['missing specialization contract: SESSION_RELAY_FLOWMASTER_SPECIALIZATION_REVISION: 3.1.0']}, [])
+OK   R-REV-T ({'tw-flowmaster': ['missing specialization contract: TW_FLOWMASTER_SPECIALIZATION_REVISION: 1.2.0']}, [])
+SKILL_REGRESSIONS 70 of 70 exact

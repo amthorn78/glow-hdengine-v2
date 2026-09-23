@@ -53,7 +53,7 @@
             "AWAITING_PO_PROCEED"
           ],
           "branch_id": "awaiting_po_proceed",
-          "condition": "one complete executable approved-scope plan awaits the original Product Owner Proceed",
+          "condition": "one complete executable approved-scope plan awaits the Product Owner Proceed for that plan",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -154,7 +154,7 @@
             "BLOCKED"
           ],
           "branch_id": "material_boundary",
-          "condition": "the planning result substantiates a material scope, architecture, requirement, or design boundary",
+          "condition": "the planning result substantiates a material change to the Epic-level commitment (D23-C)",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "CONDITIONAL_RECOVERY",

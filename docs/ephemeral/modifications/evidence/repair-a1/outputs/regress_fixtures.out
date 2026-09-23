@@ -1,0 +1,4 @@
+clean failing: [] [[]]
+OK   R-FX-1 ['REPLAN-NEG-01::reject-routed-to-pr30::single-defect', 'section-13-fixture-document'] [['FIXTURE_REPLAN_VARIANT_RULES']]
+OK   R-FX-2 ['REPLAN-NEG-01::reject-routed-to-pr30::single-defect']
+FIXTURE_REGRESSIONS 2 of 2 exact

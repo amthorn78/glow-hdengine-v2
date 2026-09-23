@@ -1138,3 +1138,302 @@ review stays independent, by its own rule.
 Each check has an injected must-fail regression. Of the 39 selftest cases, 6 fail with the parts
 checks disabled and 2 fail with the half-applied check disabled. A Modification abandoned at
 INTAKE is not asked for analysis fields it never reached, and a must-pass case holds that.
+
+## D22 — A transient file the tooling makes in order to read a prompt body is a read, not a copy
+
+**Product Owner, 2026-09-23:** *"allow save to disk, and re-write the rule where needed so it is
+rationally conditional and not automatic."*
+
+### What was wrong
+
+`prompt-corpus-policy.md` prohibited, "absolutely", persisting a prompt body anywhere outside
+Notion. The Claude Code harness saves any tool result above roughly 30 KB to a session file on
+its own, before the session sees it. Thirteen of the 55 `091426.1` bodies are over that size,
+among them `PR-10`, `PR-20`, `PR-30`, `PR-40`, `OPS-30` and `QA-10`. Read literally, the rule
+made those thirteen unreadable. That blocked `AF-004`'s scan and the scope measurement for
+`MODIFICATION-20260923-alpha-feedback-open-entries`. The policy exists to stop a parallel
+corpus: a mirror, a cache, a backup, a byte-identity check. It never meant to stop a read, and
+its own text says so: *"I just don't want them copied to disk. How will you ever do any work if
+you cannot read them."*
+
+### The ruling
+
+**The test is what a file is for, not where the bytes happen to sit.** A file that exists only
+because the tooling delivered or needed the body that way is part of the read. It is allowed
+under five conditions, and all five must hold:
+
+1. it is outside the repository and outside any shared, synced or uploaded store;
+2. it serves only the read or check in hand, and is never a source for later work — the next
+   read goes back to Notion;
+3. it is never hashed, byte-compared or otherwise used as the body's identity;
+4. it is deleted when that read or check is done, and at the latest when the task ends. Where
+   the harness does not let the session delete a file in its own session store, the file is left
+   to the harness's teardown and never read again;
+5. the session says in its report that it happened.
+
+Everything the policy was written against stays prohibited, without exception: mirrors,
+exports, snapshots, backups, a cache reused across tasks or sessions, a committed or uploaded
+body, accumulation into a corpus, body hashes or byte comparison, and any procedure that
+requires a local corpus before work can proceed.
+
+### Consequences
+
+- `prompt-corpus-policy.md` carries the amendment as a successor section. The 2026-09-21
+  directive is preserved verbatim above it (`AUTH-001`).
+- `prompt-validation-procedure.md` steps 3 and 6 and `postflight-procedure.md` are corrected in
+  place. A scratch file feeding `--bodies-stdin` is permitted under the same five conditions. The
+  validator still has no path option, because a path option invites a standing directory.
+- The auto-saved Notion fetch files from 2026-09-23 in this session were ordinary operational
+  pages, not prompt bodies. No correction is owed for them.
+
+### The tested guard (`D14`)
+
+**None yet, and this is recorded rather than implied.** The conditions govern session behaviour,
+and no repository check can see a harness session directory. The standing guard is condition 5:
+the report makes every such file visible. A guard that fires is owed to the next change that
+touches a validator or skill. Until then, this ruling is applied but not guarded.
+
+### Refined the same day — a session cannot always delete its own session file
+
+The first measurement under `D22` found that the Claude Code harness refuses a session's `rm` on
+its own tool-results directory ("Session Transcript Tampering"). The workers did not work around
+the refusal. Condition 4 as first written could not be met. It now reads: deleted where the session
+can delete it; otherwise left to the harness's teardown and never read again. Everything else in the
+ruling stands. The first files left this way were two for `PR-10` and two for `OPS-30`, disclosed in
+the 2026-09-23 ANALYZE record for `MODIFICATION-20260923-alpha-feedback-open-entries`.
+
+## D23 — The Alpha Feedback rule changes: artifacts hold results, handoffs are short, implementors have latitude, PR-35 has its own session, releases stop copying unchanged prompts
+
+**Product Owner, 2026-09-23.** He approved the analysis of
+`MODIFICATION-20260923-alpha-feedback-open-entries` with "approve, all agreed", covering its three
+rulings, and its plan with "yes approve". On the same day he ruled that a PR-40 reject re-plans
+through PR-20: *"if a whole PR cycle fails validation, then it means it was badly executed and yes,
+needs to route back to PR-20."*
+
+This entry records the rulings. **The exact wording each rule is applied with is the canonical
+wording in that Modification's §P** (`docs/ephemeral/modifications/`). It is cited there, not
+restated here, so the two cannot drift (`DERIV-001`).
+
+### The rulings
+
+**D23-A — Results live in the artifact (`AF-008`).** Every result a session produces, test results
+above all, is written to its output artifact before a handoff is emitted. A handoff names the
+artifact and never carries the only copy of a fact.
+
+**D23-B — A handoff is short (`AF-008`).** A handoff carries:
+- the destination prompt by full name, version and direct Notion URL;
+- the receiving role and session;
+- each input artifact by repository path, with a one-line label;
+- the pull request reference when the receiver continues an existing PR;
+- only the minimum context for a condition the artifacts do not record.
+
+It carries no branch or commit, and restates nothing the named prompt, canon or files hold. The
+block ends the response, after at most a few lines. **This reverses the "complete, self-contained
+handoff carrying status, completed work, decisions, constraints" rule** in `handoff_contract`.
+
+**D23-C — Implementors have latitude; "material" is defined (`AF-009`, with `AF-010`'s merged scope).**
+- **"Material" means a change to the Epic-level commitment:** its outcome or objective; approved
+  acceptance criteria; a protected architectural, security, data-model or external-contract
+  boundary; the scope of several planned work units; an accepted dependency or cross-team
+  commitment; or budget, schedule or risk needing Product Owner direction. A planned approach found
+  incomplete, impractical or inferior is not by itself material.
+- **Everything obvious, necessary and consistent with the objective** is decided, implemented and
+  tested by the implementor, and recorded under *In-flight decisions* in `PR_IMPLEMENTATION_RESULT`.
+- **Scope: the PR lane.** The ESC remediation lane keeps its own threshold.
+
+**D23-D — PR-35 runs in its own dedicated session (`AF-011`).** PR-30 and PR-35 remain two phases of
+one work unit, sharing everything except the session. **This reverses the same-session contract,
+and re-pins R1 row GCF-17.**
+
+**D23-E — The PR-35 session subscribes to its pull request** where the surface allows, and PR-40 is
+dispatched when that subscription observes Nathan's merge (`AF-011`). The observed merge event
+replaces Nathan's pasted merge assertion as PR-40's trigger. PR-40 still verifies the merged state
+independently, and no agent merges. **This reverses `direct_PR35_to_PR40_automatic_edge: false`.**
+
+**D23-F — A PR-40 reject re-plans.** An in-scope defect found by PR-40 in landed work goes back to
+PR-20 for a new plan, in a new dedicated implementor session that Nathan seeds, with a new Proceed.
+**This reverses "never a second Proceed" for that case, and re-pins R1 row GCF-15.** Carried by
+`MODIFICATION-20260923-pr40-reject-replans`.
+
+**D23-G — Releases stop copying unchanged prompts (`AF-012`, GCFPE only).**
+- Membership and each member's current version live in the register and the complete-prompt-set
+  catalog.
+- A changed member gets a successor page. An unchanged member keeps its page, and the register
+  records it in the new release.
+- Bodies carry no release-bound header line.
+- **This supersedes the `Prompt version:` and `Ecosystem release:` allowance in
+  `prompt-body-content-policy.md`, and `D11`'s in-body version assertion.**
+
+**Class B, not ruled here:**
+- the Notion read-only message (`AF-006`), which applies the 2026-09-22 policy;
+- the governance-line scan (`AF-004`);
+- PR-35 owning review correction, which applies `D13` and PR-30's own body;
+- the `flowmaster-validate` wording of `D22`.
+
+### What it does not decide
+
+- **It authorizes only what the plans say.** Where a plan proves incomplete, the part returns to
+  PLAN.
+- **The Flow Index Alpha-state block (`D18`) is untouched.**
+- **The TW ecosystem and the PE Metaprompt are outside `D23-G`.**
+
+### The tested guard (`D14`)
+
+Each ruling gets a registry assertion with an injected must-fail regression, as listed in the
+Modification's §P. **Until those land, `D23` is ruled but not applied.**
+
+### Correction, 2026-09-23 — D23-F names the wrong R1 row
+
+Found by the EXECUTE preflight of the plan and confirmed against the bundled oracle
+(`flowmaster-validate/references/glow-hde-canonical-change-flow-r1.json`). D23-F above is left as
+written (`AUTH-001`); this is its successor.
+
+- **`STOP_SECOND_APPROVAL_OBJECT_REQUESTED` is on GCF-16, not GCF-15.** GCF-15's stop conditions are
+  `STOP_PLAN_IDENTITY_MISMATCH or STOP_PO_PROCEED_NOT_INVOKED`.
+- **GCF-16 already allows the re-plan.** Its approval contract is "bounded to one Plan; it does not
+  authorize … another Plan", and its recovery owner is "remove the invented gate or replan/reinvoke".
+  A new Proceed on a new plan is therefore a new traversal, not a second approval object. GCF-16 needs
+  no change.
+- **The re-plan does change GCF-17.LINEAGE, PR-40's row.** Its `next` rows are GCF-19 and GCF-20
+  only, so PR-40 has no R1 transition back to planning. D23-F therefore re-pins **GCF-17.LINEAGE**,
+  whose `next` gains GCF-14, and not GCF-15. It is revised in one oracle revision together with
+  GCF-17 (D23-D).
+
+This corrects a fact, not a ruling. How the oracle revision is made, whether by a successor oracle
+or an in-place re-pin, is a proposal in the Modification's plan amendment and awaits approval.
+
+### Clarification, 2026-09-23 — main-ecosystem prompts are never run as subagents, and nothing creates a session automatically (D23-D, D23-E, D23-F)
+
+**Product Owner, 2026-09-23, in three messages:**
+- *"just to be clear, I definitely do not want PR-35 running as a subagent ever"*;
+- *"none of these should be subagents … I don't want any automated session creation of any kind in
+  the main ecosystem."*;
+- *"subagents may be used as workers within task, but the main prompts in the ecosystem must not be
+  run as subagents. The exception is the MGMT which is not part of the main ecosystem"*.
+
+**The rule, for the main ecosystem.** That is every GCFPE prompt except `GCFPE-MGMT-10`.
+1. **Every prompt runs as its own top-level session.** No prompt is ever run as a subagent, forked
+   agent or workflow agent of another session. This covers PR-35 in its own session (D23-D), PR-40
+   after the merge (D23-E), and PR-20 for a re-plan (D23-F).
+2. **Nothing creates a session automatically.** No session creates, launches or schedules another
+   session, by any tool or mechanism. **Nathan creates every session and starts it by pasting the
+   handoff.**
+3. **A prompt's job ends at the handoff.** It emits a paste-ready `NEXT_PROMPT_HANDOFF` block and
+   returns control.
+
+**What it allows.** A session may use subagents as **workers within its own task**. The prompt
+itself still runs top-level. Its workers carry out bounded parts of the task under it, and none of
+them runs another prompt.
+
+**What it excepts.** `GCFPE-MGMT-10`, the maintenance prompt, is not part of the main ecosystem,
+and neither rule binds it. Nor do they bind maintenance work generally, such as preflight readers and
+the `D24` skill reviewers. `execution-and-delegation-model.md` governs that work, and it gains a scope
+line: its subagents are maintenance workers, and never a way to run a main-ecosystem prompt.
+
+**What it corrects in this record's own wording:**
+- **D23-E.** "PR-40 is dispatched" means that the subscribed PR-35 session **emits** the PR-40
+  handoff when it observes the merge, and Nathan pastes it into a new session he creates. The
+  observed merge event replaces Nathan's merge *assertion*, the fact PR-40 is entered on. It does
+  not replace his paste. The subscription wakes the session that made it and creates nothing, so it
+  stays.
+- **The PART-11 ruling as first recorded.** It said "dispatch is a paste, or a session launch where
+  the surface provides one", and the plan's C-DISPATCH repeated it. The launch option is withdrawn.
+  Dispatch is a paste.
+
+**Guard.** The Modification's plan amendment carries this into:
+- the canonical wording, including C-TOP, which goes into every main-ecosystem body;
+- the R1 row;
+- PR-35's role in the graph, the contract and the registry;
+- the skills.
+
+Each surface gets a guard with an injected must-fail regression (`D14`). That includes a guard on
+every main-ecosystem row against running a prompt as a subagent or creating a session. It is scoped
+so that it does not forbid workers. PR-20's and PR-40's roles are unchanged: body-level C-TOP and its
+guards carry the rule for them.
+
+### Successor, 2026-09-23 — Amendment 1 approved
+
+**Product Owner, 2026-09-23:** *"yes"*, approving Amendment 1 of
+`MODIFICATION-20260923-alpha-feedback-open-entries` as written, with the follow-up's plan. That
+approval also covers his reading of the A1-7 routing diff: `fecc319bdd4ce7ee6201cb77d7231861`, 284
+rows, 229 edges.
+
+**What it adds to D23:**
+- **D23-D and D23-F.** The R1 oracle gets a successor, not an in-place edit. Three rows change:
+  GCF-17, GCF-17.LINEAGE and GCF-14 (A1-1).
+- **D23-E.** The observed-merge route is `MERGE_OBSERVED`, from PR-35 and from RS-40, handed to
+  PR-40 by paste. The parenthetical above is corrected: `direct_PR35_to_PR40_automatic_edge` stays
+  `false`, and the new edges are recorded in `observed_merge_edges`. Nathan's merge assertion stays
+  as the fallback, only where no `MERGE_OBSERVED` result was returned for the merge (A1-5).
+- **D23-G.** 091426.1's bodies are edited in place, and their release header lines go now. C-VERSION's
+  successor-page rule applies from the next release (A1-3).
+- **The rule on subagents and session creation.** It is carried into every main-ecosystem body by
+  C-TOP (A1-8).
+
+### Successor, 2026-09-23 — the triage prompt is also outside the main ecosystem
+
+**Product Owner, 2026-09-23:** *"the triage prompt can also run as subagent"*.
+
+*Modification Intake and Triage* is a maintenance prompt, like `GCFPE-MGMT-10`. The clarification
+above excepts `GCFPE-MGMT-10`, and this adds the triage prompt, so neither rule in that clarification
+binds it: it may run as a subagent.
+
+The triage prompt is not one of the 55 registry members, so no C-TOP guard applies to it and nothing
+in Amendment 1 changes.
+
+### Successor, 2026-09-23 — PR-40 is entered once per merge (D23-E)
+
+**Product Owner, 2026-09-23:** *"ok"*. He approved a sentence that the §10 review round a1 proposed.
+Both reviewers found the same double-dispatch window.
+
+C-DISPATCH gains one sentence:
+
+> PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, otherwise
+> the fallback block. Once either has been pasted, the other is void.
+
+## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
+
+**Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
+reviews, then just give me the approved skills to install before promotion"*, then *"make it the
+standing rule."*
+
+### What changes
+
+Until now, Nathan carried a reviewer prompt from the authoring session to a separate review session,
+and carried the verdict back. From now on:
+
+- **The authoring session runs the independent §10 review itself**, by spawning reviewer subagents.
+- **Nathan receives only approved packages**, each with its digest and its verdicts, and installs
+  them.
+
+### What keeps the review independent
+
+The review must still be done by a party that did not author the change (standing rule,
+2026-09-21). A reviewer subagent qualifies only if all of these hold:
+
+1. **Fresh context.** It is a new agent with no access to the authoring conversation — never a
+   forked or context-inheriting agent.
+2. **A brief on record.** Its only brief is the canonical `reviewer-prompt-template.md`, filled and
+   committed under `docs/ephemeral/` *before* the reviewer is spawned, so the brief cannot be
+   tailored out of sight.
+3. **Primary evidence.** It works from the packages and the repository, not from the author's
+   summary. It reproduces the baseline and the digests before it reviews.
+4. **Its own record.** It writes its verdict to its own record file (`SECTION-10-REVIEW-<round>-<id>.md`),
+   and the author never edits it (`AUTH-001`).
+5. **Two reviewers.** At least two, each independent of the other. A package is approved only when
+   both return `SKILL_FIT_CONFIRMED` against the same digests. Any `SKILL_REPAIR_REQUIRED` finding
+   is repaired and re-reviewed by fresh reviewers on the new bytes.
+6. **Scoped to bytes.** A verdict covers exact bytes and does not carry, as before.
+
+### What does not change
+
+- Nathan alone installs, and the post-install digest comparison is still mandatory.
+- The freeze rule still holds: nothing is installed while a review runs.
+- The verdict vocabulary is unchanged.
+- A handover still identifies each `.skill` by its digest.
+
+### The tested guard (`D14`)
+
+None is mechanical. **A delivery is incomplete unless it carries** the committed brief and two
+verdict files, each bound to the delivered digests. That is checked by reading the delivery, and
+this entry says so rather than implying a guard exists.

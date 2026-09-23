@@ -161,8 +161,8 @@
           "applicable_states": [
             "REJECT"
           ],
-          "branch_id": "reject_existing_pr_owner",
-          "condition": "a precise in-scope implementation/review/corrected-code/PR-lineage defect has an authorized existing PR vehicle and original Proceed",
+          "branch_id": "reject_replan",
+          "condition": "a precise in-scope implementation/review/corrected-code/PR-lineage defect in landed work requires a new per-PR plan for the same work unit, in a new top-level session Nathan creates, with a new Proceed",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -178,7 +178,7 @@
       "state_predicates": [
         "REJECT"
       ],
-      "to": "PR-30",
+      "to": "PR-20",
       "to_kind": "prompt",
       "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
     },
@@ -194,7 +194,7 @@
             "REJECT"
           ],
           "branch_id": "reject_material_boundary_proposal",
-          "condition": "a substantiated material boundary requires a new bounded rescope proposal",
+          "condition": "a substantiated material change to the Epic-level commitment (D23-C) requires a new bounded rescope proposal",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -259,7 +259,7 @@
   },
   "state_route_order": [
     "accept",
-    "reject_existing_pr_owner",
+    "reject_replan",
     "reject_instruction_owner",
     "reject_material_boundary_proposal",
     "pending_native_owner",

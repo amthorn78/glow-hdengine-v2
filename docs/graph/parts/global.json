@@ -32,7 +32,7 @@
     {
       "automatic": false,
       "branch_id": "manual_merge_then_lineage_review",
-      "condition": "Nathan has manually merged the identified PR and invokes the conditional PR-40 block",
+      "condition": "Nathan has manually merged the identified PR, no MERGE_OBSERVED result was returned for this merge, and he invokes the conditional PR-40 block",
       "from": "NATHAN_MANUAL_MERGE_ASSERTION",
       "from_kind": "boundary",
       "immediate": true,
@@ -45,7 +45,7 @@
     {
       "automatic": false,
       "branch_id": "original_proceed",
-      "condition": "original explicit Proceed for the exact work unit; never a second Proceed",
+      "condition": "the explicit Proceed for the exact approved per-PR plan; never a second Proceed for the same plan",
       "from": "NATHAN_PROCEED",
       "from_kind": "boundary",
       "immediate": true,
@@ -299,7 +299,7 @@
     "NATHAN_MANUAL_MERGE_ASSERTION": [
       {
         "branch_id": "manual_merge_then_lineage_review",
-        "condition": "Nathan has manually merged the identified PR and invokes the conditional PR-40 block",
+        "condition": "Nathan has manually merged the identified PR, no MERGE_OBSERVED result was returned for this merge, and he invokes the conditional PR-40 block",
         "origin_prompt": "PR-35_OR_RS-40",
         "origin_state": "MERGE_PENDING",
         "to": "PR-40"
@@ -308,7 +308,7 @@
     "NATHAN_PROCEED": [
       {
         "branch_id": "original_proceed",
-        "condition": "original explicit Proceed for the exact work unit; never a second Proceed",
+        "condition": "the explicit Proceed for the exact approved per-PR plan; never a second Proceed for the same plan",
         "origin_prompt": "PR-20",
         "origin_state": "AWAITING_PO_PROCEED",
         "to": "PR-30"
@@ -353,15 +353,17 @@
       "unlinked filename",
       "above",
       "conversation reconstruction",
-      "model/strength/reasoning/eligibility/suitability/account/configuration route"
+      "model/strength/reasoning/eligibility/suitability/account/configuration route",
+      "branch",
+      "commit",
+      "restated artifact content"
     ],
     "required": [
       "exact selected prompt full name/version/direct Notion URL",
       "receiving role and exact session",
-      "Epic/change and work unit",
-      "artifact repository paths, direct Notion URLs where the artifact is Notion-resident, and repository/PR references",
-      "status, completed work, decisions, constraints, unresolved items, preserved authority",
-      "next action and expected output"
+      "input artifact repository paths with one-line labels",
+      "pull request reference when the receiver continues an existing PR",
+      "minimum exceptional context only for a condition the artifacts do not record"
     ],
     "terminal_result_next_prompt_handoff_blocks": 0
   },
@@ -455,8 +457,8 @@
     },
     "event_2": {
       "actor": "Nathan / Product Owner",
-      "fact": "product_owner_manual_merge_assertion",
-      "time": "later PR-40 invocation",
+      "fact": "product_owner_manual_merge_observed_or_asserted",
+      "time": "observed by the subscribed PR-35 session; asserted at the later PR-40 invocation only where no MERGE_OBSERVED result was returned for this merge",
       "value": true
     },
     "event_3": {
@@ -467,19 +469,37 @@
         "VERIFIED",
         "PENDING"
       ]
-    }
+    },
+    "observed_merge_edges": [
+      {
+        "automatic": false,
+        "branch_id": "merge_observed",
+        "from": "PR-35",
+        "state": "MERGE_OBSERVED",
+        "to": "PR-40",
+        "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+      },
+      {
+        "automatic": false,
+        "branch_id": "merge_observed",
+        "from": "RS-40",
+        "state": "MERGE_OBSERVED",
+        "to": "PR-40",
+        "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+      }
+    ]
   },
   "pr_continuity_contract": {
     "adds": {
       "approval": 0,
-      "cross_session_route": 0,
+      "cross_session_route": 1,
       "duplicate_work_vehicle": 0,
       "merge_authority": 0,
       "proceed": 0,
       "product_owner_gate": 0,
       "r1_row": 0,
       "role": 0,
-      "session": 0,
+      "session": 1,
       "work_unit": 0,
       "work_vehicle": 0
     },
@@ -513,7 +533,6 @@
     "shared_exactly_one": [
       "WORK_UNIT_ID",
       "original Product Owner Proceed",
-      "dedicated PR-development session",
       "workspace/worktree",
       "branch",
       "pull request",
@@ -552,7 +571,7 @@
     "flowmaster_primary_core_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
     "r1_core_rows": 26,
     "r1_material_rows": 20,
-    "r1_oracle_sha256": "52807e58c4a4659e6c1fc822749f6e50253ad7b01846c833f727ee266ca71d5e",
+    "r1_oracle_sha256": "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
     "r1_rows": 46
   },
   "qa_closure_contract": {

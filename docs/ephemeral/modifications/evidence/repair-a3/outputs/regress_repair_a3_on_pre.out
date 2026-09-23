@@ -1,0 +1,14 @@
+OK   clean ('FLOWMASTER_SUITE_PASS', [], 'FLOWMASTER_SUITE_PASS', [])
+BAD  Q1 {'default': [], 'candidate': []}
+OK   Q2 {'default': [('FMV-ORACLE-022', 'owmaster-validate/references/r1-successor-source-20260923.md', 'matrix has 8 code-fence lines; exactly 6, the three JSON blocks, are allowed')], 'candidate': [('FMV-ORACLE-022', 'owmaster-validate/references/r1-successor-source-20260923.md', 'matrix has 8 code-fence lines; exactly 6, the three JSON blocks, are allowed')]}
+BAD  Q3 {'default': [], 'candidate': []}
+BAD  Q8 {'default': [], 'candidate': []}
+BAD  Q9 {'default': [], 'candidate': []}
+BAD  Q10 {'default': [], 'candidate': []}
+BAD  Q11 {'default': [], 'candidate': []}
+BAD  V1 {'default': [], 'candidate': []}
+BAD  V2 {'default': [], 'candidate': []}
+OK   K0 []
+BAD  K1 []
+OK   K2 ('ae2bd159f0ba947c', ('fecc319bdd4ce7ee6201cb77d7231861', 284))
+A3_REPAIR_REGRESSIONS 4 of 13 exact

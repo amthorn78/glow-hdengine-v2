@@ -26,7 +26,7 @@ the repository wins and the Notion page is the thing to correct.
 | Selection authority | The **GCFPE Membership and Release Register** in Notion, and nothing else. Every control page reads `REGISTER_CONTROLLED` and asserts no selection of its own |
 | Predecessor | `GCFPE-20260913.1` / `091326.2` / 54 — superseded, **archived intact** (56 pages moved, never copied or rewritten) |
 | Repository baseline | `main` @ `bf8f74d` |
-| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…` |
+| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…`, as measured before `D23` |
 
 The graph proof token is reproduced by building from the committed parts. A session that
 builds and gets the same token has proved agreement; nothing needs a stored copy.
@@ -39,7 +39,7 @@ python3 scripts/graph_parts.py build docs/graph/parts "$SCRATCH/graph.md"
 
 `graph_parts.py` ships with the **`glow-graph-contract` skill**, not as a tracked file in this
 repository. That is deliberate: reusable behaviour lives in skills, maintained data lives in
-the repository. Verified working 2026-09-18, output:
+the repository. Verified working 2026-09-18, output, as measured before `D23`:
 
 ```
 build: 55 nodes, 227 edges, 55 state_routes
@@ -56,7 +56,7 @@ never committed. **A session that cannot find the builder has not lost it — it
 |---|---|---|
 | `docs/prompt_ecosystem_management/README.md` | Architecture of this directory; what belongs here and what does not; validation posture | Current |
 | `docs/prompt_ecosystem_management/gcfpe.decision-record.md` | Product Owner rulings governing the ecosystem, with consequences. **Binding.** | Current |
-| `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` | Approved machine-readable per-prompt contract registry, all 55 prompts, with `evidence_contract` byte count and SHA-256 per prompt | `APPROVED` 2026-09-17; evidence refreshed 2026-09-18 |
+| `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` | Approved machine-readable per-prompt contract registry, all 55 prompts. Its per-prompt `evidence_contract` and `source_snapshot` identities describe the bodies before `D23` (2026-09-23) and no longer identify them | `APPROVED` 2026-09-17; evidence refreshed 2026-09-18 |
 | `docs/prompt_ecosystem_management/authoritative-surfaces.md` | This page | Current |
 | `docs/prompt_ecosystem_management/pe-succession/` | Session succession records | Current |
 | `docs/graph/parts/global.json` | Shared graph contract — boundary nodes, vocabularies, PF10 addendum contract | Current |

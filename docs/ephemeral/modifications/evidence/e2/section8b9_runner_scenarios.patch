@@ -1,0 +1,338 @@
+--- a/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
++++ b/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Run the 33 deterministic GCFPE v2 repair fixtures and contract mutations."""
++"""Run the 37 deterministic GCFPE v2 repair fixtures and contract mutations."""
+ 
+ from __future__ import annotations
+ 
+@@ -16,6 +16,8 @@
+ from validate_gcfpe_20260914 import (
+     EXPECTED_PR30_RESULTS,
+     EXPECTED_PR35_RESULTS,
++    EXPECTED_PR35_ADDED_BOUNDARIES,
++    prompt_body_release_header,
+     EXPECTED_RETURN_PHASES,
+     FIXTURE_PATH,
+     load_profile,
+@@ -28,6 +30,13 @@
+     validate_qa_closure_bodies,
+ )
+ 
++REPLAN_DEFECT_REPAIR = {
++    ("PR40_REJECT_REPLAN_PROCEED", "second-proceed-same-plan"): {"second_proceed_same_plan": False},
++    ("PR40_REJECT_REPLAN_PROCEED", "proceed-between-pr30-and-pr35"): {"proceed_between_pr30_and_pr35": False},
++    ("PR40_REJECT_REPLAN_ROUTE", "reject-routed-to-pr30"): {"receiver": "PR-20"},
++}
++EXPECTED_REPLAN_VARIANT_RULES = {name: rule for rule, name in REPLAN_DEFECT_REPAIR}
++
+ EXPECTED_NEGATIVE_RULES = {
+     "PR-SPLIT-NEG-01": "PR35_ADDED_BOUNDARY",
+     "PR-SPLIT-NEG-02": "PR30_COHERENT_PUBLICATION",
+@@ -44,6 +53,8 @@
+     "SOURCE-NEG-01": "PFCANON_MARKDOWN_ONLY",
+     "ALPHA-NEG-01": "ALPHA_HISTORICAL_HANDOFF_NONOPERATIVE",
+     "OBS-NEG-01": "OBSERVATION_EVIDENCE_ONLY",
++    "HANDOFF-NEG-02": "PR40_ENTRY_ON_OBSERVED_OR_ASSERTED_MERGE",
++    "REPLAN-NEG-01": "PR40_REJECT_REPLAN_PROCEED",
+ }
+ 
+ 
+@@ -57,17 +68,15 @@
+     alpha = contract.get("alpha_resumption_contract", {})
+ 
+     if rule == "pr_split":
+-        if facts.get("requests_additional_proceed") or facts.get("requests_new_session"):
++        if facts.get("requests_additional_proceed") or facts.get("pr35_in_pr30_session"):
+             return "VALIDATION_FAILURE"
+         if facts.get("stops_tested_work") and not facts.get("committed_and_published") and not facts.get("real_blocker"):
+             return "VALIDATION_FAILURE"
+         if facts.get("matching_vehicle_exists") and development.get("recover_existing_work_before_create"):
+             return "RECOVER_EXISTING_NO_DUPLICATE"
+-        if all(facts.get(key) for key in ("original_proceed", "fresh", "local_tests", "coherent_commit", "published_once", "same_session_pr35")):
+-            if development.get("phases") == ["PR-30", "PR-35"] and all(
+-                value == 0 for value in development.get("added_boundaries", {}).values()
+-            ):
+-                return "PR30_TO_PR35_SAME_SESSION"
++        if all(facts.get(key) for key in ("original_proceed", "fresh", "local_tests", "coherent_commit", "published_once", "new_dedicated_pr35_session")):
++            if development.get("phases") == ["PR-30", "PR-35"] and development.get("added_boundaries") == EXPECTED_PR35_ADDED_BOUNDARIES:
++                return "PR30_TO_PR35_NEW_DEDICATED_SESSION"
+         return "VALIDATION_FAILURE"
+ 
+     if rule == "pr_cost":
+@@ -172,13 +181,44 @@
+             facts.get("block_count") == 1 and facts.get("complete")
+             and facts.get("exact_selected_identity") and transition.get("actual_pasteable_complete_prompt") is True
+         )
+-        if facts.get("origin") == "PR-30" and facts.get("receiver") == "PR-35" and facts.get("same_session") and common:
++        if (
++            facts.get("origin") == "PR-30" and facts.get("receiver") == "PR-35" and common
++            and not facts.get("same_session") and facts.get("session_disposition") == "NEW_DEDICATED"
++        ):
+             return "PR35_HANDOFF_ACCEPTED"
++        if facts.get("automatic_dispatch") or facts.get("session_created_by_agent") or facts.get("merge_performed_by") == "agent":
++            return "VALIDATION_FAILURE"
+         if (
+             facts.get("origin") == "PR-35" and facts.get("receiver") == "PR-40" and common
+             and facts.get("manual_merge_condition") and facts.get("three_events_separate")
++            and not facts.get("merge_observed_result_returned")
+         ):
+             return "PR40_CONDITIONAL_HANDOFF_ACCEPTED"
++        if (
++            facts.get("origin") in {"PR-35", "RS-40"} and facts.get("receiver") == "PR-40" and common
++            and facts.get("subscription_active") and facts.get("observed_merge_event")
++            and facts.get("merge_performed_by") == "Nathan" and facts.get("three_events_separate")
++            and (contract.get("post_merge_three_event_contract") or {}).get("direct_PR35_to_PR40_automatic_edge") is False
++        ):
++            return "PR40_OBSERVED_MERGE_HANDOFF_ACCEPTED"
++        return "VALIDATION_FAILURE"
++
++    if rule == "replan":
++        rescope = contract.get("rescope_contract", {})
++        replan_edges = [
++            e for e in contract.get("route_edges", [])
++            if isinstance(e, dict) and e.get("from") == "PR-40"
++            and any(isinstance(b, dict) and b.get("branch_id") == "reject_replan" for b in e.get("route_branches", []))
++        ]
++        if facts.get("second_proceed_same_plan") or facts.get("proceed_between_pr30_and_pr35") or facts.get("receiver") != "PR-20":
++            return "VALIDATION_FAILURE"
++        if (
++            facts.get("decision") == "REJECT" and facts.get("precise_in_scope_defect")
++            and facts.get("new_top_level_session_nathan_creates") and facts.get("new_plan")
++            and facts.get("new_proceed_on_new_plan")
++            and [e.get("to") for e in replan_edges] == ["PR-20"] and rescope.get("new_proceed_required") is False
++        ):
++            return "REPLAN_NEW_PROCEED_ACCEPTED"
+         return "VALIDATION_FAILURE"
+ 
+     if rule == "pfcanon":
+@@ -255,16 +295,16 @@
+     rows = data.get("scenarios")
+     if data.get("negative_rule_attribution") != EXPECTED_NEGATIVE_RULES:
+         errors.append("FIXTURE_NEGATIVE_RULE_ATTRIBUTION")
+-    if not isinstance(required, list) or len(required) != 33 or len(set(required)) != 33:
++    if not isinstance(required, list) or len(required) != 37 or len(set(required)) != 37:
+         errors.append("FIXTURE_REQUIRED_IDS")
+-    if not isinstance(rows, list) or len(rows) != 33:
++    if not isinstance(rows, list) or len(rows) != 37:
+         errors.append("FIXTURE_COUNT")
+     else:
+         observed = [row.get("id") for row in rows if isinstance(row, dict)]
+         if observed != required:
+             errors.append("FIXTURE_ORDER_OR_COVERAGE")
+         polarities = [row.get("polarity") for row in rows if isinstance(row, dict)]
+-        if polarities.count("POSITIVE") != 18 or polarities.count("NEGATIVE") != 15:
++        if polarities.count("POSITIVE") != 20 or polarities.count("NEGATIVE") != 17:
+             errors.append("FIXTURE_POLARITY_COUNT")
+         for row in rows:
+             if not isinstance(row, dict) or row.get("polarity") not in {"POSITIVE", "NEGATIVE"} or not isinstance(row.get("input"), dict):
+@@ -284,6 +324,9 @@
+                 if isinstance(variant, dict)
+             }) != len(row["variants"]):
+                 errors.append(f"FIXTURE_VARIANT_NAMES:{row.get('id')}")
++    replan = [row for row in rows or [] if isinstance(row, dict) and row.get("id") == "REPLAN-NEG-01"]
++    if len(replan) != 1 or {v.get("name"): v.get("expected_rule") for v in replan[0].get("variants", []) if isinstance(v, dict)} != EXPECTED_REPLAN_VARIANT_RULES:
++        errors.append("FIXTURE_REPLAN_VARIANT_RULES")
+     return sorted(set(errors))
+ 
+ 
+@@ -314,14 +357,22 @@
+                 "name": f"{row['id']}::{variant['name']}", "fixture_variant": row["id"],
+                 "polarity": row["polarity"], "passed": variant_observed == variant["expected"],
+                 "observed": variant_observed, "expected": variant["expected"],
+-                "expected_rule": negative_rules.get(row["id"]) if row["polarity"] == "NEGATIVE" else None,
++                "expected_rule": variant.get("expected_rule", negative_rules.get(row["id"])) if row["polarity"] == "NEGATIVE" else None,
+             })
++            if row["id"] == "REPLAN-NEG-01":
++                # Single-defect proof: the variant is REPLAN-POS-01 plus exactly its own defect,
++                # so reverting that one fact must restore acceptance.
++                repair = REPLAN_DEFECT_REPAIR.get((variant.get("expected_rule"), variant["name"]))
++                cases.append({
++                    "name": f"{row['id']}::{variant['name']}::single-defect",
++                    "passed": repair is not None and project_behavior(source, row["rule"], {**variant["input"], **repair}) == "REPLAN_NEW_PROCEED_ACCEPTED",
++                })
+ 
+     def behavior_case(name: str, rule: str, facts: dict[str, Any], expected: str) -> None:
+         observed = project_behavior(source, rule, facts)
+         cases.append({"name": name, "passed": observed == expected, "observed": observed, "expected": expected})
+ 
+-    for key in ("requests_additional_proceed", "requests_new_session"):
++    for key in ("requests_additional_proceed", "pr35_in_pr30_session"):
+         behavior_case(f"independent-{key}", "pr_split", {key: True}, "VALIDATION_FAILURE")
+     for key in ("micro_commits", "push_after_every_edit"):
+         behavior_case(f"independent-{key}", "pr_cost", {key: True}, "VALIDATION_FAILURE")
+@@ -329,7 +380,7 @@
+         behavior_case(f"independent-{key}", "merge_authority", {"actor": "agent", key: True}, "VALIDATION_FAILURE")
+     for key in ("metadata_only", "blank_field", "library_id", "uses_above", "unlinked_filename"):
+         behavior_case(f"independent-handoff-{key}", "handoff", {
+-            "origin": "PR-30", "receiver": "PR-35", "same_session": True,
++            "origin": "PR-30", "receiver": "PR-35", "same_session": False, "session_disposition": "NEW_DEDICATED",
+             "block_count": 1, "complete": True, "exact_selected_identity": True, key: True,
+         }, "VALIDATION_FAILURE")
+     for key in ("asserted_session_endpoint", "unsupported_platform_diagnosis"):
+@@ -358,7 +409,42 @@
+     mutation("reject-pr35-removal", lambda c: c["candidate_prompt_ids"].remove("PR-35"), "MEMBER_SET")
+     mutation("reject-new-proceed-boundary", lambda c: c["pr_development_contract"]["added_boundaries"].__setitem__("proceed", 1), "PR35_ADDED_BOUNDARY")
+     mutation("reject-pr30-direct-pr40", lambda c: c["route_edges"].append({"from": "PR-30", "to": "PR-40", "automatic": False}), ["DIRECT_PR30_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
+-    mutation("reject-pr35-direct-pr40", lambda c: c["route_edges"].append({"from": "PR-35", "to": "PR-40", "automatic": False}), ["DIRECT_PR35_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-second-pr35-pr40-edge", lambda c: c["route_edges"].append({"from": "PR-35", "to": "PR-40", "automatic": False}), ["DIRECT_PR35_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
++    def _edge(c, frm, to):
++        return next(e for e in c["route_edges"] if e.get("from") == frm and e.get("to") == to)
++    mutation("reject-automatic-pr35-pr40-edge", lambda c: _edge(c, "PR-35", "PR-40").__setitem__("automatic", True), ["DIRECT_PR35_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-automatic-rs40-pr40-edge", lambda c: _edge(c, "RS-40", "PR-40").__setitem__("automatic", True), ["DIRECT_PR35_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-pr35-pr40-edge-without-merge-condition", lambda c: _edge(c, "PR-35", "PR-40")["route_branches"][0].__setitem__("condition", "PR-35 returns its result"), ["DIRECT_PR35_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-pr40-entry-before-merge", lambda c: (_edge(c, "PR-35", "PR-40").__setitem__("state_predicates", ["MERGE_PENDING"]), _edge(c, "PR-35", "PR-40")["route_branches"][0].update({"state": "MERGE_PENDING", "applicable_states": ["MERGE_PENDING"]})), ["DIRECT_PR35_PR40_EDGE", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-pr35-shared-session", lambda c: c["pr_development_contract"]["added_boundaries"].__setitem__("session", 0), "PR35_ADDED_BOUNDARY")
++    mutation("reject-cross-session-route-zero", lambda c: c["pr_development_contract"]["added_boundaries"].__setitem__("cross_session_route", 0), "PR35_ADDED_BOUNDARY")
++    mutation("reject-shared-session-continuity-field", lambda c: c["pr_development_contract"]["shared_exactly_one"].insert(2, "dedicated PR-development session"), "PR_PHASE_CONTINUITY")
++    mutation("reject-pr35-results-without-merge-observed", lambda c: c["pr_development_contract"].__setitem__("pr35_result_vocabulary", [x for x in EXPECTED_PR35_RESULTS if x != "MERGE_OBSERVED"]), "PR35_RESULT_VOCABULARY")
++    mutation("reject-automatic-post-merge-edge-flag", lambda c: c["post_merge_three_event_contract"].__setitem__("direct_PR35_to_PR40_automatic_edge", True), "POST_MERGE_CONTRACT")
++    mutation("reject-assertion-only-event-2", lambda c: c["post_merge_three_event_contract"]["event_2"].__setitem__("fact", "product_owner_manual_merge_assertion"), "POST_MERGE_THREE_EVENTS")
++    mutation("reject-missing-merge-assertion-fallback", lambda c: c["route_edges"].remove(_edge(c, "NATHAN_MANUAL_MERGE_ASSERTION", "PR-40")), ["PR40_MANUAL_MERGE_BOUNDARY", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-merge-assertion-shorthand-in-ordinary-route", lambda c: c["route_graph"].__setitem__("ordinary_pr_work_unit", ["PR-10", "PR-20", "NATHAN_PROCEED", "PR-30", "PR-35", "NATHAN_MANUAL_MERGE_ASSERTION", "PR-40"]), "ROUTE_GRAPH_SHORTHAND")
++    def _to30(c):
++        _edge(c, "PR-40", "PR-20")["to"] = "PR-30"
++        for r in c["state_routes"]["PR-40"]:
++            if r.get("branch_id") == "reject_replan":
++                r["destinations"] = ["PR-30"]
++    mutation("reject-pr40-reject-to-pr30", _to30, ["PR40_REJECT_REPLAN_ROUTE", "ROUTING_SURFACE_CHANGED"])
++    mutation("reject-receiver-pr35-same-session", lambda c: c["receiver_compatibility"]["PR-35"].__setitem__("same_session_workspace_worktree_branch_open_pr_original_proceed", True), "RECEIVER_CONTRACT:PR-35")
++    mutation("reject-receiver-pr40-assertion-only", lambda c: c["receiver_compatibility"]["PR-40"].__setitem__("nathan_manual_merge_assertion_required", True), "RECEIVER_CONTRACT:PR-40")
++    mutation("reject-receiver-pr30-replan-context", lambda c: c["receiver_compatibility"]["PR-30"]["accepted_contexts"].append("PR_WORK_UNIT_LINEAGE_REVIEW_REJECT_REPLAN"), "RECEIVER_CONTRACT:PR-30")
++    mutation("reject-restated-handoff-flag", lambda c: c["transition_contract"].__setitem__("status_completed_work_decisions_constraints_unresolved_authority", True), "HANDOFF_CONTRACT")
++    mutation("reject-handoff-branch-allowed", lambda c: c["transition_contract"]["prohibited_references"].remove("branch"), "HANDOFF_PROHIBITED_REFERENCES")
++    mutation("reject-no-subscription-fallback-shorthand", lambda c: c["route_graph"].__setitem__("pr35_no_subscription_fallback", c["route_graph"].pop("pr35_merge_pending_fallback")), "ROUTE_GRAPH_SHORTHAND")
++    mutation("reject-same-session-phase-semantics", lambda c: c["route_graph_semantics"].__setitem__("same_session_phase_continuation", c["route_graph_semantics"].pop("pr30_to_pr35_phase_continuation")), "ROUTE_GRAPH_SEMANTICS")
++    mutation("reject-pr35-role-without-top-level-clause", lambda c: c["member_registry"]["PR-35"].__setitem__("receiving_role", "You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you continue its existing pull request."), "PR35_TOP_LEVEL_ROLE")
++    mutation("reject-event-2-time-without-fallback-predicate", lambda c: c["post_merge_three_event_contract"]["event_2"].__setitem__("time", "later PR-40 invocation"), "POST_MERGE_THREE_EVENTS")
++    mutation("reject-missing-rs40-observed-merge-record", lambda c: c["post_merge_three_event_contract"]["observed_merge_edges"].pop(1), "POST_MERGE_CONTRACT")
++    mutation("reject-same-session-pr30-ownership", lambda c: c["pr_development_contract"]["pr30_ownership"].__setitem__(5, "complete same-session PR-35 handoff"), "PR_DEVELOPMENT_CONTRACT")
++    mutation("reject-shared-session-rescope-lineage", lambda c: c["rescope_contract"]["preserved_lineage"].__setitem__(1, "PR_DEVELOPMENT_SESSION"), "RESCOPE_CONTRACT")
++    mutation("reject-receiver-pr20-removed", lambda c: c["receiver_compatibility"].pop("PR-20"), "RECEIVER_CONTRACT:PR-20")
++    mutation("reject-handoff-branch-flag-removed", lambda c: c["transition_contract"].pop("no_branch_or_commit"), "HANDOFF_CONTRACT")
++    mutation("reject-r1-oracle-unchanged-claim", lambda c: c["protected_identities"].__setitem__("r1_oracle_changed", False), "PROTECTED_IDENTITIES")
+     mutation("reject-missing-pr30-result", lambda c: c["pr_development_contract"].__setitem__("pr30_result_vocabulary", EXPECTED_PR30_RESULTS[:-1]), "PR30_RESULT_VOCABULARY")
+     mutation("reject-missing-pr35-result", lambda c: c["pr_development_contract"].__setitem__("pr35_result_vocabulary", EXPECTED_PR35_RESULTS[:-1]), "PR35_RESULT_VOCABULARY")
+     mutation("reject-missing-ledger", lambda c: c["pr_remote_action_ledger_contract"].__setitem__("required", False), "PR_REMOTE_ACTION_LEDGER")
+@@ -419,13 +505,10 @@
+     # and a locator with no release-phase label. `prompt-body-content-policy.md`.
+     clean_header = [
+         pr35["title"],
+-        "Prompt Version: 091426.1",
+-        "Set: Glow HDE Complete Prompt Flow 091426.1",
+         "Prompt ID: PR-35",
+-        "Ecosystem release: GCFPE-20260914.1",
+         f"Notion URL: {pr35['notion_url']}",
+         "## Native purpose",
+-    ]
++    ] + ["Purpose line."] * 0
+     cases.append({
+         "name": "accept-identity-only-prompt-header",
+         "passed": prompt_identity_header_valid(clean_header, pr35, "PR-35"),
+@@ -433,11 +516,11 @@
+     for name, mutator in (
+         (
+             "reject-candidate-url-label",
+-            lambda lines: lines.__setitem__(5, f"Candidate Notion URL: {pr35['notion_url']}"),
++            lambda lines: lines.__setitem__(2, f"Candidate Notion URL: {pr35['notion_url']}"),
+         ),
+         (
+             "reject-selected-url-label",
+-            lambda lines: lines.__setitem__(5, f"Selected Notion URL: {pr35['notion_url']}"),
++            lambda lines: lines.__setitem__(2, f"Selected Notion URL: {pr35['notion_url']}"),
+         ),
+         (
+             "reject-duplicate-generic-url",
+@@ -455,6 +538,20 @@
+             "passed": not prompt_identity_header_valid(mutated_header, pr35, "PR-35"),
+         })
+ 
++    cases.append({"name": "accept-header-free-of-release-lines", "passed": not prompt_body_release_header(clean_header)})
++    for name, offending in (
++        ("reject-release-header-prompt-version", "Prompt Version: 091426.1"),
++        ("reject-release-header-prompt-version-lowercase", "Prompt version: 091426.1"),
++        ("reject-release-header-set", "Set: Glow HDE Complete Prompt Flow 091426.1"),
++        ("reject-release-header-ecosystem-release", "Ecosystem release: GCFPE-20260914.1"),
++        ("reject-release-header-bold", "**Prompt Version:** 091426.1"),
++        ("reject-release-header-bullet", "- Set: Glow HDE Complete Prompt Flow 091426.1"),
++        ("reject-release-header-blockquote", "> Ecosystem release: GCFPE-20260914.1"),
++        ("reject-release-header-bold-label-only", "**Prompt version**: 091426.1"),
++        ("reject-release-header-code-span", "`Set:` GCFPE-20260914.1"),
++        ("reject-release-header-table-cell", "| Ecosystem release: | GCFPE-20260914.1 |"),
++    ):
++        cases.append({"name": name, "passed": prompt_body_release_header(clean_header[:1] + [offending] + clean_header[1:])})
+     # The prohibition is a separate check with its own error code, so it is falsified
+     # separately: a body may be identity-valid and still carry governance state.
+     cases.append({
+@@ -699,7 +796,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.2.14",
++        "validator_revision": "3.3.0",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+--- a/flowmaster-validate/fixtures/gcfpe-20260914.1-091426.1/scenarios.json
++++ b/flowmaster-validate/fixtures/gcfpe-20260914.1-091426.1/scenarios.json
+@@ -8,11 +8,13 @@
+     "PR-SPLIT-POS-01", "PR-SPLIT-POS-02", "PR-SPLIT-NEG-01", "PR-SPLIT-NEG-02",
+     "PR-COST-POS-01", "PR-COST-POS-02", "PR-COST-NEG-01", "PR-COST-NEG-02",
+     "PR-READY-POS-01", "PR-MERGE-NEG-01", "PF10-POS-01", "PF10-POS-02",
+-    "PF10-NEG-01", "PF10-NEG-02", "PF10-NEG-03", "PF10-NEG-04", "PF10-NEG-05",
+-    "RS-DECISION-01", "RS-DECISION-02", "RS-RETURN-01", "RS-RETURN-02",
+-    "ABORT-POS-01", "ABORT-NEG-01", "HANDOFF-POS-01", "HANDOFF-POS-02", "HANDOFF-NEG-01",
++    "PF10-NEG-01", "PF10-NEG-02", "PF10-NEG-03", "PF10-NEG-04",
++    "PF10-NEG-05", "RS-DECISION-01", "RS-DECISION-02", "RS-RETURN-01",
++    "RS-RETURN-02", "ABORT-POS-01", "ABORT-NEG-01", "HANDOFF-POS-01",
++    "HANDOFF-POS-02", "HANDOFF-NEG-01", "HANDOFF-POS-03", "HANDOFF-NEG-02",
+     "SOURCE-POS-01", "SOURCE-NEG-01", "ALPHA-POS-01", "ALPHA-NEG-01",
+-    "OBS-POS-01", "OBS-NEG-01", "RCA-SEPARATION-01"
++    "OBS-POS-01", "OBS-NEG-01", "RCA-SEPARATION-01", "REPLAN-POS-01",
++    "REPLAN-NEG-01"
+   ],
+   "negative_rule_attribution": {
+     "PR-SPLIT-NEG-01": "PR35_ADDED_BOUNDARY",
+@@ -29,12 +31,14 @@
+     "HANDOFF-NEG-01": "HANDOFF_COMPLETE_PASTE_READY",
+     "SOURCE-NEG-01": "PFCANON_MARKDOWN_ONLY",
+     "ALPHA-NEG-01": "ALPHA_HISTORICAL_HANDOFF_NONOPERATIVE",
+-    "OBS-NEG-01": "OBSERVATION_EVIDENCE_ONLY"
++    "OBS-NEG-01": "OBSERVATION_EVIDENCE_ONLY",
++    "HANDOFF-NEG-02": "PR40_ENTRY_ON_OBSERVED_OR_ASSERTED_MERGE",
++    "REPLAN-NEG-01": "PR40_REJECT_REPLAN_PROCEED"
+   },
+   "scenarios": [
+-    {"id":"PR-SPLIT-POS-01","polarity":"POSITIVE","rule":"pr_split","input":{"original_proceed":true,"fresh":true,"local_tests":true,"coherent_commit":true,"published_once":true,"same_session_pr35":true},"expected":"PR30_TO_PR35_SAME_SESSION"},
++    {"id":"PR-SPLIT-POS-01","polarity":"POSITIVE","rule":"pr_split","input":{"original_proceed":true,"fresh":true,"local_tests":true,"coherent_commit":true,"published_once":true,"new_dedicated_pr35_session":true},"expected":"PR30_TO_PR35_NEW_DEDICATED_SESSION"},
+     {"id":"PR-SPLIT-POS-02","polarity":"POSITIVE","rule":"pr_split","input":{"matching_vehicle_exists":true},"expected":"RECOVER_EXISTING_NO_DUPLICATE"},
+-    {"id":"PR-SPLIT-NEG-01","polarity":"NEGATIVE","rule":"pr_split","input":{"requests_additional_proceed":true,"requests_new_session":true},"expected":"VALIDATION_FAILURE","variants":[{"name":"extra-proceed-only","input":{"requests_additional_proceed":true},"expected":"VALIDATION_FAILURE"},{"name":"new-session-only","input":{"requests_new_session":true},"expected":"VALIDATION_FAILURE"}]},
++    {"id":"PR-SPLIT-NEG-01","polarity":"NEGATIVE","rule":"pr_split","input":{"requests_additional_proceed":true,"pr35_in_pr30_session":true},"expected":"VALIDATION_FAILURE","variants":[{"name":"extra-proceed-only","input":{"requests_additional_proceed":true},"expected":"VALIDATION_FAILURE"},{"name":"pr35-in-pr30-session-only","input":{"pr35_in_pr30_session":true},"expected":"VALIDATION_FAILURE"}]},
+     {"id":"PR-SPLIT-NEG-02","polarity":"NEGATIVE","rule":"pr_split","input":{"stops_tested_work":true,"committed_and_published":false,"real_blocker":false},"expected":"VALIDATION_FAILURE"},
+     {"id":"PR-COST-POS-01","polarity":"POSITIVE","rule":"pr_cost","input":{"known_findings":true,"active_ci":true,"fixed_locally":true,"local_tests":true,"all_known_findings_resolved_before_push":true,"waited_on_stale_ci":false,"one_coherent_push":true},"expected":"REVIEW_FIRST_COHERENT_PUSH"},
+     {"id":"PR-COST-POS-02","polarity":"POSITIVE","rule":"pr_cost","input":{"known_findings":true,"ci_auto_started":true,"finding_after_ci_start":true,"fixed_locally":true,"local_tests":true,"all_known_findings_resolved_before_push":true,"waited_on_stale_ci":false,"cancelled_without_supported_interface":false},"expected":"STALE_CI_LOCAL_CORRECTION"},
+@@ -55,15 +59,19 @@
+     {"id":"RS-RETURN-02","polarity":"POSITIVE","rule":"pf10_verify","input":{"fresh_current_resolution_attempted":true,"current_source_resolved":true,"anchor_present":true,"addendum_id_matches":true,"decision_id_matches":true,"immutable_base_id_matches":true,"approved_delta_digest_matches":true,"later_conflict":false,"return_phase":"PR-35"},"expected":"RESUME_PR35_VIA_RS40"},
+     {"id":"ABORT-POS-01","polarity":"POSITIVE","rule":"abort","input":{"actor":"Nathan / Product Owner","manual":true,"exact_pr":"PR-405"},"expected":"PR_ABORTED_ESCALATED"},
+     {"id":"ABORT-NEG-01","polarity":"NEGATIVE","rule":"abort","input":{"actor":"agent","origin":"agent","manual":false,"exact_pr":"PR-405"},"expected":"VALIDATION_FAILURE","variants":[{"name":"prompt-origin","input":{"actor":"Nathan / Product Owner","origin":"prompt","manual":true,"exact_pr":"PR-405"},"expected":"VALIDATION_FAILURE"},{"name":"skill-origin","input":{"actor":"Nathan / Product Owner","origin":"skill","manual":true,"exact_pr":"PR-405"},"expected":"VALIDATION_FAILURE"},{"name":"automatic-origin","input":{"actor":"Nathan / Product Owner","automatic":true,"manual":true,"exact_pr":"PR-405"},"expected":"VALIDATION_FAILURE"}]},
+-    {"id":"HANDOFF-POS-01","polarity":"POSITIVE","rule":"handoff","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"exact_selected_identity":true,"block_count":1,"complete":true},"expected":"PR35_HANDOFF_ACCEPTED"},
+-    {"id":"HANDOFF-POS-02","polarity":"POSITIVE","rule":"handoff","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"manual_merge_condition":true,"three_events_separate":true},"expected":"PR40_CONDITIONAL_HANDOFF_ACCEPTED"},
+-    {"id":"HANDOFF-NEG-01","polarity":"NEGATIVE","rule":"handoff","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"block_count":1,"complete":true,"exact_selected_identity":true,"metadata_only":true,"blank_field":true,"library_id":true,"uses_above":true,"unlinked_filename":true},"expected":"VALIDATION_FAILURE","variants":[{"name":"metadata-only","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"block_count":1,"complete":true,"exact_selected_identity":true,"metadata_only":true},"expected":"VALIDATION_FAILURE"},{"name":"blank-field","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"block_count":1,"complete":true,"exact_selected_identity":true,"blank_field":true},"expected":"VALIDATION_FAILURE"},{"name":"library-id","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"block_count":1,"complete":true,"exact_selected_identity":true,"library_id":true},"expected":"VALIDATION_FAILURE"},{"name":"above-reference","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"block_count":1,"complete":true,"exact_selected_identity":true,"uses_above":true},"expected":"VALIDATION_FAILURE"},{"name":"unlinked-filename","input":{"origin":"PR-30","receiver":"PR-35","same_session":true,"block_count":1,"complete":true,"exact_selected_identity":true,"unlinked_filename":true},"expected":"VALIDATION_FAILURE"}]},
++    {"id":"HANDOFF-POS-01","polarity":"POSITIVE","rule":"handoff","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"session_disposition":"NEW_DEDICATED"},"expected":"PR35_HANDOFF_ACCEPTED"},
++    {"id":"HANDOFF-POS-02","polarity":"POSITIVE","rule":"handoff","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"manual_merge_condition":true,"three_events_separate":true},"expected":"PR40_CONDITIONAL_HANDOFF_ACCEPTED","variants":[{"name":"subscription-accepted-not-delivering","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"subscription_call_succeeded":true,"subscription_active":false,"manual_merge_condition":true,"three_events_separate":true},"expected":"PR40_CONDITIONAL_HANDOFF_ACCEPTED"}]},
++    {"id":"HANDOFF-NEG-01","polarity":"NEGATIVE","rule":"handoff","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"block_count":1,"complete":true,"exact_selected_identity":true,"metadata_only":true,"blank_field":true,"library_id":true,"uses_above":true,"unlinked_filename":true,"session_disposition":"NEW_DEDICATED"},"expected":"VALIDATION_FAILURE","variants":[{"name":"metadata-only","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"block_count":1,"complete":true,"exact_selected_identity":true,"metadata_only":true,"session_disposition":"NEW_DEDICATED"},"expected":"VALIDATION_FAILURE"},{"name":"blank-field","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"block_count":1,"complete":true,"exact_selected_identity":true,"blank_field":true,"session_disposition":"NEW_DEDICATED"},"expected":"VALIDATION_FAILURE"},{"name":"library-id","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"block_count":1,"complete":true,"exact_selected_identity":true,"library_id":true,"session_disposition":"NEW_DEDICATED"},"expected":"VALIDATION_FAILURE"},{"name":"above-reference","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"block_count":1,"complete":true,"exact_selected_identity":true,"uses_above":true,"session_disposition":"NEW_DEDICATED"},"expected":"VALIDATION_FAILURE"},{"name":"unlinked-filename","input":{"origin":"PR-30","receiver":"PR-35","same_session":false,"block_count":1,"complete":true,"exact_selected_identity":true,"unlinked_filename":true,"session_disposition":"NEW_DEDICATED"},"expected":"VALIDATION_FAILURE"}]},
++    {"id":"HANDOFF-POS-03","polarity":"POSITIVE","rule":"handoff","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"subscription_active":true,"observed_merge_event":true,"merge_performed_by":"Nathan","three_events_separate":true},"expected":"PR40_OBSERVED_MERGE_HANDOFF_ACCEPTED","variants":[{"name":"rs40-resumed-pr35-phase","input":{"origin":"RS-40","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"subscription_active":true,"observed_merge_event":true,"merge_performed_by":"Nathan","three_events_separate":true},"expected":"PR40_OBSERVED_MERGE_HANDOFF_ACCEPTED"}]},
++    {"id":"HANDOFF-NEG-02","polarity":"NEGATIVE","rule":"handoff","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"automatic_dispatch":true,"merge_performed_by":"agent"},"expected":"VALIDATION_FAILURE","variants":[{"name":"before-any-merge","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true},"expected":"VALIDATION_FAILURE"},{"name":"observed-without-active-subscription","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"subscription_active":false,"observed_merge_event":true,"merge_performed_by":"Nathan","three_events_separate":true},"expected":"VALIDATION_FAILURE"},{"name":"agent-merge","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"subscription_active":true,"observed_merge_event":true,"merge_performed_by":"agent","three_events_separate":true},"expected":"VALIDATION_FAILURE"},{"name":"automatic-dispatch","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"subscription_active":true,"observed_merge_event":true,"merge_performed_by":"Nathan","three_events_separate":true,"automatic_dispatch":true},"expected":"VALIDATION_FAILURE"},{"name":"fallback-after-merge-observed","input":{"origin":"PR-35","receiver":"PR-40","same_session":false,"exact_selected_identity":true,"block_count":1,"complete":true,"manual_merge_condition":true,"three_events_separate":true,"merge_observed_result_returned":true},"expected":"VALIDATION_FAILURE"}]},
+     {"id":"SOURCE-POS-01","polarity":"POSITIVE","rule":"pfcanon","input":{"unique_controlled_markdown":true,"folder_predicates":true,"direct_parent":true,"provenance_recorded":true},"expected":"PFCANON_MARKDOWN_ACCEPTED"},
+     {"id":"SOURCE-NEG-01","polarity":"NEGATIVE","rule":"pfcanon","input":{"unique_controlled_markdown":false,"only_native_documents":true,"opened_native_document":false,"native_type":"GOOGLE_DOCS"},"expected":"SOURCE_RESOLUTION_ERROR","variants":[{"name":"doc","input":{"unique_controlled_markdown":false,"only_native_documents":true,"opened_native_document":false,"native_type":"DOC"},"expected":"SOURCE_RESOLUTION_ERROR"},{"name":"docx","input":{"unique_controlled_markdown":false,"only_native_documents":true,"opened_native_document":false,"native_type":"DOCX"},"expected":"SOURCE_RESOLUTION_ERROR"}]},
+     {"id":"ALPHA-POS-01","polarity":"POSITIVE","rule":"alpha","input":{"successor_selected":true,"validation_passed":true,"archive_passed":true,"fresh_pr10":true,"handoff_saved_read_back":true,"execute_pr10":false},"expected":"READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION"},
+     {"id":"ALPHA-NEG-01","polarity":"NEGATIVE","rule":"alpha","input":{"source":"SUPERSEDED_PR03_PR04"},"expected":"HISTORICAL_HANDOFF_REJECTED","variants":[{"name":"old-pr02-rs20","input":{"source":"OLD_PR02_RS20"},"expected":"HISTORICAL_HANDOFF_REJECTED"}]},
+     {"id":"OBS-POS-01","polarity":"POSITIVE","rule":"observation","input":{"remote_evidence_pending":true,"no_useful_local_action":true,"durable_checkpoint":true,"same_session_reentry":true,"asserted_session_endpoint":false,"unsupported_platform_diagnosis":false},"expected":"REMOTE_EVIDENCE_PENDING"},
+     {"id":"OBS-NEG-01","polarity":"NEGATIVE","rule":"observation","input":{"asserted_session_endpoint":true,"unsupported_platform_diagnosis":true},"expected":"VALIDATION_FAILURE","variants":[{"name":"endpoint-only","input":{"asserted_session_endpoint":true},"expected":"VALIDATION_FAILURE"},{"name":"unsupported-platform-only","input":{"unsupported_platform_diagnosis":true},"expected":"VALIDATION_FAILURE"}]},
+-    {"id":"RCA-SEPARATION-01","polarity":"POSITIVE","rule":"rca","input":{"evidence":"PR03-R02","classification":"ACCEPTED_TECHNICAL_HISTORY","pf10_proof":false,"prompt_hang_proof":false,"alpha_resume_proof":false,"reopen_pr03":false},"expected":"TECHNICAL_HISTORY_ONLY"}
++    {"id":"RCA-SEPARATION-01","polarity":"POSITIVE","rule":"rca","input":{"evidence":"PR03-R02","classification":"ACCEPTED_TECHNICAL_HISTORY","pf10_proof":false,"prompt_hang_proof":false,"alpha_resume_proof":false,"reopen_pr03":false},"expected":"TECHNICAL_HISTORY_ONLY"},
++    {"id":"REPLAN-POS-01","polarity":"POSITIVE","rule":"replan","input":{"decision":"REJECT","precise_in_scope_defect":true,"receiver":"PR-20","new_top_level_session_nathan_creates":true,"new_plan":true,"new_proceed_on_new_plan":true},"expected":"REPLAN_NEW_PROCEED_ACCEPTED"},
++    {"id":"REPLAN-NEG-01","polarity":"NEGATIVE","rule":"replan","input":{"decision":"REJECT","precise_in_scope_defect":true,"receiver":"PR-30","new_top_level_session_nathan_creates":true,"new_plan":true,"new_proceed_on_new_plan":true,"second_proceed_same_plan":true,"proceed_between_pr30_and_pr35":true},"expected":"VALIDATION_FAILURE","variants":[{"name":"second-proceed-same-plan","input":{"decision":"REJECT","precise_in_scope_defect":true,"receiver":"PR-20","new_top_level_session_nathan_creates":true,"new_plan":true,"new_proceed_on_new_plan":true,"second_proceed_same_plan":true},"expected":"VALIDATION_FAILURE","expected_rule":"PR40_REJECT_REPLAN_PROCEED"},{"name":"proceed-between-pr30-and-pr35","input":{"decision":"REJECT","precise_in_scope_defect":true,"receiver":"PR-20","new_top_level_session_nathan_creates":true,"new_plan":true,"new_proceed_on_new_plan":true,"proceed_between_pr30_and_pr35":true},"expected":"VALIDATION_FAILURE","expected_rule":"PR40_REJECT_REPLAN_PROCEED"},{"name":"reject-routed-to-pr30","input":{"decision":"REJECT","precise_in_scope_defect":true,"receiver":"PR-30","new_top_level_session_nathan_creates":true,"new_plan":true,"new_proceed_on_new_plan":true},"expected":"VALIDATION_FAILURE","expected_rule":"PR40_REJECT_REPLAN_ROUTE"}]}
+   ]
+ }

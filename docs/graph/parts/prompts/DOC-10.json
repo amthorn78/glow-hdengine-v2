@@ -124,7 +124,7 @@
             "BLOCKED"
           ],
           "branch_id": "material_boundary",
-          "condition": "repository evidence proves a complete bounded material boundary",
+          "condition": "repository evidence proves a complete bounded material change to the Epic-level commitment (D23-C)",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "CONDITIONAL_RECOVERY",

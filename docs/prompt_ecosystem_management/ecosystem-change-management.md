@@ -138,9 +138,9 @@ routine; keep them working rather than rebuilding them.
 
 | Instrument | Where | What it gives you |
 |---|---|---|
-| **Contract registry with behavioural assertions** | `project-prompt-contract-registry.md` | 499 assertions across 55 prompts, 0 failing. `required_regex` binds release identity and Canon source; `forbidden_regex` guards D7 against Drive reintroduction in any of its four forms. |
+| **Contract registry with behavioural assertions** | `project-prompt-contract-registry.md` | `required_regex` binds the Canon source and the `D23` canonical wordings; `forbidden_regex` guards `D7`, the `D23` reversals and session creation. |
 | **Governance audit** | `amthor-workspace-governance-audit` skill | Executes the registry assertions on demand. Not on push — this material is outside application CI by design (see `README.md`). |
-| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…` proves a rebuild matched. |
+| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 569,902 bytes · sha256 1d0b7258…`, as measured before `D23`, proves a rebuild matched. |
 | **Isolated-readback harness** | pattern, `execution-and-delegation-model.md` §7 | Proves an applied change landed, without the verifier knowing the expectation. |
 | **Regression-injection test** | pattern, D11 | Proves a guard actually catches what it claims. The D7 guard was tested against five injected regressions and a clean control. |
 | **Succession record** | `pe-succession/` | Lets a session be replaced without losing the inheritance. |
@@ -173,7 +173,7 @@ source — not the sentence the artifact uses to express it. (D11)
 ### CHK-002 — Wording asserted as if it were behaviour
 
 **Symptom:** an exact-substring assertion breaks on a legitimate variant.
-**Example:** the release carries two header conventions — `Prompt version: \`091426.1\``
+**Example:** the release carried, until `D23-G` removed them, two header conventions — `Prompt version: \`091426.1\``
 in eleven prompts, `Prompt Version: 091426.1` in forty-four. Both declare the identity
 the rule guarantees; an exact literal failed eleven correct prompts.
 **Repair:** tolerant `required_regex` on the identity, not the sentence.
