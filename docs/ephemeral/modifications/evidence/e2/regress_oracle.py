@@ -108,12 +108,14 @@ def edit_row(o, rid, fn):
 # G1: edit GCF-16 session, digest by formula, re-stamp -> N9 on GCF-16 only.
 fresh(); o = json.loads(ORACLE.read_bytes()); r = edit_row(o, "GCF-16", lambda r: r.__setitem__("session", r["session"] + " (edited)")); r["source_row_sha256"] = dig(r)
 restamp(o); check("G1", suite()[1], ["FMV-ORACLE-015"], row="GCF-16")
-# G2: edit GCF-17 session in the oracle only -> N6 on GCF-17 only.
+# G2: edit GCF-17 session in the oracle only -> N6 on GCF-17, and (round-a1 repair R1) FMV-ORACLE-018 on GCF-17,
+# because the untouched matrix line no longer equals the oracle row's re-computed digest.
 fresh(); o = json.loads(ORACLE.read_bytes()); r = edit_row(o, "GCF-17", lambda r: r.__setitem__("session", r["session"] + " (edited)")); r["source_row_sha256"] = dig(r)
-restamp(o); check("G2", suite()[1], ["FMV-ORACLE-012"], row="GCF-17")
-# G3: GCF-14 source_row_sha256 -> another 64-hex -> N7 on GCF-14 only.
+restamp(o); check("G2", suite()[1], ["FMV-ORACLE-012", "FMV-ORACLE-018"], row="GCF-17")
+# G3: GCF-14 source_row_sha256 -> another 64-hex -> N7 on GCF-14, and (round-a1 repair R1) FMV-ORACLE-018 on GCF-14,
+# because the matrix line keeps the formula value while the oracle row now carries another digest.
 fresh(); o = json.loads(ORACLE.read_bytes()); edit_row(o, "GCF-14", lambda r: r.__setitem__("source_row_sha256", "0" * 64))
-restamp(o); check("G3", suite()[1], ["FMV-ORACLE-013"], row="GCF-14")
+restamp(o); check("G3", suite()[1], ["FMV-ORACLE-013", "FMV-ORACLE-018"], row="GCF-14")
 # G4: flip one byte in the matrix prose (outside blocks and digest lines) -> N3 only. (Not re-stamped.)
 fresh(); b = bytearray(MATRIX.read_bytes()); i = b.index(b"One block per changed row"); b[i] ^= 0x01; MATRIX.write_bytes(bytes(b)); tree_stamp()
 check("G4", suite()[1], ["FMV-ORACLE-009"])
@@ -153,10 +155,13 @@ tree_stamp()
 r = subprocess.run([sys.executable, str(fvp), str(CFD), "--contract", str(CFD / "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json")], capture_output=True, text=True, env=ENV)
 errs = json.loads(r.stdout)["errors"]
 ok = errs == ["PROTECTED_IDENTITIES"]; RES.append(("G10", ok)); print(("OK   " if ok else "BAD  ") + "G10", errs)
-# G11: leave the profile's r1_oracle_sha256 at 52807e58 -> the two candidate wrapper findings.
+# G11: leave the profile's r1_oracle_sha256 at 52807e58 -> the settled four-finding set (spec v2 §E; both round-a1
+# reviewers accepted it): the two candidate wrappers, plus FMV-GCF-CURRENT-001 and FMV-GCF-CURRENT-FIXTURE-001,
+# because under §12 S-5 the default overlay runs the same v4 checks on the same profile.
 fresh(); prof = FVD / "references/gcfpe-20260914.1-091426.1-validation-profile.json"
 sub_all(prof, sha(ORACLE.read_bytes()), "52807e58c4a4659e6c1fc822749f6e50253ad7b01846c833f727ee266ca71d5e"); tree_stamp()
-v, got = suite(True); check("G11", got, ["FMV-GCF-CANDIDATE-CONTRACT-001", "FMV-GCF-CANDIDATE-FIXTURE-PROFILE-001"])
+v, got = suite(True); check("G11", got, ["FMV-GCF-CANDIDATE-CONTRACT-001", "FMV-GCF-CANDIDATE-FIXTURE-PROFILE-001",
+                                        "FMV-GCF-CURRENT-001", "FMV-GCF-CURRENT-FIXTURE-001"])
 print("      G11 evidence:", [g[1][:120] for g in got])
 # G12: link the historical map in change-flow/SKILL.md -> the unapproved reference-file dependency.
 fresh(); p = CFD / "SKILL.md"; s = p.read_text(encoding="utf-8")

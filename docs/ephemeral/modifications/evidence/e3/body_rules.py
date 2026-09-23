@@ -78,6 +78,16 @@ T = {
     "PR35-ROLE": block_after("**PR-35 role** (§12 W-1)"),
     "RS40-ROLE": block_after("**RS-40 role** (§12 W-2"),
 }
+# D23 successor "PR-40 is entered once per merge (D23-E)" (Product Owner 2026-09-23; §10 review round a1, F3):
+# C-DISPATCH gains one sentence, appended. It is read from the decision record, never re-authored here.
+_DR = (Path(__file__).resolve().parents[4] / "prompt_ecosystem_management" / "gcfpe.decision-record.md").read_text(encoding="utf-8")
+_DR = _DR[_DR.index("### Successor, 2026-09-23 — PR-40 is entered once per merge (D23-E)"):]
+_DR = _DR[:_DR.index("\n## ")]
+C_DISPATCH_ONCE = " ".join(line[2:].strip() for line in _DR.split("\n") if line.startswith("> "))
+assert C_DISPATCH_ONCE == ("PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, "
+                           "otherwise the fallback block. Once either has been pasted, the other is void."), C_DISPATCH_ONCE
+assert T["C-DISPATCH"].endswith("No agent merges, and no session is created by an agent.")
+T["C-DISPATCH"] = T["C-DISPATCH"] + " " + C_DISPATCH_ONCE
 # Settled by the plan's author after the first E4 (coordinator, 2026-09-23): the replacement for a
 # "material boundary" routing sentence that precedes C-LAT, where "(as defined above)" would be false.
 T["STEP22-BEFORE"] = "material change (D23-C)"

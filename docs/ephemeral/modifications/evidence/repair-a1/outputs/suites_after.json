@@ -1,0 +1,317 @@
+[
+  {
+    "layer": "live",
+    "name": "fm-default",
+    "exit": 0,
+    "stdout_sha256": "7f7a8780b361fb2c1df4ba6d5419d38853a5adb34fcc2a35737b2dfe58c2dcf5",
+    "stdout_bytes": 69569,
+    "stdout_sha256_rootless": "768e9559988ba056abe06bafec22012b48f79bd5e0948cd8c7bb6b885401894e",
+    "flag": {
+      "verdict": "FLOWMASTER_SUITE_PASS",
+      "suite_ok": true,
+      "self_identity": "OK",
+      "finding_counts": {
+        "ADVISORY": 0,
+        "BLOCKER": 0,
+        "ERROR": 0,
+        "WARNING": 0
+      }
+    }
+  },
+  {
+    "layer": "live",
+    "name": "fm-candidate",
+    "exit": 0,
+    "stdout_sha256": "71dbf0c6cacdfd94ece4db87863f742c8e78159c3696d054e33b4778b00bee77",
+    "stdout_bytes": 125546,
+    "stdout_sha256_rootless": "372ecec89eecbf2818d0433b0ac302fe839a26315b8aa672eb3a215f38391245",
+    "flag": {
+      "verdict": "FLOWMASTER_SUITE_PASS",
+      "suite_ok": true,
+      "self_identity": "OK",
+      "finding_counts": {
+        "ADVISORY": 0,
+        "BLOCKER": 0,
+        "ERROR": 0,
+        "WARNING": 0
+      }
+    }
+  },
+  {
+    "layer": "live",
+    "name": "gcfpe-20260914",
+    "exit": 0,
+    "stdout_sha256": "5c3525636638823e6d2812b74fc486cbf7a596f28fbd3c15a8a0a7362351fd0c",
+    "stdout_bytes": 1056,
+    "stdout_sha256_rootless": "5c3525636638823e6d2812b74fc486cbf7a596f28fbd3c15a8a0a7362351fd0c",
+    "flag": {
+      "ok": true,
+      "errors": []
+    }
+  },
+  {
+    "layer": "live",
+    "name": "gcfpe-20260914-fixtures",
+    "exit": 0,
+    "stdout_sha256": "511abacf82168de9978a87383818eebbb4d2ed80a6a866577aa8f4782b02d7db",
+    "stdout_bytes": 47789,
+    "stdout_sha256_rootless": "511abacf82168de9978a87383818eebbb4d2ed80a6a866577aa8f4782b02d7db",
+    "flag": {
+      "fixture_suite_ok": true,
+      "case_count": 228,
+      "cases": 228,
+      "failed_cases": 0
+    }
+  },
+  {
+    "layer": "live",
+    "name": "gcfpe-current",
+    "exit": 0,
+    "stdout_sha256": "5c3525636638823e6d2812b74fc486cbf7a596f28fbd3c15a8a0a7362351fd0c",
+    "stdout_bytes": 1056,
+    "stdout_sha256_rootless": "5c3525636638823e6d2812b74fc486cbf7a596f28fbd3c15a8a0a7362351fd0c",
+    "flag": {
+      "ok": true,
+      "errors": []
+    }
+  },
+  {
+    "layer": "live",
+    "name": "gcfpe-current-fixtures",
+    "exit": 0,
+    "stdout_sha256": "511abacf82168de9978a87383818eebbb4d2ed80a6a866577aa8f4782b02d7db",
+    "stdout_bytes": 47789,
+    "stdout_sha256_rootless": "511abacf82168de9978a87383818eebbb4d2ed80a6a866577aa8f4782b02d7db",
+    "flag": {
+      "fixture_suite_ok": true,
+      "case_count": 228,
+      "cases": 228,
+      "failed_cases": 0
+    }
+  },
+  {
+    "layer": "live",
+    "name": "change-flow-fixtures",
+    "exit": 0,
+    "stdout_sha256": "f6019dd8ae205cfd252ae8f0fce41084b9bfaa3f0e27d272f1f4f644732f477c",
+    "stdout_bytes": 10184,
+    "stdout_sha256_rootless": "34cfcd3faf12fd3ff97785b1b546158d1cbcf5f3c263a56b9ad6169c749f4358",
+    "flag": {
+      "fixture_suite_ok": true,
+      "total": 32,
+      "passed_expectations": 32
+    }
+  },
+  {
+    "layer": "live",
+    "name": "cf-validator",
+    "exit": 0,
+    "stdout_sha256": "4420dc6b06fc8515e6bdc600416d5782c728967aa8e677c77003ba84bc730722",
+    "stdout_bytes": 76,
+    "stdout_sha256_rootless": "4420dc6b06fc8515e6bdc600416d5782c728967aa8e677c77003ba84bc730722",
+    "flag": {
+      "text_tail": [
+        "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+      ]
+    }
+  },
+  {
+    "layer": "live",
+    "name": "pr-dev",
+    "exit": 0,
+    "stdout_sha256": "73c19b3d2e2eceb955f341f76ec2904f48d9629e10016f70da444c6744cc965a",
+    "stdout_bytes": 56,
+    "stdout_sha256_rootless": "73c19b3d2e2eceb955f341f76ec2904f48d9629e10016f70da444c6744cc965a",
+    "flag": {
+      "text_tail": [
+        "PASS: Glow HDE PR development skill structural contract"
+      ]
+    }
+  },
+  {
+    "layer": "live",
+    "name": "relay-self-test",
+    "exit": 0,
+    "stdout_sha256": "9a9aa3a1bfe975649a2f7f45b44945e5a7910ea0fa6433bb1151766f87661206",
+    "stdout_bytes": 56179,
+    "stdout_sha256_rootless": "9a9aa3a1bfe975649a2f7f45b44945e5a7910ea0fa6433bb1151766f87661206",
+    "flag": {
+      "status": "PASS",
+      "cases": 230,
+      "failed_cases": 0
+    }
+  },
+  {
+    "layer": "live",
+    "name": "amthor-fixtures",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256_rootless": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flag": {
+      "text_tail": [
+        "Ran 34 tests in 0.012s",
+        "",
+        "OK"
+      ]
+    }
+  },
+  {
+    "layer": "live",
+    "name": "amthor-registry",
+    "exit": 0,
+    "stdout_sha256": "c69b9ffdc716dcb2e653a5c83e9eb626020c8ecafcc0d378960256709e2e8d0a",
+    "stdout_bytes": 38,
+    "stdout_sha256_rootless": "c69b9ffdc716dcb2e653a5c83e9eb626020c8ecafcc0d378960256709e2e8d0a",
+    "flag": {
+      "valid": true,
+      "problems": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "strength-middleware",
+    "exit": 0,
+    "stdout_sha256": "be9eee6bf37679a3a72a762a9ddae808d51660c496eacb52f8bcf28391bf4492",
+    "stdout_bytes": 122,
+    "stdout_sha256_rootless": "be9eee6bf37679a3a72a762a9ddae808d51660c496eacb52f8bcf28391bf4492",
+    "flag": {
+      "ok": true,
+      "errors": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "epic-alpha",
+    "exit": 0,
+    "stdout_sha256": "c6500942290a3952fa9cdab2a9fe6c176cbd4519637056ece66337099b7fb728",
+    "stdout_bytes": 66,
+    "stdout_sha256_rootless": "c6500942290a3952fa9cdab2a9fe6c176cbd4519637056ece66337099b7fb728",
+    "flag": {
+      "ok": true,
+      "errors": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "epic-reengineering",
+    "exit": 0,
+    "stdout_sha256": "35cb8ca29bb9204f5a8b20c7b00ec1e441cee53576a5dfc55b6a81f556a1c3ff",
+    "stdout_bytes": 7922,
+    "stdout_sha256_rootless": "35cb8ca29bb9204f5a8b20c7b00ec1e441cee53576a5dfc55b6a81f556a1c3ff",
+    "flag": {
+      "status": "PASS",
+      "errors": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "strength-middleware-fixtures",
+    "exit": 0,
+    "stdout_sha256": "5d36ddb9af8f717e0e1b3172e608e0fc5dd4ad2c4eb48aa363cf9c3195c1488b",
+    "stdout_bytes": 49255,
+    "stdout_sha256_rootless": "5d36ddb9af8f717e0e1b3172e608e0fc5dd4ad2c4eb48aa363cf9c3195c1488b",
+    "flag": {
+      "fixture_suite_ok": true,
+      "passed": 216
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "epic-alpha-fixtures",
+    "exit": 0,
+    "stdout_sha256": "45351a8107c05a605813b0da1ece2317fe3db3d78f1724d49e95212791c53e15",
+    "stdout_bytes": 41317,
+    "stdout_sha256_rootless": "45351a8107c05a605813b0da1ece2317fe3db3d78f1724d49e95212791c53e15",
+    "flag": {
+      "fixture_suite_ok": true,
+      "total": 197,
+      "cases": 197,
+      "failed_cases": 0
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "integrated-readiness",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256_rootless": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flag": {
+      "text_tail": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "pre-guide-correction",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256_rootless": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flag": {
+      "text_tail": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "final-scan",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256_rootless": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flag": {
+      "text_tail": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "alpha-feedback",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256_rootless": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flag": {
+      "text_tail": []
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "integrated-readiness-fixtures",
+    "exit": 0,
+    "stdout_sha256": "326787d04a424a42fbf8921c0e753ad95f49cfd1da7fa598ac5ff254785bcdf7",
+    "stdout_bytes": 9269,
+    "stdout_sha256_rootless": "326787d04a424a42fbf8921c0e753ad95f49cfd1da7fa598ac5ff254785bcdf7",
+    "flag": {
+      "fixture_suite_ok": true,
+      "total": 65,
+      "passed_expectations": 65
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "final-scan-fixtures",
+    "exit": 0,
+    "stdout_sha256": "3439e7e8e30c610131b09faea448a0f936a3a0956a94240915a237e434056d52",
+    "stdout_bytes": 3521,
+    "stdout_sha256_rootless": "3439e7e8e30c610131b09faea448a0f936a3a0956a94240915a237e434056d52",
+    "flag": {
+      "fixture_suite_ok": true,
+      "total": 26,
+      "passed_expectations": 26
+    }
+  },
+  {
+    "layer": "hist",
+    "name": "alpha-feedback-fixtures",
+    "exit": 0,
+    "stdout_sha256": "702d917b1db702f8be4c385abd502f51091d40a5fb167da19ee782d44b3d47de",
+    "stdout_bytes": 6557,
+    "stdout_sha256_rootless": "702d917b1db702f8be4c385abd502f51091d40a5fb167da19ee782d44b3d47de",
+    "flag": {
+      "fixture_suite_ok": true,
+      "total": 38,
+      "cases": 38,
+      "failed_cases": 0
+    }
+  }
+]
