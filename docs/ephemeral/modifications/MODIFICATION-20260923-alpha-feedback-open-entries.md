@@ -696,3 +696,18 @@ Step 46 runs once, after every body, graph and registry step. Step 47 follows st
 - The six out-of-scope defects noted in §A.
 - `session-relay-flowmaster:269` (Drive as artifact plane).
 - Renaming prompt pages.
+
+## §E — Execution
+
+Started 2026-09-23 under Nathan's plan approval ("yes approve").
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| 0 | all | APPLIED | `D23` is at `gcfpe.decision-record.md:1205`, commit `31c9795`; `grep -c '^## D23'` = 1. `D24`, which Nathan made a standing rule later the same day, is at `:1285`, commit `ad457a7`. It is not a plan step, and it changes step 47 (see the amendment) |
+| 1 | PART-01 | VERIFIED | 40 of 40 bodies validated by the shipped validator against the bundled `091426.1` contract. 0 `PROMPT_BODY_GOVERNANCE_STATE` hits and 0 other errors. The set-scoped check `QA_PASS_CLASS_MAP_AND_INTAKES` ran on its three bodies together. Evidence: `docs/ephemeral/modifications/evidence/PART-01-scan.md`, commit `89c6846` |
+| 1a | PART-01 | NOT_APPLICABLE | nothing was found, so no Modification was spawned |
+
+### Parts
+
+- **PART-01 landed whole.** ITEM-01 is VERIFIED: with the 15 bodies confirmed in rounds 28–30, all
+  55 `091426.1` bodies have been checked, and none carries a decorated governance line.
