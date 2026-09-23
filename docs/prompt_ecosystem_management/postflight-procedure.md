@@ -52,9 +52,12 @@ whether an input is labelled optional. None stop the flow, and one of them consu
 ## The corpus constraint binds the method
 
 The **Prompt Corpus Storage and Fidelity Policy** governs how a post-flight is conducted, not only
-what it concludes. The auditor may not write prompt bodies to disk, hash them, compare them
+what it concludes. The auditor may not keep prompt bodies on disk, hash them, compare them
 byte-for-byte, produce an evidence bundle containing body content or body digests, or require a
-complete local corpus.
+complete local corpus. A transient file made in order to read a body is part of the read, under
+the policy's five conditions (`D22`): outside the repository, for that check only, never an
+identity, deleted when done (or left to the harness's teardown where the session may not delete
+it), and disclosed.
 
 **If a procedure the auditor is told to follow conflicts with this, that procedure is defective:
 report it and stop. Do not work around it.**

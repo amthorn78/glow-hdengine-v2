@@ -1,13 +1,19 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-21
+revised_date: 2026-09-23 — D22, a transient tool file is part of a read
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Prompt Corpus Storage and Fidelity Policy — NON-NEGOTIABLE — 2026-09-21*
 ---
 
 # Prompt Corpus Storage and Fidelity Policy
+
+> **Amended 2026-09-23 by `D22`.** The directive below is preserved as issued. Where it reads as
+> forbidding every byte of a body on disk, see *Amendment — transient files are part of a read*
+> at the end of this document: a file the tooling makes in order to read a body is allowed
+> under five conditions. Everything else the directive prohibits stays prohibited.
 
 The Product Owner's policy, recorded verbatim, with what it invalidated on the day it was issued.
 **It is permanent unless Nathan explicitly changes it.** Where any procedure, skill, validator or
@@ -46,12 +52,12 @@ separately and in the plainest terms available:
 
 | | |
 |---|---|
-| **Prohibited, absolutely** | persisting, mirroring, exporting, hashing, byte-comparing, backing up, or accumulating prompt bodies anywhere outside Notion |
+| **Prohibited** | persisting, mirroring, exporting, hashing, byte-comparing, backing up, or accumulating prompt bodies anywhere outside Notion. A transient file made in order to read a body is part of the read, not persistence, under the five conditions in the amendment below (`D22`) |
 | **Not restricted at all** | reading prompts. One, three, all fifty-five. As many as the work needs, as often as the work needs |
 
 **There is no cap on how many prompts a session may read.** A whole-corpus read is a cost
 decision, never a permission question. If a session needs to read every prompt to do the work,
-it reads every prompt — into context, and not onto disk.
+it reads every prompt — into context, never into a store.
 
 ### The misreading this exists to prevent
 
@@ -63,8 +69,8 @@ the hole. The policy required no such thing.
 
 **Keep the two apart:**
 
-- **This policy governs storage.** It is absolute, it has no exceptions, and it says nothing about
-  how much may be read.
+- **This policy governs storage.** Its one exception is the transient read file in the amendment
+  below, and it says nothing about how much may be read.
 - **Source-read minimalism governs method and cost.** It is subordinate to the work. It never
   forbids a read, and "this would be expensive" is never "this is not allowed."
 
@@ -78,3 +84,34 @@ reading. Neither of them makes reading a prompt a thing that needs authorising.
 **The accumulation clause is not theoretical.** The session that received this policy was holding **8.37 MB of prompt-body copies across four scratch locations** — one deliberate 55-file corpus and three falsification trees that had each silently carried a full copy. All deleted on receipt. Nobody decided to build a corpus mirror; it arrived by copying a working tree three times.
 ## The standing test
 Before proposing any check, ask what it would catch that matters. A byte-identity check on a Notion page catches a transcription slip in a copy that should not exist. **Prompt meaning, structure, routing, dependencies and operational behaviour are what the ecosystem runs on**, and every one of them is assessable by reading the page.
+
+## Amendment — transient files are part of a read (`D22`, 2026-09-23)
+
+**Product Owner, 2026-09-23:** *"allow save to disk, and re-write the rule where needed so it is
+rationally conditional and not automatic."*
+
+**The test is what a file is for, not where the bytes happen to sit.** The directive's target is
+a parallel corpus, meaning something that can drift from Notion and then be believed. A file the
+tooling makes because that is how it delivers or consumes the body is not that. For example, the
+harness saves any tool result above roughly 30 KB to a session file, and thirteen bodies are over
+that size. A scratch file can also feed `--bodies-stdin`.
+
+**Allowed, when all five hold:**
+
+1. **Outside the repository**, and outside any shared, synced or uploaded store.
+2. **For the read or check in hand only.** It is never a source for later work; the next read
+   goes back to Notion.
+3. **Never an identity.** Not hashed, not byte-compared, not cited as the body.
+4. **Deleted** when that read or check is done, and at the latest when the task ends. Where the
+   harness does not let the session delete a file in its own session store, the file is left to
+   the harness's teardown and never read again.
+5. **Disclosed** in the session's report: which bodies, and that the files were deleted.
+
+**Still prohibited, without exception:** mirrors, exports, snapshots, backups, a cache reused
+across tasks or sessions, a committed or uploaded body, accumulation into a corpus, body hashes
+or byte comparison, and any procedure that requires a local corpus before work can proceed.
+
+**What this does not change.** Reading remains unrestricted. Byte fidelity remains the wrong
+standard for this ecosystem (*The standing test*, above). The validator keeps `--bodies-stdin` and
+gains no path option, because a path option invites a standing directory.
+
