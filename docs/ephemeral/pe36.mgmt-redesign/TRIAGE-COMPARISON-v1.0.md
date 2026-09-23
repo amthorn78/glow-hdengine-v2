@@ -4,7 +4,7 @@ artifact_version: "1.0"
 created_date: 2026-09-22
 session: PE36
 stage: 4 — first real use, intake step
-status: TEST_COMPLETE_FINDINGS_RECORDED
+status: RESULTS_INVALIDATED_PROMPT_FIXED_RERUN_PENDING
 authority: Product Owner instruction, 2026-09-22 — "why not run two subagents and compare"
 prompt_under_test: "Modification Intake and Triage — PROPOSED (D20 redesign)", Notion 3e34590a05eb81bfbf1ed0651e6b6ddf, as it stood before the 2026-09-22 handoff edit recorded in §7
 repository_state: main @ db36a8c, one git worktree per run
@@ -120,7 +120,7 @@ Both runs found both of these, independently.
    decided. Both runs removed it by hand. The template now ships it empty. The validator already
    requires it beyond INTAKE, so an undecided coupling cannot pass ANALYZE.
 
-## 6. Gaps in the triage prompt — not yet fixed, awaiting the Product Owner
+## 6. Gaps in the triage prompt — found here, fixed 2026-09-23 (§9)
 
 | # | gap | how it showed | proposed fix |
 |---|---|---|---|
@@ -169,3 +169,21 @@ do not depend on them, and a rerun from the corrected prompt can regenerate them
 The stray remote branch `docs/20260922-pe36-stage1-modification-format` matches the intake-branch
 pattern, so every triage run will find it and read it. It holds no Modification files. Only the
 Product Owner can delete it.
+
+## 9. Disposition — 2026-09-23
+
+- **Product Owner ruling: "if the triage prompt is invalid, the results are invalid."** Both runs'
+  drafts are discarded unused, and their worktrees removed. Only this record's findings carry
+  forward.
+- **G1–G6 are fixed.** The triage prompt was revised in Notion and read back. The template and
+  the validator changed in this pull request:
+  - a triage draft must now carry its proposed coupling, an `## Intake` section giving the reason,
+    and an `intake_record` that exists beside it and lists it;
+  - each of those four requirements has a must-fail regression;
+  - the selftest validates both shipped templates, the Modification and the intake record,
+    against each other. 28/28 pass.
+- **Shared skill packaging is approved** — "Yes if that is efficient and logical." Modifications
+  that change the same skill share one package, one review and one install. It is template rule 6,
+  and the MGMT-10 draft's `ANALYZE` and `PLAN` now refer to it; both edits were read back.
+- **Next:** the triage is rerun on the corrected prompt as two independent runs again, so the
+  comparison also shows whether G1's fix removes the AF-011 disagreement.

@@ -797,6 +797,12 @@ are already true. Both found the same two tooling defects, now fixed. Full recor
 same day, the triage handoff carries no branch and no commit, and the MGMT-10 draft finds a
 Modification by its id: on `main`, then on every open intake branch.
 
+**2026-09-23.** The Product Owner ruled the runs' results invalid, because the prompt that produced
+them was. The six gaps are fixed — everything triage concludes now goes in files, enforced by the
+validator — and the triage is rerun. Also approved: **Modifications that change the same skill
+share one package, one review and one install** (template rule 6). This answers the cost both runs
+flagged: three Modifications touching one skill would otherwise pay for three review rounds.
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage
