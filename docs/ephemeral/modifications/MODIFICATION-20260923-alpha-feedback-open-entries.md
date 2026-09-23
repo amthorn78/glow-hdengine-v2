@@ -1,19 +1,19 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-alpha-feedback-open-entries
-status: INTAKE
-targets: []
-gate_tier:
+status: ANALYZED
+targets: [prompt, skill, rule, graph, registry, notion_control]
+gate_tier: 2
 closure:
-  upstream: []
-  downstream: []
-  state_sharers: []
-readiness:
+  upstream: [DOC-10, DOC-20, ESC-40, GCFPE-MGMT-10, IA-30, MGR-10, OPS-20, PR-10, PR-20, PR-30, PR-35, PR-40, QA-20, RS-10, RS-20, RS-30, RS-40]
+  downstream: [DOC-10, ESC-25, ESC-30, OPS-10, PR-10, PR-20, PR-30, PR-35, QA-10, QA-20, RS-10, RS-20, RS-30, RS-40]
+  state_sharers: "closure.py over PR-10 PR-20 PR-30 PR-35 PR-40 RS-10 RS-20 DOC-20 OPS-30 QA-10, pasted in §A; the Tier 2 parts take the release-wide gate instead"
+readiness: NEEDS_RULING
 override:
   by: ""
   overrides: []
   reason: ""
-interaction_cost_predicted:
+interaction_cost_predicted: 9
 interaction_cost_actual:
 items:
   - id: ITEM-01
@@ -84,67 +84,67 @@ parts:
   - id: PART-01
     name: "Scan the 40 unread bodies for a decorated governance line, and repair what it finds"
     items: [ITEM-01]
-    class:
+    class: B
     after: []
   - id: PART-02
     name: "Say the Notion read-only default the same way everywhere"
     items: [ITEM-03]
-    class:
+    class: B
     after: []
   - id: PART-03
     name: "Every result lives in its output artifact"
     items: [ITEM-07]
-    class:
+    class: A
     after: []
   - id: PART-04
     name: "A handoff carries only what the receiver cannot find elsewhere"
     items: [ITEM-04, ITEM-08]
-    class:
+    class: A
     after: [PART-03]
   - id: PART-05
     name: "The handoff block is visible, not buried"
     items: [ITEM-06]
-    class:
+    class: A
     after: []
   - id: PART-06
     name: "Implementation reports record in-flight decisions"
     items: [ITEM-12]
-    class:
+    class: A
     after: []
   - id: PART-07
     name: "Implementation latitude and the rescope boundary"
     items: [ITEM-09, ITEM-10, ITEM-11]
-    class:
+    class: A
     after: [PART-06]
   - id: PART-08
     name: "PR-35 alone handles review findings and CI"
     items: [ITEM-14]
-    class:
+    class: B
     after: []
   - id: PART-09
     name: "PR-35 in its own session"
     items: [ITEM-15]
-    class:
+    class: A
     after: [PART-08]
   - id: PART-10
     name: "The PR-35 session subscribes to its PR"
     items: [ITEM-17]
-    class:
+    class: A
     after: []
   - id: PART-11
     name: "Automatic PR-40 dispatch after merge"
     items: [ITEM-18]
-    class:
+    class: A
     after: []
   - id: PART-12
     name: "Version bump instead of a sibling for unchanged prompts"
     items: [ITEM-19]
-    class:
+    class: A
     after: []
   - id: PART-13
     name: "flowmaster-validate states the D22 corpus rule"
     items: [ITEM-20]
-    class:
+    class: B
     after: []
 request: |
   Run the open Alpha Feedback items through triage: AF-004, AF-006, AF-008, AF-009 (it now includes AF-010's merged scope), AF-011, AF-012.
@@ -334,3 +334,186 @@ touches both.
   because the other parts can land under today's release mechanism.
 - **PART-03 and PART-06** both change what `PR_IMPLEMENTATION_RESULT` carries: every result, and
   the in-flight decisions.
+
+## §A — Analysis
+
+Written 2026-09-23 by `MODE = ANALYZE`, running the proposed `GCFPE-MGMT-10` body (Notion
+`3e34590a05eb811b93d2da9b4ef8106d`) in the same session as triage, against `main` @ `a63bf80`.
+
+**What changed after intake, in this mode.** Four things:
+
+- **ITEM-20 / PART-13 were added** on Nathan's instruction. `flowmaster-validate` still states the old
+  corpus rule, and `D22` changed it.
+- **Two of the intake tensions are settled by Nathan:**
+  - A future handoff does **not** restate the Notion read-only default. It is enough that no handoff
+    directs a routine Notion write (PART-02 against PART-04).
+  - The stale Flow Index Alpha-state record is out of this run.
+- **`D22` was ruled mid-analysis** (PR #475). Without it, 13 bodies over the harness's ~30 KB
+  save threshold could not be read.
+- **Two harness behaviours were found:**
+  - The harness saves any large fetch to a session file.
+  - It refuses a session's `rm` on that file.
+
+### Scope, and how it was measured
+
+**Method: broad match minus permitted exceptions, over every body, never over a phrase list.**
+
+**Who read the bodies.** All 55 `091426.1` bodies were read from Notion:
+- 42 small bodies by four workers, 11 bodies each, all read inline;
+- 13 large bodies by two workers under `D22`.
+
+**What each worker did.**
+- It applied one broad probe per part to every line. For example, every line containing "Notion", and
+  every line containing "rescope|RS-10|RS-20|material|in-scope|boundary".
+- It subtracted the stated exceptions: read and navigation lines, and verbatim boilerplate counted
+  separately.
+- It returned the survivors with excerpts, and any in-scope line its instructions did not cover.
+
+The skills, graph parts, registry and the bundled contract were measured by `grep` in this session.
+
+**One limit.** `QA-10` was read in one pass, with lines cut at 400 characters. Its figures are lower
+bounds, and three long lines of its handoff and result sections were seen only in part.
+
+| part | measured reach | method note |
+|---|---|---|
+| PART-01 | **40 bodies**, named: the 55 minus the 15 read in rounds 28–30 (`REPORT-r30-CORRECTIONS.md:155-157`). 11 of the 40 are over the save threshold | exact set, not a probe |
+| PART-02 | **Bodies:** 8 with a live Notion-as-state line — "Concise authorized operational state and pointers remain `CONTROL_NOTION`" in `PR-10`, `PR-20`, `PR-30`, `PR-40`, `OPS-10`, `OPS-20`, `OPS-30`, plus `QA-10` "Notion and repository persistence" (6 lines). 10 more (`CF-*`×8, `CF-PO-10`, `MGR-10`) allow "a direct Notion URL for a Notion-resident artifact" in their handoff rule. **Skill:** `session-relay-flowmaster:268` and its `CONTROL_PLANE: NOTION` field (`:353`). **Notion:** the Change Flow Overview's Alpha Test 1 tracking block. **0 bodies** tell a session to create a Notion page, status, log or handoff record | "Notion" lines minus identity, URL, navigation and "prompt bodies live in Notion" |
+| PART-03 | **53 bodies**, every nonterminal one, and each hands facts forward in its handoff. Test results must land in the artifact in only 3 bodies (`QA-100`, `QA-120`, `RS-40`). `PR-30`'s `PR_IMPLEMENTATION_RESULT` names "local tests" but not their outcome. The Hub worker standard allows "the handoff or the artifact" | output-artifact and result sections, per body |
+| PART-04 | **53 handoff field lists, in about seven wording variants**, plus `handoff_contract.required` (`docs/graph/parts/global.json:358-365`), `contract:17615`, `glow-hde-pr-development:22`, `:82`, `:162`, `change-flow:295`, `:313`, and the Hub 16-section maintenance standard. **Branch or commit** is required in 2 bodies (`PR-35`: worktree, branch, PR, head; `PR-30`, step 6) and conditional in 2 (`IA-10`, `IA-20`). It is otherwise absent from bodies and present in the skill and reviewer surfaces. `GCFPE-MGMT-10` (live) has no handoff rule; `D20` replaces it | handoff-rule section, per body |
+| PART-05 | **55 bodies** have no rule on how much text surrounds the block. **16** say "contain" rather than "end with" (`CF-*`×8, `CF-PO-10`, `MGR-10`, `PR-35`, `CL-20`, `CL-30`, `CL-40`, `CL-C-10`, `CL-E-10`). **4** also require the result to "end `ASK OK?`" (`QA-60`, `QA-80`, `RS-10`, `RS-30`), so the final position contradicts itself | placement and length wording |
+| PART-06 | `PR-30`, `PR-35`, `RS-40` (`PR_IMPLEMENTATION_RESULT`), and `glow-hde-pr-development:59`. No body requires in-flight design decisions in a result | result-content sections |
+| PART-07 | **About 20 bodies** carry a rescope or escalation threshold, and **"material" is defined in none of the 55.** Graph predicates: `PR-10.json:157`, `PR-20.json:157`, `OPS-30.json:175`. Skills: `glow-hde-pr-development:65`, `:128`, `:135`; `change-flow:313`, `:323`, `:453`, `:454`. PR-20 enters RS-10 before Proceed, and PR-30 goes straight to RS-20 after Proceed. That asymmetry is deliberate (`global.json:487-505`) | rescope and boundary lines minus routing-only mechanics |
+| PART-08 | `registry:3531` (PR-30 "review-correct"); `glow-hde-pr-development:74-79`; `PR-40`'s `REJECT` → PR-30 route (body, `PR-40.json:165`, `contract:15734`). **`PR-30`'s own body already agrees with AF-011**: "PR-35—not PR-30—owns review retrieval and correction" | review-assignment lines in `PR-30` and `PR-40` |
+| PART-09 | **About 17 bodies** state PR-30 and PR-35 as one dedicated session (the shared continuity list, plus the `CL`×5 merge block). Also: `pr_continuity_contract` (`global.json:472-526`); `PR-35.json:190`; registry `:3604-3611`, `:3633`, `:5108`; `glow-hde-pr-development` description, `:53`, `:55`, validator and behaviour cases; `change-flow:301-307`, `:365`; `session-relay-flowmaster:283`; the register and Flow Index wording; and **the R1 oracle row GCF-17**, which pins "Exactly the GCF-14 planning session" | "same session", "dedicated", "PR-35" lines |
+| PART-10 | `PR-35`, `RS-40` (the PR-35 phase), `glow-hde-pr-development:112`, `:121`. "subscribe" has **0** hits across all 55 bodies and every skill | exact term |
+| PART-11 | `global.json:33-43`, `:299-307`, `:447-471`; `PR-35.json:21`; `RS-40`'s `MERGE_PENDING` route; `DOC-20.json:151`, `:169`; registry `:3710`; `glow-hde-pr-development:110`, `:164`; `change-flow:331`, `:366`; `session-relay-flowmaster:283-285`; the bundled contract. **No merge-observing mechanism exists, and polling for the merge is prohibited** | edges into `PR-40` and no-polling rules |
+| PART-12 | **55 bodies × 5 header lines** (title, `Prompt Version:`, `Set:`, `Ecosystem release:`, URL title); registry `required_regex` on 55 rows (`registry:240`); `candidate_version` in 55 graph parts; `contract:3095`; the Alpha checklist; the register and catalog. **Not measured:** the TW prompt ecosystem and the PE Metaprompt, both named by the item's "across all prompt ecosystems". The `CL-*` "complete sibling" save rules concern artifact successors, not prompt siblings (`NAME-001`), and are excluded | header lines; `sibling` 0 hits in bodies |
+| PART-13 | `flowmaster-validate/SKILL.md:55-60`, `:231-232` ("a file persists, and a persisted corpus is what the policy forbids") | exact term |
+
+### Per part: closure, tier, class and targets
+
+Closure is `closure.py` over the graph parts. **It counts prompt-to-prompt edges only.** Two
+consequences for this Modification:
+- `PR-35 → PR-40` is a boundary edge (`NATHAN_MANUAL_MERGE_ASSERTION`), so `PR-40` shows one
+  upstream, `DOC-20`. PART-11 would turn that boundary into a prompt edge and grow both radii.
+- A skill target has no graph part, so its closure is undefined rather than empty.
+
+```
+PR-10   upstream 3  GCFPE-MGMT-10, IA-30, PR-40      downstream 3  PR-10, PR-20, RS-10              sharers 19  radius 24
+PR-20   upstream 2  DOC-10, PR-10                    downstream 2  PR-20, RS-10                     sharers 19  radius 21
+PR-30   upstream 4  ESC-40, PR-40, RS-20, RS-40      downstream 3  PR-30, PR-35, RS-20              sharers 3   radius 7
+PR-35   upstream 4  ESC-40, PR-30, RS-20, RS-40      downstream 2  PR-35, RS-20                     sharers 3   radius 6
+PR-40   upstream 1  DOC-20                           downstream 3  PR-10, PR-30, RS-10              sharers 6   radius 9
+RS-10   upstream 8  DOC-10 DOC-20 OPS-10 OPS-20 OPS-30 PR-10 PR-20 PR-40   downstream 1  RS-20       sharers 1   radius 10
+RS-20   upstream 5  PR-30, PR-35, RS-10, RS-30, RS-40  downstream 4  PR-30, PR-35, RS-30, RS-40     sharers 4   radius 9
+DOC-20  upstream 0                                   downstream 4  DOC-10, PR-40, QA-10, RS-10      sharers 23  radius 25
+OPS-30  upstream 1  OPS-20                           downstream 3  ESC-25, OPS-10, RS-10            sharers 4   radius 8
+QA-10   upstream 3  DOC-20, MGR-10, QA-20            downstream 2  ESC-30, QA-20                    sharers 0   radius 4
+```
+
+| part | class | tier | targets | why |
+|---|---|---|---|---|
+| PART-01 | **B** — applies `prompt-body-content-policy.md` | 0 for the scan | prompt (read), skill only on a false positive | a scan changes nothing; a repair is discovered scope (below) |
+| PART-02 | **B** — applies the 2026-09-22 Notion policy | 2 | skill, prompt (18 bodies), Notion control | one rule over many prompts; changes what agents do with state, not routing |
+| PART-03 | **A** — a new rule: no fact lives only in a handoff | 2 | prompt (53), skill, rule, Notion control (Hub standard) | changes what prompts produce |
+| PART-04 | **A** — reverses the "complete, self-contained handoff" rule | 2 | graph (`handoff_contract`), prompt (53), skill, registry, rule | the graph part moves; one rule over the corpus |
+| PART-05 | **A or B — genuinely ambiguous.** B if it only extends the existing length rule (`glow-po-reporting:52`) to lifecycle returns; A if it sets a new placement rule. I recommend treating it as A, because the 4 `ASK OK?` contradictions need a ruling on which comes last | 2 | prompt (~20), skill | reaches many prompts |
+| PART-06 | **A** — new required content in `PR_IMPLEMENTATION_RESULT` | 1 | prompt (3), skill | changes what 3 prompts produce |
+| PART-07 | **A** — reverses the work-unit rescope threshold | 2 | graph (3 predicates), prompt (~20), skill, rule | reaches many prompts; graph parts move |
+| PART-08 | **B** — `PR-30`'s body, `D13` and the skill (`:53`) already give review to PR-35; three surfaces lag | 1 | registry, skill, graph (`PR-40` route), prompt (`PR-40`) | the `PR-40` part moves; radius 9 |
+| PART-09 | **A** — reverses a deliberate contract and an R1 row | 2 | graph, prompt (~17), registry, skill (+ validator, R1 oracle), Notion control (register/Flow Index wording), rule | corpus-wide, and protected identity |
+| PART-10 | **A** — new behaviour | 1 | prompt (`PR-35`, `RS-40`), skill | may change `REMOTE_EVIDENCE_PENDING` routing |
+| PART-11 | **A** — reverses `direct_PR35_to_PR40_automatic_edge: false` | 1 | graph, prompt (`PR-35`, `RS-40`, `PR-40`, `DOC-20`), registry, skill | a boundary becomes an edge; the radius is the union of `PR-35` and `PR-40` |
+| PART-12 | **A** — changes the release procedure and a binding convention | 2 | prompt (55), registry (55 rows), graph (55), Notion control (register, catalog, checklist), rule | every member |
+| PART-13 | **B** — applies `D22` | 0 | skill | no graph part |
+
+**Modification tier: 2.** Parts 02, 03, 04, 05, 07, 09 and 12 are corpus-wide, so this run takes the
+release-wide gate once. It must not be paid per part.
+
+### Contradictions and risks
+
+- **The PR-lane parts collide in one skill.** PART-03, 04, 05, 06, 07, 08, 09, 10 and 11 all change
+  `glow-hde-pr-development`, and PART-09 changes its **description**, which is the trigger surface
+  (`AF-003`). One package, one review and one install, under rule 7. A review that rejects one part's
+  edit blocks that part only.
+- **PART-09 touches a protected identity.** R1 row GCF-17 is pinned by `flowmaster-validate`'s R1
+  oracle (`global.json:551-557`). Separating PR-35 fails the suite until the oracle is re-pinned.
+- **PART-11 has no mechanism to build on.** Watching for the merge is prohibited
+  (`glow-hde-pr-development:110`; `session-relay-flowmaster:283`, `:285`). Nothing in the flow can
+  launch or message a session without the operator (`session-relay-flowmaster:713`;
+  `execution-and-delegation-model.md:137-139`). The subscription PART-10 adds is the only PR-observing
+  mechanism named, so PART-11 depends on PART-10 if it uses it.
+- **PART-04 and PART-09 together** leave a separate PR-35 session locating its PR by the PR reference
+  or an artifact alone. `ITEM-16` must survive that.
+- **"material" is undefined in all 55 bodies.** PART-07 is where it gets defined. Every other threshold
+  keeps the undefined word until then.
+- **`D22` has no guard** (`GUARD-001`), and its own entry says so.
+- **Defect classes matched:**
+  - `DERIV-001`: a handoff restating what the named artifact holds (PART-03, 04).
+  - `FUNC-001` risk: PART-09 retires "same session" by function, so the sweep must test what an agent
+    is told to do, not the phrase.
+  - `NAME-001`: artifact "siblings" in `CL-*` are not prompt siblings (PART-12).
+  - `SCOPE-001`: avoided above.
+- **Noticed, outside this Modification's scope** — each is a candidate for a separate Modification,
+  not for widening this one:
+  - `QA-10` calls itself read-only and also saves three artifacts;
+  - `CL-40` updates a "Candidate CRD Items List" in place without naming its store;
+  - `CL-20` directs a board update with no destination;
+  - `OPS-10` and `OPS-20` forbid page mentions yet carry and require them;
+  - four `CL-*` bodies cite a "PR-40 merge-approval effect … defined above" that is not defined;
+  - `change-flow:559` loads the 091326.2 contract as current.
+
+### Open questions for the Product Owner
+
+Three. Each blocks only its own part.
+
+1. **PART-09 — re-pin R1 row GCF-17?** A separate PR-35 session changes an immutable R1 row and its
+   pinned oracle. **Recommend yes.** The re-pin rides in the same `flowmaster-validate` package.
+2. **PART-11 — what starts PR-40, and what stands in for your merge assertion?** Today your paste of
+   the conditional PR-40 block is both the trigger and the assertion. **Recommend:**
+   - the PR-35 session, subscribed under PART-10, observes the merge event on its PR and emits the
+     PR-40 handoff itself;
+   - PR-40 keeps its independent merge verification (event 3), so the observed event replaces the
+     assertion and nothing is inferred;
+   - dispatch stays a paste, or a session launch where the surface supports one.
+
+   This makes PART-11 **after PART-10**.
+3. **PART-12 — where does the version live, and how far does it reach?** **Recommend:**
+   - the register and catalog carry membership and version, and bodies drop the release-bound
+     header lines (`prompt-body-content-policy.md:113-114`: governance state belongs to its governing
+     artifact);
+   - `D11`'s `required_regex` moves to the register;
+   - PART-12 is limited to GCFPE in this run, because the TW ecosystem and the PE Metaprompt are
+     unmeasured.
+
+Settled by approving this analysis, as recommended:
+- PART-02 leaves `D18`'s Flow Index block alone. It is a maintenance destination, and AF-006 governs
+  lifecycle sessions.
+- PART-07 is the PR lane, and the ESC remediation lane keeps its own threshold.
+- PART-04 reaches the Hub's maintenance-session handoff standard but not the skill-reviewer prompt,
+  which `skill-packaging-and-delivery.md` governs.
+- The Class A parts are recorded as one `D23` before execution.
+
+### Readiness and interaction cost
+
+**`NEEDS_RULING`**, with two splits recommended. Readiness is advice and never refuses.
+
+- **Sequential discovery — PART-01's repair.** Whether any repair exists is unknown until the scan
+  runs. PART-01 executes the scan here. A leftover or false positive becomes a new Modification with
+  `spawned_from` set.
+- **Unmeasured scope — PART-12 outside GCFPE.** TW and the PE Metaprompt were not measured. Narrow
+  PART-12 to GCFPE, or measure them before PLAN.
+
+```
+interaction_cost = open rulings 3 + 2 + review cycles 1 + installs 1 + merges 2  =  9
+```
+
+- **Review cycles and installs:** one package set, one §10 review and one install for
+  `glow-hde-pr-development`, `change-flow`, `flowmaster-validate` and `session-relay-flowmaster`.
+- **Merges:** #474, which holds this record, and the execution PR. #475 (`D22`) is separate and
+  already open.
+- **What a split would cost.** Moving PART-09, 11 and 12 to a separate run removes the three rulings
+  from this run's path. But PART-09 and PART-11 change the same skill as six other parts, so a second
+  run would pay its own review, install and merge: **+3**, to save nothing that parts do not already
+  isolate. **Keep them together.** A part waiting on a ruling does not hold the others, and PLAN can
+  start on the ten that need none.
