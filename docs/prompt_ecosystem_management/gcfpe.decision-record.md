@@ -1351,6 +1351,25 @@ every main-ecosystem row against running a prompt as a subagent or creating a se
 so that it does not forbid workers. PR-20's and PR-40's roles are unchanged: body-level C-TOP and its
 guards carry the rule for them.
 
+### Successor, 2026-09-23 — Amendment 1 approved
+
+**Product Owner, 2026-09-23:** *"yes"*, approving Amendment 1 of
+`MODIFICATION-20260923-alpha-feedback-open-entries` as written, with the follow-up's plan. That
+approval also covers his reading of the A1-7 routing diff: `fecc319bdd4ce7ee6201cb77d7231861`, 284
+rows, 229 edges.
+
+**What it adds to D23:**
+- **D23-D and D23-F.** The R1 oracle gets a successor, not an in-place edit. Three rows change:
+  GCF-17, GCF-17.LINEAGE and GCF-14 (A1-1).
+- **D23-E.** The observed-merge route is `MERGE_OBSERVED`, from PR-35 and from RS-40, handed to
+  PR-40 by paste. The parenthetical above is corrected: `direct_PR35_to_PR40_automatic_edge` stays
+  `false`, and the new edges are recorded in `observed_merge_edges`. Nathan's merge assertion stays
+  as the fallback, only where no `MERGE_OBSERVED` result was returned for the merge (A1-5).
+- **D23-G.** 091426.1's bodies are edited in place, and their release header lines go now. C-VERSION's
+  successor-page rule applies from the next release (A1-3).
+- **The rule on subagents and session creation.** It is carried into every main-ecosystem body by
+  C-TOP (A1-8).
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill

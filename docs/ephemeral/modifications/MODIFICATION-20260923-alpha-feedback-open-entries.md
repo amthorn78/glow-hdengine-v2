@@ -1,7 +1,7 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-alpha-feedback-open-entries
-status: PLANNED
+status: EXECUTING
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 2
 closure:
@@ -153,10 +153,11 @@ request: |
 requested_by: Nathan
 analyze_approved_by: Nathan
 analyze_approved_date: 2026-09-23
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: Nathan
+plan_approved_date: 2026-09-23
 plan_approval_history:
   - "Nathan, 2026-09-23: original §P approved; steps 0-1 executed under it (§E). Cleared when Amendment 1 returned the plan for approval."
+  - "Nathan, 2026-09-23: Amendment 1 approved as written ('yes'), with its eight rulings and the A1-7 routing diff read."
 supersedes: ""
 spawned_from: ""
 shares_package_with: [MODIFICATION-20260923-pr40-reject-replans]
