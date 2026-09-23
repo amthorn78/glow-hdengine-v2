@@ -1202,6 +1202,14 @@ can delete it; otherwise left to the harness's teardown and never read again. Ev
 ruling stands. The first files left this way were two for `PR-10` and two for `OPS-30`, disclosed in
 the 2026-09-23 ANALYZE record for `MODIFICATION-20260923-alpha-feedback-open-entries`.
 
+### Status, 2026-09-23 — still unguarded after the first change that touched a validator
+
+`MODIFICATION-20260923-alpha-feedback-open-entries` changed validators and skills, which is the
+trigger named above. Its only `D22` work was `ITEM-20`: `flowmaster-validate` now gives D22's reason
+in its `SKILL.md` and in two script comments. No check pins that wording, and nothing fires when a
+session keeps a body on disk. The guard is still owed, now to the next change that touches a
+validator or skill (`GUARD-001`). Until then, this ruling is applied but not guarded.
+
 ## D23 — The Alpha Feedback rule changes: artifacts hold results, handoffs are short, implementors have latitude, PR-35 has its own session, releases stop copying unchanged prompts
 
 **Product Owner, 2026-09-23.** He approved the analysis of
