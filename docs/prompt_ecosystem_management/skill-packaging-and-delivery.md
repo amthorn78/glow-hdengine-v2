@@ -1,7 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-21
+revised_date: 2026-09-23 — D24, the review is run by reviewer subagents
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Skill packaging and installation — 2026-09-20* and *Delivered artifacts must be identifiable from their filename — 2026-09-21*
@@ -38,14 +39,14 @@ python3 -m scripts.package_skill <path/to/skill-folder> <output-dir>
 ```
 Expect `Skill is valid!` then `✅ Successfully packaged skill to: <output-dir>/<name>.skill`. The packager automatically excludes `__pycache__`, `node_modules`, `*.pyc`, `.DS_Store`, and a root-level `evals/`.
 **4. Verify by installing it yourself — do not skip this.** Extract the `.skill` into a clean directory, add back any untouched sibling skills the tooling needs to resolve, and run that skill's own gates **from the extracted contents**, not from the working copy. This is what catches a reference file dropped during packaging. Confirm `name:` survived and the intended change is present.
-**5. Deliver** the `.skill` file(s) with `SendUserFile`, and state what changed, where each file installs, and what Nathan should see after installing.
+**5. Review, then deliver.** Run the independent review with reviewer subagents (`D24`, below). Only once both reviewers confirm, deliver the `.skill` file(s) with `SendUserFile`, captioned with each digest, together with the verdict files, and state what changed, where each file installs, and what Nathan should see after installing.
 ### Reading a validator's result
 Read each tool's **own top-level flag** by name — `ok`, `fixture_suite_ok`, `suite_ok`/`verdict`, and the suite result. A green subsidiary section flag while the overall flag is false is meaningless, and a green section count (for example "33/33 passed") next to `fixture_suite_ok: false` means the suite failed.
 ### Independent validation is mandatory — for every skill change, not only GCFPE
 Standing rule, Product Owner direction 2026-09-21: **no skill change is trusted until a party that did not author it has validated it.** The author's own gates passing is necessary and never sufficient — an author validates what they thought they built.
-**Independent means a different session or reviewer**, one that did not write the change, working from the package and the repository rather than from the author's summary. Its finding is what makes a package installable-with-confidence; a green run by the author alone is corroboration.
+**Independent means a party that did not write the change**, working from the package and the repository rather than from the author's summary. Since `D24` (2026-09-23) that party is **two reviewer subagents the authoring session spawns**. Each has a fresh context and none of the authoring conversation — never a forked or context-inheriting agent. Each is briefed only by the filled template, committed before it is spawned, and writes its verdict to its own record file, which the author never edits. A package is approved only when both reviewers confirm it against the same digests. Its finding is what makes a package installable-with-confidence; a green run by the author alone is corroboration.
 **A verdict is scoped to exact bytes, and does not carry.** Bind every confirmation to the `.skill` digests it was issued against. If any byte changes afterwards — a one-line fixture rename included — the confirmation is void for the new bytes and the change needs its own pass. This is the rule that keeps "we already reviewed that skill" from covering something nobody reviewed.
-**Every handover includes a paste-ready reviewer prompt.** Standing rule, Product Owner direction 2026-09-21: a `.skill` delivered without one is an incomplete handover. Nathan is the courier between the worker session and the reviewer, and he should never have to compose the brief himself or reconstruct it from the report. The prompt is delivered in the same message as the package, in a single copyable block.
+**Every review has a complete brief, on record before the review starts.** It is the filled `reviewer-prompt-template.md`, committed under `docs/ephemeral/` before the reviewer subagents are spawned (`D24`). Nathan is no longer the courier. He receives the approved packages with their digests, the brief and both verdict files, and installs. A delivery missing any of those is incomplete.
 What the prompt must carry, because a reviewer that has to ask for any of these has already lost a round:
 - **The exact digests, file counts and byte sizes** the verdict is to be scoped to, and the prior verdict with the digests it was issued against, so the reviewer can see what does and does not carry.
 - **Where the repository evidence is** — branch, commit, and the paths of the report and the diff.
@@ -58,7 +59,7 @@ On a **re-review**, add the disposition of every prior finding — fixed, declin
 **Practical consequence, learned the expensive way:** batch small corrections into one change rather than shipping them one at a time. Three separate one-line fixes cost three independent reviews; one change carrying all three costs one.
 **Prevent bytecode rather than excluding it.** Run every validator with `PYTHONDONTWRITEBYTECODE=1`. The Freeze rule below is right that `__pycache__` is not a content change, but a stray `.pyc` has been packaged into a `.skill` before and was caught only by a file count — preventing it is cheaper than reasoning about it.
 ### GCFPE tie-in
-The GCFPE plan's §10 requires that any approved skill edit be made with `skill-creator`, preserve unrelated behaviour, be committed and read back, and then have the dedicated skill review re-run against the **final installed snapshot**. Packaging is not the end of the gate — the review still has to run after Nathan installs.
+The GCFPE plan's §10 requires that any approved skill edit be made with `skill-creator`, preserve unrelated behaviour, be committed and read back, and then have the dedicated skill review re-run against the **final installed snapshot**. Packaging is not the end of the gate. Since `D24`, the review runs on the packages before Nathan installs, and the post-install digest comparison is what binds the installed snapshot to the reviewed bytes. If the installed digest differs from the reviewed one, the review is void and runs again on the installed tree.
 ### Freeze rule
 No skill may be installed while a review is running. A review that judges a moving snapshot is void. Freeze the tree, hash it, review, then re-hash and confirm nothing moved. Note that merely *running* a bundled Python validator writes `__pycache__/*.pyc` into the tree; that is expected, is not a content change, and should be compared with `__pycache__` excluded.
 
