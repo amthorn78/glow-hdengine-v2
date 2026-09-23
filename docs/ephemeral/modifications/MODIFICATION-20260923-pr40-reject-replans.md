@@ -1,7 +1,7 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-pr40-reject-replans
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -15,12 +15,12 @@ override:
   reason: ""
 interaction_cost_predicted: 2
 item_count_at_approval: 1
-interaction_cost_actual:
+interaction_cost_actual: 2
 items:
   - id: ITEM-01
     statement: "When PR-40 rejects landed work for an in-scope implementation, corrected-code or PR-lineage defect, the finding routes back to PR-20 for a new plan in a new dedicated implementor session that Nathan seeds, and goes through a new Product Owner Proceed, PR-30, PR-35 and PR-40 again."
     source: "Product Owner, 2026-09-23, while reviewing MODIFICATION-20260923-alpha-feedback-open-entries PART-08"
-    disposition: ""
+    disposition: APPLIED
 parts:
   - id: PART-01
     name: "A PR-40 reject re-plans through PR-20 in a new session"
@@ -193,3 +193,33 @@ install and freeze are shared.
 
 Predicted 2: its analysis approval and its plan approval. The plan approval is taken together with
 the parent's amendment.
+
+## §E — Execution
+
+Executed 2026-09-23 inside the parent's stages. This Modification shares the parent's package, gate,
+review, delivery and cut-over (rule 7), so each step's evidence is the parent's stage record
+(`MODIFICATION-20260923-alpha-feedback-open-entries.md` §E, *Execution under Amendment 1*).
+
+| step | disposition | evidence |
+|---|---|---|
+| C1, C2 | APPLIED | parent E1: `PR-40.json` edge 172 is `reject_replan` → PR-20, and both `global.json` copies carry the A1-7 condition; the graph builds 55 nodes, 229 edges, `ae2bd159…` |
+| C3 | APPLIED | parent E2: successor R1 oracle `GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1` changes GCF-14, GCF-17 and GCF-17.LINEAGE; the path fixture fails against the historical oracle and passes against the successor |
+| C4 | APPLIED | parent E3 and E6: C-REPLAN in PR-40, C-PR20-ENTRY in PR-20, C-PROCEED in PR-30 and PR-35, each placed once (`evidence/e3/E3-E4-report.md`); landed and read back at the cut-over |
+| C5 | APPLIED | parent E1: `PR-40` consumers derived as `[PR-10, PR-20, RS-10]`; the two `D23-F` guards pass their regressions (parent E4 item 9) |
+| C6–C10 | APPLIED | parent E2, reviewed in E5 rounds a1–a5 (`SKILL_FIT_CONFIRMED` in a5) and installed in E6 |
+| C11 | APPLIED | parent E6 step 6: the Flow Index Proceed sentence gains the `D23-F` exception, read back. At close-out, the Flow Index's maintenance item 6 was also brought into line with C-PROCEED (`evidence/e6/CLOSE-OUT-20260923.md`) |
+
+### Parts
+
+- **PART-01 landed whole.** ITEM-01 is `APPLIED`: a PR-40 `REJECT` re-plans through PR-20 for the same
+  `WORK_UNIT_ID`, in a new session Nathan creates and seeds, with a new Proceed.
+
+### Interaction cost, actual against predicted
+
+**Predicted 2. Actual 2**: the analysis ruling (Nathan, 2026-09-23: *"if a whole PR cycle fails
+validation … needs to route back to PR-20"*) and the plan approval given with the parent's
+Amendment 1. Both came in messages the parent also counts.
+
+### Remaining Product Owner actions
+
+None of its own. The parent's merge and freeze lift cover it.
