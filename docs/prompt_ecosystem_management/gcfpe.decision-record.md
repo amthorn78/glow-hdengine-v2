@@ -1381,6 +1381,16 @@ binds it: it may run as a subagent.
 The triage prompt is not one of the 55 registry members, so no C-TOP guard applies to it and nothing
 in Amendment 1 changes.
 
+### Successor, 2026-09-23 — PR-40 is entered once per merge (D23-E)
+
+**Product Owner, 2026-09-23:** *"ok"*. He approved a sentence that the §10 review round a1 proposed.
+Both reviewers found the same double-dispatch window.
+
+C-DISPATCH gains one sentence:
+
+> PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, otherwise
+> the fallback block. Once either has been pasted, the other is void.
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
