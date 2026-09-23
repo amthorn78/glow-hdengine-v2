@@ -1,0 +1,177 @@
+[
+ {
+  "pid": "PR-10",
+  "page": "3db4590a05eb818e8359de1994e97a7d",
+  "fetched": "2026-09-23T13:19:07.698Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01URLG6MEn5i9i6N77LVMANj.json",
+  "first_run": {
+   "pass": false,
+   "pass_note": "false only because of the three PART-17 guard rows (new guards, old draft; see new_guard_results). Every rule-level check passes.",
+   "rule_mismatches": {},
+   "check_failures": [],
+   "registry_findings_after_non_new": [],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "pass_note": "same as first run: PART-17 injection rows only; no rule mismatch, CHECKs 0, ops reproduce the edit (15 ops), registry findings after 0",
+   "rule_mismatches": {},
+   "check_failures": [],
+   "registry_findings_after_non_new": [],
+   "validator_ok": true
+  },
+  "batch_task_results": {
+   "R-A1b": "hits 1 of 1 expected. R-A1a is not applied to PR-10, and its pattern would read 0 on this body anyway.",
+   "R-26-FRAME CHECK": "reads 2 before and 0 after. The 2 pre-edit hits sit on the LPR-10-1 line and the RS-10 package line, which LPR-10-4 replaces. LPR-10-4 covers the RS-10 package site.",
+   "R-A2g": "hits 4 of 4 expected. No correction needed. Hits 1 and 2 are on the LPR-10-1 and LPR-10-4 lines, which those LOCAL edits then replace. Hit 3 is the RS-20 package line, with the 'CANON_CONFLICT_REGISTER and approved/rejected dispositions; ' item. Hit 4 is the terminal/blocked package line, with ', CANON_CONFLICT_REGISTER' before ' and Required tools'. Two register mentions remain after the edits, both on purpose: the '## Carried Canon-conflict register' heading, and 'Preserve one CANON_CONFLICT_REGISTER in existing applicable substantive artifact...', where R-A2b keeps the register in the artifact.",
+   "R-ITEM38": "hits 1 of 1. It now reads 'Do not absorb a material change (D23-C) into PR instructions.' and 0 of '(D23-C) change' remains."
+  },
+  "guard_probes": {
+   "G-K08_amended (PR drafter, plan_result.json bodies[*].bodies PR-20 unplaceable[0])": {"fires_before": true, "hits_before": 4, "silent_after": true, "fires_on_injection": true, "sites_before": "the LPR-10-1 line, the LPR-10-4 line, and the RS-20 package and terminal package lines that R-A2g cleans"},
+   "G-K19 new PR-10 alternative 'dependency and evidence history; read-only substantiation of the mismatch; completed work'": {"fires_before": true, "hits_before": 1, "silent_after": true, "site": "the RS-10 package line, which LPR-10-4 replaces"},
+   "G-K19 old PR-10 alternative 'dependency and evidence history; completed work'": {"fires_before": false, "note": "It misses the body. This confirms P-06."},
+   "G06 (existing, registry row)": {"hits_before": 0, "hits_after": 0}
+  },
+  "new_guard_results": "Old draft; recorded, not repaired. G-K01/03/08/09/14/19/20/23/26/41/51 fire before and are silent after. G-K37 is silent before and after. The required guards G-K02/04/05/10/24/25 match after and fire on removal. PART-17 x3 report fires_on_injection=false only because the guard file's 'regression' field is prose ('inject a label line after ...') and dryrun passes that prose as the injection. A literal '**<label>:** x' at line 13 fires all three on the post-edit body, and all three are silent after.",
+  "readback": [
+   {"edit": "R-A1b", "reads_ok": true, "note": "attempt mappings in the output artifact's existing permitted metadata, label repository persistence pending"},
+   {"edit": "R-A1c", "reads_ok": true, "note": "existing artifact's permitted lineage metadata: usage ID, change identity"},
+   {"edit": "R-A1d", "reads_ok": true, "note": "actually exist, in the output artifact's lineage metadata or later authorized record."},
+   {"edit": "R-A1e", "reads_ok": true, "note": "existing permitted artifact metadata. Preserve approved artifact versions"},
+   {"edit": "R-A2b", "reads_ok": true, "note": "substantive artifact metadata/content, which the handoff names. This is carried state"},
+   {"edit": "R-A2e", "reads_ok": true, "note": "decided items remain decided. Keep exact register lineage ... handoff names. (then ## heading)"},
+   {"edit": "R-A2g #3", "reads_ok": true, "note": "same author/reviewer/session identity; exact Product Owner manual prerequisite; and"},
+   {"edit": "R-A2g #4", "reads_ok": true, "note": "unresolved dependency, resume point and Required tools, stores, environment"},
+   {"edit": "R-26-P1", "reads_ok": true, "note": "direct Notion page URL. Then give the other fields ... not repeated. / Resolve the actual branch"},
+   {"edit": "R-26-P4", "reads_ok": true, "note": "stable names and directories. Catalogs carry ... lineage. Never substitute opaque Library identifiers"},
+   {"edit": "R-A7-S1a", "reads_ok": true, "note": "manually merges the identified PR and only where no MERGE_OBSERVED ... this merge."},
+   {"edit": "R-A7-S1b", "reads_ok": true, "note": "historical pre-merge evidence. PR-40 is entered on ... void. PR-40 independently verifies"},
+   {"edit": "R-A7-S2", "reads_ok": true, "note": "reviewer's substantive decision. PR-40 is entered on the ... merged it. PR-40 independently verifies"},
+   {"edit": "R-A3a", "reads_ok": true, "note": "the line now starts 'Resolve the current authoritative subject-matter sources'"},
+   {"edit": "R-CLAT", "reads_ok": true, "note": "is not by itself material. / Destination prompt and directory: RS-10"},
+   {"edit": "R-ITEM38", "reads_ok": true, "note": "Do not absorb a material change (D23-C) into PR instructions."},
+   {"edit": "LPR-10-1", "reads_ok": true, "note": "producer identity. / Complete native input package naming ... hold the rest. / Native operation"},
+   {"edit": "LPR-10-2", "reads_ok": true, "note": "state is PR_CANDIDATE_PUBLISHED. PR-30 then hands off directly ... rest. PR-35 owns review retrieval"},
+   {"edit": "LPR-10-3", "reads_ok": true, "note": "manual merge is a distinct act; only after ... asserted by Nathan, may PR-40 independently verify"},
+   {"edit": "LPR-10-4", "reads_ok": true, "note": "RS-10 complete native inputs: GCF-17.RESCOPE coverage, naming ... rest. / RS-10 native result"}
+  ],
+  "g06_after": false,
+  "g06_note": "G06 reads 0 on the whole edited body. g06_after=false means G06 does not fire. Each LOCAL new_text placed right after a NEXT_PROMPT_HANDOFF line is also G06-silent.",
+  "open_issues": []
+ },
+ {
+  "pid": "PR-20",
+  "page": "3db4590a05eb8174abf8c04318ab04be",
+  "fetched": "2026-09-23T13:19:18.271Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01H72CqhbsogtAjijC9t7Xvj.json",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {"R-OWN": {"hits": 0, "expected": 1, "ok": false}},
+   "check_failures": [],
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": ["CTR-001 G-K35 combined R-OWN forbidden: fires on PR-20's unplaced read-only claim", "CTR-002 G-K36 R-OWN required: absent"],
+   "validator_ok": true
+  },
+  "patches": [
+   {"type": "rule_anchor_override",
+    "target": "R-OWN / OWN_AT['PR-20'] (closeout_rules.py)",
+    "old": "otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\\n]*\\.",
+    "new": "(?<=Do not mutate the repository in this authoring operation\\.)",
+    "why": "The old anchor reads 0 on PR-20, and 'otherwise mutating' does not occur in the body. PR-20's read-only claim is 'Do not mutate the repository in this authoring operation.' at the end of Execute step 2. The census row (ANALYZE-body-evidence.md:148) and the PR drafter's note ('placed in Execute step 2') say the same. The census row at :190 shows that the old anchor is PR-50's clause (Authority and preservation), so OWN_AT has PR-20 and PR-50 swapped. With the override R-OWN hits 1 of 1, the OWN sentence follows that claim, and the combined G-K35 goes silent."}
+  ],
+  "final_run": {
+   "pass": false,
+   "pass_note": "false only because of new-guard old-draft rows: G-K36 (CTR-002) and PART-17 x3. No rule mismatch, CHECKs 0, ops reproduce the edit (19 ops).",
+   "rule_mismatches": {},
+   "check_failures": [],
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": ["CTR-002 G-K36: the old-draft required text ends 'which it writes, commits and pushes\\.'. The P-02 text continues ', and any pull request that carries them.', and P-28 already says G-K36 follows the new text. The OWN sentence is placed once (placement OWN=1)."],
+   "validator_ok": true
+  },
+  "batch_task_results": {
+   "R-A2g": "hits 4 of 4. The hits are the PR-30 package bullet (inside LPR-20-1's span), a later RS-10 package bullet ('... where present; same PR/IA author'), the RS-20 package ('CANON_CONFLICT_REGISTER and approved/rejected history; '), and the terminal package ('resume point; and Required tools').",
+   "LPR-20-8": "It removes the RS-30 package's register item ('... evidence, recovery, CANON_CONFLICT_REGISTER, Product Owner/manual prerequisites ...'), which R-A2g cannot match. After the edits the amended G-K08 reads 0 on that line.",
+   "register mentions after": "3, all on purpose: the '## Carried Canon-conflict register' heading; 'Preserve one CANON_CONFLICT_REGISTER in existing applicable substantive artifact...' (R-A2b); and Execute step 5, 'Carry the complete CANON_CONFLICT_REGISTER, ...', which carries it 'into the plan', the artifact, so it is not a handoff site.",
+   "G06": "0 before and 0 after on the WHOLE edited body, including LPR-20-3 (the P-01 sentence in the PR-35 package line) and LPR-20-6 ('... PR-40 resolves merge, commit, order and check evidence ...'). None of 'head and commits', 'commit, order' or 'pull request reference' is a G06 term. Each new_text is G06-silent even placed right after a NEXT_PROMPT_HANDOFF line. No wording change needed.",
+   "R-26-FRAME CHECK": "2 before, on the LPR-20-6 and LPR-20-7 lines. 0 after."
+  },
+  "guard_probes": {
+   "G-K08_amended (PR drafter, plan_result.json bodies[*].bodies PR-20 unplaceable[0])": {"fires_before": true, "hits_before": 5, "silent_after": true, "fires_on_injection": true, "sites_before": "PR-30 package (ends on the LPR-20-1 bullet), RS-10 package, RS-20 package, RS-30 package (LPR-20-8 line), terminal package"},
+   "G06 (existing, registry row)": {"hits_before": 0, "hits_after": 0}
+  },
+  "new_guard_results": "Old draft; recorded, not repaired. After the patch, G-K01/03/08/09/14/19/20/23/26/35/41/51 fire before and are silent after, G-K37 is silent before and after, and the required guards G-K02/04/05/10/24/25 match. G-K36 fails matches_after, because its old-draft text lacks the P-02 tail. PART-17 x3 hits the same prose-injection harness artifact as on PR-10; a literal label injection fires all three.",
+  "readback": [
+   {"edit": "R-A1b", "reads_ok": true, "note": "task/result/attempt mappings in the output artifact's existing permitted metadata, label repository persistence"},
+   {"edit": "R-A1c", "reads_ok": true, "note": "existing artifact's permitted lineage metadata: usage ID, change identity"},
+   {"edit": "R-A1d", "reads_ok": true, "note": "actually exist, in the output artifact's lineage metadata or later authorized record."},
+   {"edit": "R-A1e", "reads_ok": true, "note": "existing permitted artifact metadata. Preserve approved artifact versions"},
+   {"edit": "R-A2b", "reads_ok": true, "note": "substantive artifact metadata/content, which the handoff names. This is carried state"},
+   {"edit": "R-A2e", "reads_ok": true, "note": "decided items remain decided. Keep exact register lineage ... handoff names. (then ## heading)"},
+   {"edit": "R-A2g #2", "reads_ok": true, "note": "RESCOPE_REVIEW_ID where present; same PR/IA author and reviewer/session continuity;"},
+   {"edit": "R-A2g #3", "reads_ok": true, "note": "IA reviewer and PR session identity; exact RS-20 decision/addendum when an approved rescope"},
+   {"edit": "R-A2g #4", "reads_ok": true, "note": "unresolved dependency; resume point; and Required tools, stores, environment and"},
+   {"edit": "R-26-P1", "reads_ok": true, "note": "direct Notion page URL. Then give the other fields ... not repeated. / Resolve the actual branch"},
+   {"edit": "R-26-P4", "reads_ok": true, "note": "stable names and directories. Catalogs carry ... lineage. Never substitute opaque Library identifiers"},
+   {"edit": "R-A7-S1a", "reads_ok": true, "note": "manually merges the identified PR and only where no MERGE_OBSERVED ... this merge."},
+   {"edit": "R-A7-S1b", "reads_ok": true, "note": "historical pre-merge evidence. PR-40 is entered on ... void. PR-40 independently verifies"},
+   {"edit": "R-A7-S2", "reads_ok": true, "note": "reviewer's substantive decision. PR-40 is entered on the ... merged it. PR-40 independently verifies"},
+   {"edit": "R-OWN", "reads_ok": true, "note": "Do not mutate the repository in this authoring operation. Every statement ... carries them. / 3. Plan"},
+   {"edit": "R-A3a", "reads_ok": true, "note": "the line now starts 'Resolve the current authoritative subject-matter sources'"},
+   {"edit": "R-CLAT", "reads_ok": true, "note": "is not by itself material. / Destination prompt and directory: RS-10"},
+   {"edit": "LPR-20-1", "reads_ok": true, "note": "- PR_IMPLEMENTATION_PLAN and PR_INSTRUCTION are each named by repository path; ... the rest. / - Product Owner"},
+   {"edit": "LPR-20-2", "reads_ok": true, "note": "handoff to PR-35's own dedicated session naming PR_IMPLEMENTATION_RESULT ... rest. PR-30 does not own final review"},
+   {"edit": "LPR-20-3", "reads_ok": true, "note": "Complete native input package: PR-35's own dedicated session, entered ... handoff does not carry them. / Native result"},
+   {"edit": "LPR-20-4", "reads_ok": true, "note": "Nathan later manually merged the identified PR, and the merge is observed ... asserted by Nathan."},
+   {"edit": "LPR-20-5", "reads_ok": true, "note": "- The complete PR-35 result: MERGE_OBSERVED ... landed lineage. / Required tools, stores, environment"},
+   {"edit": "LPR-20-6", "reads_ok": true, "note": "Grammatical; 'check evidence from repository evidence' repeats a word but reads. Left as drafted."},
+   {"edit": "LPR-20-7", "reads_ok": true, "note": "Complete RS-10 package: / - GCF-17.RESCOPE, naming PR_INSTRUCTION_ID ... rest. / - Read-only substantiation"},
+   {"edit": "LPR-20-8", "reads_ok": true, "note": "future output is an entry requirement. Also name the approved Specification/Plan/review ... rest."}
+  ],
+  "g06_after": false,
+  "g06_note": "G06 does not fire after, on the whole body or at LPR-20-3 or LPR-20-6. No minimal wording change is needed.",
+  "open_issues": [
+   "Cross-batch (PR-50 is not in E1): R-OWN's OWN_AT table has PR-20 and PR-50 swapped. Census rows ANALYZE-body-evidence.md:148 (PR-20, Execute step 2, 'Do not mutate the repository in this authoring operation.') and :190 (PR-50, Authority and preservation, 'without ... otherwise mutating the workspace, ... commits or evidence') show it, and the PR-50 drafter's own R-OWN note matches the 'otherwise mutating' alternative. E1 corrected PR-20 only. The batch holding PR-50 should expect R-OWN to read 0 there unless PR-50 also carries 'Do not mutate ...'; if it does not, PR-50 needs the mirror override. The registry/guard worker should give PR-20's per-row G-K35 alternative (P-02 split) 'Do not mutate the repository in this authoring operation' and PR-50's the 'otherwise mutating ...' clause."
+  ]
+ },
+ {
+  "pid": "RS-20",
+  "page": "3db4590a05eb81c183aac2ecb40b1497",
+  "fetched": "2026-09-23T13:22:10.719Z",
+  "harness_file": null,
+  "harness_file_note": "The fetch returned inline, so the harness saved no separate tool-results file. dryrun.py read it from this agent's own session transcript, /root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ac2643d2abfd6558d.jsonl. That is the newest-mtime file with this timestamp. An earlier task's transcript (agent-ad2b01efb76e15237.jsonl, 13:23) holds the same page version, and latest_body scans it but does not select it.",
+  "first_run": {
+   "pass": false,
+   "pass_note": "false only because of the PART-17 x3 prose-injection harness artifact",
+   "rule_mismatches": {},
+   "check_failures": [],
+   "registry_findings_after_non_new": [],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "pass_note": "same as first run (4 ops reproduce the edit; registry findings after 0)",
+   "rule_mismatches": {},
+   "check_failures": [],
+   "registry_findings_after_non_new": [],
+   "validator_ok": true
+  },
+  "batch_task_results": {
+   "LRS-20-1": "hits 1 of 1. The new text carries P-01's sentence verbatim (placement RECV=1). G-K22 (required) matches after and fires on removal. G-K21 (forbidden) fires before and is silent after. CHECK R-26-BRANCH-RECV reads 0.",
+   "G06": "0 before and 0 after on the whole edited body. LRS-20-1's new text is G06-silent even placed right after a NEXT_PROMPT_HANDOFF line.",
+   "R-CLAT": "hits 1 of 1. The engine's canonical-equality assertion holds. The removed span is exactly the canonical CLAT_DECIDE block (73 words, 4 lines) plus its one line break. 0 'Decide it during work' remains. The text joins as '... is not by itself material. / Return one complete RESCOPE_REVIEW and one state:'."
+  },
+  "new_guard_results": "Old draft; recorded, not repaired. G-K01/03/21/51 fire before and are silent after. G-K09/23/37 are silent before and after. The required guards G-K02/04/22 match after and fire on removal. PART-17 x3 hits the prose-injection harness artifact; a literal label injection fires all three.",
+  "readback": [
+   {"edit": "R-A1a", "reads_ok": true, "note": "usage/task/result/attempt mappings in the output artifact's permitted metadata, name the authorized owner"},
+   {"edit": "R-A1c", "reads_ok": true, "note": "entry to existing permitted artifact lineage: usage ID; actual change identity;"},
+   {"edit": "R-A2a", "reads_ok": true, "note": "in the existing substantive artifact, which the handoff names, within this actor's permitted output."},
+   {"edit": "R-CLAT", "reads_ok": true, "note": "is not by itself material. / Return one complete RESCOPE_REVIEW and one state:"},
+   {"edit": "LRS-20-1", "reads_ok": true, "note": "may later resume PR-35. / The request or proposal records ... does not carry them. Planning, Ops, documentation"}
+  ],
+  "g06_after": false,
+  "g06_note": "G06 does not fire after.",
+  "open_issues": []
+ }
+]

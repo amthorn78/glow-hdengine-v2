@@ -1,0 +1,314 @@
+[
+ {
+  "pid": "OPS-10",
+  "page": "3db4590a05eb81db98cce3e30a62bce5",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-23T13:22:32.873Z",
+   "rules_checked": 12,
+   "ops": {
+    "count": 10,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "registry": {
+    "findings_before": 11,
+    "findings_after": 0
+   },
+   "guards_checked": 16,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "OPS-10"
+    ]
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   }
+  }
+ },
+ {
+  "pid": "OPS-20",
+  "page": "3db4590a05eb81858a9dd361d3689ce8",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-23T13:23:01.175Z",
+   "rules_checked": 7,
+   "ops": {
+    "count": 9,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "registry": {
+    "findings_before": 7,
+    "findings_after": 0
+   },
+   "guards_checked": 13,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "OPS-20"
+    ]
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   }
+  }
+ },
+ {
+  "pid": "OPS-30",
+  "page": "3db4590a05eb816f91c9c394f9c9fa57",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01Vx6gPW5pVbCpKvbM9MewZd.json",
+  "detail": {
+   "fetched": "2026-09-23T13:20:36.022Z",
+   "rules_checked": 16,
+   "ops": {
+    "count": 15,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "registry": {
+    "findings_before": 18,
+    "findings_after": 0
+   },
+   "guards_checked": 21,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "OPS-30"
+    ]
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   }
+  }
+ },
+ {
+  "pid": "PR-30",
+  "page": "3db4590a05eb8123afb8caeeaa83a294",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-23T13:19:20.837Z",
+   "rules_checked": 14,
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "registry": {
+    "findings_before": 14,
+    "findings_after": 0
+   },
+   "guards_checked": 18,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "PR-30"
+    ]
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   }
+  }
+ },
+ {
+  "pid": "RS-10",
+  "page": "3db4590a05eb811ca0cdc66e0d508ac4",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-23T13:21:44.109Z",
+   "rules_checked": 4,
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "registry": {
+    "findings_before": 5,
+    "findings_after": 0
+   },
+   "guards_checked": 11,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "RS-10"
+    ]
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   }
+  }
+ },
+ {
+  "pid": "RS-30",
+  "page": "3db4590a05eb81ed9fd3d2ef439ceaaf",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-23T13:22:37.041Z",
+   "rules_checked": 3,
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "registry": {
+    "findings_before": 4,
+    "findings_after": 0
+   },
+   "guards_checked": 10,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "RS-30"
+    ]
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   }
+  }
+ },
+ {
+  "pid": "GCFPE-MGMT-10",
+  "page": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-21T22:56:04.638Z",
+   "rules_checked": 2,
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "registry": {
+    "findings_before": 4,
+    "findings_after": 0
+   },
+   "guards_checked": 12,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "GCFPE-MGMT-10"
+    ]
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 1,
+    "RECV": 0
+   }
+  },
+  "note": "Notion returns this page 'as of 2026-09-21T22:56:04.638Z' while page_last_edited_at is 2026-09-23T13:23:25.044Z; a second fetch returned the same snapshot. The dry run checked that snapshot; no content change was visible."
+ },
+ {
+  "pid": "GCFPE-MGMT-10-PROPOSED",
+  "page": "3e34590a05eb811b93d2da9b4ef8106d",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a4c0be5931d3a34ea.jsonl",
+  "detail": {
+   "fetched": "2026-09-23T00:49:47.074Z",
+   "rules_checked": 4,
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "registry": "NOT_A_REGISTRY_ROW",
+   "guards_checked": 0,
+   "validator": null,
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "gate_checks": {
+    "CHECK R-ITEM40": {
+     "hits": 0,
+     "expected": 0,
+     "ok": true
+    },
+    "CHECK R-ITEM23-gate": {
+     "hits": 0,
+     "expected": 0,
+     "ok": true
+    }
+   },
+   "R-ITEM23": {
+    "hits": 2,
+    "expected": 2,
+    "ok": true
+   }
+  }
+ }
+]

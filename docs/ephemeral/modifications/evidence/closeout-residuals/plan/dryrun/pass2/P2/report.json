@@ -1,0 +1,123 @@
+[
+ {
+  "pid": "CL-20",
+  "page": "3db4590a05eb81f4812be61e8877c02c",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:26:57.675Z",
+  "output": "plan/r1/dry2/P2/CL-20.json"
+ },
+ {
+  "pid": "CL-30",
+  "page": "3db4590a05eb8190a444d8818e445c1d",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:27:36.082Z",
+  "output": "plan/r1/dry2/P2/CL-30.json"
+ },
+ {
+  "pid": "CL-40",
+  "page": "3db4590a05eb81db9c88cde6027e07bf",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:28:08.922Z",
+  "output": "plan/r1/dry2/P2/CL-40.json",
+  "note": "run with --candidate-url https://app.notion.com/p/00000000000000000000000000000000 (stand-in per BRIEF)"
+ },
+ {
+  "pid": "CL-C-10",
+  "page": "3db4590a05eb81ad8989faa77f441a64",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:28:52.686Z",
+  "output": "plan/r1/dry2/P2/CL-C-10.json"
+ },
+ {
+  "pid": "CL-E-10",
+  "page": "3db4590a05eb811a8578d75885c16cac",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:29:31.478Z",
+  "output": "plan/r1/dry2/P2/CL-E-10.json"
+ },
+ {
+  "pid": "CL-E-20",
+  "page": "3db4590a05eb81c2b5d5ff46126f9e45",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:30:03.477Z",
+  "output": "plan/r1/dry2/P2/CL-E-20.json"
+ },
+ {
+  "pid": "CL-E-30",
+  "page": "3db4590a05eb81b4a649fdcdb1903345",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:30:45.395Z",
+  "output": "plan/r1/dry2/P2/CL-E-30.json"
+ },
+ {
+  "pid": "CL-E-40",
+  "page": "3db4590a05eb81e78e82f83a5f2e4b68",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:19:58.391Z",
+  "output": "plan/r1/dry2/P2/CL-E-40.json"
+ },
+ {
+  "pid": "UTIL-10",
+  "page": "3db4590a05eb81b89fbaf4b31a3ed2a9",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:23:01.028Z",
+  "output": "plan/r1/dry2/P2/UTIL-10.json"
+ },
+ {
+  "pid": "PR-50",
+  "page": "3db4590a05eb8138ac99c13cf6f2f282",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a0c9e08707e9f812c.jsonl",
+  "fetched": "2026-09-23T13:20:56.986Z",
+  "output": "plan/r1/dry2/P2/PR-50.json"
+ }
+]

@@ -1,0 +1,102 @@
+[
+ {
+  "pid": "CF-C-10",
+  "page": "3db4590a05eb8119a5a8e4d083fcf360",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-E-10",
+  "page": "3db4590a05eb815b84a5c5a5ace85fe1",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-C-20",
+  "page": "3db4590a05eb8173a73edc73f302a90a",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-E-20",
+  "page": "3db4590a05eb810eb177f7dced41bc8f",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-C-30",
+  "page": "3db4590a05eb8149a8d2ed42c9c01ffd",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-E-30",
+  "page": "3db4590a05eb81b4be79f405566da9a7",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-C-40",
+  "page": "3db4590a05eb81269931cee342ce8a0e",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-E-40",
+  "page": "3db4590a05eb8101b655ed223b11a85e",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "CF-PO-10",
+  "page": "3db4590a05eb8161b4d7cb6d07f5101c",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ },
+ {
+  "pid": "MGR-10",
+  "page": "3db4590a05eb8108ad2dd4d0e20bd6c4",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a77332628b73beac4.jsonl"
+ }
+]

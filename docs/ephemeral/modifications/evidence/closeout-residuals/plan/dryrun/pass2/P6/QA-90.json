@@ -1,0 +1,119 @@
+{
+ "pid": "QA-90",
+ "fetched": "2026-09-23T13:21:06.317Z",
+ "chars_before": 14917,
+ "chars_after": 14922,
+ "rules": {
+  "R-A1a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A1c": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A2a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  }
+ },
+ "rule_mismatches": {},
+ "ops": {
+  "count": 2,
+  "reproduces_edit": true,
+  "max_old_str_lines": 3
+ },
+ "placement": {
+  "W-4": 0,
+  "ONCE": 0,
+  "OWN": 0,
+  "RECV": 0
+ },
+ "registry": {
+  "findings_before": 4,
+  "findings_after": []
+ },
+ "guards": [
+  {
+   "id": "G-K01",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K02",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K03",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K04",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K09",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K23",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K37",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  }
+ ],
+ "guard_failures": [],
+ "validator": {
+  "exit": 0,
+  "ok": true,
+  "errors": [],
+  "validated": [
+   "QA-90"
+  ]
+ },
+ "pass": true
+}

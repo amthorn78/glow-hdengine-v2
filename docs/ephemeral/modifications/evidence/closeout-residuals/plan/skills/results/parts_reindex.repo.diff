@@ -1,0 +1,439 @@
+--- a/docs/graph/parts/global.json
++++ b/docs/graph/parts/global.json
+@@ -3,17 +3,7 @@
+   "_other_edge_indices": [
+     122,
+     123,
+-    124,
+-    125,
+-    126,
+-    127,
+-    128,
+-    129,
+-    130,
+-    131,
+-    132,
+-    133,
+-    134
++    124
+   ],
+   "_other_edges": [
+     {
+--- a/docs/graph/parts/prompts/CF-C-10.json
++++ b/docs/graph/parts/prompts/CF-C-10.json
+@@ -3,7 +3,8 @@
+     0,
+     1,
+     2,
+-    3
++    3,
++    125
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/ESC-40.json
++++ b/docs/graph/parts/prompts/ESC-40.json
+@@ -2,7 +2,9 @@
+   "edge_indices": [
+     82,
+     83,
+-    84
++    84,
++    126,
++    127
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/OPS-10.json
++++ b/docs/graph/parts/prompts/OPS-10.json
+@@ -1,10 +1,10 @@
+ {
+   "edge_indices": [
+-    135,
+-    136,
+-    137,
+-    138,
+-    139
++    130,
++    131,
++    132,
++    133,
++    134
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/OPS-20.json
++++ b/docs/graph/parts/prompts/OPS-20.json
+@@ -1,10 +1,10 @@
+ {
+   "edge_indices": [
+-    140,
+-    141,
+-    142,
+-    143,
+-    144
++    135,
++    136,
++    137,
++    138,
++    139
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/OPS-30.json
++++ b/docs/graph/parts/prompts/OPS-30.json
+@@ -1,10 +1,10 @@
+ {
+   "edge_indices": [
+-    145,
+-    146,
+-    147,
+-    148,
+-    149
++    140,
++    141,
++    142,
++    143,
++    144
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/PR-10.json
++++ b/docs/graph/parts/prompts/PR-10.json
+@@ -1,10 +1,10 @@
+ {
+   "edge_indices": [
+-    150,
+-    151,
+-    152,
+-    153,
+-    154
++    145,
++    146,
++    147,
++    148,
++    149
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/PR-20.json
++++ b/docs/graph/parts/prompts/PR-20.json
+@@ -1,10 +1,10 @@
+ {
+   "edge_indices": [
+-    155,
+-    156,
+-    157,
+-    158,
+-    159
++    150,
++    151,
++    152,
++    153,
++    154
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/PR-30.json
++++ b/docs/graph/parts/prompts/PR-30.json
+@@ -1,9 +1,9 @@
+ {
+   "edge_indices": [
+-    160,
+-    161,
+-    162,
+-    163
++    155,
++    156,
++    157,
++    158
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/PR-35.json
++++ b/docs/graph/parts/prompts/PR-35.json
+@@ -1,9 +1,10 @@
+ {
+   "edge_indices": [
+-    164,
+-    165,
+-    166,
+-    167
++    159,
++    160,
++    161,
++    162,
++    128
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/PR-40.json
++++ b/docs/graph/parts/prompts/PR-40.json
+@@ -1,11 +1,11 @@
+ {
+   "edge_indices": [
+-    168,
+-    169,
+-    170,
+-    171,
+-    172,
+-    173
++    163,
++    164,
++    165,
++    166,
++    167,
++    168
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/PR-50.json
++++ b/docs/graph/parts/prompts/PR-50.json
+@@ -1,6 +1,6 @@
+ {
+   "edge_indices": [
+-    174
++    169
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-10.json
++++ b/docs/graph/parts/prompts/QA-10.json
+@@ -1,9 +1,9 @@
+ {
+   "edge_indices": [
+-    175,
+-    176,
+-    177,
+-    178
++    170,
++    171,
++    172,
++    173
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-100.json
++++ b/docs/graph/parts/prompts/QA-100.json
+@@ -1,7 +1,7 @@
+ {
+   "edge_indices": [
+-    179,
+-    180
++    174,
++    175
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-110.json
++++ b/docs/graph/parts/prompts/QA-110.json
+@@ -1,11 +1,11 @@
+ {
+   "edge_indices": [
+-    181,
+-    182,
+-    183,
+-    184,
+-    185,
+-    186
++    176,
++    177,
++    178,
++    179,
++    180,
++    181
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-120.json
++++ b/docs/graph/parts/prompts/QA-120.json
+@@ -1,11 +1,11 @@
+ {
+   "edge_indices": [
+-    187,
+-    188,
+-    189,
+-    190,
+-    191,
+-    192
++    182,
++    183,
++    184,
++    185,
++    186,
++    187
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-20.json
++++ b/docs/graph/parts/prompts/QA-20.json
+@@ -1,8 +1,8 @@
+ {
+   "edge_indices": [
+-    193,
+-    194,
+-    195
++    188,
++    189,
++    190
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-50.json
++++ b/docs/graph/parts/prompts/QA-50.json
+@@ -1,10 +1,10 @@
+ {
+   "edge_indices": [
+-    196,
+-    197,
+-    198,
+-    199,
+-    200
++    191,
++    192,
++    193,
++    194,
++    195
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-60.json
++++ b/docs/graph/parts/prompts/QA-60.json
+@@ -1,9 +1,9 @@
+ {
+   "edge_indices": [
+-    201,
+-    202,
+-    203,
+-    204
++    196,
++    197,
++    198,
++    199
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-70.json
++++ b/docs/graph/parts/prompts/QA-70.json
+@@ -1,10 +1,9 @@
+ {
+   "edge_indices": [
+-    205,
+-    206,
+-    207,
+-    208,
+-    209
++    200,
++    201,
++    202,
++    203
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-80.json
++++ b/docs/graph/parts/prompts/QA-80.json
+@@ -1,7 +1,7 @@
+ {
+   "edge_indices": [
+-    210,
+-    211
++    204,
++    205
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/QA-90.json
++++ b/docs/graph/parts/prompts/QA-90.json
+@@ -1,9 +1,9 @@
+ {
+   "edge_indices": [
+-    212,
+-    213,
+-    214,
+-    215
++    206,
++    207,
++    208,
++    209
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/RS-10.json
++++ b/docs/graph/parts/prompts/RS-10.json
+@@ -1,8 +1,8 @@
+ {
+   "edge_indices": [
+-    216,
+-    217,
+-    218
++    210,
++    211,
++    212
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/RS-20.json
++++ b/docs/graph/parts/prompts/RS-20.json
+@@ -1,11 +1,11 @@
+ {
+   "edge_indices": [
+-    219,
+-    220,
+-    221,
+-    222,
+-    223,
+-    224
++    213,
++    214,
++    215,
++    216,
++    217,
++    218
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/RS-30.json
++++ b/docs/graph/parts/prompts/RS-30.json
+@@ -1,8 +1,8 @@
+ {
+   "edge_indices": [
+-    225,
+-    226,
+-    227
++    219,
++    220,
++    221
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/RS-40.json
++++ b/docs/graph/parts/prompts/RS-40.json
+@@ -1,10 +1,11 @@
+ {
+   "edge_indices": [
+-    228,
+-    229,
+-    230,
+-    231,
+-    232
++    222,
++    223,
++    224,
++    225,
++    226,
++    129
+   ],
+   "edges": [
+     {
+--- a/docs/graph/parts/prompts/UTIL-10.json
++++ b/docs/graph/parts/prompts/UTIL-10.json
+@@ -1,7 +1,7 @@
+ {
+   "edge_indices": [
+-    233,
+-    234
++    227,
++    228
+   ],
+   "edges": [
+     {

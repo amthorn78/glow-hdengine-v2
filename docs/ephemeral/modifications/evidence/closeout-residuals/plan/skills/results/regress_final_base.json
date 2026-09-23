@@ -1,0 +1,326 @@
+[
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:clean",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:D1 bogus comment <!x",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:D2 processing instruction <?",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:D3 unclosed <script>",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:D4 unclosed <![CDATA[",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:Q1 unclosed <style>",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:Q2b <template>",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:Q4 [//]: # reference comment",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:Q3 marker-shaped comment (F2)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:Q5 ASCII arrow --> is prose (F4 over-reach; must PASS)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_FAIL",
+   "exit 1",
+   [
+    "FMV-GCF-DISPATCH-001",
+    "an HTML comment other than a whole-line FLOWMASTER section marker is present; it can hide or contradict the pinned text"
+   ]
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:O1 >     { in a block quote (N2/F1)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:O2b -     { list item (N2/F1)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:O2c 1.     { ordered item (N2/F1)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:O3 space-tab indentation (N2/F1)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:K3 runtime map rows reversed (N3)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G3 relay retired phrase re-injected: exact predecessor assessment",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G4 relay retired phrase re-injected: predecessor assessment is the default",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G5 relay retired phrase re-injected: surface/model/reasoning recommendation",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G6 relay retired phrase re-injected: assess or preserve advice for the destination's whole operation",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G7 relay retired phrase re-injected: eligible human recommendation",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G8 relay retired phrase re-injected: optional digest",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G9 relay retired phrase re-injected: preferred artifact plane",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G10 relay retired phrase re-injected: ARTIFACT_PLANE: GOOGLE_DRIVE | NONE",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G11 relay retired phrase re-injected: Drive `Glow / Ops` contains",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G12 change-flow retired phrase re-injected: source revision/content identity",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G12c the same phrase inside the prohibition block is not active (control; must PASS)",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G13 flowmaster-validate retired phrase re-injected in SKILL.md: its recursively loaded corpus",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G14 flowmaster-validate retired phrase re-injected in SKILL.md: Validate the complete 55 prompt bodies",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G15 flowmaster-validate retired phrase re-injected in SKILL.md: against the supplied complete corpus",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G16 flowmaster-validate retired phrase re-injected in SKILL.md: the complete candidate snapshot root",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G17 flowmaster-validate retired phrase re-injected in references/gcfpe-20260914.1-091426.1-validation-profile.json: complete 55-member prompt corpus",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress_plan:base-controls",
+  "case": "control:base:G18 flowmaster-validate retired phrase re-injected in scripts/validate_flowmaster.py: Candidate snapshot root containing prompts/",
+  "ok": true,
+  "control": true,
+  "detail": [
+   "FLOWMASTER_SUITE_PASS",
+   "exit 0"
+  ]
+ }
+]

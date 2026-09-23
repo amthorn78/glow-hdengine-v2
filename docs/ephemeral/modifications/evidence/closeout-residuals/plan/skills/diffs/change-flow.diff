@@ -1,0 +1,133 @@
+diff -ruN a/SKILL.md b/SKILL.md
+--- a/SKILL.md	2026-09-23 13:11:39.047185273 +0000
++++ b/SKILL.md	2026-09-23 23:12:52.590579577 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Change Flow
+ 
+-CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0
++CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.1
+ 
+ Lifecycle note: the bundled gate hard-required `selection_status == "UNSELECTED_CANDIDATE"` and a
+ `candidate_page_binding` on every member. Promotion sets the first to `SELECTED_PRODUCTION` and
+@@ -264,6 +264,8 @@
+ 
+ For every GCFPE main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never creates, spawns, launches or schedules a session; when no existing authoritative session can do the work, it returns the paste-ready `NEXT_PROMPT_HANDOFF` and stops for Nathan.
+ 
++For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direct Notion URL, keeps no copy, hash or snapshot of its body, reads it from Notion again at each use, and stops under prompt drift when that identity resolves to a different version (`D22`).
++
+ ### Runtime entry gate
+ 
+ Require all of the following before the first state-changing dispatch:
+@@ -277,7 +279,7 @@
+ - The policy for each planned PR work unit, run in two dedicated sessions, using `glow-hde-pr-development` as the sole primary skill across PR-30 implementation/publication, PR-35 review/readiness, interrupted recovery, and eligible RS-40 continuation.
+ - The exact authorized environment execution route for bounded Ops and QA work.
+ - For HDE execution, carry required capabilities, actual execution surface and source/runtime identity, verified checks and material gaps, applicable authority and remaining attempt limits, evidence destination, and cleanup/recovery owner in the output artifact that the handoff names. A login, smoke check, or delivered handoff does not prove complete environment readiness. This adds no universal artifact or approval stage.
+-- A durable ledger identity and the exact complete selected component manifest resolved from the GCFPE register. The observed selected release, prompt family, member count, and unique identities must agree across register, catalog, prompt pages, and current direct-handoff contract. At this repair's staging boundary the predecessor remains `GCFPE-20260913.1 / 091326.2 / 54`, while `GCFPE-20260914.1 / 091426.1 / 55` is the collision-checked reserved successor until the register actually selects it; never treat reservation or publication as selection. The selected set includes RS-40 continuation and Product-Owner-only PR-50 terminal control; a selected PR-35 is lawful only as the second phase of the existing GCF-17 PR work unit. Group the fresh audit, historical comparison, complete triage, and readiness phases under one QA-10 invocation.
++- A durable ledger identity and the exact complete selected component manifest resolved from the GCFPE register. The observed selected release, prompt family, member count, and unique identities must agree across register, catalog, prompt pages, and current direct-handoff contract. The register, not this skill, names the selected release; `GCFPE-20260913.1 / 091326.2 / 54` is a superseded predecessor. Never treat reservation or publication as selection. The selected set includes RS-40 continuation and Product-Owner-only PR-50 terminal control; a selected PR-35 is lawful only as the second phase of the existing GCF-17 PR work unit. Group the fresh audit, historical comparison, complete triage, and readiness phases under one QA-10 invocation.
+ - For AUTOMATED_ORCHESTRATION only: exact evidence that the Product Owner released the existing recovery hold. This is not an input prerequisite for an explicit Product Owner `MANUAL_PROMPT_EXECUTION` invocation within native authority.
+ 
+ Reject a missing component, inactive component, prompt/contract conflict, partial class-only manifest, or unselected candidate. Do not start a partial route or advertise a limited operating mode.
+@@ -292,7 +294,7 @@
+ 
+ Reusable prompt bodies remain in Notion. All runtime planning files and planning artifacts are efficient, machine-readable Markdown in `docs/ephemeral`. The producer writes the complete artifact there, commits it on the work unit's existing working branch, and carries the exact repository path into dependent handoffs. The work unit keeps exactly one branch and one pull request; do not cut a second branch or open a second pull request for artifacts. The Product Owner merges; no agent merges, and an open pull request is a complete outcome. Local scratch is active working state only. Do not use opaque conversation-history identifiers or require a later session to reconstruct important work from conversation context.
+ 
+-For a GCFPE-bound task, record exact change, Specification identity/version when it exists, component or requirement IDs, work-unit ID, ecosystem release, prompt stable ID/version/direct Notion URL, retrieved source revision/content identity when available, role/stage, capture time, and observed result artifact, PR, branch, commit, and evidence links. Missing historical or not-yet-created facts remain explicitly unknown with a reason. Never store prompt bodies in repository usage records or invent schema fields, helper success, approvals, or platform interfaces.
++For a GCFPE-bound task, record exact change, Specification identity/version when it exists, component or requirement IDs, work-unit ID, ecosystem release, prompt stable ID/version/direct Notion URL, retrieved source revision when available, role/stage, capture time, and observed result artifact, PR, branch, commit, and evidence links. Missing historical or not-yet-created facts remain explicitly unknown with a reason. Never store prompt bodies in repository usage records or invent schema fields, helper success, approvals, or platform interfaces.
+ 
+ Every nonterminal result ends with exactly one fenced `text` `NEXT_PROMPT_HANDOFF` block that is itself the complete prompt the operator can paste into the receiving session. It is not a metadata list, blank form, menu, or routing summary. The block names the exact destination prompt by full name, version and direct Notion URL; the receiving role and session; each input artifact by repository path, with a one-line label; the pull request reference when the receiver continues an existing PR; and, only for a condition those artifacts do not already record, the minimum context it needs. It carries no branch and no commit: an artifact is identified by its versioned filename, and an issued version is never edited. It does not restate history, architecture, decisions, scope, acceptance criteria, workflow rules or artifact contents that the named prompt, canon or files hold. No placeholders, menus, alternate destinations, "above", prior-chat reconstruction or unlinked filenames. Populate only the actual qualified branch. Terminal results state completion and the native Product Owner return. The final response ends with the `NEXT_PROMPT_HANDOFF` block. Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.
+ 
+@@ -332,7 +334,7 @@
+ 
+ PR merges remain Nathan / Product Owner manual actions. This specialization never authorizes an agent to merge, enable auto-merge, or schedule a merge. Proceed, review completion, deployment permission, tool access, or orchestration authority never supplies merge permission. PR-35's `MERGE_PENDING` is historical pre-merge evidence; only where no `MERGE_OBSERVED` result was returned for this merge, Nathan's later invocation asserts that Nathan manually merged; PR-40 then independently verifies actual merged state and landed lineage read-only. At `MERGE_PENDING`, return control with the result, including the conditional `PR-40` block for Nathan, which is usable only after he merges and only where no `MERGE_OBSERVED` result was returned for this merge; stay subscribed and do not poll. When the active subscription delivers the merge of the identified PR — a merge Nathan performs — return `MERGE_OBSERVED` with the paste-ready `PR-40` handoff and return control. Nathan creates the PR-40 session and pastes it. The observed merge event is the fact PR-40 is entered on; `PR-40` still verifies the merged state and landed lineage independently. No agent merges, and no session is created by an agent. PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, otherwise the fallback block. Once either has been pasted, the other is void. Never present `MERGE_PENDING` as a current post-merge fact.
+ 
+-For HDE-EPIC040 Alpha, the sole operative state is `state: ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR`, `last_accepted_unit: HDE-EPIC040-PR03`, `last_accepted_state: ACCEPTED_FINAL`, `next_intended_unit: HDE-EPIC040-PR04`, `next_intended_stage: PR-10`, `current_handoff_status: NOT_YET_APPROVED`, and `resume_authority: Nathan / Product Owner`. Older PR02/RS-20 and superseded PR04 handoffs are historical and non-operative. Even after a successor passes promotion, archival, and post-promotion validation, this skill may prepare and read back only one complete selected-PR-10 invocation for Nathan; it must not execute PR-10, begin PR04 planning, or resume Alpha. Alpha moves only when Nathan separately approves and manually invokes that exact fresh handoff.
++HDE-EPIC040 Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record, landed by pull request; a work unit's acceptance is its PR-40 lineage review (`D18` successor, 2026-09-23). No skill, Notion page or contract field holds it: the `alpha_resumption_contract` in the graph and the 091426.1 contract is the record made at promotion, validated unchanged as that record and never read as current Alpha state. Nathan starts every Alpha stage by pasting its handoff; this skill neither resumes nor advances Alpha on its own authority, and a resumption is never a Proceed.
+ 
+ ### Artifact availability at each native stage
+ 
+diff -ruN a/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json b/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
+--- a/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-23 13:11:39.059185274 +0000
++++ b/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-23 23:15:23.299620873 +0000
+@@ -353,7 +353,7 @@
+     "version": "091426.1"
+   },
+   "contract_id": "GCFPE-20260914.1-091426.1-DIRECT-HANDOFF-SELECTED",
+-  "contract_revision": "4.1.0",
++  "contract_revision": "4.1.1",
+   "control_manifest": {
+     "candidate_contract_role": "UNSELECTED_VERSIONED_SKILL_REFERENCE; DOES_NOT ALTER LIVE SELECTION",
+     "candidate_controls_resolve_through_release_register_at_promotion": true,
+@@ -3023,7 +3023,7 @@
+       "PRODUCT_OWNER_DECISION_REQUIRED"
+     ],
+     "primary_skill": "glow-hde-pr-development",
+-    "primary_skill_revision": "1.3.0",
++    "primary_skill_revision": "1.3.1",
+     "r1_row": "GCF-17",
+     "recover_existing_work_before_create": true,
+     "resolve_known_findings_and_retest_before_coherent_corrective_push": true,
+diff -ruN a/scripts/validate_gcfpe_20260914.py b/scripts/validate_gcfpe_20260914.py
+--- a/scripts/validate_gcfpe_20260914.py	2026-09-23 13:11:39.066892819 +0000
++++ b/scripts/validate_gcfpe_20260914.py	2026-09-23 23:12:52.592743040 +0000
+@@ -743,12 +743,12 @@
+     topology_bytes = TOPOLOGY_READBACK.read_bytes()
+     topology = json.loads(topology_bytes.decode("utf-8"))
+ 
+-    require("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0" in skill, "specialization revision")
++    require("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.1" in skill, "specialization revision")
+     require("Resolve the selected GCFPE operating procedure through the release register's direct binding" in skill, "register-bound operating procedure")
+     require("Do not infer a `Glow / Ops` procedure route" in skill, "no inferred Ops procedure route")
+     require(sha256(marked_core(skill_bytes)) == EXPECTED_CORE_SHA, "protected Primary core SHA")
+     require(contract["target_release"] == "GCFPE-20260914.1", "target release")
+-    require(contract["contract_revision"] == "4.1.0", "corrected-source contract revision")
++    require(contract["contract_revision"] == "4.1.1", "corrected-source contract revision")
+     require(contract["prompt_version"] == "091426.1", "prompt family")
+     require(contract["candidate_member_count"] == 55, "candidate member count")
+     # Was pinned to UNSELECTED_CANDIDATE with no production branch, so this gate
+@@ -799,9 +799,9 @@
+     require(graph["contract_id"] == "GCFPE-20260914.1-CANDIDATE-GRAPH", "graph contract ID")
+     require(graph["schema_version"] == "gcfpe-candidate-graph-contract/2.1", "graph schema version")
+     require(graph["candidate"]["member_count"] == 55, "graph candidate count")
+-    # D15: the candidate graph carries 227 edges after the drainage removal re-pointed
+-    # the qualifying-approval branches. Measured against the graph and the contract's
+-    # own declared count, so the two cannot drift apart again.
++    # D15 left 227 edges after the drainage removal re-pointed the qualifying-approval
++    # branches; D23's two observed-merge edges (Amendment 1, A1-7) make 229. Measured
++    # against the graph and the contract's own declared count, so the two cannot drift apart again.
+     require(
+         len(graph["edges"]) == 229
+         and contract["graph_proofs"]["route_edge_count"] == len(graph["edges"]),
+@@ -1014,8 +1014,11 @@
+     require(contract["abort_prompt"]["invoker"] == "Nathan / Product Owner", "PR-50 manual invoker")
+     require(contract["post_merge_three_event_contract"]["agent_merge_authorized"] is False, "no agent merge")
+     require(contract["protected_identities"]["r1_rows"] == 46, "46-row R1")
+-    require(contract["alpha_resumption_contract"]["successor_trigger"]["execute_pr10"] is False, "PR-10 prepare only")
+-    require(contract["alpha_resumption_contract"]["successor_trigger"]["resume_alpha"] is False, "Alpha remains stopped")
++    # The promotion-time record of the Alpha resumption contract, pinned with its values unchanged
++    # (ruling 5 Q3 (A), 2026-09-23). It is not current Alpha state, which the Epic's own artifacts
++    # record (D18 successor).
++    require(contract["alpha_resumption_contract"]["successor_trigger"]["execute_pr10"] is False, "Alpha promotion record: execute_pr10 false")
++    require(contract["alpha_resumption_contract"]["successor_trigger"]["resume_alpha"] is False, "Alpha promotion record: resume_alpha false")
+ 
+     for text in (
+         "PR-30 and PR-35 are two phases",
+@@ -1030,7 +1033,7 @@
+         "PF10_BUILD_NOTES_ADDENDUM",
+         "SOURCE_RESOLUTION_ERROR",
+         "Only Nathan / Product Owner may manually invoke selected `PR-50",
+-        "ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR",
++        "Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record",
+     ):
+         require(text in skill, f"missing skill clause: {text}")
+ 
+@@ -1049,6 +1052,9 @@
+         "The same dedicated PR session implements only that work unit",
+         "Only after Nathan later asserts that the identified PR was manually merged may that invocation run",
+         "GCF-14 — Create one dedicated PR session for one planned PR work unit",
++        # ITEM-39: the retired D18 Alpha-state sentence. ITEM-06 / ITEM-16 (D22): a prompt's content identity.
++        "For HDE-EPIC040 Alpha, the sole operative state is",
++        "source revision/content identity",
+     ):
+         require(text.lower() not in skill.lower(), f"retired skill clause present: {text}")
+ 

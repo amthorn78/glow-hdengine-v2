@@ -1,0 +1,1302 @@
+{
+ "inputs": {
+  "canonical_texts": 75,
+  "spec_v2_sha256": "c273dbc80a1c18b94fc6672bc3c5482930040122b0bff4f40d824a20e724e3bb",
+  "decision_record_sha256": "003a9f3f62140a675bed7186f39701cf96755cb782bd24ed676169879a1e181a",
+  "once_per_merge_read": true,
+  "plan_result_sha256": "ee19b3f9fc1e45debb0de961a672c302b864e3fdeff6eacb935bc4fba3999242",
+  "r1_engine_locals_sha256": "4753612196499eb08a75ed1f2a22e5a00015bcfd3cd4025f498b5af2a4b05583",
+  "r1_engine_rules_sha256": "08fe4baba2924e8d1eabeaa6f2b00ce6f9e1953f40c25cfd897630750299bfd3",
+  "decisions_sha256": "a01f6df164b5123d5f29edc7a22a9fb94031fe6fa05ed07f1f65f01bed61c315",
+  "decisions_literals_found_verbatim": {
+   "P-01": true,
+   "P-02": true,
+   "P-03": true,
+   "P-04": true,
+   "P-14": true,
+   "P-32": true
+  },
+  "authored_texts": 188
+ },
+ "T1_regex_compile_failures": [],
+ "T1_python": "3.11.15",
+ "T2_checks_run": 440,
+ "T2_failures": [],
+ "T3_new_forbidden_on_canonical": [
+  [
+   "G-K51",
+   "**Material** means a change to the Epic-level comm"
+  ]
+ ],
+ "T3_new_forbidden_on_authored": [
+  [
+   "G-K44",
+   "plan_result rule R-ITEM18",
+   "The Candidate CRD Items List is the Notion page `Candidate C"
+  ],
+  [
+   "G-K44",
+   "r1 engine ITEM18_NEW",
+   "The Candidate CRD Items List is the Notion page `Candidate C"
+  ]
+ ],
+ "T3_texts": {
+  "canonical": 75,
+  "authored": 188,
+  "patterns": 55
+ },
+ "T3_unexpected_hits": [],
+ "T4_rows_with_docs": 50,
+ "T4_required_unsatisfied": [],
+ "T4_new_forbidden_hits_on_docs": [],
+ "T4_any_row_forbidden_on_after_texts": [],
+ "T4_case_regressions_run": 451,
+ "T4_case_regressions_not_caught": [],
+ "T8_regression_runs": 697,
+ "T8_failures": [],
+ "T8_max_words": {
+  "REGRESSIONS": 12,
+  "CASES": 15
+ },
+ "T8_over_15_words": [],
+ "T8_forbidden_not_minimal": [
+  [
+   "G-K55",
+   "PR-30",
+   11,
+   7,
+   "outside the approved Plan, return the metadata"
+  ]
+ ],
+ "T8_body_anchor_quotes_over_15_words": [],
+ "T5_forbidden_patterns_in_new_registry": 76,
+ "T5_forbidden_hits_on_P01_P02": {
+  "P-01": [],
+  "P-02": []
+ },
+ "T5_G06_hits_per_lead": {
+  "P-01": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "P-02": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "PR-40 input + P-01": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "LPR-20-3": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "LRS-20-1": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "LRS-40-1": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "LPR-35-1+2": [
+   false,
+   false,
+   false,
+   false,
+   false
+  ]
+ },
+ "T5_G06_on_first_round_sentence (control, expected true)": [
+  true,
+  true,
+  true,
+  true,
+  true
+ ],
+ "T5_G06_rows": 53,
+ "T5_G-K22_matches_P01": true,
+ "T5_G-K36_matches_P02": true,
+ "T6_release_lines": {
+  "**`Prompt version`**: x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "3. **`Set`**: x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "- Settings: x": {
+   "expected": false,
+   "new (P-16)": false,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "Set up the run:": {
+   "expected": false,
+   "new (P-16)": false,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "Prompt version: 1.2.0": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": true,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "**Set:** x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": true,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "`Set`: x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": true,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "> **Ecosystem release**: x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": true,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "| Ecosystem release | x |": {
+   "expected": false,
+   "new (P-16)": false,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "The check rejects `Prompt version:` in a header.": {
+   "expected": false,
+   "new (P-16)": false,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "__Prompt Version__: x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": true,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "- **`Ecosystem release`**: x": {
+   "expected": true,
+   "new (P-16)": true,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "Settings: x": {
+   "expected": false,
+   "new (P-16)": false,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  },
+  "Setup: x": {
+   "expected": false,
+   "new (P-16)": false,
+   "first-round suffix": false,
+   "R-ITEM23 single pattern agrees": true,
+   "old window guard": false
+  }
+ },
+ "T6_ok": true,
+ "T6_new_patterns_on_canonical": [],
+ "T6_engine_RELEASE_equals_R-ITEM23_pattern": true,
+ "T7_NAM002": {
+  "old registry": {
+   "sources": 55,
+   "rows": 55,
+   "unplaced_rows": [],
+   "NAM-002": 55,
+   "NAM-002_rows": [
+    "CF-C-10",
+    "CF-C-20",
+    "CF-C-30",
+    "CF-C-40",
+    "CF-E-10",
+    "CF-E-20",
+    "CF-E-30",
+    "CF-E-40",
+    "CF-PO-10",
+    "CL-20",
+    "CL-30",
+    "CL-40",
+    "CL-C-10",
+    "CL-E-10",
+    "CL-E-20",
+    "CL-E-30",
+    "CL-E-40",
+    "DOC-10",
+    "DOC-20",
+    "ESC-10",
+    "ESC-25",
+    "ESC-30",
+    "ESC-40",
+    "GCFPE-MGMT-10",
+    "IA-10",
+    "IA-20",
+    "IA-30",
+    "IA-40",
+    "IA-50",
+    "IA-60",
+    "MGR-10",
+    "OPS-10",
+    "OPS-20",
+    "OPS-30",
+    "PR-10",
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "PR-40",
+    "PR-50",
+    "QA-10",
+    "QA-100",
+    "QA-110",
+    "QA-120",
+    "QA-20",
+    "QA-50",
+    "QA-60",
+    "QA-70",
+    "QA-80",
+    "QA-90",
+    "RS-10",
+    "RS-20",
+    "RS-30",
+    "RS-40",
+    "UTIL-10"
+   ],
+   "NAM-001": [],
+   "other_errors": 0,
+   "other_prompt_findings": [],
+   "non_prompt_findings": [
+    "COL-002",
+    "SRC-001"
+   ]
+  },
+  "new registry": {
+   "sources": 55,
+   "rows": 55,
+   "unplaced_rows": [],
+   "NAM-002": 0,
+   "NAM-002_rows": [],
+   "NAM-001": [],
+   "other_errors": 0,
+   "other_prompt_findings": [],
+   "non_prompt_findings": [
+    "COL-002",
+    "SRC-001"
+   ]
+  },
+  "new registry, ESC-10 parent injected wrong": {
+   "sources": 55,
+   "rows": 55,
+   "unplaced_rows": [],
+   "NAM-002": 1,
+   "NAM-002_rows": [
+    "ESC-10"
+   ],
+   "NAM-001": [],
+   "other_errors": 0,
+   "other_prompt_findings": [],
+   "non_prompt_findings": [
+    "COL-002",
+    "SRC-001"
+   ]
+  }
+ },
+ "T7_ok": true,
+ "T9_local_edits": 66,
+ "T9_unguarded_heuristic": [
+  [
+   "LCF-C-20-2",
+   "CF-C-20",
+   "insert_after"
+  ],
+  [
+   "LCF-E-20-2",
+   "CF-E-20",
+   "insert_after"
+  ],
+  [
+   "LCF-C-30-1",
+   "CF-C-30",
+   "replace"
+  ],
+  [
+   "LCF-C-30-3",
+   "CF-C-30",
+   "insert_after"
+  ],
+  [
+   "LCF-E-30-1",
+   "CF-E-30",
+   "replace"
+  ],
+  [
+   "LCF-E-30-3",
+   "CF-E-30",
+   "insert_after"
+  ],
+  [
+   "LCF-C-40-1",
+   "CF-C-40",
+   "replace"
+  ],
+  [
+   "LCF-C-40-3",
+   "CF-C-40",
+   "insert_after"
+  ],
+  [
+   "LCF-E-40-1",
+   "CF-E-40",
+   "replace"
+  ],
+  [
+   "LCF-E-40-3",
+   "CF-E-40",
+   "insert_after"
+  ],
+  [
+   "LCL-30-2",
+   "CL-30",
+   "replace"
+  ],
+  [
+   "LOPS-10-2",
+   "OPS-10",
+   "replace"
+  ],
+  [
+   "LOPS-20-1",
+   "OPS-20",
+   "replace"
+  ],
+  [
+   "LPR-10-4",
+   "PR-10",
+   "replace"
+  ],
+  [
+   "LPR-20-6",
+   "PR-20",
+   "replace"
+  ],
+  [
+   "LPR-20-7",
+   "PR-20",
+   "replace"
+  ],
+  [
+   "LPR-20-8",
+   "PR-20",
+   "replace"
+  ],
+  [
+   "LPR-35-1",
+   "PR-35",
+   "replace"
+  ],
+  [
+   "LPR-40-2",
+   "PR-40",
+   "replace"
+  ]
+ ],
+ "T9_guard_not_silent_on_new_text": [],
+ "T9_detail": [
+  {
+   "edit": "LCF-C-10-1",
+   "row": "CF-C-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "recovery package carries the original CLASS_SELECT",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-10-2",
+   "row": "CF-C-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "UNRESOLVED_CLASSIFICATION_CASE with the preserved ",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-10-1",
+   "row": "CF-E-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "recovery package carries the original CLASS_SELECT",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-10-2",
+   "row": "CF-E-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "UNRESOLVED_CLASSIFICATION_CASE with the preserved ",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-20-1",
+   "row": "CF-C-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "direct package contains the exact pending Specific",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-20-2",
+   "row": "CF-C-20",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-20-3",
+   "row": "CF-C-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "recovery carries the original kickoff link, exact ",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-20-1",
+   "row": "CF-E-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "direct package contains the exact pending Specific",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-20-2",
+   "row": "CF-E-20",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-20-3",
+   "row": "CF-E-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "recovery carries the original kickoff link, exact ",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-30-1",
+   "row": "CF-C-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-30-2",
+   "row": "CF-C-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "and approval lineage, the carried conflict registe",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-30-3",
+   "row": "CF-C-30",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-30-1",
+   "row": "CF-E-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-30-2",
+   "row": "CF-E-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "and approval lineage, the carried conflict registe",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-30-3",
+   "row": "CF-E-30",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-40-1",
+   "row": "CF-C-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-40-2",
+   "row": "CF-C-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "actual mode, class/change/base lineage",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-C-40-3",
+   "row": "CF-C-40",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-40-1",
+   "row": "CF-E-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-40-2",
+   "row": "CF-E-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "actual mode, class/change/base lineage",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCF-E-40-3",
+   "row": "CF-E-40",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LGCFPE-MGMT-10-PROPOSED-1",
+   "row": "GCFPE-MGMT-10-PROPOSED",
+   "kind": "not a registry row (PART-11 gate)",
+   "guards": []
+  },
+  {
+   "edit": "LCL-20-1",
+   "row": "CL-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "carrying the exact qualified condition, lineage, e",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCL-30-1",
+   "row": "CL-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry the complete candidate, positive closure and",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCL-30-2",
+   "row": "CL-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LCL-C-10-1",
+   "row": "CL-C-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry exact (?:CRD|Epic) Specification|Each runnab",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCL-C-10-2",
+   "row": "CL-C-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry exact (?:CRD|Epic) Specification|Each runnab",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCL-E-10-1",
+   "row": "CL-E-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry exact (?:CRD|Epic) Specification|Each runnab",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LCL-E-10-2",
+   "row": "CL-E-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry exact (?:CRD|Epic) Specification|Each runnab",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LDOC-10-1",
+   "row": "DOC-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "only after Nathan asserts it occurred may PR-40|Na",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LDOC-20-1",
+   "row": "DOC-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "only after Nathan asserts it occurred may PR-40|Na",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LDOC-20-2",
+   "row": "DOC-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "needed after Nathan's assertion: continue to `?PR-",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LOPS-10-1",
+   "row": "OPS-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "must preserve in its execution result and return h",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LOPS-10-2",
+   "row": "OPS-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LOPS-20-1",
+   "row": "OPS-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LOPS-30-1",
+   "row": "OPS-30",
+   "action": "delete",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "A saved attachment, link or scattered fields do no",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-10-1",
+   "row": "PR-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "(?:^(?:Complete native input package|(?:Exact |Req",
+     true
+    ],
+    [
+     "fires on anchor",
+     "carry PR_INSTRUCTION_ID and its complete content|d",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-10-2",
+   "row": "PR-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "(?i)\\b(?:hands?|carry|carrying|carries)\\s+(?:the\\s",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-10-3",
+   "row": "PR-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "only after Nathan asserts it occurred may PR-40|Na",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-10-4",
+   "row": "PR-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-1",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "(?i)\\b(?:hands?|carry|carrying|carries)\\s+(?:the\\s",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-2",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "(?i)\\b(?:hands?|carry|carrying|carries)\\s+(?:the\\s",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-3",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "(?:^(?:Complete native input package|(?:Exact |Req",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-4",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "only after Nathan asserts it occurred may PR-40|Na",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-5",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocat",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-6",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-7",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-20-8",
+   "row": "PR-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-30-1",
+   "row": "PR-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "(?i)\\b(?:hands?|carry|carrying|carries)\\s+(?:the\\s",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-30-2",
+   "row": "PR-30",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "outside the approved Plan, return the metadata\\b",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-35-1",
+   "row": "PR-35",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-35-2",
+   "row": "PR-35",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [
+    [
+     "required matches new_text",
+     "verified at entry from the recorded vehicle and re",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-1",
+   "row": "PR-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "PR instruction and implementation result; actual m",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-2",
+   "row": "PR-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-3",
+   "row": "PR-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "(?:^(?:Complete native input package|(?:Exact |Req",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-4",
+   "row": "PR-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry original Proceed, dedicated PR session, work",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-5",
+   "row": "PR-40",
+   "action": "insert_after",
+   "kind": "registry row",
+   "guards": [
+    [
+     "required matches new_text",
+     "verified at entry from the recorded vehicle and re",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-6",
+   "row": "PR-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "only after Nathan asserts it occurred may PR-40|Na",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LPR-40-7",
+   "row": "PR-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "only after Nathan asserts it occurred may PR-40|Na",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LRS-20-1",
+   "row": "RS-20",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Carry original Proceed, dedicated PR session, work",
+     true
+    ],
+    [
+     "required matches new_text",
+     "verified at entry from the recorded vehicle and re",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LRS-40-1",
+   "row": "RS-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "required matches new_text",
+     "verified at entry from the recorded vehicle and re",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LRS-40-2",
+   "row": "RS-40",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "overlaps anchor (>=4 words)",
+     "usable only after Nathan later manually merges the",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LRS-40-3",
+   "row": "RS-40",
+   "action": "delete",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocat",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LQA-10-P03",
+   "row": "QA-10",
+   "action": "replace",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "read-only audit and readiness role",
+     true
+    ]
+   ],
+   "silent_after": true
+  },
+  {
+   "edit": "LQA-10-P19",
+   "row": "QA-10",
+   "action": "delete",
+   "kind": "registry row",
+   "guards": [
+    [
+     "fires on anchor",
+     "A saved attachment, link or scattered fields do no",
+     true
+    ]
+   ],
+   "silent_after": true
+  }
+ ],
+ "T10_P15": {
+  "P-15 (revised): insert after 'Do not fix it here.' (engine)": {
+   "G-K47 fires before": true,
+   "G-K47 silent after": true,
+   "G-K48 matches after": true,
+   "G-K47 fires when the new sentence is deleted": true
+  },
+  "first P-15: insert between": {
+   "G-K47 fires before": true,
+   "G-K47 silent after": true,
+   "G-K48 matches after": true,
+   "G-K47 fires when the new sentence is deleted": true
+  },
+  "engine R-ITEM34 anchor": "(\"R-ITEM34\", r\"(?<=code/Ops remediation\\. Do not fix it here\\.)\", \"replace\", ITEM34_NEW, each([\"QA-110\"])),  # P-15 rev.",
+  "engine anchor = P-15 (revised) placement": true,
+  "G-K47 on a second, unrelated 'Do not fix it here.' line (fires: the pattern is not site-scoped)": false,
+  "site-scoped variant": "code/Ops remediation\\. Do not fix it here\\.(?! This applies only before the whole approved run is complete)",
+  "site-scoped variant: fires before / silent after / silent on a second line": [
+   true,
+   true,
+   true
+  ]
+ },
+ "T11_K52": {
+  "pattern": "decision lineage; existing ADR/conflict history",
+  "equals dry-run B candidate": true,
+  "fires on pre-edit clause": true,
+  "silent after LCL-30-2": true,
+  "regression words": 5,
+  "regression fires": true,
+  "silent on CL-30 synthetic doc": true,
+  "hits on canonical/authored": []
+ },
+ "T12_dryrun_load_guards_runs": 697,
+ "T12_failures": [],
+ "T13_site_level_only": {
+  "RS-40 LRS-40-2": {
+   "words": 14,
+   "row guards firing on the phrase alone": [],
+   "row guards firing on the pre-edit bullet": [
+    "Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocat"
+   ]
+  }
+ },
+ "ALL_OK": true
+}

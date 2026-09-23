@@ -1,0 +1,328 @@
+[
+ {
+  "name": "validate_flowmaster.default",
+  "exit": 0,
+  "summary": {
+   "verdict": "FLOWMASTER_SUITE_PASS",
+   "findings": 0,
+   "warnings": 0,
+   "advisories": 0,
+   "finding_rules": [],
+   "gcfpe_20260914_candidate": "NOT_REQUESTED",
+   "gcfpe_20260914_candidate_fixtures": "NOT_REQUESTED"
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/validate_flowmaster.py",
+   "--skills-root",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base",
+   "--strict-warnings"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "validate_flowmaster.candidate",
+  "exit": 0,
+  "summary": {
+   "verdict": "FLOWMASTER_SUITE_PASS",
+   "findings": 0,
+   "warnings": 0,
+   "advisories": 0,
+   "finding_rules": [],
+   "gcfpe_20260914_candidate": null,
+   "gcfpe_20260914_candidate_fixtures": null
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/validate_flowmaster.py",
+   "--skills-root",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base",
+   "--strict-warnings",
+   "--gcfpe-contract",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "--gcfpe-candidate-root",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/cand-root-base"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "run_change_flow_fixtures",
+  "exit": 0,
+  "summary": {
+   "total": 32,
+   "fixture_suite_ok": true,
+   "passed_expectations": 32,
+   "failed_expectations": 0,
+   "cases_passed": "32/32",
+   "not_passed": []
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/run_change_flow_fixtures.py"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "run_gcfpe_current_fixtures.default",
+  "exit": 0,
+  "summary": {
+   "case_count": 228,
+   "fixture_suite_ok": true,
+   "validator_revision": "3.3.0",
+   "section_13_passed": 37,
+   "section_13_fixture_count": 37,
+   "cases_passed": "228/228",
+   "not_passed": []
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/run_gcfpe_current_fixtures.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "run_gcfpe_current_fixtures.historical_alias",
+  "exit": 0,
+  "summary": {
+   "case_count": 82,
+   "fixture_suite_ok": true,
+   "receiver_case_count": 40,
+   "cases_passed": "82/82",
+   "not_passed": []
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/run_gcfpe_current_fixtures.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow",
+   "--contract",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow/references/gcfpe-current-direct-handoff-contract.json"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "run_gcfpe_20260914_fixtures",
+  "exit": 0,
+  "summary": {
+   "case_count": 228,
+   "fixture_suite_ok": true,
+   "validator_revision": "3.3.0",
+   "section_13_passed": 37,
+   "section_13_fixture_count": 37,
+   "cases_passed": "228/228",
+   "not_passed": []
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow",
+   "--contract",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "validate_gcfpe_20260914.candidate_root",
+  "exit": 0,
+  "summary": {
+   "ok": true,
+   "errors": [],
+   "contract_sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718",
+   "frozen_graph_sha256": "ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d",
+   "frozen_graph_edge_count": 229,
+   "prompt_body_checks_not_evaluated": [
+    "ALL_BODY_LEVEL_CHECKS"
+   ],
+   "candidate_root": null
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/validate_gcfpe_20260914.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow",
+   "--contract",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "--candidate-root",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/cand-root-base"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "validate_gcfpe_20260914.no_root",
+  "exit": 0,
+  "summary": {
+   "ok": true,
+   "errors": [],
+   "contract_sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718",
+   "frozen_graph_sha256": "ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d",
+   "frozen_graph_edge_count": 229,
+   "prompt_body_checks_not_evaluated": [
+    "ALL_BODY_LEVEL_CHECKS"
+   ],
+   "candidate_root": null
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/validate_gcfpe_20260914.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow",
+   "--contract",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "validate_gcfpe_current",
+  "exit": 0,
+  "summary": {
+   "ok": true,
+   "errors": [],
+   "contract_sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718",
+   "frozen_graph_sha256": "ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d",
+   "frozen_graph_edge_count": 229,
+   "prompt_body_checks_not_evaluated": [
+    "ALL_BODY_LEVEL_CHECKS"
+   ],
+   "candidate_root": null
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/flowmaster-validate/scripts/validate_gcfpe_current.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "change_flow_own_validator",
+  "exit": 0,
+  "summary": "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow/scripts/validate_gcfpe_20260914.py"
+  ],
+  "cwd": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/change-flow"
+ },
+ {
+  "name": "relay_self_test",
+  "exit": 0,
+  "summary": {
+   "status": "PASS",
+   "cases": 230,
+   "not_ok": []
+  },
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/session-relay-flowmaster/scripts/validate_relay_manifest.py",
+   "--self-test"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "pr_skill_validator",
+  "exit": 0,
+  "summary": "PASS: Glow HDE PR development skill structural contract",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-hde-pr-development/scripts/validate_glow_hde_pr_development.py"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "governance_audit_run_fixture_suite",
+  "exit": 0,
+  "summary": "OK",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "run_fixture_suite.py"
+  ],
+  "cwd": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/amthor-workspace-governance-audit/scripts"
+ },
+ {
+  "name": "graph_parts.build.today_parts",
+  "exit": 0,
+  "summary": [
+   "build: 55 nodes, 229 edges, 55 state_routes",
+   "       embedded JSON 575074 bytes  sha256 ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d",
+   "       validation PASS -> /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/g_today.md"
+  ],
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-graph-contract/scripts/graph_parts.py",
+   "build",
+   "/home/user/glow-hdengine-v2/docs/graph/parts",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/g_today.md"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "graph_parts.build.reindexed_parts",
+  "exit": 0,
+  "summary": [
+   "build: 55 nodes, 229 edges, 55 state_routes",
+   "       embedded JSON 575074 bytes  sha256 ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d",
+   "       validation PASS -> /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/g_reindexed.md"
+  ],
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-graph-contract/scripts/graph_parts.py",
+   "build",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/parts_reindexed",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/g_reindexed.md"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "registry_deriver.final_audit_1.13.0.repo_parts",
+  "exit": 2,
+  "summary": "SUMMARY_ERROR JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-graph-contract/scripts/registry_deriver.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/amthor-workspace-governance-audit",
+   "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+   "/home/user/glow-hdengine-v2/docs/graph/parts",
+   "--derive"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "registry_deriver.final_audit_1.13.0.reindexed_parts",
+  "exit": 2,
+  "summary": "SUMMARY_ERROR JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-graph-contract/scripts/registry_deriver.py",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/amthor-workspace-governance-audit",
+   "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/parts_reindexed",
+   "--derive"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "registry_deriver.installed_audit_1.12.0.repo_parts",
+  "exit": 2,
+  "summary": "SUMMARY_ERROR JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-graph-contract/scripts/registry_deriver.py",
+   "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/amthor-workspace-governance-audit",
+   "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+   "/home/user/glow-hdengine-v2/docs/graph/parts",
+   "--derive"
+  ],
+  "cwd": null
+ },
+ {
+  "name": "registry_deriver.installed_audit_1.12.0.reindexed_parts",
+  "exit": 2,
+  "summary": "SUMMARY_ERROR JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "cmd": [
+   "/usr/local/bin/python3",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/base/glow-graph-contract/scripts/registry_deriver.py",
+   "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/amthor-workspace-governance-audit",
+   "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+   "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/parts_reindexed",
+   "--derive"
+  ],
+  "cwd": null
+ }
+]

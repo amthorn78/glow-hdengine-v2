@@ -1,0 +1,169 @@
+[
+ {
+  "pid": "PR-10",
+  "page": "3db4590a05eb818e8359de1994e97a7d",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01MhXdoMHMWV9XoEGdfJNib4.json",
+  "fetched_as_of": "2026-09-23T13:19:07.698Z",
+  "checks": {
+   "CHECK R-26-FRAME": 0,
+   "CHECK R-26-BRANCH-SEND": 0,
+   "CHECK R-A7-LOCAL": 0,
+   "CHECK R-26-RSP-scan": 0
+  },
+  "rules_applied": 19,
+  "ops": {
+   "count": 15,
+   "reproduces_edit": true,
+   "max_old_str_lines": 5
+  },
+  "registry_findings_before": 17,
+  "guards_evaluated": 21,
+  "R-26-RSP-scan": {
+   "CHECK_after_all_edits": 0,
+   "exact_phrase_before_edit": 0,
+   "variant_complete_RESCOPE_PROPOSAL_before_and_after": 0,
+   "result": "0 on the unedited and the edited body; R-26-RSP needs no extension to this body (P-38)"
+  }
+ },
+ {
+  "pid": "PR-20",
+  "page": "3db4590a05eb8174abf8c04318ab04be",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_014yGSYLWJFTtSBas4XBH2sf.json",
+  "fetched_as_of": "2026-09-23T13:19:18.271Z",
+  "checks": {
+   "CHECK R-26-FRAME": 0,
+   "CHECK R-26-BRANCH-SEND": 0,
+   "CHECK R-A7-LOCAL": 0,
+   "CHECK R-26-RSP-scan": 0
+  },
+  "rules_applied": 23,
+  "ops": {
+   "count": 19,
+   "reproduces_edit": true,
+   "max_old_str_lines": 5
+  },
+  "registry_findings_before": 19,
+  "guards_evaluated": 23,
+  "R-26-RSP-scan": {
+   "CHECK_after_all_edits": 0,
+   "exact_phrase_before_edit": 0,
+   "variant_complete_RESCOPE_PROPOSAL_before_and_after": 0,
+   "result": "0 on the unedited and the edited body; R-26-RSP needs no extension to this body (P-38)"
+  }
+ },
+ {
+  "pid": "RS-20",
+  "page": "3db4590a05eb81c183aac2ecb40b1497",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9c8190f2ff54a007.jsonl (inline fetch result in this agent's transcript)",
+  "fetched_as_of": "2026-09-23T13:22:10.719Z",
+  "checks": {
+   "CHECK R-26-BRANCH-RECV": 0
+  },
+  "rules_applied": 5,
+  "ops": {
+   "count": 4,
+   "reproduces_edit": true,
+   "max_old_str_lines": 5
+  },
+  "registry_findings_before": 7,
+  "guards_evaluated": 13
+ },
+ {
+  "pid": "PR-35",
+  "page": "3db4590a05eb8120b443ed2cb08b723c",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9c8190f2ff54a007.jsonl (inline fetch result in this agent's transcript)",
+  "fetched_as_of": "2026-09-23T13:19:01.920Z",
+  "checks": {
+   "CHECK R-26-FRAME": 0,
+   "CHECK R-26-BRANCH-RECV": 0
+  },
+  "rules_applied": 8,
+  "ops": {
+   "count": 8,
+   "reproduces_edit": true,
+   "max_old_str_lines": 2
+  },
+  "registry_findings_before": 10,
+  "guards_evaluated": 17
+ },
+ {
+  "pid": "PR-40",
+  "page": "3db4590a05eb818786c5cb6051b4d634",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_018tsquLRqL7eRp6prJsGKYo.json",
+  "fetched_as_of": "2026-09-23T13:19:20.724Z",
+  "checks": {
+   "CHECK R-26-FRAME": 0,
+   "CHECK R-26-BRANCH-RECV": 0,
+   "CHECK R-A7-LOCAL": 0,
+   "CHECK R-26-RSP-scan": 0
+  },
+  "rules_applied": 25,
+  "ops": {
+   "count": 23,
+   "reproduces_edit": true,
+   "max_old_str_lines": 6
+  },
+  "registry_findings_before": 25,
+  "guards_evaluated": 28,
+  "R-26-RSP": {
+   "rule_hits": 1,
+   "expected": 1,
+   "CHECK_after": 0,
+   "guard_G-K53": {
+    "id": "G-K53",
+    "kind": "forbidden",
+    "fires_before": true,
+    "silent_after": true,
+    "fires_on_injection": true
+   }
+  }
+ },
+ {
+  "pid": "RS-40",
+  "page": "3db4590a05eb8183b5ffdf4270133226",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9c8190f2ff54a007.jsonl (inline fetch result in this agent's transcript)",
+  "fetched_as_of": "2026-09-23T13:19:10.807Z",
+  "checks": {
+   "CHECK R-26-BRANCH-RECV": 0,
+   "CHECK R-A7-LOCAL": 0
+  },
+  "rules_applied": 4,
+  "ops": {
+   "count": 2,
+   "reproduces_edit": true,
+   "max_old_str_lines": 2
+  },
+  "registry_findings_before": 4,
+  "guards_evaluated": 12
+ }
+]

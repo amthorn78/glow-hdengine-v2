@@ -1,0 +1,1557 @@
+[
+ {
+  "pid": "QA-10",
+  "page": "3db4590a05eb818bad2fcb4bc2610b29",
+  "fetched": "2026-09-23T13:21:56.515Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/mcp-Notion-notion-fetch-1790204518392.txt",
+  "harness_note": null,
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1b": 1,
+    "R-A1c": 1,
+    "R-A1d": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-A2f2": 1,
+    "R-A2g": 6,
+    "R-26-P1": 1,
+    "R-26-P4": 1,
+    "R-26-TASK": 1,
+    "R-A7-S1a": 1,
+    "R-A7-S1b": 1,
+    "R-A7-S2": 1,
+    "R-OWN": 1,
+    "R-A10": 1,
+    "R-A3a": 1,
+    "LQA-10-P03": 1
+   },
+   "ops": {
+    "count": 18,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [
+    [
+     "CTR-002",
+     "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write"
+    ]
+   ],
+   "new_guard_results_failing": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired",
+    "G-K36 (registry CTR-002 'Required pattern absent: Every statement in this prompt ...') is the OLD P-02 text ending 'commits and pushes\\.'; the body carries the NEW P-02 text once (placement OWN=1); new guard, recorded not repaired"
+   ]
+  },
+  "patches": [
+   {
+    "type": "local_add",
+    "target": "LQA-10-P19",
+    "old": null,
+    "new": {
+     "anchor": "A saved attachment, link or scattered fields do not replace the handoff.",
+     "action": "delete",
+     "new_text": "",
+     "position": "QA-10 LOCAL list, after LQA-10-P03"
+    },
+    "why": "P-19: the sentence OPS-30's LOPS-30-1 deletes is present once in QA-10's Task-only next-step transport section (after its heading, before the next heading, followed by a space). Same deletion added; mirrored in build_locals.py."
+   },
+   {
+    "type": "span",
+    "target": "LQA-10-P19",
+    "old": "anchor (default)",
+    "new": "anchor+space",
+    "why": "P-19 names the anchor+space span, as LOPS-30-1; SPAN entry added in closeout_rules.py."
+   }
+  ],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1b": 1,
+    "R-A1c": 1,
+    "R-A1d": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-A2f2": 1,
+    "R-A2g": 6,
+    "R-26-P1": 1,
+    "R-26-P4": 1,
+    "R-26-TASK": 1,
+    "R-A7-S1a": 1,
+    "R-A7-S1b": 1,
+    "R-A7-S2": 1,
+    "R-OWN": 1,
+    "R-A10": 1,
+    "R-A3a": 1,
+    "LQA-10-P03": 1,
+    "LQA-10-P19": 1
+   },
+   "ops": {
+    "count": 18,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [
+    [
+     "CTR-002",
+     "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write"
+    ]
+   ],
+   "new_guard_results_failing": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired",
+    "G-K36 (registry CTR-002 'Required pattern absent: Every statement in this prompt ...') is the OLD P-02 text ending 'commits and pushes\\.'; the body carries the NEW P-02 text once (placement OWN=1); new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1b",
+    "reads_ok": true,
+    "note": "'...task/result/attempt mappings in the output artifact's existing permitted metadata, label repository persistence pending...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...existing artifact's permitted lineage metadata: usage ID, change identity...'"
+   },
+   {
+    "edit": "R-A1d",
+    "reads_ok": true,
+    "note": "'...after they actually exist, in the output artifact's lineage metadata or later authorized record.'"
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "'...existing permitted artifact metadata. Preserve approved artifact versions...'"
+   },
+   {
+    "edit": "R-A2b",
+    "reads_ok": true,
+    "note": "'...substantive artifact metadata/content, which the handoff names. This is carried state...'"
+   },
+   {
+    "edit": "R-A2e",
+    "reads_ok": true,
+    "note": "sentence replaced whole by A2E_NEW; follows '...unaffected decided items remain decided.'"
+   },
+   {
+    "edit": "R-A2f2",
+    "reads_ok": true,
+    "note": "'...`CHANGE_AUDIT_TRIAGE` and `QA_READINESS`; every return package names those artifacts. A QA observation...'"
+   },
+   {
+    "edit": "R-A2g",
+    "reads_ok": true,
+    "note": "6 list-item deletions; each list closes cleanly, e.g. '...repository/environment references; actual or truthfully pending...'"
+   },
+   {
+    "edit": "R-26-P1",
+    "reads_ok": true,
+    "note": "ends its line after '...direct Notion page URL.'; the handoff rule it cites sits above"
+   },
+   {
+    "edit": "R-26-P4",
+    "reads_ok": true,
+    "note": "follows '...exact stable names and directories.'; next 'Never substitute opaque Library identifiers...'"
+   },
+   {
+    "edit": "R-26-TASK",
+    "reads_ok": true,
+    "note": "follows 'a terminal result emits none.' after P-19; next 'A blocked or terminal branch must...'"
+   },
+   {
+    "edit": "R-A7-S1a",
+    "reads_ok": true,
+    "note": "'...manually merges the identified PR and only where no `MERGE_OBSERVED` result was returned for this merge.'"
+   },
+   {
+    "edit": "R-A7-S1b",
+    "reads_ok": true,
+    "note": "'...remains historical pre-merge evidence. PR-40 is entered on the observed merge event... PR-40 independently verifies...'"
+   },
+   {
+    "edit": "R-A7-S2",
+    "reads_ok": true,
+    "note": "'...that reviewer's substantive decision. PR-40 is entered on the observed merge event... PR-40 independently verifies...'"
+   },
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "OWN sentence placed after the role sentence; next 'It authors the permitted analytical results...'"
+   },
+   {
+    "edit": "R-A10",
+    "reads_ok": true,
+    "note": "'Reviewers remain read-only toward the work they review and acceptance still requires the task's...'"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "sentence removed at line start; line continues 'Resolve the current authoritative subject-matter sources at...'"
+   },
+   {
+    "edit": "LQA-10-P03",
+    "reads_ok": true,
+    "note": "'...currently effective correction. This is an audit and readiness role. Every statement in this prompt...'"
+   },
+   {
+    "edit": "LQA-10-P19",
+    "reads_ok": true,
+    "note": "'...a terminal result emits none. Populate the exact immediate destination or actual owner...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [
+   "Registry/guard worker (not repaired here): G-K36 and its registry CTR-002 rendering still require the OLD P-02 text ('...commits and pushes\\.'); they fail on the NEW text, which QA-10 carries once. Update per P-02/P-28.",
+   "Registry/guard worker (GUARD-001, P-08): LQA-10-P19, like LOPS-30-1, has no guard in the draft. Candidate forbidden 'A saved attachment, link or scattered fields do not replace the handoff\\.' on rows OPS-30 and QA-10: on QA-10 it fires before and is silent after; otherwise list both sites as unguarded with a reason."
+  ],
+  "batch_tasks": {
+   "P-03": "R-OWN lands after the role sentence, then LQA-10-P03 rewrites it: the edited body reads 'This is an audit and readiness role. Every statement in this prompt ...' (1 match, checked by regex through '... any pull request that carries them. It authors').",
+   "P-03_G-K35_alternative": "plain forbidden 'read-only audit and readiness role' fires before, silent after (tested on QA-10).",
+   "P-19": "PRESENT: 1 hit inside 'Task-only next-step transport'; LOCAL deletion added; after: 0 hits, section reads '...a terminal result emits none. Populate the exact immediate destination ...'.",
+   "R-A2g": "6 hits, expected 6; G-K08 fires before, silent after.",
+   "note_R-A1_family": "QA-10 is an R-A1b (not R-A1a) and R-A2b (not R-A2a) row by the rule table; R-A1b 1, R-A1c 1, R-A2b 1."
+  }
+ },
+ {
+  "pid": "QA-100",
+  "page": "3db4590a05eb811a8d13c0bbbf77a848",
+  "fetched": "2026-09-23T13:22:31.666Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-110",
+  "page": "3db4590a05eb816984d1d34da0e08f40",
+  "fetched": "2026-09-23T13:22:53.747Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1,
+    "R-ITEM34": 1
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1,
+    "R-ITEM34": 1
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   },
+   {
+    "edit": "R-ITEM34",
+    "reads_ok": true,
+    "note": "'...required code/Ops remediation. This applies only before... continues to QA-120. Do not fix it here.' Reads grammatically; 'it' in 'Do not fix it here' now follows a sentence about the completed run (P-15 fixes placement)"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "P-15": "R-ITEM34 1 hit; pattern 'code/Ops remediation\\. Do not fix it here\\.' fires on the unedited body (true) and is silent after (true). Old-draft G-K47/G-K48 also fire-before/silent-after and match-after.",
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-120",
+  "page": "3db4590a05eb81589d21e798cf38e8ba",
+  "fetched": "2026-09-23T13:23:26.846Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-20",
+  "page": "3db4590a05eb816daa3adff37283482b",
+  "fetched": "2026-09-23T13:23:53.729Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1,
+    "R-A7-S3": 1
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1,
+    "R-A7-S3": 1
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   },
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'...and `MERGE_PENDING`. Nathan alone manually merges. PR-40 is entered on the observed merge event...' ends paragraph"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-50",
+  "page": "3db4590a05eb81a3ac91f602bad8cfa2",
+  "fetched": "2026-09-23T13:24:32.097Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-60",
+  "page": "3db4590a05eb810b8aa3e1692830d4b8",
+  "fetched": "2026-09-23T13:19:43.022Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-70",
+  "page": "3db4590a05eb8143bf26d1459fbbcad7",
+  "fetched": "2026-09-23T13:20:13.280Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-80",
+  "page": "3db4590a05eb813ba9a9dbd9a641d36c",
+  "fetched": "2026-09-23T13:20:40.037Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1,
+    "R-ITEM35": 1
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1,
+    "R-ITEM35": 1
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   },
+   {
+    "edit": "R-ITEM35",
+    "reads_ok": true,
+    "note": "'If the target is already approved, return `WRONG_ROUTE_APPROVED_BASE`, routed as *Required result and routing* states; do not transform the request...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "P-14": "R-ITEM35 1 hit; edited clause reads 'return `WRONG_ROUTE_APPROVED_BASE`, routed as *Required result and routing* states; do not transform the request into ...' (regex-confirmed). Required result and routing (heading present once) states both graph branches in its WRONG_ROUTE_APPROVED_BASE bullet: complete explicit bounded delta -> QA-70 in APPROVED_QA_PLAN_DELTA_REVIEW mode; intake absent -> return terminally to Nathan with no continuation block (regex-confirmed before and after). G-K49 fires before/silent after; G-K50 matches after.",
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ },
+ {
+  "pid": "QA-90",
+  "page": "3db4590a05eb811e8582cf30238c5b9c",
+  "fetched": "2026-09-23T13:21:06.317Z",
+  "harness_file": null,
+  "harness_note": "fetch returned inline (no harness-saved file); dryrun.py read it from the session transcript",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rule_mismatches": {},
+   "check_failures": {},
+   "rule_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A2a": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new": [],
+   "new_guard_results_failing": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "pass_false_because": [
+    "PART-17 x3 fires_on_injection=false is a guard-file artefact: the regression text ('inject a label line after the first 8 non-blank lines, e.g. ...') is not an injectable label line after load_guards; PART-17 is a new guard, recorded not repaired"
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'...attempt mappings in the output artifact's permitted metadata, name the authorized owner...'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'...entry to existing permitted artifact lineage: usage ID; actual change identity...'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'...`CANON_CONFLICT_REGISTER` in the existing substantive artifact, which the handoff names, within this actor's...'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": {
+   "fires_before": false,
+   "fires_after": false,
+   "meaning": "g06_after=true: G06 silent on the edited body"
+  },
+  "open_issues": [],
+  "batch_tasks": {
+   "R-A1a/R-A1c/R-A2a": "1/1/1 hits, expected 1/1/1; each edited sentence reads correctly"
+  }
+ }
+]

@@ -1,0 +1,148 @@
+{
+ "pid": "RS-40",
+ "fetched": "2026-09-23T13:19:10.807Z",
+ "chars_before": 11004,
+ "chars_after": 11174,
+ "rules": {
+  "R-ITEM30b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "LRS-40-1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "LRS-40-2": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "LRS-40-3": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "CHECK R-26-BRANCH-RECV": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  },
+  "CHECK R-A7-LOCAL": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  }
+ },
+ "rule_mismatches": {},
+ "ops": {
+  "count": 2,
+  "reproduces_edit": true,
+  "max_old_str_lines": 2
+ },
+ "placement": {
+  "W-4": 0,
+  "ONCE": 1,
+  "OWN": 0,
+  "RECV": 1
+ },
+ "registry": {
+  "findings_before": 4,
+  "findings_after": []
+ },
+ "guards": [
+  {
+   "id": "G-K01",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K03",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K09",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K21",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K22",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K23",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K26",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K28",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K37",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  }
+ ],
+ "guard_failures": [],
+ "validator": {
+  "exit": 0,
+  "ok": true,
+  "errors": [],
+  "validated": [
+   "RS-40"
+  ]
+ },
+ "pass": true
+}

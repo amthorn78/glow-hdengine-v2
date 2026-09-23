@@ -1,0 +1,229 @@
+[
+ {
+  "run": "ITEM-13 acceptance 4.1.0/1.3.0 --check both installed copies",
+  "exit": 0,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/gcfpe.decision-record.md"
+ },
+ {
+  "run": "ITEM-13 acceptance 4.1.0/1.3.0, second run",
+  "exit": 0,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/gcfpe.decision-record.md"
+ },
+ {
+  "run": "PART-01 regeneration 4.1.1/1.3.1",
+  "exit": 0,
+  "output": [
+   " \"written\": [",
+   "  \"/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/tmp/tmpyf97rs0n/e2-contract.json\"",
+   " ]",
+   "}",
+   "E2 regenerator output 5ad52062133068fa5947eb512a52ddc72bd4791f65faa27444af3357495c03b2 613162",
+   "recipe output dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c 613326"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/gcfpe.decision-record.md"
+ },
+ {
+  "run": "structural diff 4.1.0 -> 4.1.1",
+  "paths": [
+   [
+    ".contract_revision",
+    "4.1.0",
+    "4.1.1"
+   ],
+   [
+    ".pr_development_contract.primary_skill_revision",
+    "1.3.0",
+    "1.3.1"
+   ]
+  ]
+ },
+ {
+  "run": "P-21 synthetic D23 successor (a_after_once_section), fixed recipe, 4.1.0 --check installed copies",
+  "exit": 0,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_a_after_once_section.md"
+ },
+ {
+  "run": "P-21 synthetic D23 successor (a_after_once_section), fixed recipe, 4.1.1",
+  "exit": 0,
+  "output": [
+   "  \"/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/tmp/tmpy3fyquae/e2-contract.json\"",
+   " ]",
+   "}",
+   "E2 regenerator output 5ad52062133068fa5947eb512a52ddc72bd4791f65faa27444af3357495c03b2 613162",
+   "recipe output dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c 613326",
+   "EQUAL     /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/results/contract-4.1.1.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_a_after_once_section.md"
+ },
+ {
+  "run": "P-21 defect control (a_after_once_section), EARLIER recipe, 4.1.0 --check installed copies",
+  "exit": 1,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output fe2f183e4cc1709b45ae6b249c3819fe30ba99e19b90d53137d33080a0a3c973 613428",
+   "DIFFERENT /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "DIFFERENT /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/new/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_a_after_once_section.md"
+ },
+ {
+  "run": "P-21 synthetic D23 successor (b_end_of_D23), fixed recipe, 4.1.0 --check installed copies",
+  "exit": 0,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_b_end_of_D23.md"
+ },
+ {
+  "run": "P-21 synthetic D23 successor (b_end_of_D23), fixed recipe, 4.1.1",
+  "exit": 0,
+  "output": [
+   "  \"/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/tmp/tmpbz87elxp/e2-contract.json\"",
+   " ]",
+   "}",
+   "E2 regenerator output 5ad52062133068fa5947eb512a52ddc72bd4791f65faa27444af3357495c03b2 613162",
+   "recipe output dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c 613326",
+   "EQUAL     /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/results/contract-4.1.1.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_b_end_of_D23.md"
+ },
+ {
+  "run": "P-21 defect control (b_end_of_D23), EARLIER recipe, 4.1.0 --check installed copies",
+  "exit": 1,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output fe2f183e4cc1709b45ae6b249c3819fe30ba99e19b90d53137d33080a0a3c973 613428",
+   "DIFFERENT /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "DIFFERENT /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/new/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_b_end_of_D23.md"
+ },
+ {
+  "run": "P-21 synthetic D23 successor (c_end_of_D23_and_D25), fixed recipe, 4.1.0 --check installed copies",
+  "exit": 0,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "EQUAL     /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_c_end_of_D23_and_D25.md"
+ },
+ {
+  "run": "P-21 synthetic D23 successor (c_end_of_D23_and_D25), fixed recipe, 4.1.1",
+  "exit": 0,
+  "output": [
+   "  \"/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/tmp/tmppuzbhyjl/e2-contract.json\"",
+   " ]",
+   "}",
+   "E2 regenerator output 5ad52062133068fa5947eb512a52ddc72bd4791f65faa27444af3357495c03b2 613162",
+   "recipe output dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c 613326",
+   "EQUAL     /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/results/contract-4.1.1.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_c_end_of_D23_and_D25.md"
+ },
+ {
+  "run": "P-21 defect control (c_end_of_D23_and_D25), EARLIER recipe, 4.1.0 --check installed copies",
+  "exit": 1,
+  "output": [
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output fe2f183e4cc1709b45ae6b249c3819fe30ba99e19b90d53137d33080a0a3c973 613428",
+   "DIFFERENT /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+   "DIFFERENT /root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502/flowmaster-validate/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/new/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_c_end_of_D23_and_D25.md"
+ },
+ {
+  "run": "P-21 assertion: third '> ' line inside the once-per-merge section, fixed recipe",
+  "exit": 1,
+  "output": [
+   "Traceback (most recent call last):",
+   "  File \"/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py\", line 50, in <module>",
+   "    assert len(quoted) == 2, f\"decision record: the once-per-merge section holds {len(quoted)} '> ' lines, not exactly 2\"",
+   "           ^^^^^^^^^^^^^^^^",
+   "AssertionError: decision record: the once-per-merge section holds 3 '> ' lines, not exactly 2"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/dr_synthetic_d_third_quote_in_section.md"
+ },
+ {
+  "run": "P-25 --check negative control: one-byte drift (contract_revision 4.1.0 -> 4.1.9) in a copy",
+  "exit": 1,
+  "output": [
+   "  \"/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/tmp/tmpgrhdfkdf/e2-contract.json\"",
+   " ]",
+   "}",
+   "E2 regenerator output 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162",
+   "recipe output 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326",
+   "DIFFERENT /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/contract-6902924a-one-byte-drift.json"
+  ],
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/contract_recipe.py",
+  "decision_record": "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/gcfpe.decision-record.md"
+ },
+ {
+  "run": "negative-control file",
+  "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/tmpout/contract-6902924a-one-byte-drift.json",
+  "sha256": "fb163530c2c097770458e176360d69b18ad06f34eedb47d47f0c38c1925d303c",
+  "bytes": 613326,
+  "byte_offset": 12641
+ },
+ {
+  "file": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/results/contract-4.1.0.json",
+  "sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718",
+  "bytes": 613326
+ },
+ {
+  "file": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/results/contract-4.1.1.json",
+  "sha256": "dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c",
+  "bytes": 613326
+ }
+]

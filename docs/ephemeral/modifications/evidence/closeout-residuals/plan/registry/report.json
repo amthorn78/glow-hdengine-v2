@@ -1,0 +1,869 @@
+{
+ "source": {
+  "live_sha256": "8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4",
+  "head_blob_sha256": "8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4",
+  "draft_head_copy_sha256": "8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4",
+  "live_bytes": 322556
+ },
+ "omitted_tbd": [],
+ "top_level_keys_changed": [],
+ "lanes_only_parent_changed_by_map": true,
+ "rows": 55,
+ "rows_kept_in_set_and_order": true,
+ "rows_with_unexpected_assertion_diff": [],
+ "kept_order_violations": [],
+ "per_row_assertions": {
+  "CF-C-10": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-C-20": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-C-30": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-C-40": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-E-10": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-E-20": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-E-30": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-E-40": {
+   "before": 27,
+   "after": 33,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CF-PO-10": {
+   "before": 27,
+   "after": 32,
+   "new_guard_entries": 5,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-20": {
+   "before": 27,
+   "after": 45,
+   "new_guard_entries": 18,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-30": {
+   "before": 27,
+   "after": 45,
+   "new_guard_entries": 18,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-40": {
+   "before": 26,
+   "after": 40,
+   "new_guard_entries": 14,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-C-10": {
+   "before": 26,
+   "after": 42,
+   "new_guard_entries": 16,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-E-10": {
+   "before": 26,
+   "after": 42,
+   "new_guard_entries": 16,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-E-20": {
+   "before": 27,
+   "after": 36,
+   "new_guard_entries": 9,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-E-30": {
+   "before": 27,
+   "after": 34,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "CL-E-40": {
+   "before": 27,
+   "after": 34,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "DOC-10": {
+   "before": 28,
+   "after": 37,
+   "new_guard_entries": 10,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "DOC-20": {
+   "before": 28,
+   "after": 39,
+   "new_guard_entries": 12,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "ESC-10": {
+   "before": 26,
+   "after": 34,
+   "new_guard_entries": 8,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "ESC-25": {
+   "before": 26,
+   "after": 36,
+   "new_guard_entries": 10,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "ESC-30": {
+   "before": 26,
+   "after": 34,
+   "new_guard_entries": 8,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "ESC-40": {
+   "before": 26,
+   "after": 34,
+   "new_guard_entries": 8,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "GCFPE-MGMT-10": {
+   "before": 16,
+   "after": 25,
+   "new_guard_entries": 9,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "IA-10": {
+   "before": 26,
+   "after": 32,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "IA-20": {
+   "before": 26,
+   "after": 32,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "IA-30": {
+   "before": 28,
+   "after": 35,
+   "new_guard_entries": 8,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "IA-40": {
+   "before": 26,
+   "after": 31,
+   "new_guard_entries": 5,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "IA-50": {
+   "before": 26,
+   "after": 31,
+   "new_guard_entries": 5,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "IA-60": {
+   "before": 26,
+   "after": 31,
+   "new_guard_entries": 5,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "MGR-10": {
+   "before": 27,
+   "after": 32,
+   "new_guard_entries": 5,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "OPS-10": {
+   "before": 27,
+   "after": 40,
+   "new_guard_entries": 13,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "OPS-20": {
+   "before": 27,
+   "after": 37,
+   "new_guard_entries": 10,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "OPS-30": {
+   "before": 26,
+   "after": 44,
+   "new_guard_entries": 18,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "PR-10": {
+   "before": 28,
+   "after": 45,
+   "new_guard_entries": 18,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "PR-20": {
+   "before": 29,
+   "after": 48,
+   "new_guard_entries": 20,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "PR-30": {
+   "before": 31,
+   "after": 46,
+   "new_guard_entries": 15,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "PR-35": {
+   "before": 34,
+   "after": 48,
+   "new_guard_entries": 14,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "PR-40": {
+   "before": 30,
+   "after": 54,
+   "new_guard_entries": 25,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "PR-50": {
+   "before": 23,
+   "after": 30,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-10": {
+   "before": 27,
+   "after": 48,
+   "new_guard_entries": 21,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-100": {
+   "before": 26,
+   "after": 33,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-110": {
+   "before": 26,
+   "after": 35,
+   "new_guard_entries": 9,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-120": {
+   "before": 26,
+   "after": 33,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-20": {
+   "before": 26,
+   "after": 34,
+   "new_guard_entries": 8,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-50": {
+   "before": 26,
+   "after": 33,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-60": {
+   "before": 28,
+   "after": 35,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-70": {
+   "before": 27,
+   "after": 34,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-80": {
+   "before": 28,
+   "after": 37,
+   "new_guard_entries": 9,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "QA-90": {
+   "before": 26,
+   "after": 33,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "RS-10": {
+   "before": 30,
+   "after": 37,
+   "new_guard_entries": 8,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "RS-20": {
+   "before": 28,
+   "after": 37,
+   "new_guard_entries": 10,
+   "release_replaced_in_place": 3,
+   "removed": 1
+  },
+  "RS-30": {
+   "before": 28,
+   "after": 35,
+   "new_guard_entries": 7,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "RS-40": {
+   "before": 34,
+   "after": 43,
+   "new_guard_entries": 9,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  },
+  "UTIL-10": {
+   "before": 26,
+   "after": 32,
+   "new_guard_entries": 6,
+   "release_replaced_in_place": 3,
+   "removed": 0
+  }
+ },
+ "non_assertion_fields_as_expected": true,
+ "parents": true,
+ "parent_value_counts": {
+  "lane_ids": 16,
+  "row_ids": 55,
+  "lane_titles": 16,
+  "row_titles": 54,
+  "old_ids_left": 0
+ },
+ "CL-40 mutations.allowed added": [
+  "Update the Notion page Candidate CRD Items List in place with this change's new CRD candidates, and no other Notion page; that page is the list's only store, named by a destination rule"
+ ],
+ "CL-40 mutations.forbidden unchanged": true,
+ "PR-40 inputs": {
+  "before": 9,
+  "after": 10,
+  "removed": [
+   "The complete ordered PR_REFS for this work unit, with each actual PR reference, commit identity, order, review/check state and merge evidence"
+  ],
+  "added": [
+   "The complete ordered PR_REFS for this work unit; PR-40 resolves each PR's commits, order, review/check state and merge evidence from repository evidence",
+   "The branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them."
+  ]
+ },
+ "values_roundtrip": true,
+ "assertions_total": [
+  1484,
+  2008
+ ],
+ "rows_per_guard": {
+  "G-K01": [
+   55,
+   true
+  ],
+  "G-K02": [
+   33,
+   true
+  ],
+  "G-K03": [
+   55,
+   true
+  ],
+  "G-K04": [
+   28,
+   true
+  ],
+  "G-K05": [
+   9,
+   true
+  ],
+  "G-K06": [
+   1,
+   true
+  ],
+  "G-K07": [
+   1,
+   true
+  ],
+  "G-K08": [
+   10,
+   true
+  ],
+  "G-K09": [
+   55,
+   true
+  ],
+  "G-K10": [
+   8,
+   true
+  ],
+  "G-K11": [
+   2,
+   true
+  ],
+  "G-K12": [
+   5,
+   true
+  ],
+  "G-K13": [
+   5,
+   true
+  ],
+  "G-K14": [
+   10,
+   true
+  ],
+  "G-K15": [
+   2,
+   true
+  ],
+  "G-K16": [
+   2,
+   true
+  ],
+  "G-K17": [
+   2,
+   true
+  ],
+  "G-K18": [
+   2,
+   true
+  ],
+  "G-K19": [
+   16,
+   true
+  ],
+  "G-K20": [
+   3,
+   true
+  ],
+  "G-K21": [
+   4,
+   true
+  ],
+  "G-K22": [
+   4,
+   true
+  ],
+  "G-K23": [
+   55,
+   true
+  ],
+  "G-K24": [
+   5,
+   true
+  ],
+  "G-K25": [
+   21,
+   true
+  ],
+  "G-K26": [
+   6,
+   true
+  ],
+  "G-K27": [
+   4,
+   true
+  ],
+  "G-K28": [
+   2,
+   true
+  ],
+  "G-K29": [
+   1,
+   true
+  ],
+  "G-K30": [
+   1,
+   true
+  ],
+  "G-K31": [
+   1,
+   true
+  ],
+  "G-K32": [
+   1,
+   true
+  ],
+  "G-K33": [
+   1,
+   true
+  ],
+  "G-K34": [
+   1,
+   true
+  ],
+  "G-K35": [
+   11,
+   true
+  ],
+  "G-K36": [
+   11,
+   true
+  ],
+  "G-K37": [
+   55,
+   true
+  ],
+  "G-K38": [
+   4,
+   true
+  ],
+  "G-K39": [
+   2,
+   true
+  ],
+  "G-K40": [
+   2,
+   true
+  ],
+  "G-K41": [
+   10,
+   true
+  ],
+  "G-K42": [
+   5,
+   true
+  ],
+  "G-K43": [
+   1,
+   true
+  ],
+  "G-K44": [
+   1,
+   true
+  ],
+  "G-K45": [
+   1,
+   true
+  ],
+  "G-K46": [
+   1,
+   true
+  ],
+  "G-K47": [
+   1,
+   true
+  ],
+  "G-K48": [
+   1,
+   true
+  ],
+  "G-K49": [
+   1,
+   true
+  ],
+  "G-K50": [
+   1,
+   true
+  ],
+  "G-K51": [
+   8,
+   true
+  ],
+  "G-K52": [
+   1,
+   true
+  ],
+  "G-K53": [
+   1,
+   true
+  ],
+  "G-K54": [
+   2,
+   true
+  ],
+  "G-K55": [
+   1,
+   true
+  ]
+ },
+ "release_guards_new": 165,
+ "release_guards_old_left": 0,
+ "clat": {
+  "PR-10": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "PR-20": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "PR-30": {
+   "required_decide": true,
+   "forbidden_decide": false,
+   "material_required": true
+  },
+  "PR-35": {
+   "required_decide": true,
+   "forbidden_decide": false,
+   "material_required": true
+  },
+  "PR-40": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "RS-10": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "RS-20": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "DOC-10": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "DOC-20": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  },
+  "IA-30": {
+   "required_decide": false,
+   "forbidden_decide": true,
+   "material_required": true
+  }
+ },
+ "RS-40 carries no R-A5 guard": true,
+ "op_counts": {
+  "PART-17 replaced in place": 165,
+  "PART-18 required removed": 8,
+  "guard entries added": 532
+ },
+ "parent_counts": {
+  "notion_parent_id:3cc4590a05eb8101b5ded32c12616eb6": 1,
+  "notion_parent_title:Glow HDE Prompt Flow Index": 1,
+  "notion_parent_id:3c74590a05eb811d8433e7022629e213": 7,
+  "notion_parent_title:HDE Change Flow": 7,
+  "notion_parent_id:3c74590a05eb81f2953de712f2adb6fa": 5,
+  "notion_parent_title:HDE IA": 5,
+  "notion_parent_id:3c74590a05eb8123bc55ca7f99ce176c": 1,
+  "notion_parent_title:Escalation": 1,
+  "notion_parent_id:3c74590a05eb8149905fd694f6d2901a": 1,
+  "notion_parent_title:HDE QA": 1,
+  "notion_parent_id:3c74590a05eb8176baf8cb59f1631f3c": 1,
+  "notion_parent_title:HDE TW": 1,
+  "expected_parent_id:3c74590a05eb811d8433e7022629e213": 18,
+  "expected_parent_title:HDE Change Flow": 18,
+  "expected_parent_id:3c74590a05eb81f2953de712f2adb6fa": 21,
+  "expected_parent_title:HDE IA": 20,
+  "expected_parent_id:3c74590a05eb8123bc55ca7f99ce176c": 4,
+  "expected_parent_title:Escalation": 4,
+  "expected_parent_id:3cc4590a05eb8101b5ded32c12616eb6": 1,
+  "expected_parent_title:Glow HDE Prompt Flow Index": 1,
+  "expected_parent_id:3c74590a05eb8149905fd694f6d2901a": 10,
+  "expected_parent_title:HDE QA": 10,
+  "expected_parent_id:3c74590a05eb8176baf8cb59f1631f3c": 1,
+  "expected_parent_title:HDE TW": 1
+ },
+ "wga_copy_identical_to_installed": {
+  "audit_workspace_governance.py": true,
+  "build_snapshot_manifest.py": true,
+  "detect_skill_collisions.py": true,
+  "run_fixture_suite.py": true,
+  "validate_project_prompt_registry.py": true,
+  "validate_workspace_skill_registry.py": true
+ },
+ "structure_check": {
+  "installed-copy": {
+   "exit": 0,
+   "stdout": {
+    "problems": [],
+    "valid": true
+   },
+   "stderr": ""
+  },
+  "r1-final": {
+   "exit": 0,
+   "stdout": {
+    "problems": [],
+    "valid": true
+   },
+   "stderr": ""
+  }
+ },
+ "yaml_per_row": {
+  "rows_parsed": 55,
+  "errors": [],
+  "equal_to_loader": true
+ },
+ "deriver": {
+  "script": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final/glow-graph-contract/scripts/registry_deriver.py",
+  "sha256": "3072b1552ffd9a42be9691187f6f6869fe14f028be950e5c99ea0c81f84c20c1",
+  "runs": {
+   "repo docs/graph/parts | audit installed | head": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "repo docs/graph/parts | audit installed | new": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "repo docs/graph/parts | audit r1-final | head": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "repo docs/graph/parts | audit r1-final | new": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "r1 parts_reindexed | audit installed | head": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "r1 parts_reindexed | audit installed | new": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "r1 parts_reindexed | audit r1-final | head": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   },
+   "r1 parts_reindexed | audit r1-final | new": {
+    "exit": 0,
+    "out": {
+     "rows": 55,
+     "parts": 55,
+     "drift": [],
+     "rows_without_part": []
+    },
+    "stderr": ""
+   }
+  }
+ },
+ "diff": {
+  "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/registry/registry.diff",
+  "exit_diff": 1,
+  "lines": 3331,
+  "patch_roundtrip_equal": true,
+  "patch_stderr": ""
+ },
+ "new_path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/registry/registry.new.md",
+ "new_lines": 7668,
+ "new_sha256": "4643741b154969406fe74d135dd2d97a3321c4bef8c73a4451fc2dac4df8144a",
+ "diff_sha256": "f74abc3803cfa96f9d5a3bc4f6b6edca207c0a6d197dbd249109808b63a3e0bd",
+ "ALL_CHECKS_OK": true,
+ "ALL_CHECKS_OK_EXCEPT_TBD": true
+}

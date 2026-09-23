@@ -1,0 +1,861 @@
+[
+ {
+  "group": "regress_plan:final",
+  "case": "final:clean",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_PASS",
+    "exit 0"
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_PASS",
+    "exit 0"
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:D1 bogus comment <!x",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:D2 processing instruction <?",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "/r1/skills/work/glow-hde-pr-development/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "/r1/skills/work/glow-hde-pr-development/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:D3 unclosed <script>",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:D4 unclosed <![CDATA[",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "chpad/plan/r1/skills/work/tw-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "chpad/plan/r1/skills/work/tw-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:Q1 unclosed <style>",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "/r1/skills/work/glow-hde-pr-development/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "/r1/skills/work/glow-hde-pr-development/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:Q2b <template>",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "chpad/plan/r1/skills/work/tw-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "chpad/plan/r1/skills/work/tw-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:Q4 [//]: # reference comment",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:Q3 marker-shaped comment (F2)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-DISPATCH-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "markup that hides text in rendered Markdown is present (an HTML comment other than a whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, template or textarea element, "
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:Q5 ASCII arrow --> is prose (F4 over-reach; must PASS)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_PASS",
+    "exit 0"
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_PASS",
+    "exit 0"
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:O1 >     { in a block quote (N2/F1)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 4 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 4 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:O2b -     { list item (N2/F1)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 1 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 1 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:O2c 1.     { ordered item (N2/F1)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 1 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 1 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:O3 space-tab indentation (N2/F1)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 1 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-ORACLE-022",
+     "idate/references/r1-successor-source-20260923.md",
+     "matrix has 1 indented code lines outside the fenced blocks; only the three JSON blocks may render as code"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:K3 runtime map rows reversed (N3)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-MAP-005",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "runtime map rows are the pinned R1 oracle's rows in a different order"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-MAP-005",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "runtime map rows are the pinned R1 oracle's rows in a different order"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G1 change-flow override sentence removed",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "missing specialization contract: For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direc"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "missing specialization contract: For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direc"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G2 relay override sentence removed",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "missing specialization contract: For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direc"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "missing specialization contract: For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direc"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G3 relay retired phrase re-injected: exact predecessor assessment",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: exact predecessor assessment"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: exact predecessor assessment"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G4 relay retired phrase re-injected: predecessor assessment is the default",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: predecessor assessment is the default"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: predecessor assessment is the default"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G5 relay retired phrase re-injected: surface/model/reasoning recommendation",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: surface/model/reasoning recommendation"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: surface/model/reasoning recommendation"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G6 relay retired phrase re-injected: assess or preserve advice for the destination's whole operation",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: assess or preserve advice for the destination's whole operation"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: assess or preserve advice for the destination's whole operation"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G7 relay retired phrase re-injected: eligible human recommendation",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: eligible human recommendation"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: eligible human recommendation"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G8 relay retired phrase re-injected: optional digest",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: optional digest"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: optional digest"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G9 relay retired phrase re-injected: preferred artifact plane",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: preferred artifact plane"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: preferred artifact plane"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G10 relay retired phrase re-injected: ARTIFACT_PLANE: GOOGLE_DRIVE | NONE",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: ARTIFACT_PLANE: GOOGLE_DRIVE | NONE"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: ARTIFACT_PLANE: GOOGLE_DRIVE | NONE"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G11 relay retired phrase re-injected: Drive `Glow / Ops` contains",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: Drive `Glow / Ops` contains"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "r1/skills/work/session-relay-flowmaster/SKILL.md",
+     "superseded contract present: Drive `Glow / Ops` contains"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G12 change-flow retired phrase re-injected: source revision/content identity",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "superseded contract present: source revision/content identity"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "atchpad/plan/r1/skills/work/change-flow/SKILL.md",
+     "superseded contract present: source revision/content identity"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G12c the same phrase inside the prohibition block is not active (control; must PASS)",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_PASS",
+    "exit 0"
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_PASS",
+    "exit 0"
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G13 flowmaster-validate retired phrase re-injected in SKILL.md: its recursively loaded corpus",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: its recursively loaded corpus"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: its recursively loaded corpus"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G14 flowmaster-validate retired phrase re-injected in SKILL.md: Validate the complete 55 prompt bodies",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: Validate the complete 55 prompt bodies"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: Validate the complete 55 prompt bodies"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G15 flowmaster-validate retired phrase re-injected in SKILL.md: against the supplied complete corpus",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: against the supplied complete corpus"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: against the supplied complete corpus"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G16 flowmaster-validate retired phrase re-injected in SKILL.md: the complete candidate snapshot root",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: the complete candidate snapshot root"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in SKILL.md: the complete candidate snapshot root"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G17 flowmaster-validate retired phrase re-injected in references/gcfpe-20260914.1-091426.1-validation-profile.json: complete 55-member prompt corpus",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in references/gcfpe-20260914.1-091426.1-validation-profile.json: complete 55-member prompt corpus"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in references/gcfpe-20260914.1-091426.1-validation-profile.json: complete 55-member prompt corpus"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:G18 flowmaster-validate retired phrase re-injected in scripts/validate_flowmaster.py: Candidate snapshot root containing prompts/",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in scripts/validate_flowmaster.py: Candidate snapshot root containing prompts/"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-SKILL-STRUCTURE-001",
+     "plan/r1/skills/work/flowmaster-validate/SKILL.md",
+     "retired D22 phrase present in scripts/validate_flowmaster.py: Candidate snapshot root containing prompts/"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:A1 change-flow's retired Alpha-state sentence restored",
+  "ok": true,
+  "detail": {
+   "default": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-CURRENT-001",
+     "20260914.1-091426.1-direct-handoff-contract.json",
+     "CHANGE_FLOW_CONTRACT:Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record"
+    ]
+   ],
+   "candidate": [
+    "FLOWMASTER_SUITE_FAIL",
+    "exit 1",
+    [
+     "FMV-GCF-CANDIDATE-CONTRACT-001",
+     "20260914.1-091426.1-direct-handoff-contract.json",
+     "CHANGE_FLOW_CONTRACT:Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record"
+    ],
+    [
+     "FMV-GCF-CURRENT-001",
+     "20260914.1-091426.1-direct-handoff-contract.json",
+     "CHANGE_FLOW_CONTRACT:Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record"
+    ]
+   ]
+  }
+ },
+ {
+  "group": "regress_plan:final",
+  "case": "final:A1b change-flow's own validator on the restored sentence",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "FAIL: missing skill clause: Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record"
+  ]
+ }
+]

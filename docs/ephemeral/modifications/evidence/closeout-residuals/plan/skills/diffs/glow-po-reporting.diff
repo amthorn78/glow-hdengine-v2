@@ -1,0 +1,12 @@
+diff -ruN a/SKILL.md b/SKILL.md
+--- a/SKILL.md	2026-09-23 00:55:33.871743991 +0000
++++ b/SKILL.md	2026-09-23 23:12:52.628381198 +0000
+@@ -34,6 +34,8 @@
+ - **NOTHING NEEDED** — work continues, no input required
+ - **IN FLIGHT** — something is running; he waits
+ 
++When a `NEXT_PROMPT_HANDOFF` block ends the message, as it does for a maintenance, repair, validation or review session, the block comes last and the named state is the line immediately before it. Nothing follows the block.
++
+ If he has to ask "am I waiting for you, or are you waiting for me?", the message failed.
+ 
+ ### 3. Never phrase a request as an observation

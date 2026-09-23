@@ -1,0 +1,388 @@
+[
+ {
+  "pid": "PR-35",
+  "page": "3db4590a05eb8120b443ed2cb08b723c",
+  "fetched": "2026-09-23T13:19:01.920Z",
+  "harness_file": null,
+  "body_source_note": "fetch result returned inline (not persisted); dryrun.py read it from this session's own transcript /root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a3a4b81b5f7f59186.jsonl",
+  "first_run": {
+   "pass": false,
+   "pass_rule_level": true,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-FRAME": 0,
+    "CHECK R-26-BRANCH-RECV": 0
+   },
+   "rules_hits": {
+    "R-A1f": 1,
+    "R-ITEM30a": 1,
+    "R-ITEM30c": 1,
+    "R-ITEM30d1": 1,
+    "R-ITEM30d2": 1,
+    "R-A5": 1,
+    "LPR-35-1": 1,
+    "LPR-35-2": 1
+   },
+   "ops": {
+    "count": 8,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 1
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guard_only": [],
+   "new_guard_failures_recorded_not_repaired": [
+    "PART-17 x3 (Prompt version / Ecosystem release / Set): fires_on_injection false because the guard file's regression field is prose ('inject a label line ... e.g. ...'), which dryrun injects verbatim; the patterns still carry the old '?' suffix, not P-16's '{0,2}'. Separate registry worker."
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": "same as first_run (no patch; not re-run with changes)",
+  "readback": [
+   {
+    "edit": "R-ITEM30a",
+    "reads_ok": true,
+    "note": "'every readiness predicate above passes.' then own line '- `MERGE_OBSERVED`: the subscribed PR-35 session observes ... performed by Nathan.'"
+   },
+   {
+    "edit": "R-ITEM30c",
+    "reads_ok": true,
+    "note": "'does not become a seventh top-level PR-35 result: it returns terminal'; the list now holds six results"
+   },
+   {
+    "edit": "R-ITEM30d1",
+    "reads_ok": true,
+    "note": "'usable only after Nathan's manual merge and only where no MERGE_OBSERVED ...; for MERGE_OBSERVED, it is the same selected PR-40. Terminal results'"
+   },
+   {
+    "edit": "R-ITEM30d2",
+    "reads_ok": true,
+    "note": "'The conditional PR-40 block states only its manual prerequisite: ... verification rules. PR-40 uses glow-merged-change-attribution-lock'"
+   },
+   {
+    "edit": "R-A5",
+    "reads_ok": true,
+    "note": "'...and consumer. This prompt's artifacts are written only under ... and `docs/pfcanon/` is read-only.' (base text; 1 hit)"
+   },
+   {
+    "edit": "R-A1f",
+    "reads_ok": true,
+    "note": "'prompt-use provenance in permitted artifact metadata. Report a defect'"
+   },
+   {
+    "edit": "LPR-35-1",
+    "reads_ok": true,
+    "note": "bullet now '- exact repository, authorized local root, open PR and artifact links; and'"
+   },
+   {
+    "edit": "LPR-35-2",
+    "reads_ok": true,
+    "note": "P-01 sentence verbatim (RECV count 1) on its own line: last package bullet / RECV / 'One Proceed per approved per-PR plan.' (C-PROCEED); same shape as the existing bullet-then-C-PROCEED lines, which Notion already returns as separate blocks"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (TOP-001 NEXT_PROMPT_HANDOFF...worktree/commit identity pattern, identical in live and draft registry): 0 hits before, 0 after on the whole collapsed body",
+  "check_before_after": {
+   "R-26-FRAME": [
+    0,
+    0
+   ],
+   "R-26-BRANCH-RECV": [
+    1,
+    0
+   ]
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "PR-40",
+  "page": "3db4590a05eb818786c5cb6051b4d634",
+  "fetched": "2026-09-23T13:19:20.724Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01WnHPAiQvkWuTBRE69DS8zP.json",
+  "first_run": {
+   "pass": false,
+   "pass_rule_level": true,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-FRAME": 0,
+    "CHECK R-26-BRANCH-RECV": 0,
+    "CHECK R-A7-LOCAL": 0
+   },
+   "rules_hits": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-A2f1": 1,
+    "R-A2g": 6,
+    "R-26-P1": 1,
+    "R-26-P4": 1,
+    "R-A7-S1a": 1,
+    "R-A7-S1b": 1,
+    "R-A7-S2": 1,
+    "R-ITEM31": 1,
+    "R-OWN": 1,
+    "R-A10": 1,
+    "R-A3a": 1,
+    "R-CLAT": 1,
+    "LPR-40-1": 1,
+    "LPR-40-2": 1,
+    "LPR-40-3": 1,
+    "LPR-40-4": 1,
+    "LPR-40-5": 1,
+    "LPR-40-6": 1,
+    "LPR-40-7": 1
+   },
+   "ops": {
+    "count": 23,
+    "reproduces_edit": true,
+    "max_old_str_lines": 6
+   },
+   "placement": {
+    "W-4": 3,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 1
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guard_only": [
+    [
+     "CTR-002",
+     "Required pattern absent: Every statement in this prompt ... pushes\\. -- this is G-K36's draft pattern (new guard), not an existing assertion"
+    ]
+   ],
+   "new_guard_failures_recorded_not_repaired": [
+    "G-K36 required: matches_after false (draft pattern is the old OWN text ending 'pushes\\.'; P-02's text continues ', and any pull request that carries them.'; P-28 'G-K36 new text')",
+    "PART-17 x3 (Prompt version / Ecosystem release / Set): fires_on_injection false because the guard file's regression field is prose ('inject a label line ... e.g. ...'), which dryrun injects verbatim; the patterns still carry the old '?' suffix, not P-16's '{0,2}'. Separate registry worker."
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": "same as first_run (no patch; not re-run with changes)",
+  "readback": [
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "once, right after 'for the complete work unit, operating read-only.'; then 'Execute Review PR Work-Unit Lineage'"
+   },
+   {
+    "edit": "R-ITEM31",
+    "reads_ok": true,
+    "note": "'...substantiated genuine boundary. A precise in-scope defect in landed work returns REJECT ... re-plan** states.'; C-REPLAN head present in body (1)"
+   },
+   {
+    "edit": "R-A2g (6 hits = expected 6)",
+    "reads_ok": true,
+    "note": "sites: ACCEPT pkg (then LPR-40-1); RS-10 2nd bullet '...when present; and Product Owner/manual PF10 prerequisites.'; RS-20 '...originating owner/session; exact RS-20 decision/addendum'; RS-30 '...manual prerequisites; and Required tools'; PENDING pkg (then LPR-40-3); '...storage proof and explicit NOT PRODUCED'"
+   },
+   {
+    "edit": "LPR-40-4",
+    "reads_ok": true,
+    "note": "'- The complete ordered PR_REFS for this work unit; PR-40 resolves each PR's commits, ... from repository evidence.'"
+   },
+   {
+    "edit": "LPR-40-5",
+    "reads_ok": true,
+    "note": "own line after '...and all actual access limitations.' (last Inputs bullet), before the pre-existing W-4 paragraph; RECV count 1"
+   },
+   {
+    "edit": "LPR-40-1",
+    "reads_ok": true,
+    "note": "'- Specification, Implementation Audit, Plan, Plan review, PR instruction and implementation result, each named by repository path...'"
+   },
+   {
+    "edit": "LPR-40-2",
+    "reads_ok": true,
+    "note": "'- GCF-17.RESCOPE, naming the PR_WORK_UNIT_LINEAGE_REVIEW finding, ... with the exact PR refs; the artifacts hold the rest.'"
+   },
+   {
+    "edit": "LPR-40-3",
+    "reads_ok": true,
+    "note": "'Complete native input package: PR_WORK_UNIT_LINEAGE_REVIEW with PENDING, PR_INSTRUCTION_ID, ... the artifacts hold the rest.'"
+   },
+   {
+    "edit": "LPR-40-6",
+    "reads_ok": true,
+    "note": "'never asks an agent to merge. The pasted handoff supplies the observed merge event or, ... and review authorization, not a review'"
+   },
+   {
+    "edit": "LPR-40-7",
+    "reads_ok": true,
+    "note": "'PR-30 PR_CANDIDATE_PUBLISHED result, PR-35 MERGE_OBSERVED result or, ... Nathan's manual-merge assertion, and every ordered PR_REF.'"
+   },
+   {
+    "edit": "R-A7-S1a + R-A7-S1b",
+    "reads_ok": true,
+    "note": "'...merges the identified PR and only where no MERGE_OBSERVED ... . That earlier MERGE_PENDING remains historical pre-merge evidence. [W-4] [ONCE] PR-40 independently verifies'"
+   },
+   {
+    "edit": "R-A7-S2",
+    "reads_ok": true,
+    "note": "'substitutes for that reviewer's substantive decision. [W-4] PR-40 independently verifies actual merged state'"
+   },
+   {
+    "edit": "R-A10",
+    "reads_ok": true,
+    "note": "'Reviewers remain read-only toward the work they review and acceptance requires substantive evidence.'"
+   },
+   {
+    "edit": "R-A2b / R-A2e / R-A2f1",
+    "reads_ok": true,
+    "note": "'...artifact metadata/content, which the handoff names.'; 'Keep exact register lineage ... in the output artifact...'; '...review result without deciding Canon; every native return names those artifacts.'"
+   },
+   {
+    "edit": "R-26-P1 / R-26-P4 / R-A1a / R-A1c / R-A1e / R-A3a / R-CLAT",
+    "reads_ok": true,
+    "note": "each at 1 hit; sentences read whole; A3a removal leaves 'Resolve the current authoritative subject-matter sources' starting the paragraph"
+   }
+  ],
+  "placement_counts": {
+   "W-4": {
+    "before": 1,
+    "after": 3,
+    "sites": "pre-existing Inputs W-4 paragraph (right after the RECV line), R-A7-S1b (Product Owner merge action), R-A7-S2 (Working rules)"
+   },
+   "ONCE": {
+    "before": 0,
+    "after": 1,
+    "site": "R-A7-S1b, after its W-4"
+   },
+   "OWN": 1,
+   "RECV": 1,
+   "verdict": "matches the drafters' prediction: W-4 three times, ONCE once"
+  },
+  "g06_after": true,
+  "g06_detail": "G06: 0 hits before, 0 after on the whole collapsed body (RECV and W-4 paragraphs included)",
+  "check_before_after": {
+   "R-26-FRAME": [
+    2,
+    0
+   ],
+   "R-26-BRANCH-RECV": [
+    1,
+    0
+   ],
+   "R-A7-LOCAL": [
+    2,
+    0
+   ]
+  },
+  "registry_pr40_input_mirroring_LPR-40-4": {
+   "live_registry": "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+   "line": 4604,
+   "text_to_change": "', with each actual PR reference, commit identity, order, review/check state and merge evidence' (end of the PR-40 inputs item 'The complete ordered PR_REFS for this work unit...'; no trailing period in the registry)",
+   "follow_body_to": "'; PR-40 resolves each PR's commits, order, review/check state and merge evidence from repository evidence'",
+   "draft_state": "plan/registry/registry.new.md:5331 already carries exactly this post-edit text",
+   "note_for_registry_worker": "LPR-40-5 puts the P-01 sentence between the last Inputs bullet (live :4606) and the W-4 paragraph (live :4607); the draft's inputs list does not carry it. Whether the registry inputs list mirrors that sentence as an item is the registry worker's call (P-01: 'The registry's PR-40 input text follows the PR-40 body')."
+  },
+  "open_issues": [
+   "Not settled by DECISIONS, not edited: the Inputs package's 7th bullet still lists 'CANON_CONFLICT_REGISTER, recovery state, truthful pending, ...' as package content. Census A2 counts a register 'carried by a package' as REAL, but no R-A2g shape matches it and no LOCAL edit targets it (it is also registry input :4606). P-07 fixes PR-40's count at the measured 6.",
+   "Not settled by DECISIONS, not edited: ANALYZE body-evidence row 177 (PR-40 RS-20 package) gives the reason 'carries decision history and complete RESCOPE_PROPOSAL'. R-A2g removes the register/history clause, but the package's first bullet still begins 'RESCOPE_PROPOSAL_ID and complete RESCOPE_PROPOSAL; exact PR_WORK_UNIT_LINEAGE_REVIEW finding'. CHECK R-26-FRAME has no alternative for it."
+  ]
+ },
+ {
+  "pid": "RS-40",
+  "page": "3db4590a05eb8183b5ffdf4270133226",
+  "fetched": "2026-09-23T13:19:10.807Z",
+  "harness_file": null,
+  "body_source_note": "fetch result returned inline (not persisted); dryrun.py read it from this session's own transcript /root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a3a4b81b5f7f59186.jsonl",
+  "first_run": {
+   "pass": false,
+   "pass_rule_level": true,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-BRANCH-RECV": 0,
+    "CHECK R-A7-LOCAL": 0
+   },
+   "rules_hits": {
+    "R-ITEM30b": 1,
+    "LRS-40-1": 1,
+    "LRS-40-2": 1,
+    "LRS-40-3": 1
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 1
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guard_only": [
+    [
+     "CTR-002",
+     "Required pattern absent: This prompt's artifacts are written only under ... -- this is G-K40 (new guard), which P-04 removes from RS-40"
+    ]
+   ],
+   "new_guard_failures_recorded_not_repaired": [
+    "G-K40 required: matches_after false. R-A5 is NOT_APPLICABLE on RS-40 (P-04), and P-04/P-28 remove G-K39 and G-K40 from RS-40's row; the draft guard file still lists RS-40 on both",
+    "PART-17 x3 (Prompt version / Ecosystem release / Set): fires_on_injection false because the guard file's regression field is prose ('inject a label line ... e.g. ...'), which dryrun injects verbatim; the patterns still carry the old '?' suffix, not P-16's '{0,2}'. Separate registry worker."
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": "same as first_run (no patch; not re-run with changes)",
+  "readback": [
+   {
+    "edit": "R-A5 (NOT_APPLICABLE)",
+    "reads_ok": true,
+    "note": "'Repository paths outside ... are not written' absent: 0 before and 0 after; R-A5 not applied (RS-40 not in applies_to)"
+   },
+   {
+    "edit": "R-ITEM30b",
+    "reads_ok": true,
+    "note": "own line after the MERGE_PENDING bullet: '- `MERGE_OBSERVED`: resumed PR-35 phase; the subscribed PR-35 session observes ... performed by Nathan.'; colon form 'MERGE_OBSERVED`: ' 1"
+   },
+   {
+    "edit": "LRS-40-1",
+    "reads_ok": true,
+    "note": "'original Product Owner Proceed; the recorded phase's own dedicated session, pull request reference and artifacts by repository path; and the return condition. The branch, head ...' (through-span ends at 'and return condition.'; P-01 text verbatim, RECV 1)"
+   },
+   {
+    "edit": "LRS-40-2",
+    "reads_ok": true,
+    "note": "'Return one conditional block ... merges the identified PR and only where no MERGE_OBSERVED ...; the block directs PR-40'"
+   },
+   {
+    "edit": "LRS-40-3",
+    "reads_ok": true,
+    "note": "'...at <PR-40 URL>, and requires PR-40 to independently verify actual merged state and landed lineage.'"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06: 0 hits before, 0 after on the whole collapsed body",
+  "r_a7_local_check": {
+   "before": 2,
+   "after": 0,
+   "alternatives_firing_before": {
+    "Return one conditional block for use only after Nathan manually merges the identified PR;": 1,
+    "states that Nathan's later invocation asserts the manual merge": 1
+   },
+   "note": "fires before, and LRS-40-2 / LRS-40-3 each break one alternative"
+  },
+  "check_before_after": {
+   "R-26-BRANCH-RECV": [
+    1,
+    0
+   ],
+   "R-A7-LOCAL": [
+    2,
+    0
+   ]
+  },
+  "open_issues": []
+ }
+]

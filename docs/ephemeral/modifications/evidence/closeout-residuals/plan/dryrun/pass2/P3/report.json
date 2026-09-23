@@ -1,0 +1,122 @@
+[
+ {
+  "pid": "DOC-10",
+  "page": "3db4590a05eb8193a9a8d7ddd751cd2d",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "DOC-20",
+  "page": "3db4590a05eb8164ac09e722dc967f25",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "ESC-10",
+  "page": "3db4590a05eb81d582b8d490e77f9f40",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "ESC-25",
+  "page": "3db4590a05eb81bf9326e46a1017de38",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "ESC-30",
+  "page": "3db4590a05eb813e99b4e416bc7afdae",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "ESC-40",
+  "page": "3db4590a05eb81efb6d4cd8d02ba9756",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "IA-10",
+  "page": "3db4590a05eb817aa191f1e822c30480",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "IA-20",
+  "page": "3db4590a05eb81c4825df2ad0dec4750",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "IA-30",
+  "page": "3db4590a05eb81c6bfb5f36f7df8f464",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "IA-40",
+  "page": "3db4590a05eb8197bb1bc8f52f896969",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "IA-50",
+  "page": "3db4590a05eb81d78eeae384e93dd697",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ },
+ {
+  "pid": "IA-60",
+  "page": "3db4590a05eb8141b5b2c8fbf7b725e2",
+  "pass": true,
+  "failures": [],
+  "cause": null,
+  "proposed_fix": null,
+  "fix_tested": false,
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-ae4739b1936d06a86.jsonl"
+ }
+]
