@@ -8,15 +8,16 @@ shared sentence below gets one verdict, which applies to every carrier and overr
 in `ANALYZE-body-evidence.md`.
 
 **One rule decides the author-directed rows (A3, A4) and the mention bans (ITEM-20) alike:** a positive
-instruction addressed to the prompt's author, which an executor can act on, goes; a prohibition an executor
-cannot break has no functional consumer and stays (`NORM-001`).
+instruction addressed to the prompt's author, which an executor could act on, goes; a prohibition correctly
+scoped to what the executor actually writes stays (`NORM-001`). A3b goes with A3a where the two form one
+sentence, because its "them" refers to A3a's contracts; PLAN confirms this per body.
 
 | anchor | the sentence (by effect) | live carriers | verdict, applied to every carrier | reason |
 |---|---|---|---|---|
 | A1 | usage, task, result, attempt or requirement mappings kept "in … metadata or [the/returned] handoff" | 34: CL-20, CL-30, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30 | REAL | offers the handoff as the only copy's home; C-ART: "it never carries the only copy of a fact" |
 | A2 | `CANON_CONFLICT_REGISTER` preserved "in the … artifact and handoff" or carried by a package | 34: CF-C-30, CF-E-30, CL-30, CL-C-10, CL-E-10, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, IA-10, IA-20, IA-30, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30 | REAL | the register holds decisions and history; C-HANDOFF: the handoff "does not restate … decisions … that the … files hold" |
 | A3a | "Embed only applicable workflow contracts: actor ownership, sequence, permitted actions …" | 10: CL-20, CL-30, CL-C-10, CL-E-10, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10 | REAL | a positive instruction to the prompt's author that an executor can act on; the re-check found it read as embedding contracts in the handoff (OPS-30) |
-| A3b | "do not restate them as independent reusable prompt policy" | 10: CL-20, CL-30, CL-C-10, CL-E-10, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10 | NOT_REAL | a prohibition an executor cannot break; no functional consumer (`NORM-001`) |
+| A3b | "do not restate them as independent reusable prompt policy" | 10: CL-20, CL-30, CL-C-10, CL-E-10, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10 | goes with A3a where they form one sentence; otherwise NOT_REAL | its "them" refers to A3a's contracts |
 | A3c | "Do not copy those pins into reusable prompt text" | 11: CL-20, CL-30, CL-C-10, CL-E-10, OPS-10, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10 | NOT_REAL | same; where a body authors task text (OPS-10's `OPS_TASK`), the rule applies to that text and is correct |
 | A3d | "Do not copy historical example constants into this reusable contract" | 1: PR-10 | NOT_REAL | same |
 | A4a | "These candidate URL tokens must be replaced by observed direct Notion URLs" | 5: CL-20, CL-30, CL-40, CL-C-10, CL-E-10 | REAL | tells the executor that live bindings are placeholders to replace |

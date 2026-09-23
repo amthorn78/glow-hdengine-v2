@@ -68,7 +68,7 @@ Every installed suite passes today:
 | ITEM-16 | **REFUTED as prototyped** | The prototype gave 23 findings before and 9 after, not 29 and 0. It missed 30 of 30 paraphrased violations and flagged the edits' own prohibitions | **Redesign:** (1) `CONTRACT_REQUIRED`: ITEM-08's override sentence in `change-flow` and `session-relay-flowmaster` (the two carriers; `tw-flowmaster` excluded); (2) `CONTRACT_FORBIDDEN`: every retired phrase this Modification removes; (3) the governance-audit code fixture (ITEM-05); (4) the limit recorded under `D14`: prose paraphrase is not mechanically detectable, and review holds it | GUARD-001: each guard fires on an injected regression | B / 0 |
 | ITEM-24 | VERIFIED | `glow-po-reporting` (end every message in a named state); Hub *Worker communication rules* §2; `session-working-rules.md:83` | the named state is the line immediately before a `NEXT_PROMPT_HANDOFF` block | skill review | B / 0 |
 | ITEM-36 | CONFIRMED | registry: all 55 rows carry the three `\A`-anchored guards with the `{0,7}` window; flowmaster-validate `validate_gcfpe_20260914.py:1145-1149` checks `nonblank[:8]`. A label line after 8 non-blank lines passes both (synthetic bodies; verification B4a-c). The census found 0 such lines in the 55 live bodies and 2 in the proposed MGMT-10 body | line-anchored whole-body patterns in the registry and in `PROMPT_BODY_RELEASE_HEADER`; `prompt-body-content-policy.md` updated | an injected label line past line 8 fails | B / 0 |
-| ITEM-39 | VERIFIED | `flowmaster-validate/SKILL.md:174`, governance-audit `interoperability-contracts.md:96` and `behavioral-fixtures.md:59` say PR04 is not started and Alpha is stopped | replace with a pointer: Alpha state is recorded by the Epic's artifacts under `docs/ephemeral/` (the `D18` successor) | none (prose) | C / 0 |
+| ITEM-39 | VERIFIED, measured | broad match over the packaged skills for ALPHA_STOPPED, ALPHA_RESUMED, "PR04 not started", "Alpha remains", "sole operative state", `next_intended_unit` and `alpha_resumption` (TW excluded): prose in change-flow `SKILL.md:335`, flowmaster-validate `SKILL.md:174`, governance audit `interoperability-contracts.md:96` and `behavioral-fixtures.md:59`; validator markers requiring change-flow's line at change-flow `validate_gcfpe_20260914.py:1033` and flowmaster-validate `:2692`; machine records in both 091426.1 contracts and both graph copies (6 lines per file), checked at flowmaster-validate `:1901-1908` and change-flow `:1017-1018`, and in `docs/graph/parts/global.json` (`alpha_resumption_contract`) | prose: a pointer to the Epic's artifacts (the `D18` successor); markers moved; machine records per Open question 3 | the moved markers guard change-flow's line only; the other three prose sites are unguarded | B / 0 |
 | ITEM-25 | VERIFIED | `glow-graph-contract/SKILL.md:59` | the bundled graph copies are validator fixtures built from `docs/graph/parts` | none | C / 0 |
 
 ## Registry parent IDs (ITEM-22)
@@ -106,11 +106,11 @@ and injects one wrong parent.
 
 | package | items |
 |---|---|
-| `flowmaster-validate` | 03, 04, 11, 15, 16; `CONTRACT_REQUIRED` for 08; `CONTRACT_FORBIDDEN` for 02, 14 and 16; whole-body release-line check for 36; its revision and self-identity |
-| `change-flow` | 06 (`:295`), 08, 09 (the `:802` comment), 10; its revision and pins |
+| `flowmaster-validate` | 03, 04, 11, 15, 16, 39 (`:174` and the `:2692` marker); the regenerated contract copy and its pins (`:1012`, `:1477`, `:1816`, profile `:8`, `:27-28`); `CONTRACT_REQUIRED` for 08; `CONTRACT_FORBIDDEN` for 02, 14 and 16; whole-body release-line check for 36; its revision and self-identity |
+| `change-flow` | 06 (`:295`), 08, 09 (the `:802` comment), 10, 39 (`:335` and its validator marker); the regenerated contract copy; its revision and pins |
 | `session-relay-flowmaster` | 02, 06, 08, 14 (text, validator, self-test, examples); its revision |
 | `glow-hde-pr-development` | 01 |
-| `amthor-workspace-governance-audit` | 05 (text, code, fixture), 07 |
+| `amthor-workspace-governance-audit` | 05 (text, code, fixture), 07, 39 (`:96`, `:59`) |
 | `glow-graph-contract` | 09, 12 (`reindex` and the builder check), 13, 25 |
 | `glow-po-reporting` | 24 |
 | repository pull request | `docs/graph/parts` reindex (12); registry (22, guards); management documents |

@@ -65,7 +65,7 @@ items:
     source: "CLOSE-OUT-20260923 §4.A (carried)"
     disposition: ""
   - id: ITEM-13
-    statement: "The contract regenerator and the registry deriver live in glow-graph-contract as maintained scripts, and the pre-E2 contract they need is kept in the repository, so the shipped contract regenerates byte for byte from repository sources."
+    statement: "The contract regenerator and the registry deriver live in glow-graph-contract as maintained scripts, and the pre-E2 contract they need is kept in the repository, so the shipped 091426.1 contract 6902924a… regenerates byte for byte from repository sources."
     source: "CLOSE-OUT-20260923 §4.A (carried)"
     disposition: ""
   - id: ITEM-14
@@ -149,7 +149,7 @@ items:
     source: "ANALYZE anchor census A5 and A6 (evidence/closeout-residuals/ANALYZE-anchor-census.md)"
     disposition: ""
   - id: ITEM-33
-    statement: "The 10 live bodies carrying 'Embed only applicable workflow contracts' (A3a) and the 5 carrying 'candidate URL tokens must be replaced' (A4a) lose it; CL-40's 'This authoring candidate does not perform that update' (A4c) is resolved to match the PART-06 answer. Prohibitions an executor cannot break (A3b-d, A4b) stay."
+    statement: "The 10 live bodies carrying 'Embed only applicable workflow contracts' (A3a) lose it, with its trailing 'do not restate them as independent reusable prompt policy' clause (A3b) where the two form one sentence; the 5 carrying 'candidate URL tokens must be replaced' (A4a) lose it; CL-40's 'This authoring candidate does not perform that update' (A4c) is resolved to match the PART-06 answer. Correctly scoped prohibitions (A3c, A3d, A4b) stay."
     source: "ANALYZE anchor census A3 and A4, one verdict per sentence"
     disposition: ""
   - id: ITEM-34
@@ -173,7 +173,7 @@ items:
     source: "ANALYZE sweep: PR-10, PR-35, PR-40, DOC-10 read 'material change (D23-C)'; spec v2 step 22"
     disposition: ""
   - id: ITEM-40
-    statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY carries none of the classes this Modification removes from live bodies (census anchors A1, A2, A3a, A4a, A5 and A8), so its promotion cannot reintroduce them. Its design-level contradictions are recorded for the D20 redesign's stage 5, not resolved here."
+    statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY carries none of the classes the census measured on it and this Modification removes (anchors A1, A2, A3a with its A3b clause, A4a, A5 and A8; it has no handoff-content instruction), so its promotion cannot reintroduce them. Its read-only 'Must not: change anything' lines and its design-level contradictions are recorded for the D20 redesign's stage 5, not resolved here."
     source: "ANALYZE anchor census of page 3e34590a05eb811b93d2da9b4ef8106d (evidence/closeout-residuals/ANALYZE-anchor-census.md)"
     disposition: ""
 parts:
@@ -226,7 +226,7 @@ parts:
     name: "The MGMT-10 proposed body is fixed before promotion"
     items: [ITEM-23, ITEM-40]
     class: B
-    after: [PART-17]
+    after: []
   - id: PART-12
     name: "Named state sits immediately before a handoff block"
     items: [ITEM-24]
@@ -258,7 +258,7 @@ parts:
     class: B
     after: []
   - id: PART-18
-    name: "C-LAT's decide-during-work block leaves the non-implementing bodies"
+    name: "C-LAT in the non-implementing bodies, as ruled on Open question 2"
     items: [ITEM-37]
     class: A
     after: []
@@ -310,9 +310,10 @@ one package, one review and one install.
 *Written by MODE = ANALYZE, 2026-09-23. Two review rounds checked it:*
 
 - *round one, `wf_1ac3cdc2-156`: 11 required findings;*
-- *round two, `wf_4bf0baec-6cc`: 14 required findings, all against the repair.*
+- *round two, `wf_4bf0baec-6cc`: 14 required findings, all against the repair;*
+- *round three: a verifier's check of round two.*
 
-*This version answers both rounds; any sub-point still open is named in the closing section.
+*This version answers both rounds and a third verifier's check. The sub-points still open are named in the closing section.
 Evidence, all under `evidence/closeout-residuals/`:*
 
 - *`ANALYZE-body-evidence.md`: the sweep, its re-check verdicts, and the re-verification of ITEMs 17–21
@@ -362,6 +363,8 @@ Evidence, all under `evidence/closeout-residuals/`:*
    - **(B)** CL-40 records candidates only in its committed `CYCLE_GAP_SCAN`, and Nathan or a
      maintenance run copies them over. Then CL-40's step 7 and its A4c sentence must change too, so it
      stops attempting the update.
+   - **(B)'s cost:** no new write path in this run, and the same edit count. It adds one copying round
+     trip after every change, indefinitely.
 2. **ITEM-37, re-asked: C-LAT in the eight bodies that implement nothing.**
    - **What the bodies are:** PR-10 writes work-unit instructions; PR-20 plans; PR-40 reviews after
      the merge; RS-10 proposes a rescope; RS-20 reviews one; DOC-10 writes documentation instructions;
@@ -386,18 +389,25 @@ Evidence, all under `evidence/closeout-residuals/`:*
    - **(A) Recommended. Keep it as the promotion-time record.** The fields describe the resumption
      contract at promotion. The skills' prose says so, the validator check is renamed from a state check
      to a promotion-record check, and nothing that moves the graph digest is touched.
-   - **(B) Retire it** from the graph, both contracts and the validators. The graph digest moves off
-     `ae2bd159…`, and every recorded proof token and pin moves with it: the Flow Index, the register,
-     `authoritative-surfaces.md`, `ecosystem-change-management.md`, the v5.0.0 pointer, validators and
-     profiles.
+   - **(A)'s cost:** two check renames inside PART-03, and nothing else.
+   - **(B) Retire it** from the graph, both contracts and the validators, including change-flow's
+     `:1017-1018` successor-trigger check. The graph digest moves off `ae2bd159…`, and every recorded
+     proof token and pin moves with it: the Flow Index, the register, `authoritative-surfaces.md`,
+     `ecosystem-change-management.md`, the v5.0.0 pointer, validators and profiles.
+   - **(B)'s cost:** a new part, after PART-01, that edits `global.json`, rebuilds the graph and
+     regenerates the contract a second time; about a dozen Notion and repository token updates; and a
+     likely extra review cycle (+1). It would also replace Decision 1's "the graph is not regenerated"
+     and PART-04's byte-identical gate, which would then apply only to the reindex, before the
+     retirement.
 
 ### Items whose premise the verification refuted
 
 - **ITEM-20, proposed `NOT_APPLICABLE`.**
   - The sweep and the re-check found OPS-10's and OPS-20's mention bans correctly scoped
     (`LINK_OR_MENTION_BAN`: 0 REAL, 6 NOT_REAL).
-  - They are prohibitions an executor cannot break, so the census rule for author-directed text keeps
-    them. The same rule keeps A3b–A3d and A4b.
+  - They are correctly scoped: OPS-10's ban governs the `OPS_TASK` text it authors, and OPS-20's governs
+    reusable handoffs, not a runtime handoff's direct URL. The census rule keeps correctly scoped
+    prohibitions, and the same rule keeps A3c, A3d and A4b.
   - PART-08 therefore lands empty, and §E records the verdict.
 - **ITEM-21 keeps its four bodies and loses its premise.** The reference does resolve, to *Product Owner
   merge action*. ITEM-21 now makes that reference name the PR-40 entry the section will describe once
@@ -417,16 +427,16 @@ Evidence, all under `evidence/closeout-residuals/`:*
 
 | part | class | tier, and why | targets | gates |
 |---|---|---|---|---|
-| PART-01 | B | 0: skill text and the contract's revision fields; no prompt produces anything different | skill: PR skill (01), relay (02, 14: text, `validate_relay_manifest.py`, self-test, examples), flowmaster-validate (`CONTRACT_FORBIDDEN`). Contract: regenerated with `primary_skill_revision` 1.3.1 and `contract_revision` 4.1.0 → 4.1.1, both bundled copies (change-flow, flowmaster-validate), and every pin (`EXPECTED_CANDIDATE_CONTRACT_SHA256`, `validation-profile.json:8`, contract-revision pins at change-flow `:751` and flowmaster-validate `:1477`). After PART-04 (regenerator) | readback; forbidden literals fired by injected regressions; the regenerated contract passes both validators; D24 review; install |
-| PART-02 | B | 0: skill text, code and guards; the core bytes do not move | skill: flowmaster-validate, change-flow, relay, governance audit (text, code, fixture) | ITEM-16 guards fired by injected regressions; the governance-audit fixture; `core_sync` true; D24; install |
-| PART-03 | B | 0: skill prose brought into line with settled rulings (D23-G, D23-D, D13, D18's successor, promotion) | skill: flowmaster-validate (03, 39), governance audit (07, 39), glow-graph-contract (09 including its description, 25), change-flow (09's `:802` comment, 10, 39 at `:335`), the two validator markers that require change-flow's `:335` | readback; the moved markers fire on the old text; D24; install |
+| PART-01 | B | 0: skill text and the contract's revision fields; no prompt produces anything different | skill: PR skill (01), relay (02, 14: text, `validate_relay_manifest.py`, self-test, examples), flowmaster-validate (`CONTRACT_FORBIDDEN`). Contract: regenerated with `primary_skill_revision` 1.3.1 and `contract_revision` 4.1.0 → 4.1.1, both bundled copies (change-flow, flowmaster-validate), and every pin (`EXPECTED_CANDIDATE_CONTRACT_SHA256`, `validation-profile.json:8`, `validation-profile.json:27-28` `installed_skill_revisions`, the contract-revision pins at change-flow `:751` and flowmaster-validate `:1477`, and `primary_skill_revision` at flowmaster-validate `:1816`). After PART-04 (regenerator) | readback; forbidden literals fired by injected regressions; the regenerated contract passes both validators; D24 review; install |
+| PART-02 | B | 0: skill text, code and guards; the core bytes do not move | skill: flowmaster-validate, change-flow, relay, governance audit (text, code, fixture); decision record: a `D14` note recording the prose-paraphrase limit of ITEM-16's guards | ITEM-16 guards fired by injected regressions; the governance-audit fixture; `core_sync` true; D24; install |
+| PART-03 | B | 0: skill prose brought into line with settled rulings (D23-G, D23-D, D13, D18's successor, promotion) | skill: flowmaster-validate (03, 39), governance audit (07, 39), glow-graph-contract (09 including its description, 25), change-flow (09's `:802` comment, 10, 39 at `:335`), the two validator markers that require change-flow's `:335`; under Open question 3 (A), the checks at flowmaster-validate `:1901-1908` and change-flow `:1017-1018` renamed from Alpha-state checks to promotion-record checks, values unchanged | readback; the moved markers fire on the old text; D24; install |
 | PART-04 | C | 0: validators and graph tooling are controls; the build stays byte-identical | skill: flowmaster-validate (11, 15), glow-graph-contract (12 with `reindex` and its documentation, 13); graph: `docs/graph/parts` reindex; `docs/graph/` home for the pre-E2 contract; a dated correction note on the repair-a4 record's C8 and §2 | build byte-identical (`ae2bd159…`); the builder rejects an injected count mismatch; fixture cases for 11; the five a5 regressions; the regenerator reproduces `6902924a…` from the kept input; D24; install |
 | PART-05 | B | 0: wording aligned with what the bodies already do (ruling 2); nothing they produce changes | prompt: 15 bodies (CL-20, CL-30, CL-40, CL-E-20, DOC-20, ESC-25, GCFPE-MGMT-10, OPS-10, OPS-30, PR-20, PR-35, PR-40, PR-50, QA-10, RS-40); decision record: ruling 2's entry; registry patterns | readback; a forbidden pattern per retired phrasing, including A10, fired by regression |
-| PART-06 | A | 1: changes what CL-40 writes and where | prompt: CL-40. Notion: a new *Candidate CRD Items List* page under the Glow Operations Hub, created by `GCFPE-MGMT-10` at EXECUTE and migrated from Drive `1JPN7Wcq…`. Rule: the destination rule (answer (A)). Registry: CL-40 `mutations`, guard. Decision record: ruling 1's entry. Product Owner action: banner the Drive file as superseded (Drive is his) | decision-record entry committed before any EXECUTE edit; readback of the migrated list against the Drive source; guard fired by regression; corpus gate |
+| PART-06 | A | 1: changes what CL-40 writes and where | prompt: CL-40. Notion: a new *Candidate CRD Items List* page under the Glow Operations Hub, created by `GCFPE-MGMT-10` at EXECUTE and migrated from Drive `1JPN7Wcq…`. Rule: the destination rule (answer (A)). Registry: CL-40 `mutations`, guard. Decision record: ruling 1's entry. Product Owner action: banner the Drive file as superseded (Drive is his). The only repository mention of the Drive list (`docs/ephemeral/HDE-EPIC040-PR40-workspace-register.md:206`) is inside a dated 2026-09-09 snapshot of a Notion page and stays as written (`AUTH-001`) | decision-record entry committed before any EXECUTE edit; readback of the migrated list against the Drive source; guard fired by regression; corpus gate |
 | PART-07 | D | 1: changes what the closure memo records when no board is supplied | prompt: CL-20; registry assertion | assertion added and fired by regression |
-| PART-08 | B | 0 | prompt: OPS-10, OPS-20 | proposed `NOT_APPLICABLE` |
+| PART-08 | B | 0: wording only, and proposed `NOT_APPLICABLE` | prompt: OPS-10, OPS-20 | none: proposed `NOT_APPLICABLE` |
 | PART-10 | C | 0: registry data (a control) | registry: 71 parent IDs and 70 titles | NAM-002 run on a snapshot of actual parents, and failing on one injected wrong parent |
-| PART-11 | B | 0: not a release member | Notion: the proposed MGMT-10 body (23, 40). After PART-17 | readback; the widened release-line check and the PART-05, PART-13 and PART-15 patterns run against it |
+| PART-11 | B | 0: not a release member | Notion: the proposed MGMT-10 body (23, 40); the redesign tracking page records ITEM-40's deferred contradictions and read-only lines for stage 5 | readback; the gate runs directly, as PLAN's patterns for A1, A2, A3a, A4a, A5 and A8 plus the whole-body release-line pattern, against the body; it needs no other part to have landed |
 | PART-12 | B | 0: reporting format | skill: `glow-po-reporting`; Notion: Hub *Worker communication rules*; rule: `session-working-rules.md` | readback; D24; install |
 | PART-13 | B | 1: changes what handoffs carry | prompt: 48 bodies (46 with REAL routing findings, and every A1 and A2 carrier); registry patterns (ITEM-28) | patterns fired by injected regressions; corpus gate |
 | PART-14 | B | 1: changes PR-35's and RS-40's lawful results and how PR-40 is entered | prompt: 21 bodies with A7 (CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10, QA-20), plus PR-35, RS-40 (30) and PR-40 (31); registry patterns | forbidden patterns for assertion-only entry and for "ordinary in-scope defect remains with the existing PR owner"; required A1-5 wording; required `MERGE_OBSERVED` in PR-35's and RS-40's result lists; each fired by regression; corpus gate |
@@ -511,8 +521,10 @@ unions: 51 upstream, 50 downstream, 43 state sharers. Per prompt (full output in
   3. **Exact census:** ten anchors over the 55 live bodies and the proposed MGMT-10 body.
 
   The census governs shared sentences: one verdict per sentence, applied to every carrier. One rule
-  decides the author-directed rows and the mention bans alike: a positive instruction to the author
-  goes, and a prohibition an executor cannot break stays. Measured part scopes:
+  decides the author-directed rows and the mention bans alike: a positive instruction to the prompt's
+  author, which an executor could act on, goes; a prohibition correctly scoped to what the executor
+  actually writes stays. A3b goes with A3a where the two form one sentence (its "them" refers to A3a's
+  contracts); PLAN confirms this per body. Measured part scopes:
   - PART-05: 15 bodies;
   - PART-13: 48;
   - PART-14: 21, plus PR-35 and RS-40;
@@ -592,7 +604,10 @@ Each applies a ruling or rule already in force.
 ### Unguarded items, with the reason
 
 - **ITEMs 03, 07, 09, 10 and 25** are skill prose with no suite that reads meaning; the D24 review
-  holds them. ITEM-39 is guarded by its moved validator markers.
+  holds them.
+- **ITEM-39** is guarded only at change-flow's `:335`, by the moved validator markers. Its other three
+  prose sites have no guard: flowmaster-validate `SKILL.md:174`, and the governance audit's `:96` and
+  `:59`.
 - **ITEM-24** is prose in a prose skill.
 - **ITEM-38** is a typo with no behaviour.
 - **ITEM-36** is itself a guard.
@@ -608,7 +623,7 @@ Each applies a ruling or rule already in force.
   a blank-line window was exposed on 10 bodies. So EXECUTE uses exact-anchor replacements, puts no
   strikethrough in bodies, reads everything back in full, and reads the migrated list back against
   Drive.
-- **D24 coupling.** PART-01 spans 3 packages, PART-02 spans 4 and PART-03 spans 4. One rejected edit
+- **D24 coupling.** PART-01 spans 4 packages (the PR skill, relay, flowmaster-validate, and change-flow through the contract copy), PART-02 spans 4 and PART-03 spans 4. One rejected edit
   blocks its part, re-cuts several packages, and needs fresh reviewers. The parent took five rounds.
 - **Which MGMT-10 body governs this run.** The live 091426.1 body, as read when the run began. PART-05's
   edit to it applies to later runs. PART-11 (ITEMs 23 and 40) edits the proposed body, which does not
@@ -646,9 +661,9 @@ Each applies a ruling or rule already in force.
 - **Already spent in ANALYZE:** four Product Owner answers (rulings 1–4). The widening is ruling 3.
 - **What a split would save:**
   - Moving PART-06 or PART-18 to its own run saves one ruling here. It costs that run's own two
-    approvals and a merge, and it re-cuts packages PART-06 and PART-18 share (the registry, and
-    change-flow through ITEM-39's markers). That is a net loss of 2 or more.
-  - Moving Open question 3 out, and taking its option (A) now, saves 1 at no cost.
+    approvals and a merge, and a second registry edit and readback. That is a net loss of 2 or more.
+  - Moving Open question 3 to its own run saves 1 here and costs that run's 2 approvals and a merge, a
+    net loss of 2.
 - **Calibration:** the parent predicted 11 and took 29, four of them extra review rounds. Each extra
   round here adds 1.
 
@@ -679,6 +694,23 @@ Each applies a ruling or rule already in force.
   - the PART-40 typo removed;
   - package spans corrected;
   - ITEM-20 attributed to the sweep.
+- **Round three** (a verifier's check of round two: 4 findings not yet resolved and 5 new):
+  - the mention-ban premise restated as "correctly scoped";
+  - `validation-profile.json:27-28` and flowmaster-validate `:1816` added to PART-01's pins;
+  - ITEM-13 names `6902924a…`;
+  - PART-08's tier;
+  - the split-saving claim corrected;
+  - the Drive mention recorded as a dated snapshot;
+  - ITEM-39's three unguarded sites listed;
+  - PART-01 spans 4 packages;
+  - ITEM-40 and PART-11's gate limited to the classes measured on the proposed body;
+  - Open question 3 carried by PART-03 (A) or a new part (B), with costs;
+  - option costs added;
+  - A3b goes with A3a where they form one sentence;
+  - the skill-evidence table updated;
+  - PART-18's name made neutral;
+  - Decision 11's tracking-page record placed in PART-11;
+  - ITEM-16's D14 note placed in PART-02.
 - **Non-blocking sub-points still open:**
   - skill hit counts per class: only the 31-site total is recorded;
-  - the separate-PR arithmetic depends on Nathan's merge pattern.
+  - the merge count depends on Nathan merging the record PR separately (#478).
