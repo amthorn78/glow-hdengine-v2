@@ -275,7 +275,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -388,7 +388,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -504,7 +504,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -614,7 +614,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -731,7 +731,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -844,7 +844,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -960,7 +960,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1070,7 +1070,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1185,7 +1185,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1304,7 +1304,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1415,7 +1415,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1530,7 +1530,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1643,7 +1643,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1757,7 +1757,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1870,7 +1870,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -1985,7 +1985,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2098,7 +2098,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2224,7 +2224,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2358,7 +2358,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2467,7 +2467,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2579,7 +2579,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2697,7 +2697,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -2811,7 +2811,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3018,7 +3018,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3132,7 +3132,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3254,7 +3254,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3369,7 +3369,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3484,7 +3484,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3594,7 +3594,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3713,7 +3713,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion-resident artifact'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3830,7 +3830,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -3949,7 +3949,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4071,7 +4071,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4190,7 +4190,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4307,7 +4307,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4431,7 +4431,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4550,7 +4550,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4696,7 +4696,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -4927,7 +4927,7 @@ prompts:
       rule_id: CTR-001
     - value: 'Notion and repository persistence'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5044,7 +5044,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5167,7 +5167,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5293,7 +5293,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5406,7 +5406,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5525,7 +5525,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5640,7 +5640,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
@@ -5755,7 +5755,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -5866,7 +5866,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
@@ -5986,7 +5986,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -6100,7 +6100,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
@@ -6224,7 +6224,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -6334,7 +6334,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
@@ -6471,7 +6471,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
@@ -6582,7 +6582,7 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
     - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
