@@ -77,7 +77,7 @@ items:
     source: "CLOSE-OUT-20260923 §4.A (carried); SECTION-10-REVIEW-a5-SFR-A5-1.md N1-N4, SECTION-10-REVIEW-a5-SFR-A5-2.md F1-F4"
     disposition: ""
   - id: ITEM-16
-    statement: "D22 has guards that fire on regression: the D22 override sentence is required in each GCFPE-bound skill, every retired body-copying or body-hashing phrase this Modification removes is forbidden, and a governance-audit fixture proves prompt-kind sources carry no digest; the residual limit (prose paraphrase) is recorded under D14."
+    statement: "D22 has guards that fire on regression: CONTRACT_REQUIRED holds ITEM-08's override sentence in change-flow and session-relay-flowmaster; CONTRACT_FORBIDDEN, or the owning skill's own suite, forbids every retired body-copying or body-hashing phrase this Modification removes from change-flow, session-relay-flowmaster, glow-hde-pr-development, flowmaster-validate and amthor-workspace-governance-audit; a governance-audit fixture proves prompt-kind sources carry no digest. tw-flowmaster is excluded (out of scope), and the residual limit, prose paraphrase, is recorded under D14."
     source: "CLOSE-OUT-20260923 §4.A (carried); gcfpe.decision-record.md D22 (GUARD-001)"
     disposition: ""
   - id: ITEM-17
@@ -89,7 +89,7 @@ items:
     source: "CLOSE-OUT-20260923 §4.E"
     disposition: ""
   - id: ITEM-19
-    statement: "CL-20 names the board reference supplied by the change context in its board-update instruction, and records the update as pending with Master Scrum as owner when none is supplied."
+    statement: "CL-20's board-update instruction names the board reference supplied by the change context, and records the update as pending with its PF04 §9.1.1 owner (the authorized manual operator and the actual receiving owners) when none is supplied."
     source: "CLOSE-OUT-20260923 §4.E"
     disposition: ""
   - id: ITEM-20
@@ -116,6 +116,10 @@ items:
     statement: "glow-graph-contract says that the graph copies bundled in skills are validator fixtures built from docs/graph/parts, not sources."
     source: "Parent Modification Amendment 1 'Noticed, not in scope' (spec S-3); glow-graph-contract/SKILL.md:59"
     disposition: ""
+  - id: ITEM-39
+    statement: "No installed skill this Modification packages still states the retired D18 Alpha state (PR04 not started, Alpha stopped): flowmaster-validate/SKILL.md:174, amthor-workspace-governance-audit references/interoperability-contracts.md:96 and behavioral-fixtures.md:59."
+    source: "ANALYZE completeness review, 2026-09-23; close-out §6 retired the D18 block (PR04 merged in #467 and accepted)"
+    disposition: ""
   - id: ITEM-26
     statement: "No body's routing, recovery or package sentence tells a handoff to carry lineage, decisions, completed work, evidence, a branch or commit, or other content its named artifacts hold; each such sentence names the artifacts instead (C-HANDOFF, D23-B)."
     source: "ANALYZE body sweep and adversarial re-check: HANDOFF_RESTATES_CONTENT, 123 REAL findings in 46 bodies (evidence/closeout-residuals/ANALYZE-body-evidence.md)"
@@ -129,7 +133,7 @@ items:
     source: "The parent's E4 gate passed every body ITEM-26 names (0 of 1 484 assertions); a guard that never fired is not a guard (GUARD-001)"
     disposition: ""
   - id: ITEM-29
-    statement: "Every body that describes how PR-40 is entered names the MERGE_OBSERVED handoff from PR-35 or RS-40 first, and Nathan's merge assertion only as the fallback where none was returned, once per merge (D23-E)."
+    statement: "Every body that describes how PR-40 is entered uses the parent's A1-5 wording and the D23 once-per-merge sentence verbatim: the MERGE_OBSERVED handoff from PR-35 or RS-40 first, Nathan's merge assertion only where no MERGE_OBSERVED result was returned for this merge, and PR-40 entered once per merge."
     source: "ANALYZE re-check: PR40_ENTRY_PRE_D23E, 28 REAL in 17 bodies"
     disposition: ""
   - id: ITEM-30
@@ -161,17 +165,17 @@ items:
     source: "ANALYZE verification B4a-c: both checks see 8 non-blank lines only"
     disposition: ""
   - id: ITEM-37
-    statement: "In the bodies that carry C-LAT but implement nothing (PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20, IA-30), step 2 sends an obvious, necessary, consistent change to the implementing PR owner instead of telling the reader to implement it (a D23-C successor)."
+    statement: "In the eight bodies that carry C-LAT but implement nothing (PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20, IA-30), C-LAT's 'Decide it during work' three-step block is removed; the Material definition and each body's own routing stay (a D23-C successor, Product Owner ruling 4)."
     source: "ANALYZE completeness critic; C-LAT is placed verbatim by the parent's step 22 (spec v2 §3), so this changes a canonical placement and needs a Product Owner ruling"
     disposition: ""
   - id: ITEM-38
-    statement: "Every C-LAT routing sentence uses the step-22 literal 'material change (as defined above)'; the '(D23-C)' variants and PR-10's doubled 'change' are repaired."
+    statement: "PR-10's 'material change (D23-C) change' loses its doubled word. The '(D23-C)' form itself stays: it is the parent's recorded STEP22-BEFORE settlement for routing lines that come before C-LAT (evidence/e3/E3-E4-report.md:112)."
     source: "ANALYZE sweep: PR-10, PR-35, PR-40, DOC-10 read 'material change (D23-C)'; spec v2 step 22"
     disposition: ""
 parts:
   - id: PART-01
-    name: "Skill handoff wording follows D23-B"
-    items: [ITEM-01, ITEM-02]
+    name: "Skill text applies D23-B and D7"
+    items: [ITEM-01, ITEM-02, ITEM-14]
     class: B
     after: []
   - id: PART-02
@@ -181,7 +185,7 @@ parts:
     after: []
   - id: PART-03
     name: "Stale statements in skill text"
-    items: [ITEM-03, ITEM-07, ITEM-09, ITEM-10, ITEM-14, ITEM-25]
+    items: [ITEM-03, ITEM-07, ITEM-09, ITEM-10, ITEM-25, ITEM-39]
     class: C
     after: []
   - id: PART-04
@@ -207,12 +211,12 @@ parts:
   - id: PART-08
     name: "OPS-10 and OPS-20 page-mention rule scoped"
     items: [ITEM-20]
-    class: C
+    class: B
     after: []
   - id: PART-10
     name: "Registry parent ids match the 091426.1 hubs"
     items: [ITEM-22]
-    class: D
+    class: C
     after: []
   - id: PART-11
     name: "MGMT-10 proposed body carries no release header line"
@@ -236,8 +240,8 @@ parts:
     after: []
   - id: PART-15
     name: "Author-only leftovers removed from live bodies"
-    items: [ITEM-33]
-    class: C
+    items: [ITEM-33, ITEM-38]
+    class: D
     after: []
   - id: PART-16
     name: "Two routing contradictions in QA-110 and QA-80"
@@ -250,8 +254,8 @@ parts:
     class: B
     after: []
   - id: PART-18
-    name: "C-LAT placement in non-implementing bodies"
-    items: [ITEM-37, ITEM-38]
+    name: "C-LAT's decide-during-work block leaves the non-implementing bodies"
+    items: [ITEM-37]
     class: A
     after: []
 request: |
