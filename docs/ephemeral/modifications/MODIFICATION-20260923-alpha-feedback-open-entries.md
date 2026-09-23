@@ -1,7 +1,7 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
 modification_id: MODIFICATION-20260923-alpha-feedback-open-entries
-status: EXECUTING
+status: PLANNED
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 2
 closure:
@@ -13,7 +13,7 @@ override:
   by: ""
   overrides: []
   reason: ""
-interaction_cost_predicted: 9
+interaction_cost_predicted: 11
 item_count_at_approval: 16
 interaction_cost_actual:
 items:
@@ -153,8 +153,10 @@ request: |
 requested_by: Nathan
 analyze_approved_by: Nathan
 analyze_approved_date: 2026-09-23
-plan_approved_by: Nathan
-plan_approved_date: 2026-09-23
+plan_approved_by: ""
+plan_approved_date: ""
+plan_approval_history:
+  - "Nathan, 2026-09-23: original §P approved; steps 0-1 executed under it (§E). Cleared when Amendment 1 returned the plan for approval."
 supersedes: ""
 spawned_from: ""
 shares_package_with: [MODIFICATION-20260923-pr40-reject-replans]
@@ -697,6 +699,365 @@ Step 46 runs once, after every body, graph and registry step. Step 47 follows st
 - `session-relay-flowmaster:269` (Drive as artifact plane).
 - Renaming prompt pages.
 
+### Amendment 1 — what the EXECUTE preflight found, and the plan it changes
+
+Written 2026-09-23. **Awaiting Nathan's approval.**
+
+- **Steps 0 and 1 stand.** They ran under the original approval (§E).
+- **Every other step is held until this amendment is approved.** `D23` says "where a plan proves
+  incomplete, the part returns to PLAN", and this plan proved incomplete for the skill, contract and
+  oracle work.
+- **Precedence.** The original §P above is left as written. Wherever this amendment changes a step, a
+  ruling or a canonical wording, the amendment governs. The same holds against any preflight row or
+  critic finding that disagrees with it. §P's PART-11 ruling row ("Dispatch is a paste, or a session
+  launch where the surface provides one") and §P's C-DISPATCH are superseded by C-DISPATCH below.
+- **Execution specification.** The exhaustive, per-site detail is in
+  `docs/ephemeral/modifications/specs/EXECUTION-SPEC-20260923-alpha-feedback-open-entries-v1.md`. It
+  gives:
+  - every edit and literal;
+  - every guard's exact value;
+  - every pin site;
+  - every command with its arguments and baseline result;
+  - the disposition of every preflight row and critic finding.
+
+  It is part of this amendment. Its sections compile the decisions below. Its §12 settles the
+  technical questions the compilers left open, and its §0 defines the stages E1–E6. A choice that
+  would contradict any ruling here is not settled there: EXECUTE stops and brings it to Nathan.
+
+#### How it was found
+
+Before running any editing step, EXECUTE ran a read-only preflight in two rounds. Nothing in the
+installed skills, the repository or Notion was written, and no prompt body was read.
+1. **Four readers**, each taking one surface:
+   - `flowmaster-validate`'s main validator;
+   - the rest of that skill, with `change-flow`;
+   - the PR, relay and graph skills with the graph parts;
+   - the registry with the governance-audit skill.
+
+   They produced 121 findings, in
+   `docs/ephemeral/modifications/evidence/preflight-2026-09-23.md`. This round's completeness critic
+   was interrupted and returned nothing.
+2. **Three critics** worked against a first draft of this amendment:
+   - a broad sweep for literals the readers missed;
+   - a coverage audit that mapped all 121 findings to steps (90 correct, 31 not);
+   - an adversary that tested the new designs by experiment.
+
+   They produced 77 more findings, 5 of them blockers. Every one is placed in this version.
+
+**What they found, in short.** Executed as written, the plan would make the 091426.1 validator report
+18 error codes and fail 48 of its 172 fixture cases (simulated). It would also break literals in
+three other skills' validators. The larger defects are in the plan itself:
+
+| # | defect | answered by |
+|---|---|---|
+| 1 | No generator exists for the direct-handoff contract, so step 15 ("regenerate, never hand-edit") cannot run | A1-2 |
+| 2 | No script derives the registry's `D13` fields from the graph | A1-2 |
+| 3 | The R1 re-pin cannot be done in place. Row digests come from an external matrix and cannot be recomputed (155 formulas tried, none reproduces them), and historical layers pin the old files | A1-1 |
+| 4 | No order of body edits and installs keeps the ecosystem green | A1-4 |
+| 5 | C-VERSION contradicts the plan's own in-place edits | A1-3 |
+| 6 | PART-11 contradicts itself, misses RS-40, and depends on a subscription that can succeed without delivering events | A1-5 |
+| 7 | Two more skills restate reversed rules: `amthor-workspace-governance-audit` and `tw-flowmaster`. The Flowmaster core shared by five skills also still permits spawning a session | A1-6 |
+| 8 | The governance-audit CLI hashes bodies, so the gate must evaluate assertions in memory | E4 |
+| 9 | The follow-up named the wrong R1 row | decision record, correction under `D23` |
+| 10 | `D23-E` had no guard. Two proposed guards matched their own canonical text, and two others masked each other | spec §7 |
+| 11 | `change-flow` loads the 091326.2 contract as its current overlay | A1-6 |
+| 12 | Whole-line replacements at skill anchors delete kept rules | spec §8, each literal marked keep, replace or forbid |
+| 13 | No skill revision was bumped | spec §8 |
+
+#### Rulings received during PLAN
+
+**1. Main-ecosystem prompts are never run as subagents, and nothing creates a session automatically.**
+Nathan, 2026-09-23, in three messages:
+- *"just to be clear, I definitely do not want PR-35 running as a subagent ever"*;
+- *"none of these should be subagents … I don't want any automated session creation of any kind in
+  the main ecosystem."*;
+- *"subagents may be used as workers within task, but the main prompts in the ecosystem must not be
+  run as subagents. The exception is the MGMT which is not part of the main ecosystem"*.
+
+It is recorded under `D23` as a clarification of `D23-D`, `D23-E` and `D23-F`. It clarifies what
+ITEM-15's "separate dedicated session" and ITEM-18's "dispatches" mean, and adds no item.
+
+**2. No PR session runs until the skills are approved and installed.** Nathan, 2026-09-23: *"no PR
+sessions will run until skills are approved and installed."* A1-4 builds the cut-over on this.
+
+#### Rulings needed
+
+Eight. Each carries a recommendation. **Approving the amendment as written accepts all eight.**
+
+**A1-1 — The R1 oracle gets a successor, not an in-place edit. Recommend yes.**
+
+The successor consists of:
+- `flowmaster-validate/references/glow-hde-canonical-change-flow-r1-20260923.json`, with profile id
+  `GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1`;
+- `change-flow/references/glow-hde-canonical-change-flow-r1-runtime-map-20260923.json`;
+- a successor source matrix, `r1-successor-source-20260923.md`. It ships in
+  `flowmaster-validate/references`, and the repository keeps a copy.
+
+The historical oracle, runtime map, correction layers and historical contracts keep their bytes, and
+**their validators and pins are never edited.** The live validators are re-pointed to the successor
+files. The suite goes on verifying the historical files' digests (`52807e58…`, `5574666e…`), so the
+switch weakens nothing.
+
+Three rows change, and the oracle keeps 46 rows (26 core, 20 material):
+
+| row | field | today | successor |
+|---|---|---|---|
+| GCF-17 | name | Same dedicated PR session implements and creates PR lineage | Dedicated PR session implements and creates PR lineage; PR-35 continues it in its own session |
+| GCF-17 | actor | Same dedicated PR session | Dedicated PR session (PR-30 phase) and dedicated PR-35 session (PR-35 phase) |
+| GCF-17 | session | Exactly the GCF-14 planning session, continuing for implementation of its one authorized work unit. | PR-30: exactly the GCF-14 planning session, continuing for implementation of its one authorized work unit. PR-35: its own dedicated top-level session for the same work unit and pull request, entered from PR-30's handoff; never a subagent of another session. |
+| GCF-17 | failure_stop_condition | … recovery owner: same PR session/IA rescope. | … recovery owner: the phase's own PR session/IA rescope. |
+| GCF-17.LINEAGE | next | GCF-19, GCF-20 | GCF-14, GCF-19, GCF-20 |
+| GCF-17.LINEAGE | failure_stop_condition | … recovery owner: PR session/reviewer/IA. | … recovery owner: a new top-level PR session Nathan creates for a re-plan (GCF-14), the reviewer, or IA. |
+| GCF-14 | consumes | pr_instruction, approved_implementation_plan_lineage, current_repository | … plus pr_work_unit_lineage_review (the PR-40 finding a re-plan starts from) |
+
+**GCF-14 and GCF-15's session wording stays.** It reads per plan cycle: a re-plan's session is the
+GCF-14 session of the new cycle.
+
+**Provenance.** The matrix holds each changed row as a fenced JSON block:
+- its 11 content fields, and the historical digest it supersedes;
+- **the row's digest,** which is the sha256 of `json.dumps(content fields, sort_keys=True,
+  ensure_ascii=False, separators=(",", ":"))`;
+- **the authority block,** which keeps the original matrix digest (`faa7fb7d…`), scoped to the 43
+  unchanged rows. It adds the successor matrix digest, the list of successor rows, and "`D23-D`,
+  `D23-F`, Product Owner 2026-09-23".
+
+**New checks,** each with a must-fail regression:
+- the changed rows equal the matrix;
+- their digests follow the formula;
+- the 43 unchanged rows equal the historical rows field for field;
+- a third row edited with every hash re-stamped fails;
+- a flipped byte in the matrix or in the historical oracle fails.
+
+**A1-2 — Two derivation scripts, reviewed like skill code. Recommend yes.**
+- **The contract regenerator** writes both contract copies as UTF-8 `json.dumps(indent=2,
+  sort_keys=True, ensure_ascii=False)` plus a newline. That recipe reproduces today's `2b78f877…`
+  exactly.
+  - **It copies from the graph build** every key pair the two validators compare (the list is in the
+    specification).
+  - **It sets the contract-only keys** from the value table in specification §6. The main values:
+    - the handoff flags follow C-HANDOFF, and `HANDOFF_CONTRACT` becomes an exact-key check;
+    - PR-35's receiver entry is a dedicated top-level session;
+    - PR-40 is entered on `MERGE_OBSERVED` or, as the fallback, on Nathan's assertion;
+    - the route shorthands are revised, and the re-plan gets one;
+    - `event_2` becomes "observed or asserted";
+    - the R1 identity flags tell the truth: `r1_oracle_changed: true`;
+    - `versioned_sibling_successors` is kept, because it is true of how 091426.1 was made (A1-3).
+  - **Acceptance test:** strip every copied key from today's contract and regenerate from today's
+    build. The result must be `2b78f877…` / 606 657 bytes. Negative control: one changed edge
+    condition must change `route_edges`, `state_routes` and the graph digest in `source_snapshot`.
+  - **The contract revision** moves from 4.0.6 to 4.1.0.
+- **The registry deriver** rewrites only the `D13` fields of rows whose values change: PR-35, PR-40
+  and RS-40. It uses the rule that reproduces all 55 rows today with zero drift. Registry edits are
+  line-anchored insertions, checked by a semantic diff through the audit skill's `load_data`.
+- **Where the scripts live.** Both are committed with this run's evidence and reviewed in E5.
+  Shipping them in `glow-graph-contract` is a separate Modification.
+
+**A1-3 — Edit 091426.1 in place, and apply C-VERSION from the next release. Recommend yes.**
+- Every member changes in this run. Applying C-VERSION now would mean 55 successor pages and every
+  binding moved, which is the copying AF-012 set out to stop.
+- The register records each changed member's revision date. The date is informational: nothing reads
+  it, and it identifies nothing.
+- The contract and skill revisions move, so the bytes stay distinguishable.
+
+**A1-4 — One cut-over, under a freeze. Recommend yes.** No order of edits and installs stays green.
+So nothing lands in Notion until the new skills are installed, and then everything lands in one
+sitting.
+1. **Before.** Repository work goes on the execution branch, and skill work happens in scratch
+   copies.
+2. **Bodies are computed, not landed.** A rules script turns each freshly fetched body into its
+   edited form in memory, and the gate validates those forms. The script holds canonical text and
+   anchor patterns, never body text. It is committed and reviewed in E5.
+3. **Delivery to you:**
+   - six `.skill` packages, each named by its digest;
+   - the brief and both verdict files;
+   - six rollback packages built from today's installed trees (digests recorded in the
+     specification).
+4. **The freeze starts when you merge the execution PR.** First confirm that no lifecycle session is
+   in flight. The freeze then covers every lane, not only PR sessions.
+5. **Cut-over, in this order.** You install all six packages together. Then I:
+   - compare each installed digest to the reviewed one, and run the installed suite with
+     `PYTHONDONTWRITEBYTECODE=1`;
+   - land the body edits with the reviewed rules script, reading each page back;
+   - re-scan all 55 live bodies with the installed validator and with the registry at the merge
+     commit;
+   - make the Notion control edits and read them back: steps 6, 9, 16, 36 and 44, and the follow-up's
+     C11;
+   - report.
+6. **You lift the freeze** after that report.
+7. **If anything fails, I stop and the freeze stays.** I report exactly where it stopped, and you
+   reinstall the rollback packages if needed.
+
+**A1-5 — The shape of PART-11. Recommend:**
+- **A new result, `MERGE_OBSERVED`.** Both **PR-35** and **RS-40** gain it. RS-40 resumes the PR-35
+  phase in the same subscribed PR-35 session. It routes to PR-40 on an edge that, like every edge, is
+  a paste (`automatic: false`): you create the PR-40 session and paste the handoff.
+- **One ordered vocabulary everywhere:** `MERGE_PENDING`, `MERGE_OBSERVED`, `RESCOPE_PENDING`,
+  `RECOVERY_PENDING`, `REMOTE_EVIDENCE_PENDING`, `PRODUCT_OWNER_DECISION_REQUIRED`.
+- **`MERGE_PENDING` stays pre-merge evidence, and always carries the conditional PR-40 block** as the
+  fallback.
+- **The fallback's condition is worded one way everywhere:** "only where no `MERGE_OBSERVED` result
+  was returned for this merge".
+- **A subscription counts as active only when the tool confirms that this session receives the PR's
+  events.** A call can succeed while a PR Steward holds the events.
+- **`direct_PR35_to_PR40_automatic_edge` stays `false`**, truthfully. The observed-merge edge is
+  recorded inside `post_merge_three_event_contract`.
+- **The DOC-20 → PR-40 edge is unchanged.**
+- **Canonical wording,** superseding §P's C-SUB and C-DISPATCH:
+  - **C-SUB:** *"At entry, subscribe to the pull request's activity where the surface provides it,
+    and record the subscription as active only when the tool result confirms that this session
+    receives the pull request's events. Act on review, comment and check events as they arrive.
+    Without an active subscription, `REMOTE_EVIDENCE_PENDING` and its re-entry handoff apply as
+    before. Subscribing is not polling, and it creates no session."*
+  - **C-DISPATCH:** *"At `MERGE_PENDING`, return control with the result, including the conditional
+    `PR-40` block for Nathan, which is usable only after he merges and only where no
+    `MERGE_OBSERVED` result was returned for this merge; stay subscribed and do not poll. When the
+    active subscription delivers the merge of the identified PR — a merge Nathan performs — return
+    `MERGE_OBSERVED` with the paste-ready `PR-40` handoff and return control. Nathan creates the
+    PR-40 session and pastes it. The observed merge event is the fact PR-40 is entered on; `PR-40`
+    still verifies the merged state and landed lineage independently. No agent merges, and no
+    session is created by an agent."*
+
+**A1-6 — The package set grows to six. Recommend yes.**
+- **The six packages** are `glow-hde-pr-development`, `change-flow`, `flowmaster-validate`,
+  `session-relay-flowmaster`, `amthor-workspace-governance-audit` and `tw-flowmaster`. The last one
+  carries byte-identical copies of the relay's retired GCFPE lines.
+- **The shared Flowmaster core is left byte-identical.** It is pinned across five skills, and its
+  "fresh spawned session" option contradicts ruling 1. So `change-flow`, `session-relay-flowmaster`
+  and `tw-flowmaster` each gain a **GCFPE override outside the core**: *"For every GCFPE
+  main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never
+  creates, spawns, launches or schedules a session; when no existing authoritative session can do
+  the work, it returns the paste-ready `NEXT_PROMPT_HANDOFF` and stops for Nathan."* The override is
+  held in place by `CONTRACT_REQUIRED` entries.
+- **`change-flow`'s current overlay** is re-pointed from 091326.2 to the 091426.1 contract, and the
+  v4 validator gains the `receiver_compatibility` content check it lacks.
+- **`change-flow` gets a check that fails if a retired phrase comes back.** Today nothing does:
+  `CONTRACT_FORBIDDEN` is never applied to it.
+
+**A1-7 — The routing-surface pin. You are the reader.** `flowmaster-validate` pins a digest of every
+route row. Its rule is that only a human who has read the route diff may move that pin, and this is
+the complete diff:
+- **Scale:** 15 route rows change or are added (13 changed, 2 new), and the 7 state-route rows that
+  restate them move with them.
+- **The digest** moves from `7380cd14…`/282 rows to **`fecc319bdd4ce7ee6201cb77d7231861`/284 rows**.
+- **The graph** moves from 227 to **229 edges**. The routing-only build is 574 175 bytes, sha256
+  `b1911cf5…`, and EXECUTE checks it as a checkpoint first. The final graph also carries the
+  non-routing edits (roles, the post-merge record, the successor oracle's digest), so its final bytes
+  are measured and recorded at E4. The routing digest and the edge count are unaffected.
+- **How the digest was produced:** a simulation script applied the exact wording below and computed
+  it. That script is committed with the evidence, and its sha256 is the authority for the full edge
+  objects and insertion positions.
+
+**Approving this amendment is that reading.** If EXECUTE cannot reproduce the exact digest, it stops
+and brings you the new diff.
+
+| from → to | branch | today | after |
+|---|---|---|---|
+| PR-10 → RS-10 | `material_boundary` | a genuine material scope, architecture, requirement, or design boundary is substantiated | a material change to the Epic-level commitment (D23-C) is substantiated |
+| PR-20 → RS-10 | `material_boundary` | the planning result substantiates a material scope, architecture, requirement, or design boundary | the planning result substantiates a material change to the Epic-level commitment (D23-C) |
+| PR-40 → RS-10 | `reject_material_boundary_proposal` | a substantiated material boundary requires a new bounded rescope proposal | a substantiated material change to the Epic-level commitment (D23-C) requires a new bounded rescope proposal |
+| DOC-10 → RS-10 | `material_boundary` | repository evidence proves a complete bounded material boundary | repository evidence proves a complete bounded material change to the Epic-level commitment (D23-C) |
+| PR-30 → PR-35 | `pr_candidate_published` | one complete same-session phase continuation | one complete PR-35 handoff to the dedicated PR-35 session for the same work unit and pull request |
+| RS-40 → PR-30 | `recovery_pr30` | recorded resumed phase is PR-30_POSTPUBLICATION; same session/vehicle re-entry | recorded resumed phase is PR-30_POSTPUBLICATION; PR-30 session/vehicle re-entry |
+| RS-40 → PR-35 | `recovery_pr35` | recorded resumed phase is PR-35; same session/vehicle re-entry | recorded resumed phase is PR-35; PR-35 session/vehicle re-entry |
+| PR-35 → merge-assertion boundary | `merge_pending` | conditional PR-40 invocation usable only after Nathan manually merges | conditional PR-40 invocation for Nathan, usable only after he manually merges and only where no MERGE_OBSERVED result was returned for this merge |
+| RS-40 → merge-assertion boundary | `merge_pending` | recorded PR-35 phase result; historical pre-merge evidence | recorded PR-35 phase result; historical pre-merge evidence; its conditional PR-40 invocation is usable only where no MERGE_OBSERVED result was returned for this merge |
+| merge-assertion boundary → PR-40 | `manual_merge_then_lineage_review` | Nathan has manually merged the identified PR and invokes the conditional PR-40 block | Nathan has manually merged the identified PR, no MERGE_OBSERVED result was returned for this merge, and he invokes the conditional PR-40 block |
+| **PR-35 → PR-40 (new)** | `merge_observed` | — | the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan |
+| **RS-40 → PR-40 (new)** | `merge_observed` | — | resumed PR-35 phase; the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan |
+| PR-40 → **PR-20** (was PR-30) | `reject_replan` (was `reject_existing_pr_owner`) | a precise in-scope implementation/review/corrected-code/PR-lineage defect has an authorized existing PR vehicle and original Proceed | a precise in-scope implementation/review/corrected-code/PR-lineage defect in landed work requires a new per-PR plan for the same work unit, in a new top-level session Nathan creates, with a new Proceed |
+| PR-20 → Proceed boundary | `awaiting_po_proceed` | one complete executable approved-scope plan awaits the original Product Owner Proceed | one complete executable approved-scope plan awaits the Product Owner Proceed for that plan |
+| Proceed boundary → PR-30 | `original_proceed` | original explicit Proceed for the exact work unit; never a second Proceed | the explicit Proceed for the exact approved per-PR plan; never a second Proceed for the same plan |
+
+The last three rows belong to the follow-up Modification, which shares this package and this pin.
+DOC-20's `material_delta` branch is a documentation term, and it is left unchanged.
+
+**A1-8 — One more canonical wording, C-TOP, in every main-ecosystem body. Recommend yes.** The 54
+bodies that aren't `GCFPE-MGMT-10` each carry it beside their handoff or return rule. For `PR-50`
+this is a separate edit, because PR-50 has no handoff:
+
+> This prompt runs in a top-level session that Nathan creates, or re-enters by pasting a handoff, and
+> never as a subagent of another session. It may use subagents as workers within its own task. It
+> never creates, starts or schedules another session; it returns control, with the handoff where
+> there is one.
+
+C-SESSION also gains: *"PR-35 runs as its own top-level session, entered from PR-30's handoff that
+Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other
+session."* The role of PR-35 in the graph, the contract and the registry carries the same clause.
+
+**The guards** are in specification §7. Each was tested against every canonical text:
+- they require C-TOP and the C-SESSION clause, each by its own distinct pattern;
+- they forbid running a named prompt as a subagent, creating a session to run a named prompt, and
+  naming a session-creating tool;
+- "use subagents as workers" matches none of them.
+
+**Stated plainly, as AF-001 requires:** a bare "launch a new session." that names no prompt is not
+caught by these patterns. The governance audit's semantic invariant catches it instead, and that
+invariant is added to the fifth package.
+
+#### The gate (E4) and the review (E5)
+
+**The gate replaces step 46.** It runs once, over everything:
+- the graph build, plus parity between the graph and the contract;
+- the routing digest `fecc319b…`/284;
+- the full `flowmaster-validate` suite, with the candidate root, and the 172-case fixture suite;
+- the other five packages' own validators;
+- all twelve historical-layer validators and runners, **each equal to its recorded baseline**;
+- the 55 edited bodies, validated in memory;
+- every registry assertion, evaluated in memory, with no snapshot and no hash;
+- every must-fail regression, each producing exactly its own finding.
+
+The specification (§9) gives each command with its arguments and its baseline result.
+
+**The review replaces step 47** (`D24`). The filled reviewer brief is committed first. Two fresh
+reviewer subagents then review, as one set:
+- the six packages;
+- the contract regenerator, the registry deriver, the routing simulation and the body rules script.
+
+Both must return `SKILL_FIT_CONFIRMED` against the same digests.
+
+**New revisions:**
+- `glow-hde-pr-development` 1.3.0;
+- `change-flow` 3.3.0;
+- `session-relay-flowmaster` 3.1.0;
+- `flowmaster-validate` 3.3.0, with its validator revision moving alongside;
+- `amthor-workspace-governance-audit` bumped one minor;
+- `tw-flowmaster` 1.2.0.
+
+Every revision pin moves in the same set.
+
+#### Noticed, not in scope
+
+Each is a candidate for its own Modification:
+- **`validate_gcfpe_current.py:602` raises `NameError`** on any `--bodies-stdin` call.
+- **The governance-audit skill's own procedure** snapshots and hashes bodies, against the corpus
+  policy.
+- **`flowmaster-validate/SKILL.md:178`** still requires a `Selection status` header.
+- **`glow-graph-contract/SKILL.md:13` and `:134`** state stale counts.
+- **Per-part `edge_indices` disagree with the edge counts** (235 indices for 227 edges).
+  - The builder gives the two new edges indices 128 and 129. Those match `_other_edge_indices`
+    entries that no edge carries.
+  - No two placed edges share an index, and the digest is unaffected.
+  - Even so, the index bookkeeping should be repaired.
+- **`glow-graph-contract/SKILL.md:59`** should say explicitly that skill-bundled graph copies are
+  validator fixtures built from the parts. That is how this run reads the rule (specification S-3).
+- **The two derivation scripts** should ship in `glow-graph-contract` (A1-2).
+
+#### On approval
+
+- `plan_approved_by` is set again. §P then governs as amended.
+- A `D23` successor note records A1-3, A1-5 and A1-8. It also corrects `D23-E`'s parenthetical:
+  `direct_PR35_to_PR40_automatic_edge` stays `false`, and the observed-merge edge is recorded in
+  `observed_merge_edges`.
+
+#### Interaction cost, re-estimated
+
+```
+9 (original) + amendment approval 1 + freeze start and lift 1  =  11
+```
+
+The install is one event of six packages, and the merges are unchanged. The routing-diff reading is
+part of approving this amendment.
+
 ## §E — Execution
 
 Started 2026-09-23 under Nathan's plan approval ("yes approve").
@@ -706,6 +1067,11 @@ Started 2026-09-23 under Nathan's plan approval ("yes approve").
 | 0 | all | APPLIED | `D23` is at `gcfpe.decision-record.md:1205`, commit `31c9795`; `grep -c '^## D23'` = 1. `D24`, which Nathan made a standing rule later the same day, is at `:1285`, commit `ad457a7`. It is not a plan step, and it changes step 47 (see the amendment) |
 | 1 | PART-01 | VERIFIED | 40 of 40 bodies validated by the shipped validator against the bundled `091426.1` contract. 0 `PROMPT_BODY_GOVERNANCE_STATE` hits and 0 other errors. The set-scoped check `QA_PASS_CLASS_MAP_AND_INTAKES` ran on its three bodies together. Evidence: `docs/ephemeral/modifications/evidence/PART-01-scan.md`, commit `89c6846` |
 | 1a | PART-01 | NOT_APPLICABLE | nothing was found, so no Modification was spawned |
+
+**Paused after step 1.** The preflight of every later step found the plan incomplete (§P,
+*Amendment 1*), so the plan went back for approval, with `plan_approved_by` cleared and the original
+approval kept in `plan_approval_history`. No step after 1 has run. The preflight and critique changed
+nothing in the installed skills, the repository's graph or registry, or Notion.
 
 ### Parts
 

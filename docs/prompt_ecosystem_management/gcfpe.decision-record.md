@@ -1341,14 +1341,15 @@ line: its subagents are maintenance workers, and never a way to run a main-ecosy
   Dispatch is a paste.
 
 **Guard.** The Modification's plan amendment carries this into:
-- the canonical wording;
+- the canonical wording, including C-TOP, which goes into every main-ecosystem body;
 - the R1 row;
-- the graph role and the registry role for each affected prompt;
+- PR-35's role in the graph, the contract and the registry;
 - the skills.
 
 Each surface gets a guard with an injected must-fail regression (`D14`). That includes a guard on
 every main-ecosystem row against running a prompt as a subagent or creating a session. It is scoped
-so that it does not forbid workers.
+so that it does not forbid workers. PR-20's and PR-40's roles are unchanged: body-level C-TOP and its
+guards carry the rule for them.
 
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
