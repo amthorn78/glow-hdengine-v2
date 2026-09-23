@@ -97,7 +97,7 @@
             "PR_CANDIDATE_PUBLISHED"
           ],
           "branch_id": "pr_candidate_published",
-          "condition": "one complete same-session phase continuation",
+          "condition": "one complete PR-35 handoff to the dedicated PR-35 session for the same work unit and pull request",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",

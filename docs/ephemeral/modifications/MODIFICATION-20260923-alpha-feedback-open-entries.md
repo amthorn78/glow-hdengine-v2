@@ -1078,3 +1078,22 @@ nothing in the installed skills, the repository's graph or registry, or Notion.
 
 - **PART-01 landed whole.** ITEM-01 is VERIFIED: with the 15 bodies confirmed in rounds 28–30, all
   55 `091426.1` bodies have been checked, and none carries a decorated governance line.
+
+### Execution under Amendment 1
+
+Resumed on 2026-09-23, after Nathan approved Amendment 1. It runs from
+`specs/EXECUTION-SPEC-20260923-alpha-feedback-open-entries-v2.md`, commit `0084183`.
+
+| stage | disposition | evidence |
+|---|---|---|
+| E1 — repository, commit 1 | APPLIED | Graph parts, except G16: the build gives 55 nodes and 229 edges, embedded JSON 575 074 B, sha256 `716c4cfc…` (the spec's prediction). The routing surface is `fecc319bdd4ce7ee6201cb77d7231861`/284, reproducing the diff Nathan read. Closure matches §4 V5. The registry grows from 831 to 1 484 assertions (G25B, added by the addendum, is the extra one) and passes the structure check. Its D13 drift is `[]`, and all three negative controls fire. The documentation edits are S-2, N1, N2, step 41 and the delegation-model scope line. Scripts: `evidence/e1_graph_transform.py`, `evidence/e1_registry_apply.py`. Checked independently by the executing session |
+
+Choices made during E1, each within the spec (adopted):
+- `:3705` keeps the PR-30-result input, and the W-4 sentence is added as its own line.
+- The "as measured before `D23`" label on `authoritative-surfaces.md:45-46` goes on its lead-in line,
+  because those lines are inside a code block.
+- The N1 sentence at `authoritative-surfaces.md:59` is the worker's wording.
+- The W-3 *Guard* paragraph in `D23` is left as written. It already says the same, and rewording a
+  dated note would breach `AUTH-001`.
+
+The contract's W-8 texts are set in E2 with the regenerator, as §0 requires.

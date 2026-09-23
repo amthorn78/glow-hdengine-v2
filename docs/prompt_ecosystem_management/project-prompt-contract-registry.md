@@ -83,6 +83,9 @@ body_extraction_convention:
   why_it_matters: 'The convention defines the ecosystem''s tamper-evidence. The ambiguity already
     produced one silent two-byte error that no amount of agreement between independent extractions
     would have surfaced, because both extractions were wrong in the same way.'
+  body_identity_disposition: 'The `evidence_contract` and `source_snapshot` identities on every row
+    describe the bodies before `D23` (2026-09-23) and no longer identify them. They are not
+    regenerated, because hashing bodies is prohibited (`prompt-corpus-policy.md`).'
 observation:
   release: GCFPE-20260914.1
   version_family: '091426.1'
@@ -237,11 +240,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -264,6 +269,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-C-20
   notion_page_id: 3db4590a05eb8173a73edc73f302a90a
   notion_url: https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a
@@ -326,11 +353,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -353,6 +382,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-C-30
   notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
   notion_url: https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd
@@ -418,11 +469,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -445,6 +498,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-C-40
   notion_page_id: 3db4590a05eb81269931cee342ce8a0e
   notion_url: https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e
@@ -504,11 +579,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -531,6 +608,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-E-10
   notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
   notion_url: https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1
@@ -597,11 +696,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -624,6 +725,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-E-20
   notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
   notion_url: https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f
@@ -686,11 +809,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -713,6 +838,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-E-30
   notion_page_id: 3db4590a05eb81b4be79f405566da9a7
   notion_url: https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7
@@ -778,11 +925,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -805,6 +954,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-E-40
   notion_page_id: 3db4590a05eb8101b655ed223b11a85e
   notion_url: https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e
@@ -864,11 +1035,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -891,6 +1064,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CF-PO-10
   notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
   notion_url: https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c
@@ -955,11 +1150,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -982,6 +1179,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-20
   notion_page_id: 3db4590a05eb81f4812be61e8877c02c
   notion_url: https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c
@@ -1052,11 +1271,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1079,6 +1300,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-30
   notion_page_id: 3db4590a05eb8190a444d8818e445c1d
   notion_url: https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d
@@ -1141,11 +1382,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1168,6 +1411,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-40
   notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
   notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
@@ -1234,11 +1497,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1261,6 +1526,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-C-10
   notion_page_id: 3db4590a05eb81ad8989faa77f441a64
   notion_url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
@@ -1325,11 +1610,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1352,6 +1639,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-E-10
   notion_page_id: 3db4590a05eb811a8578d75885c16cac
   notion_url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
@@ -1417,11 +1724,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1444,6 +1753,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-E-20
   notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
   notion_url: https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45
@@ -1508,11 +1837,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1535,6 +1866,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-E-30
   notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
   notion_url: https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345
@@ -1601,11 +1952,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1628,6 +1981,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: CL-E-40
   notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
   notion_url: https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68
@@ -1692,11 +2065,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1719,6 +2094,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: DOC-10
   notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
   notion_url: https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d
@@ -1792,11 +2187,17 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1819,6 +2220,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: DOC-20
   notion_page_id: 3db4590a05eb8164ac09e722dc967f25
   notion_url: https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25
@@ -1900,11 +2321,17 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1927,6 +2354,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: ESC-10
   notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
   notion_url: https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40
@@ -1987,11 +2434,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2014,6 +2463,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: ESC-25
   notion_page_id: 3db4590a05eb81bf9326e46a1017de38
   notion_url: https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38
@@ -2077,11 +2546,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2104,6 +2575,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: ESC-30
   notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
   notion_url: https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae
@@ -2173,11 +2664,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2200,6 +2693,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: ESC-40
   notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
   notion_url: https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756
@@ -2265,11 +2778,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2292,6 +2807,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: GCFPE-MGMT-10
   notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
   notion_url: https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54
@@ -2350,10 +2885,6 @@ prompts:
     required_literals: null
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
@@ -2376,6 +2907,16 @@ prompts:
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
       rule_id: SRC-001
 - prompt_key: IA-10
   notion_page_id: 3db4590a05eb817aa191f1e822c30480
@@ -2444,11 +2985,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2471,6 +3014,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: IA-20
   notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
   notion_url: https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750
@@ -2536,11 +3099,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2563,6 +3128,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: IA-30
   notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
   notion_url: https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464
@@ -2632,11 +3217,17 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2659,6 +3250,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: IA-40
   notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
   notion_url: https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969
@@ -2725,11 +3336,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2752,6 +3365,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: IA-50
   notion_page_id: 3db4590a05eb81d78eeae384e93dd697
   notion_url: https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697
@@ -2818,11 +3451,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2845,6 +3480,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: IA-60
   notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
   notion_url: https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2
@@ -2906,11 +3561,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2933,6 +3590,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: MGR-10
   notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
   notion_url: https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4
@@ -3001,11 +3678,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3028,6 +3707,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion-resident artifact'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: OPS-10
   notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
   notion_url: https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5
@@ -3096,11 +3797,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3123,6 +3826,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: OPS-20
   notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
   notion_url: https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8
@@ -3193,11 +3916,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3220,6 +3945,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: OPS-30
   notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
   notion_url: https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57
@@ -3293,11 +4038,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3320,6 +4067,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: PR-10
   notion_page_id: 3db4590a05eb818e8359de1994e97a7d
   notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
@@ -3386,11 +4153,17 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3413,6 +4186,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: PR-20
   notion_page_id: 3db4590a05eb8174abf8c04318ab04be
   notion_url: https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be
@@ -3427,6 +4220,7 @@ prompts:
   reviewer_role: Nathan / Product Owner
   inputs:
   - PR_INSTRUCTION_ID
+  - PR_WORK_UNIT_LINEAGE_REVIEW with REJECT (reject_replan) and its in-scope finding, for a re-plan of the same WORK_UNIT_ID in a new dedicated session Nathan seeds
   outputs:
   - artifact: PR_IMPLEMENTATION_PLAN
     states:
@@ -3474,11 +4268,19 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'accepts\s+a\s+`?PR_WORK_UNIT_LINEAGE_REVIEW`?\s+whose\s+result\s+is\s+`?REJECT'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3501,6 +4303,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: PR-30
   notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
   notion_url: https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294
@@ -3528,7 +4350,7 @@ prompts:
     - RS-20
   mutations:
     allowed:
-    - Implement, test, commit, publish, and review-correct the exact proceeded PR work unit
+    - Implement, test, commit and publish the exact proceeded PR work unit; review findings and CI fixes on the published PR belong to PR-35
     forbidden:
     - Edit PF10 directly
     - Merge a pull request or enable automatic merge
@@ -3566,11 +4388,23 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'An\s+\*?In-flight decisions\*?\s+section'
+      rule_id: CTR-002
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'they do not share a session'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3593,6 +4427,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: PR-35
   notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
   notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
@@ -3601,26 +4455,28 @@ prompts:
   sequence: 35
   lifecycle: ACTIVE
   function: Execute the review-resolution and merge-readiness phase for one proceeded PR work unit.
-  session_class: SAME_SESSION_CONTINUATION
-  session_role: You are the same dedicated PR-development session that produced or recovered the exact PR_CANDIDATE_PUBLISHED result for one proceeded work unit.
-  creator_role: The same dedicated PR-development session; PR-30 and PR-35 are two phases of one native PR execution work unit.
+  session_class: DEDICATED_PR_REVIEW_SESSION
+  session_role: You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you continue its existing pull request. PR-35 runs as its own top-level session, entered from PR-30's handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other session.
+  creator_role: The dedicated PR-35 session; PR-30 and PR-35 are two phases of one work unit, run in two dedicated sessions.
   reviewer_role: NONE
   inputs:
   - WORK_UNIT_ID and exact change/Epic identity
   - selected PR-35 prompt identity and direct Notion URL
-  - same dedicated PR session reference with session_disposition RETAIN_EXISTING
+  - 'session_disposition: NEW_DEDICATED — the dedicated PR-35 session for this WORK_UNIT_ID'
   - original Product Owner Proceed for the exact detailed PR Plan
   - complete IA-issued PR instruction
   - immutable approved Specification and whole-change Implementation Plan with review and approved overlay lineage
   outputs:
   - artifact: PR_IMPLEMENTATION_RESULT
     states:
+    - MERGE_OBSERVED
     - MERGE_PENDING
     - PRODUCT_OWNER_DECISION_REQUIRED
     - RECOVERY_PENDING
     - REMOTE_EVIDENCE_PENDING
     - RESCOPE_PENDING
     consumers:
+    - PR-40
     - RS-20
   mutations:
     allowed:
@@ -3630,7 +4486,7 @@ prompts:
     forbidden:
     - Merge a pull request or enable automatic merge
     - Edit PF10 directly
-    - Add an R1 row, actor, approval, Proceed, work unit or session
+    - Add an R1 row, actor, approval, Proceed or work unit, or any session beyond its own dedicated PR-35 session
     - Produce a PF10_BUILD_NOTES_ADDENDUM
   source_snapshot:
     path: candidate/prompts/PR-35.md
@@ -3645,11 +4501,29 @@ prompts:
       rule_id: CTR-002
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'An\s+\*?In-flight decisions\*?\s+section'
+      rule_id: CTR-002
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'they do not share a session'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: '[Ss]ubscribe to the pull request'
+      rule_id: CTR-002
+    - value: 'stay subscribed and do not poll'
+      rule_id: CTR-002
+    - value: 'The observed merge event is the fact PR-40 is entered on'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3672,6 +4546,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: 'launched as a new session'
+      rule_id: CTR-001
   evidence_contract:
   - 'Complete prompt body extracted from Notion 2026-09-19: 17908 bytes'
   - 'SHA-256 of that extraction: 51e8a5e85ca3b66ce755e979d0a1ac61540c7f06e58237f516f3a28148570e79'
@@ -3680,6 +4576,7 @@ prompts:
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces:
+  - PR-40
   - RS-20
   controlling_sources:
   - GCFPE-20260914.1
@@ -3702,12 +4599,13 @@ prompts:
   inputs:
   - PR_INSTRUCTION_ID and complete PR_INSTRUCTION
   - PR_IMPLEMENTATION_PLAN_ID and complete PR_IMPLEMENTATION_PLAN
-  - The complete PR-30 result with PR_CANDIDATE_PUBLISHED and the complete PR-35 result whose earlier MERGE_PENDING is historical pre-merge evidence
+  - The complete PR-30 result with PR_CANDIDATE_PUBLISHED
+  - 'The complete PR-35 result: MERGE_OBSERVED with the observed merge event, or, only where no MERGE_OBSERVED result was returned for this merge, the earlier MERGE_PENDING, which is historical pre-merge evidence.'
   - The complete ordered PR_REFS for this work unit, with each actual PR reference, commit identity, order, review/check state and merge evidence
   - CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved Specification, Implementation Audit, Plan, Plan review, dependency and acceptance/evidence lineage
-  - Existing PR reviewer/session lineage for a rereview, the dedicated PR session identity, the whole-change IA context and exact return owner
+  - Existing PR reviewer/session lineage for a rereview, the PR-30 and PR-35 session identities, the whole-change IA context and exact return owner
   - CANON_CONFLICT_REGISTER, recovery state, truthful pending, NOT PRODUCED and NOT EXECUTED values, and all actual access limitations
-  - Nathan's later invocation asserting the identified PR was manually merged after PR-35 produced MERGE_PENDING
+  - PR-40 is entered on the observed merge event for the identified PR, delivered to the subscribed PR-35 session as MERGE_OBSERVED, or, only where no MERGE_OBSERVED result was returned for this merge, on Nathan's assertion that he manually merged it.
   outputs:
   - artifact: PR_WORK_UNIT_LINEAGE_REVIEW
     states:
@@ -3716,7 +4614,7 @@ prompts:
     - PENDING
     consumers:
     - PR-10
-    - PR-30
+    - PR-20
     - RS-10
   mutations:
     allowed:
@@ -3734,7 +4632,7 @@ prompts:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces:
   - PR-10
-  - PR-30
+  - PR-20
   - RS-10
   controlling_sources:
   - GCFPE-20260914.1
@@ -3759,11 +4657,19 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3786,6 +4692,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: 'original Proceed and a suitable actual authorized implementation vehicle'
+      rule_id: CTR-001
 - prompt_key: PR-50
   notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
   notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
@@ -3843,11 +4771,9 @@ prompts:
       rule_id: CTR-002
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3870,6 +4796,24 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-10
   notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
   notion_url: https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29
@@ -3948,11 +4892,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3975,6 +4921,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'Notion and repository persistence'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-100
   notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
   notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
@@ -4043,11 +5011,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4070,6 +5040,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-110
   notion_page_id: 3db4590a05eb816984d1d34da0e08f40
   notion_url: https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40
@@ -4144,11 +5134,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4171,6 +5163,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-120
   notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
   notion_url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
@@ -4248,11 +5260,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4275,6 +5289,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-20
   notion_page_id: 3db4590a05eb816daa3adff37283482b
   notion_url: https://app.notion.com/p/3db4590a05eb816daa3adff37283482b
@@ -4339,11 +5373,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4366,6 +5402,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-50
   notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
   notion_url: https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2
@@ -4436,11 +5492,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4463,6 +5521,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-60
   notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
   notion_url: https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8
@@ -4527,11 +5605,15 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: '`ASK OK\?` is the line immediately before the block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4554,6 +5636,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\bends? `ASK OK\?`'
+      rule_id: CTR-002
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-70
   notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
   notion_url: https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7
@@ -4616,13 +5720,15 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
       rule_id: CTR-002
     - value: never a gate on later work
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4645,6 +5751,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-80
   notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
   notion_url: https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c
@@ -4705,11 +5831,15 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: '`ASK OK\?` is the line immediately before the block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4732,6 +5862,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\bends? `ASK OK\?`'
+      rule_id: CTR-002
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: QA-90
   notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
   notion_url: https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c
@@ -4801,11 +5953,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4828,6 +5982,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: RS-10
   notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
   notion_url: https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4
@@ -4887,11 +6061,19 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: '`ASK OK\?` is the line immediately before the block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4914,6 +6096,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\bends? `ASK OK\?`'
+      rule_id: CTR-002
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: RS-20
   notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
   notion_url: https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497
@@ -4983,11 +6187,17 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'Decide it during work'
+      rule_id: CTR-002
+    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5010,6 +6220,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: RS-30
   notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
   notion_url: https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf
@@ -5069,11 +6299,15 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: '`ASK OK\?` is the line immediately before the block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5096,6 +6330,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\bends? `ASK OK\?`'
+      rule_id: CTR-002
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 - prompt_key: RS-40
   notion_page_id: 3db4590a05eb8183b5ffdf4270133226
   notion_url: https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226
@@ -5105,14 +6361,15 @@ prompts:
   lifecycle: ACTIVE
   function: Execute Approved Rescope — Resume PR Implementation for the exact supplied change.
   session_class: DEDICATED_ONE_OFF
-  session_role: You are the same dedicated PR engineering session for the exact suspended work unit.
-  creator_role: the same dedicated PR engineering session for the exact suspended work unit.
+  session_role: 'You resume the recorded phase in its own dedicated session: PR-30''s session for a PR-30 phase, the PR-35 session for PR_RETURN_PHASE PR-35.'
+  creator_role: the recorded phase's own dedicated session for the exact suspended work unit.
   reviewer_role: NONE
   inputs:
   - RESCOPE_REVIEW
   outputs:
   - artifact: PR_IMPLEMENTATION_RESULT
     states:
+    - MERGE_OBSERVED
     - MERGE_PENDING
     - PRODUCT_OWNER_DECISION_REQUIRED
     - PR_CANDIDATE_PUBLISHED
@@ -5123,6 +6380,7 @@ prompts:
     consumers:
     - PR-30
     - PR-35
+    - PR-40
     - RS-20
   mutations:
     allowed:
@@ -5141,6 +6399,7 @@ prompts:
   required_interfaces:
   - PR-30
   - PR-35
+  - PR-40
   - RS-20
   controlling_sources:
   - GCFPE-20260914.1
@@ -5165,13 +6424,27 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
       rule_id: CTR-002
     - value: never a gate on later work
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'An\s+\*?In-flight decisions\*?\s+section'
+      rule_id: CTR-002
+    - value: 'they do not share a session'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30'
+      rule_id: CTR-002
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: '[Ss]ubscribe to the pull request'
+      rule_id: CTR-002
+    - value: 'stay subscribed and do not poll'
+      rule_id: CTR-002
+    - value: 'The observed merge event is the fact PR-40 is entered on'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5194,6 +6467,28 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: 'launched as a new session'
+      rule_id: CTR-001
 - prompt_key: UTIL-10
   notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
   notion_url: https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9
@@ -5254,11 +6549,13 @@ prompts:
       rule_id: TOP-001
     forbidden_literals: []
     required_regex:
-    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
-      rule_id: INV-003
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'never\s+carries\s+the\s+only\s+copy'
+      rule_id: CTR-002
+    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
+      rule_id: TOP-001
+    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5281,6 +6578,26 @@ prompts:
       rule_id: INV-003
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
+    - value: 'CONTROL_NOTION'
+      rule_id: CTR-001
+    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
+      rule_id: CTR-001
+    - value: 'NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
+      rule_id: TOP-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+      rule_id: INV-003
+    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+      rule_id: SRC-001
+    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
+      rule_id: CTR-001
+    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
+      rule_id: CTR-001
+    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
 global_literals:
   approval_request: ASK OK?
   approved: ASK OK.

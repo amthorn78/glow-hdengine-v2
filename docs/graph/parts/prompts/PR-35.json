@@ -18,7 +18,7 @@
             "MERGE_PENDING"
           ],
           "branch_id": "merge_pending",
-          "condition": "conditional PR-40 invocation usable only after Nathan manually merges",
+          "condition": "conditional PR-40 invocation for Nathan, usable only after he manually merges and only where no MERGE_OBSERVED result was returned for this merge",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -151,6 +151,38 @@
       "to": "RS-20",
       "to_kind": "prompt",
       "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-35",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MERGE_OBSERVED"
+          ],
+          "branch_id": "merge_observed",
+          "condition": "the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-35.md",
+            "section": "Required result and routing"
+          },
+          "state": "MERGE_OBSERVED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "MERGE_OBSERVED"
+      ],
+      "to": "PR-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
     }
   ],
   "id": "PR-35",
@@ -161,37 +193,39 @@
     "adds_product_owner_gate": false,
     "adds_r1_row": false,
     "adds_role": false,
-    "adds_session": false,
+    "adds_session": true,
     "adds_work_unit": false,
     "adds_work_vehicle": false,
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
     "candidate_url": "https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204",
     "candidate_version": "091426.1",
-    "cross_session_route": false,
+    "cross_session_route": true,
     "id": "PR-35",
     "lane": "PR",
     "lifecycle": "SELECTED_PRODUCTION",
-    "native_function": "Continue the same proceeded PR work unit after initial publication; resolve reviews, retest, publish coherent corrections, verify current-head CI/reviews/head/mergeability, and return MERGE_PENDING without merging.",
+    "native_function": "Continue the same proceeded PR work unit after initial publication; resolve reviews, retest, publish coherent corrections, verify current-head CI/reviews/head/mergeability, and return MERGE_PENDING without merging; return MERGE_OBSERVED when an active subscription observes Nathan's merge.",
     "output_artifacts": [
       "PR_IMPLEMENTATION_RESULT"
     ],
     "predecessor": null,
     "predecessor_union_destinations": [],
     "r1_mapping": "GCF-17",
-    "receiving_role": "Same dedicated PR engineer in the same PR-development session; no new role.",
+    "receiving_role": "You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you continue its existing pull request. PR-35 runs as its own top-level session, entered from PR-30's handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other session.",
     "result_states": [
       "MERGE_PENDING",
+      "MERGE_OBSERVED",
       "RESCOPE_PENDING",
       "RECOVERY_PENDING",
       "REMOTE_EVIDENCE_PENDING",
       "PRODUCT_OWNER_DECISION_REQUIRED"
     ],
     "sequence": 35,
-    "session_class": "SAME_DEDICATED_PR_DEVELOPMENT_SESSION_AS_PR-30",
+    "session_class": "DEDICATED_PR_REVIEW_SESSION",
     "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1"
   },
   "state_route_order": [
     "merge_pending",
+    "merge_observed",
     "rescope_pending",
     "recovery_pending",
     "remote_evidence_pending",
@@ -201,6 +235,7 @@
   "state_vocabularies": {
     "PR-35_RESULT": [
       "MERGE_PENDING",
+      "MERGE_OBSERVED",
       "RESCOPE_PENDING",
       "RECOVERY_PENDING",
       "REMOTE_EVIDENCE_PENDING",

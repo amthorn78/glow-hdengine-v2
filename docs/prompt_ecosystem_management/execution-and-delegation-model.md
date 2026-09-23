@@ -149,6 +149,9 @@ expectation in each agent's contract. Pinning a reasoning level independently is
 a session-configuration action for the Product Owner; the coordinator cannot set
 it per agent. This limitation is recorded rather than worked around.
 
+**Scope (`D23`, 2026-09-23).** Its subagents are maintenance workers, and never a way to run a
+main-ecosystem prompt.
+
 ## 2. Discovery is precomputed; agents classify
 
 The coordinator computes the raw hit list mechanically — across all 55 prompt
