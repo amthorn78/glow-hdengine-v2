@@ -1302,38 +1302,43 @@ written (`AUTH-001`); this is its successor.
 This corrects a fact, not a ruling. How the oracle revision is made, whether by a successor oracle
 or an in-place re-pin, is a proposal in the Modification's plan amendment and awaits approval.
 
-### Clarification, 2026-09-23 — no lifecycle session is a subagent or is created automatically (D23-D, D23-E, D23-F)
+### Clarification, 2026-09-23 — main-ecosystem prompts are never run as subagents, and nothing creates a session automatically (D23-D, D23-E, D23-F)
 
-**Product Owner, 2026-09-23:**
+**Product Owner, 2026-09-23, in three messages:**
 - *"just to be clear, I definitely do not want PR-35 running as a subagent ever"*;
-- then *"none of these should be subagents … I don't want any automated session creation of any kind
-  in the main ecosystem."*
+- *"none of these should be subagents … I don't want any automated session creation of any kind in
+  the main ecosystem."*;
+- *"subagents may be used as workers within task, but the main prompts in the ecosystem must not be
+  run as subagents. The exception is the MGMT which is not part of the main ecosystem"*.
 
-**The rule.** In the main ecosystem, the GCFPE lifecycle prompts that sessions run:
-1. **Every lifecycle prompt runs as its own top-level session.** None ever runs as a subagent, forked
-   agent or workflow agent of another session. This includes PR-35 in its own session (D23-D), PR-40
+**The rule, for the main ecosystem.** That is every GCFPE prompt except `GCFPE-MGMT-10`.
+1. **Every prompt runs as its own top-level session.** No prompt is ever run as a subagent, forked
+   agent or workflow agent of another session. This covers PR-35 in its own session (D23-D), PR-40
    after the merge (D23-E), and PR-20 for a re-plan (D23-F).
-2. **Nothing creates a session automatically.** No lifecycle session creates, launches or schedules
-   another session, by any tool or mechanism. **Nathan creates every session, and starts it by
-   pasting the handoff.**
+2. **Nothing creates a session automatically.** No session creates, launches or schedules another
+   session, by any tool or mechanism. **Nathan creates every session and starts it by pasting the
+   handoff.**
 3. **A prompt's job ends at the handoff.** It emits a paste-ready `NEXT_PROMPT_HANDOFF` block and
    returns control.
+
+**What it allows.** A session may use subagents as **workers within its own task**. The prompt
+itself still runs top-level. Its workers carry out bounded parts of the task under it, and none of
+them runs another prompt.
+
+**What it excepts.** `GCFPE-MGMT-10`, the maintenance prompt, is not part of the main ecosystem,
+and neither rule binds it. Nor do they bind maintenance work generally, such as preflight readers and
+the `D24` skill reviewers. `execution-and-delegation-model.md` governs that work, and it gains a scope
+line: its subagents are maintenance workers, and never a way to run a main-ecosystem prompt.
 
 **What it corrects in this record's own wording:**
 - **D23-E.** "PR-40 is dispatched" means that the subscribed PR-35 session **emits** the PR-40
   handoff when it observes the merge, and Nathan pastes it into a new session he creates. The
   observed merge event replaces Nathan's merge *assertion*, the fact PR-40 is entered on. It does
-  not replace his paste.
+  not replace his paste. The subscription wakes the session that made it and creates nothing, so it
+  stays.
 - **The PART-11 ruling as first recorded.** It said "dispatch is a paste, or a session launch where
   the surface provides one", and the plan's C-DISPATCH repeated it. The launch option is withdrawn.
   Dispatch is a paste.
-
-**What it does not change:**
-- **What a session does inside itself.** PR-35's pull-request subscription wakes the session that
-  made it and creates nothing, so it stays (D23-E).
-- **Maintenance work.** Preflight readers and the `D24` skill reviewers are maintenance subagents,
-  not lifecycle prompts, and `execution-and-delegation-model.md` governs them. That model gains a
-  scope line: it never covers running a lifecycle prompt.
 
 **Guard.** The Modification's plan amendment carries this into:
 - the canonical wording;
@@ -1341,8 +1346,9 @@ or an in-place re-pin, is a proposal in the Modification's plan amendment and aw
 - the graph role and the registry role for each affected prompt;
 - the skills.
 
-Each surface gets a guard with an injected must-fail regression (`D14`), including a corpus-wide
-guard against any instruction that creates a session.
+Each surface gets a guard with an injected must-fail regression (`D14`). That includes a guard on
+every main-ecosystem row against running a prompt as a subagent or creating a session. It is scoped
+so that it does not forbid workers.
 
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
