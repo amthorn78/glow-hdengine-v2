@@ -803,6 +803,11 @@ validator — and the triage is rerun. Also approved: **Modifications that chang
 share one package, one review and one install** (template rule 6). This answers the cost both runs
 flagged: three Modifications touching one skill would otherwise pay for three review rounds.
 
+**The rerun, 2026-09-23.** On the corrected prompt, the two runs agree on every disposition and
+group identically; they differ only in how finely they split off already-true parts. Run D's
+intake record and six drafts are adopted. The rerun also found an unfilled template section
+passing as filled, now fixed. Record: `TRIAGE-RERUN-COMPARISON-v1.0.md`.
+
 ## 10. Risks, tradeoffs, and the decisions I need from you
 
 ### Risks I can manage

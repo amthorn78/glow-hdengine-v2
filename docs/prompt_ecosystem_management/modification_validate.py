@@ -15,7 +15,8 @@ What it checks, and the rule each check enforces:
   frontmatter parses, and carries every required key
   status is in the vocabulary
   coupling is ATOMIC or INDEPENDENT, and gate_tier is 0, 1 or 2
-  the section for the declared status is present and not empty
+  the section for the declared status is present, and says something beyond the template's own
+    headings and guidance
   ENTRY GATE  analyze_approved_by is non-empty before PLANNING or later
   ENTRY GATE  plan_approved_by is non-empty before EXECUTING or later
   every item has an id and a statement
@@ -85,6 +86,23 @@ def split_frontmatter(text):
     if end == -1:
         return None, text
     return text[3:end], text[end + 4:]
+
+
+def _template_section(marker):
+    """The shipped template's text for section `marker`, or "" if the template cannot be read."""
+    try:
+        doc = Path(__file__).resolve().with_name("modification-template.md").read_text(encoding="utf-8")
+        text = _fenced(doc, "## TEMPLATE BEGINS")
+    except (OSError, IndexError):
+        return ""
+    return text.split(marker, 1)[1].split("\n## ", 1)[0] if marker in text else ""
+
+
+def _own_text(seg, marker):
+    """What a section says beyond the template's own headings and guidance for that section."""
+    template = {line.strip() for line in _template_section(marker).splitlines() if line.strip()}
+    return "".join(line.strip() for line in seg.splitlines()
+                   if line.strip() and line.strip() not in template)
 
 
 def _intake_checks(path, fm, body, mid):
@@ -201,6 +219,11 @@ def check(path):
             seg = body.split(marker, 1)[1].split("\n## ", 1)[0]
             if len(seg.strip()) < 40:
                 bad.append(f"section {marker} is present but empty")
+            elif len(_own_text(seg, marker)) < 40:
+                # The template's own headings and guidance run past 40 characters, so a section
+                # copied from it and never filled passed as written. Found by the 2026-09-23
+                # triage rerun; only what the section says beyond the template counts.
+                bad.append(f"section {marker} holds only the template's placeholder text")
 
     # --- the Product Owner's override, if one is recorded ---
     # The template ships this block with every field empty and says to keep the keys, so an
@@ -333,6 +356,14 @@ _REGRESSIONS = [
     ("declared section present but empty",
      lambda s: s.replace("## §P — Plan\nenough text here to clear the emptiness check on this section, comfortably.",
                          "## §P — Plan\n"), "present but empty"),
+    ("analysis section copied from the template and never filled",
+     lambda s: s.replace("## §A — Analysis\nenough text here to clear the emptiness check on this section, comfortably.",
+                         "## §A" + _template_section("## §A").rstrip("\n")), "only the template's placeholder text"),
+    ("template guidance kept, with real analysis written beneath it",
+     lambda s: s.replace("## §A — Analysis\nenough text here to clear the emptiness check on this section, comfortably.",
+                         "## §A" + _template_section("## §A").rstrip("\n")
+                         + "\nclosure.py returned radius 1 (PR-10); Tier 1, because the output artifact changes."),
+     None),  # must PASS: keeping the guidance is fine; what counts is what was added
     ("bad status vocabulary",
      lambda s: s.replace("status: COMPLETE", "status: DONE"), "not in"),
     ("bad coupling vocabulary",
