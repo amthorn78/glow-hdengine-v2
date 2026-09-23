@@ -571,7 +571,7 @@
     "flowmaster_primary_core_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
     "r1_core_rows": 26,
     "r1_material_rows": 20,
-    "r1_oracle_sha256": "52807e58c4a4659e6c1fc822749f6e50253ad7b01846c833f727ee266ca71d5e",
+    "r1_oracle_sha256": "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
     "r1_rows": 46
   },
   "qa_closure_contract": {

@@ -1097,3 +1097,13 @@ Choices made during E1, each within the spec (adopted):
   dated note would breach `AUTH-001`.
 
 The contract's W-8 texts are set in E2 with the regenerator, as §0 requires.
+| E2 — skills in scratch, plus commit 2 (G16) | APPLIED | Baseline re-measured and equal to §2. Successor matrix 3 653 B `8b443eb1…`; its three row digests equal §5. Successor oracle `ede635b1…`; successor map `aa6ed8e3…`. G16 written. Final graph: 55 nodes / 229 edges, 575 074 B, `ae2bd159…`; routing `fecc319b…`/284. Contract regenerator: it reproduces `2b78f877…` from a template stripped of the mirrored keys, and its negative control passes. New contract 4.1.0: 613 162 B, `7a7fd028…`, in both skills. Every live suite passes: `FLOWMASTER_SUITE_PASS`, v4 `ok`, fixtures 228/228, relay 230, `amthor` 34, PR skill PASS. All 12 historical-layer outputs are byte-equal to baseline. Skill regressions 70/70, contract 88/88, fixtures 2/2, oracle 14/15 exact (G11 below). Edited digests: `flowmaster-validate` 31 `d2d98c69…`, `change-flow` 22 `880c4284…`, `glow-hde-pr-development` 4 `c075226e…`, `session-relay-flowmaster` 5 `fb70af77…`, `amthor-workspace-governance-audit` 15 `46d22b2d…`, `tw-flowmaster` 2 `1875015f…`. Installed tree untouched. Scripts: `evidence/build_r1_successor.py`, `evidence/regenerate_contract.py`, `evidence/e2/` (the stage runs again with `run_e2.sh`). Checked independently by the executing session |
+
+Choices made during E2, settled by the plan's author:
+- **G11's expected set is the four findings measured.** Under S-5 the default overlay now runs the v4
+  checks, so one defect is reported twice. Neither report is dropped.
+- **`change-flow:563` names the historical map's digest on purpose,** as provenance. The §5.12
+  residual list gains that hit.
+- **Relay `:255`** follows addendum U-6: the override first, then W-9's sentence.
+- **The matrix header** is read literally: no blank line after it.
+- **The "It pins:" bullets and the other choices the E2 worker reports** are open to the E5 reviewers.
