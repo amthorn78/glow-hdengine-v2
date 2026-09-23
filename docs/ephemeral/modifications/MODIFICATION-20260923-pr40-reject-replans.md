@@ -202,9 +202,9 @@ review, delivery and cut-over (rule 7), so each step's evidence is the parent's 
 
 | step | disposition | evidence |
 |---|---|---|
-| C1, C2 | APPLIED | parent E1: `PR-40.json` edge 172 is `reject_replan` → PR-20, and both `global.json` copies carry the A1-7 condition; the graph builds 55 nodes, 229 edges, `ae2bd159…` |
+| C1, C2 | APPLIED | parent E1: `PR-40.json` edge 172 is `reject_replan` → PR-20, and both `global.json` copies carry the A1-7 condition (E1 graph `716c4cfc…`; the final graph after E2's G16 commit is 55 nodes, 229 edges, `ae2bd159…`) |
 | C3 | APPLIED | parent E2: successor R1 oracle `GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1` changes GCF-14, GCF-17 and GCF-17.LINEAGE; the path fixture fails against the historical oracle and passes against the successor |
-| C4 | APPLIED | parent E3 and E6: C-REPLAN in PR-40, C-PR20-ENTRY in PR-20, C-PROCEED in PR-30 and PR-35, each placed once (`evidence/e3/E3-E4-report.md`); landed and read back at the cut-over |
+| C4 | APPLIED | parent E3 and E6: C-REPLAN in PR-40, C-PR20-ENTRY in PR-20, C-PROCEED in PR-30 and PR-35, each placed once (`evidence/e3/E3-E4-report.md`); landed and read back at the cut-over. C-PR30-ENTRY is `NOT_APPLICABLE`: PR-30 has no PR-40 return context (E3 settlement), consistent with C9, which leaves `receiver_compatibility.PR-30` unchanged |
 | C5 | APPLIED | parent E1: `PR-40` consumers derived as `[PR-10, PR-20, RS-10]`; the two `D23-F` guards pass their regressions (parent E4 item 9) |
 | C6–C10 | APPLIED | parent E2, reviewed in E5 rounds a1–a5 (`SKILL_FIT_CONFIRMED` in a5) and installed in E6 |
 | C11 | APPLIED | parent E6 step 6: the Flow Index Proceed sentence gains the `D23-F` exception, read back. At close-out, the Flow Index's maintenance item 6 was also brought into line with C-PROCEED (`evidence/e6/CLOSE-OUT-20260923.md`) |

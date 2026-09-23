@@ -67,8 +67,8 @@ predecessor release settles the question of whether it was ever needed: `091326.
 such line at all, and that release ran.
 
 So the machinery would have kept 55 bodies carrying governance metadata forever, and grown it at
-each promotion. The validator is to be changed to match this policy, not the policy bent to match
-the validator.
+each promotion. The validator was changed to match this policy (installed in round 30, 3.2.16),
+not the policy bent to match the validator.
 
 ### Is the line useful?
 

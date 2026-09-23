@@ -34,12 +34,12 @@ states rules that have since been retired:
 | subject | authority |
 |---|---|
 | Selection, membership, and each member's current version | the **GCFPE Membership and Release Register** in Notion, and the complete-prompt-set catalog's `current_version` column (C-VERSION, `D23-G`) |
-| What each prompt does, what it hands off and where the handoff sits | the selected prompt body in Notion. Each body carries the canonical texts for its role: C-NOTION, C-ART, C-HANDOFF, C-PLACE and C-TOP; in the PR lane also C-DEC, C-LAT, C-SESSION, C-SUB, C-DISPATCH, C-PROCEED and C-REPLAN |
-| The wording of those canonical texts | `docs/ephemeral/modifications/MODIFICATION-20260923-alpha-feedback-open-entries.md`, §P *Canonical wording* and Amendment 1; `docs/ephemeral/modifications/MODIFICATION-20260923-pr40-reject-replans.md`, §P *Canonical wording* |
+| What each prompt does, what it hands off and where the handoff sits | the selected prompt body in Notion, which carries the canonical texts its registry row requires (C-NOTION, C-ART, C-HANDOFF, C-PLACE, C-TOP, C-DEC, C-LAT, C-SESSION, C-SUB, C-DISPATCH, C-PROCEED, C-REPLAN, C-PR20-ENTRY); which body carries which is in `docs/ephemeral/modifications/evidence/e3/E3-E4-report.md`, *E3: totals over 55 bodies* |
+| The final wording of those canonical texts | `docs/ephemeral/modifications/specs/EXECUTION-SPEC-20260923-alpha-feedback-open-entries-v2.md` §3, with `gcfpe.decision-record.md` `D23`, *Successor — PR-40 is entered once per merge*, for C-DISPATCH's last sentence. The two Modifications' §P texts are their provenance |
 | Routes, result states and the handoff contract's fields | `docs/graph/parts/` (`D13`), rebuilt on demand and never committed assembled; proof token `55 nodes · 229 edges · 55 state_routes · 575,074 bytes · sha256 ae2bd159…` |
 | Per-prompt contracts, and the guards that hold each canonical text | `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` |
 | Rulings | `docs/prompt_ecosystem_management/gcfpe.decision-record.md` |
-| PR, merge, abort and PF-document authority | the Prompt Flow Index, *Mandatory PR and PF-document authority boundaries* |
+| PR, merge, abort and PF-document authority | the Prompt Flow Index, *Mandatory PR and PF-document authority boundaries — Product Owner* |
 | Controlled sources (PFCanon read-only from `docs/pfcanon/`), runtime artifacts under `docs/ephemeral/` by pull request, and which artifacts a stage may require | the Prompt Flow Index, *Controlled-source and artifact rules* and *Artifact availability at the native stage* |
 | Reading and storing prompt bodies | `docs/prompt_ecosystem_management/prompt-corpus-policy.md` (`D22`) |
 | Notion writes | `docs/prompt_ecosystem_management/notion-write-boundary.md` |

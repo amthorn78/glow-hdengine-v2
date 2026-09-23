@@ -1127,15 +1127,18 @@ re-scanned and read back (E6).
 | PART-02 | ITEM-03 | `APPLIED` | C-NOTION in 7 bodies and the relay; `QA-10`; 10 handoff rules; `CONTROL_NOTION` guard on 55 rows; Overview prefix |
 | PART-03 | ITEM-07 | `APPLIED` | C-ART in 53 bodies and the PR skill; Hub standard; guard on 53 rows |
 | PART-04 | ITEM-04, ITEM-08 | `APPLIED` | C-HANDOFF in 53 bodies, the skills, the graph's `handoff_contract` and the Hub; branch/commit guard |
-| PART-05 | ITEM-06 | `APPLIED` | C-PLACE in 53 bodies (4 with the `ASK OK?` variant) and the skills |
+| PART-05 | ITEM-06 | `APPLIED` | C-PLACE in 53 bodies (5 with the `ASK OK?` variant: QA-50, QA-60, QA-80, RS-10, RS-30) and the skills |
 | PART-06 | ITEM-12 | `APPLIED` | C-DEC in PR-30, PR-35 and RS-40, and the PR skill |
 | PART-07 | ITEM-09, ITEM-10, ITEM-11 | `APPLIED` | C-LAT in 10 bodies, two graph conditions and the skills |
 | PART-08 | ITEM-14 | `APPLIED` | registry PR-30 row and PR-skill line; the PR-40 route moved to the child Modification (step 28) |
 | PART-09 | ITEM-15 | `APPLIED` | C-SESSION in 19 bodies; graph and registry session class; R1 successor oracle; register and Flow Index |
 | PART-10 | ITEM-17 | `APPLIED` | C-SUB in PR-35 and RS-40, and the PR skill |
-| PART-11 | ITEM-18 | `APPLIED` | C-DISPATCH in PR-35 and RS-40; `MERGE_OBSERVED` edges; the once-per-merge sentence |
+| PART-11 | ITEM-18 | `APPLIED` | as ruled: the subscribed session returns `MERGE_OBSERVED` with a paste-ready PR-40 handoff, and nothing is created or dispatched automatically (`D23` Clarification). C-DISPATCH in PR-35 and RS-40; `MERGE_OBSERVED` edges; the once-per-merge sentence |
 | PART-12 | ITEM-19 | `APPLIED` | GCFPE: release header lines removed from 55 bodies; C-VERSION in the register, catalog and policy. PE Metaprompt by override (close-out). **TW ecosystem out of scope** (Nathan); AF-012 stays open for it |
 | PART-13 | ITEM-20 | `APPLIED` | C-D22 reason in `flowmaster-validate` |
+
+C-TOP (Amendment 1, A1-8) belongs to no single part: it was placed in the 54 main-ecosystem bodies,
+every GCFPE body except `GCFPE-MGMT-10`, and guarded on each row.
 
 ### Artifacts produced
 
@@ -1153,8 +1156,10 @@ pages by fetch.
 
 ### Interaction cost, actual against predicted
 
-**Predicted 11. Actual 29**, counting only messages that decided or did something. Status requests
-and "continue" acknowledgements (8) are not counted.
+**Predicted 11. Actual 29 at completion: 28 so far, and the close-out PR's merge makes 29.** The count
+is round trips through the Product Owner, as the formula defines it. Status requests and "continue"
+acknowledgements (8) are not counted. The freeze lift is still to come, but it shares one term with
+the freeze start, as the prediction counted them.
 
 | term | predicted | actual |
 |---|---|---|
@@ -1163,23 +1168,23 @@ and "continue" acknowledgements (8) are not counted.
 | Amendment 1 approval | 1 | 1 |
 | review cycles | 1 | 5 (a1–a5; a1–a4 each ended in a repair approval) |
 | installs | 1 | 1 |
-| merges | 2 | 3 (#474, #476, and the close-out PR) |
-| freeze start and lift | 1 | 1 |
-| rulings not predicted | 0 | 13 |
+| merges | 2 | 3 (#474 and #476; the close-out PR, #477, still to merge) |
+| freeze start and lift | 1 | 1 (started 2026-09-23; the lift is still to come) |
+| rulings and questions not predicted | 0 | 13 |
 
 **Why it differs.**
-- **Four extra review rounds.**
-  - a2: the a1 repairs did not reach every carrying file, and the brief claimed they did.
-  - a3: Nathan chose to fold the non-blocking findings in.
-  - a4: a required finding on the a3 guard.
-  - a5: confirmed.
+- **Four extra review rounds.** Each was needed for the reason given:
+  - a2 because a1 required repairs;
+  - a3 because a2 found the a1 repairs incomplete, and the a2 brief had claimed otherwise;
+  - a4 because Nathan chose to fold a3's non-blocking findings in;
+  - a5 because a4 found a required defect in the a3 guard. a5 confirmed.
 - **Thirteen rulings nobody predicted.**
   - Seven were new rules raised mid-run: `D22`, `ITEM-20`, the PR-40 re-plan (`D23-F`, the child),
     `D24`, the rule against subagents and session creation, the triage exception, and the PE
     Metaprompt scope.
   - Two were guard rulings on G06.
-  - The rest: the intake continuation, one explanation of PART-08, the E1 "go", and the close-out
-    fixes.
+  - The rest: the intake continuation, one question explaining PART-08, the E1 "go", and the
+    close-out fixes.
 - **The prediction missed the size of the gate.** A run that re-pins R1 and changes six skills was
   priced at one review cycle.
 

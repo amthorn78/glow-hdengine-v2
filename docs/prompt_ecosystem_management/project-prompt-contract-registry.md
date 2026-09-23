@@ -45,7 +45,7 @@ body_extraction_convention:
     </content>. The markers occupy their own lines, so a literal reading that keeps them yields a
     body two bytes larger on every prompt. This is the convention under which every
     evidence_contract byte count and SHA-256 below was produced, and the only convention under
-    which they reproduce.'
+    which they reproduced the pre-`D23` bodies (see body_identity_disposition).'
   row_wording_disposition: 'All 55 rows carry the dated line "Extraction convention: the exact
     slice between the fetch result''s <content> and </content> markers, with no trailing newline
     added". That wording is incomplete in two ways: it omits the leading newline entirely, and it

@@ -3,7 +3,7 @@ artifact_type: PROMPT_ECOSYSTEM_AUTHORITATIVE_SURFACES
 artifact_version: "1.0"
 created_date: 2026-09-18
 status: BINDING
-authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21
+authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21; repository baseline and graph proof token updated 2026-09-23 after D23 (close-out of MODIFICATION-20260923-alpha-feedback-open-entries)
 baseline: main @ aeb256e
 ---
 
@@ -98,7 +98,9 @@ Escalation `3db4590a05eb81cd938de84cfffead9c` · TW `3db4590a05eb811b9c14f2ae89c
 
 **No page asserts its own selection.** Every control above reads `REGISTER_CONTROLLED` and carries
 the register's URL plus the rule that it is operative if and only if the register selects this
-release. If a page ever says `SELECTED` on its own, that is the defect, not the evidence.
+release. The PE Metaprompt is the one exception: it is operative while the register binds it as the
+selected release's prompt-authoring control, and when unchanged it is bound again in the next
+release (`D23-G`, AF-012). If a page ever says `SELECTED` on its own, that is the defect, not the evidence.
 
 **The 55 prompt bodies live in Notion and are authored and revised there in place.** They
 are never mirrored into the repository. The repository holds their *contracts* (registry)
