@@ -13,7 +13,7 @@ The ledger the format 2.1 `reviews` field would hold if stage 5 were a Modificat
 |---|---|---|---|---|---|
 | 1 | package | DRY_RUN | 2026-09-24 | 0 | `DRY-RUN.md`; one gap found and closed before any review (unattributed override) |
 | 2 | package | FULL | 2026-09-24 | 2 | two fresh reviewers on `dc023a5` under `REVIEW-BRIEF-r1.md`; 2 distinct required, both confirmed by PE37 and repaired; 29 LISTED (A: 13, B: 16) |
-| 3 | package | DIFF_CHECK | 2026-09-24 | *pending* | one fresh reviewer on the repair diff under `REVIEW-BRIEF-diffcheck.md` |
+| 3 | package | DIFF_CHECK | 2026-09-24 | 0 | one fresh reviewer on the repair diff (`061e4b1..8b292c3`) under `REVIEW-BRIEF-diffcheck.md`: RQ-1 and R-B1 fixed, 0 required, 12 LISTED (10 in repair-added text). Trend 2 → 0. **The cap is reached; the package goes to Nathan** |
 
 **No second full review is run.** D26-A allows two; the round-1 content defects were both in the
 resume procedure and both closed by narrow text, so the one diff check is the remaining step.
@@ -53,3 +53,18 @@ unedited. None is repaired (D26-A rule 4). The ones that bear on the next step:
   check covers `PLAN` only** (B), as the task brief specified.
 - **The skill cap counts rounds, not consecutive `SKILL_REPAIR_REQUIRED` rounds** (A). A third
   round needs Nathan's override either way.
+
+## The diff check's LISTED findings
+
+In `REVIEW-diffcheck-PE37-DC.md`, unedited, and not repaired (D26-A rule 4). The ones that bear on
+the next step:
+
+- **Withdrawing `PART-11-TRACK-01` departs from §A Decision 11**, which Nathan approved (DC L1). It
+  is stated openly, with its reason, in the procedure the resumed plan follows, so he sees it
+  before approving. The reviewer recommends adding it to item 6 as an eighth `DECISION NEEDED`.
+  That is Nathan's opt-in.
+- **The parked spec's X5.6 row, `edits.json` and `ctrl_proof.py` still name the withdrawn edit**
+  (DC L2). Low likelihood: the resumed plan's successor section, not the dated spec, is what it
+  executes.
+- **Item 6 says "the step 7 return"; it means item 7** (DC L4). In the table, step 7 is *Start PR05*.
+- **The validator comment says the D26 checks are "below"; they are above** (DC L8).
