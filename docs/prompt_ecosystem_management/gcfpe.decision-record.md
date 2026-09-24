@@ -1625,9 +1625,10 @@ run before D26 are cited from its RCA and are not entered in the ledger.
 
 A record with no `format` validates exactly as before, and a must-pass case holds that. Each check
 has an injected must-fail regression and a must-pass case; the shipped template validates at
-`INTAKE`, `ANALYZING` and `ANALYZED`. The selftest runs 63 cases, up from 39. A scratch copy with one
-check disabled fails that check's regressions: 8 cases for the ledger's shape, 2 for the cap, 3 for
-the dry run, 2 for the estimate and 16 for the format itself
+`INTAKE`, `ANALYZING` and `ANALYZED`. The selftest runs 64 cases, up from 39. A scratch copy with one
+check disabled fails that check's regressions: 8 cases for the ledger's shape, 3 for the cap, 3 for
+the dry run, 2 for the estimate, 17 for the format itself, and 1 for the rule that only an
+attributed override (`by` and `reason`) waives a D26 check
 (`docs/ephemeral/pe37.stage5/guard_proof.py`).
 
 **The session behaviours have no mechanical guard:** stopping on the non-convergence signal,

@@ -229,9 +229,17 @@ def _format(fm):
 
 
 def _waived(fm):
-    """The policy gates a recorded override names. Its well-formedness is checked in check()."""
+    """The policy gates an attributed override waives for the D26 checks.
+
+    An override counts only with a `by` and a `reason`. check() reports a malformed override only
+    past INTAKE and short of a terminal state, so without this an unattributed block on an INTAKE or
+    ABANDONED record would waive the review cap silently."""
     override = fm.get("override") or {}
-    raw = override.get("overrides") if isinstance(override, dict) else None
+    if not isinstance(override, dict):
+        return []
+    if not (str(override.get("by") or "").strip() and str(override.get("reason") or "").strip()):
+        return []
+    raw = override.get("overrides")
     return [raw] if isinstance(raw, str) else list(raw or [])
 
 
@@ -830,6 +838,11 @@ _D26_REGRESSIONS = [
      lambda s: s.replace("""  - mode: PLAN
     kind: DRY_RUN""", """  - mode: ANALYZE
     kind: DRY_RUN"""), "DRY RUN FIRST"),
+    ("a third full review waived by an unattributed override on an abandoned record",
+     lambda s: s.replace("status: COMPLETE", "status: ABANDONED").replace(_THIRD_PLAN_FULL, _EXTRA_PLAN_FULLS)
+                .replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  overrides: [review_cap]\n  reason: "x"'),
+     "REVIEW CAP"),
     ("a full PLAN review with no dry run, which Nathan overrode",
      lambda s: s.replace("""  - mode: PLAN
     kind: DRY_RUN

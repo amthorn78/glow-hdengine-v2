@@ -26,6 +26,8 @@ DISABLE = {
     "_dry_run_first": "return []",
     "_estimate_check": "return []",
     "_d26_checks": "return []",
+    # the attribution requirement: count any override's waivers, attributed or not
+    "_waived": "return list((fm.get('override') or {}).get('overrides') or [])",
 }
 
 
@@ -45,8 +47,8 @@ def main():
     print(f"intact validator: {passed}/{total}")
     ok = passed == total
     for name, stub in DISABLE.items():
-        # each check opens with a one-line docstring; the stub goes directly after it
-        pat = re.compile(rf"def {name}\([^)]*\):\n    \"\"\"[^\n]*\"\"\"\n")
+        # each check opens with a docstring; the stub goes directly after its closing quotes
+        pat = re.compile(rf"def {name}\([^)]*\):\n    \"\"\"(?:[^\"]|\"(?!\"\"))*\"\"\"\n")
         m = pat.search(original)
         if not m:
             print(f"{name}: NOT FOUND")

@@ -15,7 +15,7 @@ waits on him, and nothing here asks him to choose between options.
 
 | # | Step | Owner | Done when |
 |---|---|---|---|
-| 1 | **Merge the stage 5 pull request.** Merging preserves the record (`D21-C`). `D26` is recorded from his instruction of 2026-09-24; a part he corrects is corrected by a successor section in the decision record | **Nathan** | D26 is on `main`, and `modification_validate.py --selftest` on `main` passes 63/63 |
+| 1 | **Merge the stage 5 pull request.** Merging preserves the record (`D21-C`). `D26` is recorded from his instruction of 2026-09-24; a part he corrects is corrected by a successor section in the decision record | **Nathan** | D26 is on `main`, and `modification_validate.py --selftest` on `main` passes 64/64 |
 | 2 | **Create the MGMT-10 session** with the kickoff below, and give Nathan its link | **PE37** | the session exists; its id and link are recorded in this file's *Record* section |
 | 3 | **Resume the plan under D26** (detail below) and return it with its open findings listed | **the MGMT-10 session** | the record is `PLANNED` at format 2.1, with a §P successor, a `reviews` ledger holding one `DRY_RUN` and at most one `DIFF_CHECK`, and an `estimate`; the result is `PRODUCT_OWNER_ACTION_PENDING` |
 | 4 | **Approve the plan.** The session records `plan_approved_by` from his words | **Nathan**, the process's gate | `plan_approved_by` is set, quoting him |
