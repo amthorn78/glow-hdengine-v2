@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_POLICY
-artifact_version: "1.2"
+artifact_version: "1.3"
 created_date: 2026-09-22
 status: BINDING
 authority: Product Owner, 2026-09-22 — "Policy Update — Notion Storage and Write Boundaries"
@@ -108,6 +108,7 @@ architecture in `README.md`:
 | procedure, convention, registry, decision record | `docs/prompt_ecosystem_management/` |
 | run artifacts, reports, ledgers, verdicts, filled prompt instances, handoffs worth keeping | `docs/ephemeral/`, by pull request |
 | operational status, navigation, plan state | Notion — where a destination rule already says so |
+| the Candidate CRD Items List | the Notion page *Candidate CRD Items List* (`https://app.notion.com/p/3e54590a05eb813c8d89d065026f694d`), under the Glow Operations Hub, and nowhere else. An established destination rule (`D25-A`): `CL-40` updates that page in place with each change's new CRD candidates, and writes no other Notion page. It is a flow prompt's own rule, so it authorizes `CL-40` alone and lends nothing to any other flow prompt. The Drive file it replaced is Nathan's reference copy, not a store. |
 
 **"Not in Notion" does not mean "nowhere".** A development session that produces a report still
 writes it to `docs/ephemeral/` and lands it by pull request. What it does not do is additionally
