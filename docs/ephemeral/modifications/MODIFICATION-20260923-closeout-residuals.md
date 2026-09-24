@@ -1282,3 +1282,29 @@ words, is recorded in both records' §E (`RESUME-PROCEDURE.md` step 6).
 **Where the record stands.** #484 merged as `07b47d8` before the rulings and the diff check were committed. This
 approval and everything after `07b47d8` reach `main` in a new pull request. **EXECUTE starts only once that pull request
 is on `main`** (X0.1).
+
+## §E — Execution
+
+*Written by MODE = EXECUTE, 2026-09-24, on branch `docs/20260924-closeout-residuals-execute`, opened from `main`
+`7028bea` (`EX/run.json` `base`). Evidence is under `EX` = `docs/ephemeral/modifications/evidence/closeout-residuals/execute/`.*
+
+| dated step | spec rows | disposition | evidence |
+|---|---|---|---|
+| 1 | X0.1–X0.3 | VERIFIED | `main`'s record carries `plan_approved_by`; X0.2's gate passes (`HEAD` = `origin/main`, clean); X0.3 (a) to (d) equal the recorded values; `root_x0.3` recorded (`320 420705ec…`) |
+| 2 | X1.1–X1.3 | VERIFIED | patches exit 0, `expected_after_patch` diff exit 0, `root_x1.1` `323 047ca742…`; `EX/gate_pre.json` 12/12 |
+| 3 | X2.1–X2.2 | APPLIED, VERIFIED | commit `772c039`; the decision record is `c8cdfd5a…`, 111 107 B; `## D25` once, between D24 and D26; no added `> ` line; `canon.py` imports |
+| 4 | X3.1 | APPLIED, VERIFIED | commit `1ef19bf`, the registry alone; `EX/x3.1.json`: `97bda1a0…`, `valid: true`, 55 rows, drift `[]` |
+| 5 | X3.2 | APPLIED, VERIFIED | `EX/x3.2.txt`: `cmp` exit 0, 27 files, the build is `ae2bd159…`, and a second reindex rewrites 0 |
+| 6 | X3.3 | APPLIED, VERIFIED | `EX/x3.3.txt`: the contract `2b78f877…` and the README `469e2265…` at `docs/graph/contract-template/` |
+| 7 | X3.4–X3.5 | APPLIED, VERIFIED | `session-working-rules.md` `2501579e…`; commit `e0b186f` |
+| 8 | X3.6 | VERIFIED | `EX/nam002/`: runs 1 to 4 as spec §4.4's table (0; one on ESC-10; one title; 55/16/6, exit 1) |
+| 9 | X4.1 | VERIFIED | `EX/x4.1.txt`: `6902924a…` and `dbae180b…` each EQUAL ×2; two expected diff lines |
+| 10 | X4.2 | VERIFIED | `EX/gate_pkg.json` 34/34 |
+| 11 | X4.3–X4.4 | VERIFIED | `EX/packages.json`: 7 × "Skill is valid!", the extracted digests equal `expected_after_patch.txt`; brief `REVIEWER-PROMPT-cr1.md` committed before the reviewers started (`6a643d6`); SFR-CR1-1 and SFR-CR1-2 both `SKILL_FIT_CONFIRMED`, bound to the seven sha256s; the seven archives, the brief and both verdicts delivered to Nathan; `delivered_cr1` 2026-09-24T14:24:50Z |
+| 12 | X4.5 | **BLOCKED** | `EX/rehearsal/`: 54 of 56 pages pass (49 `plan`, 5 `check` and the proposed MGMT-10 body's `check` with `R-ITEM40` 0 and `R-ITEM23-gate` 0; 246 operations; no tool refusal). **PR-30 and ESC-40 were not rehearsed**: the harness's permission classifier refused the rehearsal command ("Data Exfiltration") after each page's fetch. The refusal was not retried or worked around. ESC-25, refused in the dry run, ran this time with the plan's own command and passes (4 operations) |
+| 12 | X4.6 | NOT_RUN | the stop at X4.5 |
+| 13–28 | X5.0–X7.8 | NOT_RUN | the stop at X4.5 |
+
+**The stop.** It comes before the first external write: nothing was written to Notion, the execution branch is
+unmerged, and `main` is unchanged. It is returned to Nathan (`IMPLEMENTATION_BLOCKED`, the successor's *Before it*),
+and what follows is his ruling. No item has a final disposition yet.
