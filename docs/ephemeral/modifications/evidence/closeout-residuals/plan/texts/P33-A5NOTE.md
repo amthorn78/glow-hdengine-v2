@@ -1,3 +1,4 @@
+
 ## Correction, 2026-09-23 — C8 and §2 overstated the comment rule
 
 Recorded by `MODIFICATION-20260923-closeout-residuals` (ITEM-15). The brief above is left as written

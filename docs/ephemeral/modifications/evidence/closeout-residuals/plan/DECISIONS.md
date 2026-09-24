@@ -177,8 +177,8 @@ Standing rules for every worker:
   drafted dated amendment (PART-18). The Alpha feedback list is an established maintenance destination.
 - **P-45** The Glow Operations Checklist property *Authoritative Drive register* on the four item rows stays as history;
   each row gets the drafted dated movement entry. No data-source change.
-- **P-46** The 10 pointer edits (Hub ×3, item rows ×8 — two per row) are PART-06 steps, run only after the new page's
-  readback passes.
+- **P-46** The eleven pointer edits (Hub ×3, item rows ×8 — two per row) are PART-06 steps, run only after the new
+  page's readback passes.
 - **P-47** Migration method M2: the eight Drive self-references outside the fence are rewritten to name the Notion page,
   and one dated bullet is appended to *Scope-repair revision record*. Exact old/new pairs are in the spec.
 - **P-48** No Notion or repository write may land a `{{...}}` token: the landing step refuses any new text containing
@@ -197,3 +197,54 @@ Standing rules for every worker:
   all 12 P3 bodies (identical results, now from the task's own fetches) and by a negative control (a 1-minute window
   refuses with `NO_FETCH_FOUND`). The limit, stated: the scan still parses older entries of a live transcript in memory
   to skip them; it never selects or uses them.
+
+## Settled from the PLAN review, round 2 (wf_045af16b-3ed: completeness, executability, consistency)
+
+- **P-55** G-K55 (forbidden `outside the approved Plan, return the metadata\b` on PR-30) guards LPR-30-2 (dry run pass 2
+  registry repair); it closes the last unguarded LOCAL edit at a REAL site.
+- **P-56 Order.** The seven packages are patched into the scratchpad (and the full skills root and the candidate root
+  built) before any repository change that needs them: the reindex needs the new builder, the registry gate needs the
+  new deriver. The contract regeneration runs after commit 1, the reindex and the contract-template move.
+- **P-57 One landing unit.** Every part that edits a prompt body or the registry (PART-05, 06, 07, 10, 11, 13, 14, 15,
+  16, 17, 18) lands as one unit, because one page carries several parts' edits and one registry diff carries their
+  guards. Before the first Notion write to a body, `land.py plan --no-ops` rehearses every page and must print no
+  refusal. PART-06's page must exist first (PART-15 is after PART-06). If a page then fails `check` and cannot be
+  repaired forward in the same sitting, every landed page is reversed from the rollback journal (P-58), the registry
+  commit is reverted, and the unit is BLOCKED as a whole (template rule 6). The skill parts (PART-01 to 04, 12) are
+  a separate unit held by the D24 review.
+- **P-58 Rollback journal.** `land.py plan --journal DIR` writes each page's operations to `DIR/<PID>.ops.json` in the
+  session scratchpad, so a reversal is mechanical. Under D22 this is part of the landing transaction in hand: outside
+  the repository, never hashed or compared, read only to reverse the landing it records, deleted when the unit passes
+  its gate or has been reversed, and reported in §E. No other use.
+- **P-59 land.py hardening.** `--no-ops` prints counts only (the rehearsal). The token test refuses only a `{{` the
+  edit introduces. A body where every rule and edit reads 0 and every CHECK passes is reported NOTHING_TO_LAND (run
+  check), which covers deletion-only bodies. `check` reports STALE_READBACK, not a failure, when a page that should
+  carry new text does not yet show it; the executor re-fetches, and only a non-stale failure is reversed.
+- **P-60 The suite gate is a script.** `EV/skills/run_gate.py --set pre|pkg|post` runs each set with its expected
+  results embedded and exits non-zero on any difference: `pre` (before the reindex: today's parts fail the new
+  builder with exactly 7 bookkeeping errors), `pkg` (the patched tree and the reindexed working tree), `post` (the
+  installed tree; no pre-reindex row and no 1.12.0-audit row).
+- **P-61 W-4 is required on every A7 row.** G-K24 (`PR-40 is entered on the observed merge event for the identified
+  PR`) goes on all 21 ITEM-29 rows (PR-40 keeps its existing G25B, which the same text satisfies), so ITEM-29's
+  "uses the A1-5 wording verbatim" has a guard that fails on removal in every body (§A PART-14 gate).
+- **P-62** G-K39 (forbidden, the retired storage sentence) goes back on RS-40's row; G-K40 stays off. RS-40's part of
+  ITEM-32 keeps a guard that fires if the sentence comes back.
+- **P-63 ITEM-22 titles and lane parents.** `nam002_live.py` also checks each lane `notion_parent_id` and every
+  parent title against the live child lists, with an injected wrong title as its must-fail case.
+- **P-64 PART-16 against the graph.** `EV/engine/graph_check.py` reads QA-110's and QA-80's branches from
+  `docs/graph/parts` and asserts the landed bodies state them (the gate for §A PART-16's "text matches the graph").
+- **P-65 Tracking-page records.** The PART-11 entry is dated `{{EXECUTE_DATE}}` and inserted before the paragraph that
+  introduces "the three decisions below". The freeze start and lift, and the close-out status lines, are drafted as
+  exact edits with tokens. They are the run's own record-keeping on a maintenance surface, not items.
+- **P-66 Freeze window.** The freeze runs from the first Notion write to the close-out merge, not only to the corpus
+  gate as §A order 4 says: the landed bodies must not be used before the matching skills are installed. Recorded as an
+  upstream finding (spec §10.1).
+- **P-67** PART-06-HUB-03 is reduced to a pointer-only rewrite. The eleven PART-06 pointer edits and the AF-009 amendment
+  are consequences of ITEM-18 and ITEM-37 that §A's target lists omitted (spec §10.1).
+- **P-68** D25 cites the execution specification (not §P) for its wording and guards, and attributes the pull-request
+  clause to the approved plan (P-02). The D18 successor names both renamed checks. `{{INSTALL_DATE}}` is the X6.3 date
+  and `{{FREEZE_DIGESTS}}` the seven `<skill> <files> <digest>` lines of the post-install comparison.
+- **P-69** ITEM-13's regeneration reads one input from a skill, not the repository: the R1 oracle bundled in
+  flowmaster-validate, pinned by its digest. Recorded in ITEM-13's disposition, not widened.
+- **P-70** The v5.0.0 procedure's pointer to `E3-E4-report.md` for per-body placement goes stale for W-4, ONCE and C-LAT.
+  Recorded on the Modification Backlog (MB-004, S3), not edited here.

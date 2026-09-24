@@ -234,7 +234,7 @@
    "anchor": "carrying the exact qualified condition, lineage, evidence, owner, gates",
    "action": "replace",
    "new_text": "naming the positive closure decision and the `POST_CLOSURE_RECORD`, which records the exact qualified condition, by repository path; the artifacts hold the rest.",
-   "why": "Span: from the anchor to the end of its sentence (regex: carrying the exact qualified condition[^.\\n]*\\.). The kept subject is 'An explicitly required conditional ADR route goes directly to `CL-30 ...` in `AI Prompts / HDE Change Flow`,'. The original sentence names no artifact, so the names come from this body's Inputs and Required result, following the finding's fix hint ('naming by repository path the artifacts that record them'). Per C-HANDOFF and C-PLACE."
+   "why": "Span: from the anchor to the end of its sentence. The kept subject is the sentence's opening, naming the conditional ADR route to CL-30. The original names no artifact, so the names come from this body's Inputs and Required result, following the finding's fix hint. Per C-HANDOFF and C-PLACE."
   }
  ],
  "CL-30": [
@@ -454,7 +454,7 @@
    "anchor": "and Nathan invokes PR-40 asserting that manual merge occurred",
    "action": "replace",
    "new_text": "and the merge is observed as `MERGE_OBSERVED` or, only where no `MERGE_OBSERVED` result was returned for this merge, asserted by Nathan",
-   "why": "SPAN: the anchor only. The line reads '... only after PR-35 produced historical `MERGE_PENDING`, Nathan later manually merged the identified PR, and the merge is observed as ...'. The C-DISPATCH predicate is verbatim. Python-tested."
+   "why": "SPAN: the anchor only. The line then continues with the observed merge or, on fallback, Nathan's assertion. The C-DISPATCH predicate is verbatim. Python-tested."
   },
   {
    "id": "LPR-20-5",
@@ -638,7 +638,7 @@
    "anchor": "states that Nathan's later invocation asserts the manual merge, ",
    "action": "delete",
    "new_text": "",
-   "why": "SPAN: the anchor only, including its trailing space. The bullet then reads '... the block directs `PR-40 — ...` at <URL>, and requires PR-40 to independently verify actual merged state and landed lineage.' This removes the A7 guard phrase 'Nathan's later invocation asserts'."
+   "why": "SPAN: the anchor only, including its trailing space. The bullet then keeps its PR-40 destination and its independent-verification clause. This removes the A7 guard phrase 'Nathan's later invocation asserts'."
   }
  ],
  "QA-10": [

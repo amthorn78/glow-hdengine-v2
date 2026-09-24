@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """EXECUTE landing tool for MODIFICATION-20260923-closeout-residuals (the parent's evidence/e6/land.py, for these rules).
 
-  land.py plan  <PID> <PAGE_ID> --candidate-url URL [--registry R] [--guards G] [--skills K]
-  land.py check <PID> <PAGE_ID> [--registry R] [--guards G] [--skills K]
+  land.py plan    <PID> <PAGE_ID> --candidate-url URL [--no-ops | --journal DIR] [--registry R] [--guards G] [--skills K]
+  land.py check   <PID> <PAGE_ID> [--registry R] [--guards G] [--skills K]
+  land.py reverse <PID> <PAGE_ID> --journal DIR
+
+--no-ops (P-59): the rehearsal. Prints counts, refusals and the precheck, never the operations.
+--journal DIR (P-58): also writes the operations to DIR/<PID>.ops.json (the rollback journal: session scratchpad only,
+      read only to reverse this landing, deleted when the landing unit passes its gate or has been reversed; D22).
+reverse: reads DIR/<PID>.ops.json and the newest fetch of the page, confirms each landed new_str occurs exactly once,
+      and prints the reversing operations (new_str -> old_str, in reverse order) for one `update_content` call.
 
 plan: the newest fetch of the page (dryrun.latest_body: this session's harness files written in the last 30 minutes;
       D22) -> closeout_rules.apply -> the minimal search-and-replace operations for Notion `update_content`, printed to
@@ -53,11 +60,26 @@ def landed(pid, body):
     return bool(news) and all(C.collapse(n).strip() in flat for n in news)
 
 
+def nothing_to_land(rep):
+    """Every rule and LOCAL edit reads 0 and every CHECK passes: a deletion-only body already landed, or an untouched
+    body (P-59)."""
+    rules = [v for k, v in rep.items() if not k.startswith("CHECK ")]
+    checks_ok = all(v["ok"] for k, v in rep.items() if k.startswith("CHECK "))
+    return all(v["hits"] == 0 for v in rules) and checks_ok
+
+
 def checks(pid, text, a):
     """The readback checks on `text` as stored; the dryrun's registry, guard and validator checks, without the rules."""
     import os
     import subprocess
     stored = C.collapse(text)
+    has_news = any(pid in exp and exp[pid] > 0 for _, _, _, _, exp in R.RULES) or bool(R.LOCAL.get(pid))
+    if a.mode == "check" and has_news and not landed(pid, text):
+        post, rep = R.apply(pid, text)
+        if not nothing_to_land(rep):
+            return {"status": "STALE_READBACK_OR_NOT_LANDED", "pass": False,
+                    "note": "the page does not show this landing's new text: re-fetch and run check again; reverse only on a "
+                            "failure of a readback that shows the landing (P-59)"}
     out = {"placement": {k: stored.count(C.collapse(v)) for k, v in
                          {"W-4": C.W4, "ONCE": C.ONCE, "OWN": R.OWN, "RECV": R.RECV}.items()},
            "unfilled_tokens": stored.count("{{")}
@@ -100,7 +122,7 @@ def checks(pid, text, a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["plan", "check"])
+    ap.add_argument("mode", choices=["plan", "check", "reverse"])
     ap.add_argument("pid")
     ap.add_argument("page")
     ap.add_argument("--candidate-url")
@@ -108,11 +130,26 @@ def main():
     ap.add_argument("--guards", default=str(HERE.parent / "registry/row_assertions.json"))
     ap.add_argument("--skills", default=str(D.INSTALLED))
     ap.add_argument("--since-minutes", type=int, default=30)
+    ap.add_argument("--no-ops", action="store_true")
+    ap.add_argument("--journal")
     a = ap.parse_args()
     D.SINCE = a.since_minutes * 60
     ts, body = D.latest_body(a.page)
     if a.mode == "check":
         print(json.dumps({"pid": a.pid, "fetched": ts, **checks(a.pid, body, a)}, indent=1, ensure_ascii=False))
+        return
+    if a.mode == "reverse":
+        if not a.journal:
+            raise SystemExit(json.dumps({"refused": "REVERSE_NEEDS_JOURNAL"}))
+        ops = json.loads((Path(a.journal) / f"{a.pid}.ops.json").read_text(encoding="utf-8"))["ops"]
+        rev = [{"old_str": o["new_str"], "new_str": o["old_str"]} for o in reversed(ops)]
+        t = body
+        for o in rev:
+            if t.count(o["old_str"]) != 1:
+                print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "REVERSE_NOT_UNIQUE"}))
+                raise SystemExit(7)
+            t = t.replace(o["old_str"], o["new_str"])
+        print(json.dumps({"pid": a.pid, "fetched": ts, "ops": rev}, ensure_ascii=False))
         return
     if a.candidate_url:
         fill(a.candidate_url)
@@ -120,19 +157,33 @@ def main():
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "ALREADY_LANDED: run check, not plan"}))
         raise SystemExit(3)
     post, rep = R.apply(a.pid, body)
+    if nothing_to_land(rep):
+        print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "NOTHING_TO_LAND: already landed or untouched; run check"}))
+        raise SystemExit(3)
     bad = {k: v for k, v in rep.items() if not v["ok"]}
     if bad:
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "COUNT_MISMATCH", "rules": bad}, indent=1))
         raise SystemExit(4)
-    if "{{" in post:
+    if post.count("{{") > body.count("{{"):  # P-59: only a token the edit introduces
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "UNFILLED_TOKEN (P-48)"}))
         raise SystemExit(5)
     ops = D.ops_for(body, post)
     if ops is None or D.simulate(body, ops) != post:
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "OPS_DO_NOT_REPRODUCE"}))
         raise SystemExit(6)
-    print(json.dumps({"pid": a.pid, "fetched": ts, "ops": ops, "rules": rep,
-                      "precheck": checks(a.pid, D.simulate(body, ops), a)}, ensure_ascii=False))
+    a.mode = "precheck"
+    pre = checks(a.pid, D.simulate(body, ops), a)
+    if a.journal:
+        jd = Path(a.journal)
+        jd.mkdir(parents=True, exist_ok=True)
+        jf = jd / f"{a.pid}.ops.json"
+        jf.write_text(json.dumps({"pid": a.pid, "page": a.page, "fetched": ts, "ops": ops}, ensure_ascii=False), encoding="utf-8")
+        jf.chmod(0o600)
+    if a.no_ops:
+        print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "ops_count": len(ops),
+                          "rules": rep, "precheck": pre}, indent=1, ensure_ascii=False))
+        return
+    print(json.dumps({"pid": a.pid, "fetched": ts, "ops": ops, "rules": rep, "precheck": pre}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
