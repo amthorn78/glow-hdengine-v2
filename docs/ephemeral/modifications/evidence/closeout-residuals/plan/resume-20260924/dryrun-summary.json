@@ -1,0 +1,1202 @@
+{
+ "what": "D26 dry run of the resumed PLAN, MODIFICATION-20260923-closeout-residuals, 2026-09-24: every normal-path gate read-only against the live pages, and the manifest in spec \u00a79 order on a scratch clone of main d179277. Counts, ids and hashes only; no prompt body text (D22).",
+ "base": "d179277912987ef2448053a3871268f32951bf43",
+ "rehearsal": {
+  "live_plan_pass": 49,
+  "live_check_pass": 5,
+  "not_run": [
+   "ESC-25"
+  ],
+  "operations": 256,
+  "rows": [
+   {
+    "pid": "CF-C-10",
+    "page": "3db4590a05eb8119a5a8e4d083fcf360",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:42.836Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-C-20",
+    "page": "3db4590a05eb8173a73edc73f302a90a",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:26:41.035Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-C-30",
+    "page": "3db4590a05eb8149a8d2ed42c9c01ffd",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:27:04.309Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-C-40",
+    "page": "3db4590a05eb81269931cee342ce8a0e",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:27:38.648Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-E-10",
+    "page": "3db4590a05eb815b84a5c5a5ace85fe1",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:28:00.706Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-E-20",
+    "page": "3db4590a05eb810eb177f7dced41bc8f",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:28:31.604Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-E-30",
+    "page": "3db4590a05eb81b4be79f405566da9a7",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:28:53.874Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-E-40",
+    "page": "3db4590a05eb8101b655ed223b11a85e",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:29:19.497Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CF-PO-10",
+    "page": "3db4590a05eb8161b4d7cb6d07f5101c",
+    "mode": "check",
+    "fetched": "2026-09-23T13:19:43.641Z",
+    "pass": true
+   },
+   {
+    "pid": "CL-20",
+    "page": "3db4590a05eb81f4812be61e8877c02c",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:26:57.675Z",
+    "ops": 10,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-30",
+    "page": "3db4590a05eb8190a444d8818e445c1d",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:27:36.082Z",
+    "ops": 10,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-40",
+    "page": "3db4590a05eb81db9c88cde6027e07bf",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:28:08.922Z",
+    "ops": 5,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-C-10",
+    "page": "3db4590a05eb81ad8989faa77f441a64",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:28:52.686Z",
+    "ops": 11,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-E-10",
+    "page": "3db4590a05eb811a8578d75885c16cac",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:29:31.478Z",
+    "ops": 11,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-E-20",
+    "page": "3db4590a05eb81c2b5d5ff46126f9e45",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:30:03.477Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-E-30",
+    "page": "3db4590a05eb81b4a649fdcdb1903345",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:30:45.395Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "CL-E-40",
+    "page": "3db4590a05eb81e78e82f83a5f2e4b68",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:58.391Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "DOC-10",
+    "page": "3db4590a05eb8193a9a8d7ddd751cd2d",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:20:42.669Z",
+    "ops": 5,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "DOC-20",
+    "page": "3db4590a05eb8164ac09e722dc967f25",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:16:52.823Z",
+    "ops": 7,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "ESC-10",
+    "page": "3db4590a05eb81d582b8d490e77f9f40",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:21:16.736Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "ESC-25",
+    "page": "3db4590a05eb81bf9326e46a1017de38",
+    "mode": "plan",
+    "result": "NOT_RUN",
+    "reason": "the harness permission classifier refused the rh.sh command, in a worker and in the main session; not worked around"
+   },
+   {
+    "pid": "ESC-30",
+    "page": "3db4590a05eb813e99b4e416bc7afdae",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:21.293Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "ESC-40",
+    "page": "3db4590a05eb81efb6d4cd8d02ba9756",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:59.282Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "GCFPE-MGMT-10",
+    "page": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+    "mode": "plan",
+    "fetched": "2026-09-21T22:56:04.638Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "IA-10",
+    "page": "3db4590a05eb817aa191f1e822c30480",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:23:51.013Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "IA-20",
+    "page": "3db4590a05eb81c4825df2ad0dec4750",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:57.694Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "IA-30",
+    "page": "3db4590a05eb81c6bfb5f36f7df8f464",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:20:30.041Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "IA-40",
+    "page": "3db4590a05eb8197bb1bc8f52f896969",
+    "mode": "check",
+    "fetched": "2026-09-23T13:20:55.193Z",
+    "pass": true
+   },
+   {
+    "pid": "IA-50",
+    "page": "3db4590a05eb81d78eeae384e93dd697",
+    "mode": "check",
+    "fetched": "2026-09-23T13:21:22.132Z",
+    "pass": true
+   },
+   {
+    "pid": "IA-60",
+    "page": "3db4590a05eb8141b5b2c8fbf7b725e2",
+    "mode": "check",
+    "fetched": "2026-09-23T13:21:46.154Z",
+    "pass": true
+   },
+   {
+    "pid": "MGR-10",
+    "page": "3db4590a05eb8108ad2dd4d0e20bd6c4",
+    "mode": "check",
+    "fetched": "2026-09-23T13:29:42.793Z",
+    "pass": true
+   },
+   {
+    "pid": "OPS-10",
+    "page": "3db4590a05eb81db98cce3e30a62bce5",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:32.873Z",
+    "ops": 10,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "OPS-20",
+    "page": "3db4590a05eb81858a9dd361d3689ce8",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:23:01.175Z",
+    "ops": 9,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "OPS-30",
+    "page": "3db4590a05eb816f91c9c394f9c9fa57",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:20:36.022Z",
+    "ops": 15,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "PR-10",
+    "page": "3db4590a05eb818e8359de1994e97a7d",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:07.698Z",
+    "ops": 15,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "PR-20",
+    "page": "3db4590a05eb8174abf8c04318ab04be",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:18.271Z",
+    "ops": 19,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "PR-30",
+    "page": "3db4590a05eb8123afb8caeeaa83a294",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:20.837Z",
+    "ops": 11,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "PR-35",
+    "page": "3db4590a05eb8120b443ed2cb08b723c",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:01.920Z",
+    "ops": 8,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "PR-40",
+    "page": "3db4590a05eb818786c5cb6051b4d634",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:20.724Z",
+    "ops": 23,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "PR-50",
+    "page": "3db4590a05eb8138ac99c13cf6f2f282",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:20:56.986Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-10",
+    "page": "3db4590a05eb818bad2fcb4bc2610b29",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:21:56.515Z",
+    "ops": 18,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-100",
+    "page": "3db4590a05eb811a8d13c0bbbf77a848",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:31.666Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-110",
+    "page": "3db4590a05eb816984d1d34da0e08f40",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:53.747Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-120",
+    "page": "3db4590a05eb81589d21e798cf38e8ba",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:23:26.846Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-20",
+    "page": "3db4590a05eb816daa3adff37283482b",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:23:53.729Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-50",
+    "page": "3db4590a05eb81a3ac91f602bad8cfa2",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:24:32.097Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-60",
+    "page": "3db4590a05eb810b8aa3e1692830d4b8",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:43.022Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-70",
+    "page": "3db4590a05eb8143bf26d1459fbbcad7",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:20:13.280Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-80",
+    "page": "3db4590a05eb813ba9a9dbd9a641d36c",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:20:40.037Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "QA-90",
+    "page": "3db4590a05eb811e8582cf30238c5b9c",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:21:06.317Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "RS-10",
+    "page": "3db4590a05eb811ca0cdc66e0d508ac4",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:21:44.109Z",
+    "ops": 3,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "RS-20",
+    "page": "3db4590a05eb81c183aac2ecb40b1497",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:10.719Z",
+    "ops": 4,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "RS-30",
+    "page": "3db4590a05eb81ed9fd3d2ef439ceaaf",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:22:37.041Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "RS-40",
+    "page": "3db4590a05eb8183b5ffdf4270133226",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:19:10.807Z",
+    "ops": 2,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "UTIL-10",
+    "page": "3db4590a05eb81b89fbaf4b31a3ed2a9",
+    "mode": "plan",
+    "fetched": "2026-09-23T13:23:01.028Z",
+    "ops": 1,
+    "repair": [],
+    "reapply_unsafe": [],
+    "precheck": true,
+    "landed_check": true
+   },
+   {
+    "pid": "GCFPE-MGMT-10-PROPOSED",
+    "page": "3e34590a05eb811b93d2da9b4ef8106d",
+    "mode": "check",
+    "fetched": "2026-09-24T11:00:24.691Z",
+    "pass": true,
+    "gates": {
+     "R-ITEM40": 0,
+     "R-ITEM23-gate": 0
+    }
+   },
+   {
+    "pid": "GCFPE-MGMT-10-PROPOSED",
+    "page": "3e34590a05eb811b93d2da9b4ef8106d",
+    "mode": "plan",
+    "fetched": "2026-09-24T11:00:24.691Z",
+    "refused": "ALREADY_LANDED: every edit reads landed; run check, not plan"
+   },
+   {
+    "pid": "GCFPE-MGMT-10-PROPOSED",
+    "page": "3e34590a05eb811b93d2da9b4ef8106d",
+    "mode": "state",
+    "fetched": "2026-09-24T11:00:24.691Z",
+    "verdict": "LANDED"
+   }
+  ]
+ },
+ "drive_check": {
+  "file_id": "1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO",
+  "captured": "2026-09-24T11:35:00.176Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6bf0a127daff5c88.jsonl",
+  "bytes": 31923,
+  "size_ok": true,
+  "sha256_ok": true,
+  "fence_lines": [
+   119,
+   286
+  ],
+  "fence_bytes": 18624,
+  "fence_sha256_ok": true,
+  "old_outside": {
+   "M2-R1": 1,
+   "M2-R2": 1,
+   "M2-R3": 1,
+   "M2-R4": 1,
+   "M2-R5": 1,
+   "M2-R6": 1,
+   "M2-R7": 1,
+   "M2-R8": 1,
+   "M2-R9": 1
+  },
+  "old_inside": {
+   "M2-R3": 1
+  },
+  "hub": {
+   "page": "3ce4590a05eb814f8892f88ff8539308",
+   "fetched": "2026-09-24T11:33:20.582Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/tool-results/mcp-Notion-notion-fetch-1790249701000.txt",
+   "children_titled": []
+  },
+  "pass": true
+ },
+ "anchor_check_expect_unlanded": {
+  "exit": 1,
+  "pass": false,
+  "bad": [
+   "TRACK-STATUS-01",
+   "TRACK-STATUS-02",
+   "TRACK-STATUS-03",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03"
+  ],
+  "landed": [],
+  "mixed": [],
+  "doubled": [],
+  "edits": {
+   "PART-12-HUB-01": {
+    "page": "3ce4590a05eb814f8892f88ff8539308",
+    "state": "NOT_LANDED",
+    "old_count": 1
+   },
+   "PART-06-HUB-01": {
+    "page": "3ce4590a05eb814f8892f88ff8539308",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-HUB-02": {
+    "page": "3ce4590a05eb814f8892f88ff8539308",
+    "state": "NOT_LANDED",
+    "old_count": 1
+   },
+   "PART-06-HUB-03": {
+    "page": "3ce4590a05eb814f8892f88ff8539308",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "TRACK-FREEZE-START": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-11-TRACK-01": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "TRACK-STATUS-01": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 0
+   },
+   "TRACK-STATUS-02": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 0
+   },
+   "TRACK-STATUS-03": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 0
+   },
+   "TRACK-FREEZE-LIFT": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "TRACK-UNIT-STOPPED": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "TRACK-STATUS-STOP-01": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 0
+   },
+   "TRACK-STATUS-STOP-02": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 0
+   },
+   "TRACK-STATUS-STOP-03": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 0
+   },
+   "TRACK-FREEZE-LIFT-STOP": {
+    "page": "3e34590a05eb81e7927efe0541258916",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-18-AF009-01": {
+    "page": "3df4590a05eb8111a6a5f67cb82f96f6",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM1-01": {
+    "page": "3d54590a05eb8142a187d32ad4435950",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM1-02": {
+    "page": "3d54590a05eb8142a187d32ad4435950",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM2-01": {
+    "page": "3d54590a05eb8119affafcfb024ba990",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM2-02": {
+    "page": "3d54590a05eb8119affafcfb024ba990",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM3-01": {
+    "page": "3d54590a05eb8159a73cf6af261c1c2b",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM3-02": {
+    "page": "3d54590a05eb8159a73cf6af261c1c2b",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM4-01": {
+    "page": "3d54590a05eb8118b229e0ca25bdfd42",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   },
+   "PART-06-ITEM4-02": {
+    "page": "3d54590a05eb8118b229e0ca25bdfd42",
+    "state": "TOKEN_NOT_RECORDED",
+    "old_count": 1
+   }
+  },
+  "fetched": {
+   "3ce4590a05eb814f8892f88ff8539308": "2026-09-24T11:33:20.582Z",
+   "3e34590a05eb81e7927efe0541258916": "2026-09-24T11:25:18.385Z",
+   "3df4590a05eb8111a6a5f67cb82f96f6": "2026-09-24T00:11:08.183Z",
+   "3d54590a05eb8142a187d32ad4435950": "2026-09-08T07:23:26.492Z",
+   "3d54590a05eb8119affafcfb024ba990": "2026-09-08T07:23:28.047Z",
+   "3d54590a05eb8159a73cf6af261c1c2b": "2026-09-08T07:23:29.473Z",
+   "3d54590a05eb8118b229e0ca25bdfd42": "2026-09-08T07:23:30.741Z"
+  }
+ },
+ "nam002": {
+  "run1": {
+   "summary": {
+    "sources": 55,
+    "rows": 55,
+    "unplaced_rows": [],
+    "NAM-002": 0,
+    "NAM-002_rows": [],
+    "NAM-001": [],
+    "other_errors": 0,
+    "other_prompt_findings": [],
+    "non_prompt_findings": [
+     "COL-002",
+     "SRC-001"
+    ],
+    "lanes": 16,
+    "lane_parent_findings": 0,
+    "lane_parent_lanes": [],
+    "title_findings": 0,
+    "title_hubs": [],
+    "title_references": {
+     "compared": 70,
+     "mismatched": 0
+    }
+   },
+   "expectation_met": true
+  },
+  "run2": {
+   "summary": {
+    "sources": 55,
+    "rows": 55,
+    "unplaced_rows": [],
+    "NAM-002": 1,
+    "NAM-002_rows": [
+     "ESC-10"
+    ],
+    "NAM-001": [],
+    "other_errors": 0,
+    "other_prompt_findings": [],
+    "non_prompt_findings": [
+     "COL-002",
+     "SRC-001"
+    ],
+    "lanes": 16,
+    "lane_parent_findings": 0,
+    "lane_parent_lanes": [],
+    "title_findings": 0,
+    "title_hubs": [],
+    "title_references": {
+     "compared": 70,
+     "mismatched": 0
+    }
+   },
+   "expectation_met": true
+  },
+  "run3": {
+   "summary": {
+    "sources": 55,
+    "rows": 55,
+    "unplaced_rows": [],
+    "NAM-002": 0,
+    "NAM-002_rows": [],
+    "NAM-001": [],
+    "other_errors": 0,
+    "other_prompt_findings": [],
+    "non_prompt_findings": [
+     "COL-002",
+     "SRC-001"
+    ],
+    "lanes": 16,
+    "lane_parent_findings": 0,
+    "lane_parent_lanes": [],
+    "title_findings": 1,
+    "title_hubs": [
+     "3db4590a05eb81cd938de84cfffead9c"
+    ],
+    "title_references": {
+     "compared": 70,
+     "mismatched": 5
+    }
+   },
+   "expectation_met": true
+  },
+  "run4": {
+   "summary": {
+    "sources": 55,
+    "rows": 55,
+    "unplaced_rows": [],
+    "NAM-002": 55,
+    "NAM-002_rows": [
+     "CF-C-10",
+     "CF-C-20",
+     "CF-C-30",
+     "CF-C-40",
+     "CF-E-10",
+     "CF-E-20",
+     "CF-E-30",
+     "CF-E-40",
+     "CF-PO-10",
+     "CL-20",
+     "CL-30",
+     "CL-40",
+     "CL-C-10",
+     "CL-E-10",
+     "CL-E-20",
+     "CL-E-30",
+     "CL-E-40",
+     "DOC-10",
+     "DOC-20",
+     "ESC-10",
+     "ESC-25",
+     "ESC-30",
+     "ESC-40",
+     "GCFPE-MGMT-10",
+     "IA-10",
+     "IA-20",
+     "IA-30",
+     "IA-40",
+     "IA-50",
+     "IA-60",
+     "MGR-10",
+     "OPS-10",
+     "OPS-20",
+     "OPS-30",
+     "PR-10",
+     "PR-20",
+     "PR-30",
+     "PR-35",
+     "PR-40",
+     "PR-50",
+     "QA-10",
+     "QA-100",
+     "QA-110",
+     "QA-120",
+     "QA-20",
+     "QA-50",
+     "QA-60",
+     "QA-70",
+     "QA-80",
+     "QA-90",
+     "RS-10",
+     "RS-20",
+     "RS-30",
+     "RS-40",
+     "UTIL-10"
+    ],
+    "NAM-001": [],
+    "other_errors": 0,
+    "other_prompt_findings": [],
+    "non_prompt_findings": [
+     "COL-002",
+     "SRC-001"
+    ],
+    "lanes": 16,
+    "lane_parent_findings": 16,
+    "lane_parent_lanes": [
+     "GCFPE-MGMT",
+     "CF-PO",
+     "CF-C",
+     "CF-E",
+     "CL-C",
+     "CL-E",
+     "CL",
+     "DOC",
+     "ESC",
+     "IA",
+     "MGR",
+     "OPS",
+     "PR",
+     "QA",
+     "RS",
+     "UTIL"
+    ],
+    "title_findings": 6,
+    "title_hubs": [
+     "3db4590a05eb811b9c14f2ae89c28df7",
+     "3db4590a05eb814d96d3dcfa8835f96d",
+     "3db4590a05eb8195a2ccf7c0959a8b6e",
+     "3db4590a05eb81cd938de84cfffead9c",
+     "3db4590a05eb81d59059eb6b95ed5fcf",
+     "3db4590a05eb81de9736ea69bac61016"
+    ],
+    "title_references": {
+     "compared": 70,
+     "mismatched": 70
+    }
+   },
+   "expectation_met": false
+  }
+ },
+ "childlist_counts": {
+  "3db4590a05eb81d59059eb6b95ed5fcf": 19,
+  "3db4590a05eb8195a2ccf7c0959a8b6e": 21,
+  "3db4590a05eb814d96d3dcfa8835f96d": 10,
+  "3db4590a05eb81cd938de84cfffead9c": 4,
+  "3db4590a05eb811b9c14f2ae89c28df7": 2,
+  "3db4590a05eb81de9736ea69bac61016": 4
+ },
+ "packages": {
+  "out_dir": "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/skills-out",
+  "archives": [
+   {
+    "skill": "flowmaster-validate",
+    "file": "flowmaster-validate.skill",
+    "files": 31,
+    "bytes": 322703,
+    "sha256": "8d04c8c3b7eb3dac596f6aa880e6251a6487b0cee7afbccdae2e87eb5589e3ff",
+    "freeze": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626"
+   },
+   {
+    "skill": "change-flow",
+    "file": "change-flow.skill",
+    "files": 22,
+    "bytes": 258193,
+    "sha256": "f2da38f74c7b122b354e6adf619c0d9d2bda2ccf8575f28878f5f3601f443d53",
+    "freeze": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47"
+   },
+   {
+    "skill": "glow-graph-contract",
+    "file": "glow-graph-contract.skill",
+    "files": 9,
+    "bytes": 55695,
+    "sha256": "b6789cf207b0a0ee86e193afda332b4ad1638cf092a0e36bbb458f9d0374f85a",
+    "freeze": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c"
+   },
+   {
+    "skill": "session-relay-flowmaster",
+    "file": "session-relay-flowmaster.skill",
+    "files": 5,
+    "bytes": 56250,
+    "sha256": "41c7d922aa715229c9e9cde9de7188990a93f8528549f8069d9ea7e1095f330a",
+    "freeze": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4"
+   },
+   {
+    "skill": "glow-hde-pr-development",
+    "file": "glow-hde-pr-development.skill",
+    "files": 4,
+    "bytes": 22605,
+    "sha256": "aa5103279c5741335d51f30b74236699e903e3cab72d0f92d045e524604cb68a",
+    "freeze": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a"
+   },
+   {
+    "skill": "amthor-workspace-governance-audit",
+    "file": "amthor-workspace-governance-audit.skill",
+    "files": 15,
+    "bytes": 56629,
+    "sha256": "226cd7e7003f64f108e3a67ddc43daf73d18cdec504fba7b4231c361025ff777",
+    "freeze": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab"
+   },
+   {
+    "skill": "glow-po-reporting",
+    "file": "glow-po-reporting.skill",
+    "files": 1,
+    "bytes": 3776,
+    "sha256": "e763e89a539bcd80b0e00044ffa6c0e9dc0b28cb666bc97db18785649b2a0779",
+    "freeze": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
+   }
+  ]
+ },
+ "graph_check_simulate": {
+  "graph_QA-110_accept_to_QA-120_with_completed_failing_run": true,
+  "graph_QA-110_escalation_to_ESC-10": true,
+  "body_QA-110_states_accept_route": true,
+  "graph_QA-80_wrong_route_two_branches": true,
+  "body_QA-80_pointer": true,
+  "body_QA-80_section_states_both_branches": true,
+  "pass": true
+ },
+ "anchor_check_option_A": {
+  "edits_file": "control-edits.json",
+  "edits": 15,
+  "exit": 0,
+  "pass": true,
+  "landed": [],
+  "mixed": [],
+  "bad": []
+ },
+ "repository_gates": {
+  "X0.3": {
+   "a_registry_sha256": "8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4",
+   "b_seven_installed_freeze_equal_manifest": true,
+   "c_graph": "55 nodes, 229 edges, embedded JSON 575074 B sha256 ae2bd159\u2026; graph.md a70a9326\u2026",
+   "d_checks_matching_authored_or_canonical": [],
+   "e_root": "320 420705ec2881bdd82cc46d32880fa02abb463460f081dfa728c3c4aca928f24a"
+  },
+  "X1.1": {
+   "patches_exit": 0,
+   "expected_after_patch_diff_exit": 0,
+   "root_pkg": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae"
+  },
+  "X1.3_pre": {
+   "exit": 0,
+   "rows_ok": "12/12"
+  },
+  "X2.1": {
+   "applier_exit": 0,
+   "applied": [
+    "P29-D25",
+    "P29-D23C",
+    "P29-D23G",
+    "P29-D18",
+    "P29-D14"
+   ],
+   "count_^## D25": 1,
+   "added_lines_starting_quote": 0,
+   "canon_ONCE_loaded": true,
+   "decision_record_after": {
+    "sha256": "c8cdfd5a46666173e2b634ef5793a7db11fbc23f4e9a3615a161fd2d2cb7a638",
+    "bytes": 111107
+   },
+   "heading_order": "D24, D25, D26"
+  },
+  "X3.1": {
+   "sha256_after": "97bda1a06b0c917fa66bdfb098e9d9c0b5d394f16d62a3bfa953f16253219015",
+   "valid": true,
+   "problems": [],
+   "deriver": {
+    "rows": 55,
+    "parts": 55,
+    "drift": []
+   }
+  },
+  "X3.2": {
+   "parts_before": "56 980af73e\u2026",
+   "reindex": "229 edges; 27 files rewritten",
+   "cmp_exit": 0,
+   "parts_after": "56 84dbb1fe\u2026",
+   "build": "575074 B ae2bd159\u2026; graph.md a70a9326\u2026",
+   "second_reindex_rewrites": 0
+  },
+  "X3.3": {
+   "contract": "2b78f877e7a31efb2da8488d7f129794e60bcbdbf9f43e9851a319f83f06b53b",
+   "readme": "469e2265640439b0b126379c358aa7e862638c77240b2f0c6b52de8c5ba60fde",
+   "old_dir_removed": true
+  },
+  "X3.4": {
+   "applier_exit": 0,
+   "session_working_rules_after": {
+    "sha256": "2501579e1f04a2f7d4855b965859407348b7c2dc2cbdf9c03b8dabd1a4eadf4b",
+    "bytes": 16113
+   },
+   "rerun_applies_nothing": true
+  },
+  "X4.1": {
+   "r0": "6902924a\u2026 EQUAL x2",
+   "r1": "dbae180b\u2026 EQUAL x2",
+   "diff_exit": 1,
+   "diff_lines": [
+    "contract_revision 4.1.0 -> 4.1.1",
+    "primary_skill_revision 1.3.0 -> 1.3.1"
+   ],
+   "skill_tree_digest": "ed52208f48479124f39119a54f29774096381ab85f54109a73bc3a7f3cc572af"
+  },
+  "X4.2_pkg": {
+   "exit": 0,
+   "rows_ok": "34/34"
+  },
+  "X4.3": {
+   "skill_is_valid": 7,
+   "freeze_diff_exit": 0,
+   "packages_json_exit": 0,
+   "pkg_unchanged_diff_exit": 0,
+   "note": "archive sha256s vary with file mtimes; the ones reviewed at X4.4 are the ones delivered"
+  },
+  "X6.3_closure_diff_exit": 0,
+  "texts_on_new_base": {
+   "X2.2": {
+    "gcfpe.decision-record.md": [
+     "c8cdfd5a46666173e2b634ef5793a7db11fbc23f4e9a3615a161fd2d2cb7a638",
+     111107
+    ]
+   },
+   "X3.5": {
+    "session-working-rules.md": [
+     "2501579e1f04a2f7d4855b965859407348b7c2dc2cbdf9c03b8dabd1a4eadf4b",
+     16113
+    ]
+   },
+   "X5.2_stand_in_url": {
+    "notion-write-boundary.md": [
+     "8fde58f27dd10b2b5712412656618a99fb1da23bf1f58c1beed75efa55a0a3fb",
+     11865
+    ]
+   },
+   "close_stand_in_install_date_2026-01-01_and_expected_freeze_lines": {
+    "gcfpe.decision-record.md": [
+     "b324490a3e4598c264b193e187e31069845bb76618b2ceaf88c5c9dd109d10d4",
+     113065
+    ],
+    "prompt-body-content-policy.md": [
+     "c24061b8970bd307bd9c80d96d682d679b61ec9c28d4d6a6edfa21582f0470f1",
+     7125
+    ],
+    "evidence/REVIEWER-PROMPT-a5.md": [
+     "9e2d822cd9f866cfe1cbed36d18f47886607954beeb1b3182c3b6f1010088b2c",
+     19234
+    ]
+   },
+   "rerun_each_label": "every edit reads APPLIED; nothing written"
+  }
+ }
+}

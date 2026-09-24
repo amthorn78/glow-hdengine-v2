@@ -1,7 +1,8 @@
 ---
 artifact_type: GCFPE_MODIFICATION_RECORD
+format: "2.1"
 modification_id: MODIFICATION-20260923-closeout-residuals
-status: PLANNED
+status: PLANNING
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -16,6 +17,15 @@ override:
 interaction_cost_predicted: 11
 item_count_at_approval: 40
 interaction_cost_actual:
+estimate:
+  plan: "2 h and 2.5M tokens for this resume under D26 (the dry run, one diff check of the successor, two returns); set 2026-09-24 by the resumed PLAN, for the work still to come (D26 transition)"
+  execute: "8 h of session time and 8M tokens (X0 to X7.7, one D24 round of two reviewers, the 50-body landing and two corpus gates in lanes); Nathan's merges and install sitting add wall-clock time on top"
+reviews:
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-24
+    required_open: 1
+    outcome: "Every normal-path gate read-only on fresh fetches and the manifest in order on main d179277: all pass except TRACK-STATUS-01..03, whose anchors stage 5 removed from the tracking page (X4.6 and X7.7 fail loudly). ESC-25 not rehearsed: the permission classifier refused the command. D26-F trigger 2: one bounded check, then back to Nathan (DN-8)"
 items:
   - id: ITEM-01
     statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
@@ -928,3 +938,234 @@ restoration and the restoration check's pull request (P-99, P-108). An archive y
 message, when the session no longer holds its bytes either, becomes a recorded failure and a plan change
 (P-112 (d)). `interaction_cost_predicted` keeps §A's 11, and §E compares the actual cost
 against both.
+
+### Successor, 2026-09-24 — the plan resumed under D26
+
+*Written by MODE = PLAN, 2026-09-24, in a `GCFPE-MGMT-10` maintenance session running the proposed body
+(Notion `3e34590a05eb811b93d2da9b4ef8106d`, last edited at 11:00Z and read in full at the start), started by Nathan with the kickoff in
+`docs/ephemeral/pe37.stage5/RESUME-PROCEDURE.md`. It follows that file's step 3, in order. The plan above was stopped
+before approval on 2026-09-24 at 08:28Z (`evidence/closeout-residuals/RCA-20260924-closeout-residuals.md` §8), and it is
+not rewritten. **Where this section and the dated plan or the spec differ, this section governs.** Scope stays frozen
+at 40 items in 17 parts. Nothing here is approved: `plan_approved_by` is empty.*
+
+**Authority.** `D26` (its *Transition* names this Modification); the recovery analysis §4.3
+(`docs/ephemeral/pe36.mgmt-redesign/RECOVERY-ANALYSIS-20260924.md`); `RESUME-PROCEDURE.md` step 3; `D20`–`D24` as
+before.
+
+**The eight PLAN rounds before D26** (2026-09-23 and 24) are cited from the RCA §2 and §8, not entered in the
+`reviews` ledger (`D26` transition). The ledger starts with this resume.
+
+**Where this stands.** The dry run failed on the normal path in one place, `TRACK-STATUS-01` to `03` (DN-8
+below). Under `D26-F` trigger 2 that means one bounded executability check, then a return to Nathan. **So the diff check
+(`RESUME-PROCEDURE.md` step 3.5) has not run.** It runs after Nathan rules on DN-1 to DN-8, on the successor as it then
+stands. `status` is `PLANNING` until then.
+
+#### What resumes, and what is withdrawn
+
+| part of the plan | disposition | what that means for EXECUTE |
+|---|---|---|
+| **Content**: the 51 body edits (spec §3 and the engine), the 7 skill diffs, the registry diff and its guards, the graph reindex, the 11 repository texts, the Notion edits | **KEEP**, less `PART-11-TRACK-01` and (under DN-8's recommendation) `TRACK-STATUS-01` to `03` | Landed exactly as the spec and `EV/` state them. The re-derived text results are below |
+| **`PART-11-TRACK-01`** (§P step 19) | **WITHDRAWN**, not rewritten | It would write a dated paragraph saying the proposed MGMT-10 body's contradictions are not resolved and wait for stage 5. Stage 5 resolved them (`docs/ephemeral/pe37.stage5/MGMT-10-REVISION.md`), so the paragraph would be false when written |
+| **PART-11** (ITEM-23, ITEM-40) | **VERIFIED, not applied** | Stage 5 already applied `R-ITEM23` and the LOCAL preamble edit to the proposed body. The dry run: `land.py check` passes with `R-ITEM40` 0 and `R-ITEM23-gate` 0, `state` reads `LANDED`, and `plan` refuses `ALREADY_LANDED`. So X4.5 and X5.5 run `check` on `GCFPE-MGMT-10-PROPOSED`, never `plan`, and write nothing to it |
+| **Normal-path tools**: `land.py` (`plan`, `check`, and `state` for the sweep), `ctrl.py` (`edits`, `all`, `op`, `children`), `run_gate.py`, `apply_texts.py`, `m2.py`, `drive_check.py`, `graph_check.py`, `runjson.py`, `nam002_live.py`, `packages_json.py`, `fill_brief.py` without `--prior-file`, and the first-round D24 brief | **KEEP**, with **R8-02 fixed** | X6.4's path check becomes the three-dot merge-base diff, and X7.6's check uses the same form (below) |
+| **Machinery**: automated stop and reversal; the stop record and its `attempt-<n>` directories; the restoration check (`ctrl.py all --expect restored`, `--kept-from`, `--sent`, `--waived`); the lift and end routes after a stop; `TRACK-UNIT-STOPPED`, `TRACK-STATUS-STOP-01` to `03` and `TRACK-FREEZE-LIFT-STOP`; resuming in a new session at any step, and the branch rule that routes it; the lease pushes; the sent list `EX/ctrl/sent.txt`; post-merge routing by commit subjects; the D24 re-roll and plan-change brief variants (`fill_brief.py --prior-file`, `REVIEWER-PROMPT-prior.md`) | **WITHDRAWN** | Not run. The files stay in `EV/` as dated records. Round 8's R8-01, R8-03 and R8-04 go with this machinery, and so does the downgraded lift-after-stop finding |
+
+The spec's §9 preamble keeps its definitions (`EV`, `EX`, `<record>`, `$SCRATCH`, `$INST`, `$PKG`, `$GATE`,
+`$BASE`, `<URL>`, `<ROOT>`, the environment line), *Recorded values* (`runjson.py`; the keys `stop_date`,
+`delivered_cr<k>` for any `k` but the first, and those of the withdrawn routes are not used), and *Notion writes*
+(`allow_async: false`, the async poll, the apply-once test, and the control readback rule's three cycles). Everything
+else in the preamble is superseded by the three subsections below. That includes the sent list, the commit-and-push
+lease, *A failing gate*, *Sessions*, *The branch rule*, *The landing unit*, the stop record, the restoration check,
+the lift and the end route. `AT` is not used.
+
+#### The failure path (`D26-B`), replacing the stop procedure
+
+**The first external write** is X5.0's `TRACK-FREEZE-START` Notion call. The RCA and the dated plan use the
+term this way too. No Notion page is written before it.
+
+- **Before it.** A failing gate stops EXECUTE. Nothing has left the execution branch, which stays unmerged, and
+  `main` does not change. The session writes the failing step's row and the failed predicate into §E on the branch,
+  commits and pushes, and returns `IMPLEMENTATION_BLOCKED` to Nathan. What follows is his ruling: end the
+  Modification, or a plan change that a PLAN session writes. A D24 `SKILL_REPAIR_REQUIRED` verdict at X4.4 is such a
+  stop. It is returned to Nathan and not re-rolled (`D26-A` rule 2). The parts share one registry diff, one engine
+  and one package set, so no part carries on alone. That is an open finding (OF-3), not a design choice this plan
+  makes silently.
+- **From the first external write to X6.4's pull request**, a failure that forward repair within the session cannot
+  clear takes these four steps and nothing more. Forward repair means `land.py plan` on a fresh fetch, which lands
+  only the edits still missing, and the control readback rule's three cycles.
+  1. **Failure record to `main`.** `git fetch origin main && git checkout -B docs/<yyyymmdd>-closeout-residuals-failure origin/main`;
+     `git checkout <execution branch> -- docs/ephemeral/modifications/evidence/closeout-residuals/execute`. In the
+     record, set `status: EXECUTING` and write §E: a row for every step run, with its disposition; the failing step
+     with its failed predicate and its output, copied from `$SCRATCH` into
+     `docs/ephemeral/modifications/evidence/closeout-residuals/failure/`; and every later step `NOT_RUN`, citing
+     the failure. Run `modification_validate.py`, commit (`closeout-residuals record: failed at <step>`), push, and open a
+     pull request against `main`. It carries no registry, graph, skill-text or rule change.
+  2. **Sweep, read-only.** Fetch each of the 50 live bodies with edits and run `land.py state <PID> <PAGE>`
+     (CL-40 with `--candidate-url <URL>` once `url` is recorded). Fetch the seven control pages and run
+     `ctrl.py all --run EX/run.json --edits EV/resume-20260924/control-edits.json` without `--expect`. Fetch the Hub
+     and run `ctrl.py children 3ce4590a05eb814f8892f88ff8539308`, which lists any *Candidate CRD Items List* child
+     page by id. The states, ids and counts go to `failure/sweep.json`, one more commit on
+     the same pull request. Lanes of workers may do the fetches.
+  3. **Keep the freeze.** Nothing lifts it, and the tracking page keeps `TRACK-FREEZE-START`.
+  4. **Return to Nathan** with `PRODUCT_OWNER_ACTION_PENDING`. It names every page the sweep reads `LANDED` or
+     `PARTIAL`, every control edit that reads `LANDED`, and the new page if one exists; the record PR to merge; and the
+     statement that the Modification stays `EXECUTING` until he has restored the bodies from Notion page history.
+     Nothing further is automated: no reversal, no trashing, no stop lines, no restoration check. After his
+     restoration, ending the Modification or a plan change is his ruling.
+- **A lost session between the first external write and X6.4** is not a resume point (`D26-C`). The session
+  Nathan starts next with `MODE = EXECUTE` finds `execute_date_X5.0` in `EX/run.json` on the pushed execution branch,
+  and no execution PR merged. It then takes steps 1 to 4 above.
+- **From X7.1 to X7.4** (post-merge, freeze held), a failure is recorded as spec §9 *A failing gate*'s third bullet
+  already says: §E's row, the `D25 applies from:` line, one commit
+  (`closeout-residuals record: X7.<s> failed`), a record PR, and a return to Nathan. The difference is that it is
+  made on a branch opened from `origin/main`, as the next subsection says. "A plan change … rejoins at X7.2" is
+  withdrawn: a plan change states its own steps.
+- **From X7.5**, where Nathan has lifted the freeze, a failure is repaired forward by running the step again, or
+  returned with the failing gate named. Nothing is reversed.
+
+#### Checkpoints (`D26-C`)
+
+1. **Mode boundary.** EXECUTE starts only when `main`'s record carries `plan_approved_by` (X0.1). X0.2 is:
+   `git fetch origin main && git checkout -B docs/<yyyymmdd>-closeout-residuals-execute origin/main`, then
+   `mkdir -p EX` and `runjson.py EX/run.json base "$(git rev-parse HEAD)"`. The gate is: `HEAD` equals `origin/main`
+   and `git status --porcelain` prints nothing. Every push is `git push -u origin <that branch>`.
+2. **Before the first external write, by restarting.** A session lost or stopped before X5.0's Notion call is
+   followed by a new session that restarts EXECUTE at X0.2 on a new branch,
+   `docs/<yyyymmdd>-closeout-residuals-execute-<n>` with `<n>` = 2, 3, and so on. The earlier branch stays unmerged,
+   for Nathan to delete. X1 to X4 run again in full, including X4.3's packaging and a fresh D24 round. Archives
+   delivered by an earlier attempt are void, because X7.2 names the archives to install by the sha256s in the
+   `EX/packages.json` that reaches `main`.
+3. **Post-merge steps, started from `main`.** The execution PR's merge is detected by a file on `main`, never by a
+   commit subject: `git fetch origin main && git cat-file -e origin/main:docs/ephemeral/modifications/evidence/closeout-residuals/execute/run.json`
+   exits 0. That replaces R8-01's subject test. X7.2 runs once that holds. X7.4 runs once Nathan says his install
+   sitting is done. It opens `docs/<yyyymmdd>-closeout-residuals-close` from `origin/main`. X7.4 to X7.7 commit
+   there, and the close-out PR is opened from it. A session started after X7.1 begins at X7.2, or at X7.4 when
+   Nathan says the install is done. After X7.4 has committed, it continues on the close branch.
+4. **Within one session**, what keeps a step safe after compaction stays: values recorded once (`runjson.py`), the
+   apply-once tests (`apply_texts.py`'s states, `land.py plan`'s edit states, `ctrl.py edits`), and operations that
+   match nothing when sent twice (P-103). `m2.py check --stage auto` still reads X5.1's stage from the page, so a
+   compacted session does not create the page twice.
+
+#### Changes to the dated steps
+
+The dated §P steps and spec §9 rows stand, with these changes. Nothing else in a step moves.
+
+| dated step | spec row | change |
+|---|---|---|
+| 1 | X0.2 | Checkpoint 1's commands replace the branch rule. X0.3's recorded values hold on `main` `d179277` (dry run) |
+| 3 | X2.1 | The applier's result on the new base: `gcfpe.decision-record.md` sha256 `c8cdfd5a46666173e2b634ef5793a7db11fbc23f4e9a3615a161fd2d2cb7a638`, 111 107 B, where it was `6742d593…`, 101 936 B. D25 lands between D24 and D26. The other gates are unchanged |
+| 7 | X3.4 | `session-working-rules.md` after `P32-SWR`: sha256 `2501579e1f04a2f7d4855b965859407348b7c2dc2cbdf9c03b8dabd1a4eadf4b`, 16 113 B |
+| 11 | X4.4 | `fill_brief.py EX/packages.json --write` only. It prints `k` = 1, because no `REVIEWER-PROMPT-cr*.md` exists yet in the closeout-residuals evidence directory on `main`. `--prior-file` and the new-session resume (P-109) are withdrawn. `SKILL_REPAIR_REQUIRED` from either reviewer stops EXECUTE (the failure path, before the first external write). `delivered_cr1` is still recorded once |
+| 12 | X4.5 | `GCFPE-MGMT-10-PROPOSED` moves from `plan` to `check`: 50 `plan` runs and 6 `check` runs. X4.6's `ctrl.py all` takes `--edits EV/resume-20260924/control-edits.json` (sha256 `72889b248019c61dff47451bded0f22ea9785e203445117e7181306a0e978bbc`, 15 edits: `EV/notion/edits.json` less `PART-11-TRACK-01`, the five stop-path edits and, under DN-8 (A), `TRACK-STATUS-01` to `03`). Every later `ctrl.py` call takes the same `--edits` |
+| 13 | X5.0 | Nathan confirms the freeze. `runjson.py EX/run.json execute_date_X5.0`, commit, push. Then `TRACK-FREEZE-START` by the apply-once test and `ctrl.py op`, with its readback. The sent-list append is withdrawn |
+| 16 | X5.3 | As dated, without the sent-list append |
+| 17 | X5.4 | As dated, except "on an X5.4 a session continued (the branch rule's rule 3)". A `repair` ≠ `[]` can now arise only within this session, after compaction or a lost response. It is the forward repair, applied once and checked. A refusal, or a non-empty `reapply_unsafe`, takes the failure path |
+| 18 | X5.5 | `land.py check GCFPE-MGMT-10-PROPOSED 3e34590a05eb811b93d2da9b4ef8106d --skills $PKG` on a fresh fetch: exit 0, `R-ITEM40` 0, `R-ITEM23-gate` 0. No write. PART-11 lands as `VERIFIED` (stage 5 applied it) |
+| 19 | X5.6 | **Withdrawn** (`PART-11-TRACK-01`) |
+| 20, 21 | X5.6 | `PART-12-HUB-01` and `PART-18-AF009-01` only, without the sent-list append |
+| 24 | X6.4 | **R8-02.** The path check is `git diff --name-only origin/main...HEAD`, a three-dot merge-base diff: it lists only paths under `docs/prompt_ecosystem_management/`, `docs/graph/` and `docs/ephemeral/`. A commit that reaches `main` outside those paths during EXECUTE no longer fails it |
+| 25 | X7.2–X7.4 | Checkpoint 3 replaces the branch rule. X7.2's re-send and failure record stand. X7.4's failure is recorded on a branch from `origin/main` |
+| 27 | X7.6 | The pull request's path check uses the same three-dot form on the close branch. The close texts' results depend on the install date and the installed freeze lines. With a stand-in date of 2026-01-01 and the expected lines, they were: decision record `b324490a…` (113 065 B), `prompt-body-content-policy.md` `c24061b8…` (7 125 B), `REVIEWER-PROMPT-a5.md` `9e2d822c…` (19 234 B), and each re-run of a label applied nothing |
+| 28 | X7.7 | Under DN-8 (A), **withdrawn**. The tracking page's status lines belong to the D20 track, which already rewrote them. Under DN-8 (B), three re-anchored edits, drafted after the ruling |
+
+The spec's stop-only material stays in the file as a dated record: §9's stop record, restoration check, lift and end
+route, §7.3's stop and lift-stop edits, and P-98, P-99, P-107, P-108 and P-112's stop clauses.
+
+#### The dry run (`D26-A` rule 1; the ledger's `DRY_RUN`)
+
+2026-09-24, 11:05Z to 11:40Z. Every normal-path gate was run read-only against fresh fetches of the live pages, and
+the manifest's commands were run in spec §9 order on a scratch clone of `main` `d179277`, with `$PKG` built from
+`$INST`. Nothing was written to Notion, Drive or the repository. The evidence is
+`evidence/closeout-residuals/plan/resume-20260924/dryrun-summary.json`: counts, ids and hashes, and no body text.
+
+| gate | result |
+|---|---|
+| X0.3 (a)–(e) | registry `8b4e46ed…`; the 7 installed freeze lines equal the manifest; graph 575 074 B `ae2bd159…`, `a70a9326…`; `checks_matching_authored_or_canonical: []`; root `320 420705ec…` |
+| X1.1, X1.3 | 7 patches exit 0; `expected_after_patch` diff exits 0; `$PKG` root `323 047ca742…`; the `pre` gate exits 0 with 12 of 12 rows |
+| X2.1, X3.1–X3.4 | as the table above; the registry reaches `97bda1a0…`, `valid: true`, drift `[]`; reindex `cmp` exit 0, 27 files, a second reindex 0; the contract template and its README at their sha256s |
+| X3.6 (NAM-002 on the six live hubs) | runs 1 to 3 `expectation_met` true, with 0, one ESC-10, and one title finding; run 4, the control, 55 / 16 / 6, exit 1; exactly spec §4.4's table |
+| X4.1, X4.2, X4.3 | `6902924a…` and `dbae180b…` EQUAL ×2, with the two expected diff lines; the `pkg` gate exits 0 with 34 of 34 rows; `Skill is valid!` ×7; the extracted freeze digests equal `expected_after_patch.txt`; `$PKG` unchanged by packaging |
+| X4.5 (rehearsal) | **49 of 50** live bodies with edits pass `plan --no-ops`: no refusal, `repair` `[]`, `reapply_unsafe` `[]`, precheck and landed check pass, 256 operations. The 5 untouched pass `check`. The proposed body passes `check` and is `ALREADY_LANDED` (PART-11). **ESC-25 was not rehearsed**: the harness's permission classifier refused the command twice, once in a worker and once in this session. The refusal was not worked around (OF-2) |
+| X4.6 | `drive_check.py` passes: 31 923 B, sha256 and fence OK, each M2 `old` once, no Hub child with the title. `ctrl.py all --expect unlanded` on the dated 24 edits **fails**: `TRACK-STATUS-01` to `03`, and their three stop variants, have `old_count` 0 (DN-8). On the 15-edit successor set it passes, with every `old_str` once and none `LANDED` |
+| X6.2 (`--simulate`), X6.3 | graph check `pass: true`; the closure `diff` exits 0 |
+| texts (step 3.3) | every anchor occurs once on the new base. The results are in the table above, and a second run of each label applies nothing |
+
+**The bounded executability check (`D26-F` trigger 2).** Only the three `TRACK-STATUS` edits fail, and they fail in
+two places: X4.6's gate, before any Notion write, which would stop EXECUTE loudly, and X7.7. No other step uses them.
+The rest of the normal path ran clean. The one gap is ESC-25, which pass 7 rehearsed clean on 2026-09-24 at 13:15Z to
+13:25Z and which this dry run could not run.
+
+**`D22` condition 5.** The workers' and this session's fetches left harness files in this session's store. Among
+them, the QA-10 body and the Hub page were saved to `tool-results/` files. No worker or session opened those files by
+hand; only the plan's tools read them, in memory. They are left to the harness's teardown.
+
+#### Findings on upstream sections — DECISION NEEDED (template rule 1)
+
+These seven were recorded in the dated plan and spec §10.1. Under rule 1, as `D26` amended it, each returns to Nathan.
+None is an accepted risk, and the plan is not approved past them. **DN-8 is the dry run's.**
+
+| # | the upstream text it contradicts | the plan's current handling | recommendation |
+|---|---|---|---|
+| DN-1 | `ANALYZE-anchor-census.md` A5 row: "REAL only in GCFPE-MGMT-10, PR-35, RS-40" | RS-40 does not carry the sentence; its runtime-artifact sentence already scopes to "explicitly authorized paths". R-A5 is `NOT_APPLICABLE` on RS-40 (P-04), and ITEM-32 is met by PR-35, GCFPE-MGMT-10 and RS-40's existing wording | Accept: the census row is wrong and the plan's handling is right |
+| DN-2 | `ANALYZE-anchor-census.md` on the proposed MGMT-10 body: "Carries A1, A2, A3, A4, A5 and A8" | The per-body rows found only A8's two lines; R-ITEM23 removed them. **Answered by stage 5**: `MGMT-10-REVISION.md` removed those lines and resolved the census's contradictions, and the dry run reads both gates at 0 | Accept, and record PART-11 as `VERIFIED` (stage 5 applied it) |
+| DN-3 | §A *Decisions*, item 1: the revision table lists flowmaster-validate 3.3.0 → 3.3.1 but not `validator_revision` | `validator_revision` moves 3.3.0 → 3.3.1 at its four sites, under the same rule: "Corrected bytes never reuse one" (P-22) | Accept: the same rule, applied to one more field |
+| DN-4 | §A *Readiness*: "merges 2 … Merges count the record PR and the execution PR" | 3 in the dated plan: the close-out PR carries the post-install record. **4 now**: #478 (merged), this plan's record PR, the execution PR and the close-out PR | Accept 4 |
+| DN-5 | §A *Order*, item 4: the freeze "lifts after full readback and the corpus gate" | It lifts at X7.5, after X7.4's post-install verification. The bodies land at X5, before the matching skills are installed at X7.3, and must not be used in between (P-66 revised) | Accept the longer window |
+| DN-6 | §A per-part targets, PART-06 and PART-18: they name the new page, the destination rule and the eight bodies, but not the Hub and Checklist pointers to the Drive list, nor AF-009's placement statement | The plan includes them as consequences of ITEM-18 and ITEM-37 (P-67): eleven PART-06 pointer edits and `PART-18-AF009-01`. No item is added | Accept: these are the Notion surfaces of two frozen items. Reject only if you read them as new scope, in which case they go to the Backlog |
+| DN-7 | ITEM-13: "regenerates byte for byte from repository sources" | One input, digest-pinned, is the R1 oracle bundled in flowmaster-validate, a skill rather than a repository file. ITEM-13's disposition records it, and nothing is widened (P-69) | Accept, with the disposition naming the oracle |
+| DN-8 | The dry run: the tracking page (`3e34590a05eb81e7927efe0541258916`) no longer carries `TRACK-STATUS-01` to `03`'s anchors. Stage 5 rewrote the status lines, to `STAGE_5_PROCESS_FIX_IN_PROGRESS_PE37` and "`PLANNED`, not approved" (stage 5's review A L1) | X4.6's gate fails before any Notion write, and X7.7 cannot land | **(A) Recommended: withdraw the three edits.** The D20 track owns those status lines, rewrote them, and closes them at resume step 8. This Modification's own state is on its record. X4.6 then passes, as the dry run shows. **(B)** Re-anchor them to the current wording. That is new control-page text written by this plan, then a dry run of the three edits |
+
+#### Open findings, accepted as risks (`D26-A` rule 4)
+
+Approving the plan accepts these (`DISP-001`). None is repaired here.
+
+| # | finding | path | likelihood | consequence | why listed |
+|---|---|---|---|---|---|
+| OF-1 | Round 8's 21 machinery findings: 1–7, 9, 13, 14, 16, 17 and 19–27 in `rca-20260924/round8-review-results.json`, plus the downgraded lift-after-stop finding | failure paths | — | — | **Withdrawn with the machinery**; none survives in a step that runs |
+| OF-2 | ESC-25's rehearsal was refused by the harness's permission classifier ("Data Exfiltration" in the worker, "Auto-Mode Bypass" here) | normal, X4.5 | unknown; it happened twice today | if it recurs at X4.5, a loud stop before any Notion write; if it recurs at X5.4 or X6.1, the failure path | a harness permission, not a plan defect. Pass 7 rehearsed ESC-25 clean. Nathan can allow the command, or EXECUTE stops and asks |
+| OF-3 | Before the first external write, one part's failure stops every part, where the MGMT-10 body says "carry on with every part not ordered after it" (`D21-B`) | failure, before X5.0 | low | a loud stop; nothing is written outside the unmerged branch | the parts share one registry diff, one engine and one package set, so landing a subset needs new machinery. The rule for that is Nathan's (`D26-B`: a fix that needs new machinery is a question first) |
+| OF-4 | A session lost between the first external write and X6.4 cannot resume, so the next session takes the failure path, and Nathan restores the landed bodies by hand | failure | low to medium: X5 is the longest window | a manual restore of up to 50 bodies, and the freeze held for a PLAN cycle | `D26-C`: no resume is designed there |
+| OF-5 | Restarting before X5.0 repeats X1 to X4 in full: a new package cut, a fresh D24 round and a new delivery | failure, before X5.0 | low | about 1.5 h and 1M tokens | `D26-C`: restart, not resume |
+| OF-6 | Round 8 #10: every `m2.py` mode needs a Drive download from the last 30 minutes, and X5.1 is long | normal, X5.1 | medium | `m2.py` refuses loudly; downloading again and re-running clears it within the session | a loud refusal, repaired by re-running |
+| OF-7 | Round 8 #11: `notion-create-pages` can return an async task with no page id | normal, X5.1 | low | a second create is caught by F1, loudly, which leads to the failure path, where Nathan trashes the duplicate | loud |
+| OF-8 | Round 8 #12: X5.3's and X5.6's readbacks put several JSON documents in one file | normal, evidence | certain | an evidence file that is JSON Lines rather than one JSON document; no behaviour changes | no runtime effect |
+| OF-9 | Round 8 #8, #15 and #18: stale counts and marks in the spec §0, spec §2.9 and `DECISIONS.md` | none | certain | documentation only | no runtime effect |
+
+#### Product Owner actions (this successor)
+
+- **Rule on DN-1 to DN-8.** The session records each answer in a successor note. Then it runs the one diff check
+  (`RESUME-PROCEDURE.md` step 3.5) and returns the plan for approval.
+- **Approve the plan.** The session writes `plan_approved_by` with your words (template rule 2), and you merge that
+  record PR. X0.1 checks `main`'s record.
+- **OF-2, if you want to prevent it:** allow the `land.py` command that the classifier refused on ESC-25, before
+  X4.5.
+- **The rest are as the dated plan says:** receive the seven archives at X4.4; confirm the freeze at X5.0; banner the
+  Drive file after X6.4; merge the execution PR; install the seven in one sitting; lift the freeze at X7.5; merge the
+  close-out PR.
+- **On a failure after the first external write:** merge the failure-record PR; restore the bodies the sweep names
+  from Notion page history; then rule on ending the Modification or a plan change.
+
+#### Explicitly not in scope (additions)
+
+- The tracking page's status lines, under DN-8 (A).
+- Every change stage 5 made: `D26`, the template, the validator, the proposed MGMT-10 body. This plan verifies
+  PART-11 against it and changes none of it.
+
+#### Interaction cost, and the estimate against what has been spent
+
+    interaction_cost = open rulings 4 + 2 + ANALYZE review rounds 3 + PLAN review rounds 9 + skill review cycles 1
+                       + installs 1 + merges 4 + freeze 1 + Drive banner 1 = 26
+
+- **Rulings (4):** §A's three, plus this return's DN-1 to DN-8, answered together.
+- **PLAN review rounds (9):** the eight before D26, cited from the RCA, and the one diff check to come. The dry run is
+  not a review round.
+- **Merges (4):** #478, this record PR, the execution PR and the close-out PR.
+- **Already spent (16):** 3 rulings, the ANALYZE approval, 3 ANALYZE rounds, 8 PLAN rounds and #478. **To come (10).**
+- §A predicted 11 and the dated plan 12. The difference is the format 2.1 formula counting review rounds, which the
+  earlier counts left out (`D26-D`), plus this plan's record PR.
+
+**The estimate against what has been spent.** The estimate for this resume is 2 h and 2.5M tokens. Spent so far: the
+dry run took about 40 minutes of this session. Its five read-only workers used 0.81M tokens, as measured by the
+harness. This session's own tokens are not measured by the session. Still to come: the diff check, two reviewers at
+about 0.5M, and the return. EXECUTE's estimate stands at 8 h and 8M tokens. Twice the estimate triggers a re-price to
+Nathan (`D26-D`).
