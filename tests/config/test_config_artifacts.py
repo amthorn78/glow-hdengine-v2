@@ -387,7 +387,9 @@ def test_manifest_cut_callback_recovers_actual_publication_failure(writer_root, 
 
 import ast
 import copy
+import errno
 import hashlib
+import os
 import subprocess
 
 from ci.checks import classify_ci_changes as classifier
@@ -583,6 +585,29 @@ def test_added_or_missing_expected_keys_are_mismatches(bundle_root, tmp_path) ->
         ("expected.extra", 1, "<absent>"), ("expected.categories", "<absent>", "<observed>")}
 
 
+UNRUNNABLE = {
+    "g008_non_canonical_identity": ("M10-G008", lambda case: case["inputs"]["a"].__setitem__("person_uid", "00000000-0000-0000-0000-00000000000A"),
+                                    "CompatBoundaryError: ERR_READER_INVALID_CHART"),
+    "g008_invalid_gate": ("M10-G008", lambda case: case["inputs"]["a"].__setitem__("gates", [0]), "CompatBoundaryError: ERR_READER_INVALID_CHART"),
+    "g005_no_pairs": ("M10-G005", lambda case: case["inputs"].__setitem__("pairs", []), "IndexError: "),
+}
+
+
+@pytest.mark.parametrize("name", sorted(UNRUNNABLE))
+def test_a_case_that_cannot_execute_is_its_own_mismatch_never_a_crash(bundle_root, tmp_path, capfdbinary, name) -> None:
+    case_id, mutate, actual_prefix = UNRUNNABLE[name]
+    document = _document()
+    _alter(document, case_id, mutate)
+    goldens = _write_document(tmp_path / f"{name}.json", document)
+    result = artifact_tools.compare_goldens(bundle_root, goldens)
+    assert result.ok is False
+    assert [(row.case_id, row.path, row.expected) for row in result.mismatches] == [(case_id, "execution", "completed")]
+    assert result.mismatches[0].actual.startswith(actual_prefix)
+    assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == [case_id]
+    code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"", b"GOLDEN_COMPARISON_MISMATCH:1\n")
+
+
 # --- refusals ---------------------------------------------------------------------------
 
 def _refusal(root: Path, goldens: Path) -> str:
@@ -701,6 +726,32 @@ def test_candidate_root_must_be_a_real_directory(bundle_root, tmp_path) -> None:
     link = tmp_path / "link"
     link.symlink_to(bundle_root, target_is_directory=True)
     assert _refusal(link, GOLDENS) == "CANDIDATE_ROOT_INVALID"
+
+
+def _deny(monkeypatch, method: str, denied: Path) -> None:
+    """Make one ``Path`` method raise EACCES for exactly one path (root can read anything)."""
+    original = getattr(Path, method)
+
+    def guarded(self, *args, **kwargs):
+        if os.path.realpath(self) == os.path.realpath(denied):
+            raise PermissionError(errno.EACCES, "Permission denied", str(self))
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, method, guarded)
+
+
+@pytest.mark.parametrize(("target", "method", "code"), [
+    ("goldens", "read_bytes", "GOLDENS_INVALID"),
+    ("goldens", "is_symlink", "GOLDENS_INVALID"),
+    ("candidate", "is_symlink", "CANDIDATE_ROOT_INVALID"),
+])
+def test_inputs_that_cannot_be_inspected_or_read_refuse(bundle_root, tmp_path, capfdbinary, monkeypatch, target, method, code) -> None:
+    goldens = tmp_path / "goldens.json"
+    goldens.write_bytes(GOLDENS.read_bytes())
+    _deny(monkeypatch, method, goldens if target == "goldens" else bundle_root)
+    assert _refusal(bundle_root, goldens) == code
+    result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
+    assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", f"{code}\n".encode("ascii"))
 
 
 def test_rails_are_required_before_anything_runs(bundle_root, monkeypatch) -> None:
@@ -855,6 +906,49 @@ def test_cli_report_path_inside_candidate_or_repository_refuses(bundle_root, tmp
     code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--report", str(report_path)], capfdbinary)
     assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"REPORT_PATH_INVALID\n")
     assert not report_path.exists()
+
+
+@pytest.mark.parametrize("stage", ["mkstemp", "replace"])
+@pytest.mark.parametrize("goldens_kind", ["match", "mismatch"])
+def test_cli_report_write_failure_is_a_refusal_never_a_mismatch(bundle_root, tmp_path, capfdbinary, monkeypatch,
+                                                                stage, goldens_kind) -> None:
+    goldens = GOLDENS
+    if goldens_kind == "mismatch":
+        document = _document()
+        _alter(document, *ALTERATIONS["g004_signal_q"][:2])
+        goldens = _write_document(tmp_path / "mismatch.json", document)
+    report_dir = tmp_path / "out"
+    report_dir.mkdir()
+    report_path = report_dir / "report.json"
+    real_mkstemp, real_replace = config_tools.tempfile.mkstemp, config_tools.os.replace
+
+    def mkstemp(*args, **kwargs):
+        if os.path.realpath(kwargs.get("dir", "")) == os.path.realpath(report_dir):
+            raise OSError(errno.ENOSPC, "No space left on device")
+        return real_mkstemp(*args, **kwargs)
+
+    def replace(src, dst, *args, **kwargs):
+        if os.path.realpath(dst) == os.path.realpath(report_path):
+            raise OSError(errno.EIO, "Input/output error")
+        return real_replace(src, dst, *args, **kwargs)
+
+    if stage == "mkstemp":
+        monkeypatch.setattr(config_tools.tempfile, "mkstemp", mkstemp)
+    else:
+        monkeypatch.setattr(config_tools.os, "replace", replace)
+    code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens), "--report", str(report_path)],
+                              capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"REPORT_WRITE_FAILED\n")
+    assert list(report_dir.iterdir()) == []  # neither a report nor a temporary file is left behind
+
+
+def test_cli_report_path_that_cannot_be_inspected_refuses(bundle_root, tmp_path, capfdbinary, monkeypatch) -> None:
+    report_dir = tmp_path / "sealed"
+    report_dir.mkdir()
+    _deny(monkeypatch, "is_dir", report_dir)
+    code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--report", str(report_dir / "report.json")], capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"REPORT_PATH_INVALID\n")
+    assert list(report_dir.iterdir()) == []
 
 
 def test_cli_refusals_and_usage(bundle_root, tmp_path, capfdbinary, monkeypatch) -> None:

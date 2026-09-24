@@ -6,6 +6,7 @@ vendor or network is reached, and nothing is written.
 from __future__ import annotations
 
 import ast
+import errno
 import hashlib
 import importlib
 import json
@@ -217,6 +218,25 @@ def test_selection_file_and_flags_combine_sorted_and_deduplicated_checked(monkey
     assert [params for _sql, params in fake.queries] == [(UUID_A,), (UUID_B,), (UUID_C,)]
     selection.write_text(f"{UUID_A}\n{UUID_A}\n", encoding="utf-8")
     assert _run(["--selection-file", str(selection)], capfdbinary)[2] == b"READINESS_SELECTION_INVALID\n"
+
+
+def test_unreadable_selection_file_refuses_before_any_database_access(monkeypatch, capfdbinary, tmp_path) -> None:
+    monkeypatch.setattr(readiness.DBAccess, "for_current_env", classmethod(lambda cls, *a, **k: pytest.fail("database reached")))
+    not_utf8 = tmp_path / "latin1.txt"
+    not_utf8.write_bytes(b"\xff" + UUID_A.encode("ascii") + b"\n")
+    denied = tmp_path / "denied.txt"
+    denied.write_text(f"{UUID_A}\n", encoding="utf-8")
+    real_read_text = Path.read_text
+
+    def read_text(self, *args, **kwargs):
+        if self == denied:  # root can read anything, so the permission failure is injected
+            raise PermissionError(errno.EACCES, "Permission denied", str(self))
+        return real_read_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", read_text)
+    for path in (tmp_path / "absent.txt", tmp_path, not_utf8, denied):
+        code, out, err = _run(["--selection-file", str(path)], capfdbinary)
+        assert (code, out, err) == (readiness.REFUSAL_EXIT_CODE, b"", b"READINESS_SELECTION_INVALID\n"), path
 
 
 # --- unavailable or denied datasets never become ready ----------------------------------

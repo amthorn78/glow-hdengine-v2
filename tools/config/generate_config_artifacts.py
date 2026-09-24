@@ -272,13 +272,16 @@ GOLDEN_COMPARISON_REFUSAL_EXIT_CODE = 5
 
 def _golden_report_destination(report_path: Path, candidate_root: Path) -> Path:
     """Refuse a report path inside the candidate root or the repository, or unsafe on disk."""
-    parent = Path(os.path.realpath(Path(os.path.abspath(report_path)).parent))
-    destination = parent / Path(report_path).name
-    forbidden = (Path(os.path.realpath(candidate_root)), Path(os.path.realpath(ROOT)))
-    if (not destination.name or destination.name in {".", ".."} or not parent.is_dir()
-            or destination.is_symlink() or (destination.exists() and not destination.is_file())
-            or any(destination == root or destination.is_relative_to(root) for root in forbidden)):
-        raise GoldenComparisonRefusal("REPORT_PATH_INVALID")
+    try:
+        parent = Path(os.path.realpath(Path(os.path.abspath(report_path)).parent))
+        destination = parent / Path(report_path).name
+        forbidden = (Path(os.path.realpath(candidate_root)), Path(os.path.realpath(ROOT)))
+        if (not destination.name or destination.name in {".", ".."} or not parent.is_dir()
+                or destination.is_symlink() or (destination.exists() and not destination.is_file())
+                or any(destination == root or destination.is_relative_to(root) for root in forbidden)):
+            raise GoldenComparisonRefusal("REPORT_PATH_INVALID")
+    except OSError:
+        raise GoldenComparisonRefusal("REPORT_PATH_INVALID") from None
     return destination
 
 
@@ -304,7 +307,12 @@ def _compare_goldens_main(candidate_root: Path, goldens: Path, report: Path | No
         result = compare_goldens(candidate_root, goldens)
         payload = render_golden_report(result)
         if destination is not None:
-            _write_golden_report(destination, payload)
+            try:
+                _write_golden_report(destination, payload)
+            except OSError:
+                # Exit 1 is reserved for a completed comparison with mismatches;
+                # failing to publish the report is a refusal.
+                raise GoldenComparisonRefusal("REPORT_WRITE_FAILED") from None
     except GoldenComparisonRefusal as exc:
         sys.stderr.write(f"{exc.code}\n")
         return GOLDEN_COMPARISON_REFUSAL_EXIT_CODE

@@ -79,7 +79,13 @@ def parse_selection(user_ids: Sequence[str], selection_file: Path | None) -> tup
     """Return the sorted, duplicate-free canonical selection or refuse."""
     raw = [value for value in user_ids]
     if selection_file is not None:
-        for line in selection_file.read_text(encoding="utf-8").splitlines():
+        try:
+            text = selection_file.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            # A missing, unreadable or non-UTF-8 file is an invalid selection,
+            # refused value-free before any database access.
+            raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+        for line in text.splitlines():
             stripped = line.strip()
             if stripped and not stripped.startswith("#"):
                 raw.append(stripped)

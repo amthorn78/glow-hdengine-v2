@@ -303,9 +303,12 @@ def _golden_is_str(value: object) -> bool:
 
 def _golden_load_document(goldens_path: Path) -> tuple[Mapping[str, Any], str]:
     path = Path(os.path.abspath(goldens_path))
-    if path.is_symlink() or not path.is_file():
-        raise _golden_refuse("GOLDENS_INVALID")
-    raw = path.read_bytes()
+    try:
+        if path.is_symlink() or not path.is_file():
+            raise _golden_refuse("GOLDENS_INVALID")
+        raw = path.read_bytes()
+    except OSError:
+        raise _golden_refuse("GOLDENS_INVALID") from None
     try:
         document = json.loads(raw.decode("utf-8"), object_pairs_hook=_golden_pairs_hook)
     except (UnicodeDecodeError, ValueError):
@@ -361,8 +364,11 @@ def _golden_validate_document(document: Mapping[str, Any]) -> None:
 
 def _golden_admit(candidate_root: Path):
     root = Path(os.path.abspath(candidate_root))
-    if root.is_symlink() or not root.is_dir():
-        raise _golden_refuse("CANDIDATE_ROOT_INVALID")
+    try:
+        if root.is_symlink() or not root.is_dir():
+            raise _golden_refuse("CANDIDATE_ROOT_INVALID")
+    except OSError:
+        raise _golden_refuse("CANDIDATE_ROOT_INVALID") from None
     try:
         bundle = _load_active_mechanics_bundle_from_root(root)
     except SchemaValidationError as exc:
@@ -717,7 +723,10 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
             observed = _golden_runner(case)(case, constants, bundle)
         except _GoldenCaseMismatch as exc:
             case_mismatches = [Mismatch(case_id, exc.path, exc.expected, exc.actual)]
-        except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        except Exception as exc:
+            # A case that cannot run as the fixture states it (for example a
+            # CompatBoundaryError from a non-canonical identity) is that case's
+            # mismatch; it never aborts the comparison of the other cases.
             case_mismatches = [Mismatch(case_id, "execution", "completed", f"{type(exc).__name__}: {exc}")]
         else:
             case_mismatches = _golden_diff(case_id, expected, observed)
