@@ -31,6 +31,11 @@ reviews:
     date: 2026-09-24
     required_open: 2
     outcome: "PLAN-DC-1 and PLAN-DC-2, independently: the same 2 required defects (a restart after a lost session re-runs a rejected D24 review unseen; X7.6's PR body waits for the withdrawn X7.7), plus 16 and 13 listed, all in the successor's own text. The cap is reached: returned to Nathan unrepaired"
+  - mode: SKILL
+    kind: FULL
+    date: 2026-09-24
+    required_open: 0
+    outcome: "D24 round cr1 at X4.4: SFR-CR1-1 and SFR-CR1-2 both SKILL_FIT_CONFIRMED on the seven archives in EX/packages.json; the archives, brief and verdicts delivered to Nathan"
 items:
   - id: ITEM-01
     statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
