@@ -1,0 +1,599 @@
+{
+ "summary": {
+  "sources": 55,
+  "rows": 55,
+  "unplaced_rows": [],
+  "NAM-002": 55,
+  "NAM-002_rows": [
+   "CF-C-10",
+   "CF-C-20",
+   "CF-C-30",
+   "CF-C-40",
+   "CF-E-10",
+   "CF-E-20",
+   "CF-E-30",
+   "CF-E-40",
+   "CF-PO-10",
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10",
+   "CL-E-20",
+   "CL-E-30",
+   "CL-E-40",
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "GCFPE-MGMT-10",
+   "IA-10",
+   "IA-20",
+   "IA-30",
+   "IA-40",
+   "IA-50",
+   "IA-60",
+   "MGR-10",
+   "OPS-10",
+   "OPS-20",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "PR-35",
+   "PR-40",
+   "PR-50",
+   "QA-10",
+   "QA-100",
+   "QA-110",
+   "QA-120",
+   "QA-20",
+   "QA-50",
+   "QA-60",
+   "QA-70",
+   "QA-80",
+   "QA-90",
+   "RS-10",
+   "RS-20",
+   "RS-30",
+   "RS-40",
+   "UTIL-10"
+  ],
+  "NAM-001": [],
+  "other_errors": 0,
+  "other_prompt_findings": [],
+  "non_prompt_findings": [
+   "COL-002",
+   "SRC-001"
+  ],
+  "lanes": 16,
+  "lane_parent_findings": 16,
+  "lane_parent_lanes": [
+   "GCFPE-MGMT",
+   "CF-PO",
+   "CF-C",
+   "CF-E",
+   "CL-C",
+   "CL-E",
+   "CL",
+   "DOC",
+   "ESC",
+   "IA",
+   "MGR",
+   "OPS",
+   "PR",
+   "QA",
+   "RS",
+   "UTIL"
+  ],
+  "title_findings": 6,
+  "title_hubs": [
+   "3db4590a05eb811b9c14f2ae89c28df7",
+   "3db4590a05eb814d96d3dcfa8835f96d",
+   "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "3db4590a05eb81cd938de84cfffead9c",
+   "3db4590a05eb81d59059eb6b95ed5fcf",
+   "3db4590a05eb81de9736ea69bac61016"
+  ],
+  "title_references": {
+   "compared": 70,
+   "mismatched": 70
+  }
+ },
+ "verdict": "INDETERMINATE",
+ "lane_findings": [
+  {
+   "check": "LANE_PARENT",
+   "lane": "GCFPE-MGMT",
+   "notion_parent_id": "3cc4590a05eb8101b5ded32c12616eb6",
+   "observed_hubs": [
+    "3db4590a05eb81de9736ea69bac61016"
+   ],
+   "rows": 1,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "CF-PO",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 1,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "CF-C",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 4,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "CF-E",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 4,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "CL-C",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 1,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "CL-E",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 4,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "CL",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 3,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "DOC",
+   "notion_parent_id": "3c74590a05eb81f2953de712f2adb6fa",
+   "observed_hubs": [
+    "3db4590a05eb8195a2ccf7c0959a8b6e"
+   ],
+   "rows": 2,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "ESC",
+   "notion_parent_id": "3c74590a05eb8123bc55ca7f99ce176c",
+   "observed_hubs": [
+    "3db4590a05eb81cd938de84cfffead9c"
+   ],
+   "rows": 4,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "IA",
+   "notion_parent_id": "3c74590a05eb81f2953de712f2adb6fa",
+   "observed_hubs": [
+    "3db4590a05eb8195a2ccf7c0959a8b6e"
+   ],
+   "rows": 6,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "MGR",
+   "notion_parent_id": "3c74590a05eb811d8433e7022629e213",
+   "observed_hubs": [
+    "3db4590a05eb81d59059eb6b95ed5fcf"
+   ],
+   "rows": 1,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "OPS",
+   "notion_parent_id": "3c74590a05eb81f2953de712f2adb6fa",
+   "observed_hubs": [
+    "3db4590a05eb8195a2ccf7c0959a8b6e"
+   ],
+   "rows": 3,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "PR",
+   "notion_parent_id": "3c74590a05eb81f2953de712f2adb6fa",
+   "observed_hubs": [
+    "3db4590a05eb8195a2ccf7c0959a8b6e"
+   ],
+   "rows": 6,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "QA",
+   "notion_parent_id": "3c74590a05eb8149905fd694f6d2901a",
+   "observed_hubs": [
+    "3db4590a05eb814d96d3dcfa8835f96d"
+   ],
+   "rows": 10,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "RS",
+   "notion_parent_id": "3c74590a05eb81f2953de712f2adb6fa",
+   "observed_hubs": [
+    "3db4590a05eb8195a2ccf7c0959a8b6e"
+   ],
+   "rows": 4,
+   "unplaced_rows": []
+  },
+  {
+   "check": "LANE_PARENT",
+   "lane": "UTIL",
+   "notion_parent_id": "3c74590a05eb8176baf8cb59f1631f3c",
+   "observed_hubs": [
+    "3db4590a05eb811b9c14f2ae89c28df7"
+   ],
+   "rows": 1,
+   "unplaced_rows": []
+  }
+ ],
+ "title_findings": [
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb811b9c14f2ae89c28df7",
+   "fetched_title": "HDE TW — GCFPE-20260914.1 — 091426.1",
+   "references": 2,
+   "mismatches": [
+    {
+     "field": "lanes[UTIL].notion_parent_title",
+     "value": "HDE TW"
+    },
+    {
+     "field": "UTIL-10.expected_parent_title",
+     "value": "HDE TW"
+    }
+   ]
+  },
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb814d96d3dcfa8835f96d",
+   "fetched_title": "HDE QA — GCFPE-20260914.1 — 091426.1",
+   "references": 11,
+   "mismatches": [
+    {
+     "field": "lanes[QA].notion_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-10.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-100.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-110.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-120.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-20.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-50.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-60.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-70.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-80.expected_parent_title",
+     "value": "HDE QA"
+    },
+    {
+     "field": "QA-90.expected_parent_title",
+     "value": "HDE QA"
+    }
+   ]
+  },
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "fetched_title": "HDE IA — GCFPE-20260914.1 — 091426.1",
+   "references": 25,
+   "mismatches": [
+    {
+     "field": "lanes[DOC].notion_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "lanes[IA].notion_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "lanes[OPS].notion_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "lanes[PR].notion_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "lanes[RS].notion_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "DOC-10.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "DOC-20.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "IA-10.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "IA-20.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "IA-30.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "IA-40.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "IA-50.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "IA-60.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "OPS-10.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "OPS-20.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "OPS-30.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "PR-10.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "PR-20.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "PR-30.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "PR-40.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "PR-50.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "RS-10.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "RS-20.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "RS-30.expected_parent_title",
+     "value": "HDE IA"
+    },
+    {
+     "field": "RS-40.expected_parent_title",
+     "value": "HDE IA"
+    }
+   ]
+  },
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb81cd938de84cfffead9c",
+   "fetched_title": "Escalation — GCFPE-20260914.1 — 091426.1",
+   "references": 5,
+   "mismatches": [
+    {
+     "field": "lanes[ESC].notion_parent_title",
+     "value": "Escalation"
+    },
+    {
+     "field": "ESC-10.expected_parent_title",
+     "value": "Escalation"
+    },
+    {
+     "field": "ESC-25.expected_parent_title",
+     "value": "Escalation"
+    },
+    {
+     "field": "ESC-30.expected_parent_title",
+     "value": "Escalation"
+    },
+    {
+     "field": "ESC-40.expected_parent_title",
+     "value": "Escalation"
+    }
+   ]
+  },
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "fetched_title": "HDE Change Flow — GCFPE-20260914.1 — 091426.1",
+   "references": 25,
+   "mismatches": [
+    {
+     "field": "lanes[CF-PO].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "lanes[CF-C].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "lanes[CF-E].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "lanes[CL-C].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "lanes[CL-E].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "lanes[CL].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "lanes[MGR].notion_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-C-10.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-C-20.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-C-30.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-C-40.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-E-10.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-E-20.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-E-30.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-E-40.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CF-PO-10.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-20.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-30.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-40.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-C-10.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-E-10.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-E-20.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-E-30.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "CL-E-40.expected_parent_title",
+     "value": "HDE Change Flow"
+    },
+    {
+     "field": "MGR-10.expected_parent_title",
+     "value": "HDE Change Flow"
+    }
+   ]
+  },
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb81de9736ea69bac61016",
+   "fetched_title": "Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1",
+   "references": 2,
+   "mismatches": [
+    {
+     "field": "lanes[GCFPE-MGMT].notion_parent_title",
+     "value": "Glow HDE Prompt Flow Index"
+    },
+    {
+     "field": "GCFPE-MGMT-10.expected_parent_title",
+     "value": "Glow HDE Prompt Flow Index"
+    }
+   ]
+  }
+ ],
+ "expectation_met": false
+}
