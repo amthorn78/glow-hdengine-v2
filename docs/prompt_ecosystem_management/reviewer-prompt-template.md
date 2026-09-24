@@ -1,14 +1,20 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.1"
+artifact_version: "1.2"
 created_date: 2026-09-21
-revised_date: 2026-09-23 — D24, delivered to reviewer subagents rather than pasted by Nathan
+revised_date: 2026-09-24 — D26, a second template for ANALYZE and PLAN reviews (1.1, 2026-09-23: D24, delivered to reviewer subagents rather than pasted by Nathan)
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Standard skill reviewer prompt — canonical template — 2026-09-21*
 ---
 
 # Standard skill reviewer prompt — canonical template
+
+This file holds two canonical templates. **The first, below, is for skill reviews** (`D24`). **The
+second, *ANALYZE and PLAN review brief*, is for reviews of a Modification's analysis or plan**
+(`D26`). Both are filled, committed under `docs/ephemeral/` before any reviewer is spawned, and given
+to fresh-context reviewer subagents as their only brief. Both run under `D26`'s bounds: a dry run
+first, at most two full reviews and one check of the repair's diff per mode.
 
 Every skill handover uses this template. Do not compose a reviewer prompt from scratch. Fill the
 slots, delete nothing. Filled instances are release-scoped and belong in `docs/ephemeral/`.
@@ -104,3 +110,74 @@ Put your answer first and close with DECISION NEEDED, NOTHING NEEDED, or IN FLIG
 ## Why each section is there
 Each maps to a mandatory element in `Skill packaging and installation`, so filling the template satisfies that rule by construction: §1 the scoped digests, §2 the prior verdict and what carries, §3 the baseline, §4 the repository evidence, §5 the claims in the author's words, §6 the attack priority, §7 the volunteered limits, §10 the deliverable and its vocabulary. §8 and §9 carry the packaging procedure's own step 4 and the freeze rule.
 **A reviewer that has to ask for any of this has already lost a round.**
+
+---
+
+# ANALYZE and PLAN review brief — canonical template
+
+For a review of a Modification's `§A` or `§P` (`D26-A`). Replaces the three-lenses-plus-verifiers
+pattern whose rounds ran eight times on `MODIFICATION-20260923-closeout-residuals`.
+
+**How to use it.** Run the dry run first and record it in the Modification's `reviews` ledger
+(`kind: DRY_RUN`). Then copy the fenced block, replace every `<SLOT>`, write `NONE` in any section
+that is genuinely empty, and commit the filled instance under `docs/ephemeral/` **before** spawning
+the reviewers. Spawn two reviewer subagents with fresh context, never forked or
+context-inheriting, each with its own `<REVIEWER_ID>` and record path. Each writes its own record,
+and the author never edits it (`AUTH-001`). The author then enters the round in the `reviews`
+ledger with its count of distinct confirmed required defects.
+
+**The author fills in the attack list, not the rubric.** §3, §5 and §6 are fixed text: the
+required-finding rubric, the cap and the exit are not the author's to widen or tighten.
+
+```plain text
+You are <REVIEWER_ID>, reviewing <MODE: ANALYZE or PLAN> of <MODIFICATION_ID>. You did not author it.
+This is full review <1 or 2> of at most 2 for this mode (D26-A). <For review 2: the prior round's
+record path, and the repair diff you are reviewing against it.>
+
+=== 1. WHAT YOU ARE REVIEWING ===
+Repository <OWNER/REPO>, branch <BRANCH>, commit <SHA>. Read that commit, not the branch head.
+The record: docs/ephemeral/modifications/<MODIFICATION_ID>.md, section <§A or §P>.
+Its evidence: <paths>. Its governing documents: docs/prompt_ecosystem_management/ — read
+gcfpe.decision-record.md D20-D26, modification-template.md and ecosystem-change-management.md.
+The dry run that preceded you: <path to its output>, <its result, one line>.
+
+=== 2. WHAT IT CLAIMS, AS CLAIMS ===
+<C1..Cn in the author's own words, to be tested rather than accepted.>
+
+=== 3. WHAT COUNTS AS A REQUIRED FINDING — FIXED TEXT, DO NOT EDIT ===
+Only these are REQUIRED:
+  R1  a defect on the normal success path;
+  R2  a silent wrong edit to a prompt body, governed document or control page;
+  R3  a silent breach of a Product Owner ruling, however unlikely;
+  R4  a plausible path with a silent or destructive outcome.
+A failure that ends in a loud stop and a return to Nathan is NOT required: list it as LISTED.
+Everything else is LISTED. For each finding give its path (normal or failure), its likelihood, its
+consequence, and whether it sits in text the last repair added. Refute your own findings first: a
+finding you cannot reproduce from the committed text is not a finding.
+
+=== 4. WHAT TO ATTACK, WEAKEST FIRST ===
+<A1..An, the author's least-confident reasoning first. Name what the dry run did not exercise.
+No instruction to "try hard", "be exhaustive" or "find everything": the list is the attack.>
+
+=== 5. THE CAP AND THE EXIT — FIXED TEXT, DO NOT EDIT ===
+After at most two full reviews and one check of the repair's diff, the output goes to Nathan with
+every open finding listed by path, likelihood and consequence, however many there are. The session
+stops early and returns to Nathan if distinct confirmed required defects do not at least halve from
+the previous round, or if most of this round's findings sit in text the last repair added. Zero
+findings is not the exit, and no session may make it one. LISTED findings are not repaired unless
+Nathan opts in.
+
+=== 6. THE DELIVERABLE — FIXED TEXT, DO NOT EDIT ===
+Write your record to <RECORD_PATH>. First line: the count of distinct confirmed REQUIRED findings.
+Then each REQUIRED finding: rubric class (R1-R4), the exact text or step, the evidence, the smallest
+correction, and whether it is in text the last repair added. Then each LISTED finding, one line
+each. On review 2: the disposition of every prior REQUIRED finding (fixed, not fixed, or fixed with
+a new defect), and the trend in the count.
+Do not edit the record under review, merge, install, write to Notion, or edit a prompt body.
+Put your answer first and close with DECISION NEEDED, NOTHING NEEDED, or IN FLIGHT.
+```
+
+**Why it is shaped this way.** The eight PLAN rounds had no likelihood test for "required", no cap,
+"clean" as the only exit, an attack list the author widened each round, and 25–33% duplicate
+reports across three lenses and three verifiers. §3 and §5 are fixed so none of that can be brought
+back by filling the slots (`D26-A`; recovery analysis §7; RCA §7 actions 1–3).

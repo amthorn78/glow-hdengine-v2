@@ -2,6 +2,7 @@
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
 artifact_version: "1.0"
 created_date: 2026-09-21
+revised_date: 2026-09-24 — *Loops*, D26
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Source reads — minimal by rule — 2026-09-21*, *Tracking is part of the work — 2026-09-21*, *Worker communication rules — 2026-09-20*
@@ -9,9 +10,9 @@ migrated_from: Glow Operations Hub, *Source reads — minimal by rule — 2026-0
 
 # Session working rules
 
-Three rules that govern how a session works rather than what it produces: how much source it reads,
-how it records what it did, and how it talks to other sessions. Each was written after the failure
-it prevents.
+Four rules that govern how a session works rather than what it produces: how much source it reads,
+how it records what it did, how it talks to other sessions, and how it reports a loop. Each was
+written after the failure it prevents.
 
 ## Source reads — minimal by rule
 
@@ -103,3 +104,26 @@ This workspace reuses "pilot", "PoC", "review", "round", "gate" and "flag" acros
 If a message can be cut by half without losing a fact the Product Owner needs, it was too long. Tables and lists beat paragraphs. A status update is one to three lines.
 ### Note on enforcement
 This page records the rules; it does not load them. A session reads its installed skills, not the Operations Hub, before writing. **The durable enforcement path is ****`glow-po-reporting`**, which is already loaded before every report to the Product Owner. Rules that must survive into future sessions belong in that skill, packaged with `skill-creator` and installed by the Product Owner. This page is the reference; the skill is the mechanism.
+
+## Loops
+
+Standing rule, `D26` (2026-09-24). Written after eight PLAN review rounds on
+`MODIFICATION-20260923-closeout-residuals` ran for most of a night with nobody told they were not
+converging. Applies to any repeated round: a review, a repair, a re-run.
+
+1. **A status update inside a loop carries the trend and an option to stop.** One to three lines:
+   the round, the count of distinct confirmed required defects against the last round, and "stop
+   here and take it as it stands" as a named option.
+2. **A changed commitment is headlined as a correction.** If the session said it would bring the
+   work back after a review and then kept going, the next message opens with that, flatly.
+3. **A compaction summary quotes, it does not paraphrase.** It carries the session's own commitment
+   word for word and Nathan's reply to it word for word, and every stopping rule it states names who
+   set it and when. "Continue when the review is done" must not become "repair until clean".
+4. **Re-price at twice the estimate.** When time or tokens pass twice the estimate Nathan approved,
+   stop and return to him with the new estimate before the next round.
+5. **Stop on non-convergence.** When required defects do not at least halve, or most of a round's
+   findings sit in text the last repair added, return to Nathan with a `DECISION NEEDED`. Looking
+   harder is not the response (`D26-F`).
+
+None of this is mechanically checked, and `D26` says so. `glow-po-reporting` needs the same lines;
+it is a skill, so they wait for its next package cycle.
