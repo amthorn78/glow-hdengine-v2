@@ -1,0 +1,36 @@
+id,plan_reviewed,path_trigger,path_class(judgement),consequence(from verifier text),consequence_class,evidence
+R4-01,6b29ce9,D24 rejection at X4.4 then resume,likely (parent 5 D24 rounds; spec 2.7 names it the leading pre-X5.0 stop),resume cannot run; X2.1 would insert D25 twice (gate catches),loud/stuck,review4_required.txt completeness#0 + consistency#6
+R4-02,6b29ce9,any post-X5.0 stop; reached on success path via R4-06,success-path-reachable at 6b29ce9,stop deletes freeze line while freeze held; reversal order fails; no trash op,wrong control edit + unexecutable,completeness#1 exec#2 cons#0
+R4-03,6b29ce9,partly landed body or stale readback then forward repair,plausible-low,duplicate insertion in live prompt body passes every gate,silent wrong prompt-body edit,executability#0 (verifier: unlikely but not ruled out)
+R4-04,6b29ce9,success path,certain,D25 decision-record sentence points at undated nonexistent §E line,silent mis-record (governed record),completeness#3 exec#4 cons#1
+R4-05,6b29ce9,success path (single session),certain,D24 verdict files never committed; delivery incomplete per D24 guard,D24 record gap,completeness#4 cons#3
+R4-06,6b29ce9,success path X5.6,certain,literal readback fails after all bodies land; re-apply adds 2nd amendment or unit stop,post-landing stop or silent duplicate control edit,executability#1
+R4-07,6b29ce9,queued Notion write,plausible,STALE counted as failure; re-plan/second write; §E write list wrong,mis-record / stop,executability#3
+R4-08,6b29ce9,success path X1.1 X4.3,certain,rm -rf $VAR refused without human approval,loud (permission prompt),consistency#4
+R5-01,de3d3d5,re-run of X5.0/X5.3/X5.6 on a later UTC day,plausible-low,duplicate dated freeze line/AF amendment/10-bullet entry; readback passes; or false unit stop,silent wrong control edit,completeness#0 exec#0 cons#2
+R5-02,de3d3d5,stop after session change,low,stop list misses writes; TRACK-UNIT-STOPPED claims complete; landed bodies left live after lift,silent wrong live prompt bodies,completeness#1
+R5-03,de3d3d5,D24 rejection (likely) / any stop,likely for D24 part,rejected verdicts+brief dropped by force-push; cr1 reused; stop list destroyed by next X0.2,D24 cond.4 record loss; unrecoverable list,completeness#2 #4 #5
+R5-04,de3d3d5,any stop past X5.0,conditional on stop,terminal BLOCKED while bodies live; rule 6 contradicted; restore never recorded,mis-record (governed record),completeness#3 cons#1
+R5-05,de3d3d5,resumed X5.4 on delete-only body,plausible (compaction/new session in landing),NOTHING_TO_LAND read literally = false unit stop,loud false post-landing stop,executability#1
+R5-07,de3d3d5,success path X4.4,certain,D24 brief §2-§9 authored at EXECUTE (template forbids composing from scratch),interpretation,executability#3
+R5-08,de3d3d5,new session at X7.4-X7.7,likely (verifier; X7.3 is Nathan's install sitting),patch re-apply fails; false X7.4 failure record,mis-record (loud),executability#4
+R6-01,8a905f3,new session between X7.4 and X7.6; reinstall path,likely (verifier: X7.5 waits on Nathan's lift),deadlock; bypass drops lift_date,dead end,completeness#0 exec#1
+R6-02,8a905f3,stop at X2.1-X3.4,low,half-applied repo edits (contract move) carried by record PR to main,silent wrong repo edit,completeness#1 exec#3
+R6-03,8a905f3,stop past X5.0 then Nathan merges on receipt as told,conditional on stop,stop lines stranded; restoration check refused,dead end + mis-record,completeness#5 exec#0
+R6-04,8a905f3,X7.4 failure,low-moderate,stop procedure resets and writes 'must not be installed' for installed archives,mis-record,consistency#2
+R6-05,8a905f3,stop at X5.0 / MIXED tracking anchor,low,restoration check can never pass,dead end,completeness#2
+R6-06,8a905f3,stop between X5.0 and X5.1 create,low,CL-40 never classified; restoration check never passes,dead end,completeness#3 exec#2 cons#0
+R6-07,8a905f3,session ends between verdicts and delivery,low-moderate,wrong route; surfaces at X7.2 after merge with no route,dead end after landing,completeness#4
+R6-08,8a905f3,session break between X3.4 write and X3.5 commit,low,P-32 sentence ships twice in session-working-rules.md,silent wrong governed-doc edit,executability#4
+R6-09,8a905f3,success path X5.1,certain,no F1-F10 tool: 18624 B code block compared by hand; wrong pass = mis-migrated permanent page,interpretation / possible silent wrong page,executability#5
+R6-10,8a905f3,X5.0 re-run on later UTC day,low,execute_date overwritten; second freeze line inserted; readback passes,silent wrong control edit,consistency#1
+R7-01/02,46ecce0,stop + DOUBLED/MIXED control edit,very low,pointer to trashed page survives; restoration check passes,silent wrong control edit,completeness#0 exec#0 cons#1
+R7-03,46ecce0,session lost in X5.1 window,low,correct page trashed and unit stopped,destructive,completeness#1 cons#0
+R7-04,46ecce0,stop resumed in new session,low,failing step and evidence unrecoverable,incomplete record,completeness#2
+R7-05,46ecce0,lost archive / plan change after X7.4,low,gates cannot pass on installed tree; no route,dead end,completeness#4 #5 exec#2
+R7-06,46ecce0,stale readback at X5.0,plausible-low (plan's own P-103 premise),'nothing written' recorded; next attempt lands second freeze line,silent mis-record + wrong control edit,executability#1
+R7-07,46ecce0,post-X7.1 review routes,low,D24 brief §2 false; prior-file text dropped,false D24 brief (silent),consistency#2
+R8-01,0e24b01,new session after Nathan's squash merge,moderate (cost analysis: 'moderately likely'),routed to X0.2 -> false stop; TRACK-UNIT-STOPPED + 3 status lines on a merged unit; one verifier reads stop step 3 as reversing control edits,wrong control edits / possibly destructive,completeness#0 exec#0 cons#0 (3 verifiers)
+R8-02,0e24b01,commit to main outside the 3 prefixes during X0.2-X6.4,plausible-likely (4 such commits 09-21..09-23),false full unit stop after all bodies land,loud but costly (manual restore of up to 50 bodies),completeness#1
+R8-03,0e24b01,plan change + X4.4 re-run after a rejection,low,rejection re-rolled on same bytes,silent D24 condition 5 breach,exec#1 cons#2
+R8-04,0e24b01,new session at X7.2 after install,low,patch re-apply fails; false 'X7.2 failed' record,mis-record (loud),cons#1

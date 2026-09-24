@@ -1,0 +1,401 @@
+{
+ "workflow": "wf_0d617074-7b8",
+ "reviews": [
+  {
+   "lens": "COMPLETENESS and SCOPE (review round 8 of the closeout-residuals PLAN, commit 0e24b01)",
+   "verdict": "NEEDS_REPAIR",
+   "checked": [
+    "Record front matter: all 40 items and 17 parts. Each item is named in the spec (grep count at least 1 for every ITEM-01..40) and carried by a \u00a7P step or a \u00a79 row. \u00a7A's per-part targets and gates are each met by a step: X2 commit 1 comes before any EXECUTE edit (PART-06, PART-18). X3.6 covers NAM-002 (PART-10). X5.1's m2 check covers the list readback (PART-06). X5.5 covers PART-11. X6.1 fires each new guard on its injected regression. X6.2 checks QA-80/QA-110 against the graph. X4.2/X7.4 run run_gate. P31-POLICY and P33-A5NOTE land at close. ITEM-20 is NOT_APPLICABLE and recorded in \u00a7E. Regressions for PART-01 to 04 are PLAN-time only, but they bind to identical bytes through the freeze digests.",
+    "Scope: round 8 adds no content edit beyond the 40 items. The notion/edits.json changes are the when fields and the PART-06-HUB-01 wording. The AF-009 amendment and the pointer edits are recorded as \u00a7A omissions in \u00a710.1.",
+    "\u00a77 token table against every {{...}} in texts/edits.json, texts/*.md, notion/edits.json (per-edit token/step map), notion/M2.json (the rewrites, callout, bullet and self_links; the EXECUTE_DATE in M2 'verification' is a superseded note), engine/*.py, and the brief draft with fill_brief.py (K, ARCHIVES, OUT_DIR, HEAD, PRIOR, REREVIEW). On the success, stop, lift and restoration paths, each value is recorded, committed and pushed before the write that carries it: stop_date in stop step 1, lift_date in AT/execute/run.json before TRACK-FREEZE-LIFT-STOP, url before step 7, P30-DEST and R-ITEM18. The reversals fill tokens from the recorded run.json.",
+    "engine/ctrl.py read in full: TOKENS, STOP_KEPT, restored_bad (kept is limited to STOP_KEPT; sent/waived/DOUBLED/MIXED rules), links(), edit_state, make_op (widening, undouble, --reverse, end_of_page) and the all/op/edits modes.",
+    "engine/m2.py read in full: build, check (F1 with exactly one Hub child; F6 via fill_mentions), insert_op, stage_of, step7_ops. runjson.py and fill_brief.py read in full. land.py header read.",
+    "notion/ctrl_proof.out.json: the five sequences, the three restoration checks and the five stops after X5.3, with their bad sets. m2_proof.out.json cases. anchor_check_plan.json passes. brief_cases_r8.py read.",
+    "Walked every path in the branch rule (reset/refuse/exception/continue/PLAN) with the lease: resume after each commit subject, including X5.1 migration date/page/create check/readback; X5.0 before and after the listing commit and after the readback; X5.3, X5.4 and X5.6 mid-step; stop: failure/sweep/rows; the stop record steps 1-6 including between the push and the PR; restoration check k, waived; lift; end route; the X4.4 new-session rule and a session lost between X4.3 and delivered_cr<k>; a D24 rejection followed by a plan change (fill_brief k across attempt-*/, --prior-file); X7.2 lost archive; X7.4 differing digest vs other failure, then reinstall or plan change; X7.5 to X7.7 resume.",
+    "modification_validate.py read. It accepts: EXECUTING with a partial \u00a7E, the stop record; BLOCKED with every item BLOCKED, the end route; COMPLETE, which needs every disposition and interaction_cost_actual. Ran it on the record: 1/1 pass.",
+    "Main's merge history (git log origin/main): every PR is squash-merged. The PR title is the subject, and branch commit subjects appear only as '* ...' body lines. P-83 already names 'the squash merge'.",
+    "Scratch git experiment (gitexp1): after an unrelated commit on main, `git diff --name-only origin/main HEAD` lists the main-only file, while `origin/main...HEAD` does not.",
+    "Scratch git experiment (gitexp2): `git add EX/run.json EX/ctrl/ EX/stop/` with no EX/ctrl fails with exit 128 and adds nothing.",
+    "Fetched the D20 tracking page 3e34590a05eb81e7927efe0541258916 (control page, as of 2026-09-23T17:45:35Z, unchanged since PLAN). The shared anchor '**The three decisions below are recorded as' occurs once. The TRACK-STATUS old_str values are present. Child pages are listed as <page url=\"https://app.notion.com/p/<32hex>\">, the form ctrl.CHILD parses."
+   ],
+   "not_verified": [
+    "The GCFPE Modification Backlog entries MB-001 to MB-004 (spec \u00a710.2). That page is not among the control pages this review may read.",
+    "The Glow Operations Hub and the four Checklist item rows as they stand today (PART-06 and PART-12 anchors, Hub child list). Not fetched: relied on anchor_check_plan.json from PLAN.",
+    "P-112 (h)'s evidence that update_content kept a Markdown link literally on the Alpha feedback page (00:11Z write; 04:08Z and 06:03Z fetches). Not re-fetched.",
+    "The Drive file bytes and hashes (drive_check_plan.json taken as recorded).",
+    "ctrl_proof.py, m2_proof.py and brief_cases_r8.py were not re-run. The first two read the PLAN session's harness files, which may hold prompt bodies (D22). Their committed outputs were read instead.",
+    "The skill diffs, run_gate pre/pkg/post sets and PLAN-time regression files were not re-run (outside this lens).",
+    "The repository's GitHub merge settings (squash title/message defaults, auto-delete of head branches). Squash-only merging is inferred from main's history."
+   ],
+   "findings": [
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 'The branch rule' rule 1 (lines 6061-6066); X0.2 row; P-112 (d) 'Where a reset session resumes after X7.1' (spec line 1027); record \u00a7P 'Rulings' P-112 (d)",
+     "problem": "The only test for 'the execution PR has merged' is a commit subject: 'main holds a merged `closeout-residuals X6.4:` commit'. After a merged failure record, the test is 'a merged `closeout-residuals record: X7.<s> failed`'. This repository squash-merges every PR, and P-83 itself says 'the squash merge'. A squash leaves no commit with that subject on main; the subjects survive only as '* \u2026' lines in the squash body, and only under the current GitHub message setting. The test is therefore not mechanical, and read as a subject test it is false. A session after X7.1 then misses the merge and starts at X0.2. X0.3(a) finds the registry at 97bda1a0\u2026 instead of 8b4e46ed\u2026 and stops. Stop step 1 reads the merged EX/ctrl/sent.txt, which lists TRACK-FREEZE-START, and sets past_x50 true. The stop record then files 'attempt 1 stopped at X0.3' and writes TRACK-UNIT-STOPPED and TRACK-STATUS-STOP-01..03 on the tracking page, for a unit that passed and merged. This is the exact resume case P-112 (d) was added for.",
+     "evidence": "Every recent commit on main is a squash commit titled '<PR title> (#NNN)', for example 77d98dd and d848942. For the branch subject 'docs(ephemeral): modification intake - Alpha Feedback open entries', `git log origin/main --format=%s | grep -c '^docs(ephemeral): modification intake - Alpha Feedback open entries'` gives 0, while `git log origin/main --grep=\u2026` finds d848942 through its body. P-83 (spec line 384) says the lease is needed 'because the squash merge leaves the remote branch's old history in place'. X0.3(a) pins the registry at 8b4e46ed\u2026, but after X7.1 main holds 97bda1a0\u2026 (\u00a78.6). Per the \u00a79 'A failing gate' bullet, a failing gate before X5.0 runs stop step 1, whose past_x50 comes from EX/ctrl/sent.txt.",
+     "fix": "Base the test on content, not subjects. 'The execution PR has merged' becomes `git cat-file -e origin/main:docs/ephemeral/modifications/evidence/closeout-residuals/execute/run.json` together with main's record reading `status: EXECUTING`. EX reaches main only through the execution PR, because every stop record moves it to AT. For a merged failure record, have the failure-record commit add a key to EX/run.json (`runjson.py EX/run.json failed_X7.<s> <date>`) and test that key on origin/main. If a grep is kept instead, state the exact command: `git log origin/main --grep='^\\* closeout-residuals X6.4:'`. Also add to X0.2 a refusal when origin/main already holds EX/run.json, so a missed detection can never enter the stop path."
+    },
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 X6.4 gate; P-111 (c) (spec line 897); record \u00a7P step 24 (rollback 'the unit stops (P-98, P-99), as step 23')",
+     "problem": "X6.4's path check is `git diff --name-only origin/main HEAD`, a two-dot diff between trees. Every push first runs `git fetch --prune`, so origin/main is fresh. Any commit that lands on main between X0.2 and X6.4 outside the three open paths therefore appears in the list, and the check fails. PF10 build-notes updates are one example: they are committed straight to main, as in 3b8084d. Past X5.0 a failing X6.4 gate stops the unit. The whole landed unit is then swept and reversed, the new page is trashed, and Nathan must restore 50 bodies from page history, all because of an unrelated commit that does not stop the execution PR from merging. The freeze stops flow sessions only, not other commits to main, and X0.2 to X6.4 spans the D24 review and the landing, easily a day.",
+     "evidence": "Scratch repo at \u2026/review8/completeness/gitexp1: main gains an unrelated `engine/x.py` change after the branch point. `git diff --name-only origin/main HEAD` prints `docs/ephemeral/r.md` and `engine/x.py`; `git diff --name-only origin/main...HEAD` prints only `docs/ephemeral/r.md`. Commit 3b8084d ('PF10 update build notes to v13.2.9') on main has no PR number, showing that direct commits to main happen. Nothing in the spec handles main moving (grep for 'origin/main...', 'merge-base' and 'main moved' finds nothing).",
+     "fix": "Compare against the recorded base or the merge base: `git diff --name-only \"$(python3 -c 'import json;print(json.load(open(\"EX/run.json\"))[\"base\"])')\" HEAD` or `git diff --name-only origin/main...HEAD`. Use the same form in X7.6's 'the PR changes only the three open paths'. Add a note that main moving is not a failure. If the PR cannot merge cleanly, return to Nathan without stopping the unit."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 landing unit, stop steps 2, 4 and 5; \u00a77.4.2 step 1; F1 (P-112 (b))",
+     "problem": "Round 8 added F1's 'exactly one Hub child carries the title' to catch a second create after a lost response and a stale Hub fetch. The stop that follows handles one page only. Step 2 lists 'the page'. Step 4 trashes 'it' using 'the page's exact child line', singular. Step 5 asserts 'no such child remains' but gives no route when one does. With two children, the executor must decide which to trash. Any leftover child is not in the rows for Nathan, and the restoration check (hub.json lists no such child) then fails with no named item for him to act on.",
+     "evidence": "m2_proof.out.json case 'a second child of the same title': F1 false, children_titled 2. Stop step 4 reads: 'if the Hub lists the page, trashes it: update_content on the Hub with old_str the page's exact child line as fetched'. Step 5 reads: '\u2026 and no such child remains' (an assertion only).",
+     "fix": "Step 4: trash every Hub child titled *Candidate CRD Items List* whose callout names MODIFICATION-20260923-closeout-residuals, one update_content per child line, re-fetching between them. Step 5: list any such child that remains in the rows for Nathan, with its URL."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 'Sessions' and the landing unit, stop steps 1-6, commit `closeout-residuals stop: rows`",
+     "problem": "A resumed stop is told to resume 'at the step the last commit names' and run it from its start. For `closeout-residuals stop: failure`, `stop: sweep` and `stop: rows`, 'that step' is the whole stop. Only steps 1 and 2 are protected ('unless \u2026 already committed'). A session that ends after some reversals or the trash, before the rows commit, loses that record: on resume those edits read NOT_LANDED and are skipped, and the page is gone, so step 4 skips. A session that ends after `stop: rows`, during the stop record's local steps 1-4, may re-run step 6 and overwrite the committed rows.md with rows that show no reversals and no trash call. \u00a7E's Attempt subsection is copied from that file. Separately, a resumed stop is never told to take the pre-X5.0 path (rows, then the stop record) or the past-X5.0 path (steps 2-6) from failure.json's past_x50.",
+     "evidence": "Stop step 6 builds rows.md from 'the list \u2026, the reversals, the trash call'. Only failure.json and control.json have 'unless already committed' guards. The stop record 'begins once stop step 1 and the stop rows \u2026 are committed', yet the resume rule points a `stop: rows` tip back at the stop.",
+     "fix": "Commit each reversal and trash outcome as it happens (EX/stop/reversals.json, appended and pushed). Guard step 6 with 'unless EX/stop/rows.md is committed'. State that a `stop: rows` tip resumes at the stop record's step 1, and that a resumed stop branches on failure.json's past_x50."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "P-112 (d) 'A plan change after X7.1 \u2026 rejoins at X7.2'; P-112 (j); X7.2 and X7.4 rows; fill_brief.py; brief_cases_r8 case 'after_x71_plan_change_top_level_brief_delivered'",
+     "problem": "P-112 (d) says a plan change after X7.1 cuts its own diffs and expected digests and rejoins at X7.2. X7.2 names 'the seven archives delivered at X4.4' by EX/packages.json. X7.4 compares against EV/skills/expected_after_patch.txt and EX/packages.json. fill_brief.py refuses FREEZE_LINES_DIFFER unless its packages file carries expected_after_patch.txt's lines. P-112 (j) says EX/packages.json is never overwritten once it has merged. As written, the rejoined X7.2 and X7.4 would name and check the old archives. The r8 proof case for this route uses the same seven freeze lines, so it does not model new packages.",
+     "evidence": "fill_brief.py: `if got != [x for x in expected if x]: refuse(\"FREEZE_LINES_DIFFER\")`. brief_cases_r8.py 'x71' case copies the fixture's EX/packages.json with the expected lines. X7.2: 'Every file sent again has the sha256 of its line in `EX/packages.json`'. X7.4: 'Each installed digest equals X4.3's (`EX/packages.json`)'.",
+     "fix": "State that such a plan change writes its packages to a new file (e.g. EX/pc<m>/packages.json) with its own expected-digest file, and that X7.2, X7.4 and fill_brief take those paths as parameters. Add a brief case with changed freeze lines."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 'The lift' and 'The end route' after a stop; ctrl.STOP_KEPT",
+     "problem": "Neither the lift nor the end route checks that a restoration check has passed. TRACK-FREEZE-LIFT-STOP says 'every body it landed was restored and checked unlanded', and it is not in STOP_KEPT. A lift before a passing check therefore writes a false line, and every later restoration check fails (LANDED \u2260 kept) unless Nathan waives the lift line. The end route records 'applied steps rolled back' without a verified check. After a failure past X7.1 the freeze is held with no lift procedure and no tracking line that fits it.",
+     "evidence": "ctrl.restored_bad computes `keep = set(kept) & set(STOP_KEPT)`, and STOP_KEPT holds only TRACK-FREEZE-START and the four stop lines. \u00a79 'The lift' begins 'When Nathan lifts the freeze: the branch rule; \u2026', with no precondition. P-99 says he may lift 'once the restoration check has passed'.",
+     "fix": "Gate both the lift and the end route on the newest AT/restore/<k>/control.json reading \"pass\": true with every AT/restore/<k>/bodies/*.json UNTOUCHED, and refuse with a named reason otherwise. Say what the freeze line records after a failure past X7.1 if Nathan lifts before a plan change."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 restoration check step 2 (prose)",
+     "problem": "The prose says the LANDED edits are exactly the freeze line and the kept stop lines, and also that 'every edit in `sent.txt` reads `NOT_LANDED` with its `old_str` once'. TRACK-FREEZE-START is in sent.txt (X5.0 lists it) and must read LANDED, so both statements cannot hold. The code exempts kept edits (`r[\"id\"] not in keep`), but the prose does not.",
+     "evidence": "restored_bad: `bad |= {\u2026 if r[\"id\"] in set(sent) and r[\"id\"] not in keep and not (NOT_LANDED and old_count == 1)}`. X5.0 appends TRACK-FREEZE-START to EX/ctrl/sent.txt.",
+     "fix": "Change the prose to 'every edit in sent.txt other than the kept freeze line reads NOT_LANDED with its old_str once'."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop step 1 commit; X4.4 delivery message (P-112 (j))",
+     "problem": "(1) Stop step 1 commits `EX/run.json`, `EX/ctrl/` and `EX/stop/`. In a stop before X5.0 there is no EX/ctrl, and `git add` with a missing pathspec fails and adds nothing. (2) The supersession list in a delivery message includes 'those in attempt-*/execute/packages.json' even when that attempt never delivered, for example after a D24 rejection, so Nathan is told that undelivered archives are superseded. Deliveries from an earlier round of a stopped attempt, whose EX/packages.json versions were lost to the stop's reset and force push, are named nowhere, although their briefs in AT list the sha256s.",
+     "evidence": "Scratch gitexp2: `git add EX/run.json EX/ctrl/ EX/stop/` gives 'fatal: pathspec 'EX/ctrl/' did not match any files', exit 128, EX/ untracked. X4.4: 'those in attempt-*/execute/packages.json, and every earlier EX/packages.json of this attempt (git log -p -- EX/packages.json)'.",
+     "fix": "(1) `git add -- $(ls -d EX/run.json EX/ctrl EX/stop 2>/dev/null)`, or `mkdir -p EX/ctrl` first. (2) Name only the deliveries recorded as `delivered_cr<k>` in attempt-*/execute/run.json, and take their sha256s from attempt-*/REVIEWER-PROMPT-cr<k>.md."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop record step 5; X6.4 'Run again \u2026 finds the PR open'",
+     "problem": "A re-run of X6.4 can find the execution PR already open. If that re-run then fails (modification_validate or the path check), the unit stops. The stop record's reset and force push turn the open execution PR into the record PR, and step 5's 'open the record PR' or rule 2's 'when no pull request \u2026 is open' reuse it without retitling. Its title and body still read as the execution PR.",
+     "evidence": "P-111 (c) guarantees only that the first X6.4 run checks before opening. Rule 2 and stop record step 6 open a PR only 'when none is open'. The end route alone says 'or the open one retitled'.",
+     "fix": "In stop record step 5: if a PR from the branch is open, retitle it 'closeout-residuals record: attempt <n> stopped at <step>' and replace its body before returning."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a70 evidence table (line 31); EV/notion/ctrl_proof.py docstring and case (a)",
+     "problem": "The spec \u00a70 table still says 'P-01 to P-111'; DECISIONS.md and the README say P-112. The ctrl_proof docstring still says 'A stop at X5.0 itself writes nothing and is a stop before X5.0 (P-107)', which P-112 (e) replaced. Proof case (a) passes a sent list with a duplicate id ('sent': 13 = 12 + the doubled item), unlike sent.txt's 'each once'.",
+     "evidence": "Spec line 31 reads '`EV/DECISIONS.md` | the PLAN decisions, P-01 to P-111 (\u00a71)'. ctrl_proof.py lines 16-17. ctrl_proof.py `unit_stop(\u2026, sa + [item], \u2026)`; ctrl_proof.out.json stops_after_x53[0] check sent = 13.",
+     "fix": "Update the \u00a70 range to P-112, correct the docstring to P-112 (e)'s rule, and pass `sa` in case (a) without the duplicate."
+    }
+   ]
+  },
+  {
+   "lens": "EXECUTABILITY",
+   "verdict": "NEEDS_REPAIR",
+   "checked": [
+    "Read spec \u00a79 in full (X0\u2013X7.8, the definitions, the sent list, commits and pushes, a failing gate, Notion writes, sessions, the branch rule, the landing unit and stop steps 1\u20136, the restoration check, the lift, the end route, the stop record), \u00a71 repair round 8 (P-112 (a)\u2013(l)), \u00a72.10, \u00a77 intro and token table, \u00a77.1\u2013\u00a77.3, \u00a77.4.1\u2013\u00a77.4.3, \u00a78.6, \u00a78.7, and record \u00a7P. modification_validate.py passes on the record.",
+    "engine/ctrl.py on the real control pages I fetched (tracking page, Hub, AF page, item 1 row), written to my lens directory: links() gives the same page id for a Markdown link, a text-less mention, a mention with text, a notion.so slug URL, a URL with ?pvs and a dashed UUID. A landed HUB-03 stored as a mention reads LANDED, and its --reverse is refused NOT_LITERALLY_ONCE, so it goes to Nathan's list. An insert-before at page start is refused REAPPLY_WOULD_MATCH. An insert-after at page end, with or without a trailing LF, is end_of_page; sent again it reads DOUBLED and undoubles exactly. A tripled copy is undoubled in one op. A duplicated anchor reads MIXED and op is refused STATE_MIXED. PART-11-TRACK-01 after the freeze line reads LANDED and reverses back to NOT_LANDED with old_count 1. AF009's widened op is reapply-safe. The ITEM1-02 DOUBLED\u2192op --reverse ('then: op --reverse')\u2192LANDED\u2192op --reverse path gives back the original page byte for byte.",
+    "restored_bad for a stop at X5.0 with sent=[TRACK-FREEZE-START], freeze line landed and not landed, stop lines applied: both pass (bad=[]).",
+    "ctrl.py CLI end to end on a synthetic harness (--harness-root/--session), with the \u00a79 commands as written: the X4.6 anchor check exits 0. Then TRACK-FREEZE-START and X5.3's eleven pointers are sent, followed by the sweep (all > control.json), the reversals via op --reverse, the four stop lines, all > control.kept.json, and all --expect restored --kept-from control.kept.json --sent sent.txt, which exits 0. Then a lift followed by a second check exits 1 (see finding).",
+    "ctrl_proof.py: its five after-X5.3 stops really are must-fail/must-pass. (b), (c), (d) and (e) assert membership in 'bad', and (a) asserts DOUBLED before the stop, so none can pass vacuously. The output matches the \u00a78.7 counts (19/33/34/5/4 steps; four next-day misses).",
+    "engine/m2.py on the real Drive bytes (downloaded, 31923 B, sha256 2d7ff093\u2026): the built page has no bare autolinkable file names or URLs outside code spans. insert_op on the small page, verbatim and with an <empty-block/> before the heading, is reapply-safe; after it the stage is 'create' and the check at create passes. The X5.1 and \u00a77.4.2 command lines match m2.py's argparse and outputs (build/check/insert-op/step7-ops, --stage auto, the PARTIAL_STEP7 and CODE_BLOCK_ALREADY_PRESENT refusals).",
+    "fill_brief.py in a scratch git repo with a plan-change round: see finding.",
+    "Git, in a scratch bare remote and clones, running \u00a79's commands literally. The branch-rule lease line works with R absent (empty lease creates the branch) and with R present. A second session pushing in between makes the stale-lease push fail (stale info, rc 1). An empty lease against an existing branch is rejected. A new session continues by rule 3. In the stop record, commits.txt is written, the reset without fetch leaves a clean status, AT/execute is laid out correctly, the staged paths are only the record and AT, and the force push with the lease replaces R. The rule-2 exception reads AT/execute/stop/failure.json from R via the commit subject's <n>. After the record PR is squash-merged, the restoration check resets, commits and pushes. After the X7.1 squash merge, the branch rule resets (see finding for the resume detection)."
+   ],
+   "not_verified": [
+    "Real Notion behaviour, since no writes are allowed: update_content matching a widened multi-block old_str; trashing a child page by deleting its <page> line with allow_deleting_content; whether update_content keeps a Markdown page link literally (P-112 (h) evidence was read, not reproduced).",
+    "notion-create-pages async behaviour and the shape of its result (page id and URL).",
+    "GitHub PR tool behaviour. The squash-merge message format is inferred from this repository's own squash commits (77d98dd, aeb256e), not from a live merge.",
+    "land.py plan/check/state and the 51-body sweep or restoration check on real bodies (D22: no prompt body read).",
+    "run_gate.py, packaging (execute.4b) and the X0\u2013X4 manifest commands were not re-run.",
+    "ctrl_proof.py and m2_proof.py were not re-run against the live harness. I used synthetic and real-page reproductions in my lens directory instead."
+   ],
+   "findings": [
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 branch rule, rule 1, lines 6061-6066 (and X0.2 row line 6204, X7.4 row line 6272, P-112 (d) at spec lines 1026-1033 / DECISIONS P-112 (d))",
+     "problem": "After X7.1, where a reset session resumes depends on whether 'main holds a merged `closeout-residuals X6.4:` commit' and 'a merged `closeout-residuals record: X7.<s> failed`'. This repository squash-merges its PRs, and the plan itself says so (spec line 384: 'because the squash merge leaves the remote\u2026'). A squash merge leaves no commit with that subject on main: the subject becomes the PR title, and the branch's subjects appear only as '* \u2026' bullet lines in the squash commit's body. No command is given for this test. Checked literally against subjects, it finds nothing, so rule 1 falls through to its default, starting at X0.2. That default would re-run the whole of EXECUTE after the unit has merged, and after X7.3 X0.3(b) would then fail on the installed skills and trigger a stop record. X7.2, X7.4 and every post-merge session depend on this test.",
+     "evidence": "`git log -1 --format=%B 77d98dd` (PR #477) shows the subject 'Close-out \u2014 \u2026 (#477)' with '* <branch commit subject>' lines in the body; aeb256e is the same. In my scratch remote I squash-merged a branch whose tip was 'closeout-residuals X6.4: execution record' the way GitHub does. `git log --format=%s origin/main | grep -c '^closeout-residuals X6.4:'` printed 0, `git log --grep='closeout-residuals X6.4:'` found 1 (the body bullet), and the branch rule took rule 1 (reset).",
+     "fix": "Give the test as a command that holds under squash merges. Robust option: EX/ reaches main only through the execution PR (a stop record moves EX to AT/execute), so test `git cat-file -e origin/main:docs/ephemeral/modifications/evidence/closeout-residuals/execute/graph_check.json` (X6.4 commits EX/graph_check.json) for 'the execution PR has merged'. Detect a merged failure record the same way, e.g. by \u00a7E's 'X7.<s> failed' row on main's record, or by `git log origin/main --format=%B | grep -q '^\\* closeout-residuals record: X7\\.[0-9] failed'`. Also state plainly what rule 1 does when neither holds."
+    },
+    {
+     "severity": "REQUIRED",
+     "where": "EV/skills/fill_brief.py lines 67-88 (the `if a.prior_file:` branch comes before the REPAIR_VERDICT_PENDING and PRIOR_ROUND_DELIVERED checks); spec \u00a79 X4.4 row, line 6240 ('after a plan change add --prior-file \u2026'; 'unless a verdict of the latest round reads SKILL_REPAIR_REQUIRED (a stop; fill_brief.py refuses with REPAIR_VERDICT_PENDING)'); P-112 (f)",
+     "problem": "X4.4 says that after a plan change every fill_brief run adds --prior-file. With --prior-file, fill_brief skips both refusals the spec relies on. So in any attempt after a plan change, a new-session X4.4 whose latest top-level round holds a SKILL_REPAIR_REQUIRED verdict is not refused: X4.3 re-cuts, and a fresh round cr<k+1> reviews new bytes. That re-rolls a rejection (D24 condition 5), where the gate column says it is a stop. A round whose delivery is recorded is not refused either. brief_cases_r8 has no case for this path.",
+     "evidence": "Scratch repo with attempt-1/REVIEWER-PROMPT-cr1.md, top-level REVIEWER-PROMPT-cr2.md and SECTION-10-REVIEW-cr2-SFR-CR2-1.md reading 'Verdict: **SKILL_REPAIR_REQUIRED**', run.json {}. `fill_brief.py \u2026/execute/packages.json --prior-file prior.md` exits 0 and prints 'round cr3' with the plan-change text. Without --prior-file it refuses REPAIR_VERDICT_PENDING (exit 1). With delivered_cr2 recorded and --prior-file it also exits 0 (cr3); without --prior-file it refuses PRIOR_ROUND_DELIVERED.",
+     "fix": "In fill_brief.py, run the REPAIR_VERDICT_PENDING check whenever the newest brief is top-level, with or without --prior-file. The post-X7.1 case still passes, since its prior round was confirmed. Keep PRIOR_ROUND_DELIVERED for the no-prior-file path. In X4.4, add --prior-file only on the first round of an attempt after a plan change (newest brief under attempt-*/) or for a post-X7.1 plan change, and check the latest round's verdicts before re-running X4.3. Add a brief_cases case: plan change, re-cut after rejection, with --prior-file \u2192 REPAIR_VERDICT_PENDING."
+    },
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 'The lift', lines 6159-6163; P-108 (f) ('the lift after a stop comes once a check has passed'); \u00a77.3 intro ('a lift line after the restoration check'); record \u00a7P Product Owner actions line 893 ('lift the freeze when you choose'); engine/ctrl.py STOP_KEPT (lines 74-75) and restored_bad (lines 82-103)",
+     "problem": "Nothing in the lift procedure checks that a restoration check has passed. Its steps are the branch rule, lift_date, TRACK-FREEZE-LIFT-STOP and the readback, and \u00a7P tells Nathan to lift 'when you choose'. If the lift runs before a passing check, TRACK-FREEZE-LIFT-STOP writes 'every body it landed was restored and checked unlanded', which is then false. And since TRACK-FREEZE-LIFT-STOP is not in STOP_KEPT, every later restoration check fails on it, with no route except a waiver. The step has no verification that could fail on its own precondition.",
+     "evidence": "The ctrl.py CLI scenario (scen.py in my lens dir) runs the stop after X5.3, the reversals, the stop lines, control.kept.json and `all --expect restored --kept-from \u2026 --sent \u2026`, which exits 0 with bad []. After `runjson lift_date` and TRACK-FREEZE-LIFT-STOP (it read NOT_LANDED, then landed), the same check exits 1 with bad ['TRACK-FREEZE-LIFT-STOP'].",
+     "fix": "Make the lift's first step, after the branch rule, check the newest AT/restore/<k>/: control.json has \"pass\": true, every bodies/*.json reads UNTOUCHED, and hub.json lists no child of the title. Otherwise refuse and return to Nathan. Word \u00a7P's action as 'after the check passes'. Optionally have restored_bad treat TRACK-FREEZE-LIFT-STOP as kept when lift_date is recorded, so that a check run after the lift can still pass. Give the end route the same passed-check gate."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 landing unit, stop step 1, line 6107 ('Commit EX/run.json, EX/ctrl/ and EX/stop/'), used by every stop before X5.0 (lines 6082-6087)",
+     "problem": "EX/ctrl/ is created only at X5.0 (the sent-list mkdir). For every stop before X5.0 it does not exist, so `git add EX/run.json EX/ctrl/ EX/stop/` taken literally fails and stages nothing.",
+     "evidence": "Scratch repo: `git add EX/run.json EX/ctrl/ EX/stop/` printed \"fatal: pathspec 'EX/ctrl/' did not match any files\", exit 128, and `git diff --cached` was empty.",
+     "fix": "Write it as `git add -- EX/run.json EX/stop/ $( [ -d EX/ctrl ] && echo EX/ctrl/ )`, or 'commit EX/ctrl/ when it exists', or `mkdir -p EX/ctrl` in stop step 1."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "engine/m2.py main(), line 377 (drive_text() runs before every mode, with the default --since-minutes 30 at line 369); spec \u00a79 X5.1 row line 6249 ('Downloads the Drive file again' once, at the start)",
+     "problem": "Every m2.py mode (build, insert-op, step7-ops, check) needs a download_file_content result from the last 30 minutes. X5.1 downloads once, then does a large create (possibly async), runjson plus commit and push twice, Hub fetches (a 175 KB page saved to tool-results), insert-op, the create check and its commit and push, step 7, and the final check. If that takes longer than 30 minutes, the later calls refuse NO_DOWNLOAD_FOUND with exit 1. By X5.1's letter that is a failing check, run once more and then a stop of the unit.",
+     "evidence": "m2.py main(): `text, src = drive_text()` comes before the mode dispatch; DC.newest_download filters by D.SINCE = since_minutes*60.",
+     "fix": "In X5.1 and \u00a77.4.2 steps 6-7: re-download the Drive file immediately before each m2.py call (or pass --since-minutes large enough to cover the step), and treat NO_DOWNLOAD_FOUND as 're-download and re-run', not as a failing check."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a77.4.2 step 5 (line 5089) and \u00a79 X5.1 row (line 6249); \u00a79 'Notion writes' (line 6018) covers only notion-update-page",
+     "problem": "notion-create-pages defaults to allow_async: true and can return an async_task with no page id. X5.1 says to record page_id and url 'as soon as the create returns', but no allow_async setting is given and nothing says how to get the id from an async task. A 'failed' create task is also uncertain, because the page may exist. That feeds the lost-response path that P-112 (b) guards with F1.",
+     "evidence": "The notion-create-pages schema: 'allow_async: Default to true for page creation \u2026 returns an async_task result'. The spec sets allow_async: false only for notion-update-page.",
+     "fix": "Say that the create uses allow_async: false. If an async_task still comes back, poll notion-get-async-task to succeeded and take the page id and URL from its result. On failed, fetch the Hub and apply \u00a77.4.2 step 1's resume rule before anything else, and never create again."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 X5.3 row (line 6251) and X5.6 row (line 6254): 'their readback to EX/ctrl/X5.3.json' / 'EX/ctrl/X5.6.json'; engine/ctrl.py `edits` mode takes exactly one page (lines 282-291)",
+     "problem": "X5.3's eleven edits are on five pages and X5.6's three on three pages. `ctrl.py edits` prints one JSON document per page, so 'the readback to EX/ctrl/X5.3.json' means several documents in one file, which is not valid JSON. No combining rule is given.",
+     "evidence": "ctrl.py `edits <PAGE_ID> <EDIT_ID>...` reads one page's newest fetch and prints {page, fetched, source_file, edits}.",
+     "fix": "Write one file per page (EX/ctrl/X5.3.<page>.json), or produce the step's readback with `ctrl.py all --run EX/run.json` and keep that step's rows."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 restoration check step 2, line 6144 ('k = 1 + the checks already in AT/restore/') with line 6152 (AT/restore/waived.txt)",
+     "problem": "AT/restore/ also holds waived.txt, so counting the entries of AT/restore/ gives the wrong k once a waiver exists. 'Checks' is meant as the numbered directories, but that is not stated.",
+     "evidence": "Line 6152 writes AT/restore/waived.txt beside AT/restore/<k>/.",
+     "fix": "k = 1 + the number of numbered directories, e.g. `k=$(( 1 + $(find AT/restore -mindepth 1 -maxdepth 1 -type d -name '[0-9]*' 2>/dev/null | wc -l) ))`."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop step 4, lines 6128-6130 ('if the Hub lists the page, trashes it: update_content on the Hub with old_str the page's exact child line')",
+     "problem": "The step is singular, but the case P-112 (b) adds (a second create after a lost response, which fails F1) leaves two Hub children with the title. Step 5 then requires that none remain, and the step does not say to trash each one.",
+     "evidence": "m2_proof 'a second child of the same title' shows F1 fails with two children, and ctrl.py children lists both.",
+     "fix": "Say 'for each child line of that title in `ctrl.py children`'s output, one update_content per line (or one call with several content_updates), then re-fetch'."
+    }
+   ]
+  },
+  {
+   "lens": "CONSISTENCY and CORRECTNESS OF CONTENT (round 8, commit 0e24b01)",
+   "verdict": "NEEDS_REPAIR",
+   "checked": [
+    "DECISIONS.md P-112 (a)-(l) compared line by line with spec \u00a71: identical apart from one blank line. Also compared with \u00a79's preamble (definitions, sent list, commits and pushes, a failing gate, Notion writes, sessions, branch rule, landing unit and stop steps 1-6, restoration check, lift, end route, stop record), rows X0.2, X4.4, X5.0, X5.1, X5.3, X5.4, X5.6, X6.4, X7.2, X7.4 and X7.5, and \u00a77 intro, \u00a77.3, \u00a77.4.2, \u00a77.4.3, \u00a78.6, \u00a78.7, \u00a711, \u00a72.10 and the record's \u00a7P (build history item 10, rulings, steps 13-28, Order, Product Owner actions, cost).",
+    "engine/ctrl.py read in full: restored_bad, edit_state, make_op (DOUBLED undouble with `then: op --reverse`), links and `all`'s exit rules. They match P-112 (a) and (h), except the sent-list wording noted below. Probed restored_bad on synthetic rows: a freeze line that never landed but is listed passes; a DOUBLED freeze line fails, whatever Nathan does short of deleting it.",
+    "notion/ctrl_proof.py and ctrl_proof.out.json: 24 edits and 7 pages; success 19 steps, stop 33, stop then lift 34, X5.1 stop 5, mixed stop 4; all_ok true; fetched times equal \u00a78.7's list. The five stops after X5.3 give the outcomes P-112 (a) states.",
+    "engine/m2.py read in full (stage_of, step7_ops, insert_op, fill_mentions, F1 exactly-one-child). m2_proof.out.json matches P-112 (b), (h) and (l) and \u00a78.7: create 33856 B, final 34039 B, small 14899 B, trailing 2, stage_of create/create/final/final/final, PARTIAL_STEP7:2, 2 ops left, small create fails until insert-op, second child fails F1.",
+    "skills/fill_brief.py read in full. Rebuilt the missing scratch fixture (git repo holding execute/packages.json with the seven expected freeze lines, plus prior.md) and re-ran the committed brief_cases_r8.py: all_ok true, with the same eight outcomes as brief_cases_r8.json. Added probes showing that --prior-file bypasses both guards.",
+    "P-112 (h) evidence: in the parent session transcript, the notion-update-page call at 2026-09-24T00:11:07Z to 3df4590a\u2026 carried `[GCFPE Modification Backlog](https://app.notion.com/p/3e54590a05eb81eb818fd0f42045167a)`, and the fetches at 04:08:26Z and 06:03:02Z returned the same Markdown link. Only that control page's fragments were printed.",
+    "Explicit-lease push semantics (empty lease creates the branch, stale lease rejected with 'stale info') tested in a scratch git repository.",
+    "notion/edits.json: all 24 when/step/\u00a7P-step fields match \u00a79 and \u00a7P (steps 13, 16, 19, 20, 21, 26, 28; five stop-path edits with no \u00a7P step). The tokens used match \u00a77's token table (URL in ten pointers plus M2-R4, R5 and R9; MIGRATION_DATE in M2-R1, the callout, the bullet, HUB-01 and the four ITEM*-02; per-step EXECUTE_DATE).",
+    "The truth of each new_str when it lands, on the success path, the stop at X5.0 after the listing (freeze line unlanded), the MIXED stop-line case and the lift after a stop. PART-06-HUB-01's prospective CL-40 clause is consistent.",
+    "Supersession marks on P-51, P-80, P-84 (revised), P-87, P-98, P-99, P-103 and P-105 to P-111 are present. Grepped live texts for round 7's mechanisms: only ctrl_proof.py's docstring and P-100's mark remain.",
+    "\u00a72.10 counts (11 required and 27 non-blocking IDs) match its intro and the round-8 preamble. \u00a72.9's table holds 15 required and 22 non-blocking IDs.",
+    "skills/manifest.json 'when' fields and manifest_r7_proof.json ('323 047ca742\u2026' equals final_root_freeze).",
+    "registry.diff applied in scratch gives 97bda1a0\u2026. The base registry is 8b4e46ed\u2026 on HEAD and origin/main. contract-template-README.md is 469e2265\u2026, 1158 B.",
+    "modification_validate.py passes on the record. PR #478 is open from claude/epic-tesla-17406z. origin/main is merged by squash: single-parent commits titled by the PR, constituent subjects only in the body as '* <subject>'."
+   ],
+   "not_verified": [
+    "Did not re-run ctrl_proof.py or m2_proof.py. Both scan this project's harness files, which also hold prompt-body fetches; I avoided that for D22. I relied on the committed outputs and on reading the code.",
+    "No live Notion control page or Drive file was fetched. The live anchor state rests on anchor_check_plan.json and drive_check_plan.json as committed.",
+    "manifest_r7_proof.json is a prose record with no captured output, so it was not reproducible from the repository.",
+    "Not verified: whether update_content deleting a <page> child line trashes the page, and whether a SendUserFile archive stays downloadable from its message later.",
+    "brief_cases_r8.py's scratch fixture is not committed. I rebuilt an equivalent one, so equivalence to the original fixture is assumed.",
+    "To check P-112 (h), I parsed the parent session transcript in memory (a JSONL that also holds prompt-body fetch results). Only tool_use and tool_result entries for the Alpha feedback control page were inspected and printed; no prompt body text was output."
+   ],
+   "findings": [
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 branch rule, rule 1 (lines 6061-6066); X0.2 row (line 6204); DECISIONS.md P-112 (d) 'Where a reset session resumes after X7.1' (lines 986-993)",
+     "problem": "Round 8 routes a session reset after X7.1 by whether `main` holds a merged `closeout-residuals X6.4:` commit, and a merged `closeout-residuals record: X7.<s> failed`. This repository merges by squash, so neither commit subject exists on `main`, and the spec gives no command for the test. A literal subject test fails after a successful merge, and the session starts at X0.2.",
+     "evidence": "`git log origin/main --format='%h %p %s'` shows single-parent commits titled by the PR (#477, #476, #474 \u2026). The constituent subjects appear only in the body as '* <subject>' (for example aeb256e's body). The plan already knows this: spec line 384 / DECISIONS P-83 say 'because the squash merge leaves the remote\u2026'. If the test misfires: X0.2 keeps `base`, and X0.3(a) fails because main's registry is now 97bda1a0\u2026, not 8b4e46ed\u2026. That is a stop. Stop step 1 reads EX/ctrl/sent.txt, which is on main and lists TRACK-FREEZE-START, so `past_x50` is true. The stop record then copies the successful EX/ to attempt-1 and writes 'must not be installed'. Its step 6 writes TRACK-UNIT-STOPPED and TRACK-STATUS-STOP-01..03 on the tracking page after a unit that passed and merged.",
+     "fix": "Test files, not commit subjects. For the merged execution PR, use `git cat-file -e origin/main:docs/ephemeral/modifications/evidence/closeout-residuals/execute/graph_check.json` (committed only at X6.4) together with main's record reading `status: EXECUTING`. For a merged failure record, test a file the record commit adds (for example `EX/failed/X7.<s>.json`) or \u00a7E's `X7.<s>` failure row. At minimum, state the command, e.g. `git log origin/main --format=%B | grep -q '^\\* closeout-residuals X6.4: '`, and require the default squash body."
+    },
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 'Sessions' (line 6047: 'A new session before X7.3 also rebuilds $PKG\u2026'); DECISIONS P-101 (line 610); skills/manifest.json execute.1.then.when; versus X7.4 row (line 6272: 'one he no longer holds follows X7.2's rule') and P-112 (d) ('rejoins at X7.2')",
+     "problem": "The rebuild rule is ordinal: a new session at any step numbered before X7.3 rebuilds $PKG with X1.1's patches. Round 8 now sends sessions to X7.2 after Nathan's install: the X7.4 differing-digest path for an archive he no longer holds, and a plan change after an X7.4 failure, which rejoins at X7.2. A new session there patches an already-patched $INST copy and fails. P-112 (d) itself says 'X1.1's patches do not apply to an installed tree'.",
+     "evidence": "execute.1.then runs `cp -r $INST $PKG`, then `patch -p1 -s -d $PKG/$s < diffs/$s.diff` for each of the 7 packages. After X7.3, $INST holds the patched packages, so the patches fail (PATCH FAILED, exit 1). That is a failing gate between X7.1 and X7.4, recorded as `closeout-residuals record: X7.2 failed` and naming the wrong gate. X7.2 uses neither $PKG nor $GATE: it only asks Nathan, or re-sends from `$SCRATCH/skills-out`, which a new session does not hold anyway.",
+     "fix": "Change the boundary to X7.2 in all three places: 'A new session at a step before X7.2 rebuilds $PKG and the scratch directories (X1.1, X1.2); from X7.2 on it rebuilds neither $PKG nor the archives.' Add the same to P-101's mark and to manifest execute.1.then.when."
+    },
+    {
+     "severity": "REQUIRED",
+     "where": "spec \u00a79 X4.4 row (line 6240: 'after a plan change add `--prior-file \u2026`, which always gives the plan-change variant'); skills/fill_brief.py lines 63-70; DECISIONS P-112 (f); skills/results/brief_cases_r8.py",
+     "problem": "Given --prior-file, fill_brief.py skips both new guards, the REPAIR_VERDICT_PENDING verdict scan and PRIOR_ROUND_DELIVERED. X4.4 tells EXECUTE to add --prior-file whenever the attempt follows a plan change, including X4.4's own new-session re-run. So in every attempt after a plan change, a re-cut round re-rolls a committed SKILL_REPAIR_REQUIRED verdict (D24 condition 5) or re-cuts an already delivered round. X4.4's gate text ('fill_brief.py refuses with REPAIR_VERDICT_PENDING') is then false, and the brief carries the plan-change text for what is a same-attempt re-cut.",
+     "evidence": "Scratch fixture: attempt-1/REVIEWER-PROMPT-cr1.md, top-level REVIEWER-PROMPT-cr2.md, and SECTION-10-REVIEW-cr2-SFR-CR2-2.md reading 'verdict: SKILL_REPAIR_REQUIRED'. Without --prior-file: rc=1 REPAIR_VERDICT_PENDING. With --prior-file prior.md: rc=0, '# Reviewer prompt, round cr3' written. Same fixture with confirmed verdicts and `delivered_cr2` in execute/run.json: rc=1 PRIOR_ROUND_DELIVERED without the flag, rc=0 (cr3) with it. None of brief_cases_r8's eight cases covers a same-attempt round after a plan change.",
+     "fix": "In fill_brief.py, run the REPAIR_VERDICT_PENDING scan of the top-level cr<k-1> verdicts in every variant. Accept --prior-file with a top-level newest brief only under an explicit post-X7.1 flag (e.g. --after-x71), and refuse it otherwise. In X4.4, pass --prior-file only on a plan change's first round (newest earlier brief under attempt-*/), never on a re-run of X4.4 within the attempt. Add both probes to brief_cases_r8."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a72.9 intro (line 1376)",
+     "problem": "\u00a72.9 still says review round 6 had '14 non-blocking reports'. P-112 (l) corrected the round-7 preamble in DECISIONS and spec \u00a71 to twenty-two, so the spec now states two counts for the same review.",
+     "evidence": "DECISIONS line 650: 'twenty-two non-blocking ones'. Counting the non-required finding IDs in \u00a72.9's table gives 22 (15 required).",
+     "fix": "Change \u00a72.9's intro to '22 non-blocking reports'."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "notion/ctrl_proof.py docstring line 17 and comment line 186",
+     "problem": "The proof's docstring still states round 7's rule that P-112 (e) replaced: 'A stop at X5.0 itself writes nothing and is a stop before X5.0 (P-107)'. The code comment says 'three stops after X5.3' where there are five. The proof has no case for the new path: a stop at X5.0 after the listing, with the freeze line unlanded. Case (a) passes a sent list holding PART-06-ITEM1-02 twice (`sa + [item]`, reported as sent 13), against 'each once'.",
+     "evidence": "grep of ctrl_proof.py. ctrl_proof.out.json stops_after_x53[0].check_before_nathan.sent = 13, the other cases 12.",
+     "fix": "Reword the docstring to P-112 (e): past X5.0 from the commit that lists TRACK-FREEZE-START. Fix the comment. Add a case with the freeze line listed but never landed, stop lines applied, and the check passing. Pass `sa` in case (a)."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "README.md notion/ row ('three of which must fail the restoration check'); spec \u00a72.10 row 1 ('three of which must fail'); record \u00a7P item 10 (line 792)",
+     "problem": "The count of must-fail stops disagrees with the proof. Four of the five stops after X5.3 require a failing restoration check: (b), (c), (d) and (e). \u00a7P names only three of them, omitting the MIXED case (c).",
+     "evidence": "ctrl_proof.out.json: (b) check_before_nathan pass false; (c) check_before_nathan pass false; (d) check_with_the_pointer_left pass false; (e) check_with_the_stop_line_gone pass false. Each case's ok requires that failure.",
+     "fix": "Say 'four of which include a check that must fail (two until Nathan restores or waives)', and list the MIXED case in \u00a7P item 10."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "DECISIONS P-100 mark (line 586); P-110 mark (line 836)",
+     "problem": "P-100's mark still points to P-109's X7.2 route ('X7.2 has a route when Nathan no longer holds an archive (P-109)'), which P-112 (d) replaced with the no-re-cut route. P-110's mark says its record covers failures 'from X7.2 to X7.4', while P-112 (d) and \u00a79 say from X7.1 to X7.4.",
+     "evidence": "P-109's own mark says 'Its X7.2 route is replaced by P-112 (d)'. \u00a79 'A failing gate' bullet 3 reads 'From X7.1 to X7.4'.",
+     "fix": "P-100 mark: '\u2026 and X7.2's route for a lost archive is P-112 (d): no re-cut after X7.1'. P-110 mark: 'from X7.1 to X7.4'."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 restoration check step 2 (lines 6149-6151); DECISIONS P-112 (a) restoration-check bullets",
+     "problem": "The text says every edit in sent.txt must read NOT_LANDED with its old_str once, 'whether it is MIXED or not'. But X5.0 lists TRACK-FREEZE-START in sent.txt, and the same sentence requires the freeze line to read LANDED. The code exempts kept edits (`r['id'] not in keep`), so the prose contradicts itself and the tool.",
+     "evidence": "engine/ctrl.py restored_bad: `bad |= {\u2026 if r['id'] in set(sent) and r['id'] not in keep and not (NOT_LANDED and old_count == 1)}`.",
+     "fix": "Reword both: 'every listed edit the stop did not keep (all but the freeze line) reads NOT_LANDED with its old_str once'."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop steps 3 and 5 (lines 6117-6134) with the restoration check",
+     "problem": "Stop steps 3 and 5 skip TRACK-FREEZE-START in every state. If the freeze line reads DOUBLED or MIXED at the stop, it is neither undoubled nor listed for Nathan. The restoration check then fails until Nathan deletes the freeze line altogether, which contradicts 'the freeze line stays', or waives it. Undoubling it, the natural restoration, still fails.",
+     "evidence": "ctrl.restored_bad probe with the stop lines kept and TRACK-FREEZE-START listed: DOUBLED gives bad [TRACK-FREEZE-START]; after undoubling to LANDED, still bad (the kept report excluded it); only NOT_LANDED passes.",
+     "fix": "In stop step 3, undouble a DOUBLED freeze line (without reversing it), and list a MIXED one for Nathan. In step 5, list any freeze-line state other than LANDED or NOT_LANDED. Or keep the freeze line whenever the kept report reads it LANDED or DOUBLED."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop step 4 (line 6128) and step 5, versus F1 (\u00a77.4.3, P-112 (b))",
+     "problem": "Round 8 made F1 fail on a second Hub child of the same title (a lost create response, then a stale Hub fetch). Stop step 4 still trashes 'the page' by one child line, and step 5's 'no such child remains' has no route when two exist.",
+     "evidence": "m2_proof case 'a second child of the same title' fails F1 (children_titled 2). Step 4's text is singular. The restoration check requires hub.json to list no such child.",
+     "fix": "Step 4: trash every Hub child titled Candidate CRD Items List, each by its own child line, and re-fetch. Step 5: any child that remains goes on the list for Nathan."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop step 1 (lines 6101-6107) versus X5.0 row (line 6248)",
+     "problem": "Stop step 1 sets `past_x50` whenever EX/ctrl/sent.txt lists TRACK-FREEZE-START, which reads the working tree. X5.0 says a failure before the execute-date commit is a stop before X5.0. Between the append and that commit, a failure is classified both ways. Also, before X5.0 there is no EX/ctrl/, so 'Commit EX/run.json, EX/ctrl/ and EX/stop/' fails with `git add` 'pathspec did not match'.",
+     "evidence": "The \u00a79 sent-list command appends before `git commit`. No step creates EX/ctrl before X5.0.",
+     "fix": "Define past_x50 from the committed list (`git show HEAD:<EX>/ctrl/sent.txt | grep -qx TRACK-FREEZE-START`). Commit only the paths that exist."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 X5.1 step 2 (line 6249) with stop step 1",
+     "problem": "X5.1's create-stage check writes to `$SCRATCH/m2/auto.json` and reaches EX/ only when it passes. Stop step 1 copies only 'the failing step's uncommitted EX/ outputs', so the most likely X5.1 failure keeps no evidence of which F criterion failed, which P-112 (c) was meant to preserve.",
+     "evidence": "The X5.1 row reads '> $SCRATCH/m2/auto.json \u2026 At create it must exit 0: copy it to EX/m2/create.json'.",
+     "fix": "Write the check to `EX/m2/auto.json` (booleans and counts only, D22-safe), or have stop step 1 also copy `$SCRATCH/m2/auto.json` into EX/stop/failed/."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 'The lift' (lines 6159-6163); edits.json TRACK-FREEZE-LIFT-STOP",
+     "problem": "TRACK-FREEZE-LIFT-STOP asserts 'every body it landed was restored and checked unlanded', but the lift procedure has no gate that a restoration check passed. Its `when` says 'restoration sweep' where \u00a79 says 'restoration check'.",
+     "evidence": "The lift's steps: branch rule, lift_date, commit, push, then the edit. None reads AT/restore/<k>/control.json.",
+     "fix": "Before the edit, require the newest AT/restore/<k>/control.json to read pass true and every AT/restore/<k>/bodies/*.json to read UNTOUCHED; otherwise return to Nathan. Say 'restoration check' in `when`."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 restoration check step 2 (line 6144)",
+     "problem": "'k = 1 + the checks already in AT/restore/' is ambiguous, now that round 8 puts the file waived.txt in the same directory. Counting entries gives the wrong k after a waiver.",
+     "evidence": "The restoration check writes `AT/restore/waived.txt` beside `AT/restore/<k>/`.",
+     "fix": "k = 1 + `find AT/restore -mindepth 1 -maxdepth 1 -type d | wc -l`, or move waived.txt to AT/waived.txt."
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "skills/REVIEWER-PROMPT-cr.draft.md line 32 (second PRIOR variant) versus P-112 (j)",
+     "problem": "The re-cut variant tells reviewers that the earlier round's archives 'were not delivered and no longer exist'. P-112 (j) acknowledges that archives of a round may have gone out before a session ended without recording `delivered_cr<k>`, so a re-cut after a partial delivery gives the brief a false statement.",
+     "evidence": "X4.4's new-session rule re-cuts whenever `delivered_cr<k>` is absent. P-112 (j): 'whose archives may have gone out before a session ended'.",
+     "fix": "Reword: 'Its delivery was not recorded; any of its archives already sent are superseded by this round and must not be installed.'"
+    },
+    {
+     "severity": "NON_BLOCKING",
+     "where": "spec \u00a79 stop step 5 (line 6131) and stop record step 6 (line 6194)",
+     "problem": "Stop step 2 says its `ctrl.py all` exit status is recorded, not acted on. Step 5's and step 6's `ctrl.py all` runs exit 1 whenever an edit reads MIXED, which is expected on the MIXED stop-line path, but the spec does not say so for them.",
+     "evidence": "ctrl.py all without --expect exits 1 on any MIXED or DOUBLED. ctrl_proof's mixed case has TRACK-UNIT-STOPPED MIXED at the kept report.",
+     "fix": "Add 'its exit status is recorded, not acted on' to steps 5 and 6."
+    }
+   ]
+  }
+ ],
+ "verifies": [
+  {
+   "verdicts": [
+    {
+     "index": 0,
+     "where": "spec \u00a79 'The branch rule' rule 1 (lines 6061-6066); X0.2 row (line 6204); P-112 (d) (spec line 1026-1032, DECISIONS.md line 987)",
+     "verdict": "CONFIRMED",
+     "reason": "Reproduced. The only merge test is the prose 'main holds a merged `closeout-residuals X6.4:` commit'. The spec gives no command for it, and P-83 (spec line 384) itself says the execution PR is squash-merged. main is all single-parent squash commits titled '<PR title> (#N)' (77d98dd, aeb256e, d848942, ...). On origin/main, `git log --format=%s | grep -c '^docs(ephemeral): modification intake - Alpha Feedback open entries'` gives 0. `git log --grep='^docs(ephemeral): modification intake'` also gives nothing. Only the unanchored `--grep`, or `--grep='^\\* ...'`, finds d848942, through its body. The body form is not reliable either: 29 of the last 53 main commits carry no '* <subject>' lines (161c55c and fb304b6 use PR-description bodies), so the outcome depends on the GitHub message setting and on what Nathan keeps at merge. So the test needs interpretation, and its natural subject reading misses the merge. The miss takes the session into the stop path. It starts at X0.2 (the X0.2 row sends only a detected merge elsewhere), and X0.3(a) fails, because main's registry is 97bda1a0 after X3.1 (spec lines 3156, 4025), not 8b4e46ed. Stop step 1 then sets past_x50 from the merged EX/ctrl/sent.txt, which lists TRACK-FREEZE-START. Stop-record step 6 ('past X5.0 only') writes TRACK-UNIT-STOPPED and TRACK-STATUS-STOP-01..03 on the tracking page for a unit that passed and merged. It can also be read as 'from that listing \u2026 stops the unit' (the failing-gate bullet), which sweeps and reverses the landed control edits. That is a Notion mis-write in exactly the resume case P-112 (d) was added for. Nothing in X0.2 refuses when main already holds EX/run.json or reads status EXECUTING. REQUIRED. The reviewer's content-based fix (EX/run.json present on origin/main plus status EXECUTING, plus an X0.2 refusal) or an exact stated command would close it."
+    },
+    {
+     "index": 1,
+     "where": "spec \u00a79 X6.4 gate (line 6263); P-111 (c) (spec line 897); record \u00a7P step 24 (line 855, rollback 'the unit stops (P-98, P-99), as step 23'); X7.6 'The PR changes only the three open paths' (line 6274)",
+     "verdict": "CONFIRMED",
+     "reason": "Reproduced in a scratch repo (verify-completeness/g1). main gained an engine/x.py commit after the branch point. `git diff --name-only main HEAD` then printed docs/ephemeral/r.md and engine/x.py; `git diff --name-only main...HEAD` printed only docs/ephemeral/r.md. X6.4's gate is the two-dot form against origin/main. The branch rule runs `git fetch --prune origin` at every new session's start (line 6055), so any session that reaches X6.4 after main has moved sees main's own changes outside the three open paths. Main does move by direct commit (3b8084d, 'PF10 update build notes to v13.2.9', has no PR number) and by other PR merges. Nothing in the spec or the record forbids or handles main moving: grep finds no merge-base, no three-dot form and no 'main moved' rule, and the freeze stops only flow sessions. The X5 landing of 51 bodies and the D24 round make a multi-session span between X0.2 and X6.4 likely. \u00a79's failing-gate bullet says a failing gate 'From that listing to X6.4 \u2026 stops the unit'. Record step 24's rollback is 'the unit stops (P-98, P-99)', and the path check has no forward repair. So an unrelated commit to main reverses the whole landed unit and trashes the page. Nathan must then restore 50 bodies. REQUIRED. Fix: compare against the merge base (`origin/main...HEAD`) or against EX/run.json's `base`, use the same form at X7.6, and state that main moving is not a failure."
+    }
+   ]
+  },
+  {
+   "verdicts": [
+    {
+     "index": 0,
+     "where": "spec \u00a79 branch rule, rule 1 (EXECUTION-SPEC lines 6061-6066); P-112 (d) (spec 1026-1033, DECISIONS 986-993); X0.2 row line 6204",
+     "verdict": "CONFIRMED",
+     "reason": "Reproduced. main has no merge commits (`git log --merges origin/main` = 0); every PR is squash-merged with the PR title as subject and the branch commits only as '* <subject>' body bullets. This holds for multi-commit PRs (77d98dd, aeb256e) and for single-commit PRs too (8b5a836, a4490af), so the repository uses 'PR title and commit details'. In a scratch repo squashed the same way, `git log --format=%s main | grep -c '^closeout-residuals X6.4:'` gives 0, `git merge-base --is-ancestor br main` fails, and only `git log --grep` finds the bullet. Neither the spec nor any engine file gives a command for 'main holds a merged `closeout-residuals X6.4:` commit' (grep for --grep/is-ancestor/log origin/main finds none), and the literal test is false under squash. The same applies to the 'merged `record: X7.<s> failed`' test, since single-commit record PRs also get the PR title as subject. When the test fails, rule 1 falls back to X0.2. X0.3(a) then fails, because X3.1 changed the registry sha. main's EX/ctrl/sent.txt lists TRACK-FREEZE-START, so the stop is classified past X5.0, and stop step 3 would reverse the landed control edits after the unit has merged. That is a mis-edit. Fix as proposed: a tree-based test such as `git cat-file -e origin/main:<EX>/graph_check.json` together with main's record status. For the failure record, read \u00a7E's 'X7.<s> failed' row on main or use `git log origin/main --format=%B | grep`. Also state rule 1's default."
+    },
+    {
+     "index": 1,
+     "where": "EV/skills/fill_brief.py lines 67-88; spec \u00a79 X4.4 row (line 6240); P-112 (f)",
+     "verdict": "CONFIRMED",
+     "reason": "Reproduced on the committed fill_brief.py in a scratch git repo with attempt-1/REVIEWER-PROMPT-cr1.md, top-level REVIEWER-PROMPT-cr2.md, SECTION-10-REVIEW-cr2-SFR-CR2-1.md reading 'Verdict: **SKILL_REPAIR_REQUIRED**' and run.json {}. With `--prior-file` it exits 0 and prints round cr3 with the plan-change text. Without it, it refuses REPAIR_VERDICT_PENDING (exit 1). With delivered_cr2 recorded plus --prior-file it also exits 0. The cause is that `if a.prior_file:` (line 67) is tested before both refusals. X4.4 says 'after a plan change add `--prior-file \u2026`' with no limit to the attempt's first round, and its new-session gate says a SKILL_REPAIR_REQUIRED verdict of the latest round is a stop because 'fill_brief.py refuses with REPAIR_VERDICT_PENDING'. In any attempt after a plan change that claim is false. A session lost between the verdict commit and stop step 1's commit would re-cut at X4.3 and send the same fix for a new review. That breaks D24 condition 5 (a SKILL_REPAIR_REQUIRED finding is repaired, then re-reviewed on new bytes) and P-84 revised (a D24 rejection is a stop). brief_cases_r8.py has no case for this. The gate text states the condition in words, but the only mechanical check it names does not fire, so REQUIRED. Fix: run the REPAIR_VERDICT_PENDING check whenever the newest brief is top-level, before the prior_file branch. Keep PRIOR_ROUND_DELIVERED on the no-prior path. Limit --prior-file to the attempt's first round (newest brief under attempt-*/) or a post-X7.1 plan change, and add the case to brief_cases."
+    },
+    {
+     "index": 2,
+     "where": "spec \u00a79 'The lift' (lines 6159-6163); P-99 (spec 608); P-108 (f) (spec 850); notion/edits.json TRACK-FREEZE-LIFT-STOP 'when'; record \u00a7P line 893-894; engine/ctrl.py STOP_KEPT/restored_bad",
+     "verdict": "DOWNGRADE_NON_BLOCKING",
+     "reason": "The gap is real: neither the lift procedure nor ctrl.py checks that a restoration check has passed, and restored_bad (lines 82-103) would flag a LANDED TRACK-FREEZE-LIFT-STOP in any later check, because it is not in STOP_KEPT. But the plan consistently puts the lift after a passing check. In \u00a79 the lift is nested under 'Once a check has passed, Nathan ends \u2026 or rules a plan change'. P-99 says 'which he may do once the restoration check has passed', and P-108 (f) says 'the lift after a stop comes once a check has passed'. The edit's `when` reads 'once the restoration sweep passes (P-99)'. Record \u00a7P tells Nathan 'Once it passes, end the Modification or approve a plan change, and lift the freeze when you choose.' No designed path runs a restoration check after the lift, so the later check failure the reviewer reproduced cannot happen in the designed order. The false lift line needs Nathan to lift before the check passes, against his own stated action. A refusal gate in the lift and end route (newest AT/restore/<k>/control.json pass true, every body UNTOUCHED, hub.json with no child of the title) is a worthwhile hardening, but EXECUTE following the plan as written does not mis-edit or mis-record."
+    }
+   ]
+  },
+  {
+   "verdicts": [
+    {
+     "index": 0,
+     "where": "spec \u00a79 branch rule rule 1 (lines 6061-6066); X0.2 row (line 6204); DECISIONS.md P-112 (d) lines 986-993 (spec 1026-1033)",
+     "verdict": "CONFIRMED",
+     "reason": "This is real. `git log origin/main` shows 53 single-parent squash commits whose subjects are PR titles (#477, #476, #474 \u2026), with no merge commits. The branch-side subjects survive only as '* <subject>' lines in the body. The spec itself says the merge is a squash (line 384, P-83). The only test given in rule 1 and P-112 (d) is 'main holds a merged `closeout-residuals X6.4:` commit'. No command is given (grep over spec, DECISIONS and the record finds none), and X6.4 does not fix the execution PR's title. I built a scratch squash repro, and three natural readings give three answers: a subject grep finds 0; `merge-base --is-ancestor` on the X6.4 sha returns 1; an unanchored `git log --grep` finds the squash commit, but only if the default body is kept. So the test cannot be run mechanically, and its literal reading fails after a successful merge. The session then goes to X0.2. X0.3(a) expects registry sha 8b4e46ed\u2026, but X3.1 made it 97bda1a0\u2026 (spec 3156, 4025), so X0.3 stops. EX/ctrl/sent.txt merged to main lists TRACK-FREEZE-START, so past_x50 is true. The stop record and its step 6 then write TRACK-UNIT-STOPPED after a unit that passed. The unanchored reading has the opposite fault: a squashed stop-record PR whose branch already held an X6.4 commit (a path-check failure after X6.4's commit) gives a false positive. Fix: test tree content rather than subjects. For example, `git cat-file -e origin/main:<EX>/graph_check.json` (written only at X6.4) together with status EXECUTING. For a failure record, test a file or \u00a7E row that the failure-record commit adds."
+    },
+    {
+     "index": 1,
+     "where": "spec \u00a79 'Sessions' line 6047; DECISIONS P-101 (line 610) and line 739; skills/manifest.json execute.1.then.when; against the X7.4 row (line 6272, 'one he no longer holds follows X7.2's rule') and P-112 (d) ('rejoins at X7.2')",
+     "verdict": "CONFIRMED",
+     "reason": "This is real. The rebuild boundary is set by step position: the manifest says 'A new session rebuilds $PKG with it only at a step before X7.3', and \u00a79 says 'A new session before X7.3 also rebuilds $PKG \u2026 (X1.1, X1.2)'. Round 8 now routes work back to X7.2 after an install: X7.4's differing-digest path for an archive Nathan no longer holds, the plan change that 'rejoins at X7.2', and rule 3's 'a session Nathan starts for a named step \u2026 X7.2'. A new session at X7.2 is 'at a step before X7.3', and it is also before the next X7.3. So it runs execute.1.then, which copies $INST, now already patched, and applies the diffs again. I reproduced `patch -p1 -s -d` on an already-patched tree with no tty: 'Reversed (or previously applied) patch detected \u2026 1 out of 1 hunk ignored', rc=1. The subshell prints PATCH FAILED and exits 1. X7.2 uses neither $PKG nor $GATE, so the result is a spurious failure after X7.1, recorded as `closeout-residuals record: X7.2 failed` and naming the wrong gate. This brings back the round-6 required defect (spec line 1357, executability#4) that P-101 repaired. P-112 (d) itself says X1.1's patches do not apply to an installed tree. Fix: tie the boundary to X7.2 (or to 'once the execution PR has merged') in \u00a79 Sessions, in P-101's mark and line 739, and in execute.1.then.when."
+    },
+    {
+     "index": 2,
+     "where": "spec \u00a79 X4.4 row (line 6240); skills/fill_brief.py lines 67-88; DECISIONS P-112 (f) (lines 1007-1019); skills/results/brief_cases_r8.py",
+     "verdict": "CONFIRMED",
+     "reason": "I reproduced this with a scratch fixture using the committed fill_brief.py, draft and expected_after_patch.txt. The fixture had attempt-1/REVIEWER-PROMPT-cr1.md, a top-level REVIEWER-PROMPT-cr2.md, and a cr2 verdict reading SKILL_REPAIR_REQUIRED. Without the flag: rc=1 REPAIR_VERDICT_PENDING. With --prior-file: rc=0, round cr3, plan-change text. With confirmed verdicts and delivered_cr2 recorded: rc=1 PRIOR_ROUND_DELIVERED without the flag, rc=0 (cr3) with it. The cause is that the `if a.prior_file:` branch (lines 67-70) skips both guards. X4.4 says 'after a plan change add --prior-file \u2026, which always gives the plan-change variant' and does not limit this to the first round of the attempt. In every attempt after a plan change, the P-109 new-session re-run ('X4.3 runs again and X4.4 runs a new round, unless a verdict \u2026 reads SKILL_REPAIR_REQUIRED (a stop; fill_brief.py refuses with REPAIR_VERDICT_PENDING)') therefore passes the flag. The refusal the gate names does not fire. A committed rejection is re-reviewed on the same bytes, against D24 condition 5 (a SKILL_REPAIR_REQUIRED finding is repaired and re-reviewed on new bytes). The brief also carries the plan-change PRIOR/REREVIEW text instead of cr<k-1>'s findings. brief_cases_r8 has no same-attempt re-cut case after a plan change. Fix: run the top-level cr<k-1> verdict scan, and the delivered check where it applies, in every variant. Pass --prior-file only on the first round of a plan change (newest brief under attempt-*/) or on the post-X7.1 route, and add those cases to brief_cases_r8."
+    }
+   ]
+  }
+ ],
+ "usage": {
+  "agents": 6,
+  "subagent_tokens": 1609364,
+  "tool_uses": 305,
+  "duration_ms": 2635948
+ }
+}
