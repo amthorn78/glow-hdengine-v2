@@ -21,6 +21,10 @@ and regression injections of at most 15 words (guards.REGRESSIONS and the per-ru
   T9  GUARD-001 anchor-level coverage of every r1 LOCAL edit (anchor fires a row guard, new_text silent);
   T10 P-15: G-K47 under DECISIONS' placement and under the r1 engine's 'P-15 rev.' placement;
   T11 P-18: the dry-run B candidate for the TBD G-K52.
+  T14 P-61: W-4 required on all 21 ITEM-29 rows (G-K24 on 20, PR-40's parent G25B), each fails when W-4 is removed;
+      the engine's four W-4-placing rules carry the canonical W-4; pass-2 dry-run placement W-4 >= 1 on each row;
+  T15 P-62: G-K39 on RS-40 (silent on its document, fires on the retired sentence), G-K40 not on RS-40.
+  T7 (P-63) also runs the lane-parent and parent-title checks and the --inject-title must-fail case.
 """
 import hashlib, json, os, re, sys
 
@@ -294,6 +298,8 @@ CASES = [
  ("R-A5", G.A5, {"GCFPE-MGMT-10": G.A5_MGMT + ", and `docs/pfcanon/` is read-only.",
                  "PR-35": G.A5_NEW + ", and `docs/pfcanon/` is read-only."},
   ["Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written, and `docs/pfcanon/` is read-only."]),
+ ("R-A5", ["RS-40"], "",  # P-62: RS-40 has no A5 sentence (NOT_APPLICABLE); G-K39 guards it against coming back
+  ["Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written, and `docs/pfcanon/` is read-only."]),
  ("R-A3a", G.A3A, "Resolve the current authoritative subject-matter sources.",
   ["Embed only applicable workflow contracts: actor ownership, sequence, permitted actions, lineage, recovery and handoff."]),
  ("R-A4a", G.A4A, "Use only the binding for the actual result branch.",
@@ -566,19 +572,35 @@ out["T6_ok"] = all(v["expected"] == v["new (P-16)"] and v["R-ITEM23 single patte
 out["T6_new_patterns_on_canonical"] = [c[:40] for c in CANON if re.search(G.RELEASE_ALL, c, re.M)]
 out["T6_engine_RELEASE_equals_R-ITEM23_pattern"] = ns["RELEASE"] == G.RELEASE_ALL
 
-# ---- T7: NAM-002 (prototype; the EXECUTE run uses nam002_live.py on the live child lists) -------------
-idmap = {o: n for o, _, n, _, _, _ in G.PARENT_MAP}
-children = {}
-for r in old["prompts"]:
-    children.setdefault(idmap[r["expected_parent_id"]], []).append({"id": r["notion_page_id"], "title": r["expected_title"]})
-syn = {"captured_at": "SYNTHETIC (PLAN; parents from the ANALYZE mapping)", "hubs": [{"id": h, "children": c} for h, c in children.items()]}
+# ---- T7: NAM-002, lane parents and parent titles (prototype; EXECUTE runs nam002_live.py on the live child lists) --
+# The synthetic child list is built from the new registry's own parent ids and titles (nam002_proof/make_childlist.py),
+# circular by construction; it must equal the ANALYZE parent map.
+sys.path.insert(0, HERE + "/nam002_proof")
+import make_childlist as MC  # noqa: E402
+syn = MC.childlist(new)
+assert {h["id"]: h["title"] for h in syn["hubs"]} == {n: nt for _, _, n, nt, _, _ in G.PARENT_MAP}
+ESC_HUB = "3db4590a05eb81cd938de84cfffead9c"
 res_new = N2.run(HERE + "/registry.new.md", syn, inject=None)
 res_old = N2.run(HERE + "/registry.head.md", syn, inject=None)
 res_inj = N2.run(HERE + "/registry.new.md", syn, inject=("ESC-10", "3db4590a05eb81d59059eb6b95ed5fcf"))
+res_tit = N2.run(HERE + "/registry.new.md", syn, inject_title=(ESC_HUB, "Escalation"))
 out["T7_NAM002"] = {"old registry": res_old["summary"], "new registry": res_new["summary"],
-                    "new registry, ESC-10 parent injected wrong": res_inj["summary"]}
-out["T7_ok"] = (res_old["summary"]["NAM-002"] == 55 and res_new["summary"]["NAM-002"] == 0
-                and res_inj["summary"]["NAM-002_rows"] == ["ESC-10"] and res_new["summary"]["other_errors"] == 0)
+                    "new registry, ESC-10 parent injected wrong": res_inj["summary"],
+                    "new registry, Escalation hub title injected wrong": res_tit["summary"]}
+out["T7_expectation_met"] = {"new": N2.expectation_met(res_new["summary"]),
+                             "inject ESC-10": N2.expectation_met(res_inj["summary"], inject=("ESC-10", "x")),
+                             "inject-title Escalation hub": N2.expectation_met(res_tit["summary"], inject_title=(ESC_HUB, "x")),
+                             "old (control, expected false)": N2.expectation_met(res_old["summary"])}
+_o, _n, _t = res_old["summary"], res_new["summary"], res_tit["summary"]
+out["T7_ok"] = (_o["NAM-002"] == 55 and _o["lane_parent_findings"] == 16 and _o["title_findings"] == 6
+                and _o["title_references"] == {"compared": 70, "mismatched": 70}
+                and _n["NAM-002"] == 0 and _n["other_errors"] == 0 and _n["lane_parent_findings"] == 0
+                and _n["title_findings"] == 0 and _n["title_references"] == {"compared": 70, "mismatched": 0}
+                and res_inj["summary"]["NAM-002_rows"] == ["ESC-10"]
+                and _t["title_hubs"] == [ESC_HUB] and _t["title_references"]["mismatched"] == 5
+                and _t["NAM-002"] == 0 and _t["lane_parent_findings"] == 0
+                and out["T7_expectation_met"] == {"new": True, "inject ESC-10": True, "inject-title Escalation hub": True,
+                                                  "old (control, expected false)": False})
 
 # ---- T9: GUARD-001, anchor-level coverage of every r1 LOCAL edit (heuristic; the dry run is authoritative) ----
 from altsplit import top_alts  # noqa: E402
@@ -693,6 +715,48 @@ for k_, s_ in SITE_ONLY.items():
     t13[k_] = {"words": words(s_), "row guards firing on the phrase alone": alone, "row guards firing on the pre-edit bullet": with_sibling}
 out["T13_site_level_only"] = t13
 
+# ---- T14: P-61, W-4 required on all 21 ITEM-29 rows ---------------------------------------------------------
+t14 = {"rows": {}, "failures": []}
+_w4_rules = {r[0]: r for r in ER.RULES if r[0] in ("R-A7-S1b", "R-A7-S2", "R-A7-CL", "R-A7-S3")}
+t14["engine rules carrying canonical W-4"] = {k: (W4 in v[3]) for k, v in _w4_rules.items()}
+t14["W-4 canonical matches G-K24 / G25B"] = [bool(re.search(G.W4_REQ, W4)), bool(re.search(G.G25B_REQ, W4))]
+_DRY2 = SCR + "/r1/dry2"
+for row in G.A7ALL:
+    req = [val(x) for x in ROWS[row]["audit_assertions"].get("required_regex") or [] if val(x) in (G.W4_REQ, G.G25B_REQ)]
+    base = CANON_BLOCK_CLAT8 if row in G.CLAT8 else CANON_BLOCK
+    doc = base + "\n\n" + "\n\n".join(a for _, a, _ in docs[row])
+    removed = doc.replace(W4, "")
+    retired = G.REGRESSIONS["K24"].get(row) or G.REGRESSIONS["K24"]["*"]
+    put_back = doc.replace(W4, retired)
+    dry = [f for f in __import__("glob").glob(_DRY2 + f"/P*/{row}.json")]
+    placed = json.load(open(dry[0], encoding="utf-8"))["placement"]["W-4"] if len(dry) == 1 else None
+    rec = {"required": req, "matches doc": [bool(re.search(p, doc, re.M)) for p in req],
+           "fails when W-4 removed": [not re.search(p, removed, re.M) for p in req],
+           "fails when the retired wording replaces W-4": [not re.search(p, put_back, re.M) for p in req],
+           "pass-2 dry-run placement W-4": placed}
+    t14["rows"][row] = rec
+    want = [G.G25B_REQ] if row == "PR-40" else [G.W4_REQ]
+    if req != want or not all(rec["matches doc"]) or not all(rec["fails when W-4 removed"]) \
+            or not all(rec["fails when the retired wording replaces W-4"]) or not (placed or 0) >= 1:
+        t14["failures"].append(row)
+t14["rows_count"] = len(t14["rows"])
+t14["G-K24 rows"] = sorted(r for r in G.A7ALL if G.W4_REQ in [val(x) for x in ROWS[r]["audit_assertions"].get("required_regex") or []])
+out["T14_P61_W4"] = t14
+out["T14_ok"] = (t14["rows_count"] == 21 and not t14["failures"] and all(t14["engine rules carrying canonical W-4"].values())
+                 and len(t14["engine rules carrying canonical W-4"]) == 4 and all(t14["W-4 canonical matches G-K24 / G25B"])
+                 and len(t14["G-K24 rows"]) == 20 and "PR-40" not in t14["G-K24 rows"])
+
+# ---- T15: P-62, G-K39 back on RS-40, G-K40 off ------------------------------------------------------------------
+_rs = ROWS["RS-40"]["audit_assertions"]
+_rsdoc = CANON_BLOCK + "\n\n" + "\n\n".join(a for _, a, _ in docs["RS-40"])
+_ret = G.REGRESSIONS["K39"]["*"]
+out["T15_P62_RS40"] = {"G-K39 on RS-40": G.A5_FORBID in [val(x) for x in _rs.get("forbidden_regex") or []],
+                       "G-K40 off RS-40": not any(val(x) in (G.A5_NEW, G.A5_MGMT) for l in ("required_regex", "required_literals")
+                                                  for x in _rs.get(l) or []),
+                       "G-K39 silent on the RS-40 document": not re.search(G.A5_FORBID, _rsdoc, re.M),
+                       "G-K39 fires on the retired sentence appended": bool(re.search(G.A5_FORBID, _rsdoc + "\n" + _ret + "\n", re.M))}
+out["T15_ok"] = all(out["T15_P62_RS40"].values())
+
 out["ALL_OK"] = (not out["T1_regex_compile_failures"] and not out["T2_failures"] and not out["T3_unexpected_hits"]
                  and not out["T4_required_unsatisfied"] and not out["T4_new_forbidden_hits_on_docs"]
                  and not out["T4_any_row_forbidden_on_after_texts"] and not out["T4_case_regressions_not_caught"]
@@ -700,6 +764,7 @@ out["ALL_OK"] = (not out["T1_regex_compile_failures"] and not out["T2_failures"]
                  and not any(out["T5_forbidden_hits_on_P01_P02"].values())
                  and not any(any(v) for v in out["T5_G06_hits_per_lead"].values())
                  and out["T5_G-K22_matches_P01"] and out["T5_G-K36_matches_P02"] and out["T6_ok"] and out["T7_ok"]
-                 and out["inputs"]["once_per_merge_read"] and not out.get("T12_failures"))
+                 and out["inputs"]["once_per_merge_read"] and not out.get("T12_failures")
+                 and out["T14_ok"] and out["T15_ok"])
 json.dump(out, open(HERE + "/guard_tests.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 print(json.dumps({k: v for k, v in out.items() if k not in ("T9_detail",)}, indent=1, ensure_ascii=False))

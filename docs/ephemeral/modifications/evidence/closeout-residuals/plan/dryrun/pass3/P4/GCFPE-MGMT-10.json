@@ -1,0 +1,42 @@
+{
+ "mode": "plan",
+ "pid": "GCFPE-MGMT-10",
+ "page": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan GCFPE-MGMT-10 3db4590a05eb81d1bb64ebcb3ca8eb54 --registry $P3/registry.new.md --guards EV/registry/row_assertions.json --skills $P3/pkg-root --no-ops --candidate-url https://app.notion.com/p/00000000000000000000000000000000",
+ "result": {
+  "pid": "GCFPE-MGMT-10",
+  "fetched": "2026-09-21T22:56:04.638Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_a465047b-110/agent-ae966010fc5c94b48.jsonl",
+  "ops_count": 2,
+  "rules": {
+   "R-OWN": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A5": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

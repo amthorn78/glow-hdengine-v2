@@ -464,10 +464,14 @@
  "root_manifest_json_equal": true,
  "execute": {
   "variables": {
-   "ENV": "export PYTHONDONTWRITEBYTECODE=1 TMPDIR=$SCRATCH",
+   "cwd": "the repository root; every relative path below is relative to it",
+   "ENV": "export PYTHONDONTWRITEBYTECODE=1 TMPDIR=$SCRATCH/tmp (mkdir -p $SCRATCH/tmp first)",
+   "EV": "docs/ephemeral/modifications/evidence/closeout-residuals/plan",
    "INST": "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502",
-   "SCRATCH": "a scratchpad directory; never the repository or a skill",
-   "GGC, FV, CF, RELAY, PR, AUDIT, REPORT": "the new package directories (the patched copies or the extracted packages)",
+   "SCRATCH": "the executing session's scratchpad directory; never the repository or a skill",
+   "PKG": "$SCRATCH/pkg-root: a full copy of $INST with the seven packages replaced by their patched copies (execute.1.then); freeze.py $PKG prints 323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+   "GGC, FV, CF, RELAY, PR, AUDIT, REPORT": "$PKG/glow-graph-contract, $PKG/flowmaster-validate, $PKG/change-flow, $PKG/session-relay-flowmaster, $PKG/glow-hde-pr-development, $PKG/amthor-workspace-governance-audit, $PKG/glow-po-reporting",
+   "GATE": "$SCRATCH/gate: run_gate.py's --out; it builds the candidate root at $GATE/cand (graph/GCFPE-20260914.1-Candidate-Graph-Contract.json = $CF/references/gcfpe-20260914.1-091426.1-candidate-graph-contract.json, byte-equal to the graph bundled in $FV)",
    "FVI, CFI": "$INST/flowmaster-validate, $INST/change-flow (installed, before the install sitting)"
   },
   "1_base_unchanged_before_applying": {
@@ -494,7 +498,33 @@
     "expected_stdout_at_plan_time": "320 420705ec2881bdd82cc46d32880fa02abb463460f081dfa728c3c4aca928f24a",
     "note": "the whole root also covers the 19 skills outside the seven packages; any sync of them changes it"
    },
-   "then": "cp -r $INST/<skill> $SCRATCH/pkg/<skill>; patch -p1 -d $SCRATCH/pkg/<skill> < diffs/<skill>.diff (exit 0), then freeze.py $SCRATCH/pkg/<skill> must print final_freeze below",
+   "then": {
+    "when": "X1.1 (spec §9), before any repository change (P-56): the reindex needs $GGC, the registry gate needs its deriver",
+    "commands": [
+     "mkdir -p $SCRATCH/tmp && rm -rf $PKG && cp -r $INST $PKG",
+     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf $PKG/$s && cp -r $INST/$s $PKG/$s && patch -p1 -s -d $PKG/$s < $EV/skills/diffs/$s.diff || { echo \"PATCH FAILED: $s\"; exit 1; }; done)",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/flowmaster-validate",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/change-flow",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-graph-contract",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/session-relay-flowmaster",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-hde-pr-development",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/amthor-workspace-governance-audit",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-po-reporting",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG"
+    ],
+    "expected": [
+     "exit 0",
+     "exit 0: every patch exits 0 (the subshell exits 1 and names the package at the first failure)",
+     "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
+     "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+     "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae (manifest final_root_freeze)"
+    ]
+   },
    "expected_after_patch": {
     "flowmaster-validate": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
     "change-flow": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
@@ -503,63 +533,71 @@
     "glow-hde-pr-development": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
     "amthor-workspace-governance-audit": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
     "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
-   }
+   },
+   "when": "X0.3 (spec §9), before any repository change"
   },
   "2_graph_reindex_ITEM-12_repository_in_execution_PR_before_install": {
    "commands": [
     "python3 docs/prompt_ecosystem_management/freeze.py docs/graph/parts",
-    "python3 $GGC/scripts/graph_parts.py build docs/graph/parts $SCRATCH/g-before.md",
     "python3 $GGC/scripts/graph_parts.py reindex docs/graph/parts",
     "git diff --stat docs/graph/parts",
+    "git diff --no-color docs/graph/parts | grep -v -e '^diff --git' -e '^index ' | cmp - $EV/skills/results/parts_reindex.repo.diff",
     "python3 docs/prompt_ecosystem_management/freeze.py docs/graph/parts",
     "python3 $GGC/scripts/graph_parts.py build docs/graph/parts $SCRATCH/graph.md",
     "python3 $GGC/scripts/graph_parts.py reindex docs/graph/parts"
    ],
    "expected": [
     "56 980af73e656e20740663ae1dbfa8780eff61b41e2f754c5719c743e4647cae50 (today's parts, HEAD 705568e)",
-    "exit 1; VALIDATION FAILED with exactly 7 bookkeeping errors: global.json 13 _other_edge_indices for 3 _other_edges; CF-C-10 4 for 5; ESC-40 3 for 5; PR-35 4 for 5; QA-70 5 for 4; RS-40 5 for 6; 'edge indices are not exactly 0..228, each once (235 indices for 229 edges)'; then the reindex hint line",
     "exit 0; 'reindex: 229 edges; 27 file(s) rewritten' and the 27 names (global.json + 26 prompt parts)",
     "27 files changed, 107 insertions(+), 113 deletions(-); only edge_indices / _other_edge_indices change (results/parts_reindex.json holds the from/to table)",
+    "exit 0 (cmp prints nothing): the reindex diff, less its 27 'diff --git' and 27 'index' header lines, is byte-identical to the stored diff (sha256 b37fc1d7b79e0f4f88f9a1ae000e6e30123ea57782885171dd739b19e98ddb7b, 6296 B). Run it before staging docs/graph/parts",
     "56 84dbb1fe5e7566b871ddc436bcbc875a772dcc695be221d2b4d45a18a470027f (the reindexed parts)",
     "exit 0; 'build: 55 nodes, 229 edges, 55 state_routes'; 'embedded JSON 575074 bytes  sha256 ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d'; graph.md 575672 B sha256 a70a93263f2943be45450a210f62a82a2a27abfd49a259d04f838e469ba0cc24",
     "exit 0; 'reindex: 229 edges; 0 file(s) rewritten' (idempotent)"
    ],
-   "alternative": "git apply results/parts_reindex.repo.diff (git apply --check exits 0 on HEAD 705568e)",
-   "note": "the installed builder has no reindex and passes today's parts; $GGC must be the new package"
+   "read_only_cross_check": "git apply --check $EV/skills/results/parts_reindex.repo.diff exits 0 before the reindex; git apply --check -R $EV/skills/results/parts_reindex.repo.diff exits 0 after it",
+   "note": "$GGC is the patched package in $PKG (execute.1.then, run first); the installed builder has no reindex and passes today's parts. The cmp check reads the unstaged working tree, so it runs before `git add`",
+   "when": "X3.2 (spec §9): after commit 1 (X2.2) and the registry commit (X3.1); the pre gate ran at X1.3 on the unchanged tree"
   },
   "3_contract_template_move_ITEM-13_repository_in_execution_PR": {
    "commands": [
     "sha256sum docs/ephemeral/modifications/evidence/pre-e2-contract/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json",
+    "mkdir -p docs/graph/contract-template",
     "git mv docs/ephemeral/modifications/evidence/pre-e2-contract/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json",
     "git rm docs/ephemeral/modifications/evidence/pre-e2-contract/README.md",
-    "cp <plan>/new/repo/docs/graph/contract-template/README.md docs/graph/contract-template/README.md",
+    "cp $EV/skills/contract-template-README.md docs/graph/contract-template/README.md",
+    "git add docs/graph/contract-template/README.md",
     "sha256sum docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json docs/graph/contract-template/README.md"
    ],
    "expected": [
     "2b78f877e7a31efb2da8488d7f129794e60bcbdbf9f43e9851a319f83f06b53b, 606657 B",
-    "rename, bytes unchanged",
-    "the old README (839 B, sha256 995399d40b11f94b03058283059e78885bf2d5613769aa96c826f512850c7e2f) is replaced",
-    "new README 1158 B",
+    "exit 0 (docs/graph/contract-template/ exists; without it git mv exits 128)",
+    "exit 0; rename, bytes unchanged",
+    "exit 0; the old README (839 B, sha256 995399d40b11f94b03058283059e78885bf2d5613769aa96c826f512850c7e2f) is removed and docs/ephemeral/modifications/evidence/pre-e2-contract/ no longer exists",
+    "exit 0; new README 1158 B",
+    "exit 0; the README is staged",
     "2b78f877e7a31efb2da8488d7f129794e60bcbdbf9f43e9851a319f83f06b53b; 469e2265640439b0b126379c358aa7e862638c77240b2f0c6b52de8c5ba60fde"
    ],
-   "note": "evidence/regenerate_contract.py and evidence/repair-a4/contract_recipe.py stay as dated records (drafter's recommendation, AUTH-001); the maintained copies are the glow-graph-contract scripts"
+   "note": "evidence/regenerate_contract.py and evidence/repair-a4/contract_recipe.py stay as dated records (drafter's recommendation, AUTH-001); the maintained copies are the glow-graph-contract scripts",
+   "when": "X3.3 (spec §9)"
   },
   "4_contract_regeneration_PART-01_after_steps_2_3_and_the_decision_record_commit": {
    "commands": [
     "python3 $GGC/scripts/graph_parts.py build docs/graph/parts $SCRATCH/graph.md",
     "python3 $GGC/scripts/contract_recipe.py $SCRATCH/graph.md docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json $FV/references/glow-hde-canonical-change-flow-r1-20260923.json docs/prompt_ecosystem_management/gcfpe.decision-record.md $SCRATCH/contract-4.1.0.json --contract-revision 4.1.0 --primary-skill-revision 1.3.0 --check $CFI/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json $FVI/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
     "python3 $GGC/scripts/contract_recipe.py $SCRATCH/graph.md docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json $FV/references/glow-hde-canonical-change-flow-r1-20260923.json docs/prompt_ecosystem_management/gcfpe.decision-record.md $SCRATCH/contract-4.1.1.json --contract-revision 4.1.1 --primary-skill-revision 1.3.1 --check $CF/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json $FV/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
-    "structural diff of contract-4.1.0.json against contract-4.1.1.json",
+    "diff $SCRATCH/contract-4.1.0.json $SCRATCH/contract-4.1.1.json",
     "python3 -c \"import sys,pathlib; sys.path.insert(0,'$FV/scripts'); import validate_gcfpe_20260914 as v; print(v.skill_tree_digest(pathlib.Path('$FV')))\""
    ],
    "expected": [
-    "embedded JSON 575074 B sha256 ae2bd159…",
+    "exit 0; embedded JSON 575074 B sha256 ae2bd159…; graph.md 575672 B sha256 a70a93263f2943be45450a210f62a82a2a27abfd49a259d04f838e469ba0cc24",
     "E2 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162; recipe 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326; EQUAL x2; exit 0",
     "E2 5ad52062133068fa5947eb512a52ddc72bd4791f65faa27444af3357495c03b2 613162; recipe dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c 613326; EQUAL x2 (the packages already carry the regenerated bytes and every pin); exit 0",
-    "exactly .contract_revision 4.1.0 -> 4.1.1 and .pr_development_contract.primary_skill_revision 1.3.0 -> 1.3.1",
+    "exit 1 with exactly two changed lines (the contracts are canonical JSON, indent 2, sorted keys): \"contract_revision\": \"4.1.0\" -> \"4.1.1\" and \"primary_skill_revision\": \"1.3.0\" -> \"1.3.1\" (.pr_development_contract)",
     "ed52208f48479124f39119a54f29774096381ab85f54109a73bc3a7f3cc572af (= SKILL_TREE_SHA256 on $FV/SKILL.md:9)"
    ],
-   "note": "the oracle is byte-identical in $FV and $FVI (not a changed file). The recipe reads the two '> ' lines of the D23-E once-per-merge section only, bounded at the next '### ' or '## ' heading, and asserts there are exactly two (P-21), so entries added under D23 or later decisions do not change the output"
+   "note": "the oracle is byte-identical in $FV and $FVI (not a changed file). The recipe reads the two '> ' lines of the D23-E once-per-merge section only, bounded at the next '### ' or '## ' heading, and asserts there are exactly two (P-21), so entries added under D23 or later decisions do not change the output. $CFI and $FVI are the installed packages before the install sitting; $CF and $FV are in $PKG",
+   "when": "X4.1 (spec §9), after X2 and X3"
   },
   "5_after_the_install_sitting": {
    "commands": [
@@ -580,8 +618,36 @@
     "amthor-workspace-governance-audit": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
     "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
    },
-   "then": "rerun every suite of results/suites_final.json against $INST; expected exits and counts as recorded there",
-   "one_install_event": "flowmaster-validate 3.3.1 passes only with change-flow 3.3.1, relay 3.2.0, PR skill 1.3.1 and the dbae180b contract in both bundled copies; install the seven together"
-  }
+   "then": "python3 $EV/skills/run_gate.py --set post --inst $INST --out $GATE (suite_gate.post); exit 0, 28 rows ok",
+   "one_install_event": "flowmaster-validate 3.3.1 passes only with change-flow 3.3.1, relay 3.2.0, PR skill 1.3.1 and the dbae180b contract in both bundled copies; install the seven together",
+   "when": "X7.4 (spec §9), after Nathan's install sitting (X7.3)"
+  },
+  "suite_gate": {
+   "script": "$EV/skills/run_gate.py (expected results embedded; exit 0 only when every row is ok; writes only under --out and --cand, refuses either inside the repository or a skill tree)",
+   "pre": {
+    "when": "X1.3, once, on the unchanged working tree before commit 1 and the reindex",
+    "command": "python3 $EV/skills/run_gate.py --set pre --pkg-root $PKG --out $GATE",
+    "expected": "exit 0; gate_pre.json: 12 rows, all ok"
+   },
+   "pkg": {
+    "when": "X4.2, after commit 1 (X2), the registry, the reindex, the contract-template move, P32-SWR (X3) and the contract regeneration (X4.1)",
+    "command": "python3 $EV/skills/run_gate.py --set pkg --pkg-root $PKG --out $GATE",
+    "expected": "exit 0; gate_pkg.json: 34 rows, all ok"
+   },
+   "post": {
+    "when": "X7.4, after the install sitting, on main with the execution PR merged",
+    "command": "python3 $EV/skills/run_gate.py --set post --inst $INST --out $GATE",
+    "expected": "exit 0; gate_post.json: 28 rows, all ok"
+   }
+  },
+  "_changes_from_committed_manifest": [
+   "variables: TMPDIR is $SCRATCH/tmp (spec §9); PKG, EV, GATE and cwd defined; GGC..REPORT are $PKG's packages",
+   "1.then: builds the full skills root $PKG (a copy of $INST with the seven patched packages) and gates it on the whole-root freeze; runs at X0.3, before any repository change (P-56)",
+   "2: the new builder's expected refusal of today's parts runs as run_gate.py --set pre; the reindex-diff check is the mechanical cmp; the 'alternative' git apply became a read-only cross-check",
+   "3: mkdir -p before git mv; README source is $EV/skills/contract-template-README.md; README staged",
+   "4: the structural diff is a plain diff of the two canonical contracts; no PLAN scratch path",
+   "suite_gate (new): the three run_gate.py calls; 5.then points at suite_gate.post",
+   "repair round 3: 'when' fields follow spec §9 X0-X7; the pre gate runs at X1.3 (suite_gate.pre), no longer inside execute.2"
+  ]
  }
 }

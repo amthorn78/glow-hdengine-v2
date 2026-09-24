@@ -1,114 +1,173 @@
 [
-  {
-    "id": "PART-12-HUB-01",
-    "page_id": "3ce4590a05eb814f8892f88ff8539308",
-    "page_title": "Glow Operations Hub",
-    "old_str": "- **IN FLIGHT** — something is running; the Product Owner waits",
-    "new_str": "- **IN FLIGHT** — something is running; the Product Owner waits\nWhen a `NEXT_PROMPT_HANDOFF` block ends the message, as it does for a maintenance, repair, validation or review session, the block comes last and the named state is the line immediately before it. Nothing follows the block.",
-    "why": "PART-12 / ITEM-24 / P-32: inserts the P-32 sentence verbatim (DECISIONS.md line 136) immediately after the three named states are defined in Worker communication rules §2 (fetched Hub text line 694; the list is lines 691-694). old_str occurs once on the page as fetched 2026-09-23T22:24:21Z (the only other IN FLIGHT, line 819, is the reviewer template's closing line, which has no handoff block). No P-32-equivalent sentence exists on the Hub."
-  },
-  {
-    "id": "PART-11-TRACK-01",
-    "page_id": "3e34590a05eb81e7927efe0541258916",
-    "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
-    "old_str": "## The three decisions — answered 2026-09-22",
-    "new_str": "**2026-09-23: input for stage 5 — the proposed body's design-level contradictions.** `MODIFICATION-20260923-closeout-residuals` records them in `docs/ephemeral/modifications/evidence/closeout-residuals/ANALYZE-anchor-census.md`, section *The proposed MGMT-10 body*, from a complete read of the proposed body (the child page below) on 2026-09-23. **They are not resolved by that Modification** (its §A, Decision 11): each needs a design choice the `D20` track owns, so they wait for stage 5. That Modification changes the proposed body only to remove the classes it removes from the live bodies (ITEM-23, ITEM-40).\n- **Read-only lines:** ANALYZE's \"Must not: change anything, propose a plan, decide a policy question\" and PLAN's \"Must not: apply anything, add scope not in the analysis\", yet each mode writes, commits and pushes its own section of the Modification.\n- **Exactly one Modification:** \"Every invocation reads and writes exactly one Modification\" conflicts with ANALYZE's read-only line, and with EXECUTE turning genuinely new scope into a new Modification, whose writer is not stated.\n- **Result codes:** one result per invocation, with three codes only; the pending-approval return of ANALYZE and PLAN has no code, and one session may span several modes.\n- **Approval fields:** \"Each mode writes only its own section\" does not say which mode or session writes `analyze_approved_by` and `plan_approved_by` when modes chain in one session.\n- **Artifact locations:** every artifact is Markdown under `docs/ephemeral/`, but graph parts live in `docs/graph/` and rule changes in `docs/prompt_ecosystem_management/`.\n- **Entry contract:** a raw-request ANALYZE has no id, yet the body finds the Modification by its id; creating the file and the branch is not specified.\n- **Open-PR outcome:** \"An open pull request is a complete outcome\" against `ECOSYSTEM_CHANGE_COMPLETE`'s \"applied and verified\" and \"a part lands whole\"; the result code for an unmerged PR or a pending install is unclear.\n- **Install verification:** PLAN's chain of package, independent review, Nathan's install and post-install digest comparison cannot finish inside EXECUTE, which stops at install.\n- **Release-selection boundary:** the body says it does not execute release selection or promotion, yet PLAN's prompt step moves registry rows of selected release members.\n- **YAML governance state:** the page preamble carries `status: APPROVED_FOR_TESTING` and `approved_by`, while the body says a prompt body carries behaviour, never governance state.\n## The three decisions — answered 2026-09-22",
-    "why": "PART-11 / Decision 11 / ITEM-40: one dated 2026-09-23 entry recording, for the redesign's stage 5, the proposed MGMT-10 body's read-only \"Must not\" lines and its design-level contradictions, taken from ANALYZE-anchor-census.md section \"The proposed MGMT-10 body\" (census sha256 759bdd52007cabe74a05aee2619212b819325a8d0e8b36b98d0e727008bbf205, 12 bullets there, grouped here into 10 lines: the two read-only lines share one bullet). The page's convention puts dated entries as bold-dated paragraphs at the end of \"Where things actually stand\"; the entry is inserted directly before the next heading, after the latest dated paragraph and the standing \"three decisions\" paragraph. Body quotes are each at most 11 words (D22). old_str is the heading, which occurs once."
-  },
-  {
-    "id": "PART-18-AF009-01",
-    "page_id": "3df4590a05eb8111a6a5f67cb82f96f6",
-    "page_title": "GCFPE Alpha Feedback — Deferred Items — 091426.1",
-    "old_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold.",
-    "new_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold. **Amended {{EXECUTE_DATE}} (`D23-C` successor; `MODIFICATION-20260923-closeout-residuals` PART-18):** C-LAT's three-step *Decide it during work* block now sits whole only in PR-30 and PR-35, which implement; PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20 and IA-30 keep its Material definition and their own routing. The parenthesis above is left as written (`AUTH-001`).",
-    "why": "PART-18 / ITEM-37 / Q2 (a): the AF-009 disposition states C-LAT's placement (\"C-LAT, in the ten bodies with a rescope threshold\"). The disposition is dated 2026-09-23, so it is amended by an appended note, not rewritten (AUTH-001; the page already uses this convention, e.g. AF-004 \"superseded by D22\"). old_str is the disposition paragraph's last sentence and occurs once on the page. SCOPE FLAG: the page is not among PART-18's named targets (PE Metaprompt overlay, skill copies); it is a Notion control page stating the placement, and the Alpha feedback list is an established MGMT-10 destination (notion-write-boundary.md:119-122). Plan author decides inclusion. Fill {{EXECUTE_DATE}} with the date of the D23-C successor commit."
-  },
-  {
-    "id": "PART-06-HUB-01",
-    "page_id": "3ce4590a05eb814f8892f88ff8539308",
-    "page_title": "Glow Operations Hub",
-    "old_str": "[Open the authoritative Candidate CRD Items List](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view?usp=drivesdk), maintained in place at Glow / Ops / Assessments & Decisions as `Candidate-CRD-Items-List.md`.",
-    "new_str": "[Open the Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}), a Notion page under this Hub and the list's only store (`D25-A`); `CL-40` updates it in place under the destination rule in `docs/prompt_ecosystem_management/notion-write-boundary.md`. The Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`), which held the list until {{EXECUTE_DATE}}, is Nathan's reference copy and is not updated. (Corrected {{EXECUTE_DATE}}: this line named the Drive file as the authoritative list.)",
-    "why": "PART-06 / D25-A: the Hub's current \"Candidate CRD Items\" section (fetched line 110) names the Drive file as the authoritative list; after migration it must point to the new Notion page. Correction note follows the workspace convention \"(Corrected <date>: ...)\". Run only after the page is created and read back; fill {{CANDIDATE_CRD_LIST_URL}} with the page URL in https://app.notion.com/p/<32 hex> form (the form G-K45 requires in CL-40). old_str occurs once. The historical <details> copy (lines 128-132) and the dated 2026-09-08 note (line 125) stay as written (AUTH-001)."
-  },
-  {
-    "id": "PART-06-HUB-02",
-    "page_id": "3ce4590a05eb814f8892f88ff8539308",
-    "page_title": "Glow Operations Hub",
-    "old_str": "Their original identities and complete source history are preserved in the Drive moved-items history.",
-    "new_str": "Their original identities and complete source history are preserved in the list's moved-items history, which moved with it from Drive.",
-    "why": "PART-06: same section, fetched line 112; the moved-items history migrates with the list, so \"the Drive moved-items history\" becomes a stale store pointer. old_str occurs once."
-  },
-  {
-    "id": "PART-06-HUB-03",
-    "page_id": "3ce4590a05eb814f8892f88ff8539308",
-    "page_title": "Glow Operations Hub",
-    "old_str": "Keep ambiguous items in Notion and out of the active Drive list.",
-    "new_str": "Keep ambiguous items in the Checklist's *Ambiguous — PO Decision Required* view and out of the active Candidate CRD Items List.",
-    "why": "PART-06: same section, fetched line 123 (Maintenance paragraph). Once the list is in Notion, \"in Notion\" no longer separates ambiguous items from the list; the view named on line 116 does. old_str occurs once."
-  },
-  {
-    "id": "PART-06-ITEM1-01",
-    "page_id": "3d54590a05eb8142a187d32ad4435950",
-    "page_title": "Repository prompt-use provenance helper",
-    "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "why": "PART-06: Glow Operations Checklist row for original local item 1; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM1-02",
-    "page_id": "3d54590a05eb8142a187d32ad4435950",
-    "page_title": "Repository prompt-use provenance helper",
-    "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
-    "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
-    "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM2-01",
-    "page_id": "3d54590a05eb8119affafcfb024ba990",
-    "page_title": "QA-10 substantive, paste-ready PF10 findings summary",
-    "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "why": "PART-06: Glow Operations Checklist row for original local item 2; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM2-02",
-    "page_id": "3d54590a05eb8119affafcfb024ba990",
-    "page_title": "QA-10 substantive, paste-ready PF10 findings summary",
-    "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
-    "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
-    "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM3-01",
-    "page_id": "3d54590a05eb8159a73cf6af261c1c2b",
-    "page_title": "QA-90 explicit Product Owner task selection",
-    "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "why": "PART-06: Glow Operations Checklist row for original local item 3; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM3-02",
-    "page_id": "3d54590a05eb8159a73cf6af261c1c2b",
-    "page_title": "QA-90 explicit Product Owner task selection",
-    "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
-    "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
-    "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM4-01",
-    "page_id": "3d54590a05eb8118b229e0ca25bdfd42",
-    "page_title": "Combined audit-and-plan invocations for IA and QA preparation",
-    "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
-    "why": "PART-06: Glow Operations Checklist row for original local item 4; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
-  },
-  {
-    "id": "PART-06-ITEM4-02",
-    "page_id": "3d54590a05eb8118b229e0ca25bdfd42",
-    "page_title": "Combined audit-and-plan invocations for IA and QA preparation",
-    "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
-    "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
-    "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
-  }
+ {
+  "id": "PART-12-HUB-01",
+  "page_id": "3ce4590a05eb814f8892f88ff8539308",
+  "page_title": "Glow Operations Hub",
+  "old_str": "- **IN FLIGHT** — something is running; the Product Owner waits",
+  "new_str": "- **IN FLIGHT** — something is running; the Product Owner waits\nWhen a `NEXT_PROMPT_HANDOFF` block ends the message, as it does for a maintenance, repair, validation or review session, the block comes last and the named state is the line immediately before it. Nothing follows the block.",
+  "when": "X5.7; §P step 19",
+  "why": "PART-12 / ITEM-24 / P-32: inserts the P-32 sentence verbatim (DECISIONS.md line 136) immediately after the three named states are defined in Worker communication rules §2 (fetched Hub text line 694; the list is lines 691-694). old_str occurs once on the page as fetched 2026-09-23T22:24:21Z (the only other IN FLIGHT, line 819, is the reviewer template's closing line, which has no handoff block). No P-32-equivalent sentence exists on the Hub."
+ },
+ {
+  "id": "TRACK-FREEZE-START",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "**The three decisions below are recorded as",
+  "new_str": "**{{EXECUTE_DATE}}: the freeze started.** Nathan confirmed it before `MODIFICATION-20260923-closeout-residuals` made its first Notion write: no flow session runs until the seven skills it changes are installed and verified and Nathan lifts the freeze, so no landed prompt body is used before the matching skills are installed.\n**The three decisions below are recorded as",
+  "when": "X5.0; §P step 11 — after Nathan confirms the freeze, as the run's first Notion write",
+  "why": "P-65, P-66 (revised). One dated line in the page's convention for dated entries: a bold-dated paragraph at the end of 'Where things actually stand' (e.g. '**2026-09-23: those results are void**'). Inserted before the '**The three decisions below are recorded as' paragraph, so it follows the latest dated paragraph and precedes PART-11-TRACK-01 (X5.7) and TRACK-FREEZE-LIFT (X7.5), which insert at the same point later: the three land in date order. old_str occurs once as fetched. No code span inside the bold run, so the readback is not affected by Notion's '****' serialization of bold next to code. {{EXECUTE_DATE}} is the UTC date of this write (P-71)."
+ },
+ {
+  "id": "PART-11-TRACK-01",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "**The three decisions below are recorded as",
+  "new_str": "**{{EXECUTE_DATE}}: input for stage 5 — the proposed body's design-level contradictions.** `MODIFICATION-20260923-closeout-residuals` records them in `docs/ephemeral/modifications/evidence/closeout-residuals/ANALYZE-anchor-census.md`, section *The proposed MGMT-10 body*, from a complete read of the proposed body (the child page below) on 2026-09-23. **They are not resolved by that Modification** (its §A, Decision 11): each needs a design choice the `D20` track owns, so they wait for stage 5. That Modification changes the proposed body only to remove the classes it removes from the live bodies (ITEM-23, ITEM-40).\n- **Read-only lines:** ANALYZE's \"Must not: change anything, propose a plan, decide a policy question\" and PLAN's \"Must not: apply anything, add scope not in the analysis\", yet each mode writes, commits and pushes its own section of the Modification.\n- **Exactly one Modification:** \"Every invocation reads and writes exactly one Modification\" conflicts with ANALYZE's read-only line, and with EXECUTE turning genuinely new scope into a new Modification, whose writer is not stated.\n- **Result codes:** one result per invocation, with three codes only; the pending-approval return of ANALYZE and PLAN has no code, and one session may span several modes.\n- **Approval fields:** \"Each mode writes only its own section\" does not say which mode or session writes `analyze_approved_by` and `plan_approved_by` when modes chain in one session.\n- **Artifact locations:** every artifact is Markdown under `docs/ephemeral/`, but graph parts live in `docs/graph/` and rule changes in `docs/prompt_ecosystem_management/`.\n- **Entry contract:** a raw-request ANALYZE has no id, yet the body finds the Modification by its id; creating the file and the branch is not specified.\n- **Open-PR outcome:** \"An open pull request is a complete outcome\" against `ECOSYSTEM_CHANGE_COMPLETE`'s \"applied and verified\" and \"a part lands whole\"; the result code for an unmerged PR or a pending install is unclear.\n- **Install verification:** PLAN's chain of package, independent review, Nathan's install and post-install digest comparison cannot finish inside EXECUTE, which stops at install.\n- **Release-selection boundary:** the body says it does not execute release selection or promotion, yet PLAN's prompt step moves registry rows of selected release members.\n- **YAML governance state:** the page preamble carries `status: APPROVED_FOR_TESTING` and `approved_by`, while the body says a prompt body carries behaviour, never governance state.\n**The three decisions below are recorded as",
+  "when": "X5.7; §P step 18",
+  "why": "PART-11 / Decision 11 / ITEM-40; P-51, P-65. Replaces the r1 draft. Same entry text, except that it opens '**{{EXECUTE_DATE}}:' (the write date, P-51) instead of '**2026-09-23:'; 'on 2026-09-23' is kept, because it dates the census read. Inserted immediately before the paragraph that begins '**The three decisions below are recorded as ****`D20`**', so 'below' still introduces the heading '## The three decisions — answered 2026-09-22' (review r1 finding on PART-11-TRACK-01). old_str is that paragraph's opening, which occurs once on the page as fetched 2026-09-24 (page_last_edited_at 2026-09-23T17:45:35.845Z), and still once after TRACK-FREEZE-START, which inserts before the same paragraph and so stays above this entry. new_str re-emits old_str at its end: a pure insertion. The 10 bullets are unchanged from r1 (census sha256 759bdd52007cabe74a05aee2619212b819325a8d0e8b36b98d0e727008bbf205; body quotes at most 11 words, D22)."
+ },
+ {
+  "id": "TRACK-STATUS-01",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "FOLLOW_UP_MODIFICATION_AT_INTAKE",
+  "new_str": "FOLLOW_UP_MODIFICATION_COMPLETE ({{CLOSE_DATE}}, docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md)",
+  "when": "X7.7; §P step 28 — after the close commit (X7.6) is pushed",
+  "why": "P-50, P-65. The yaml block's status line reads 'status: STAGE_4_FIRST_USE_COMPLETE_FOLLOW_UP_MODIFICATION_AT_INTAKE'. Only its tail is replaced; 'status: STAGE_4_FIRST_USE_COMPLETE_' is kept. The value stays a plain YAML scalar (no ': ' and no ' #'), in the block's own style for a value with a parenthesized note ('substance_lives_in: <path> (v1.1)'). old_str occurs once on the page (the other INTAKE mentions are '`INTAKE`' in backticks). Written after the close commit that sets COMPLETE is pushed (X7.6, P-72), so the line never claims COMPLETE before the record does; {{CLOSE_DATE}} is that commit's UTC date (P-71)."
+ },
+ {
+  "id": "TRACK-STATUS-02",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "which is at `INTAKE` with `ANALYZE` in progress",
+  "new_str": "which reached `COMPLETE` on {{CLOSE_DATE}} (record: `docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md`)",
+  "when": "X7.7; §P step 28 — after the close commit (X7.6) is pushed",
+  "why": "P-50, P-65. The last sentence of the '**2026-09-23: stage 4's first real use ran end to end.**' paragraph ends '..., which is at `INTAKE` with `ANALYZE` in progress.' Only that clause is replaced; the paragraph's dated text before it and the closing period stay. old_str occurs once. Written after the close commit that sets COMPLETE is pushed (X7.6, P-72), so the line never claims COMPLETE before the record does; {{CLOSE_DATE}} is that commit's UTC date (P-71)."
+ },
+ {
+  "id": "TRACK-STATUS-03",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "`INTAKE`, branch",
+  "new_str": "`COMPLETE` on {{CLOSE_DATE}}, branch",
+  "when": "X7.7; §P step 28 — after the close commit (X7.6) is pushed",
+  "why": "P-50, P-65. Records row 'The follow-up Modification — the close-out's installed-skill and prompt-body items', whose cell reads '`docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md` — `INTAKE`, branch `claude/epic-tesla-17406z`'. The cell already names the record path; only the status word gains its date. The branch is kept as written (the task rule: keep everything else on the line). old_str occurs once (TRACK-STATUS-02's '`INTAKE` with' is a different string). Written after the close commit that sets COMPLETE is pushed (X7.6, P-72), so the line never claims COMPLETE before the record does; {{CLOSE_DATE}} is that commit's UTC date (P-71)."
+ },
+ {
+  "id": "TRACK-FREEZE-LIFT",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "**The three decisions below are recorded as",
+  "new_str": "**{{LIFT_DATE}}: the freeze lifted.** The seven skills `MODIFICATION-20260923-closeout-residuals` changes were installed and verified after install, and Nathan lifted the freeze: flow sessions may run again.\n**The three decisions below are recorded as",
+  "when": "X7.5; §P step 26 — after X7.4's post-install verification passes and Nathan lifts the freeze",
+  "why": "P-65, P-66 (revised); the matching lift line for TRACK-FREEZE-START (§P Product Owner actions: 'Verified by the tracking page's two dated lines'). Same placement and anchor, so it lands after PART-11-TRACK-01. old_str occurs once as fetched and once after the X5.0 and X5.7 insertions (simulated). It states only what is true when it is written: the install, X7.4's verification and Nathan's lift. It says nothing of the close-out PR, which is opened after it (X7.6). {{LIFT_DATE}} is the UTC date Nathan lifts the freeze (P-71)."
+ },
+ {
+  "id": "PART-18-AF009-01",
+  "page_id": "3df4590a05eb8111a6a5f67cb82f96f6",
+  "page_title": "GCFPE Alpha Feedback — Deferred Items — 091426.1",
+  "old_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold.",
+  "new_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold. **Amended {{EXECUTE_DATE}} (`D23-C` successor; `MODIFICATION-20260923-closeout-residuals` PART-18):** C-LAT's three-step *Decide it during work* block now sits whole only in PR-30 and PR-35, which implement; PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20 and IA-30 keep its Material definition and their own routing. The parenthesis above is left as written (`AUTH-001`).",
+  "when": "X5.7; §P step 20",
+  "why": "PART-18 / ITEM-37 / Q2 (a): the AF-009 disposition states C-LAT's placement (\"C-LAT, in the ten bodies with a rescope threshold\"). The disposition is dated 2026-09-23, so it is amended by an appended note, not rewritten (AUTH-001; the page already uses this convention, e.g. AF-004 \"superseded by D22\"). old_str is the disposition paragraph's last sentence and occurs once on the page. The page is not among PART-18's named targets (PE Metaprompt overlay, skill copies); it is a Notion control page stating the placement, and the Alpha feedback list is an established MGMT-10 destination (notion-write-boundary.md:119-122). {{EXECUTE_DATE}} is the UTC date of this write (P-71). Included (P-67): a consequence of ITEM-37 that §A's target list omitted."
+ },
+ {
+  "id": "PART-06-HUB-01",
+  "page_id": "3ce4590a05eb814f8892f88ff8539308",
+  "page_title": "Glow Operations Hub",
+  "old_str": "[Open the authoritative Candidate CRD Items List](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view?usp=drivesdk), maintained in place at Glow / Ops / Assessments & Decisions as `Candidate-CRD-Items-List.md`.",
+  "new_str": "[Open the Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}), a Notion page under this Hub and the list's only store (`D25-A`); `CL-40` updates it in place under the destination rule in `docs/prompt_ecosystem_management/notion-write-boundary.md`. The Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`), which held the list until {{EXECUTE_DATE}}, is Nathan's reference copy and is not updated. (Corrected {{EXECUTE_DATE}}: this line named the Drive file as the authoritative list.)",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06 / D25-A: the Hub's current \"Candidate CRD Items\" section (fetched line 110) names the Drive file as the authoritative list; after migration it must point to the new Notion page. Correction note follows the workspace convention \"(Corrected <date>: ...)\". Run only after the page is created and read back; fill {{CANDIDATE_CRD_LIST_URL}} with the page URL in https://app.notion.com/p/<32 hex> form (the form G-K45 requires in CL-40). old_str occurs once. The historical <details> copy (lines 128-132) and the dated 2026-09-08 note (line 125) stay as written (AUTH-001)."
+ },
+ {
+  "id": "PART-06-HUB-02",
+  "page_id": "3ce4590a05eb814f8892f88ff8539308",
+  "page_title": "Glow Operations Hub",
+  "old_str": "Their original identities and complete source history are preserved in the Drive moved-items history.",
+  "new_str": "Their original identities and complete source history are preserved in the list's moved-items history, which moved with it from Drive.",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: same section, fetched line 112; the moved-items history migrates with the list, so \"the Drive moved-items history\" becomes a stale store pointer. old_str occurs once."
+ },
+ {
+  "id": "PART-06-HUB-03",
+  "page_id": "3ce4590a05eb814f8892f88ff8539308",
+  "page_title": "Glow Operations Hub",
+  "old_str": "Keep ambiguous items in Notion and out of the active Drive list.",
+  "new_str": "Keep ambiguous items in Notion and out of the active [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}).",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06 / D25-A; P-67. Replaces the r1 draft, which also asserted the Checklist's *Ambiguous — PO Decision Required* view (review r1 finding: beyond a pointer change). Pointer-only: the Maintenance paragraph's sentence keeps 'in Notion' and changes only its pointer, 'the active Drive list', to the Notion page. old_str occurs once on the Hub as fetched 2026-09-24T00:43:18Z (page_last_edited_at 2026-09-23T17:46:27.946Z). Fill {{CANDIDATE_CRD_LIST_URL}} with the normalized page URL from X5.1."
+ },
+ {
+  "id": "PART-06-ITEM1-01",
+  "page_id": "3d54590a05eb8142a187d32ad4435950",
+  "page_title": "Repository prompt-use provenance helper",
+  "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: Glow Operations Checklist row for original local item 1; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM1-02",
+  "page_id": "3d54590a05eb8142a187d32ad4435950",
+  "page_title": "Repository prompt-use provenance helper",
+  "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
+  "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM2-01",
+  "page_id": "3d54590a05eb8119affafcfb024ba990",
+  "page_title": "QA-10 substantive, paste-ready PF10 findings summary",
+  "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: Glow Operations Checklist row for original local item 2; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM2-02",
+  "page_id": "3d54590a05eb8119affafcfb024ba990",
+  "page_title": "QA-10 substantive, paste-ready PF10 findings summary",
+  "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
+  "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM3-01",
+  "page_id": "3d54590a05eb8159a73cf6af261c1c2b",
+  "page_title": "QA-90 explicit Product Owner task selection",
+  "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: Glow Operations Checklist row for original local item 3; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM3-02",
+  "page_id": "3d54590a05eb8159a73cf6af261c1c2b",
+  "page_title": "QA-90 explicit Product Owner task selection",
+  "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
+  "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM4-01",
+  "page_id": "3d54590a05eb8118b229e0ca25bdfd42",
+  "page_title": "Combined audit-and-plan invocations for IA and QA preparation",
+  "old_str": "- [Authoritative Drive register and complete moved-item history](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "new_str": "- [Candidate CRD Items List — the list and its complete moved-item history]({{CANDIDATE_CRD_LIST_URL}})\n- [Drive reference copy of the list, not updated after the move to Notion](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view)",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: Glow Operations Checklist row for original local item 4; its \"Evidence and history\" bullet names the Drive file as the authoritative register. After migration it points to the Notion page and keeps the Drive link labelled as a reference copy. old_str occurs once in the page content (the \"Authoritative Drive register\" database property is separate; see NOTES open decision). Run after page readback; fill {{CANDIDATE_CRD_LIST_URL}}."
+ },
+ {
+  "id": "PART-06-ITEM4-02",
+  "page_id": "3d54590a05eb8118b229e0ca25bdfd42",
+  "page_title": "Combined audit-and-plan invocations for IA and QA preparation",
+  "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
+  "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{EXECUTE_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
+  "when": "X5.3; §P step 14 — after the new page's readback passes (X5.1)",
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}."
+ }
 ]

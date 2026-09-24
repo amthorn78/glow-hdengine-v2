@@ -749,14 +749,16 @@ orders them with an actor, a gate and a readback for each.
 4. **Dry runs.** Pass 1 was rule level. Pass 2 was the complete check: 56 of 56 bodies passed (50 live, 5 untouched
    live, and the proposed MGMT-10 body).
 5. **A second review** (`wf_045af16b-3ed`, three lenses) returned 7 required findings on order, paths, landing units
-   and one guard. Repair round 2 (`wf_9c136682-f25`) answered them (P-55 to P-70; spec §2.4). **Pass 3 then
-   rehearsed `land.py` itself on every body.**
+   and one guard. Repair round 2 (`wf_9c136682-f25`) answered them (P-55 to P-70; spec §2.4), and repair round 3
+   settled the close order and the tokens (P-58 and P-66 revised, P-71 to P-74; spec §2.5). **Pass 3 rehearsed
+   `land.py` itself** with the new registry and the patched skills root: 51 of 51 bodies plan with no refusal and a
+   passing precheck, the 5 untouched bodies pass `check`, and the graph check passes (spec §8).
 6. **The skills.** Every suite passes on the patched tree, and every must-fail regression fires. The contract
    regenerates byte for byte. The suite gate is a script with its expected results built in.
 
 ### Rulings this plan applies
 
-The Product Owner rulings in §A (1 to 5) are applied as recorded. The PLAN decisions P-01 to P-70 (spec §1) apply them
+The Product Owner rulings in §A (1 to 5) are applied as recorded. The PLAN decisions P-01 to P-74 (spec §1) apply them
 or settle a finding; none needs a new ruling. Five settle something the analysis left to PLAN:
 
 - **P-02:** R-OWN's sentence also covers the pull request that carries a prompt's outputs (D25-B credits it to the
@@ -764,8 +766,9 @@ or settle a finding; none needs a new ruling. Five settle something the analysis
 - **P-37:** a prompt's own intake list may name `CANON_CONFLICT_REGISTER`.
 - **P-43:** the policy line and the repair-a4 note land after the install, in the close-out PR.
 - **P-57, P-58:** the body parts land as one unit, with a rehearsal before the first write and a rollback journal. The
-  journal is a transient file of the landing in hand under `D22`, deleted at close.
-- **P-66:** the freeze runs to the close-out merge (an upstream finding against §A order 4).
+  journal is a transient file of the landing in hand under `D22`, kept until the post-install verification passes.
+- **P-66:** the freeze runs from before the first Notion write until Nathan lifts it after the post-install
+  verification (an upstream finding against §A order 4).
 
 ### Steps
 
@@ -789,31 +792,33 @@ or settle a finding; none needs a new ruling. Five settle something the analysis
 | 16 | PART-05, 06, 07, 13, 14, 15, 16, 18 | the 50 live bodies | Land each page from the engine with a rollback journal; re-fetch; `check` (spec §3; X5.5) | the parts' classes; `D23`, `D25` | `check` passes on each page | `land.py reverse` on every landed page; revert the registry; the body unit is BLOCKED |
 | 17 | PART-11 | the proposed MGMT-10 body | R-ITEM23 and its LOCAL preamble edit; the gates (X5.6) | ITEM-23, ITEM-40 | both gates read 0 on the readback | reverse |
 | 18 | PART-11 | Notion: the D20 redesign tracking page | `PART-11-TRACK-01` (spec §7.3; X5.7) | Decision 11 | readback | reverse the edit |
-| 19 | PART-12 | Notion: Hub *Worker communication rules* §2 | `PART-12-HUB-01` (spec §7.1) | ITEM-24 | readback | reverse the edit |
-| 20 | PART-18 | Notion: the Alpha feedback list, AF-009 | `PART-18-AF009-01`, a dated amendment (spec §7.2). The PE Metaprompt and the skills state no placement; no edit | P-44 | readback | reverse the edit |
+| 19 | PART-12 | Notion: Hub *Worker communication rules* §2 | `PART-12-HUB-01` (spec §7.1; X5.7) | ITEM-24 | readback | reverse the edit |
+| 20 | PART-18 | Notion: the Alpha feedback list, AF-009 | `PART-18-AF009-01`, a dated amendment (spec §7.2; X5.7). The PE Metaprompt and the skills state no placement; no edit | P-44 | readback | reverse the edit |
 | 21 | PART-10 | the registry's parent IDs and titles | NAM-002 and the title and lane checks on a live snapshot (spec §4.4; X5.8) | ITEM-22; P-63 | 0 findings; exactly one on each injected fault; the old registry gives 55, exit 1 | revert the parent IDs |
 | 22 | PART-08 | OPS-10, OPS-20 | No edit. ITEM-20 is `NOT_APPLICABLE`: the mention bans are correctly scoped (§A) | §A | §E records the disposition | — |
 | 23 | gate | the corpus | The Tier 1 gate (X6): `land.py check` on all 55 live bodies; `graph_check.py`; `closure.py` | Tier 1; P-64 | 55/55; exit 0; the graph proof token is unchanged | fix within the failing unit, or block it |
 | 24 | record | this record's §E and the evidence | Write §E; commit; open the execution PR (X6.4) | template rules 5, 6 | `modification_validate.py` passes; only the three open paths change | — |
 | 25 | the skill unit | the installed tree | After Nathan merges and installs: digests; `run_gate.py --set post`; the corpus gate with the installed skills (X7.4) | `D24` | every digest equals its packaged digest; exit 0; 55/55 | reinstall the previous packages (base digests in the manifest) |
-| 26 | close | the decision record, the policy, the repair-a4 record, §E, the tracking page | `CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`, `TRACK-STATUS-*`, `TRACK-FREEZE-LIFT`, §E's install record and actual cost, `COMPLETE`; the rollback journal deleted. Opened as the close-out PR (X7.5) | P-43, P-65 | `modification_validate.py` passes on `COMPLETE`; readbacks; the journal directory is gone | revert |
+| 26 | close | the freeze; Notion: the D20 tracking page | After step 25 passes, Nathan lifts the freeze; `TRACK-FREEZE-LIFT`; the rollback journal deleted (X7.5) | P-66, P-58 | readback; the journal directory is gone | — |
+| 27 | close | the decision record, the policy, the repair-a4 record, this record | The close commit: `CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`, §E's install record and actual cost, the dispositions, `COMPLETE`; the close-out PR opened (X7.6) | P-43, P-72 | `modification_validate.py` passes on `COMPLETE`; no committed `{{` | revert |
+| 28 | close | Notion: the D20 tracking page | `TRACK-STATUS-01` to `03`, dated by the step-27 commit; their readback added to §E on the same PR (X7.7) | P-65, P-72 | readback; `modification_validate.py` passes | reverse the edit |
 
 **Order:** 1, 2, 3, then 4–7, then 8–10. Then 11 → 12 → 13 → 14 → 15 → 16, then 17–21. Step 12 must pass
-before any body lands (PART-15 is after PART-06). Then 22–24. Step 25 follows Nathan's merge and install, and step 26
-comes last.
+before any body lands (PART-15 is after PART-06). Then 22–24. Step 25 follows Nathan's merge and install; then 26,
+27 and 28 in that order.
 
 ### Product Owner actions
 
 - **Approve this plan.** Recorded as `plan_approved_by`.
 - **Merge #478**, this record. Verified by `plan_approved_by` on `main`.
-- **Confirm the freeze** at step 11 and **lift it** at step 26. No flow session runs in between. Verified by the
-  tracking page's two dated lines.
+- **Confirm the freeze** at step 11 and **lift it** at step 26, once step 25's post-install verification passes. No
+  flow session runs in between. Verified by the tracking page's two dated lines.
 - **Merge the execution PR** after step 24. Verified by the merge commit on `main`, which puts the reindex there
   before the install.
 - **Install the seven `.skill` packages in one sitting.** Verified by step 25's digest comparison.
 - **Banner the Drive file** `Candidate-CRD-Items-List.md` as superseded, pointing to the new page. Verified by reading
   the file's first lines.
-- **Merge the close-out PR.** Verified by the merge commit.
+- **Merge the close-out PR** after step 28. Verified by the merge commit.
 
 ### Explicitly not in scope
 

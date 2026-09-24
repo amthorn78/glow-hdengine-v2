@@ -7,7 +7,7 @@
   "plan_result_sha256": "ee19b3f9fc1e45debb0de961a672c302b864e3fdeff6eacb935bc4fba3999242",
   "r1_engine_locals_sha256": "4753612196499eb08a75ed1f2a22e5a00015bcfd3cd4025f498b5af2a4b05583",
   "r1_engine_rules_sha256": "08fe4baba2924e8d1eabeaa6f2b00ce6f9e1953f40c25cfd897630750299bfd3",
-  "decisions_sha256": "a01f6df164b5123d5f29edc7a22a9fb94031fe6fa05ed07f1f65f01bed61c315",
+  "decisions_sha256": "baa57fe6571d5a8ea4285560e52105c24edd5694e7cf4dc6942e11d12574de4e",
   "decisions_literals_found_verbatim": {
    "P-01": true,
    "P-02": true,
@@ -20,7 +20,7 @@
  },
  "T1_regex_compile_failures": [],
  "T1_python": "3.11.15",
- "T2_checks_run": 440,
+ "T2_checks_run": 456,
  "T2_failures": [],
  "T3_new_forbidden_on_canonical": [
   [
@@ -50,12 +50,12 @@
  "T4_required_unsatisfied": [],
  "T4_new_forbidden_hits_on_docs": [],
  "T4_any_row_forbidden_on_after_texts": [],
- "T4_case_regressions_run": 451,
+ "T4_case_regressions_run": 452,
  "T4_case_regressions_not_caught": [],
- "T8_regression_runs": 697,
+ "T8_regression_runs": 713,
  "T8_failures": [],
  "T8_max_words": {
-  "REGRESSIONS": 12,
+  "REGRESSIONS": 14,
   "CASES": 15
  },
  "T8_over_15_words": [],
@@ -307,7 +307,40 @@
    "non_prompt_findings": [
     "COL-002",
     "SRC-001"
-   ]
+   ],
+   "lanes": 16,
+   "lane_parent_findings": 16,
+   "lane_parent_lanes": [
+    "GCFPE-MGMT",
+    "CF-PO",
+    "CF-C",
+    "CF-E",
+    "CL-C",
+    "CL-E",
+    "CL",
+    "DOC",
+    "ESC",
+    "IA",
+    "MGR",
+    "OPS",
+    "PR",
+    "QA",
+    "RS",
+    "UTIL"
+   ],
+   "title_findings": 6,
+   "title_hubs": [
+    "3db4590a05eb811b9c14f2ae89c28df7",
+    "3db4590a05eb814d96d3dcfa8835f96d",
+    "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "3db4590a05eb81cd938de84cfffead9c",
+    "3db4590a05eb81d59059eb6b95ed5fcf",
+    "3db4590a05eb81de9736ea69bac61016"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 70
+   }
   },
   "new registry": {
    "sources": 55,
@@ -321,7 +354,16 @@
    "non_prompt_findings": [
     "COL-002",
     "SRC-001"
-   ]
+   ],
+   "lanes": 16,
+   "lane_parent_findings": 0,
+   "lane_parent_lanes": [],
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   }
   },
   "new registry, ESC-10 parent injected wrong": {
    "sources": 55,
@@ -337,8 +379,48 @@
    "non_prompt_findings": [
     "COL-002",
     "SRC-001"
-   ]
+   ],
+   "lanes": 16,
+   "lane_parent_findings": 0,
+   "lane_parent_lanes": [],
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   }
+  },
+  "new registry, Escalation hub title injected wrong": {
+   "sources": 55,
+   "rows": 55,
+   "unplaced_rows": [],
+   "NAM-002": 0,
+   "NAM-002_rows": [],
+   "NAM-001": [],
+   "other_errors": 0,
+   "other_prompt_findings": [],
+   "non_prompt_findings": [
+    "COL-002",
+    "SRC-001"
+   ],
+   "lanes": 16,
+   "lane_parent_findings": 0,
+   "lane_parent_lanes": [],
+   "title_findings": 1,
+   "title_hubs": [
+    "3db4590a05eb81cd938de84cfffead9c"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 5
+   }
   }
+ },
+ "T7_expectation_met": {
+  "new": true,
+  "inject ESC-10": true,
+  "inject-title Escalation hub": true,
+  "old (control, expected false)": false
  },
  "T7_ok": true,
  "T9_local_edits": 66,
@@ -1287,7 +1369,7 @@
   "silent on CL-30 synthetic doc": true,
   "hits on canonical/authored": []
  },
- "T12_dryrun_load_guards_runs": 697,
+ "T12_dryrun_load_guards_runs": 713,
  "T12_failures": [],
  "T13_site_level_only": {
   "RS-40 LRS-40-2": {
@@ -1298,5 +1380,366 @@
    ]
   }
  },
+ "T14_P61_W4": {
+  "rows": {
+   "OPS-30": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 2
+   },
+   "PR-10": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 2
+   },
+   "PR-20": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 2
+   },
+   "PR-30": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 2
+   },
+   "PR-40": {
+    "required": [
+     "PR-40 is entered on the observed merge event"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 3
+   },
+   "QA-10": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 2
+   },
+   "CL-20": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-30": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-40": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-C-10": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-E-10": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-E-20": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-E-30": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "CL-E-40": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "DOC-10": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "DOC-20": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "ESC-10": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "ESC-25": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "ESC-30": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "ESC-40": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   },
+   "QA-20": {
+    "required": [
+     "PR-40 is entered on the observed merge event for the identified PR"
+    ],
+    "matches doc": [
+     true
+    ],
+    "fails when W-4 removed": [
+     true
+    ],
+    "fails when the retired wording replaces W-4": [
+     true
+    ],
+    "pass-2 dry-run placement W-4": 1
+   }
+  },
+  "failures": [],
+  "engine rules carrying canonical W-4": {
+   "R-A7-S1b": true,
+   "R-A7-S2": true,
+   "R-A7-CL": true,
+   "R-A7-S3": true
+  },
+  "W-4 canonical matches G-K24 / G25B": [
+   true,
+   true
+  ],
+  "rows_count": 21,
+  "G-K24 rows": [
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10",
+   "CL-E-20",
+   "CL-E-30",
+   "CL-E-40",
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "QA-10",
+   "QA-20"
+  ]
+ },
+ "T14_ok": true,
+ "T15_P62_RS40": {
+  "G-K39 on RS-40": true,
+  "G-K40 off RS-40": true,
+  "G-K39 silent on the RS-40 document": true,
+  "G-K39 fires on the retired sentence appended": true
+ },
+ "T15_ok": true,
  "ALL_OK": true
 }

@@ -1,0 +1,26 @@
+{
+ "mode": "check",
+ "pid": "IA-60",
+ "page": "3db4590a05eb8141b5b2c8fbf7b725e2",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py check IA-60 3db4590a05eb8141b5b2c8fbf7b725e2 --registry $P3/registry.new.md --guards EV/registry/row_assertions.json --skills $P3/pkg-root",
+ "result": {
+  "pid": "IA-60",
+  "fetched": "2026-09-23T13:21:46.154Z",
+  "placement": {
+   "W-4": 0,
+   "ONCE": 0,
+   "OWN": 0,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ }
+}

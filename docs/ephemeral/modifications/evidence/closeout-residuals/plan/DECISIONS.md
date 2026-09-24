@@ -129,7 +129,7 @@ Standing rules for every worker:
   - **D23-G successor** (ITEM-36): the release-line check covers the whole body; the spec v2 §3
     literal "in the header window" in `prompt-body-content-policy.md` is superseded.
 - **P-30 Destination rule** (PART-06): a row in `notion-write-boundary.md` naming the one page, with
-  the URL filled after the page exists (commit 2).
+  the URL filled after the page exists (committed at X5.2; P-73).
 - **P-31** `prompt-body-content-policy.md`'s Enforcement line: the label line is rejected anywhere in
   the body, line-anchored.
 - **P-32** ITEM-24 wording, shared by glow-po-reporting, the Hub *Worker communication rules* §2 and
@@ -242,9 +242,47 @@ Standing rules for every worker:
 - **P-67** PART-06-HUB-03 is reduced to a pointer-only rewrite. The eleven PART-06 pointer edits and the AF-009 amendment
   are consequences of ITEM-18 and ITEM-37 that §A's target lists omitted (spec §10.1).
 - **P-68** D25 cites the execution specification (not §P) for its wording and guards, and attributes the pull-request
-  clause to the approved plan (P-02). The D18 successor names both renamed checks. `{{INSTALL_DATE}}` is the X6.3 date
+  clause to the approved plan (P-02). The D18 successor names both renamed checks. `{{INSTALL_DATE}}` is the X7.3 date
   and `{{FREEZE_DIGESTS}}` the seven `<skill> <files> <digest>` lines of the post-install comparison.
 - **P-69** ITEM-13's regeneration reads one input from a skill, not the repository: the R1 oracle bundled in
   flowmaster-validate, pinned by its digest. Recorded in ITEM-13's disposition, not widened.
 - **P-70** The v5.0.0 procedure's pointer to `E3-E4-report.md` for per-body placement goes stale for W-4, ONCE and C-LAT.
   Recorded on the Modification Backlog (MB-004, S3), not edited here.
+
+### Repair round 3 (2026-09-24): the close order and the tokens
+
+- **P-66 (revised) Freeze window.** Nathan confirms the freeze at X5.0, before the run's first Notion write, and lifts
+  it at X7.5, once X7.4's post-install verification passes: the seven installed digests equal the packaged ones, the
+  `post` gate exits 0 and the corpus gate passes 55/55 with the installed skills. From then on the landed bodies and
+  the installed skills agree, so flow sessions may run; the close-out PR that follows carries only records. The lift
+  line on the tracking page states only the install, the verification and the lift. This replaces "to the close-out
+  merge" (P-66); §A order 4's "after full readback and the corpus gate" stays an upstream finding (spec §10.1),
+  because the bodies land before the skills are installed.
+- **P-58 (revised) Journal retention.** The rollback journal is kept until X7.4 passes, the last gate that can call
+  for a reversal of the body unit, and deleted at X7.5 (or at once after a reversal). It stays in the session
+  scratchpad throughout and is reported in §E.
+- **P-71 Tokens and their fills.** Every token in the Notion and repository edits, and what fills it. A new text that
+  still carries `{{` is refused when it lands (P-48), by `land.py` for bodies and by the readback for the rest.
+
+  | token | filled with | where |
+  |---|---|---|
+  | `{{CANDIDATE_CRD_LIST_URL}}` | the page URL from X5.1, normalized to `https://app.notion.com/p/<32 hex>` | body rules (R-ITEM18), `P30-DEST`, ten of the eleven PART-06 pointer edits, M2-R4, R5 and R9 (the page's self-links) |
+  | `{{EXECUTE_DATE}}` | the UTC date (YYYY-MM-DD) of the Notion write that carries it | `TRACK-FREEZE-START`, `PART-11-TRACK-01`, `PART-18-AF009-01`, `PART-06-HUB-01` and the four `PART-06-ITEM*-02` edits, M2-R1, and the M2 callout and revision bullet |
+  | `{{INSTALL_DATE}}` | the UTC date of Nathan's install sitting (X7.3), as X7.4 records it | `CLOSE-D22` |
+  | `{{FREEZE_DIGESTS}}` | the seven `<skill> <files> <digest>` lines of X7.4's comparison (P-68) | `CLOSE-D22` |
+  | `{{LIFT_DATE}}` | the UTC date Nathan lifts the freeze (X7.5) | `TRACK-FREEZE-LIFT` |
+  | `{{CLOSE_DATE}}` | the UTC date of the close commit that sets `COMPLETE` (X7.6) | `TRACK-STATUS-01` to `03` |
+- **P-72 Close order.** X7.4 verifies the install. X7.5: Nathan lifts the freeze; `TRACK-FREEZE-LIFT` lands; the
+  journal is deleted. X7.6: the close commit (`CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`, §E's install record and the
+  X7.5 readback, the dispositions, the actual cost, `COMPLETE`) on the designated branch restarted from `main`, and the
+  close-out PR opened. X7.7: `TRACK-STATUS-01` to `03` land, dated by that commit, and their readback is added to §E in
+  a second commit on the same PR. X7.8: Nathan banners the Drive file and merges the close-out PR. No tracking line
+  claims a state before the record holds it.
+- **P-73 Commit labels and the registry commit.** `EV/texts/edits.json` labels each text by the step that commits it:
+  `X2.2` (the decision record), `X3.5` (`P32-SWR`), `X5.2` (`P30-DEST`, `P30-VERSION`) and `close` (X7.6). The former
+  label `2` covered two different commits. The registry diff is committed alone at X3.1, so reverting the body unit
+  (P-57) reverts exactly that commit and leaves the reindex and the contract-template move.
+- **P-74 The PLAN-time generators.** `EV/registry/apply_registry.py`, `guard_tests.py`, `summarize.py` and
+  `build_guards_md.py` ran in the PLAN scratchpad beside a copy of the governance audit's scripts and record how the
+  diff, the guard file and `GUARDS.md` were made. EXECUTE runs none of them: it uses `registry.diff`,
+  `row_assertions.json` and `nam002_live.py` (with `--audit-root`).

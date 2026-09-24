@@ -1,0 +1,258 @@
+{
+ "inputs": {
+  "nam002_live.py": "3e5d5e3e8fcf6eeadac0fc058bb8f6f645abe25178730e38cb136e2f61916f54",
+  "registry.new.md": "97bda1a06b0c917fa66bdfb098e9d9c0b5d394f16d62a3bfa953f16253219015",
+  "reg-old.md": "8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4",
+  "childlist.synthetic.json": "365b51edd815c710c47f709ab9795a92ba382db6658e29af5d366c1e4852896d"
+ },
+ "runs": {
+  "wga_scripts copy (default) | 1 committed (new)": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 0,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 0,
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "wga_scripts copy (default) | 2 inject parent ESC-10": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 1,
+   "NAM-002_rows": [
+    "ESC-10"
+   ],
+   "lane_parent_findings": 0,
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "wga_scripts copy (default) | 3 inject title Escalation hub": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 0,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 0,
+   "title_findings": 1,
+   "title_hubs": [
+    "3db4590a05eb81cd938de84cfffead9c"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 5
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "wga_scripts copy (default) | 4 control (old)": {
+   "exit": 1,
+   "expectation_met": false,
+   "NAM-002": 55,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 16,
+   "title_findings": 6,
+   "title_hubs": [
+    "3db4590a05eb811b9c14f2ae89c28df7",
+    "3db4590a05eb814d96d3dcfa8835f96d",
+    "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "3db4590a05eb81cd938de84cfffead9c",
+    "3db4590a05eb81d59059eb6b95ed5fcf",
+    "3db4590a05eb81de9736ea69bac61016"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 70
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "installed | 1 committed (new)": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 0,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 0,
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "installed | 2 inject parent ESC-10": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 1,
+   "NAM-002_rows": [
+    "ESC-10"
+   ],
+   "lane_parent_findings": 0,
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "installed | 3 inject title Escalation hub": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 0,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 0,
+   "title_findings": 1,
+   "title_hubs": [
+    "3db4590a05eb81cd938de84cfffead9c"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 5
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "installed | 4 control (old)": {
+   "exit": 1,
+   "expectation_met": false,
+   "NAM-002": 55,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 16,
+   "title_findings": 6,
+   "title_hubs": [
+    "3db4590a05eb811b9c14f2ae89c28df7",
+    "3db4590a05eb814d96d3dcfa8835f96d",
+    "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "3db4590a05eb81cd938de84cfffead9c",
+    "3db4590a05eb81d59059eb6b95ed5fcf",
+    "3db4590a05eb81de9736ea69bac61016"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 70
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "r1 final | 1 committed (new)": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 0,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 0,
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "r1 final | 2 inject parent ESC-10": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 1,
+   "NAM-002_rows": [
+    "ESC-10"
+   ],
+   "lane_parent_findings": 0,
+   "title_findings": 0,
+   "title_hubs": [],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 0
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "r1 final | 3 inject title Escalation hub": {
+   "exit": 0,
+   "expectation_met": true,
+   "NAM-002": 0,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 0,
+   "title_findings": 1,
+   "title_hubs": [
+    "3db4590a05eb81cd938de84cfffead9c"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 5
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  },
+  "r1 final | 4 control (old)": {
+   "exit": 1,
+   "expectation_met": false,
+   "NAM-002": 55,
+   "NAM-002_rows": null,
+   "lane_parent_findings": 16,
+   "title_findings": 6,
+   "title_hubs": [
+    "3db4590a05eb811b9c14f2ae89c28df7",
+    "3db4590a05eb814d96d3dcfa8835f96d",
+    "3db4590a05eb8195a2ccf7c0959a8b6e",
+    "3db4590a05eb81cd938de84cfffead9c",
+    "3db4590a05eb81d59059eb6b95ed5fcf",
+    "3db4590a05eb81de9736ea69bac61016"
+   ],
+   "title_references": {
+    "compared": 70,
+    "mismatched": 70
+   },
+   "unplaced_rows": [],
+   "other_errors": 0,
+   "stderr": ""
+  }
+ },
+ "unusable_input": {
+  "inject-title on a non-hub id": {
+   "exit": 2,
+   "error": "--inject-title: 0123456789abcdef0123456789abcdef is not a fetched hub"
+  },
+  "inject-title equal to the fetched title": {
+   "exit": 2,
+   "error": "--inject-title: the injected title equals the fetched one"
+  },
+  "--inject with --inject-title": {
+   "exit": 2,
+   "error": "                     [--audit-root AUDIT_ROOT] [--snapshot-out SNAPSHOT_OUT]\n                      registry childlist\nnam002_live.py: error: argument --inject-title: not allowed with argument --inject"
+  },
+  "a hub without its title": {
+   "exit": 2,
+   "error": "hub 3db4590a05eb81de9736ea69bac61016 has no fetched title"
+  },
+  "missing child-list file": {
+   "exit": 2,
+   "error": "[Errno 2] No such file or directory: '/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/registry/nam002_proof/missing.json'"
+  }
+ },
+ "ALL_OK": true
+}

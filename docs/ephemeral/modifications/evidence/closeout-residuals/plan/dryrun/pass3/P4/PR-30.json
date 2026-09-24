@@ -1,0 +1,102 @@
+{
+ "mode": "plan",
+ "pid": "PR-30",
+ "page": "3db4590a05eb8123afb8caeeaa83a294",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan PR-30 3db4590a05eb8123afb8caeeaa83a294 --registry $P3/registry.new.md --guards EV/registry/row_assertions.json --skills $P3/pkg-root --no-ops --candidate-url https://app.notion.com/p/00000000000000000000000000000000",
+ "result": {
+  "pid": "PR-30",
+  "fetched": "2026-09-23T13:19:20.837Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_a465047b-110/agent-ae966010fc5c94b48.jsonl",
+  "ops_count": 11,
+  "rules": {
+   "R-A1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-P1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LPR-30-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LPR-30-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "CHECK R-26-BRANCH-SEND": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

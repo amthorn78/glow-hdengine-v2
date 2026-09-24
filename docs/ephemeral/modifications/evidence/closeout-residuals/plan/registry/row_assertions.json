@@ -569,21 +569,58 @@
   "regression_words": 4
  },
  {
-  "rule_id": "G-K24 R-A7-S1b, R-A7-S2",
+  "rule_id": "G-K24 R-A7-S1b, R-A7-S2, R-A7-CL, R-A7-S3",
   "part": "PART-14",
   "kind": "required_regex",
   "rule_code": "CTR-002",
-  "decision": "",
+  "decision": "P-61",
   "rows": [
    "OPS-30",
    "PR-10",
    "PR-20",
    "PR-30",
-   "QA-10"
+   "QA-10",
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10",
+   "CL-E-20",
+   "CL-E-30",
+   "CL-E-40",
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "QA-20"
   ],
   "pattern": "PR-40 is entered on the observed merge event for the identified PR",
   "regression": "in OPS-30, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
-  "regression_words": 10
+  "regression_words": 10,
+  "regressions_per_row": {
+   "OPS-30": "in OPS-30, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "PR-10": "in PR-10, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "PR-20": "in PR-20, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "PR-30": "in PR-30, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "QA-10": "in QA-10, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "CL-20": "in CL-20, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-30": "in CL-30, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-40": "in CL-40, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-C-10": "in CL-C-10, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-E-10": "in CL-E-10, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-E-20": "in CL-E-20, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "CL-E-30": "in CL-E-30, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "CL-E-40": "in CL-E-40, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "DOC-10": "in DOC-10, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "DOC-20": "in DOC-20, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-10": "in ESC-10, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-25": "in ESC-25, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-30": "in ESC-30, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-40": "in ESC-40, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "QA-20": "in QA-20, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage."
+  }
  },
  {
   "rule_id": "G-K25 R-A7-S1b, R-A7-CL, R-A7-S3",
@@ -940,10 +977,11 @@
   "part": "PART-05",
   "kind": "forbidden_regex",
   "rule_code": "CTR-001",
-  "decision": "P-04",
+  "decision": "P-04, P-62",
   "rows": [
    "GCFPE-MGMT-10",
-   "PR-35"
+   "PR-35",
+   "RS-40"
   ],
   "pattern": "Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written",
   "regression": "inject into GCFPE-MGMT-10: Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written",
@@ -1183,7 +1221,7 @@
   "part": "PART-13",
   "kind": "forbidden_regex",
   "rule_code": "TOP-001",
-  "decision": "",
+  "decision": "P-55",
   "rows": [
    "PR-30"
   ],

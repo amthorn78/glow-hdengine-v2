@@ -9,6 +9,9 @@ A guard whose value is TBD stops the build unless --allow-tbd is given; then the
 says so, and ALL_CHECKS_OK is false. --tbd K52 treats a filled guard as TBD (the refusal test). --fill-k52 PATTERN
 builds with that value instead (a candidate trial; outputs get the --suffix given).
 
+Round 2 (P-61, P-62): the report also asserts that RS-40 carries G-K39 and no G-K40, and that each of the 21
+ITEM-29 rows requires W-4 (G-K24 on 20 rows; PR-40's parent G25B). TMPDIR must be absolute (the patch round trip).
+
 Usage: PYTHONDONTWRITEBYTECODE=1 TMPDIR=<scratch>/plan/tmp python3 apply_registry.py [--allow-tbd] [--tbd K52]
        [--fill-k52 PATTERN --suffix .k52]
 Writes registry.new<suffix>.md, report<suffix>.json and registry<suffix>.diff next to this script.
@@ -286,8 +289,17 @@ def semdiff(old, new, guards):
                        "forbidden_decide": any(v == "Decide it during work" for v, _ in ids(N[k]["audit_assertions"]["forbidden_regex"])),
                        "material_required": any("Material" in v for v, _ in ids(N[k]["audit_assertions"]["required_regex"]))}
                    for k in ["PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "RS-10", "RS-20", "DOC-10", "DOC-20", "IA-30"]}
-    rep["RS-40 carries no R-A5 guard"] = not any(v in (G.A5_FORBID, G.A5_NEW, G.A5_MGMT) for l in LISTS
-                                                  for v, _ in ids(N["RS-40"]["audit_assertions"].get(l)))
+    # P-62: RS-40 carries the forbidden G-K39 (the retired storage sentence) and no required R-A5 text (G-K40 stays off)
+    _rs40 = {l: [v for v, _ in ids(N["RS-40"]["audit_assertions"].get(l))] for l in LISTS}
+    rep["RS-40 carries G-K39 and no G-K40"] = (_rs40["forbidden_regex"].count(G.A5_FORBID) == 1 and
+                                               not any(v in (G.A5_NEW, G.A5_MGMT) for l in LISTS for v in _rs40[l]))
+    # P-61: the required W-4 on all 21 ITEM-29 rows: G-K24 on 20, and PR-40's kept parent G25B
+    rep["W-4 required on the 21 ITEM-29 rows"] = {
+        k: [v for v, _ in ids(N[k]["audit_assertions"].get("required_regex")) if v in (G.W4_REQ, G.G25B_REQ)]
+        for k in G.A7ALL}
+    rep["W-4 required on the 21 ITEM-29 rows ok"] = all(
+        v == ([G.G25B_REQ] if k == "PR-40" else [G.W4_REQ]) for k, v in rep["W-4 required on the 21 ITEM-29 rows"].items()) \
+        and len(rep["W-4 required on the 21 ITEM-29 rows"]) == 21
     return rep
 
 
@@ -394,14 +406,16 @@ def main():
           and rep["values_roundtrip"] and rep["release_guards_new"] == 165 and rep["release_guards_old_left"] == 0
           and all(v["exit"] == 0 and v["stdout"] == {"valid": True, "problems": []} for v in checks.values())
           and rep["yaml_per_row"]["rows_parsed"] == 55 and rep["yaml_per_row"]["equal_to_loader"]
-          and drift_ok and rep["diff"]["patch_roundtrip_equal"] and rep["RS-40 carries no R-A5 guard"]
+          and drift_ok and rep["diff"]["patch_roundtrip_equal"] and rep["RS-40 carries G-K39 and no G-K40"]
+          and rep["W-4 required on the 21 ITEM-29 rows ok"]
           and all(v[1] for v in rep["rows_per_guard"].values()))
     rep["ALL_CHECKS_OK"] = ok
     rep["ALL_CHECKS_OK_EXCEPT_TBD"] = ok or (bool(omitted) and (not rep["top_level_keys_changed"]) and all(
         [rep["lanes_only_parent_changed_by_map"], rep["rows_kept_in_set_and_order"], not rep["rows_with_unexpected_assertion_diff"],
          not rep["kept_order_violations"], rep["non_assertion_fields_as_expected"], rep["parents"], rep["values_roundtrip"],
          rep["release_guards_new"] == 165, rep["release_guards_old_left"] == 0, drift_ok, rep["diff"]["patch_roundtrip_equal"],
-         rep["yaml_per_row"]["rows_parsed"] == 55, rep["yaml_per_row"]["equal_to_loader"], rep["RS-40 carries no R-A5 guard"],
+         rep["yaml_per_row"]["rows_parsed"] == 55, rep["yaml_per_row"]["equal_to_loader"], rep["RS-40 carries G-K39 and no G-K40"],
+         rep["W-4 required on the 21 ITEM-29 rows ok"],
          all(v["exit"] == 0 and v["stdout"] == {"valid": True, "problems": []} for v in checks.values()),
          all(v[1] for v in rep["rows_per_guard"].values())]))
     json.dump(rep, open(HERE + f"/report{a.suffix}.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)

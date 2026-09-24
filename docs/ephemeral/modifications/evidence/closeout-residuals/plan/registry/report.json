@@ -78,99 +78,99 @@
   },
   "CL-20": {
    "before": 27,
-   "after": 45,
-   "new_guard_entries": 18,
+   "after": 46,
+   "new_guard_entries": 19,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-30": {
    "before": 27,
-   "after": 45,
-   "new_guard_entries": 18,
+   "after": 46,
+   "new_guard_entries": 19,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-40": {
    "before": 26,
-   "after": 40,
-   "new_guard_entries": 14,
+   "after": 41,
+   "new_guard_entries": 15,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-C-10": {
    "before": 26,
-   "after": 42,
-   "new_guard_entries": 16,
+   "after": 43,
+   "new_guard_entries": 17,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-E-10": {
    "before": 26,
-   "after": 42,
-   "new_guard_entries": 16,
+   "after": 43,
+   "new_guard_entries": 17,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-E-20": {
    "before": 27,
-   "after": 36,
-   "new_guard_entries": 9,
+   "after": 37,
+   "new_guard_entries": 10,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-E-30": {
    "before": 27,
-   "after": 34,
-   "new_guard_entries": 7,
+   "after": 35,
+   "new_guard_entries": 8,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "CL-E-40": {
    "before": 27,
-   "after": 34,
-   "new_guard_entries": 7,
+   "after": 35,
+   "new_guard_entries": 8,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "DOC-10": {
    "before": 28,
-   "after": 37,
-   "new_guard_entries": 10,
+   "after": 38,
+   "new_guard_entries": 11,
    "release_replaced_in_place": 3,
    "removed": 1
   },
   "DOC-20": {
    "before": 28,
-   "after": 39,
-   "new_guard_entries": 12,
+   "after": 40,
+   "new_guard_entries": 13,
    "release_replaced_in_place": 3,
    "removed": 1
   },
   "ESC-10": {
    "before": 26,
-   "after": 34,
-   "new_guard_entries": 8,
+   "after": 35,
+   "new_guard_entries": 9,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "ESC-25": {
    "before": 26,
-   "after": 36,
-   "new_guard_entries": 10,
+   "after": 37,
+   "new_guard_entries": 11,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "ESC-30": {
    "before": 26,
-   "after": 34,
-   "new_guard_entries": 8,
+   "after": 35,
+   "new_guard_entries": 9,
    "release_replaced_in_place": 3,
    "removed": 0
   },
   "ESC-40": {
    "before": 26,
-   "after": 34,
-   "new_guard_entries": 8,
+   "after": 35,
+   "new_guard_entries": 9,
    "release_replaced_in_place": 3,
    "removed": 0
   },
@@ -323,8 +323,8 @@
   },
   "QA-20": {
    "before": 26,
-   "after": 34,
-   "new_guard_entries": 8,
+   "after": 35,
+   "new_guard_entries": 9,
    "release_replaced_in_place": 3,
    "removed": 0
   },
@@ -386,8 +386,8 @@
   },
   "RS-40": {
    "before": 34,
-   "after": 43,
-   "new_guard_entries": 9,
+   "after": 44,
+   "new_guard_entries": 10,
    "release_replaced_in_place": 3,
    "removed": 0
   },
@@ -426,7 +426,7 @@
  "values_roundtrip": true,
  "assertions_total": [
   1484,
-  2008
+  2024
  ],
  "rows_per_guard": {
   "G-K01": [
@@ -522,7 +522,7 @@
    true
   ],
   "G-K24": [
-   5,
+   20,
    true
   ],
   "G-K25": [
@@ -582,7 +582,7 @@
    true
   ],
   "G-K39": [
-   2,
+   3,
    true
   ],
   "G-K40": [
@@ -704,11 +704,77 @@
    "material_required": true
   }
  },
- "RS-40 carries no R-A5 guard": true,
+ "RS-40 carries G-K39 and no G-K40": true,
+ "W-4 required on the 21 ITEM-29 rows": {
+  "OPS-30": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "PR-10": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "PR-20": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "PR-30": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "PR-40": [
+   "PR-40 is entered on the observed merge event"
+  ],
+  "QA-10": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-20": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-30": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-40": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-C-10": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-E-10": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-E-20": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-E-30": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "CL-E-40": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "DOC-10": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "DOC-20": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "ESC-10": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "ESC-25": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "ESC-30": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "ESC-40": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ],
+  "QA-20": [
+   "PR-40 is entered on the observed merge event for the identified PR"
+  ]
+ },
+ "W-4 required on the 21 ITEM-29 rows ok": true,
  "op_counts": {
   "PART-17 replaced in place": 165,
   "PART-18 required removed": 8,
-  "guard entries added": 532
+  "guard entries added": 548
  },
  "parent_counts": {
   "notion_parent_id:3cc4590a05eb8101b5ded32c12616eb6": 1,
@@ -856,14 +922,14 @@
  "diff": {
   "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/registry/registry.diff",
   "exit_diff": 1,
-  "lines": 3331,
+  "lines": 3363,
   "patch_roundtrip_equal": true,
   "patch_stderr": ""
  },
  "new_path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/registry/registry.new.md",
- "new_lines": 7668,
- "new_sha256": "4643741b154969406fe74d135dd2d97a3321c4bef8c73a4451fc2dac4df8144a",
- "diff_sha256": "f74abc3803cfa96f9d5a3bc4f6b6edca207c0a6d197dbd249109808b63a3e0bd",
+ "new_lines": 7700,
+ "new_sha256": "97bda1a06b0c917fa66bdfb098e9d9c0b5d394f16d62a3bfa953f16253219015",
+ "diff_sha256": "fcfd549e2850423a169adb6ad6166e580625e0e8e1e87adbdde03941d122bc8b",
  "ALL_CHECKS_OK": true,
  "ALL_CHECKS_OK_EXCEPT_TBD": true
 }

@@ -22,6 +22,15 @@ Changes against the first-round draft, by decision:
   P-38/P-42  G-K53: R-26-RSP's guard on PR-40.
   P-42  G-K54: the deleted 'A saved attachment ...' sentence (LOPS-30-1, LQA-10-P19) on OPS-30 and QA-10.
   P-12  every regression injection is at most 15 words (REGRESSIONS below).
+
+Round 2 (plan/r1/DECISIONS.md P-55 to P-70; review wf_045af16b-3ed):
+  P-55  G-K55 (forbidden 'outside the approved Plan, return the metadata\\b' on PR-30) guards LPR-30-2; its decision
+        label is P-55 (summarize.py, build_guards_md.py).
+  P-61  G-K24 (required W-4, 'PR-40 is entered on the observed merge event for the identified PR') goes on all 21
+        ITEM-29 rows except PR-40 (20 rows: A7S1 without PR-40, A7CL, A7S3), and its shared rules gain R-A7-CL and
+        R-A7-S3, which place W-4 on the CL and S3 rows. PR-40 keeps the parent's G25B ('PR-40 is entered on the
+        observed merge event', CTR-002), which the same W-4 text satisfies (guard_tests.py T14).
+  P-62  G-K39 (forbidden, the retired storage sentence) goes back on RS-40's row (A5_K39); G-K40 stays off RS-40.
 """
 
 ALL55 = "ALL55"
@@ -77,7 +86,10 @@ A7S3 = ["CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25",
 A7LOCAL = ["PR-10", "PR-20", "PR-40", "DOC-10", "DOC-20", "RS-40"]
 OWN11 = ["CL-20", "CL-30", "CL-40", "CL-E-20", "DOC-20", "ESC-25", "GCFPE-MGMT-10", "PR-20", "PR-40", "PR-50", "QA-10"]
 A10 = ["OPS-10", "OPS-30", "PR-40", "QA-10"]
-A5 = ["GCFPE-MGMT-10", "PR-35"]                                                        # P-04: RS-40 leaves
+A5 = ["GCFPE-MGMT-10", "PR-35"]                                                        # P-04: RS-40 leaves R-A5
+A5_K39 = A5 + ["RS-40"]                                    # P-62: the forbidden G-K39 goes back on RS-40; G-K40 stays off
+A7ALL = A7S1 + A7CL + A7S3                                                              # the 21 ITEM-29 rows
+K24_ROWS = [r for r in A7ALL if r != "PR-40"]                  # P-61: 20 rows; PR-40 keeps the parent's G25B
 A3A = ["CL-20", "CL-30", "CL-C-10", "CL-E-10", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-40", "QA-10"]
 A4A = ["CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10"]
 
@@ -167,6 +179,7 @@ A7_FORBID = (r"Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|P
              r"asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is "
              r"defined above")
 W4_REQ = r"PR-40 is entered on the observed merge event for the identified PR"
+G25B_REQ = r"PR-40 is entered on the observed merge event"   # the parent's G25B on PR-40 (spec v2 §6/§7), kept (P-61)
 ONCE_REQ = r"PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives"
 # P-08 / P-42: the first-round R-A7-LOCAL alternation (PR-10, PR-20, PR-40 sites) with the DOC-10 and DOC-20 site
 # fragments appended (DOC-20's widened to '`?PR-40'); one pattern on the rule's 6 rows. PR-20's second site and RS-40's
@@ -254,7 +267,7 @@ GUARDS = [
     ("K22", ["R-26-BRANCH-RECV"], "PART-13", "required_regex", BRECV_REQ, "CTR-002", ["PR-35", "PR-40", "RS-20", "RS-40"]),
     # PART-14 — ITEM-21/29/30/31: forbidden CTR-001 (as the parent's PR-40 guard G26), required CTR-002 (as G25/G25B)
     ("K23", ["R-A7-S1a", "R-A7-S1b", "R-A7-S2", "R-A7-CL", "R-A7-S3", "R-ITEM21", "R-A7-LOCAL"], "PART-14", "forbidden_regex", A7_FORBID, "CTR-001", ALL55),
-    ("K24", ["R-A7-S1b", "R-A7-S2"], "PART-14", "required_regex", W4_REQ, "CTR-002", [r for r in A7S1 if r != "PR-40"]),
+    ("K24", ["R-A7-S1b", "R-A7-S2", "R-A7-CL", "R-A7-S3"], "PART-14", "required_regex", W4_REQ, "CTR-002", K24_ROWS),  # P-61
     ("K25", ["R-A7-S1b", "R-A7-CL", "R-A7-S3"], "PART-14", "required_regex", ONCE_REQ, "CTR-002", A7S1 + A7CL + A7S3),
     ("K26", ["R-A7-LOCAL"], "PART-14", "forbidden_regex", A7LOCAL_FORBID, "CTR-001", A7LOCAL),        # P-08, P-42
     ("K27", ["R-ITEM21"], "PART-14", "required_regex", ITEM21_REQ, "CTR-002", ["CL-20", "CL-30", "CL-C-10", "CL-E-10"]),
@@ -270,7 +283,7 @@ GUARDS = [
     ("K36", ["R-OWN"], "PART-05", "required_regex", OWN_REQ, "CTR-002", OWN11),                       # P-02
     ("K37", ["R-A10"], "PART-05", "forbidden_regex", A10_FORBID, "CTR-001", ALL55),
     ("K38", ["R-A10"], "PART-05", "required_regex", A10_REQ, "CTR-002", A10),
-    ("K39", ["R-A5"], "PART-05", "forbidden_regex", A5_FORBID, "CTR-001", A5),                         # P-04
+    ("K39", ["R-A5"], "PART-05", "forbidden_regex", A5_FORBID, "CTR-001", A5_K39),                     # P-04, P-62
     ("K40", ["R-A5"], "PART-05", "required_regex", K40, "CTR-002", A5),                                # P-04
     # PART-15 — ITEM-33
     ("K41", ["R-A3a"], "PART-15", "forbidden_regex", A3A_FORBID, "CTR-001", A3A),
@@ -331,7 +344,11 @@ REGRESSIONS = {
             "RS-40": "current head; completed work, commits/local changes"},
     "K22": {"*": "open PR, tests, reviews/checks already observed, unresolved items"},
     "K23": {"*": "Nathan's later invocation asserts"},
-    "K24": {"*": "Nathan's later PR-40 invocation asserts that a manual merge occurred;"},
+    # P-61: each row's retired wording is the text its own W-4-placing rule replaces (R-A7-S2, R-A7-CL, R-A7-S3)
+    "K24": {"*": "Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+            **{r: "Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;"
+               for r in A7CL},
+            **{r: "PR-40 independently verifies the later asserted merge and landed lineage." for r in A7S3}},
     "K25": {"*": "PR-40 independently verifies the later asserted merge and landed lineage."},
     "K26": {"*": "only after Nathan asserts it occurred may PR-40",
             "PR-20": "Nathan invokes PR-40 asserting that manual merge occurred",
