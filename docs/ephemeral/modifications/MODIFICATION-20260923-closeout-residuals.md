@@ -2,7 +2,7 @@
 artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 modification_id: MODIFICATION-20260923-closeout-residuals
-status: PLANNING
+status: PLANNED
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -26,6 +26,11 @@ reviews:
     date: 2026-09-24
     required_open: 1
     outcome: "Every normal-path gate read-only on fresh fetches and the manifest in order on main d179277: all pass except TRACK-STATUS-01..03, whose anchors stage 5 removed from the tracking page (X4.6 and X7.7 fail loudly). ESC-25 not rehearsed: the permission classifier refused the command. D26-F trigger 2: one bounded check, then back to Nathan (DN-8)"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-24
+    required_open: 2
+    outcome: "PLAN-DC-1 and PLAN-DC-2, independently: the same 2 required defects (a restart after a lost session re-runs a rejected D24 review unseen; X7.6's PR body waits for the withdrawn X7.7), plus 16 and 13 listed, all in the successor's own text. The cap is reached: returned to Nathan unrepaired"
 items:
   - id: ITEM-01
     statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
@@ -278,8 +283,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: Nathan
 analyze_approved_date: 2026-09-23
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: Nathan
+plan_approved_date: 2026-09-24
 supersedes: ""
 spawned_from: MODIFICATION-20260923-alpha-feedback-open-entries
 shares_package_with: []
@@ -994,15 +999,16 @@ term this way too. No Notion page is written before it.
   clear takes these four steps and nothing more. Forward repair means `land.py plan` on a fresh fetch, which lands
   only the edits still missing, and the control readback rule's three cycles.
   1. **Failure record to `main`.** `git fetch origin main && git checkout -B docs/<yyyymmdd>-closeout-residuals-failure origin/main`;
-     `git checkout <execution branch> -- docs/ephemeral/modifications/evidence/closeout-residuals/execute`. In the
-     record, set `status: EXECUTING` and write §E: a row for every step run, with its disposition; the failing step
-     with its failed predicate and its output, copied from `$SCRATCH` into
-     `docs/ephemeral/modifications/evidence/closeout-residuals/failure/`; and every later step `NOT_RUN`, citing
-     the failure. Run `modification_validate.py`, commit (`closeout-residuals record: failed at <step>`), push, and open a
+     `mkdir -p docs/ephemeral/modifications/evidence/closeout-residuals/failure && git archive <execution branch> docs/ephemeral/modifications/evidence/closeout-residuals/execute | tar -x --strip-components=5 -C docs/ephemeral/modifications/evidence/closeout-residuals/failure`,
+     which copies `EX` to `failure/execute/`. It never goes to `EX`'s own path, so `EX/run.json` reaches `main` only
+     through the execution PR, and checkpoint 3's test stays true. In the record, set `status: EXECUTING` and write §E:
+     a row for every step run, with its disposition; the failing step with its failed predicate and its output (counts and ids, no body text),
+     copied from `$SCRATCH` into `failure/`; and every later step `NOT_RUN`, citing the failure. Run `modification_validate.py`; `git add` the record and `failure/` only, and `git diff --cached --name-only` lists
+     nothing else; commit (`closeout-residuals record: failed at <step>`), push, and open a
      pull request against `main`. It carries no registry, graph, skill-text or rule change.
   2. **Sweep, read-only.** Fetch each of the 50 live bodies with edits and run `land.py state <PID> <PAGE>`
      (CL-40 with `--candidate-url <URL>` once `url` is recorded). Fetch the seven control pages and run
-     `ctrl.py all --run EX/run.json --edits EV/resume-20260924/control-edits.json` without `--expect`. Fetch the Hub
+     `ctrl.py all --run docs/ephemeral/modifications/evidence/closeout-residuals/failure/execute/run.json --edits EV/resume-20260924/control-edits.json` without `--expect`. Fetch the Hub
      and run `ctrl.py children 3ce4590a05eb814f8892f88ff8539308`, which lists any *Candidate CRD Items List* child
      page by id. The states, ids and counts go to `failure/sweep.json`, one more commit on
      the same pull request. Lanes of workers may do the fetches.
@@ -1029,12 +1035,15 @@ term this way too. No Notion page is written before it.
    `git fetch origin main && git checkout -B docs/<yyyymmdd>-closeout-residuals-execute origin/main`, then
    `mkdir -p EX` and `runjson.py EX/run.json base "$(git rev-parse HEAD)"`. The gate is: `HEAD` equals `origin/main`
    and `git status --porcelain` prints nothing. Every push is `git push -u origin <that branch>`.
-2. **Before the first external write, by restarting.** A session lost or stopped before X5.0's Notion call is
+2. **Before the first external write, by restarting.** A session lost before X5.0's Notion call is
    followed by a new session that restarts EXECUTE at X0.2 on a new branch,
    `docs/<yyyymmdd>-closeout-residuals-execute-<n>` with `<n>` = 2, 3, and so on. The earlier branch stays unmerged,
    for Nathan to delete. X1 to X4 run again in full, including X4.3's packaging and a fresh D24 round. Archives
    delivered by an earlier attempt are void, because X7.2 names the archives to install by the sha256s in the
-   `EX/packages.json` that reaches `main`.
+   `EX/packages.json` that reaches `main`. Before X0.2, `git fetch origin` and, for each
+   `origin/docs/*-closeout-residuals-execute*` branch,
+   `git grep -l SKILL_REPAIR_REQUIRED <branch> -- 'docs/ephemeral/modifications/evidence/closeout-residuals/SECTION-10-REVIEW-cr*'`;
+   any output is the X4.4 stop, returned to Nathan, with no restart.
 3. **Post-merge steps, started from `main`.** The execution PR's merge is detected by a file on `main`, never by a
    commit subject: `git fetch origin main && git cat-file -e origin/main:docs/ephemeral/modifications/evidence/closeout-residuals/execute/run.json`
    exits 0. That replaces R8-01's subject test. X7.2 runs once that holds. X7.4 runs once Nathan says his install
@@ -1065,7 +1074,7 @@ The dated §P steps and spec §9 rows stand, with these changes. Nothing else in
 | 20, 21 | X5.6 | `PART-12-HUB-01` and `PART-18-AF009-01` only, without the sent-list append |
 | 24 | X6.4 | **R8-02.** The path check is `git diff --name-only origin/main...HEAD`, a three-dot merge-base diff: it lists only paths under `docs/prompt_ecosystem_management/`, `docs/graph/` and `docs/ephemeral/`. A commit that reaches `main` outside those paths during EXECUTE no longer fails it |
 | 25 | X7.2–X7.4 | Checkpoint 3 replaces the branch rule. X7.2's re-send and failure record stand. X7.4's failure is recorded on a branch from `origin/main` |
-| 27 | X7.6 | The pull request's path check uses the same three-dot form on the close branch. The close texts' results depend on the install date and the installed freeze lines. With a stand-in date of 2026-01-01 and the expected lines, they were: decision record `b324490a…` (113 065 B), `prompt-body-content-policy.md` `c24061b8…` (7 125 B), `REVIEWER-PROMPT-a5.md` `9e2d822c…` (19 234 B), and each re-run of a label applied nothing |
+| 27 | X7.6 | The pull request's path check uses the same three-dot form on the close branch. The close texts' results depend on the install date and the installed freeze lines. With a stand-in date of 2026-01-01 and the expected lines, they were: decision record `b324490a…` (113 065 B), `prompt-body-content-policy.md` `c24061b8…` (7 125 B), `REVIEWER-PROMPT-a5.md` `9e2d822c…` (19 234 B), and each re-run of a label applied nothing. X7.6 opens the close-out PR without the X7.7 sentence, records step 28 in §E as withdrawn under DN-8 (A), and returns to Nathan for X7.8 |
 | 28 | X7.7 | Under DN-8 (A), **withdrawn**. The tracking page's status lines belong to the D20 track, which already rewrote them. Under DN-8 (B), three re-anchored edits, drafted after the ruling |
 
 The spec's stop-only material stays in the file as a dated record: §9's stop record, restoration check, lift and end
@@ -1169,3 +1178,102 @@ dry run took about 40 minutes of this session. Its five read-only workers used 0
 harness. This session's own tokens are not measured by the session. Still to come: the diff check, two reviewers at
 about 0.5M, and the return. EXECUTE's estimate stands at 8 h and 8M tokens. Twice the estimate triggers a re-price to
 Nathan (`D26-D`).
+
+#### Product Owner rulings on DN-1 to DN-8, 2026-09-24
+
+**Nathan, 2026-09-24**, answering the return above:
+
+> My rulings on DN-1 to DN-8. I accept all eight as you recommended:
+>
+> DN-1: the A5 edit doesn't apply to RS-40.
+> DN-2: stage 5 already made PART-11's edits. Record PART-11 as verified.
+> DN-3: the validator revision moves from 3.3.0 to 3.3.1.
+> DN-4: four merges: #478, #484, the execution PR and the close-out PR.
+> DN-5: the freeze lifts after the post-install check, not at readback.
+> DN-6: the missing Notion pointer edits and the AF-009 note belong to ITEM-18 and ITEM-37. No new items.
+> DN-7: ITEM-13's disposition names the oracle that ships inside the skill.
+> DN-8: option (A). Withdraw the three TRACK-STATUS edits.
+> One correction to DN-8: stage 5 didn't remove those tracking-page lines. They were already gone before stage 5
+> started. It doesn't change the ruling.
+
+**What this settles.** The plan's handling of DN-1 to DN-7 stands as written. DN-8 (A) is the plan, so
+`TRACK-STATUS-01` to `03` are withdrawn, X4.6 and every later `ctrl.py` call use
+`EV/resume-20260924/control-edits.json` (15 edits), and dated step 28 does not run. "This record's plan PR" in DN-4 and
+the interaction cost is #484. PART-11 is recorded as `VERIFIED` at §E, with stage 5 as the one that applied it.
+
+**The correction.** Where this successor and the ledger's `DRY_RUN` outcome say stage 5 removed or rewrote the
+tracking page's status lines, that is wrong. Nathan's correction above holds: the lines were gone before stage 5
+started. The ruling does not change, and the text above is left as written (a dated record gets a successor, not an
+edit).
+
+**One change to the successor after the dry run**, made before the diff check so the check covers it: failure-path
+step 1 copied `EX` to its own path on the failure-record branch. That would put `EX/run.json` on `main` through a
+failure-record PR, and checkpoint 3 would then read that as the execution PR's merge. Step 1 now copies `EX` to
+`failure/execute/`.
+
+#### The diff check, and the plan returned for approval, 2026-09-24
+
+The one diff check ran under the committed brief `EV/resume-20260924/REVIEW-BRIEF-diffcheck.md` (`217068c`). Two
+fresh reviewers each wrote a record, committed unedited beside the brief: `REVIEW-diffcheck-PLAN-DC-1.md` and
+`REVIEW-diffcheck-PLAN-DC-2.md`. They found **the same two required defects independently**. Both sit in this
+successor's own text. **Neither is repaired here**: this was the last review the cap allows (`D26-A` rule 2), so the
+plan goes to Nathan with both open. Each has a one-sentence correction, quoted from the records:
+
+| # | defect | path, likelihood, consequence | the reviewers' smallest correction |
+|---|---|---|---|
+| DC-1 (PLAN-DC-1 REQ-1, PLAN-DC-2 DC2-01) | Checkpoint 2 restarts a session "lost or stopped" before X5.0 on a new branch from `main`. A `SKILL_REPAIR_REQUIRED` verdict pushed by a lost session is invisible there: `fill_brief.py` writes a first-round brief, and the rejected bytes are reviewed again as new. "Or stopped" also contradicts *Before it*, which sends a stop to Nathan | failure, then restart; low; **silent**: a rejected package set can be delivered and installed without Nathan seeing the rejection (`D24` condition 5, `D26-A` rule 2) | "lost" for "lost or stopped"; before X0.2, `git fetch origin` and, for each `origin/docs/*-closeout-residuals-execute*` branch, `git grep -l SKILL_REPAIR_REQUIRED <branch> -- 'docs/ephemeral/modifications/evidence/closeout-residuals/SECTION-10-REVIEW-cr*'`; any output is the X4.4 stop, returned to Nathan, with no restart |
+| DC-2 (PLAN-DC-1 REQ-2, PLAN-DC-2 DC2-02) | Withdrawing X7.7 leaves spec X7.6 opening the close-out PR "its body saying not to merge it before X7.7's commit", with no final return to Nathan and no §E disposition for dated step 28 | normal; certain; the PR tells Nathan to wait for a commit that never comes; nothing is written wrong | X7.6 opens the close-out PR without the X7.7 sentence, records step 28 in §E as withdrawn under DN-8 (A), and returns to Nathan for X7.8 |
+
+**Listed findings.** PLAN-DC-1 lists 16 and PLAN-DC-2 lists 13, each with its path, likelihood and consequence in its
+record, and several overlap. Both reviewers list the same three failure-path gaps, each correctable in one clause:
+
+- the sweep's `--run EX/run.json` names a file the failure branch no longer has
+  (`--run docs/ephemeral/modifications/evidence/closeout-residuals/failure/execute/run.json` runs);
+- step 1 names no staging scope and no staged-path check, which the dated stop record had;
+- step 1's copy of the failing step's output lacks the dated limit "counts and ids, no body text" (`D22`).
+
+Listed findings are not repaired unless Nathan opts in (`D26-A` rule 4).
+
+**The trend.** There is no earlier round to halve from. Every finding sits in text the last repair added, which is
+expected for a check of that repair's diff, and it is also `D26-A` rule 5's signal to return. The two DRY_RUN and
+DIFF_CHECK rows are the ledger for this resumed PLAN.
+
+**The estimate against what has been spent** (the estimate for this resume: 2 h and 2.5M tokens). Session time so
+far: about 1.4 h of work, 11:00Z to 11:47Z and 12:47Z to 13:25Z. The hour between was spent waiting on Nathan's
+rulings. Tokens measured by the harness: 0.81M for the five dry-run workers and 0.86M for the two reviewers (0.45M and
+0.41M), 1.67M in all. This session's own tokens are not visible to the session, so the total is higher than 1.67M and
+may be near the estimate. It has not passed twice the estimate on what can be measured.
+
+#### Plan approved, 2026-09-24
+
+**Nathan, 2026-09-24**, answering the return above:
+
+> I approve the plan with option (A): apply the two required fixes and the three failure-path one-liners, each
+> exactly as the reviewers worded them. No other edits and no further review.
+>
+> One correction: #484 already merged (07b47d8) before my rulings and your diff check were committed. Those commits
+> are only on your branch, and main still shows the plan at PLANNING. Record my approval, apply the fixes, and put all
+> of it in a new pull request from main. Tell me when it's ready to merge. Don't start EXECUTE until that PR is on
+> main.
+>
+> When we get to lifting the freeze, it covers both freezes: the Alpha run's E6 freeze and this Modification's. Record
+> the lift in both records' §E (resume procedure, step 6).
+
+**The five corrections, applied in place in the successor above**, each in the wording the diff-check table quotes
+from the reviewers' records. There was no further review, as Nathan ruled.
+
+1. **DC-1**, checkpoint 2: "lost" for "lost or stopped", and the `git grep` for `SKILL_REPAIR_REQUIRED` across
+   `origin/docs/*-closeout-residuals-execute*` before X0.2, where any output is the X4.4 stop returned to Nathan.
+2. **DC-2**, the table's row 27: X7.6 opens the close-out PR without the X7.7 sentence, records step 28 in §E as
+   withdrawn under DN-8 (A), and returns to Nathan for X7.8.
+3. **Failure step 2**: the sweep's `--run` names `failure/execute/run.json`.
+4. **Failure step 1**: stage the record and `failure/` only, with a `git diff --cached --name-only` check.
+5. **Failure step 1**: the failing step's output is copied as counts and ids, with no body text.
+
+**The freeze, as Nathan instructs.** X7.5's lift covers both freezes: the Alpha run's E6 freeze
+(`MODIFICATION-20260923-alpha-feedback-open-entries`) and this Modification's. The lift, with its date and Nathan's
+words, is recorded in both records' §E (`RESUME-PROCEDURE.md` step 6).
+
+**Where the record stands.** #484 merged as `07b47d8` before the rulings and the diff check were committed. This
+approval and everything after `07b47d8` reach `main` in a new pull request. **EXECUTE starts only once that pull request
+is on `main`** (X0.1).
