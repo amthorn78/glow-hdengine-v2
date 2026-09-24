@@ -1,0 +1,52 @@
+{
+ "pid": "PR-50",
+ "fetched": "2026-09-23T13:20:56.986Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-ad7e5a5663433b1dd.jsonl",
+ "ops_count": 1,
+ "reapply_unsafe": [],
+ "repair": [],
+ "rules": {
+  "R-OWN": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  }
+ },
+ "precheck": {
+  "placement": {
+   "W-4": 0,
+   "ONCE": 0,
+   "OWN": 1,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ },
+ "landed_check": {
+  "placement": {
+   "W-4": 0,
+   "ONCE": 0,
+   "OWN": 1,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ }
+}

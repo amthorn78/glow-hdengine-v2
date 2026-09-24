@@ -1,0 +1,142 @@
+{
+ "pid": "OPS-30",
+ "fetched": "2026-09-23T13:20:36.022Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/tool-results/toolu_01MPmn7e8ZNJhXy2N1JcJ2Hz.json",
+ "ops_count": 15,
+ "reapply_unsafe": [],
+ "repair": [],
+ "rules": {
+  "R-A1b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A1c": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A1d": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A1e": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2e": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2g": {
+   "hits": 5,
+   "expected": 5,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-26-P1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-26-P4": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-26-TASK": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-S1a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-S1b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-S2": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A10": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A3a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LOPS-30-1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  }
+ },
+ "precheck": {
+  "placement": {
+   "W-4": 2,
+   "ONCE": 1,
+   "OWN": 0,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ },
+ "landed_check": {
+  "placement": {
+   "W-4": 2,
+   "ONCE": 1,
+   "OWN": 0,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ }
+}

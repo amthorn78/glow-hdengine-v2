@@ -1,0 +1,82 @@
+{
+ "pid": "CL-40",
+ "fetched": "2026-09-23T13:28:08.922Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-ad7e5a5663433b1dd.jsonl",
+ "ops_count": 5,
+ "reapply_unsafe": [],
+ "repair": [],
+ "rules": {
+  "R-26-P3": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-CL": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-OWN": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A4a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A4c": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-ITEM18": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  }
+ },
+ "precheck": {
+  "placement": {
+   "W-4": 1,
+   "ONCE": 1,
+   "OWN": 1,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ },
+ "landed_check": {
+  "placement": {
+   "W-4": 1,
+   "ONCE": 1,
+   "OWN": 1,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ }
+}
