@@ -1,0 +1,144 @@
+{
+ "mode": "plan",
+ "pid": "QA-10",
+ "page": "3db4590a05eb818bad2fcb4bc2610b29",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan QA-10 3db4590a05eb818bad2fcb4bc2610b29 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "QA-10",
+  "fetched": "2026-09-23T13:21:56.515Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/mcp-Notion-notion-fetch-1790215695831.txt",
+  "ops_count": 18,
+  "rules": {
+   "R-A1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2f2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2g": {
+    "hits": 6,
+    "expected": 6,
+    "ok": true
+   },
+   "R-26-P1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-TASK": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-OWN": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A10": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LQA-10-P03": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LQA-10-P19": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

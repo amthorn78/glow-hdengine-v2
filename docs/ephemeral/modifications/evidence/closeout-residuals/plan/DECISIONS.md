@@ -172,7 +172,8 @@ Standing rules for every worker:
 
 - **P-43** P31 (policy Enforcement line) and P33 (the repair-a4 correction note) describe checks that exist only after the
   install, so they move to the close commit (the close-out PR, after the post-install gate). Commit 2 keeps P30-DEST,
-  P30-VERSION and P32.
+  P30-VERSION and P32. *[Commit placement superseded by P-73: `P32` lands in the X3.5 commit, `P30-DEST` and
+  `P30-VERSION` in the X5.2 commit.]*
 - **P-44** The AF-009 disposition on *GCFPE Alpha Feedback — Deferred Items* ("C-LAT, in the ten bodies ...") gets the
   drafted dated amendment (PART-18). The Alpha feedback list is an established maintenance destination.
 - **P-45** The Glow Operations Checklist property *Authoritative Drive register* on the four item rows stays as history;
@@ -281,7 +282,9 @@ Standing rules for every worker:
 - **P-73 Commit labels and the registry commit.** `EV/texts/edits.json` labels each text by the step that commits it:
   `X2.2` (the decision record), `X3.5` (`P32-SWR`), `X5.2` (`P30-DEST`, `P30-VERSION`) and `close` (X7.6). The former
   label `2` covered two different commits. The registry diff is committed alone at X3.1, so reverting the body unit
-  (P-57) reverts exactly that commit and leaves the reindex and the contract-template move.
+  (P-57) reverts exactly that commit and leaves the reindex and the contract-template move. *[The revert is superseded
+  in repair round 4 by P-58 (revised again): a stopped unit leaves the branch unmerged, so nothing is reverted; the
+  registry commit stays alone so that §E can name it.]*
 - **P-74 The PLAN-time generators.** `EV/registry/apply_registry.py`, `guard_tests.py`, `summarize.py` and
   `build_guards_md.py` ran in the PLAN scratchpad beside a copy of the governance audit's scripts and record how the
   diff, the guard file and `GUARDS.md` were made. EXECUTE runs none of them: it uses `registry.diff`,

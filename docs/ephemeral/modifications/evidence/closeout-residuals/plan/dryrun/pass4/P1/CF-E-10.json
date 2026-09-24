@@ -1,0 +1,64 @@
+{
+ "mode": "plan",
+ "pid": "CF-E-10",
+ "page": "3db4590a05eb815b84a5c5a5ace85fe1",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan CF-E-10 3db4590a05eb815b84a5c5a5ace85fe1 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "CF-E-10",
+  "fetched": "2026-09-23T13:28:00.706Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ce55a240-5a1/agent-a0b66ad33728ec39e.jsonl",
+  "ops_count": 2,
+  "rules": {
+   "LCF-E-10-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LCF-E-10-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

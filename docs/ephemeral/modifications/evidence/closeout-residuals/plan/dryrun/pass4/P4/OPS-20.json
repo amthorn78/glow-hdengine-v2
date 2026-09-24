@@ -1,0 +1,84 @@
+{
+ "mode": "plan",
+ "pid": "OPS-20",
+ "page": "3db4590a05eb81858a9dd361d3689ce8",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan OPS-20 3db4590a05eb81858a9dd361d3689ce8 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "OPS-20",
+  "fetched": "2026-09-23T13:23:01.175Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ce55a240-5a1/agent-a903c21af1e9649d3.jsonl",
+  "ops_count": 9,
+  "rules": {
+   "R-A1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2g": {
+    "hits": 4,
+    "expected": 4,
+    "ok": true
+   },
+   "R-26-P1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-P4": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "LOPS-20-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

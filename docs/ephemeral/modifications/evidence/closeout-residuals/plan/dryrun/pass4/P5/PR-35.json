@@ -1,0 +1,99 @@
+{
+ "mode": "plan",
+ "pid": "PR-35",
+ "page": "3db4590a05eb8120b443ed2cb08b723c",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan PR-35 3db4590a05eb8120b443ed2cb08b723c --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "PR-35",
+  "fetched": "2026-09-23T13:19:01.920Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ce55a240-5a1/agent-aa004bb3c7ac76553.jsonl",
+  "ops_count": 8,
+  "rules": {
+   "R-A1f": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-ITEM30a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-ITEM30c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-ITEM30d1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-ITEM30d2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A5": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LPR-35-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LPR-35-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-26-BRANCH-RECV": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 1
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 1
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

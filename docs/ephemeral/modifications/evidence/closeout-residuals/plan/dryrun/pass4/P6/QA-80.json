@@ -1,0 +1,69 @@
+{
+ "mode": "plan",
+ "pid": "QA-80",
+ "page": "3db4590a05eb813ba9a9dbd9a641d36c",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan QA-80 3db4590a05eb813ba9a9dbd9a641d36c --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "QA-80",
+  "fetched": "2026-09-23T13:20:40.037Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 3,
+  "rules": {
+   "R-A1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-ITEM35": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

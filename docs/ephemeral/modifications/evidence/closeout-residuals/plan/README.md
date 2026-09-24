@@ -16,7 +16,7 @@ dry runs' readback notes, each at most 15 words (`D22`).
 | `dryrun/pass1/` | the rule-level dry run, 7 batches | all 51 bodies passed after the data fixes now in the engine |
 | `dryrun/pass2/` | the complete dry run, 6 batches: per-body engine output and batch reports | 56 of 56 pass (50 live, 5 untouched live, the proposed MGMT-10 body) |
 | `dryrun/pass3/` | the landing rehearsal: `land.py plan --no-ops` on the 51 bodies with edits, `land.py check` on the 5 untouched, `graph_check.py --simulate`; `report.json`; `one.py`, the wrapper that ran each | 51/51 plan with no refusal, 5/5 check, graph check passes |
-| `dryrun/pass4/` | the rehearsal after repair round 4, with the readback each landing will run (`landed_check`, P-76) and CL-40's URL filled in both modes (P-75); `report.json` | see `report.json` |
+| `dryrun/pass4/` | the rehearsal after repair round 4, with the readback each landing will run (`landed_check`, P-76) and CL-40's URL filled in both modes (P-75); `report.json`; `one.py` | 51/51 plan with precheck and landed check passing, CL-40 included; 5/5 check; graph check passes; 0 refusals |
 
 The builders in `registry/`, the skills' `results/` and `dryrun/pass3/one.py` and `dryrun/pass4/one.py` were run in the PLAN session's
 scratchpad, and the paths they name are scratchpad paths. The files EXECUTE runs (`engine/`, `registry/nam002_live.py`) resolve the repository root
