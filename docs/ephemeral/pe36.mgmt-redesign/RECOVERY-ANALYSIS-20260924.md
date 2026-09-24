@@ -12,12 +12,16 @@ evidence: docs/ephemeral/pe36.mgmt-redesign/recovery-20260924/
 
 # Recovery analysis — the prompt ecosystem after the eight review rounds
 
-**Recoverable forward, with nothing to roll back.** The eight rounds changed nothing live. They built a
-plan for the follow-up Modification that was never approved or run. The live ecosystem was changed a day
-earlier, on 2026-09-23, by the Alpha Feedback Modification. After refute-by-default checking, none of its 48
-known defects is material, and none is shown to make behaviour worse than it was before 09-23. The plan's
-content converged by round 5 and is intact on `main`. What went wrong in the rounds is the failure-handling
-machinery they kept adding, and that machinery never ran.
+**Your changes are live, and nothing needs rolling back.** All six Alpha Feedback entries went into the
+live ecosystem on 2026-09-23, through the Alpha Feedback Modification: all 55 prompt bodies and 6 skills,
+checked at the cut-over. They are not yet clean. Old text still sits beside the new rules in about 50
+bodies, so some sessions may still behave the old way. The eight overnight rounds built the cleanup for
+that, and it was never landed.
+
+After refute-by-default checking, none of the 48 known defects is material, and none is shown to make
+behaviour worse than before 09-23. The cleanup's content converged by round 5 and is intact on `main`.
+What went wrong in the rounds is the failure-handling machinery they kept adding, and that machinery never
+ran.
 
 **Of the brief's five possibilities, this is 5, mixed.** The content converged legitimately (1). The
 machinery was review-induced regression (3), kept going by a review design with no likelihood test and a
@@ -47,7 +51,7 @@ Two claims from my redesign (PE36, 2026-09-22/23) were wrong, and both fed this.
 | Was the process converging? | The content was, by round 5. The machinery was not: serious machinery defects ran 1, 3, 3, 5, 5, 5, 3 over rounds 2–8, a new set each round. You did not stop early. | 5 |
 | Which findings actually matter? | None is material. Five are credible risks. Two of those are on the path of the next development work, PR-40's reject routing and change-flow's stale Alpha state, and each has a one-line workaround. | 4.2 |
 | What can be retained? | All of the live change, the plan's content and its normal-path tools, and the RCA. The process rules stay, with patches. | 4 |
-| What should be deferred? | The 43 findings that are low-impact or affect records only, the plan's content (kept as a ready package), and every rule patch except the stopping rule. | 4, 8 |
+| What should be deferred? | Every rule patch except the stopping rule, and the 7 known defects outside the cleanup's 40 items: the Backlog entries MB-001 to MB-004, TW-01, the MGMT-10 design notes and ITEM-39b. The cleanup itself should land (decision 2). | 4, 8 |
 | Was the model configuration appropriate? | Not as the default. The finds that mattered came from simulation and breadth sweeps, not depth. Depth mostly widened the review surface and removed the budget signal. It was not the cause: ANALYZE converged under the same mode. | 6 |
 | What should trigger escalation? | Five named triggers, each answered with one bounded pass. | 6 |
 | What is the stopping rule? | Dry-run the normal path first. Then allow at most two full reviews and one check of the repair's diff. Then the plan comes to you with every open finding listed. Stop earlier if defects stop halving or the budget doubles. | 7 |
@@ -152,7 +156,8 @@ The five credible risks, in four rows:
 | ITEM-08 | The Flowmaster core pins stage prompts by their complete content and keeps content hashes | Resuming a ledger pinned before E6 stops the run; fresh runs are unaffected. Hashing bodies breaches D22 | there before 09-23 | Defer to the next skill cycle |
 | TW-01 | The same pin in tw-flowmaster | TW only | there before 09-23 | Defer: TW is out of scope |
 
-**The other 43 go to the backlog.** They include:
+**The other 43 are low-impact as defects.** Most of them are among the cleanup's 40 items and land with
+it (decision 2). They include:
 - the 123 handoff-content leftovers: handoffs longer than D23-B intends, but no wrong route;
 - the 21 bodies that describe PR-40 entry by your assertion: that is the fallback, and it still works;
 - read-only self-descriptions beside commits: sessions commit anyway, as PR04's PR-40 did;
@@ -322,7 +327,7 @@ R3-07 and R4-07 were of that kind.
 |---|---|
 | no material defect is open | met |
 | credible risks are fixed or have workarounds | met for the two on PR05's path (decision 1) |
-| the improvements are preserved | met: the live change is kept, and the plan's content is on `main` |
+| the improvements are preserved | partly: the live change is kept, but it is only partly in effect until the cleanup lands (decision 2) |
 | the remaining findings are low-impact | met: 43 of 48 |
 | the next real run shows the flow works | outstanding: PR05 |
 
@@ -330,8 +335,8 @@ R3-07 and R4-07 were of that kind.
 
 | # | Question | If nothing changes | Recommendation |
 |---|---|---|---|
-| 1 | Is the ecosystem recovered? | PR05 cannot start: the E6 freeze is still in force on the record | **Yes.** Lift the freeze and run PR05 as the functional test, with two workarounds |
-| 2 | What happens to the stopped Modification? | It sits at PLANNED, with a plan nobody should approve as written | **Park it.** Withdraw the machinery and keep the content as a ready package |
+| 1 | Is the ecosystem recovered? | PR05 cannot start: the E6 freeze is still in force on the record | **Yes.** Once the cleanup lands, lift the freeze and run PR05 as the functional test |
+| 2 | What happens to the stopped Modification? | It sits at PLANNED, with a plan nobody should approve as written, and your changes stay only partly in effect | **Land its content in one bounded pass**, with the machinery withdrawn (revised 2026-09-24; it was "park") |
 | 3 | Adopt the stopping rule? | The next PLAN review or skill review has no cap, just like this one | **Yes, as `D26`,** binding now. `D25` is already drafted in the parked plan |
 
 ### Decision 1 — is the ecosystem recovered?
@@ -340,7 +345,8 @@ R3-07 and R4-07 were of that kind.
 - **(b) One bounded pass first.** Land the PR-40 text fix and the ITEM-39 skill fix, then run PR05. That
   costs a skill package cycle (review and install) and a body edit through MGMT-10: about half a day.
 
-**Recommendation: (a).** The two workarounds:
+**Recommendation: (a), after the cleanup lands (decision 2).** The cleanup covers ITEM-31, ITEM-37 and
+ITEM-39, so the two workarounds below matter only if the cleanup is parked:
 - **At PR05's kickoff,** one line: *"Alpha state is recorded in the repository (D18 successor,
   2026-09-23): HDE-EPIC040-PR04 was accepted by its PR-40 review,
   `docs/ephemeral/HDE-EPIC040-PR04-pr-work-unit-lineage-review-v1.0.md`. change-flow `SKILL.md:335` is
@@ -374,12 +380,24 @@ A material failure in any of them gets its own fix, and no new review round.
   edits 51 live bodies, mostly for consistency.
 - **(c) End it.** Mark it ABANDONED and keep the content as evidence.
 
-**Recommendation: (a).**
-- 43 of its 48 known defects are low-impact. The brief's test, operational benefit against the risk of
-  changing working prompts, does not justify editing 51 of them now.
-- Nothing is lost: the content is on `main` and re-applies today.
-- The RCA recommended applying the four round-8 fixes and bringing the plan for approval. Three of those
-  four fixes are to machinery that should go instead.
+**Recommendation: (b), revised 2026-09-24 after Nathan's reply.** It was (a).
+
+**Why (a) was wrong.** It rated the leftovers by whether anything breaks. None does, so they came out
+low-impact. That measured breakage, not whether the changes Nathan asked for took effect. The leftovers are
+exactly what stops them taking full effect. AF-008 was about long handoffs, and 46 bodies still tell
+handoffs to carry what D23-B removed. The brief requires that "the improvements that justified the work"
+survive recovery. Until the cleanup lands, those improvements are only partly in effect.
+
+**How (b) stays bounded:**
+- The dated plan is not rewritten. A short successor to §P names the minimal execution in §4.3: the
+  content and normal-path tools as they stand, with the machinery withdrawn and R8-02 fixed.
+- Before approval: one fresh rehearsal on the day, and one in-order run of the manifest. No review loop.
+- The landing runs under the stopping rule (decision 3). Any failure comes straight back to Nathan.
+- Cost: about half a day. That includes one D24 review round of the 7 packages, Nathan's install and two
+  merges.
+
+The RCA recommended applying the four round-8 fixes and bringing the plan for approval. Three of those four
+fixes are to machinery that should go instead.
 
 ### Decision 3 — the stopping rule
 
