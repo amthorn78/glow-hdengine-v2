@@ -15,8 +15,11 @@
   "expect": "unlanded",
   "kept_from_stop": null,
   "mixed_kept": [],
+  "sent": 0,
+  "waived": [],
   "landed": [],
   "mixed": [],
+  "doubled": [],
   "bad": [],
   "pass": true
  },
@@ -30,6 +33,8 @@
    "TRACK-UNIT-STOPPED"
   ],
   "mixed_kept": [],
+  "sent": 15,
+  "waived": [],
   "landed": [
    "TRACK-FREEZE-START",
    "TRACK-STATUS-STOP-01",
@@ -38,6 +43,7 @@
    "TRACK-UNIT-STOPPED"
   ],
   "mixed": [],
+  "doubled": [],
   "bad": [],
   "pass": true
  },
@@ -51,6 +57,8 @@
    "TRACK-UNIT-STOPPED"
   ],
   "mixed_kept": [],
+  "sent": 1,
+  "waived": [],
   "landed": [
    "TRACK-FREEZE-START",
    "TRACK-STATUS-STOP-01",
@@ -59,6 +67,7 @@
    "TRACK-UNIT-STOPPED"
   ],
   "mixed": [],
+  "doubled": [],
   "bad": [],
   "pass": true
  },
@@ -73,6 +82,8 @@
   "mixed_kept": [
    "TRACK-UNIT-STOPPED"
   ],
+  "sent": 1,
+  "waived": [],
   "landed": [
    "TRACK-FREEZE-START",
    "TRACK-STATUS-STOP-01",
@@ -82,6 +93,7 @@
   "mixed": [
    "TRACK-UNIT-STOPPED"
   ],
+  "doubled": [],
   "bad": [],
   "pass": true
  },
@@ -1280,6 +1292,432 @@
    "listed_for_nathan": [
     "TRACK-UNIT-STOPPED"
    ]
+  }
+ ],
+ "stops_after_x53": [
+  {
+   "sequence": "stop after X5.3, a pointer doubled",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 13,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "state_before_stop": "DOUBLED",
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, a pointer doubled with text between",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [
+    "PART-06-ITEM1-02"
+   ],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [
+     "PART-06-ITEM1-02"
+    ],
+    "bad": [
+     "PART-06-ITEM1-02"
+    ],
+    "pass": false
+   },
+   "check_after_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, a sent edit stored differently",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [
+    "PART-06-HUB-02"
+   ],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [
+     "PART-06-HUB-02"
+    ],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [
+     "PART-06-HUB-02"
+    ],
+    "doubled": [],
+    "bad": [
+     "PART-06-HUB-02"
+    ],
+    "pass": false
+   },
+   "check_with_nathans_waiver": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [
+     "PART-06-HUB-02"
+    ],
+    "sent": 12,
+    "waived": [
+     "PART-06-HUB-02"
+    ],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [
+     "PART-06-HUB-02"
+    ],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "check_after_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, one reversal missed",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "check_with_the_pointer_left": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "PART-06-HUB-02",
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "PART-06-HUB-02",
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [
+     "PART-06-HUB-02"
+    ],
+    "pass": false
+   },
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, a stop line removed later",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "check_with_the_stop_line_gone": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [
+     "TRACK-UNIT-STOPPED"
+    ],
+    "pass": false
+   },
+   "ok": true
   }
  ]
 }

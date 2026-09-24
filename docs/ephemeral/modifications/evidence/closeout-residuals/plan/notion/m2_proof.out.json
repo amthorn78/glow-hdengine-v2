@@ -1,5 +1,5 @@
 {
- "drive_source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_bafe0805-392/agent-afe382a6da0cc12db.jsonl",
+ "drive_source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ca01df8d-ee0/agent-af76e2f2bcee67caa.jsonl",
  "create_bytes": 33856,
  "final_bytes": 34039,
  "small_bytes": 14899,
@@ -24,7 +24,14 @@
    "failed": [
     "F7_code_sha256_exact"
    ],
-   "trailing": 1,
+   "trailing": 2,
+   "links": 11,
+   "ok": true
+  },
+  "final, every page link a text-less mention": {
+   "pass": true,
+   "failed": [],
+   "trailing": 0,
    "links": 11,
    "ok": true
   },
@@ -109,6 +116,27 @@
    "trailing": 0,
    "links": 8,
    "op_matches_again": 0,
+   "insert_op_on_the_result": "CODE_BLOCK_ALREADY_PRESENT",
+   "ok": true
+  },
+  "a second child of the same title": {
+   "pass": false,
+   "F1": false,
+   "children_titled": 2,
+   "ok": true
+  },
+  "resume: stage read from the page": {
+   "create": "create",
+   "create_notion_style": "create",
+   "final": "final",
+   "final_notion_style": "final",
+   "final_mentions": "final",
+   "one_self_link_landed": "PARTIAL_STEP7:2",
+   "ops_left_after_one": 2,
+   "ops_left_on_final": 0,
+   "ops_left_then_final_equal": true,
+   "small_stage": "create",
+   "small_check_passes": false,
    "ok": true
   }
  }

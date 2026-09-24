@@ -76,7 +76,7 @@
   "step": "STOP",
   "old_str": "**The three decisions below are recorded as",
   "new_str": "**{{STOP_DATE}}: the closeout-residuals Modification stopped.** `MODIFICATION-20260923-closeout-residuals` stopped during `EXECUTE`: its landing unit did not pass, so the freeze holds until Nathan lifts it. Its record's §E, in the stop's record pull request, lists every Notion write found on the pages; Nathan restores those bodies from page history, then ends the Modification or rules a plan change.\n**The three decisions below are recorded as",
-  "when": "Only on the stop path after X5.0 (spec §9, the stop record, step 6; P-107), after the stop record's pull request is pushed and opened, and before the return to Nathan; never on a run whose unit passes",
+  "when": "Only on the stop path after X5.0 (spec §9, the stop record, step 6; P-107), after the stop record's pull request is pushed and opened, and before the return to Nathan; never on a run whose unit passes; no §P step, since the stop path is not in §P's success order",
   "why": "P-98 and P-99 (repair round 6; they supersede P-85): the tracking page states the stop beside the freeze line, and claims only what is true when it lands: the record PR exists, the status is EXECUTING with the stop recorded, and §E lists the writes the sweep found (P-98). {{STOP_DATE}} is recorded in EX/run.json at stop step 1 (P-96)"
  },
  {
@@ -86,7 +86,7 @@
   "step": "STOP",
   "old_str": "FOLLOW_UP_MODIFICATION_AT_INTAKE",
   "new_str": "FOLLOW_UP_MODIFICATION_STOPPED ({{STOP_DATE}}, stop record PR, docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md)",
-  "when": "Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (stop step 7; P-98)",
+  "when": "Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (spec §9, the stop record, step 6; P-107); no §P step, since the stop path is not in §P's success order",
   "why": "P-99: on a stop the page's three status spots would still read INTAKE (completeness#7, round 5). The stop variants state a fact that stays true whichever way Nathan rules afterwards"
  },
  {
@@ -96,7 +96,7 @@
   "step": "STOP",
   "old_str": "which is at `INTAKE` with `ANALYZE` in progress",
   "new_str": "which stopped during `EXECUTE` on {{STOP_DATE}}; its record's §E (`docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md`) lists what landed",
-  "when": "Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (stop step 7; P-98)",
+  "when": "Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (spec §9, the stop record, step 6; P-107); no §P step, since the stop path is not in §P's success order",
   "why": "P-99, as TRACK-STATUS-STOP-01"
  },
  {
@@ -106,7 +106,7 @@
   "step": "STOP",
   "old_str": "`INTAKE`, branch",
   "new_str": "stopped during `EXECUTE` on {{STOP_DATE}}, branch",
-  "when": "Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (stop step 7; P-98)",
+  "when": "Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (spec §9, the stop record, step 6; P-107); no §P step, since the stop path is not in §P's success order",
   "why": "P-99, as TRACK-STATUS-STOP-01"
  },
  {
@@ -116,7 +116,7 @@
   "step": "LIFT-STOP",
   "old_str": "**The three decisions below are recorded as",
   "new_str": "**{{LIFT_DATE}}: the freeze lifted.** `MODIFICATION-20260923-closeout-residuals` stopped on {{STOP_DATE}}; every body it landed was restored and checked unlanded (its record's §E), and Nathan lifted the freeze: flow sessions may run again.\n**The three decisions below are recorded as",
-  "when": "Only after a stop past X5.0, once the restoration sweep passes (P-99) and Nathan lifts the freeze",
+  "when": "Only after a stop past X5.0, once the restoration sweep passes (P-99) and Nathan lifts the freeze; no §P step, since the stop path is not in §P's success order",
   "why": "P-99: TRACK-FREEZE-LIFT states an install, so it cannot record a lift after a stop (completeness#7, round 5)"
  },
  {
@@ -135,9 +135,9 @@
   "page_title": "Glow Operations Hub",
   "step": "X5.3",
   "old_str": "[Open the authoritative Candidate CRD Items List](https://drive.google.com/file/d/1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO/view?usp=drivesdk), maintained in place at Glow / Ops / Assessments & Decisions as `Candidate-CRD-Items-List.md`.",
-  "new_str": "[Open the Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}), a Notion page under this Hub and the list's only store (`D25-A`); `CL-40` updates it in place under the destination rule `D25-A` adds to `docs/prompt_ecosystem_management/notion-write-boundary.md`. The Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`), which held the list until {{MIGRATION_DATE}}, is Nathan's reference copy and is not updated. (Corrected {{EXECUTE_DATE}}: this line named the Drive file as the authoritative list.)",
+  "new_str": "[Open the Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}), a Notion page under this Hub and the list's only store (`D25-A`); `CL-40` is to update it in place under the destination rule `D25-A` adds to `docs/prompt_ecosystem_management/notion-write-boundary.md`. The Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`), which held the list until {{MIGRATION_DATE}}, is Nathan's reference copy and is not updated. (Corrected {{EXECUTE_DATE}}: this line named the Drive file as the authoritative list.)",
   "when": "X5.3; §P step 16 — after the new page's readback passes (X5.1)",
-  "why": "PART-06 / D25-A: the Hub's current \"Candidate CRD Items\" section (fetched line 110) names the Drive file as the authoritative list; after migration it must point to the new Notion page. Correction note follows the workspace convention \"(Corrected <date>: ...)\". Run only after the page is created and read back; fill {{CANDIDATE_CRD_LIST_URL}} with the page URL in https://app.notion.com/p/<32 hex> form (the form G-K45 requires in CL-40). old_str occurs once. The historical <details> copy (lines 128-132) and the dated 2026-09-08 note (line 125) stay as written (AUTH-001). {{MIGRATION_DATE}} is the UTC date recorded in EX/run.json before the X5.1 create call, so the move is dated alike everywhere (P-80, P-96). Round 7 (P-111): the destination-rule clause is worded prospectively (\"the destination rule `D25-A` adds to\"), because the rule reaches `main` only at X7.1, after this line lands (review round 6 consistency#7)."
+  "why": "PART-06 / D25-A: the Hub's current \"Candidate CRD Items\" section (fetched line 110) names the Drive file as the authoritative list; after migration it must point to the new Notion page. Correction note follows the workspace convention \"(Corrected <date>: ...)\". Run only after the page is created and read back; fill {{CANDIDATE_CRD_LIST_URL}} with the page URL in https://app.notion.com/p/<32 hex> form (the form G-K45 requires in CL-40). old_str occurs once. The historical <details> copy (lines 128-132) and the dated 2026-09-08 note (line 125) stay as written (AUTH-001). {{MIGRATION_DATE}} is the UTC date recorded in EX/run.json before the X5.1 create call, so the move is dated alike everywhere (P-80, P-96). Round 7 (P-111): the destination-rule clause is worded prospectively (\"the destination rule `D25-A` adds to\"), because the rule reaches `main` only at X7.1, after this line lands (review round 6 consistency#7). Round 8 (P-112 (l)): the `CL-40` clause is prospective too (\"is to update it\"), since CL-40's body lands only at X5.4 and its registry row reaches main at X7.1 (review round 7 consistency#11)."
  },
  {
   "id": "PART-06-HUB-02",

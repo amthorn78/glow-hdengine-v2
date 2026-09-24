@@ -5,11 +5,16 @@ checks as drive_check.py), m2.py builds the create and final content, and m2.che
   - each content as Notion would return it verbatim (must pass);
   - a Notion-style rendering of the final content: blank lines between blocks, every numbered list renumbered 1.,
     the internal links as <mention-page> with the same text and a notion.so URL, a {color="default"} on a heading,
-    table cells re-indented, and trailing spaces on non-empty code lines 3 and 9 (must pass; the trailing-space lines
-    are counted);
+    table cells re-indented, and trailing spaces on code lines 3 and 10, both non-empty (must pass; the
+    trailing-space lines are counted);
+  - the final content with every Notion page link stored as a text-less <mention-page url=.../> (must pass, P-112);
   - seven single faults (each must fail, on the criterion named);
   - the fallback: the small create content, then m2.py's insert-op on it (the result must pass as `create`, and the
-    same operation sent again must match nothing).
+    same operation sent again must match nothing);
+  - a resumed X5.1 (P-112): `stage_of` reads `create` on the create content and its Notion-style rendering, `final` on
+    the final content, its Notion-style rendering and its text-less-mention form, and PARTIAL_STEP7 with one self-link landed; `step7_ops` then gives exactly the two
+    operations left, which bring the page to the final content, and none on the final content; the small create
+    content reads `create` but fails the check until insert-op has run.
 Prints booleans and counts only.
 
   m2_proof.py <run.json> [--since-minutes N]
@@ -60,7 +65,7 @@ def main():
                 continue
             if in_code:
                 n += 1
-                out.append(ln + "  " if n in (3, 9) and ln.strip() else ln)
+                out.append(ln + "  " if n in (3, 10) and ln.strip() else ln)
                 continue
             ln = re.sub(r"^\d+\. ", "1. ", ln)
             ln = re.sub(r"\[([^\]]*)\]\(https://app\.notion\.com/p/([0-9a-f]{32})[^)]*\)",
@@ -73,8 +78,21 @@ def main():
                 out.append("")
         return "\n".join(out)
 
+    def bare(c):
+        """every Notion page link outside the code block as a text-less mention, as a native mention is stored"""
+        out, in_code = [], False
+        for ln in c.split("\n"):
+            if ln.startswith("```"):
+                in_code = not in_code
+            elif not in_code:
+                ln = re.sub(r"\[([^\]]*)\]\(https://app\.notion\.com/p/([0-9a-f]{32})[^)]*\)",
+                            lambda m: f'<mention-page url="https://www.notion.so/{m.group(2)}"/>', ln)
+            out.append(ln)
+        return "\n".join(out)
+
     cases = {"create verbatim": (create, "create", True, None), "final verbatim": (final, "final", True, None),
-             "final, Notion-style rendering": (notionish(final), "final", True, None)}
+             "final, Notion-style rendering": (notionish(final), "final", True, None),
+             "final, every page link a text-less mention": (bare(final), "final", True, None)}
     faults = {
         "a moved-items row dropped": (lambda c: re.sub(r"\t<tr>\n\t\t<td>3</td>(?:\n\t\t<td>.*</td>)+\n\t</tr>\n", "", c, 1),
                                       "F4_moved_table"),
@@ -101,16 +119,37 @@ def main():
     # the fallback: the small create, then insert-op on the page as it would be fetched
     lines = M.build(text, run, "create")[0]
     small = "\n".join(lines[:lines.index(M.H3)] + lines[lines.index(M.MAINT):]) + "\n"
-    p = small.index(M.MAINT)
-    ls = small.rfind("\n", 0, p)
-    start = small.rfind("\n", 0, ls) + 1
-    block = lines[lines.index(M.H3):lines.index(M.MAINT)]
-    op = {"old_str": small[start:p] + M.MAINT, "new_str": small[start:p] + "\n".join(block) + "\n" + M.MAINT}
+    res = M.insert_op(small, text, run)                   # m2.py's own insert-op code path
+    op = res["op"]
     assert D.occ(small, op["old_str"]) == 1
     after = small.replace(op["old_str"], op["new_str"], 1)
     r = chk(after, "create")
+    again = M.insert_op(after, text, run)
     rows["fallback: small create then insert-op"] = {**r, "op_matches_again": D.occ(after, op["old_str"]),
-                                                     "ok": r["pass"] and D.occ(after, op["old_str"]) == 0}
+                                                     "insert_op_on_the_result": again.get("refused"),
+                                                     "ok": r["pass"] and D.occ(after, op["old_str"]) == 0
+                                                     and again.get("refused") == "CODE_BLOCK_ALREADY_PRESENT"}
+    # a second page of the same title under the Hub (a lost create response, then a stale Hub fetch): F1 fails
+    two = M.check(final, M.TITLE, kids + [{"id": "0" * 31 + "2", "title": M.TITLE}], PAGE, text, run, "final")
+    rows["a second child of the same title"] = {"pass": two["pass"], "F1": two["F1_title_and_parent"],
+                                                "children_titled": two["F1_children_titled"],
+                                                "ok": (not two["pass"]) and not two["F1_title_and_parent"]}
+    # a resumed X5.1: the stage read from the page, and the step-7 operations still to send (P-112)
+    s7 = M.step7_ops(create, run)["ops"]
+    one = create.replace(s7[0]["old_str"], s7[0]["new_str"], 1)
+    left = M.step7_ops(one, run)["ops"]
+    two = one
+    for op in left:
+        two = two.replace(op["old_str"], op["new_str"], 1)
+    rows["resume: stage read from the page"] = {
+        "create": M.stage_of(create), "create_notion_style": M.stage_of(notionish(create)), "final": M.stage_of(final),
+        "final_notion_style": M.stage_of(notionish(final)), "final_mentions": M.stage_of(bare(final)),
+        "one_self_link_landed": M.stage_of(one), "ops_left_after_one": len(left), "ops_left_on_final": len(M.step7_ops(final, run)["ops"]),
+        "ops_left_then_final_equal": two == final, "small_stage": M.stage_of(small), "small_check_passes": chk(small, "create")["pass"],
+        "ok": (M.stage_of(create), M.stage_of(notionish(create)), M.stage_of(final), M.stage_of(notionish(final)),
+               M.stage_of(bare(final)), M.stage_of(one)) == ("create", "create", "final", "final", "final", "PARTIAL_STEP7:2")
+              and len(left) == 2 and two == final and not M.step7_ops(final, run)["ops"] and chk(two, "final")["pass"]
+              and M.stage_of(small) == "create" and not chk(small, "create")["pass"]}
     print(json.dumps({"drive_source_file": src, "create_bytes": len(create.encode()), "final_bytes": len(final.encode()),
                       "small_bytes": len(small.encode()), "all_ok": all(v["ok"] for v in rows.values()), "cases": rows},
                      indent=1, ensure_ascii=False))

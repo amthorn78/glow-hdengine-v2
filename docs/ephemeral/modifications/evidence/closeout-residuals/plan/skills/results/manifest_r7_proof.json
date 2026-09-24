@@ -1,0 +1,5 @@
+{
+ "what": "PLAN test of the manifest command repair round 7 changed (P-111 (e)), 2026-09-24, main session, in the PLAN scratchpad",
+ "execute.4b freeze before and after": "freeze.py run on the pass-4 patched root standing in for $PKG: exit 0, one line '323 047ca742...'; run again and compared by diff with the first output: diff exit 0",
+ "not_rerun": "no other manifest command changed in round 7; round 6's commands are tested in manifest_r6_proof.json"
+}

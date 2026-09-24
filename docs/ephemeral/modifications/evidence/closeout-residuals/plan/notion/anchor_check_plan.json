@@ -5,7 +5,7 @@
    "page": "3ce4590a05eb814f8892f88ff8539308",
    "title": "Glow Operations Hub",
    "fetched": "2026-09-24T04:18:31.010Z",
-   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/mcp-Notion-notion-fetch-1790229782981.txt",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/mcp-Notion-notion-fetch-1790232840542.txt",
    "edits": [
     {
      "id": "PART-12-HUB-01",
@@ -43,7 +43,7 @@
    "page": "3e34590a05eb81e7927efe0541258916",
    "title": "GCFPE MGMT Change-Process Redesign \u2014 Tracking",
    "fetched": "2026-09-23T17:45:35.844Z",
-   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ca01df8d-ee0/agent-a4b063fdcc2ddda27.jsonl",
    "edits": [
     {
      "id": "TRACK-FREEZE-START",
@@ -156,7 +156,7 @@
    "page": "3d54590a05eb8142a187d32ad4435950",
    "title": "Repository prompt-use provenance helper",
    "fetched": "2026-09-08T07:23:26.492Z",
-   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ca01df8d-ee0/agent-af76e2f2bcee67caa.jsonl",
    "edits": [
     {
      "id": "PART-06-ITEM1-01",
@@ -255,6 +255,7 @@
  ],
  "landed": [],
  "mixed": [],
+ "doubled": [],
  "bad": [],
  "pass": true
 }

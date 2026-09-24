@@ -227,7 +227,7 @@ Standing rules for every worker:
 - **P-49** *[Narrowed by P-90 and P-96: a control-page edit whose new text is present has landed.]* Before every Notion edit, EXECUTE re-fetches the page and confirms each `old_str` still occurs exactly once.
 - **P-50** The tracking page's stale status lines (yaml status, "at INTAKE with ANALYZE in progress", the Records row) are
   updated at the close-out, from the state at that time.
-- **P-51** *[Its date is the unit's start date, recorded at X5.0 (P-96).]* The tracking-page entry is dated by its write date ({{EXECUTE_DATE}}) and names the census of 2026-09-23.
+- **P-51** *[It is dated by the day X5.6 started, `execute_date_X5.6` (P-104).]* The tracking-page entry is dated by its write date ({{EXECUTE_DATE}}) and names the census of 2026-09-23.
 - **P-52** `notion-write-boundary.md`'s artifact_version moves 1.2 → 1.3 with the destination row (P30-VERSION kept).
 - **P-53** Decision-record entries are dated 2026-09-23, the date of the rulings they record (house style).
 - **P-54** The parent record's §E line (`MODIFICATION-20260923-alpha-feedback-open-entries.md:1112`) repeats the C8
@@ -369,7 +369,7 @@ Standing rules for every worker:
 - **P-79 The whole skills root is measured, not held to a constant.** It also covers skills this Modification does not
   change, which may sync at any time. X0.3 and X1.1 record it, and `run_gate.py` checks that each run leaves it as it
   found it. Only the seven package digests are held to expected values.
-- **P-80 `{{MIGRATION_DATE}}`** *[Recorded before the create call, not after it, and `{{EXECUTE_DATE}}` is the unit's start date, not the date of each write (P-96).]* is the UTC date of the X5.1 page creation. The page's callout, revision bullet and
+- **P-80 `{{MIGRATION_DATE}}`** *[Recorded before the create call, not after it (P-96). `{{EXECUTE_DATE}}` is recorded per step, so a "Corrected" note carries the day its own step started (`execute_date_X5.3`, P-104).]* is the UTC date of the X5.1 page creation. The page's callout, revision bullet and
   M2-R1, and the pointers' "held the list until" and "moved" clauses carry it, so every record dates the move alike even
   if X5.3 falls on a later day. `{{EXECUTE_DATE}}` stays the date of the write for a "Corrected" note.
 - **P-81 Commit 1 carries the status change.** *[Its last sentence is replaced by P-86.]* X2.1 sets `status: EXECUTING` and commit 1 holds it with the
@@ -424,7 +424,7 @@ Standing rules for every worker:
   have fired on the landed bodies (X6.1, `D14`). X7.6 writes into §E the line
   `D25 applies from: <merge commit sha>, <YYYY-MM-DD>` with the X7.1 merge commit and its UTC date, and its gate
   finds that line exactly once. Replaces P-81's "the date the guards landed".
-- **P-87 Evidence is committed as it is produced, so any step can run in a new session.** *[`EX/run.json` also holds the token values (P-96); the list is extended by P-102 (i) and P-111 (d). `migration_date` is recorded before the create and `url` as soon as it returns (P-96); X7.4 commits its own summaries (P-110); a new session continues on the pushed branch (P-106).]* X0.2 starts `EX/run.json`
+- **P-87 Evidence is committed as it is produced, so any step can run in a new session.** *[`EX/run.json` also holds the token values (P-96); the list is extended by P-102 (i) and P-111 (d). `migration_date` is recorded before the create and `url` as soon as it returns (P-96); X7.4 commits its own summaries (P-110); a new session continues on the pushed branch (P-106). `EX/ctrl/sent.txt`, `EX/stop/failure.json`, `EX/stop/failed/` and `EX/stop/rows.md` are added by P-112 (a) and (c).]* X0.2 starts `EX/run.json`
   (`$BASE` and the X0.3(e) root digest); X1.1 adds its root digest. Commit 1 (X2.2) carries `EX/run.json` and
   `EX/gate_pre.json` with the decision record and the record. X3.6 commits `EX/nam002/`; X4.2 and X4.3 commit
   `EX/gate_pkg.json` and `EX/packages.json` (the seven freeze lines and archive sha256s); X4.4 commits the brief before
@@ -562,7 +562,7 @@ Standing rules for every worker:
   P-94 record PR (completeness#13). X0.1 requires `main`'s record at `PLANNED`, so an attempt cannot start over an
   unresolved stop. Every `--force-with-lease` push follows a `git fetch --prune origin`, so a branch deleted on merge
   leaves no stale lease (executability#2).
-- **P-98 The stop sweep, after X5.0.** *[Its outputs are named and a `MIXED` edit is never written (P-108); its step 7 runs inside the stop record, before the return to Nathan (P-107 step 6). A stop at X5.0 itself is a stop before X5.0 (P-107).]* A failure that cannot be repaired forward (P-88: a refusal on a page's first
+- **P-98 The stop sweep, after X5.0.** *[Its outputs are named and a `MIXED` edit is never written (P-108); its step 7 runs inside the stop record, before the return to Nathan (P-107 step 6). A stop at X5.0 before the freeze line is listed in `EX/ctrl/sent.txt` is a stop before X5.0 (P-107, P-112 (e)). `DOUBLED` and listed edits are on its list and reversed (P-112 (a)), and its step 1 is now the failure record (P-112 (c)).]* A failure that cannot be repaired forward (P-88: a refusal on a page's first
   `plan`, a second failing `check`, a failed async task that the fresh fetch cannot explain, or an apply-once test that
   reads `MIXED`) stops the unit. EXECUTE, in this order:
   1. records `stop_date` in `EX/run.json`, commits and pushes;
@@ -591,7 +591,7 @@ Standing rules for every worker:
      `--force-with-lease` after `git fetch --prune origin`. So no tracking line claims a record before it exists
      (consistency#0).
   The freeze and `TRACK-FREEZE-START` stay. Supersedes P-85's steps.
-- **P-99 After a stop past X5.0: restore, verify, then end or change the plan.** *[The restoration check, the lift and the end route are completed by P-108: each commits, pushes and opens its pull request, and the check expects the stop's own final report.]* Round 5 set every item and the status
+- **P-99 After a stop past X5.0: restore, verify, then end or change the plan.** *[The restoration check, the lift and the end route are completed by P-108: each commits, pushes and opens its pull request, and the check expects the stop's own final report. Their reset or continue is the branch rule (P-106), not P-97's guard. The check also tests every edit the unit listed before writing it, and skips the edits Nathan waives (P-112 (a)).]* Round 5 set every item and the status
   to `BLOCKED` while landed bodies were still live. That is terminal, against template rule 6 ("Roll back what was
   applied, or unblock the rest"), and it left "a forward fix" with no vehicle (completeness#3, consistency#1). Now the
   status stays `EXECUTING`. Nathan restores each body on the list from Notion's page history. Then, at his direction,
@@ -611,7 +611,7 @@ Standing rules for every worker:
   record's pull request if that is open, or in a record PR of its own. "A forward fix" is withdrawn: after a stop,
   nothing more lands except through a plan change after the restoration. Supersedes P-85's end state and P-58
   (revised again)'s "or he rules a forward fix".
-- **P-84 (revised) A stop before X5.0, and how EXECUTE starts again.** *[A stop at X5.0 is one of these (P-107). Its restart at X0.1 applies to stops before X7.1; a plan change after an X7.4 failure names its own restart (P-110).]* A failing gate before X5.0, a D24 rejection
+- **P-84 (revised) A stop before X5.0, and how EXECUTE starts again.** *[A stop at X5.0 is one of these only until `TRACK-FREEZE-START` is listed in `EX/ctrl/sent.txt` (P-112 (e)). Its reset is the branch rule (P-106), not P-97's guard. Its restart at X0.1 applies to stops before X7.1; after X7.1 a plan change names its own steps (P-112 (d)).]* A failing gate before X5.0, a D24 rejection
   included, stops EXECUTE with nothing outside the branch. EXECUTE writes the stop rows and runs the stop record
   (P-97), so `main`'s record goes to `EXECUTING` with them. Nothing was applied outside the branch, so nothing is
   restored. Nathan then chooses one of two routes. The first is to end: items and status `BLOCKED` through a record
@@ -687,10 +687,10 @@ Standing rules for every worker:
 
 ### Repair round 7 (2026-09-24): review round 6 (`wf_bafe0805-392`)
 
-Review round 6 confirmed ten required findings (fifteen reports) and fourteen non-blocking ones. Every one is
+Review round 6 confirmed ten required findings (fifteen reports) and twenty-two non-blocking ones. Every one is
 answered below, by the decision named in brackets after it in spec §2.9.
 
-- **P-103 A Notion call sent twice lands once.** A fetch can be older than a write already made (§10.2 records one
+- **P-103 A Notion call sent twice lands once.** *[On the stop path a `DOUBLED` edit is listed, undoubled and reversed, and a readback that does not read `LANDED` is retried by P-112 (a) and (e). A Notion link is compared by its page id (P-112 (h)).]* A fetch can be older than a write already made (§10.2 records one
   whose "as of" time precedes an edit recorded against it). Round 6's operations anchored an insertion on the line
   next to it, which a landed page still holds once, so the same call sent again on a stale read would land a second
   copy (executability#6). Now every `update_content` operation EXECUTE sends has an `old_str` that occurs once on the
@@ -726,7 +726,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
   present twice it reads `MIXED` and writes nothing. `ctrl_proof.py` now moves each execute date to the next day for
   its resume test (consistency#6): the four landed edits carrying `{{EXECUTE_DATE}}` then read not landed, the
   round-5 defect reproduced, while with the recorded dates every landed edit reads `LANDED`.
-- **P-105 The new page is built and read back by committed tools.** The *Candidate CRD Items List* page's content
+- **P-105 The new page is built and read back by committed tools.** *[X5.1 reads its stage from the page, so it resumes at any point (P-112 (b)); F1 requires exactly one Hub child of the title (P-112 (b)); a text-less mention is read as its link (P-112 (h)).]* The *Candidate CRD Items List* page's content
   and its F1–F10 readback had no committed tool, so EXECUTE would have built and compared them by hand at X5.1
   (executability#5). `EV/engine/m2.py`, reading the Drive file from the newest download under `drive_check.py`'s
   checks: `build --run EX/run.json --out DIR` writes `page.create.md` (§7.4.2 steps 3–4) and `page.small.md` (the
@@ -740,7 +740,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
   faults each fail on the criterion named; the fallback passes after `insert-op`, and the same operation sent again
   matches nothing. X5.1's gate is `m2.py check` exiting 0 at both stages, its output committed to `EX/m2/`. A
   failing check is not repaired by hand: it stops the unit (P-98), whose sweep trashes the page.
-- **P-106 The branch rule.** Round 6's reset guard refused every re-run that found the remote branch holding
+- **P-106 The branch rule.** *[Every push carries an explicit lease (P-112 (i)). Rule 2 and the stop record's step 6 first open the record PR when none is open, and rule 2's exception is read from `failure.json` (P-112 (c)). After X7.1 a reset resumes by P-112 (d). X5.1's re-run is made safe by P-112 (b), and a stop's evidence by P-112 (c).]* Round 6's reset guard refused every re-run that found the remote branch holding
   evidence `main` lacked, although no pull request existed to merge at X7.4, on the reinstall path or after X7.5
   (completeness#0, executability#1). Its reset kept staged, unstaged and untracked changes, which a stop could carry
   into a record commit bound for `main` (completeness#1, executability#3). And `checkout -B … origin/main` made
@@ -780,7 +780,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
   session did not commit is discarded by the clean checkout and done again. Every push is
   `git fetch --prune origin && git push --force-with-lease origin claude/epic-tesla-17406z`. Replaces P-97's reset
   guard.
-- **P-107 The stop record, in order and in scope.** Round 6's stop record returned to Nathan before the stop lines
+- **P-107 The stop record, in order and in scope.** *[A stop at X5.0 is past X5.0 once `TRACK-FREEZE-START` is listed in `EX/ctrl/sent.txt` (P-112 (e)). Every stop first records its failure, and the stop rows are committed as `EX/stop/rows.md`, not kept in `$SCRATCH` (P-112 (c)). `AT` names the attempt directory (P-112 (i)). Step 6 fetches the seven control pages before `all`, opens the record PR when none is open, and continues when `failure.json` reads `past_x50` (P-112 (c)).]* Round 6's stop record returned to Nathan before the stop lines
   were applied. A record PR merged on receipt then lost their readback and left a branch the guard refused
   (completeness#5, executability#0, consistency#3). It also claimed every stop, although at X7.4 it mis-records
   (consistency#2). The stop record now applies to stops before X7.1: before X5.0, and from X5.0 to X6.4 after the
@@ -814,7 +814,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
      continues on `R` at this step (P-106 rule 3's commands);
   7. return to Nathan.
   Replaces P-97's five steps.
-- **P-108 The stop sweep and the restoration check, completed.**
+- **P-108 The stop sweep and the restoration check, completed.** *[(c) and (d) are completed by P-112 (a): a `DOUBLED` edit and every edit the unit listed are on the sweep's list and reversed, the kept set counts only the freeze and stop lines, and the check tests the listed edits.]*
   (a) `land.py state` no longer refuses CL-40 without a page URL (completeness#3, executability#2, consistency#0).
       With no `--candidate-url` it fills X4.5's stand-in (P-76) and says so (`"candidate_url": "stand-in"`). No body
       can carry the page URL before X5.1 records it, because X5.4 follows X5.1, so the stand-in gives an unlanded
@@ -856,7 +856,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
       §E names the tracking page's three status lines as they then read, for Nathan, because no edit brings them to
       `BLOCKED` (completeness#9). Then `modification_validate.py`, commit
       (`closeout-residuals record: attempt <n> ended`), push, and a record PR, or the open one retitled.
-- **P-109 The delivery is recorded.** Nothing recorded that X4.4 had delivered the archives, so a new session could
+- **P-109 The delivery is recorded.** *[Its X7.2 route is replaced by P-112 (d): nothing is re-cut after X7.1. A delivery message also names the earlier rounds of the same attempt (P-112 (j)).]* Nothing recorded that X4.4 had delivered the archives, so a new session could
   not tell "delivered" from "ended before the delivery" (completeness#4). X4.4 now delivers the seven archives in
   seven `SendUserFile` calls, one archive each, each caption leading with its sha256 and then its freeze digest.
   Each message states what changed in that skill, where it installs (`$INST/<skill>`), the freeze line Nathan should
@@ -873,7 +873,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
   At X7.2, if Nathan no longer holds an archive whose sha256 `EX/packages.json` lists, MGMT-10 runs X1.1, X1.2 and
   X4.2 to X4.4 again on the branch: a new round, re-cut, delivered and recorded the same way. Then X7.2 runs again.
   The freeze holds throughout, and X7.4 checks the installed freeze digests against the new `EX/packages.json`.
-- **P-110 X7.4 and X7.5 resume on the branch.** X7.4 left its summaries uncommitted and told a new session to re-run
+- **P-110 X7.4 and X7.5 resume on the branch.** *[Its record covers every failure from X7.2 to X7.4, and its plan-change restart is replaced by P-112 (d).]* X7.4 left its summaries uncommitted and told a new session to re-run
   it, which the reset guard then refused (completeness#0, executability#1). Now X7.4 starts with P-106's rule: a
   reset after X7.1's merge, or a continue once X7.4 has committed. It then runs the post-install verification:
   `execute.5` to `EX/installed_freeze.txt`, `run_gate.py --set post` to `EX/gate_post.json`, and the corpus gate to
@@ -889,7 +889,7 @@ answered below, by the decision named in brackets after it in spec §2.9.
   `ctrl.py op`; its readback goes to `EX/ctrl/X7.5.json`, committed at X7.6. A plan change after an X7.4 failure
   cannot restart at X0.1, because X7.1 has merged. It names its own restart: X1.1, X1.2 and X4.2 to X4.4 with the new
   packages, then X7.2 to X7.8 (completeness#8). `install_date` moves from P-96's "at X7.4, first" to X7.4's pass.
-- **P-111 Smaller corrections (round 6's non-blocking findings).**
+- **P-111 Smaller corrections (round 6's non-blocking findings).** *[(a) is extended by P-112 (k); (i) and (j) are completed by P-112 (l).]*
   (a) X5.4's first `plan` on a page an earlier sitting wrote to may print `repair` ≠ [] with no refusal. Its
       operations are applied once and checked, as P-88's forward repair (executability#10).
   (b) The `source_file` gate reads: the file is `<ROOT>/$CLAUDE_CODE_SESSION_ID.jsonl`, or lies under
@@ -917,6 +917,186 @@ answered below, by the decision named in brackets after it in spec §2.9.
       lands (consistency#7).
   (j) X5.1 runs `drive_check.py --hub <Hub>`, or `drive_check.py` without `--hub` on a resume where the Hub already
       lists this run's page (§7.4.2 step 1; consistency#10).
+
+### Repair round 8 (2026-09-24): review round 7 (`wf_ca01df8d-ee0`)
+
+Review round 7 confirmed seven required defects (eleven reports) and twenty-seven non-blocking findings, one of them
+a required report downgraded. Every one is answered below, by the part named in brackets after it in spec §2.10.
+
+- **P-112 Resumable, recorded and checked to the end.**
+  (a) **Control edits the unit wrote, on the stop path.** Round 7's `DOUBLED` state was not on the stop's list, not
+      reversed and not tested. A `MIXED` edit the unit had itself written passed the restoration check because the
+      stop's own report read it `MIXED` (completeness#0, executability#0, consistency#1, consistency#9). Now:
+      - **The sent list.** Each step that writes control edits before X6.4 lists them in `EX/ctrl/sent.txt`, one id
+        per line and each once, in the commit that records its execute date, pushed before its first write: X5.0
+        lists `TRACK-FREEZE-START`, X5.3 its eleven pointers, X5.6 its three edits. An edit listed but never sent
+        still reads `NOT_LANDED` with its `old_str` once, which is what the check below requires of it, so listing
+        before writing is safe.
+      - **The sweep** lists every body not `UNTOUCHED`, every control edit that reads `LANDED`, `MIXED` or
+        `DOUBLED`, every edit in `sent.txt`, and the page if the Hub lists it. `ctrl.py all` exits 1 when an edit
+        reads `MIXED` or `DOUBLED`; in the sweep that exit is recorded, not acted on.
+      - **The reversals** (stop step 3) take every edit that is in `sent.txt` or reads `LANDED` or `DOUBLED`, except
+        `TRACK-FREEZE-START`, in reverse §9 order. `DOUBLED`: send the operation `ctrl.py op … --reverse` prints,
+        which takes the second copy out and says `then: op --reverse`; re-fetch, and go on as for `LANDED`.
+        `LANDED`: send `op --reverse`'s operation; re-fetch; `ctrl.py edits` must read `NOT_LANDED` with `old_count`
+        1. `NOT_LANDED`: skip. `MIXED`, a refused undouble (`DOUBLED_NOT_CONTIGUOUS`), or a reversal that does not
+        read back: listed for Nathan and not written again. Stop step 5 lists every edit other than
+        `TRACK-FREEZE-START` that still reads `LANDED`, `MIXED` or `DOUBLED`.
+      - **The restoration check** adds `--sent AT/execute/ctrl/sent.txt`. It passes only when:
+        - the `LANDED` set equals the freeze line and the stop lines that the kept report reads `LANDED`. Only those
+          five can be kept, so a reversal the stop missed fails even though its own report read the pointer
+          `LANDED`;
+        - no edit reads `DOUBLED`;
+        - every listed edit reads `NOT_LANDED` with its `old_str` once, whether it is `MIXED` or not;
+        - an unlisted `MIXED` edit is one the kept report also read `MIXED`.
+        An edit Nathan restores passes on the next check. An edit he rules should stay as it is (for example one
+        someone else edited after the unit's write) he names. The check session then writes its id to
+        `AT/restore/waived.txt`, records his words in §E, and passes `--waived AT/restore/waived.txt`, which skips it.
+      - `EV/notion/ctrl_proof.out.json` adds five stops after X5.3, each ending in the check (executability#9):
+        - a doubled pointer is undoubled, reversed, and passes;
+        - a doubled pointer split by other text is listed and fails, and passes once Nathan restores the row;
+        - a listed pointer stored differently (`MIXED`) is listed and fails although the report read it `MIXED`, and
+          passes once restored or waived;
+        - a missed reversal fails;
+        - a stop line removed after the report fails.
+  (b) **X5.1 resumes from the page.** X5.1 ran the create-stage check unconditionally (completeness#1,
+      consistency#0, executability#7). A session resumed after step 7 had sent any self-link failed F6 on a correct
+      page. One resumed after the fallback's small create skipped `insert-op` and failed F7. Now, after the create
+      (or when `page_id` is recorded, or §7.4.2 step 1 finds this run's page), X5.1 runs on fresh fetches of the
+      page and the Hub:
+      1. `m2.py insert-op`: an operation is sent and the page re-fetched; `CODE_BLOCK_ALREADY_PRESENT` means nothing
+         to send;
+      2. `m2.py check --stage auto`, which reads the stage from the page (`m2.stage_of`): `create` while all three
+         step-7 `old_str` stand, `final` once none does, and otherwise it refuses `PARTIAL_STEP7`. At `create` it
+         must pass. Its output is committed as `EX/m2/create.json` (`closeout-residuals X5.1: create check`) and
+         pushed before step 7 sends anything, so a resumed X5.1 that finds step 7 sent finds it committed;
+      3. `m2.py step7-ops`: the step-7 operations whose `old_str` still stands, sent in one call (none once all have
+         landed); re-fetch;
+      4. `m2.py check --stage final > EX/m2/final.json`.
+      F1 now requires exactly one Hub child titled *Candidate CRD Items List*, and that it is `page_id`, so a second
+      create after a lost response and a stale Hub fetch fails the readback. `EV/notion/m2_proof.out.json` shows:
+      - `stage_of` reads `create` on the create content and its Notion-style rendering, and `final` on the final
+        content in its three forms;
+      - with one self-link landed it reads `PARTIAL_STEP7:2`; `step7-ops` then gives exactly the two operations
+        left, and the page equals the final content;
+      - the small create reads `create` and fails until `insert-op` has run;
+      - a second child of the title fails F1.
+  (c) **A stop records its failure first.** A stop resumed in a new session could not name its failing step or
+      show its evidence: both lived in the lost session (completeness#2, executability#6). Every stop before X7.1
+      now begins with **stop step 1**:
+      - unless `EX/stop/failure.json` is committed (a resumed stop keeps it), write it: the failing §9 step; the
+        page, body or edit id; the command; its exit code; the finding in one sentence; the UTC time; and
+        `past_x50`, which is true once `TRACK-FREEZE-START` is listed in `EX/ctrl/sent.txt`;
+      - copy the failing step's uncommitted `EX/` outputs (the refusal or check JSON: counts and ids, no body text)
+        into `EX/stop/failed/`;
+      - past X5.0, record `stop_date` too;
+      - commit `EX/run.json`, `EX/ctrl/` and `EX/stop/` (`closeout-residuals stop: failure`); push.
+      The stop rows are written to `EX/stop/rows.md` from `failure.json` and, past X5.0, from the sweep. They are
+      committed (`closeout-residuals stop: rows`) and pushed before the stop record. The `<step>` in the record's
+      subject `record: attempt <n> stopped at <step>` is `failure.json`'s. The stop record's step 6 fetches the
+      seven control pages before its `ctrl.py all`, as stop step 5 does (completeness#6). The branch rule's exception
+      for a stop record in progress now reads: `R`'s tip is `closeout-residuals record: attempt <n> stopped at
+      <step>`, and `AT/execute/stop/failure.json` on `R` reads `"past_x50": true`. Rule 2, and the stop record's
+      step 6, first open the record PR against `main` when none is open for the branch (with the GitHub tools), then
+      refuse or continue (completeness#6, consistency#16).
+  (d) **After X7.1.** Round 7's X7.2 route re-cut and re-reviewed the packages after X7.1 (completeness#4,
+      executability#2). Its plan-change restart ran X1.1 and X4.2 after X7.3 (completeness#5, executability#8,
+      consistency#10). Neither can run then: X1.1's patches do not apply to an installed tree, X4.2's `pkg` set
+      asserts the pre-install audit, and no failure of those gates had a route. Now:
+      - **Nothing is re-cut after X7.1.** The archives are the ones X4.4 delivered and the D24 verdicts reviewed
+        (`EX/packages.json`). Each delivery message holds its archive, so Nathan can save it again from there. If he
+        no longer holds one, and this session holds a file in `$SCRATCH/skills-out` whose sha256 equals its line in
+        `EX/packages.json`, X7.2 sends that file again in a message of the same form. No review is needed, since
+        these are the bytes reviewed. Otherwise it is a failure after X7.1.
+      - **A failure after X7.1**, at X7.2 (an archive nobody holds), X7.3 or X7.4, is recorded the way P-110
+        records an X7.4 failure:
+        - §E's row for the step;
+        - the line `D25 applies from: <X7.1 merge commit sha>, <its UTC date>`, unless it is already written;
+        - status `EXECUTING`, with the freeze held;
+        - `modification_validate.py`;
+        - one commit (`closeout-residuals record: X7.<s> failed`), pushed, and a record PR;
+        - the return to Nathan.
+        There is no attempt directory and no reversal: the unit passed and has merged. From X7.5, where Nathan lifts
+        the freeze, a failure is repaired forward by running the step again, or returned to Nathan with the failing
+        gate named; nothing is reversed (consistency#5).
+      - **A plan change after X7.1** cannot restart at X0.1 or re-run X1.1 to X4.4. It names its own steps and
+        their inputs: the package base (the installed tree, or the archives Nathan holds), the diffs and expected
+        digests cut against that base, the gate set it runs, and its own D24 round, briefed with `--prior-file`
+        ((f)). It rejoins at X7.2. This replaces P-110's restart and P-109's X7.2 route.
+      - **Where a reset session resumes after X7.1** (completeness#3). The branch rule may reset when `main`'s
+        record reads `status: EXECUTING` and `main` holds a merged `closeout-residuals X6.4:` commit. The session
+        then does not start at X0.2:
+        - with no merged `record: X7.<s> failed`, it resumes at X7.4 when Nathan has given an install date, and
+          otherwise at X7.2;
+        - after a merged failure record, it runs the step Nathan's ruling names: X7.4 after a reinstall, or the
+          plan change's first step.
+        X7.2, X7.4 and X7.5 are also named procedures that a session Nathan starts runs directly.
+  (e) **A control readback that does not read `LANDED` is retried, and X5.0 is decided by the sent list.** One
+      stale readback sent X5.0 down the stop-before-X5.0 path, recording that nothing was written while the freeze
+      line stood, and no other control readback had a route (executability#1, consistency#8). Now:
+      - A control readback that does not read `LANDED` polls the write's task to its end (P-89), re-fetches, and
+        runs the apply-once test again, up to three times. On `NOT_LANDED` it sends the operation again. If the
+        write had landed, its `old_str` matches nothing and Notion refuses it: the fetch was stale, so re-fetch. An
+        end-of-page append instead lands a second copy, which reads `DOUBLED` and is undoubled. After three cycles
+        without `LANDED`, the edit cannot be repaired forward.
+      - At X5.0, `ctrl.py edits` must read `TOKEN_NOT_RECORDED` with `old_count` 1 before X5.0 records its date and
+        lists `TRACK-FREEZE-START`. On a resume the date is already recorded, and the apply-once test decides.
+      - A failure before that listing's commit is a stop before X5.0: nothing was written. From that commit on, a
+        failure at X5.0 is a stop past X5.0, whose sweep finds whether the line landed. This replaces P-107's "a stop
+        at X5.0 itself is a stop before X5.0".
+  (f) **The D24 brief's variant after X7.1.** `fill_brief.py` chose its variant from the newest brief's directory.
+      So both post-X7.1 routes got the re-cut variant, which says the archives were never delivered, and a plan
+      change's `--prior-file` was dropped (consistency#2). Now:
+      - `--prior-file` always gives the plan-change variant;
+      - the re-cut variant is refused with `PRIOR_ROUND_DELIVERED` when `EX/run.json` records `delivered_cr<k-1>`;
+      - a round whose newest earlier brief is under `attempt-*/` still refuses without `--prior-file`;
+      - a re-cut round is refused with `REPAIR_VERDICT_PENDING` when a verdict file of the round before mentions
+        `SKILL_REPAIR_REQUIRED` anywhere, not only first (completeness#7). A confirmed record that quotes the
+        vocabulary then stops for Nathan's ruling, which is the safe side of D24 condition 5.
+      `EV/skills/results/brief_cases_r8.json` runs all eight cases on the committed script, all_ok true: first;
+      re-cut; re-cut after a rejection; re-cut after a confirmed record quoting both words (refused); re-cut after a
+      recorded delivery (refused); plan change without and with `--prior-file`; and, as after X7.1, a top-level brief
+      with the delivery recorded and `--prior-file` (the plan-change variant).
+  (g) **X6.4 run again** finds its §E rows in place and writes none twice, commits only what changed, and finds the
+      execution PR open (completeness#8 (2)).
+  (h) **Notion links** (executability#3, consistency#12). `ctrl.py` compares a Notion page link by its page id,
+      whether the page returns a Markdown link or a `<mention-page>`, with text or without (`ctrl.links`). `m2.py`
+      reads a text-less `<mention-page url="U"/>` as the link to `U`, with the one text the build gives links to `U`
+      (`m2.fill_mentions`). Evidence that `update_content` keeps a Markdown link literally: this session's own write
+      of 2026-09-24T00:11Z to the Alpha feedback page carried a Markdown link to another Notion page, and the page's
+      fetches at 04:08Z and 06:03Z returned it as the same Markdown link. `m2_proof` adds the final content with
+      every page link outside the code block as a text-less mention, which passes. `EV/notion/NOTES.md` item 7 is
+      revised to match.
+  (i) **`AT` and the lease** (executability#4, executability#5). `AT` is
+      `docs/ephemeral/modifications/evidence/closeout-residuals/attempt-<n>/`, defined beside `EV` and `EX`; every
+      command after the stop record's step 3 uses it. The restoration check writes `AT/restore/<k>/bodies/<PID>.json`,
+      `AT/restore/<k>/control.json` and `AT/restore/<k>/hub.json`. The branch rule writes `$SCRATCH/lease`: `R`'s
+      sha, or nothing when `R` is absent. Every push is
+      `git push --force-with-lease=claude/epic-tesla-17406z:"$(cat $SCRATCH/lease)" origin claude/epic-tesla-17406z && git rev-parse HEAD > $SCRATCH/lease`.
+      A push rejected for a stale lease means another session has pushed: this session stops and applies the branch
+      rule again.
+  (j) **The deliveries a message supersedes** (completeness#8 (1), executability#10, consistency#10 (a)). A
+      delivery message names every earlier delivery of the same skill: those in `attempt-*/execute/packages.json`,
+      and every earlier version of `EX/packages.json` on the branch (`git log -p -- EX/packages.json`), whose
+      archives may have gone out before a session ended. Since nothing is re-cut after X7.1, `EX/packages.json` is
+      never overwritten once it has merged.
+  (k) **X5.4's gates** (executability#11, consistency#15). Every plan X5.4 applies, the first and a forward repair
+      alike, must print `reapply_unsafe` `[]`; a non-empty list stops the unit before that page's write. A `repair`
+      ≠ `[]` is allowed on any page of an X5.4 that a session continued (the branch rule's rule 3), because the page
+      in flight when a session ended is not in the committed summaries.
+  (l) **Wording** (consistency#3 to #7, #11, #13, #14):
+      - the marks above on P-51, P-80, P-84 (revised) and P-99;
+      - `PART-06-HUB-01`'s `CL-40` clause is prospective too ("is to update it in place"), since CL-40's body lands
+        at X5.4 and its registry row reaches `main` at X7.1;
+      - `TRACK-STATUS-STOP-01` to `03` name the stop record's step 6 (P-107), and the five stop-path edits say they
+        have no §P step;
+      - round 7's preamble counts twenty-two non-blocking findings;
+      - §7.4.2 step 2 drops `--hub` only on a resume where the Hub lists this run's page, as §9 does;
+      - §P step 25 records `install_date` after the three checks pass;
+      - `m2_proof`'s Notion-style rendering puts trailing spaces on code lines 3 and 10, both non-empty (it counts
+        2), and its fallback case runs `m2.insert_op` and shows its `CODE_BLOCK_ALREADY_PRESENT` refusal;
+      - `EV/skills/results/manifest_r7_proof.json` records the run of round 7's `execute.4b` change: freeze before and
+        after, diff exit 0.
 
 ## §2 Every PLAN review finding and drafter issue, with its disposition
 
@@ -1216,6 +1396,27 @@ required findings, returned `NEEDS_REPAIR`: 15 required reports, all confirmed, 
 | Directories and output names missing; X5.1's `--hub` on a resume | executability#7, consistency#10 | `mkdir -p` added; outputs named; `--hub` dropped on a resume (P-108 (b), P-111 (f), (j)) |
 | The `source_file` gate did not match an inline fetch's transcript path; X5.4's first plan on a page an earlier sitting wrote to | executability#8, #10 | The gate names the transcript file; a `repair` ≠ `[]` there is applied and checked (P-111 (a), (b)) |
 | Stale decision text, a proof claim wider than what ran, a dated note carrying another day's date, a rule clause not yet true when it lands, deleted fixed text in the brief draft | consistency#4, #5, #6, #7, #9 | Marks added; the 400-line cut stated; the date moved to the next day; per-step dates; the clause worded prospectively; the template's fixed text restored (P-104, P-111 (g)–(i)) |
+
+### 2.10 The seventh PLAN review (`wf_ca01df8d-ee0`)
+
+Three reviewers (completeness, executability, consistency), each followed by a verifier that tried to refute its
+required findings, returned `NEEDS_REPAIR`: 11 required reports, all confirmed, which come to 7 distinct defects, and
+27 non-blocking reports, one of them a required report the verifier downgraded. Each is repaired below, by P-112.
+Where a row here corrects a §2.9 disposition, this row governs.
+
+| finding | lens | disposition |
+|---|---|---|
+| A control edit left `DOUBLED` was not on the stop's list, not reversed and not tested, so a Checklist row could keep two copies of a pointer to the trashed page with the restoration check passing; a `MIXED` edit the unit itself wrote passed the check because the stop's report read it `MIXED` | completeness#0, executability#0, consistency#1 (required); consistency#9, executability#9 | The sent list `EX/ctrl/sent.txt`, committed before each step's first write; the sweep lists `DOUBLED` and listed edits; stop step 3 undoubles, then reverses, and lists a refused undouble for Nathan; the check keeps only the freeze and stop lines, requires every listed edit to read `NOT_LANDED` with its `old_str` once, fails on `DOUBLED`, and skips only edits Nathan waives. Five stops after X5.3 in `ctrl_proof`, three of which must fail (P-112 (a)). Corrects §2.9's row on the `MIXED` set |
+| X5.1 could not be run again: a session resumed after step 7 failed F6 on a correct page, and one resumed after the small create skipped `insert-op` and failed F7, stopping the unit | completeness#1, consistency#0 (required); executability#7 | `insert-op` always runs first and refuses once the block is there; `check --stage auto` reads the stage from the page; `EX/m2/create.json` is committed before step 7; `step7-ops` sends what is left; F1 requires one Hub child of the title. Proved in `m2_proof` (P-112 (b)) |
+| A stop resumed in a new session could not name its failing step or show its evidence | completeness#2 (required); executability#6, completeness#6, consistency#16 | Stop step 1 commits `EX/stop/failure.json` and the failing outputs first; the stop rows are committed as `EX/stop/rows.md`; the record's `<step>` and the branch rule's exception are read from `failure.json`; rule 2 and step 6 open the record PR when none is open, and step 6 fetches the seven pages first (P-112 (c)) |
+| After X7.1 the X7.2 route re-ran X1.1 to X4.4, whose gates cannot pass on an installed tree, and no failure of them, or a D24 rejection there, had a route; the plan-change restart after X7.4 named the same steps | completeness#4, completeness#5, executability#2 (required); executability#8, consistency#10, completeness#3 | Nothing is re-cut after X7.1: a lost archive is saved again from its delivery message or re-sent from the session's own bytes, and otherwise recorded. Every failure from X7.1 to X7.4 is recorded as P-110's X7.4 failure; a plan change after X7.1 names its own steps and inputs and rejoins at X7.2; a reset after the execution PR's merge resumes at X7.2 or X7.4 (P-112 (d)). Corrects §2.9's lost-archive row and its completeness#8 row |
+| X5.0 concluded "nothing written" from one readback that could be stale, and no other control readback had a route | executability#1 (required); consistency#8 | The control readback rule: poll, re-fetch and re-test up to three times, re-sending safely; X5.0's stop is before X5.0 only until the freeze line is listed in the sent list (P-112 (e)). Corrects §2.9's "a stop at X5.0 is a stop before X5.0" |
+| `fill_brief.py` gave both post-X7.1 routes the re-cut variant and dropped a plan change's prior-round text | consistency#2 (required); completeness#7 | `--prior-file` always gives the plan-change variant; a re-cut after a recorded delivery is refused; any mention of `SKILL_REPAIR_REQUIRED` refuses a re-cut. Eight cases in `brief_cases_r8.json` (P-112 (f)) |
+| X6.4 stated no re-run behaviour; a delivery message could not name an earlier round of the same attempt | completeness#8, executability#10 | X6.4 finds its rows in place; a message names every earlier `EX/packages.json` in the branch's history (P-112 (g), (j)) |
+| Notion might return a link as a mention, which `ctrl.py` compared literally and `m2.py` read with empty text | executability#3, consistency#12 | Links are compared by page id in `ctrl.py`; `m2.py` reads a text-less mention as its link; evidence that `update_content` kept a Markdown link literally on this session's own write (P-112 (h)) |
+| `attempt-<n>/` was never defined as a path, and the restoration check's outputs were unnamed; every push was an unconditional force push | executability#4, executability#5 | `AT` is defined and used; the check's outputs are named; every push carries an explicit lease from `$SCRATCH/lease` (P-112 (i)) |
+| X5.4 had no `reapply_unsafe` gate, and allowed a `repair` only where it could not tell | executability#11, consistency#15 | Every applied plan needs `reapply_unsafe` `[]`; a `repair` is allowed on any page of a continued X5.4 (P-112 (k)) |
+| Stale marks, counts and wording: P-51, P-80, P-84 (revised), P-99; the stop status edits' step; round 6's count; X7.5's freeze wording; §P step 25's order; `m2_proof`'s claims; the manifest's round-7 proof; §7.4.2's `--hub`; HUB-01's `CL-40` clause | consistency#3 to #7, #11, #13, #14 | Each corrected (P-112 (l)) |
 
 ## §3 Body edits
 
@@ -4105,7 +4306,7 @@ The build of today's parts with the new builder fails on purpose (7 bookkeeping 
   "when": "X4.1 (spec \u00a79), after X2 and X3"
  },
  "4b_package_X4.3_after_the_pkg_gate": {
-  "when": "X4.3 (spec \u00a79), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 records their delivery, or at X7.2 when Nathan no longer holds a delivered archive, and each time followed by a new review round and delivery (P-100, P-109)",
+  "when": "X4.3 (spec \u00a79), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 records their delivery, each time followed by a new review round and delivery (P-100, P-109). Never after X7.1: nothing is re-cut then (P-112 (d))",
   "commands": [
    "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext && python3 docs/prompt_ecosystem_management/freeze.py $PKG > $SCRATCH/pkg-before.txt",
    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
@@ -4184,7 +4385,8 @@ The build of today's parts with the new builder fails on purpose (7 bookkeeping 
   "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)",
   "repair round 5: every `rm -rf` takes the guarded form \"${VAR:?}\" (P-92), which the session's safety check allows and which cannot expand to /; execute.4b compares the extracted freeze digests with expected_after_patch.txt by diff, so X4.3's gate fails mechanically on a mismatch; the archive sha256s go to EX/packages.json",
   "repair round 6: BASE is read from EX/run.json; execute.1.then only before X7.3 (P-101); execute.4b writes EX/packages.json with packages_json.py and is never re-run after X4.4's delivery (P-100); execute.5 writes EX/installed_freeze.txt and compares it by diff; execute.6 carries X6.3's closure commands unescaped (P-102)",
-  "repair round 7 (P-111 (e)): execute.4b takes freeze.py $PKG before packaging and diffs it after, within the session; tested at PLAN on the pass-4 patched root (diff exit 0)"
+  "repair round 7 (P-111 (e)): execute.4b takes freeze.py $PKG before packaging and diffs it after, within the session; tested at PLAN on the pass-4 patched root (diff exit 0; results/manifest_r7_proof.json)",
+  "repair round 8 (P-112 (d)): execute.4b's 'when' says it never runs after X7.1; the X7.2 re-cut route is removed. No command changed"
  ]
 }
 ````
@@ -4599,14 +4801,14 @@ The status above is left as written (`AUTH-001`).
 
 ## §7 Notion
 
-Every edit: re-fetch the page and run `python3 EV/engine/ctrl.py edits <PAGE> <EDIT_ID> --run EX/run.json` (P-90, P-96). `LANDED`: it has landed, so go to the readback. `NOT_LANDED`: send the operation `python3 EV/engine/ctrl.py op <PAGE> <EDIT_ID> --run EX/run.json` prints, with `notion-update-page` `update_content` (`allow_async: false`, P-83; poll an `async_task` to its end, P-89): its tokens are filled from `EX/run.json`, and its `old_str` is widened so that, sent again once landed, it matches nothing (P-103). `TOKEN_NOT_RECORDED`: record the value first. `DOUBLED`: send the operation `ctrl.py op` prints, which takes the second copy out (P-104). `MIXED`: never written; it cannot be repaired forward (P-98, P-108). Read back: the same command reads `LANDED`, and its output goes to `EX/ctrl/<step>.json`. No bold run holds a code span (P-91). No new text may carry `{{` when it lands (P-48). Each edit's *when* names its §9 step and §P step, and its `step` field names the step whose execute date it carries. The tokens, their `EX/run.json` keys and when each is recorded, each by `EV/engine/runjson.py`, which never overwrites a value (P-96, P-104):
+Every edit: re-fetch the page and run `python3 EV/engine/ctrl.py edits <PAGE> <EDIT_ID> --run EX/run.json` (P-90, P-96). `LANDED`: it has landed, so go to the readback. `NOT_LANDED`: send the operation `python3 EV/engine/ctrl.py op <PAGE> <EDIT_ID> --run EX/run.json` prints, with `notion-update-page` `update_content` (`allow_async: false`, P-83; poll an `async_task` to its end, P-89): its tokens are filled from `EX/run.json`, and its `old_str` is widened so that, sent again once landed, it matches nothing (P-103). `TOKEN_NOT_RECORDED`: record the value first. `DOUBLED`: send the operation `ctrl.py op` prints, which takes the second copy out (P-104). `MIXED`: never written; it cannot be repaired forward (P-98, P-108). Read back: the same command reads `LANDED`, and its output goes to `EX/ctrl/<step>.json`; a readback that does not is retried by §9's control readback rule (P-112 (e)). Before its first write, each step from X5.0 to X5.6 lists its edits in `EX/ctrl/sent.txt` (P-112 (a)). No bold run holds a code span (P-91). No new text may carry `{{` when it lands (P-48). Each edit's *when* names its §9 step and, on the success path, its §P step (the five stop-path edits have none), and its `step` field names the step whose execute date it carries. The tokens, their `EX/run.json` keys and when each is recorded, each by `EV/engine/runjson.py`, which never overwrites a value (P-96, P-104):
 
 | token | `EX/run.json` key | recorded | where it is used |
 |---|---|---|---|
 | `{{CANDIDATE_CRD_LIST_URL}}` | `url` (and `page_id`) | at X5.1 as soon as the create returns, committed and pushed before step 7's write | body rules (R-ITEM18), `P30-DEST`, ten PART-06 pointers, M2-R4, R5 and R9 |
 | `{{MIGRATION_DATE}}` | `migration_date` | at X5.1, the UTC date, committed and pushed before the create call | M2-R1, the M2 callout and revision bullet, `PART-06-HUB-01`, the four `PART-06-ITEM*-02` edits |
 | `{{EXECUTE_DATE}}` | `execute_date_X5.0`, `execute_date_X5.3`, `execute_date_X5.6`, by the edit's `step` | when that step starts, the UTC date, committed and pushed before its first write | X5.0: `TRACK-FREEZE-START` (the unit's start); X5.3: `PART-06-HUB-01`'s "Corrected" note; X5.6: `PART-11-TRACK-01`, `PART-18-AF009-01` |
-| `{{STOP_DATE}}` | `stop_date` | at a stop from X5.1 on, the UTC date, first (§9 stop step 1) | `TRACK-UNIT-STOPPED`, `TRACK-STATUS-STOP-01` to `03`, `TRACK-FREEZE-LIFT-STOP` |
+| `{{STOP_DATE}}` | `stop_date` | at a stop past X5.0, the UTC date, in stop step 1 (§9) | `TRACK-UNIT-STOPPED`, `TRACK-STATUS-STOP-01` to `03`, `TRACK-FREEZE-LIFT-STOP` |
 | `{{INSTALL_DATE}}` | `install_date` | at X7.4, when the post-install verification passes: the UTC date Nathan gives for that install sitting (P-110) | `CLOSE-D22` |
 | `{{LIFT_DATE}}` | `lift_date` | when Nathan lifts the freeze, committed and pushed before `TRACK-FREEZE-LIFT` (X7.5) or `TRACK-FREEZE-LIFT-STOP` (P-108 (f)) | those two lines |
 | `{{CLOSE_DATE}}` | `close_date` | at X7.6, the UTC date, in the close commit itself | `TRACK-STATUS-01` to `03` (X7.7) |
@@ -4657,7 +4859,7 @@ Scope is the PR lane; the ESC remediation lane keeps its own threshold. **Amende
 
 ### 7.3 The D20 redesign tracking page: PART-11, the freeze and the close-out status (Decision 11; P-65, P-66, P-72, P-98, P-99, P-107, P-108)
 
-Three dated insertions and three status replacements on one page. After a stop from X5.1 on only, a dated stop line and three stop variants of the status replacements (the stop record's step 6, P-107), and a lift line after the restoration check (P-108 (f)); any of them that reads `MIXED` is listed for Nathan, not applied. The insertions share one anchor, the opening of the paragraph that introduces *the three decisions below*, so each lands after the one before it, in date order. `ctrl_proof.py` replays both sequences on the live page (§8.7).
+Three dated insertions and three status replacements on one page. After a stop past X5.0 only, a dated stop line and three stop variants of the status replacements (the stop record's step 6, P-107), and a lift line after the restoration check (P-108 (f)); any of them that reads `MIXED` is listed for Nathan, not applied. The insertions share one anchor, the opening of the paragraph that introduces *the three decisions below*, so each lands after the one before it, in date order. `ctrl_proof.py` replays the success, stop and lift sequences and the stops after X5.3 on the live pages (§8.7).
 
 #### TRACK-FREEZE-START — GCFPE MGMT Change-Process Redesign — Tracking (`3e34590a05eb81e7927efe0541258916`)
 
@@ -4772,7 +4974,7 @@ new_str:
 
 #### TRACK-UNIT-STOPPED — GCFPE MGMT Change-Process Redesign — Tracking (`3e34590a05eb81e7927efe0541258916`)
 
-After the stop record PR is opened, before the return to Nathan (P-107 step 6). The freeze line stays; this states why. *When:* Only on the stop path after X5.0 (spec §9, the stop record, step 6; P-107), after the stop record's pull request is pushed and opened, and before the return to Nathan; never on a run whose unit passes.
+After the stop record PR is opened, before the return to Nathan (P-107 step 6). The freeze line stays; this states why. *When:* Only on the stop path after X5.0 (spec §9, the stop record, step 6; P-107), after the stop record's pull request is pushed and opened, and before the return to Nathan; never on a run whose unit passes; no §P step, since the stop path is not in §P's success order.
 
 old_str:
 
@@ -4789,7 +4991,7 @@ new_str:
 
 #### TRACK-STATUS-STOP-01 — GCFPE MGMT Change-Process Redesign — Tracking (`3e34590a05eb81e7927efe0541258916`)
 
-With `TRACK-UNIT-STOPPED`, in place of the close status line it replaces. *When:* Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (stop step 7; P-98).
+With `TRACK-UNIT-STOPPED`, in place of the close status line it replaces. *When:* Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (spec §9, the stop record, step 6; P-107); no §P step, since the stop path is not in §P's success order.
 
 old_str:
 
@@ -4805,7 +5007,7 @@ FOLLOW_UP_MODIFICATION_STOPPED ({{STOP_DATE}}, stop record PR, docs/ephemeral/mo
 
 #### TRACK-STATUS-STOP-02 — GCFPE MGMT Change-Process Redesign — Tracking (`3e34590a05eb81e7927efe0541258916`)
 
-With `TRACK-UNIT-STOPPED`, in place of the close status line it replaces. *When:* Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (stop step 7; P-98).
+With `TRACK-UNIT-STOPPED`, in place of the close status line it replaces. *When:* Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (spec §9, the stop record, step 6; P-107); no §P step, since the stop path is not in §P's success order.
 
 old_str:
 
@@ -4821,7 +5023,7 @@ which stopped during `EXECUTE` on {{STOP_DATE}}; its record's §E (`docs/ephemer
 
 #### TRACK-STATUS-STOP-03 — GCFPE MGMT Change-Process Redesign — Tracking (`3e34590a05eb81e7927efe0541258916`)
 
-With `TRACK-UNIT-STOPPED`, in place of the close status line it replaces. *When:* Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (stop step 7; P-98).
+With `TRACK-UNIT-STOPPED`, in place of the close status line it replaces. *When:* Only on the stop path after X5.0, with TRACK-UNIT-STOPPED (spec §9, the stop record, step 6; P-107); no §P step, since the stop path is not in §P's success order.
 
 old_str:
 
@@ -4837,7 +5039,7 @@ stopped during `EXECUTE` on {{STOP_DATE}}, branch
 
 #### TRACK-FREEZE-LIFT-STOP — GCFPE MGMT Change-Process Redesign — Tracking (`3e34590a05eb81e7927efe0541258916`)
 
-After the restoration check passes and Nathan lifts the freeze (P-99). It claims no install. *When:* Only after a stop past X5.0, once the restoration sweep passes (P-99) and Nathan lifts the freeze.
+After the restoration check passes and Nathan lifts the freeze (P-99). It claims no install. *When:* Only after a stop past X5.0, once the restoration sweep passes (P-99) and Nathan lifts the freeze; no §P step, since the stop path is not in §P's success order.
 
 old_str:
 
@@ -4869,12 +5071,12 @@ Steps 2 to 4 and 6 are `EV/engine/m2.py`'s (P-105): `build` makes the content, `
    committed and pushed, before anything else (P-96; on a resumed step it is already there). Fetch the Hub: it may
    list no child titled *Candidate CRD Items List*, with one exception (P-95): a child of that title whose callout
    names `MODIFICATION-20260923-closeout-residuals` is this run's page, from a create whose session ended. Then do not
-   create again: record its id and URL in `EX/run.json`, read it back against F1 to F10 (step 6), and continue at
-   step 7, whose operations are applied only where their new text is not already on the page.
+   create again: record its id and URL in `EX/run.json`, and continue at step 6, which reads the page's stage.
 2. **Read** the raw bytes with `download_file_content`, then run `python3 EV/engine/drive_check.py --hub
-   3ce4590a05eb814f8892f88ff8539308` (without `--hub` on a resumed step): it decodes the newest download of this
-   session in memory and checks the length, both sha256 values and each M2 `old` once outside the fence (X4.6 ran
-   the same checks before X5.0; this is the copy the page is made from). Nothing is transcribed by hand.
+   3ce4590a05eb814f8892f88ff8539308` (without `--hub` only on a resume where the Hub lists this run's page, as §9
+   X5.1 says): it decodes the newest download of this session in memory and checks the length, both sha256 values
+   and each M2 `old` once outside the fence (X4.6 ran the same checks before X5.0; this is the copy the page is made
+   from). Nothing is transcribed by hand.
 3. **Rewrite** M2-R1 to R9 below, in memory. Each `old` occurs exactly once outside the fence. R3's text also occurs
    inside the fence, which never changes. The fence content stays byte-identical.
 4. **Convert:** the body H1 becomes the title. Add the callout at the top and append the revision bullet to
@@ -4886,23 +5088,30 @@ Steps 2 to 4 and 6 are `EV/engine/m2.py`'s (P-105): `build` makes the content, `
    H3 *Preserved pre-repair source*, its paragraph and the code block).
 5. **Create** with `notion-create-pages` under the Hub (`3ce4590a05eb814f8892f88ff8539308`), the content
    `page.create.md`, and `preserve_internal_links: true` so the list's Notion links keep their text. If the call
-   rejects the size, create from `page.small.md`, then send the operation
-   `python3 EV/engine/m2.py insert-op --page <page_id> --run EX/run.json` prints (it puts the preserved source
-   back before `## Maintenance rule`, and sent again it matches nothing). Record `page_id` and the normalized `url`
-   by `runjson.py`, commit and push, as soon as the create returns.
-6. **Read back:** `python3 EV/engine/m2.py check --page <page_id> --hub 3ce4590a05eb814f8892f88ff8539308 --run
-   EX/run.json --stage create > EX/m2/create.json` on a fresh fetch of the page and the Hub: F1 to F10 below, F6
-   counting the 8 pairs. A failing check is not repaired by hand: it stops the unit (P-98), whose sweep trashes the
-   page. Never repeat a create.
-7. Apply the three step-7 operations in 7.4.4 with `url` from `EX/run.json`, in one `update_content` call
-   (`allow_async: false`), each whose `old_str` is still on the page (each is a replacement, gone once landed:
-   P-103); re-fetch; `m2.py check … --stage final > EX/m2/final.json`: F1 to F10 with the 11 pairs, and no `{{`.
+   rejects the size, create from `page.small.md`; step 6 puts the preserved source back. Record `page_id` and the
+   normalized `url` by `runjson.py`, commit and push, as soon as the create returns. Never repeat a create.
+6. **Read back the create** (P-112 (b)), on fresh fetches of the page and the Hub. First
+   `python3 EV/engine/m2.py insert-op --page <page_id> --run EX/run.json`: send the operation it prints (it puts the
+   preserved source back before `## Maintenance rule`, and sent again it matches nothing) and re-fetch; its
+   `CODE_BLOCK_ALREADY_PRESENT` refusal means there is nothing to send. Then `python3 EV/engine/m2.py check --page
+   <page_id> --hub 3ce4590a05eb814f8892f88ff8539308 --run EX/run.json --stage auto`, which reads the stage from the
+   page: `create` while all three step-7 `old_str` stand on it, `final` once none does, and a `PARTIAL_STEP7`
+   refusal in between. At `create` it computes F1 to F10 below, F6 counting the 8 pairs, and must exit 0; its output
+   is committed as `EX/m2/create.json` and pushed before step 7 sends anything. At `final`, or on the refusal, an
+   earlier session has already sent step 7, after committing `EX/m2/create.json`. A failing check is run once more
+   on a fresh fetch; failing again, it is not repaired by hand: it stops the unit (P-98), whose sweep trashes the
+   page.
+7. `python3 EV/engine/m2.py step7-ops --page <page_id> --run EX/run.json` gives the three step-7 operations in 7.4.4,
+   with `url` from `EX/run.json`, each whose `old_str` still stands on the page (each is a replacement, gone once
+   landed: P-103). Send them in one `update_content` call (`allow_async: false`); re-fetch;
+   `m2.py check … --stage final > EX/m2/final.json`: F1 to F10 with the 11 pairs, and no `{{`.
 8. Nathan banners the Drive file as superseded, pointing to the page, once X6.4 has passed and before X7.6, which
    reads the banner back (§P, Product Owner actions; P-102 (e)). After X6.4 the page is permanent.
 
 #### 7.4.3 Readback criteria
 
-- **F1.** The title is *Candidate CRD Items List*, and the parent is the Hub.
+- **F1.** The title is *Candidate CRD Items List*, and the parent is the Hub: exactly one Hub child carries the
+  title, and it is this page (P-112 (b)).
 - **F2.** The ordered (level, text) headings outside the code block equal the Drive file's 12 H2 and 1 H3.
 - **F3.** The active list holds 0 entries in both, and its "Empty" statement is present. The moved-items table holds
   4 data rows in both.
@@ -4910,7 +5119,8 @@ Steps 2 to 4 and 6 are `EV/engine/m2.py`'s (P-105): `build` makes the content, `
   by their 32-hex page id.
 - **F5.** The review-status table's 6 rows × 2 cells are equal.
 - **F6.** Links outside code: the Drive file's 8 (link text, target) pairs are all present: 8 at step 6, and 11 after
-  step 7 with the 3 self-links. Notion targets are compared by page id; other targets exactly.
+  step 7 with the 3 self-links. Notion targets are compared by page id, and a text-less `<mention-page>` of a page
+  the build links under one text is read as that link (P-112 (h)); other targets exactly.
 - **F7.** Exactly one code block, language `markdown`, whose content equals the Drive fence's byte for byte after
   LF normalization (18 624 B, sha256 in 7.4.1). Only trailing spaces on a line are tolerated, and are recorded.
 - **F8.** List counts: Inclusion 5, Routing 7, Classification 5, Candidate item format 13 (labels equal), and
@@ -5114,7 +5324,7 @@ old_str:
 new_str:
 
 ```markdown
-[Open the Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}), a Notion page under this Hub and the list's only store (`D25-A`); `CL-40` updates it in place under the destination rule `D25-A` adds to `docs/prompt_ecosystem_management/notion-write-boundary.md`. The Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`), which held the list until {{MIGRATION_DATE}}, is Nathan's reference copy and is not updated. (Corrected {{EXECUTE_DATE}}: this line named the Drive file as the authoritative list.)
+[Open the Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}), a Notion page under this Hub and the list's only store (`D25-A`); `CL-40` is to update it in place under the destination rule `D25-A` adds to `docs/prompt_ecosystem_management/notion-write-boundary.md`. The Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`), which held the list until {{MIGRATION_DATE}}, is Nathan's reference copy and is not updated. (Corrected {{EXECUTE_DATE}}: this line named the Drive file as the authoritative list.)
 ```
 
 #### PART-06-HUB-02 — Glow Operations Hub (`3ce4590a05eb814f8892f88ff8539308`)
@@ -5694,11 +5904,13 @@ last 200); two steps were cut, X4.2 (1007 lines) and X7.4 post (818 lines) (P-11
 deriver, X3.6, X4.4 to X4.6, X5 or X6, which pass 6 and §8.7 cover. Repair round 6 changed three manifest entries:
 `execute.4b`'s `packages_json.py`, `execute.5`'s `EX/installed_freeze.txt` and the new `execute.6`. Each was run at
 PLAN (`EV/skills/results/manifest_r6_proof.json`: `execute.5` with the patched root standing in for `$INST`, diff exit
-0; `execute.6` on the working tree, diff exit 0). It applied the X2.2 and X3.5 texts with the PLAN
+0; `execute.6` on the working tree, diff exit 0). Repair round 7 changed `execute.4b` once more: it takes
+`freeze.py $PKG` before packaging and compares it after, in the same session. That was run at PLAN on the pass-4
+patched root (`EV/skills/results/manifest_r7_proof.json`: exit 0, one line, diff exit 0). It applied the X2.2 and X3.5 texts with the PLAN
 copy of the applier; `EV/texts/apply_texts.py`, committed in repair round 6, gives the same X2.2 result
 (`EV/texts/apply_texts_proof.json`: `gcfpe.decision-record.md` sha256 `6742d593…`, 101 936 B).
 
-### 8.7 The round-6 and round-7 helpers, on today's pages (P-96 to P-111)
+### 8.7 The round-6 to round-8 helpers, on today's pages (P-96 to P-112)
 
 - **Control pages** (`EV/notion/ctrl_proof.py` → `ctrl_proof.out.json`, stand-in values in `ctrl_proof.run.json`,
   fetched 2026-09-08T07:23:26.492Z, 2026-09-08T07:23:28.047Z, 2026-09-08T07:23:29.473Z, 2026-09-08T07:23:30.741Z, 2026-09-23T17:45:35.844Z, 2026-09-24T00:11:08.183Z, 2026-09-24T04:18:31.010Z): 24 edits on 7 live pages, each
@@ -5712,7 +5924,11 @@ copy of the applier; `EV/texts/apply_texts.py`, committed in repair round 6, giv
   at X5.1 on a tracking page whose shared anchor someone else duplicated, where
   TRACK-UNIT-STOPPED is listed for Nathan rather than applied and the lift line reads
   MIXED (P-108 (c), (d)). The anchor check (`--expect unlanded`) passes on the pages
-  as fetched.
+  as fetched. Five stops after X5.3 (P-112 (a)), each ending in the restoration check with the sent list:
+  stop after X5.3, a pointer doubled (ok True); stop after X5.3, a pointer doubled with text between (ok True); stop after X5.3, a sent edit stored differently (ok True); stop after X5.3, one reversal missed (ok True); stop after X5.3, a stop line removed later (ok True). A doubled pointer is undoubled and
+  reversed, and the check passes; a doubled pointer split by other text, and a listed pointer stored differently, are
+  listed for Nathan, and the check fails until he restores the page (or, for the latter, waives it); a missed
+  reversal and a stop line removed after the report each fail the check.
 - **The anchor check on the live pages** (`EV/notion/anchor_check_plan.json`, `ctrl.py all --expect unlanded`): all
   24 edits' `old_str` occur exactly once on the seven pages and none reads `LANDED`: pass True.
 - **The Drive file** (`EV/notion/drive_check_plan.json`, `drive_check.py --hub`): 31923 B, size
@@ -5722,15 +5938,24 @@ copy of the applier; `EV/texts/apply_texts.py`, committed in repair round 6, giv
   the four runs give exactly §4.4's expected table.
 - **The new page** (`EV/notion/m2_proof.out.json`, P-105): `m2.py build` gives 33856 B for the
   create, 34039 B after step 7 and 14899 B for the fallback's create; `m2.py check`
-  passes on the create and final content verbatim and in a Notion-style rendering, fails each of seven single faults
-  on the criterion named, and passes the fallback after `insert-op`, whose operation sent again matches nothing:
-  all_ok True.
+  passes on the create and final content verbatim, in a Notion-style rendering (trailing spaces on code lines 3 and
+  10, counted 2), and with every page link a text-less
+  mention; it fails each of seven single faults on the criterion named, and a second Hub child of the title fails F1.
+  The fallback passes after `m2.insert_op`, whose operation sent again matches nothing and which then refuses
+  CODE_BLOCK_ALREADY_PRESENT. A resumed X5.1 (P-112 (b)):
+  `stage_of` reads the create content `create`, the final
+  content `final` and, with one self-link landed,
+  `PARTIAL_STEP7:2`, after which `step7-ops` gives the
+  2 operations left. all_ok True.
 - **Recorded values and the texts** (P-104): `runjson.py` keeps a value already recorded; `EV/texts/apply_texts_proof.json`:
   each label run a second time (X2.2, X3.5, X5.2 with --run, close with --run and --installed-freeze): every edit reads APPLIED, nothing is written, the file hashes are unchanged; with P29-D14 alone taken back out after X2.2 and close, X2.2 again applies only P29-D14 (the others read APPLIED); the decision record then equals a fresh X2.2 plus close (sha256 901fb877...); with P32-SWR's text present twice, X3.5 reads MIXED and exits 1, writing nothing.
 - **The D24 brief** (`EV/skills/results/brief_fill_proof.json`): `packages_json.py` and `fill_brief.py` on archives
   cut from the patched tree give a brief with no token left for the first round, the re-cut round and the plan-change
   round (which refuses without its prior-round file). Re-packaging a rebuilt tree changes the archive sha256 and keeps
-  the freeze digest, which is why the archives reviewed are the archives delivered (P-100).
+  the freeze digest, which is why the archives reviewed are the archives delivered (P-100). Repair round 8's eight
+  cases on the committed script (`EV/skills/results/brief_cases_r8.json`, all_ok True):
+  first (cr1); recut (cr2); recut after rejection (REPAIR_VERDICT_PENDING); recut after a confirmed record quoting both words (REPAIR_VERDICT_PENDING); recut after delivery (PRIOR_ROUND_DELIVERED); plan change without prior file (PLAN_CHANGE_ROUND_NEEDS_PRIOR_FILE); plan change with prior file (cr2); after x71 plan change top level brief delivered (cr2)
+  (P-112 (f)).
 
 ### 8.8 Harness files (D22 condition 5)
 
@@ -5743,9 +5968,11 @@ hashed or read again, and the harness's teardown removes them.
 ## §9 Execution order and cut-over
 
 `EV` is `docs/ephemeral/modifications/evidence/closeout-residuals/plan/`. `EX` is
-`docs/ephemeral/modifications/evidence/closeout-residuals/execute/`, where EXECUTE's evidence goes (P-83, P-87).
-`<record>` is `docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md`. `$SCRATCH` is the executing
-session's scratchpad, and `$INST` the installed skills root
+`docs/ephemeral/modifications/evidence/closeout-residuals/execute/`, where EXECUTE's evidence goes (P-83, P-87). `AT`
+is `docs/ephemeral/modifications/evidence/closeout-residuals/attempt-<n>/`, a stopped attempt's directory from the
+stop record's step 3 on; a session after a stop takes the highest `<n>` there (P-112 (i)). `<record>` is
+`docs/ephemeral/modifications/MODIFICATION-20260923-closeout-residuals.md`. `$SCRATCH` is the executing session's
+scratchpad, and `$INST` the installed skills root
 (`/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502`). `$PKG` is
 the full patched skills root built at X1.1 (`$SCRATCH/pkg-root`). `$GATE` is the suite gate's work directory
 (`$SCRATCH/gate`); `run_gate.py` builds and checks the candidate root at `$GATE/cand`. `$BASE` is the `main` commit
@@ -5759,22 +5986,39 @@ the harness's project directory (`/root/.claude/projects/-home-user-glow-hdengin
 (`"kept": true`); with no value it records today's UTC date. Each is committed and pushed before the first write that
 carries it. The keys: `base` (X0.2), `root_x0.3` (X0.3(e)), `root_x1.1` (X1.1), `delivered_cr<k>` (X4.4, P-109),
 `execute_date_X5.0`, `migration_date`, `page_id`, `url`, `execute_date_X5.3`, `execute_date_X5.6`, `install_date`
-(X7.4, P-110), `lift_date` (X7.5), `close_date` (X7.6), and `stop_date` after a stop.
+(X7.4, P-110), `lift_date` (X7.5), `close_date` (X7.6), and `stop_date` after a stop past X5.0.
 
-**Commits and pushes (P-106).** Every commit EXECUTE makes has the subject `closeout-residuals <step>: <what>`, with
-`<step>` the step below. The commit Nathan is asked to merge after a stop, an end route or an X7.4 failure begins
-`closeout-residuals record:`. A step commits only its own paths, and only when `git status --porcelain -- <paths>`
-prints something. Every push is `git fetch --prune origin && git push --force-with-lease origin claude/epic-tesla-17406z`.
+**The sent list (P-112 (a)).** `EX/ctrl/sent.txt` names, one id per line and each once, every control edit the
+unit may have written. X5.0, X5.3 and X5.6 each append their edits to it in the commit that records their execute
+date, pushed before their first write. Each id is appended by `mkdir -p EX/ctrl && (grep -qxF <EDIT_ID> EX/ctrl/sent.txt 2>/dev/null || echo <EDIT_ID> >> EX/ctrl/sent.txt)`. An edit listed but never sent reads `NOT_LANDED` with its `old_str` once, which
+is what the restoration check requires of it. From the commit that lists `TRACK-FREEZE-START`, a stop is a stop
+past X5.0.
 
-**A failing gate.** Before X5.0, and at X5.0 itself, a failing gate stops EXECUTE by P-84 (revised) and the stop
-record (P-107). From X5.1 to X6.4 it stops the unit by P-98, P-107 and P-108 once forward repair (P-88) has failed.
-At X7.4 it is recorded by P-110. A failure from X7.5 on is repaired forward or returned to Nathan with the freeze
-held; nothing is reversed.
+**Commits and pushes (P-106, P-112 (i)).** Every commit EXECUTE makes has the subject
+`closeout-residuals <step>: <what>`, with `<step>` the step below. The commit Nathan is asked to merge after a stop,
+an end route or a failure after X7.1 begins `closeout-residuals record:`. A step commits only its own paths, and only
+when `git status --porcelain -- <paths>` prints something. Every push is
+`git push --force-with-lease=claude/epic-tesla-17406z:"$(cat $SCRATCH/lease)" origin claude/epic-tesla-17406z && git rev-parse HEAD > $SCRATCH/lease`,
+where the branch rule writes `$SCRATCH/lease`. A push refused for a stale lease means another session has pushed:
+this session stops its step and applies the branch rule again.
 
-**Notion writes (P-83, P-89, P-90, P-103).** Every `notion-update-page` call uses `allow_async: false`. If a response
-is still an `async_task`, EXECUTE polls `notion-get-async-task` until it reads `succeeded` or `failed`, and only then
-re-fetches the page; a `failed` task is an uncertain write, inspected on a fresh fetch before anything else. A body's
-operations come from `land.py plan`, and a control edit's from
+**A failing gate.**
+- Before X5.0, and at X5.0 before `TRACK-FREEZE-START` is listed in `EX/ctrl/sent.txt`, a failing gate stops EXECUTE
+  by P-84 (revised) and the stop record (P-107): stop step 1, then the stop rows, then the stop record.
+- From that listing to X6.4 it stops the unit (P-98, P-107, P-108, P-112), once forward repair (P-88, and the
+  control readback rule below) has failed.
+- From X7.1 to X7.4 (the freeze held) it is recorded as a failure after X7.1 (P-110, P-112 (d)): §E's row for the
+  step; the line `D25 applies from: <X7.1 merge commit sha>, <its UTC date>` unless it is already written; status
+  `EXECUTING`; `modification_validate.py`; one commit (`closeout-residuals record: X7.<s> failed`); push; a record PR;
+  return to Nathan. Nothing is reversed and no attempt directory is made. A differing installed digest at X7.4 is
+  not a failure: Nathan reinstalls the delivered file.
+- From X7.5, where Nathan lifts the freeze, a failure is repaired forward by running the step again, or returned to
+  Nathan with the failing gate named; nothing is reversed.
+
+**Notion writes (P-83, P-89, P-90, P-103, P-112 (e)).** Every `notion-update-page` call uses `allow_async: false`. If
+a response is still an `async_task`, EXECUTE polls `notion-get-async-task` until it reads `succeeded` or `failed`,
+and only then re-fetches the page; a `failed` task is an uncertain write, inspected on a fresh fetch before anything
+else. A body's operations come from `land.py plan`, and a control edit's from
 `python3 EV/engine/ctrl.py op <PAGE> <EDIT_ID> --run EX/run.json` on the page as just fetched: each operation's
 `old_str` occurs once on the page and, once landed, nowhere on it, so the same call sent again matches nothing. The
 apply-once test, before each control edit, re-fetches the page and runs
@@ -5786,127 +6030,170 @@ apply-once test, before each control edit, re-fetches the page and runs
   which takes the second copy out;
 - `MIXED`: it cannot be repaired forward.
 The readback re-fetches the page and runs the same command, which must read `LANDED`; its output goes to
-`EX/ctrl/<step>.json`.
+`EX/ctrl/<step>.json`. **A control readback that does not read `LANDED`** polls the write's task to its end (P-89),
+re-fetches, and runs the apply-once test again, up to three times. Sent again, an operation that had landed matches
+nothing and Notion refuses it: the fetch was stale, so re-fetch. An end-of-page append lands a second copy instead,
+which reads `DOUBLED` and is undoubled. After three cycles without `LANDED`, the edit cannot be repaired forward.
 
-**Sessions (P-101, P-106).** Any step can run in a new session. The session starts at the repository root and applies
-the branch rule below; when it continues, it resumes at the step the branch's last commit names and runs that step
-again from its start. Every step is safe to run again: a recorded value is kept, an applied text is skipped, a landed
-Notion edit reads `LANDED` (a landed body `ALREADY_LANDED`, then `check`), an operation sent again matches nothing,
-and a step with nothing to commit commits nothing. X4.4 resumes by P-109. A new session before X7.3 also rebuilds
-`$PKG` and the scratch directories (X1.1, X1.2); from X7.3 on it rebuilds neither `$PKG` nor the archives. `land.py`,
-`ctrl.py`, `graph_check.py`, `drive_check.py` and `m2.py` read only the running session's harness files
-(`$CLAUDE_CODE_SESSION_ID`; `--session` and `--harness-root` point them elsewhere). Where a step checks it, each
-printed `source_file` is `<ROOT>/$CLAUDE_CODE_SESSION_ID.jsonl` or lies under `<ROOT>/$CLAUDE_CODE_SESSION_ID/`, and
-`fetched` is the "as of" time of the fetch just made (P-111 (b)).
+**Sessions (P-101, P-106, P-112).** Any step can run in a new session. The session starts at the repository root and
+applies the branch rule below. When it continues, it resumes at the step the branch's last commit names and runs that
+step again from its start. Every step is safe to run again:
+- a recorded value is kept, and an applied text is skipped;
+- a landed Notion edit reads `LANDED` (a landed body `ALREADY_LANDED`, then `check`), and an operation sent again
+  matches nothing;
+- a step with nothing to commit commits nothing;
+- X4.4 resumes by P-109, and X5.1 reads its stage from the page (P-112 (b));
+- a stop keeps its committed `failure.json` and sweep (P-112 (c)).
+A new session before X7.3 also rebuilds `$PKG` and the scratch directories (X1.1, X1.2); from X7.3 on it rebuilds
+neither `$PKG` nor the archives. `land.py`, `ctrl.py`, `graph_check.py`, `drive_check.py` and `m2.py` read only the
+running session's harness files (`$CLAUDE_CODE_SESSION_ID`; `--session` and `--harness-root` point them elsewhere).
+Where a step checks it, each printed `source_file` is `<ROOT>/$CLAUDE_CODE_SESSION_ID.jsonl` or lies under
+`<ROOT>/$CLAUDE_CODE_SESSION_ID/`, and `fetched` is the "as of" time of the fetch just made (P-111 (b)).
 
-**The branch rule (P-106).** Every start of EXECUTE work in a session applies it: X0.2, a new session at any step, the
-stop record, the restoration check, the lift and the end route after a stop, and a plan change's PLAN session. After
-`git fetch --prune origin`, with `R` = `origin/claude/epic-tesla-17406z`:
+**The branch rule (P-106, P-112).** Every start of EXECUTE work in a session applies it: X0.2, a new session at any
+step, the stop record, the restoration check, the lift and the end route after a stop, the steps from X7.2 on, and a
+plan change's PLAN session. After `git fetch --prune origin`, with `R` = `origin/claude/epic-tesla-17406z`, it first
+runs `git rev-parse --verify -q R > $SCRATCH/lease || : > $SCRATCH/lease` (the lease for the next push). Then:
 1. `R` is absent, or
    `git diff --quiet origin/main R -- <record> docs/ephemeral/modifications/evidence/closeout-residuals` exits 0:
    **reset**,
-   `git checkout --no-track -f -B claude/epic-tesla-17406z origin/main && git clean -fd -- docs/ephemeral/modifications docs/graph docs/prompt_ecosystem_management`;
-2. otherwise, when `R`'s last commit subject begins `closeout-residuals record:`: **refuse**, and return to Nathan,
-   who merges that record PR first. The exception is a stop record in progress (P-107 step 6);
+   `git checkout --no-track -f -B claude/epic-tesla-17406z origin/main && git clean -fd -- docs/ephemeral/modifications docs/graph docs/prompt_ecosystem_management`.
+   When `main`'s record reads `status: EXECUTING` and `main` holds a merged `closeout-residuals X6.4:` commit, the
+   execution PR has merged. Then the session does not start at X0.2 (P-112 (d)):
+   - with no merged `closeout-residuals record: X7.<s> failed`, it resumes at X7.4 when Nathan has given an install
+     date, and otherwise at X7.2;
+   - after a merged failure record, it runs the step Nathan's ruling names: X7.4 after a reinstall, or the plan
+     change's first step.
+2. otherwise, when `R`'s last commit subject begins `closeout-residuals record:`: first, when no pull request from the
+   branch is open, open the record PR against `main` (the GitHub tools). Then **refuse**, and return to Nathan, who
+   merges that record PR first. The exception is a stop record in progress: `R`'s last commit is
+   `closeout-residuals record: attempt <n> stopped at <step>` and `AT/execute/stop/failure.json` on `R` reads
+   `"past_x50": true`. That continues (rule 3's commands) at the stop record's step 6;
 3. otherwise, when it begins `closeout-residuals `: **continue**,
    `git checkout --no-track -f -B claude/epic-tesla-17406z origin/claude/epic-tesla-17406z && git clean -fd -- docs/ephemeral/modifications docs/graph docs/prompt_ecosystem_management`.
-   A session resuming interrupted work resumes at the step `R`'s last commit names; a session Nathan starts for a
-   named procedure (the restoration check, the lift, the end route) runs that procedure;
+   A session resuming interrupted work resumes at the step `R`'s last commit names. A session Nathan starts for a
+   named step or procedure runs it: X7.2, X7.4, X7.5, the restoration check, the lift, or the end route;
 4. otherwise `R` holds work that is not EXECUTE's (an unmerged PLAN commit): EXECUTE refuses and returns to Nathan;
    a PLAN session continues on it with rule 3's commands.
 After a reset or a continue, `git status --porcelain` prints nothing. Work a lost session did not commit is
 discarded and done again.
 
-**The landing unit (P-57, P-84 revised, P-88, P-98, P-107, P-108).**
-- **Before X5.1 nothing leaves the branch.** There is no Notion write before X5.0, and X5.0's one write is the freeze
-  line. A failure before X5.0, a D24 rejection included, stops EXECUTE (P-84 revised). So does an X5.0 whose freeze
-  line does not read `LANDED` after its write: then nothing was written to Notion, and Nathan's confirmation of the
-  freeze lapses with the stop (P-107). EXECUTE writes the stop rows and runs the stop record below, so `main`'s record
-  carries them at `EXECUTING`. Nathan ends the Modification, or rules a plan change; EXECUTE then starts again at X0.1
-  once the plan-change PR has merged. Shipping without a rejected part is such a change (template rule 7).
+**The landing unit (P-57, P-84 revised, P-88, P-98, P-107, P-108, P-112).**
+- **Before X5.1 nothing leaves the branch but the freeze line.** There is no Notion write before X5.0, and X5.0's one
+  write is the freeze line. A failure before X5.0, a D24 rejection included, stops EXECUTE (P-84 revised). So does a
+  failure at X5.0 before `TRACK-FREEZE-START` is listed in `EX/ctrl/sent.txt`: then nothing was written to Notion,
+  and Nathan's confirmation of the freeze lapses with the stop. EXECUTE runs stop step 1 (below), writes the stop
+  rows to `EX/stop/rows.md` (each step done, the failing step `BLOCKED` with its evidence, and the finding), commits
+  them (`closeout-residuals stop: rows`), pushes, and runs the stop record below, so `main`'s record carries them at
+  `EXECUTING`. Nathan ends the Modification, or rules a plan change; EXECUTE then starts again at X0.1 once the
+  plan-change PR has merged. Shipping without a rejected part is such a change (template rule 7).
 - **From X5.0 all 17 parts land as one unit.** The unit is the page, the destination rule, the pointers, the 51
   bodies and the control-page edits. Each package is installed only after the unit has passed (X6) and the execution
   PR has merged (X7.1), and is verified at X7.4 (P-110).
 - **A readback that fails is repaired forward (P-88).** After the write's task has succeeded (P-89), EXECUTE
   re-fetches the page and runs `check` again. If it still reports `STALE_READBACK_OR_NOT_LANDED`, EXECUTE runs
   `land.py plan` on that fresh fetch. `ALREADY_LANDED`: run `check` again. Operations whose `repair` lists the edits
-  already landed: apply them once, as at X5.4, and run `check`. Any refusal, or a second failing `check`, cannot be
-  repaired forward. A control edit that reads `MIXED` cannot be repaired forward either.
-- **A failure from X5.1 that cannot be repaired forward stops the unit (P-98, P-108).** EXECUTE, in this order:
-  1. `python3 EV/engine/runjson.py EX/run.json stop_date`; commit (`closeout-residuals stop: date`); push;
+  already landed: apply them once, as at X5.4 (with `reapply_unsafe` `[]`), and run `check`. Any refusal, or a second
+  failing `check`, cannot be repaired forward. A control edit is repaired forward by the control readback rule above;
+  one that reads `MIXED`, or is still not `LANDED` after its three cycles, cannot be.
+- **A failure past X5.0 that cannot be repaired forward stops the unit (P-98, P-108, P-112).** Past X5.0 means from
+  the commit that lists `TRACK-FREEZE-START` in `EX/ctrl/sent.txt`. EXECUTE, in this order:
+  1. **Stop step 1, the failure** (every stop before X7.1 begins here; P-112 (c)). Unless `EX/stop/failure.json` is
+     already committed (a resumed stop keeps it): `mkdir -p EX/stop/failed`; write `EX/stop/failure.json` with the
+     failing §9 step (`step`), the page, body or edit id (`id`), the command (`command`), its exit code (`exit`), the
+     finding in one sentence (`finding`), the UTC time (`time`) and `past_x50` (true when `EX/ctrl/sent.txt` lists
+     `TRACK-FREEZE-START`); copy the failing step's uncommitted `EX/` outputs (the refusal or check JSON: counts and
+     ids, no body text) into `EX/stop/failed/`. Past X5.0, `python3 EV/engine/runjson.py EX/run.json stop_date`.
+     Commit `EX/run.json`, `EX/ctrl/` and `EX/stop/` (`closeout-residuals stop: failure`); push;
   2. unless `EX/stop/control.json` is already committed (a resumed stop keeps the first sweep), sweeps Notion,
      read-only: `mkdir -p EX/stop/bodies`; for each of the 51 bodies with edits, fetch and
      `python3 EV/engine/land.py state <PID> <PAGE> > EX/stop/bodies/<PID>.json` (CL-40: `--candidate-url <URL>` when
      `url` is recorded; otherwise `state` fills the stand-in, P-108 (a)); fetch the seven control pages and
-     `python3 EV/engine/ctrl.py all --run EX/run.json > EX/stop/control.json`; fetch the Hub and
-     `python3 EV/engine/ctrl.py children 3ce4590a05eb814f8892f88ff8539308 > EX/stop/hub.json`. Commit
-     (`closeout-residuals stop: sweep`); push. The list of writes is every body not `UNTOUCHED`, every control edit
-     `LANDED` or `MIXED`, and the page if the Hub lists a *Candidate CRD Items List* child; times from `EX/landing/`
-     where recorded;
-  3. reverses each control edit that reads `LANDED`, except `TRACK-FREEZE-START`, in reverse §9 order
-     (`PART-18-AF009-01`, `PART-12-HUB-01`, `PART-11-TRACK-01`, then the PART-06 pointers in reverse): re-fetch;
-     `ctrl.py op <PAGE> <EDIT_ID> --run EX/run.json --reverse`; send its operation; re-fetch; `ctrl.py edits` must read
-     `NOT_LANDED` with `old_count` 1. An edit already `NOT_LANDED` is skipped. A `MIXED` edit is never written: it
-     stays on the list for Nathan (P-108 (c)). `P30-DEST` and `P30-VERSION` are on the branch only;
+     `python3 EV/engine/ctrl.py all --run EX/run.json > EX/stop/control.json` (its exit status is recorded, not acted
+     on); fetch the Hub and `python3 EV/engine/ctrl.py children 3ce4590a05eb814f8892f88ff8539308 > EX/stop/hub.json`.
+     Commit (`closeout-residuals stop: sweep`); push. The list of writes is every body not `UNTOUCHED`, every control
+     edit that reads `LANDED`, `MIXED` or `DOUBLED`, every edit in `EX/ctrl/sent.txt`, and the page if the Hub lists a
+     *Candidate CRD Items List* child; times from `EX/landing/` where recorded;
+  3. reverses, in reverse §9 order (`PART-18-AF009-01`, `PART-12-HUB-01`, `PART-11-TRACK-01`, then the PART-06
+     pointers in reverse), each control edit that is in `EX/ctrl/sent.txt` or reads `LANDED` or `DOUBLED`, except
+     `TRACK-FREEZE-START`. For each: re-fetch; `ctrl.py edits`;
+     - `DOUBLED`: send the operation `ctrl.py op <PAGE> <EDIT_ID> --run EX/run.json --reverse` prints, which takes
+       the second copy out (it says `then: op --reverse`); re-fetch and go on as `LANDED`. A refused undouble
+       (`DOUBLED_NOT_CONTIGUOUS`) is listed for Nathan;
+     - `LANDED`: send the operation `ctrl.py op … --reverse` prints; re-fetch; `ctrl.py edits` must read
+       `NOT_LANDED` with `old_count` 1, and otherwise the edit is listed for Nathan;
+     - `NOT_LANDED`: skip;
+     - `MIXED`: never written; listed for Nathan (P-108 (c)).
+     `P30-DEST` and `P30-VERSION` are on the branch only;
   4. if the Hub lists the page, trashes it: `update_content` on the Hub with `old_str` the page's exact child line as
      fetched (`<page url="…">Candidate CRD Items List</page>`), `new_str` empty and `allow_deleting_content: true`;
      re-fetches the Hub. If there is no such page, skips this step;
-  5. `ctrl.py all --run EX/run.json > EX/stop/control.after.json` and
-     `ctrl.py children 3ce4590a05eb814f8892f88ff8539308 > EX/stop/hub.after.json`: the only control edit reading
-     `LANDED` is `TRACK-FREEZE-START`, every `MIXED` one is on the list, and no such child remains;
-  6. writes the stop rows to `$SCRATCH/attempt/stop-rows.md`: the list (each body pending Nathan's restoration), the
-     reversals, the trash call, each step done, the failing step `BLOCKED` with its evidence, and the finding. Then
-     the stop record below, whose step 6 applies the stop lines. The status stays `EXECUTING`; the freeze stays.
-     Nothing keeps a copy of a body (`D22`).
-- **After a stop past X5.0 (P-99, P-108).** Nathan restores each listed body from Notion's page history. At his
-  direction a `GCFPE-MGMT-10` session runs the **restoration check**:
+  5. fetches the seven control pages and the Hub; `ctrl.py all --run EX/run.json > EX/stop/control.after.json` and
+     `ctrl.py children 3ce4590a05eb814f8892f88ff8539308 > EX/stop/hub.after.json`. Every edit other than
+     `TRACK-FREEZE-START` that reads `LANDED`, `MIXED` or `DOUBLED` is on the list for Nathan, and no such child
+     remains;
+  6. writes the stop rows to `EX/stop/rows.md`: the list (each body pending Nathan's restoration, each control edit
+     listed for Nathan), the reversals, the trash call, each step done, the failing step `BLOCKED` with the evidence
+     `EX/stop/failure.json` names, and its finding. Commits them with the step-5 outputs
+     (`closeout-residuals stop: rows`); pushes. Then the stop record below, whose step 6 applies the stop lines. The
+     status stays `EXECUTING`; the freeze stays. Nothing keeps a copy of a body (`D22`).
+- **After a stop past X5.0 (P-99, P-108, P-112 (a)).** Nathan restores each listed body from Notion's page history,
+  and each listed control edit, or rules that it stays. At his direction a `GCFPE-MGMT-10` session runs the
+  **restoration check**:
   1. the branch rule;
-  2. `mkdir -p attempt-<n>/restore/<k>` (`k` = 1 + the checks already there); the sweep of stop step 2 again, into it:
-     every one of the 51 bodies must read `UNTOUCHED`; the Hub must list no *Candidate CRD Items List* child; and
-     `ctrl.py all --run attempt-<n>/execute/run.json --edits attempt-<n>/edits.json --expect restored --kept-from attempt-<n>/execute/stop/control.kept.json`
-     must exit 0 (the edits the stop left `LANDED`, and no `MIXED` edit the stop's report did not read `MIXED`);
+  2. `k` = 1 + the checks already in `AT/restore/`; `mkdir -p AT/restore/<k>/bodies`. The sweep of stop step 2
+     again, into it: every one of the 51 bodies must read `UNTOUCHED` (`AT/restore/<k>/bodies/<PID>.json`); after a
+     fetch of the Hub, `ctrl.py children 3ce4590a05eb814f8892f88ff8539308 > AT/restore/<k>/hub.json` must list no
+     *Candidate CRD Items List* child; and after a fetch of the seven control pages,
+     `ctrl.py all --run AT/execute/run.json --edits AT/edits.json --expect restored --kept-from AT/execute/stop/control.kept.json --sent AT/execute/ctrl/sent.txt > AT/restore/<k>/control.json`
+     must exit 0. That is: the edits reading `LANDED` are exactly the freeze line and the stop lines the kept report
+     reads `LANDED`; none reads `DOUBLED`; every edit in `sent.txt` reads `NOT_LANDED` with its `old_str` once;
+     and an unlisted `MIXED` edit is one the kept report also read `MIXED`. When Nathan has ruled that a named edit
+     stays as it is, the session appends its id to `AT/restore/waived.txt`, records his words in §E, and adds
+     `--waived AT/restore/waived.txt`;
   3. a §E row; `modification_validate.py`; commit (`closeout-residuals restore: attempt <n> check <k>`); push; open a
      pull request, or use the one an earlier check opened; return to Nathan. A body or control edit that fails goes
      back to Nathan by name, and the next check continues on the same branch.
   Once a check has passed, Nathan ends the Modification or rules a plan change (P-84 revised), which also revises
   §7's control-page edits for the pages as they then stand.
-  - **The lift.** When Nathan lifts the freeze: the branch rule;
-    `runjson.py attempt-<n>/execute/run.json lift_date`; commit (`closeout-residuals lift: attempt <n> date`); push;
-    then `TRACK-FREEZE-LIFT-STOP` by the apply-once test and `ctrl.py op`, with
-    `--run attempt-<n>/execute/run.json --edits attempt-<n>/edits.json`; its readback to
-    `attempt-<n>/execute/ctrl/lift.json` and §E; commit (`closeout-residuals lift: attempt <n> readback`); push; a pull
-    request, or the one open on the branch. A `MIXED` lift line is listed for Nathan, not applied (P-108 (f)).
+  - **The lift.** When Nathan lifts the freeze: the branch rule; `runjson.py AT/execute/run.json lift_date`; commit
+    (`closeout-residuals lift: attempt <n> date`); push; then `TRACK-FREEZE-LIFT-STOP` by the apply-once test and
+    `ctrl.py op`, with `--run AT/execute/run.json --edits AT/edits.json`; its readback to `AT/execute/ctrl/lift.json`
+    and §E; commit (`closeout-residuals lift: attempt <n> readback`); push; a pull request, or the one open on the
+    branch. A `MIXED` lift line is listed for Nathan, not applied (P-108 (f)).
   - **The end route.** The branch rule; every item and part `BLOCKED` with its applied steps rolled back; status
     `BLOCKED`; §E names the tracking page's three status lines as they then read, for Nathan (P-108 (g));
     `modification_validate.py`; commit (`closeout-residuals record: attempt <n> ended`); push; a record PR, or the
     open one retitled.
 
-**The stop record (P-107).** It applies to stops before X7.1. An X7.4 failure is P-110's.
+**The stop record (P-107, P-112 (c)).** It applies to stops before X7.1; a failure after X7.1 is recorded as above.
+It begins once stop step 1 and the stop rows (`EX/stop/rows.md`) are committed and pushed.
 1. `mkdir -p "$SCRATCH/attempt"`;
    `git log --format='%H %s' origin/main..HEAD > "$SCRATCH/attempt/commits.txt"`. Into `$SCRATCH/attempt/` copy
    `EX/`, `EV/notion/edits.json` (as `edits.json`), and this attempt's `REVIEWER-PROMPT-cr*.md` and
-   `SECTION-10-REVIEW-cr*-*.md` (in `docs/ephemeral/modifications/evidence/closeout-residuals/`). The stop rows are
-   already in `$SCRATCH/attempt/stop-rows.md`;
-2. the branch rule's reset (its step 1), whatever `R` holds. `git status --porcelain` prints nothing;
+   `SECTION-10-REVIEW-cr*-*.md` (in `docs/ephemeral/modifications/evidence/closeout-residuals/`);
+2. the reset commands of the branch rule's rule 1, whatever `R` holds, without its fetch or its lease line;
+   `git status --porcelain` prints nothing. `$SCRATCH/lease` still holds the sha this session last pushed, or read
+   from `R`, so step 5's push replaces `R`;
 3. `n` = 1 + the number of `attempt-*/` directories in the closeout-residuals evidence directory. Copy
-   `$SCRATCH/attempt/`, less `stop-rows.md`, to `docs/ephemeral/modifications/evidence/closeout-residuals/attempt-<n>/`,
-   with `EX/` as `attempt-<n>/execute/`. From here on the stopped attempt's `run.json` is
-   `attempt-<n>/execute/run.json` and its control edits are `attempt-<n>/edits.json`: every later `--run`, `--edits`
-   and recorded value uses them;
-4. in the record, set `status: EXECUTING` and add to §E a subsection *Attempt <n>* with the stop rows, saying that
-   archives delivered in this attempt (`delivered_cr<k>` in `attempt-<n>/execute/run.json`), if any, must not be
-   installed;
-5. `python3 docs/prompt_ecosystem_management/modification_validate.py <record>`; `git add` the record and
-   `attempt-<n>/` only; `git diff --cached --name-only` lists nothing else; commit
-   (`closeout-residuals record: attempt <n> stopped at <step>`); push; open the record PR against `main`. After a
-   stop past X5.0, its body says not to merge it before the stop lines' commit;
-6. past X5.0 only: applies `TRACK-UNIT-STOPPED` and `TRACK-STATUS-STOP-01` to `03` (§7.3), each by the apply-once
-   test and `ctrl.py op` with `--run attempt-<n>/execute/run.json --edits attempt-<n>/edits.json`, and reads each
-   back. One that reads `MIXED` is listed for Nathan and not applied. Then
-   `ctrl.py all --run attempt-<n>/execute/run.json --edits attempt-<n>/edits.json > attempt-<n>/execute/stop/control.kept.json`;
-   the readback in §E; commit (`closeout-residuals record: attempt <n> stop lines`); push. A new session that finds
-   `R`'s last commit to be `closeout-residuals record: attempt <n> stopped at <step>`, with `<step>` X5.1 or later,
-   continues on `R` (the branch rule's continue commands) at this step;
+   `$SCRATCH/attempt/` to `AT` (`docs/ephemeral/modifications/evidence/closeout-residuals/attempt-<n>/`), with `EX/`
+   as `AT/execute/`. From here on the stopped attempt's `run.json` is `AT/execute/run.json` and its control edits are
+   `AT/edits.json`: every later `--run`, `--edits` and recorded value uses them;
+4. in the record, set `status: EXECUTING` and add to §E a subsection *Attempt <n>* holding
+   `AT/execute/stop/rows.md`'s rows. It says that archives delivered in this attempt (`delivered_cr<k>` in
+   `AT/execute/run.json`), if any, must not be installed;
+5. `python3 docs/prompt_ecosystem_management/modification_validate.py <record>`; `git add` the record and `AT` only;
+   `git diff --cached --name-only` lists nothing else; commit
+   (`closeout-residuals record: attempt <n> stopped at <step>`, with `<step>` from `AT/execute/stop/failure.json`);
+   push; open the record PR against `main`. After a stop past X5.0 (`"past_x50": true`), its body says not to merge
+   it before the stop lines' commit;
+6. past X5.0 only: open the record PR if none from the branch is open; fetch the tracking page; apply
+   `TRACK-UNIT-STOPPED` and `TRACK-STATUS-STOP-01` to `03` (§7.3), each by the apply-once test and `ctrl.py op` with
+   `--run AT/execute/run.json --edits AT/edits.json`, and read each back. One that reads `MIXED` is listed for Nathan
+   and not applied. Then fetch the seven control pages;
+   `ctrl.py all --run AT/execute/run.json --edits AT/edits.json > AT/execute/stop/control.kept.json`; the readback in
+   §E; commit (`closeout-residuals record: attempt <n> stop lines`); push. A new session reaches this step by the
+   branch rule's exception (rule 2);
 7. returns to Nathan.
 
 ### X0 Preconditions
@@ -5914,7 +6201,7 @@ discarded and done again.
 | step | actor | action | gate |
 |---|---|---|---|
 | X0.1 | Nathan | Approves the PLAN, recorded as `plan_approved_by`. Merges the record PR (#478, or the plan-change PR after a stop) | The record on `main` has `status: PLANNED` and carries `plan_approved_by`; `modification_validate.py` passes on it |
-| X0.2 | MGMT-10 | The branch rule, which resets here (a continue means a new session: resume as it says). `mkdir -p EX`; `python3 EV/engine/runjson.py EX/run.json base "$(git rev-parse HEAD)"` | After the reset `HEAD` equals `origin/main` and `git status --porcelain` prints nothing. A refuse returns to Nathan |
+| X0.2 | MGMT-10 | The branch rule, which resets here (a continue means a new session: resume as it says; a reset after the execution PR has merged resumes at X7.2 or X7.4 instead, P-112 (d)). `mkdir -p EX`; `python3 EV/engine/runjson.py EX/run.json base "$(git rev-parse HEAD)"` | After the reset `HEAD` equals `origin/main` and `git status --porcelain` prints nothing. A refuse returns to Nathan |
 | X0.3 | MGMT-10 | Checks that the base has not moved | (a) The registry's sha256 is `8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4`. (b) `freeze.py $INST/<skill>` equals `EV/skills/manifest.json` `execute.1.expected_stdout` for each of the 7 packages. (c) `python3 $INST/glow-graph-contract/scripts/graph_parts.py build docs/graph/parts $SCRATCH/g0.md` exits 0 and prints embedded JSON 575074 bytes sha256 `ae2bd159…`; `g0.md` itself hashes to `a70a9326…`. (d) `python3 EV/engine/closeout_rules.py` prints `checks_matching_authored_or_canonical: []`. (e) `freeze.py $INST` is recorded as `root_x0.3`; `320 420705ec…` unless a skill outside the seven has synced (P-79; not a stop). Any mismatch in (a)–(d): stop (P-84 revised) |
 
 ### X1 The skills, in the scratchpad (P-56: before any repository step that needs them)
@@ -5950,7 +6237,7 @@ discarded and done again.
 | X4.1 | MGMT-10 | PART-01 contract regeneration, `execute.4`, on the working tree after X2 and X3; its figures to `EX/x4.1.txt` | The acceptance gives `6902924a…` EQUAL x2 from the kept template. The 4.1.1 regeneration gives `dbae180b…`, equal to both bundled copies in `$PKG`. The plain `diff` of the two contracts exits 1 with exactly the two expected lines |
 | X4.2 | MGMT-10 | `python3 EV/skills/run_gate.py --set pkg --pkg-root $PKG --out $GATE` | Exit 0: all 34 rows equal their expected results (§5.3), among them `candidate_root` (built at `$GATE/cand`, byte-equal to the graph bundled in flowmaster-validate). The summary goes to `EX/gate_pkg.json` |
 | X4.3 | MGMT-10 | Takes `freeze.py $PKG`. `execute.4b`: packages the seven with skill-creator from `$PKG`'s copy into `$SCRATCH/skills-out`, extracts each archive into `$SCRATCH/skills-ext/<skill>`, takes each extracted package's freeze digest and compares the seven lines with `EV/skills/expected_after_patch.txt`, and writes `EX/packages.json` with `EV/skills/packages_json.py` (each archive's name, entries, bytes, sha256 and freeze line). Commits `EX/packages.json`, `EX/gate_pkg.json` and `EX/x4.1.txt` (`closeout-residuals X4.3: packages`) and pushes. The archives stay in `$SCRATCH/skills-out` for X4.4 | `Skill is valid!` seven times. The `diff` exits 0 (P-92). `packages_json.py` exits 0. `freeze.py $PKG` after packaging equals the value taken before it, in this session (P-111 (e)) |
-| X4.4 | MGMT-10 | **The D24 review and the delivery (P-100, P-109).** `python3 EV/skills/fill_brief.py EX/packages.json --write` (after a plan change add `--prior-file EV/skills/REVIEWER-PROMPT-prior.md`) writes `docs/ephemeral/modifications/evidence/closeout-residuals/REVIEWER-PROMPT-cr<k>.md` and prints `k`, the brief's path and the two reviewers' ids and record paths; commits (`closeout-residuals X4.4: brief cr<k>`) and pushes. Then spawns two fresh reviewer subagents (`D24`; no forked or context-inheriting agent), each given the filled brief as its only brief, with its own `<REVIEWER_ID>` and record path as printed (`SFR-CR<k>-1` and `-2`; `SECTION-10-REVIEW-cr<k>-SFR-CR<k>-1.md` and `-2.md` beside the brief). Commits (`closeout-residuals X4.4: verdict SFR-CR<k>-<i>`) and pushes each verdict unedited as it returns. When both confirm, delivers the seven archives from `$SCRATCH/skills-out` in seven `SendUserFile` calls, one archive each: the caption leads with its sha256 and then its freeze digest, and the message states what changed in that skill, its install target (`$INST/<skill>`), the freeze line Nathan should see after installing, and any earlier delivery of the same skill it supersedes (`attempt-*/execute/packages.json`). An eighth call carries the brief and both verdict files, with the instruction to install at X7.3 and not before. Then `runjson.py EX/run.json delivered_cr<k> "$(date -u +%Y-%m-%dT%H:%M:%SZ)"`; commit (`closeout-residuals X4.4: delivered`); push | `fill_brief.py` exits 0 and the brief carries no `{{`. The brief is committed before either reviewer starts. Both verdicts return `SKILL_FIT_CONFIRMED`, bound to the §1 digests. Before each call, the file's sha256 equals its line in `EX/packages.json`. On `SKILL_REPAIR_REQUIRED`: stop (P-84 revised). **In a new session (P-109):** `delivered_cr<k>` recorded for the latest round: go on to X4.5; otherwise X4.3 runs again and X4.4 runs a new round, unless a verdict of the latest round reads `SKILL_REPAIR_REQUIRED` (a stop; `fill_brief.py` refuses with `REPAIR_VERDICT_PENDING`) |
+| X4.4 | MGMT-10 | **The D24 review and the delivery (P-100, P-109).** `python3 EV/skills/fill_brief.py EX/packages.json --write` (after a plan change add `--prior-file EV/skills/REVIEWER-PROMPT-prior.md`, which always gives the plan-change variant; P-112 (f)) writes `docs/ephemeral/modifications/evidence/closeout-residuals/REVIEWER-PROMPT-cr<k>.md` and prints `k`, the brief's path and the two reviewers' ids and record paths; commits (`closeout-residuals X4.4: brief cr<k>`) and pushes. Then spawns two fresh reviewer subagents (`D24`; no forked or context-inheriting agent), each given the filled brief as its only brief, with its own `<REVIEWER_ID>` and record path as printed (`SFR-CR<k>-1` and `-2`; `SECTION-10-REVIEW-cr<k>-SFR-CR<k>-1.md` and `-2.md` beside the brief). Commits (`closeout-residuals X4.4: verdict SFR-CR<k>-<i>`) and pushes each verdict unedited as it returns. When both confirm, delivers the seven archives from `$SCRATCH/skills-out` in seven `SendUserFile` calls, one archive each: the caption leads with its sha256 and then its freeze digest, and the message states what changed in that skill, its install target (`$INST/<skill>`), the freeze line Nathan should see after installing, and any earlier delivery of the same skill it supersedes: those in `attempt-*/execute/packages.json`, and every earlier `EX/packages.json` of this attempt (`git log -p -- EX/packages.json`), whose archives may have gone out before a session ended (P-112 (j)). An eighth call carries the brief and both verdict files, with the instruction to install at X7.3 and not before. Then `runjson.py EX/run.json delivered_cr<k> "$(date -u +%Y-%m-%dT%H:%M:%SZ)"`; commit (`closeout-residuals X4.4: delivered`); push | `fill_brief.py` exits 0 and the brief carries no `{{`. The brief is committed before either reviewer starts. Both verdicts return `SKILL_FIT_CONFIRMED`, bound to the §1 digests. Before each call, the file's sha256 equals its line in `EX/packages.json`. On `SKILL_REPAIR_REQUIRED`: stop (P-84 revised). **In a new session (P-109):** `delivered_cr<k>` recorded for the latest round: go on to X4.5; otherwise X4.3 runs again and X4.4 runs a new round, unless a verdict of the latest round reads `SKILL_REPAIR_REQUIRED` (a stop; `fill_brief.py` refuses with `REPAIR_VERDICT_PENDING`) |
 | X4.5 | MGMT-10 | **Rehearsal (P-76, P-77).** For each of the 51 bodies with edits (`EV/engine/pages.json` less CF-PO-10, MGR-10, IA-40, IA-50 and IA-60): fetch; `python3 EV/engine/land.py plan <PID> <PAGE> --no-ops --skills $PKG`, and for CL-40 add `--candidate-url https://app.notion.com/p/00000000000000000000000000000000`. For the five: fetch; `land.py check <PID> <PAGE> --skills $PKG`. Writes a summary per page to `EX/rehearsal/` (counts, no body text); commits (`closeout-residuals X4.5: rehearsal`) and pushes | Every `plan` prints no refusal, its `repair` is `[]`, its `reapply_unsafe` is `[]`, and its `precheck` and `landed_check` both pass. Every `check` exits 0. One failure stops EXECUTE before any Notion write (P-84 revised) |
 | X4.6 | MGMT-10 | **Read-only Notion checks (P-95, P-102).** Downloads the Drive file (`download_file_content`, file `1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`) and fetches the Hub; runs `python3 EV/engine/drive_check.py --hub 3ce4590a05eb814f8892f88ff8539308 > EX/drive_check.json`. Fetches the seven control pages (§7) and runs `python3 EV/engine/ctrl.py all --run EX/run.json --expect unlanded > EX/anchor_check.json`. Commits both (`closeout-residuals X4.6: read-only Notion checks`) and pushes | `drive_check.py` exits 0: the bytes are sha256 `2d7ff093…`, 31 923 B; the fence content's sha256 is `7108e84a…`; each M2 `old` occurs once outside the fence; no Hub child is titled *Candidate CRD Items List*. `ctrl.py` exits 0: every control edit's `old_str` occurs once and none reads `LANDED`. Any failure stops EXECUTE before any Notion write (P-84 revised) |
 
@@ -5958,13 +6245,13 @@ discarded and done again.
 
 | step | actor | action | gate |
 |---|---|---|---|
-| X5.0 | Nathan, then MGMT-10 | Unless `execute_date_X5.0` is already recorded (a resume), Nathan confirms the freeze: no flow session runs until he lifts it at X7.5, after the post-install verification (P-66 revised). `runjson.py EX/run.json execute_date_X5.0`; commit (`closeout-residuals X5.0: execute date`); push. Then `TRACK-FREEZE-START` (§7.3) by the apply-once test and `ctrl.py op`; its readback to `EX/ctrl/X5.0.json`; commit (`closeout-residuals X5.0: readback`); push | `ctrl.py edits` reads `LANDED` on the re-fetched page. Otherwise nothing was written to Notion: a stop before X5.0 (P-107) |
-| X5.1 | MGMT-10 | Creates the *Candidate CRD Items List* page (§7.4.2, P-105). `runjson.py EX/run.json migration_date`; commit (`closeout-residuals X5.1: migration date`); push. Downloads the Drive file again and fetches the Hub; `drive_check.py --hub <Hub>`, or without `--hub` on a resume where the Hub lists this run's page (§7.4.2 step 1). `python3 EV/engine/m2.py build --run EX/run.json --out $SCRATCH/m2`. Unless `page_id` is recorded or §7.4.2 step 1 finds this run's page, creates the page under the Hub from `$SCRATCH/m2/page.create.md` with `preserve_internal_links: true` (the step-5 fallback: `page.small.md`, then `m2.py insert-op`). Records `page_id` and `url` (normalized) by `runjson.py` as soon as the create returns; commit (`closeout-residuals X5.1: page`); push. Fetches the page and the Hub; `python3 EV/engine/m2.py check --page <page_id> --hub 3ce4590a05eb814f8892f88ff8539308 --run EX/run.json --stage create > EX/m2/create.json`. Applies the three `self_links.step7_ops` with `<URL>` in one `update_content` call, each whose `old_str` is still on the page; fetches; `m2.py check … --stage final > EX/m2/final.json`. Commits both (`closeout-residuals X5.1: readback`); pushes | `drive_check.py` passes: 31 923 B, sha256 `2d7ff093…`, each M2 `old` once outside the fence, and no collision. `m2.py check` exits 0 at both stages (F1–F10; F6 8 pairs at `create`, 11 at `final`). No `{{` on the page |
+| X5.0 | Nathan, then MGMT-10 | Unless `execute_date_X5.0` is already recorded (a resume), Nathan confirms the freeze: no flow session runs until he lifts it at X7.5, after the post-install verification (P-66 revised); then fetch the tracking page, and `ctrl.py edits <tracking page> TRACK-FREEZE-START --run EX/run.json` must read `TOKEN_NOT_RECORDED` with `old_count` 1. `runjson.py EX/run.json execute_date_X5.0`; append `TRACK-FREEZE-START` to `EX/ctrl/sent.txt`; commit both (`closeout-residuals X5.0: execute date`); push. Then `TRACK-FREEZE-START` (§7.3) by the apply-once test and `ctrl.py op`; its readback to `EX/ctrl/X5.0.json`; commit (`closeout-residuals X5.0: readback`); push | `ctrl.py edits` reads `LANDED` on the re-fetched page, after the control readback rule's cycles if needed. A failure before the execute-date commit is a stop before X5.0: nothing was written. From that commit on, a failure is a stop past X5.0, whose sweep finds whether the line landed (P-112 (e)) |
+| X5.1 | MGMT-10 | Creates the *Candidate CRD Items List* page (§7.4.2, P-105, P-112 (b)). `runjson.py EX/run.json migration_date`; commit (`closeout-residuals X5.1: migration date`); push. Downloads the Drive file again and fetches the Hub; `drive_check.py --hub <Hub>`, or without `--hub` on a resume where the Hub lists this run's page (§7.4.2 step 1). `python3 EV/engine/m2.py build --run EX/run.json --out $SCRATCH/m2`. Unless `page_id` is recorded or §7.4.2 step 1 finds this run's page, creates the page under the Hub from `$SCRATCH/m2/page.create.md` with `preserve_internal_links: true` (if the call rejects the size: from `page.small.md`). Records `page_id` and `url` (normalized) by `runjson.py` as soon as the create returns; commit (`closeout-residuals X5.1: page`); push. Then, each time on fresh fetches of the page and the Hub: <br>1. `python3 EV/engine/m2.py insert-op --page <page_id> --run EX/run.json`: send the operation it prints, and re-fetch; a `CODE_BLOCK_ALREADY_PRESENT` refusal means nothing to send; <br>2. `m2.py check --page <page_id> --hub 3ce4590a05eb814f8892f88ff8539308 --run EX/run.json --stage auto > $SCRATCH/m2/auto.json`, which reads the stage from the page. At `create` it must exit 0: copy it to `EX/m2/create.json`; commit (`closeout-residuals X5.1: create check`); push. A `PARTIAL_STEP7` refusal, or the stage `final`, means an earlier session sent step 7, after committing `EX/m2/create.json`; <br>3. `m2.py step7-ops --page <page_id> --run EX/run.json`: send its operations, if any, in one `update_content` call, and re-fetch; <br>4. `m2.py check … --stage final > EX/m2/final.json`; commit (`closeout-residuals X5.1: readback`); push | `drive_check.py` passes: 31 923 B, sha256 `2d7ff093…`, each M2 `old` once outside the fence, and no collision. `EX/m2/create.json` is committed with exit 0 at `create` (F6 8 pairs), and `m2.py check` exits 0 at `final` (11 pairs). F1: exactly one Hub child carries the title, and it is `page_id`. No `{{` on the page. A failing check is run once more on a fresh fetch after the write's task has succeeded (P-89); failing again, it stops the unit |
 | X5.2 | MGMT-10 | `python3 EV/texts/apply_texts.py . EV/texts/edits.json X5.2 --run EX/run.json` applies `P30-DEST` with `<URL>` and `P30-VERSION`; skipped if already there. Commits them (`closeout-residuals X5.2: destination rule`) and pushes | The applier exits 0: no edit `MIXED`, no token left, each text once afterwards. `grep -rn '{{' docs/prompt_ecosystem_management` shows no new token |
-| X5.3 | MGMT-10 | `runjson.py EX/run.json execute_date_X5.3`; commit (`closeout-residuals X5.3: execute date`); push. Applies the eleven PART-06 pointer edits (§7.4.5) by the apply-once test and `ctrl.py op`, with `url`, `migration_date` and `execute_date_X5.3` from `EX/run.json`; their readback to `EX/ctrl/X5.3.json`; commit (`closeout-residuals X5.3: readback`); push | Each edit applied once (P-90, P-103); `ctrl.py edits` reads `LANDED` on each re-fetched page, and no `{{`. An end-of-page append reading `DOUBLED` is undoubled by `ctrl.py op` and read back again |
-| X5.4 | MGMT-10 | Lands the 50 live bodies with edits (X4.5's 51 less `GCFPE-MGMT-10-PROPOSED`), one page at a time. Fetch; run `python3 EV/engine/land.py plan <PID> <PAGE> --skills $PKG` (CL-40: `--candidate-url <URL>`), reading its JSON from the harness's saved output file when the tool truncates it (`D22`, transient); apply the printed `ops` in one `notion-update-page` `update_content` call (P-89); re-fetch; run `python3 EV/engine/land.py check <PID> <PAGE> --skills $PKG` (CL-40: `--candidate-url <URL>`). Writes each check summary to `EX/landing/`; commits (`closeout-residuals X5.4: landing <count>`) and pushes after every ten pages and after the last | The first `plan` on each page prints no refusal. Its `repair` is `[]`; on a page an earlier sitting wrote to, a `repair` ≠ `[]` is applied once and checked, as the forward repair (P-111 (a)); `ALREADY_LANDED` goes to `check`. A refusal stops the unit before that page's write. `check` exits 0. Each `source_file` and `fetched` belongs to the fetch just made. A failing `check` is repaired forward or stops the unit (the landing-unit rule above) |
+| X5.3 | MGMT-10 | `runjson.py EX/run.json execute_date_X5.3`; append the eleven PART-06 pointer ids (§7.4.5 order) to `EX/ctrl/sent.txt`; commit both (`closeout-residuals X5.3: execute date`); push. Applies the eleven PART-06 pointer edits (§7.4.5) by the apply-once test and `ctrl.py op`, with `url`, `migration_date` and `execute_date_X5.3` from `EX/run.json`; their readback to `EX/ctrl/X5.3.json`; commit (`closeout-residuals X5.3: readback`); push | Each edit applied once (P-90, P-103); `ctrl.py edits` reads `LANDED` on each re-fetched page, after the control readback rule's cycles if needed, and no `{{`. An end-of-page append reading `DOUBLED` is undoubled by `ctrl.py op` and read back again |
+| X5.4 | MGMT-10 | Lands the 50 live bodies with edits (X4.5's 51 less `GCFPE-MGMT-10-PROPOSED`), one page at a time. Fetch; run `python3 EV/engine/land.py plan <PID> <PAGE> --skills $PKG` (CL-40: `--candidate-url <URL>`), reading its JSON from the harness's saved output file when the tool truncates it (`D22`, transient); apply the printed `ops` in one `notion-update-page` `update_content` call (P-89); re-fetch; run `python3 EV/engine/land.py check <PID> <PAGE> --skills $PKG` (CL-40: `--candidate-url <URL>`). Writes each check summary to `EX/landing/`; commits (`closeout-residuals X5.4: landing <count>`) and pushes after every ten pages and after the last | The first `plan` on each page prints no refusal, and its `reapply_unsafe` is `[]`; so does every forward-repair `plan` X5.4 applies. A refusal or a non-empty `reapply_unsafe` stops the unit before that page's write (P-112 (k)). Its `repair` is `[]`, except on an X5.4 a session continued (the branch rule's rule 3), where a `repair` ≠ `[]` is applied once and checked, as the forward repair (P-111 (a), P-112 (k)); `ALREADY_LANDED` goes to `check`. `check` exits 0. Each `source_file` and `fetched` belongs to the fetch just made. A failing `check` is repaired forward or stops the unit (the landing-unit rule above) |
 | X5.5 | MGMT-10 | Lands PART-11 on `GCFPE-MGMT-10-PROPOSED` the same way; commits its summary (`closeout-residuals X5.5: landing`) and pushes | `check` exits 0: the R-ITEM40 and R-ITEM23 gates read 0 |
-| X5.6 | MGMT-10 | `runjson.py EX/run.json execute_date_X5.6`; commit (`closeout-residuals X5.6: execute date`); push. Applies `PART-11-TRACK-01`, `PART-12-HUB-01` and `PART-18-AF009-01` by the apply-once test and `ctrl.py op`; their readback to `EX/ctrl/X5.6.json`; commit (`closeout-residuals X5.6: readback`); push | Each edit applied once (P-90, P-103); `ctrl.py edits` reads `LANDED` on each re-fetched page |
+| X5.6 | MGMT-10 | `runjson.py EX/run.json execute_date_X5.6`; append `PART-11-TRACK-01`, `PART-12-HUB-01` and `PART-18-AF009-01` to `EX/ctrl/sent.txt`; commit both (`closeout-residuals X5.6: execute date`); push. Applies `PART-11-TRACK-01`, `PART-12-HUB-01` and `PART-18-AF009-01` by the apply-once test and `ctrl.py op`; their readback to `EX/ctrl/X5.6.json`; commit (`closeout-residuals X5.6: readback`); push | Each edit applied once (P-90, P-103); `ctrl.py edits` reads `LANDED` on each re-fetched page, after the control readback rule's cycles if needed |
 
 ### X6 The Tier 1 gate
 
@@ -5973,17 +6260,17 @@ discarded and done again.
 | X6.1 | MGMT-10 | Corpus gate on all 55 live bodies, the five untouched ones included. For each: fetch; run `land.py check <PID> <PAGE> --skills $PKG` (CL-40: `--candidate-url <URL>`). Writes the summaries to `EX/corpus/` | 55/55 exit 0. Each new guard fires on its injected regression, and each required guard fails when removed, on the landed text. Each `source_file` and `fetched` belongs to the fetch just made |
 | X6.2 | MGMT-10 | `python3 EV/engine/graph_check.py --qa110 <QA-110 page> --qa80 <QA-80 page>` after fetching both; output to `EX/graph_check.json` | Exit 0 (§A PART-16: the text matches the graph) |
 | X6.3 | MGMT-10 | `execute.6` (the manifest): the closure of each live prompt `ANALYZE-closure.md` lists, compared by `diff` with that file | The `diff` exits 0: closure over the 50 live prompts is unchanged against `ANALYZE-closure.md` (proved on the reindexed tree at PLAN) |
-| X6.4 | MGMT-10 | Writes §E: a disposition for every step and item, and the harness files (`D22` condition 5), citing `EX/run.json` for `$BASE`, the root digests, the page, `<URL>`, the token values and the delivery, `EX/packages.json` for the archives, and the `EX/` output of each gate. Runs `modification_validate.py`; commits `EX/corpus/`, `EX/graph_check.json` and the record (`closeout-residuals X6.4: execution record`); pushes; runs the path check; then opens the execution PR, or finds it open | `modification_validate.py` passes, and `git diff --name-only origin/main HEAD` lists only paths under `docs/prompt_ecosystem_management/`, `docs/graph/` and `docs/ephemeral/`, both before the PR is opened (P-111 (c)). From here on Nathan may banner the Drive file (P-102 (e)) |
+| X6.4 | MGMT-10 | Writes §E: a disposition for every step and item, and the harness files (`D22` condition 5), citing `EX/run.json` for `$BASE`, the root digests, the page, `<URL>`, the token values and the delivery, `EX/packages.json` for the archives, and the `EX/` output of each gate. Runs `modification_validate.py`; commits `EX/corpus/`, `EX/graph_check.json` and the record (`closeout-residuals X6.4: execution record`); pushes; runs the path check; then opens the execution PR, or finds it open. Run again, it finds its §E rows in place and writes none twice, commits only what changed, and finds the PR open (P-112 (g)) | `modification_validate.py` passes, and `git diff --name-only origin/main HEAD` lists only paths under `docs/prompt_ecosystem_management/`, `docs/graph/` and `docs/ephemeral/`, both before the PR is opened (P-111 (c)). From here on Nathan may banner the Drive file (P-102 (e)) |
 
 ### X7 Merge, install and close
 
 | step | actor | action | gate |
 |---|---|---|---|
 | X7.1 | Nathan | Merges the execution PR. The reindex reaches `main` before the stricter builder is installed | The merge commit is on `main` |
-| X7.2 | MGMT-10 | Asks Nathan to install the seven archives delivered at X4.4 (P-100, P-109), naming each by the sha256 its caption leads with, and to give the date of his install sitting. If he no longer holds an archive whose sha256 `EX/packages.json` lists: the branch rule, then X1.1, X1.2 and X4.2 to X4.4 again (a new round, re-cut, delivered and recorded; P-109), their commits named `X7.2` (`closeout-residuals X7.2: packages`, `… X7.2: brief cr<k>`, `… X7.2: verdict …`, `… X7.2: delivered`) so a new session resumes here, then X7.2 again; the freeze holds | — |
+| X7.2 | MGMT-10 | The branch rule. Asks Nathan to install the seven archives delivered at X4.4 (P-100, P-109), naming each by the sha256 its caption leads with, and to give the date of his install sitting. Nothing is re-cut after X7.1 (P-112 (d)). An archive Nathan no longer holds he saves again from its delivery message. If he cannot, and this session holds a file in `$SCRATCH/skills-out` whose sha256 equals its line in `EX/packages.json`, MGMT-10 sends that file again in a message of X4.4's form. Otherwise it records a failure after X7.1 (`closeout-residuals record: X7.2 failed`, naming the archive), and Nathan rules | Every file sent again has the sha256 of its line in `EX/packages.json`. The freeze holds |
 | X7.3 | Nathan | Installs all seven in one sitting, and gives the date | — |
-| X7.4 | MGMT-10 | **The post-install verification (P-110).** The branch rule (a reset after X7.1's merge; a continue once this step has committed). Then: <br>• `execute.5`: the seven `freeze.py $INST/<skill>` lines to `EX/installed_freeze.txt`, compared by `diff` with `EV/skills/expected_after_patch.txt`; <br>• `python3 EV/skills/run_gate.py --set post --inst $INST --out $GATE`, its summary to `EX/gate_post.json`; <br>• X6.1's corpus gate with `--skills $INST`, its summaries to `EX/corpus-post/`. <br>When all three pass: `runjson.py EX/run.json install_date <the date Nathan gave for this sitting>`; one commit of the four (`closeout-residuals X7.4: post-install verification`); push | Each installed digest equals X4.3's (`EX/packages.json`): the `diff` exits 0. `run_gate` exits 0 (28 rows). 55/55 exit 0, with each `source_file` and `fetched` from the fetch just made. On a failure the freeze stays. A differing digest commits nothing: Nathan reinstalls the delivered file (X7.3 again), and X7.4 runs again. Any other failure: §E's X7.4 row (the failing rows, the installed digests, the freeze held) and the line `D25 applies from: <X7.1 merge commit sha>, <its UTC date>`, status stays `EXECUTING`, `modification_validate.py`, one commit (`closeout-residuals record: X7.4 failed`), push, a record PR, and return to Nathan (P-94, P-102 (g), P-110). A plan change after it restarts where P-110 says, not at X0.1 |
-| X7.5 | Nathan, then MGMT-10 | After X7.4 passes, Nathan lifts the freeze. `runjson.py EX/run.json lift_date`; commit (`closeout-residuals X7.5: lift date`); push. Then `TRACK-FREEZE-LIFT` (§7.3) by the apply-once test and `ctrl.py op`; its readback to `EX/ctrl/X7.5.json` | `ctrl.py edits` reads `LANDED` on the re-fetched page |
+| X7.4 | MGMT-10 | **The post-install verification (P-110).** The branch rule (a reset after X7.1's merge; a continue once this step has committed). Then: <br>• `execute.5`: the seven `freeze.py $INST/<skill>` lines to `EX/installed_freeze.txt`, compared by `diff` with `EV/skills/expected_after_patch.txt`; <br>• `python3 EV/skills/run_gate.py --set post --inst $INST --out $GATE`, its summary to `EX/gate_post.json`; <br>• X6.1's corpus gate with `--skills $INST`, its summaries to `EX/corpus-post/`. <br>When all three pass: `runjson.py EX/run.json install_date <the date Nathan gave for this sitting>`; one commit of the four (`closeout-residuals X7.4: post-install verification`); push | Each installed digest equals X4.3's (`EX/packages.json`): the `diff` exits 0. `run_gate` exits 0 (28 rows). 55/55 exit 0, with each `source_file` and `fetched` from the fetch just made. On a failure the freeze stays. A differing digest commits nothing: Nathan reinstalls the delivered file (X7.3 again), and X7.4 runs again; one he no longer holds follows X7.2's rule. Any other failure is a failure after X7.1 (above): §E's X7.4 row (the failing rows, the installed digests, the freeze held) and the line `D25 applies from: <X7.1 merge commit sha>, <its UTC date>`, status stays `EXECUTING`, `modification_validate.py`, one commit (`closeout-residuals record: X7.4 failed`), push, a record PR, and return to Nathan (P-94, P-102 (g), P-110). A plan change after it names its own steps and inputs and rejoins at X7.2; it does not restart at X0.1 or re-run X1.1 to X4.4 (P-112 (d)) |
+| X7.5 | Nathan, then MGMT-10 | After X7.4 passes, Nathan lifts the freeze. `runjson.py EX/run.json lift_date`; commit (`closeout-residuals X7.5: lift date`); push. Then `TRACK-FREEZE-LIFT` (§7.3) by the apply-once test and `ctrl.py op`; its readback to `EX/ctrl/X7.5.json` | `ctrl.py edits` reads `LANDED` on the re-fetched page, after the control readback rule's cycles if needed; a failure is repaired forward or returned to Nathan (the freeze is lifted) |
 | X7.6 | MGMT-10 | Reads the Drive file's first lines to confirm Nathan's banner. Makes the close commit (P-72): <br>• `runjson.py EX/run.json close_date`; <br>• `python3 EV/texts/apply_texts.py . EV/texts/edits.json close --run EX/run.json --installed-freeze EX/installed_freeze.txt` (`CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`); <br>• §E's install record, citing `EX/installed_freeze.txt`, `EX/gate_post.json` and `EX/corpus-post/`, the X7.5 readback, X7.4's harness files (`D22` condition 5) and the actual interaction cost; <br>• the line `D25 applies from: <X7.1 merge commit sha>, <its UTC date>` (P-86), unless a P-94 record already wrote it; <br>• the item dispositions (ITEM-13's names the oracle input, P-69); <br>• `EX/ctrl/X7.5.json`; <br>• `status: COMPLETE`. <br>Commits (`closeout-residuals X7.6: close`), pushes, and opens the close-out PR, its body saying not to merge it before X7.7's commit. Run again, it finds its texts and rows in place, commits nothing, and finds the PR open | The banner is present. If it is not, MGMT-10 asks Nathan and waits. `grep -cE '^D25 applies from: [0-9a-f]{40}, [0-9]{4}-[0-9]{2}-[0-9]{2}$'` on the record is 1. `modification_validate.py` passes on `COMPLETE`. `git show --format= HEAD \| grep '^+[^+]' \| grep -c '{{'` prints `0` (P-102 (c)). The PR changes only the three open paths |
 | X7.7 | MGMT-10 | Applies `TRACK-STATUS-01` to `03`, with `close_date` from `EX/run.json` (§7.3), by the apply-once test and `ctrl.py op`. Their readback to `EX/ctrl/X7.7.json` and §E, in a second commit on the close-out PR (`closeout-residuals X7.7: tracking status`); push; this is step 28's disposition. Returns to Nathan | Each edit applied once (P-90, P-103); `ctrl.py edits` reads `LANDED`; `modification_validate.py` passes |
 | X7.8 | Nathan | Merges the close-out PR | The merge commit is on `main` |
@@ -6060,6 +6347,8 @@ are silent on them. Each clause is at most 15 words.
 §A predicted 11 with 2 merges. The install must follow the execution PR's merge (§A order 3: the reindex reaches
 `main` first), so the post-install verification and the close texts need a third merge, the close-out PR. A D24
 rejection stops EXECUTE before X5.0 and makes the fix a plan change (P-84 revised), so each one adds 4: the stop
-record's merge, the plan approval, the further review round and the plan-change merge. A stop after X5.0 adds
-Nathan's restoration of the listed bodies and the restoration check's pull request before either route (P-99,
-P-108). An archive Nathan no longer holds at X7.2 adds a review round and a delivery (P-109).
+record's merge, the plan approval, the further review round and the plan-change merge. A stop past X5.0 (from the
+commit that lists the freeze line) adds Nathan's restoration of the listed bodies and control edits, and the
+restoration check's pull request, before either route (P-99, P-108, P-112 (a)). An archive Nathan can no longer
+save from its delivery message adds nothing when the session still holds its bytes; otherwise it is a failure after
+X7.1, and its record, merge and plan change add at least 3 (P-112 (d)).

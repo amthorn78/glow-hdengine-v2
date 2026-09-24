@@ -12,14 +12,16 @@ the brief before either reviewer starts. Fills the draft's six tokens (EV/skills
   {{ARCHIVES}}  one line per package from EX/packages.json;
   {{OUT_DIR}}   EX/packages.json's out_dir;
   {{HEAD}}      git rev-parse HEAD (X4.3's commit; the brief's own commit comes after);
-  {{PRIOR}} and {{REREVIEW}}  the variant the repository selects: first (no earlier brief), re-cut (the newest
-                earlier brief is in the closeout-residuals directory itself, so it belongs to this attempt), or
-                plan change (the newest earlier brief is under attempt-*/: the text comes from --prior-file, which
-                the PLAN session writes, with a '## PRIOR' and a '## REREVIEW' section).
+  {{PRIOR}} and {{REREVIEW}}  the variant: plan change whenever --prior-file is given (the PLAN session writes it,
+                with a '## PRIOR' and a '## REREVIEW' section; P-112); otherwise first (no earlier brief), or re-cut
+                (the newest earlier brief is in the closeout-residuals directory itself, so it belongs to this
+                attempt, and its archives were never delivered). A plan-change round, whose newest earlier brief is
+                under attempt-*/, needs --prior-file.
 Refuses (exit 1, nothing printed) when EX/packages.json does not hold the seven packages with the freeze lines of
 EV/skills/expected_after_patch.txt, when a plan-change round has no --prior-file, when a re-cut round follows a round
-whose verdict file reads SKILL_REPAIR_REQUIRED first (REPAIR_VERDICT_PENDING: that is a stop, P-84 revised), or when
-any {{ remains.
+whose verdict file mentions SKILL_REPAIR_REQUIRED anywhere (REPAIR_VERDICT_PENDING: that is a stop, P-84 revised), when a
+re-cut round follows a round whose delivery EX/run.json records (PRIOR_ROUND_DELIVERED: after a delivery nothing is
+re-cut; a new round then comes only from a plan change, with --prior-file; P-112), or when any {{ remains.
 """
 import argparse
 import json
@@ -60,26 +62,30 @@ def main():
     briefs = sorted(list(DIR.glob("REVIEWER-PROMPT-cr*.md")) + list(DIR.glob("attempt-*/REVIEWER-PROMPT-cr*.md")),
                     key=lambda p: int(re.search(r"-cr(\d+)\.md$", p.name).group(1)))
     k = len(briefs) + 1
-    if not briefs:
+    run_path = Path(a.packages).parent / "run.json"
+    run = json.loads(run_path.read_text(encoding="utf-8")) if run_path.exists() else {}
+    if a.prior_file:
+        t = Path(a.prior_file).read_text(encoding="utf-8")
+        prior = t.split("## PRIOR", 1)[1].split("## REREVIEW", 1)[0].strip()
+        rereview = t.split("## REREVIEW", 1)[1].strip()
+    elif not briefs:
         prior = quoted(draft, "`{{PRIOR}}`, first variant")
         rereview = "NONE, first review."
     elif briefs[-1].parent == DIR:
+        if run.get(f"delivered_cr{k - 1}"):
+            refuse("PRIOR_ROUND_DELIVERED", round=f"cr{k - 1}")
         # a re-cut round never re-rolls a rejection (D24 condition 5): a SKILL_REPAIR_REQUIRED verdict of the earlier
         # round is a stop before X5.0 (P-84 revised), not a reason for another round on the same bytes
+        # verdict records state their verdict in varied forms, so any mention of the rejection word refuses the
+        # re-cut: a confirmed record that only quotes the vocabulary then stops for Nathan's ruling (P-112), which
+        # is the safe side of D24 condition 5
         for v in sorted(DIR.glob(f"SECTION-10-REVIEW-cr{k - 1}-*.md")):
-            t = v.read_text(encoding="utf-8")
-            first = min(((t.find(w), w) for w in ("SKILL_REPAIR_REQUIRED", "SKILL_FIT_CONFIRMED") if w in t),
-                        default=(-1, None))[1]
-            if first == "SKILL_REPAIR_REQUIRED":
+            if "SKILL_REPAIR_REQUIRED" in v.read_text(encoding="utf-8"):
                 refuse("REPAIR_VERDICT_PENDING", verdict=str(v))
         prior = quoted(draft, "`{{PRIOR}}`, second variant").replace("<k-1>", str(k - 1))
         rereview = f"Give the disposition of every finding in round cr{k - 1}'s verdict files, if any."
     else:
-        if not a.prior_file:
-            refuse("PLAN_CHANGE_ROUND_NEEDS_PRIOR_FILE", newest=str(briefs[-1]))
-        t = Path(a.prior_file).read_text(encoding="utf-8")
-        prior = t.split("## PRIOR", 1)[1].split("## REREVIEW", 1)[0].strip()
-        rereview = t.split("## REREVIEW", 1)[1].strip()
+        refuse("PLAN_CHANGE_ROUND_NEEDS_PRIOR_FILE", newest=str(briefs[-1]))
     head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
     lines = [f"- {r['file']}, {r['files']} files, {r['bytes']} bytes, sha256 {r['sha256']}; extracted freeze {r['freeze']}"
              for r in pk["archives"]]

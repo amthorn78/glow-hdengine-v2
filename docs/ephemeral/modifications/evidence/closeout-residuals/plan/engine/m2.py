@@ -12,11 +12,17 @@ checks), decoded in memory. Only `build` writes, and only to the --out directory
       and the code block (the fallback of step 5). Prints sizes and sha256s only. {{MIGRATION_DATE}} comes from
       EX/run.json; a create sends page.create.md with preserve_internal_links true, so the list's Notion links keep
       their text.
-  m2.py check --page PAGE --hub HUB --run EX/run.json --stage create|final [--harness-root H] [--session S]
+  m2.py check --page PAGE --hub HUB --run EX/run.json --stage create|final|auto [--harness-root H] [--session S]
       F1-F10 (§7.4.3) on the newest fetch of PAGE against the content `build` makes from the same download, `create`
       at step 6 (the self-link spots as plain text, 8 links) or `final` after step 7 (the links in place, 11 links),
-      and on the newest fetch of HUB for F1's parent. Prints booleans and counts, and on a failure the first
-      differing item's position; exits 0 only when all ten pass.
+      and on the newest fetch of HUB for F1's parent (exactly one Hub child carries the title, and it is PAGE). `auto` (a resumed X5.1, P-112) reads the stage from the page:
+      `create` while all three step-7 old_strs stand on it, `final` once none does; with some and not others it
+      refuses PARTIAL_STEP7 (send `step7-ops`, then check again). Prints booleans and counts, the stage used, and
+      on a failure the first differing item's position; exits 0 only when all ten pass.
+  m2.py step7-ops --page PAGE --run EX/run.json [--harness-root H] [--session S]
+      Step 7's operations (M2.json self_links.step7_ops, the URL filled from EX/run.json) whose old_str still stands
+      on the page as fetched, for one update_content call; each is a replacement whose old_str is gone once it lands,
+      so sent again it matches nothing (P-103). Prints an empty list once all three have landed.
   m2.py insert-op --page PAGE --run EX/run.json [--harness-root H] [--session S]
       The fallback's second write: the update_content operation that puts the H3, its paragraph and the code block
       back before `## Maintenance rule` on the page as fetched, widened to the line before so that sent again it
@@ -24,7 +30,8 @@ checks), decoded in memory. Only `build` writes, and only to the --out directory
 
 Normalizations the readback applies to both sides, and nothing else: blank lines are ignored (Notion drops them);
 a backslash before any of \\ * ~ ` $ [ ] < > { } | ^ is removed; a block's {color=...} attribute list is removed; a
-<mention-page url="U">T</mention-page> is read as the link [T](U); a Notion link target is compared by its 32-hex page
+<mention-page url="U">T</mention-page> is read as the link [T](U), and a text-less <mention-page url="U"/> as [T](U) with
+the one text the build gives links to U; a Notion link target is compared by its 32-hex page
 id; list numbers are not compared (Notion may renumber); whitespace runs are one space; in the code block only
 trailing spaces on a line are tolerated, and they are counted (F7).
 """
@@ -226,12 +233,32 @@ def sections(blocks):
     return sec
 
 
+def fill_mentions(content, pairs):
+    """A text-less <mention-page url="U"/> (Notion shows the page's title there) read as [T](U), where T is the text the
+    build gives every link to U; a target the build links under more than one text, or not at all, is left as is and
+    fails F6 (P-112)."""
+    by = {}
+    for t, u in pairs:
+        by.setdefault(u, set()).add(t)
+
+    def sub(m):
+        ts = by.get(target(m.group(1)))
+        return f"[{next(iter(ts))}]({m.group(1)})" if ts and len(ts) == 1 else m.group(0)
+    return re.sub(r'<mention-page url="([^"]*)"\s*/>', sub, content)
+
+
 def check(content, title, hub_children, page_id, text, run, stage):
     exp_lines, inner = build(text, run, stage)
     e_codes, e_tables, e_blocks = parse("\n".join(exp_lines))
+    content = fill_mentions(content, [x for _, b in e_blocks for x in links(b)]
+                            + [x for t in e_tables for row in t for c in row for x in links(c)])
     codes, tables, blocks = parse(content)
     r = {}
-    r["F1_title_and_parent"] = title == TITLE and any(c["id"] == page_id and c["title"] == TITLE for c in hub_children)
+    # exactly one Hub child carries the title, and it is this page: a second create (a lost response, then a stale
+    # Hub fetch) fails F1 (P-112)
+    same = [c for c in hub_children if c["title"] == TITLE]
+    r["F1_title_and_parent"] = title == TITLE and len(same) == 1 and same[0]["id"] == page_id
+    r["F1_children_titled"] = len(same)
     eh = [norm(b) for k, b in e_blocks if k == "h"]
     gh = [norm(b) for k, b in blocks if k == "h"]
     r["F2_headings"] = eh == gh
@@ -289,14 +316,56 @@ def check(content, title, hub_children, page_id, text, run, stage):
     return r
 
 
+def insert_op(content, text, run):
+    """The step-5 fallback's second write: the preserved-source block put back before `## Maintenance rule`, widened
+    to the line before so that sent again it matches nothing (P-103). Refuses once a code block is on the page."""
+    codes, _, _ = parse(content)
+    if codes:
+        return {"refused": "CODE_BLOCK_ALREADY_PRESENT"}
+    lines, _ = build(text, run, "create")
+    block = lines[lines.index(H3):lines.index(MAINT)]
+    if D.occ(content, MAINT) != 1:
+        return {"refused": "ANCHOR_NOT_ONCE"}
+    p = content.index(MAINT)
+    ls = content.rfind("\n", 0, p)
+    start = content.rfind("\n", 0, ls) + 1 if ls > 0 else 0
+    op = {"old_str": content[start:p] + MAINT, "new_str": content[start:p] + "\n".join(block) + "\n" + MAINT}
+    after = content.replace(op["old_str"], op["new_str"], 1)
+    return {"op": op, "reapply_refused": D.occ(after, op["old_str"]) == 0}
+
+
+def plain_spots(content):
+    """The step-7 old_strs still standing on the page (whitespace collapsed; a landed self-link keeps its markup)."""
+    ws = lambda s: re.sub(r"\s+", " ", s)
+    return [op["old_str"] for op in M2["self_links"]["step7_ops"] if D.occ(ws(content), ws(op["old_str"]))]
+
+
+def stage_of(content):
+    """`create` while all three step-7 old_strs stand, `final` once none does, else PARTIAL_STEP7:<n> (P-112)."""
+    n = len(plain_spots(content))
+    return "create" if n == len(M2["self_links"]["step7_ops"]) else "final" if n == 0 else f"PARTIAL_STEP7:{n}"
+
+
+def step7_ops(content, run):
+    """Step 7's operations still to send on the page as fetched, the URL filled from run.json (P-103, P-112)."""
+    if not run.get("url"):
+        return {"refused": "TOKEN_NOT_RECORDED", "need": ["url"]}
+    left = set(plain_spots(content))
+    ops = [{"old_str": op["old_str"], "new_str": op["new_str"].replace("{{CANDIDATE_CRD_LIST_URL}}", run["url"])}
+           for op in M2["self_links"]["step7_ops"] if op["old_str"] in left]
+    if any(D.occ(content, op["old_str"]) != 1 for op in ops):
+        return {"refused": "OLD_STR_NOT_LITERALLY_ONCE"}
+    return {"ops": ops}
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["build", "check", "insert-op"])
+    ap.add_argument("mode", choices=["build", "check", "insert-op", "step7-ops"])
     ap.add_argument("--run", required=True)
     ap.add_argument("--out")
     ap.add_argument("--page")
     ap.add_argument("--hub", default="3ce4590a05eb814f8892f88ff8539308")
-    ap.add_argument("--stage", choices=["create", "final"], default="create")
+    ap.add_argument("--stage", choices=["create", "final", "auto"], default="create")
     ap.add_argument("--since-minutes", type=int, default=30)
     ap.add_argument("--harness-root", default=D.ROOT)
     ap.add_argument("--session", default=D.SESSION or "any")
@@ -327,26 +396,27 @@ def main():
     ts, content = D.latest_body(a.page)
     title, page_src = D.TITLE, D.SOURCE
     if a.mode == "insert-op":
-        codes, _, _ = parse(content)
-        if codes:
-            refuse("CODE_BLOCK_ALREADY_PRESENT")
-        lines, _ = build(text, run, "create")
-        block = lines[lines.index(H3):lines.index(MAINT)]
-        if D.occ(content, MAINT) != 1:
-            refuse("ANCHOR_NOT_ONCE")
-        p = content.index(MAINT)
-        ls = content.rfind("\n", 0, p)
-        start = content.rfind("\n", 0, ls) + 1 if ls > 0 else 0
-        op = {"old_str": content[start:p] + MAINT, "new_str": content[start:p] + "\n".join(block) + "\n" + MAINT}
-        after = content.replace(op["old_str"], op["new_str"], 1)
-        print(json.dumps({"page": a.page, "fetched": ts, "source_file": page_src, "op": op,
-                          "reapply_refused": D.occ(after, op["old_str"]) == 0}, ensure_ascii=False))
+        res = insert_op(content, text, run)
+        if res.get("refused"):
+            refuse(res["refused"])
+        print(json.dumps({"page": a.page, "fetched": ts, "source_file": page_src, **res}, ensure_ascii=False))
         return
+    if a.mode == "step7-ops":
+        res = step7_ops(content, run)
+        if res.get("refused"):
+            refuse(res["refused"], **{k: v for k, v in res.items() if k != "refused"})
+        print(json.dumps({"page": a.page, "fetched": ts, "source_file": page_src, **res}, ensure_ascii=False))
+        return
+    stage = a.stage
+    if stage == "auto":
+        stage = stage_of(content)
+        if stage.startswith("PARTIAL_STEP7"):
+            refuse("PARTIAL_STEP7", plain_spots=int(stage.split(":")[1]))
     _, hub = D.latest_body(a.hub)
     children = [{"id": i, "title": t.strip()} for i, t in K.CHILD.findall(hub)]
-    res = check(content, title, children, a.page.replace("-", ""), text, run, a.stage)
+    res = check(content, title, children, a.page.replace("-", ""), text, run, stage)
     print(json.dumps({"page": a.page, "fetched": ts, "source_file": page_src, "drive_source_file": src,
-                      "stage": a.stage, **res}, indent=1))
+                      "stage": stage, **res}, indent=1))
     raise SystemExit(0 if res["pass"] else 1)
 
 

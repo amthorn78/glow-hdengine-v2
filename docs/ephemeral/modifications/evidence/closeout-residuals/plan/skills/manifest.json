@@ -603,7 +603,7 @@
    "when": "X4.1 (spec §9), after X2 and X3"
   },
   "4b_package_X4.3_after_the_pkg_gate": {
-   "when": "X4.3 (spec §9), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 records their delivery, or at X7.2 when Nathan no longer holds a delivered archive, and each time followed by a new review round and delivery (P-100, P-109)",
+   "when": "X4.3 (spec §9), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 records their delivery, each time followed by a new review round and delivery (P-100, P-109). Never after X7.1: nothing is re-cut then (P-112 (d))",
    "commands": [
     "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext && python3 docs/prompt_ecosystem_management/freeze.py $PKG > $SCRATCH/pkg-before.txt",
     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
@@ -682,7 +682,8 @@
    "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)",
    "repair round 5: every `rm -rf` takes the guarded form \"${VAR:?}\" (P-92), which the session's safety check allows and which cannot expand to /; execute.4b compares the extracted freeze digests with expected_after_patch.txt by diff, so X4.3's gate fails mechanically on a mismatch; the archive sha256s go to EX/packages.json",
    "repair round 6: BASE is read from EX/run.json; execute.1.then only before X7.3 (P-101); execute.4b writes EX/packages.json with packages_json.py and is never re-run after X4.4's delivery (P-100); execute.5 writes EX/installed_freeze.txt and compares it by diff; execute.6 carries X6.3's closure commands unescaped (P-102)",
-   "repair round 7 (P-111 (e)): execute.4b takes freeze.py $PKG before packaging and diffs it after, within the session; tested at PLAN on the pass-4 patched root (diff exit 0)"
+   "repair round 7 (P-111 (e)): execute.4b takes freeze.py $PKG before packaging and diffs it after, within the session; tested at PLAN on the pass-4 patched root (diff exit 0; results/manifest_r7_proof.json)",
+   "repair round 8 (P-112 (d)): execute.4b's 'when' says it never runs after X7.1; the X7.2 re-cut route is removed. No command changed"
   ]
  }
 }
