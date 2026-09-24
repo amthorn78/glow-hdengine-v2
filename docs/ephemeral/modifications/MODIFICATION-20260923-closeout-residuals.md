@@ -2,7 +2,7 @@
 artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 modification_id: MODIFICATION-20260923-closeout-residuals
-status: PLANNING
+status: PLANNED
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -26,6 +26,11 @@ reviews:
     date: 2026-09-24
     required_open: 1
     outcome: "Every normal-path gate read-only on fresh fetches and the manifest in order on main d179277: all pass except TRACK-STATUS-01..03, whose anchors stage 5 removed from the tracking page (X4.6 and X7.7 fail loudly). ESC-25 not rehearsed: the permission classifier refused the command. D26-F trigger 2: one bounded check, then back to Nathan (DN-8)"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-24
+    required_open: 2
+    outcome: "PLAN-DC-1 and PLAN-DC-2, independently: the same 2 required defects (a restart after a lost session re-runs a rejected D24 review unseen; X7.6's PR body waits for the withdrawn X7.7), plus 16 and 13 listed, all in the successor's own text. The cap is reached: returned to Nathan unrepaired"
 items:
   - id: ITEM-01
     statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
@@ -1201,3 +1206,36 @@ edit).
 step 1 copied `EX` to its own path on the failure-record branch. That would put `EX/run.json` on `main` through a
 failure-record PR, and checkpoint 3 would then read that as the execution PR's merge. Step 1 now copies `EX` to
 `failure/execute/`.
+
+#### The diff check, and the plan returned for approval, 2026-09-24
+
+The one diff check ran under the committed brief `EV/resume-20260924/REVIEW-BRIEF-diffcheck.md` (`217068c`). Two
+fresh reviewers each wrote a record, committed unedited beside the brief: `REVIEW-diffcheck-PLAN-DC-1.md` and
+`REVIEW-diffcheck-PLAN-DC-2.md`. They found **the same two required defects independently**. Both sit in this
+successor's own text. **Neither is repaired here**: this was the last review the cap allows (`D26-A` rule 2), so the
+plan goes to Nathan with both open. Each has a one-sentence correction, quoted from the records:
+
+| # | defect | path, likelihood, consequence | the reviewers' smallest correction |
+|---|---|---|---|
+| DC-1 (PLAN-DC-1 REQ-1, PLAN-DC-2 DC2-01) | Checkpoint 2 restarts a session "lost or stopped" before X5.0 on a new branch from `main`. A `SKILL_REPAIR_REQUIRED` verdict pushed by a lost session is invisible there: `fill_brief.py` writes a first-round brief, and the rejected bytes are reviewed again as new. "Or stopped" also contradicts *Before it*, which sends a stop to Nathan | failure, then restart; low; **silent**: a rejected package set can be delivered and installed without Nathan seeing the rejection (`D24` condition 5, `D26-A` rule 2) | "lost" for "lost or stopped"; before X0.2, `git fetch origin` and, for each `origin/docs/*-closeout-residuals-execute*` branch, `git grep -l SKILL_REPAIR_REQUIRED <branch> -- 'docs/ephemeral/modifications/evidence/closeout-residuals/SECTION-10-REVIEW-cr*'`; any output is the X4.4 stop, returned to Nathan, with no restart |
+| DC-2 (PLAN-DC-1 REQ-2, PLAN-DC-2 DC2-02) | Withdrawing X7.7 leaves spec X7.6 opening the close-out PR "its body saying not to merge it before X7.7's commit", with no final return to Nathan and no §E disposition for dated step 28 | normal; certain; the PR tells Nathan to wait for a commit that never comes; nothing is written wrong | X7.6 opens the close-out PR without the X7.7 sentence, records step 28 in §E as withdrawn under DN-8 (A), and returns to Nathan for X7.8 |
+
+**Listed findings.** PLAN-DC-1 lists 16 and PLAN-DC-2 lists 13, each with its path, likelihood and consequence in its
+record, and several overlap. Both reviewers list the same three failure-path gaps, each correctable in one clause:
+
+- the sweep's `--run EX/run.json` names a file the failure branch no longer has
+  (`--run docs/ephemeral/modifications/evidence/closeout-residuals/failure/execute/run.json` runs);
+- step 1 names no staging scope and no staged-path check, which the dated stop record had;
+- step 1's copy of the failing step's output lacks the dated limit "counts and ids, no body text" (`D22`).
+
+Listed findings are not repaired unless Nathan opts in (`D26-A` rule 4).
+
+**The trend.** There is no earlier round to halve from. Every finding sits in text the last repair added, which is
+expected for a check of that repair's diff, and it is also `D26-A` rule 5's signal to return. The two DRY_RUN and
+DIFF_CHECK rows are the ledger for this resumed PLAN.
+
+**The estimate against what has been spent** (the estimate for this resume: 2 h and 2.5M tokens). Session time so
+far: about 1.4 h of work, 11:00Z to 11:47Z and 12:47Z to 13:25Z. The hour between was spent waiting on Nathan's
+rulings. Tokens measured by the harness: 0.81M for the five dry-run workers and 0.86M for the two reviewers (0.45M and
+0.41M), 1.67M in all. This session's own tokens are not visible to the session, so the total is higher than 1.67M and
+may be near the estimate. It has not passed twice the estimate on what can be measured.
