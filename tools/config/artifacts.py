@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from engine.config.registry_loader import (
-    RegistryConfig, SchemaValidationError, _capture_registry_config,
+    RegistryConfig, RegistryConfigError, _capture_registry_config,
     _load_active_mechanics_bundle_from_root, _validate_thresholds,
 )
 from engine.serializer import canon
@@ -237,6 +237,21 @@ _GOLDEN_APPLICATION_INPUT_KEYS = {
 }
 _GOLDEN_ABSENT = "<absent>"
 _GOLDEN_OWNER_SWAP = {"member_lo": "member_hi", "member_hi": "member_lo", None: None}
+# Nested input objects are closed like the rest of the collection: an unknown or
+# missing key is that case's mismatch, never silently ignored.
+_GOLDEN_ROW_KEYS = frozenset({"channel_id", "owner", "state"})
+_GOLDEN_WEIGHTED_CHANNEL_KEYS = frozenset({"channel_id", "weight"})
+_GOLDEN_SCENARIO_KEYS = frozenset({"owners", "scenario_id"})
+_GOLDEN_PARTY_KEYS = frozenset({"gates", "person_uid"})
+_GOLDEN_PAIR_KEYS = frozenset({"a", "b", "pair_id"})
+_GOLDEN_ADVERSE_KEYS = frozenset({"adverse_id", "field", "party", "value"})
+# The collection's identity and annotations (``schema``, the PF01 ``source``, the
+# ``constants`` and every case field other than ``inputs`` and ``expected``) are
+# never compared, and most are never consumed, so they are pinned to the committed
+# PF01 §9.5 transcription: a collection carrying any other identity or annotation
+# is refused instead of being reported as matching.  ``inputs`` stay free, so an
+# altered input still yields its mismatches; ``expected`` is what is compared.
+GOLDEN_ANNOTATION_SHA256 = "c9ce74c3d055826235d16b26de4dbac31644d1a995c73c6844447c9b6e846a8a"
 
 
 class GoldenComparisonRefusal(RuntimeError):
@@ -311,12 +326,20 @@ def _golden_load_document(goldens_path: Path) -> tuple[Mapping[str, Any], str]:
         raise _golden_refuse("GOLDENS_INVALID") from None
     try:
         document = json.loads(raw.decode("utf-8"), object_pairs_hook=_golden_pairs_hook)
-    except (UnicodeDecodeError, ValueError):
+        canonical = isinstance(document, dict) and canon.sercanon(document, sort_keys=True) == raw
+    except (UnicodeDecodeError, ValueError, RecursionError):
         raise _golden_refuse("GOLDENS_INVALID") from None
-    if not isinstance(document, dict) or canon.sercanon(document, sort_keys=True) != raw:
+    if not canonical:
         raise _golden_refuse("GOLDENS_INVALID")
     _golden_validate_document(document)
     return document, hashlib.sha256(raw).hexdigest()
+
+
+def _golden_annotation_digest(document: Mapping[str, Any]) -> str:
+    projection = {key: document[key] for key in ("schema", "source", "constants")}
+    projection["cases"] = [{key: value for key, value in case.items() if key not in ("inputs", "expected")}
+                           for case in document["cases"]]
+    return hashlib.sha256(canon.sercanon(projection, sort_keys=True)).hexdigest()
 
 
 def _golden_validate_document(document: Mapping[str, Any]) -> None:
@@ -349,6 +372,7 @@ def _golden_validate_document(document: Mapping[str, Any]) -> None:
         if (not _golden_is_str(case["title"])
                 or type(case["realizable_chart_claim"]) not in (bool, type(None))
                 or not isinstance(provenance, list) or not provenance
+                or not all(_golden_is_str(tag) for tag in provenance)
                 or len(set(provenance)) != len(provenance)
                 or not all(tag in _GOLDEN_PROVENANCE_TAGS for tag in provenance)
                 or not isinstance(case["inputs"], dict) or not isinstance(case["expected"], dict)
@@ -360,6 +384,15 @@ def _golden_validate_document(document: Mapping[str, Any]) -> None:
                                else _GOLDEN_KERNEL_INPUT_KEYS[kind])
         if set(case["inputs"]) != expected_input_keys:
             raise _golden_refuse("GOLDENS_INVALID")
+    if _golden_annotation_digest(document) != GOLDEN_ANNOTATION_SHA256:
+        raise _golden_refuse("GOLDENS_INVALID")
+
+
+def _golden_closed(value: object, keys: frozenset[str], path: str) -> Mapping[str, Any]:
+    if not isinstance(value, dict) or set(value) != keys:
+        actual = sorted(value) if isinstance(value, dict) else type(value).__name__
+        raise _GoldenCaseMismatch(path, sorted(keys), actual)
+    return value
 
 
 def _golden_admit(candidate_root: Path):
@@ -371,7 +404,7 @@ def _golden_admit(candidate_root: Path):
         raise _golden_refuse("CANDIDATE_ROOT_INVALID") from None
     try:
         bundle = _load_active_mechanics_bundle_from_root(root)
-    except SchemaValidationError as exc:
+    except RegistryConfigError as exc:
         raise _golden_refuse(f"CANDIDATE_ADMISSION_REFUSED:{exc.code}") from None
     return root, bundle
 
@@ -398,7 +431,11 @@ def _golden_categories(q_by_signal: Mapping[str, int], bundle) -> list[dict[str,
 def _golden_rows(states: Sequence[Mapping[str, Any]]):
     from engine.magic10.composite import ChannelClassification
 
-    return tuple(ChannelClassification(row["channel_id"], row["state"], row["owner"]) for row in states)
+    rows = []
+    for index, row in enumerate(states):
+        _golden_closed(row, _GOLDEN_ROW_KEYS, f"inputs.channel_states[{index}]")
+        rows.append(ChannelClassification(row["channel_id"], row["state"], row["owner"]))
+    return tuple(rows)
 
 
 def _golden_run_signal_vector(case, constants, bundle) -> dict[str, Any]:
@@ -429,9 +466,19 @@ def _golden_run_signal_operation(case, constants, bundle) -> dict[str, Any]:
     if "profile_id" in definition:
         responses = next(row["responses"] for row in bundle.mechanics["profiles"]
                          if row["profile_id"] == definition["profile_id"])
+    candidate = {
+        "operation": definition["operation"],
+        "channels": [{"channel_id": member["channel_id"], "weight": member["weight"]} for member in definition["channels"]],
+    }
+    for index, member in enumerate(inputs["channels"]):
+        _golden_closed(member, _GOLDEN_WEIGHTED_CHANNEL_KEYS, f"inputs.channels[{index}]")
+    stated = {"operation": inputs["operation"], "channels": inputs["channels"]}
+    if canon.sercanon(stated) != canon.sercanon(candidate):
+        raise _GoldenCaseMismatch("inputs.definition", stated, candidate)
     channel_ids = [member["channel_id"] for member in definition["channels"]]
     scenarios = []
-    for scenario in inputs["scenarios"]:
+    for index, scenario in enumerate(inputs["scenarios"]):
+        _golden_closed(scenario, _GOLDEN_SCENARIO_KEYS, f"inputs.scenarios[{index}]")
         owners = list(scenario["owners"])
         if len(owners) != len(channel_ids):
             raise _GoldenCaseMismatch(f"inputs.scenarios.{scenario['scenario_id']}.owners.length", len(channel_ids), len(owners))
@@ -443,13 +490,7 @@ def _golden_run_signal_operation(case, constants, bundle) -> dict[str, Any]:
             "q": _signal_q(definition["operation"], definition["channels"], rows, responses),
             "q_owners_swapped": _signal_q(definition["operation"], definition["channels"], swapped, responses),
         })
-    return {
-        "definition": {
-            "operation": definition["operation"],
-            "channels": [{"channel_id": member["channel_id"], "weight": member["weight"]} for member in definition["channels"]],
-        },
-        "scenarios": scenarios,
-    }
+    return {"definition": candidate, "scenarios": scenarios}
 
 
 def _golden_run_reducer(case, constants, bundle) -> dict[str, Any]:
@@ -516,11 +557,12 @@ def _golden_chart(constants: Mapping[str, Any], person_uid: str, gates: Sequence
     }
 
 
-def _golden_party(constants: Mapping[str, Any], spec: Mapping[str, Any],
+def _golden_party(constants: Mapping[str, Any], spec: Mapping[str, Any], path: str,
                   override: Mapping[str, Any] | None = None):
     from engine.bodygraph.resolver import ResolvedCompatChart
     from engine.compat.compute import evaluation_party
 
+    _golden_closed(spec, _GOLDEN_PARTY_KEYS, path)
     chart = _golden_chart(constants, spec["person_uid"], spec["gates"], override)
     return evaluation_party(ResolvedCompatChart(spec["person_uid"], chart, "resolved", None, None, None, None))
 
@@ -563,10 +605,18 @@ def _golden_run_identity_independence(case, constants, bundle) -> dict[str, Any]
     from engine.compat.compute import evaluate_pair
 
     router = _golden_router(constants)
+    pairs = case["inputs"]["pairs"]
+    for index, pair in enumerate(pairs):
+        _golden_closed(pair, _GOLDEN_PAIR_KEYS, f"inputs.pairs[{index}]")
+    # Pair identifiers are positional labels; nothing else consumes them.
+    labels = [f"pair_{index}" for index in range(1, len(pairs) + 1)]
+    stated_labels = [pair["pair_id"] for pair in pairs]
+    if stated_labels != labels:
+        raise _GoldenCaseMismatch("inputs.pairs.pair_id", labels, stated_labels)
     results = []
-    for pair in case["inputs"]["pairs"]:
-        party_a = _golden_party(constants, pair["a"])
-        party_b = _golden_party(constants, pair["b"])
+    for index, pair in enumerate(pairs):
+        party_a = _golden_party(constants, pair["a"], f"inputs.pairs[{index}].a")
+        party_b = _golden_party(constants, pair["b"], f"inputs.pairs[{index}].b")
         results.append(evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router))
     intrinsic = [_golden_intrinsic(result) for result in results]
     return {
@@ -583,18 +633,19 @@ def _golden_run_self_pair(case, constants, bundle) -> dict[str, Any]:
 
     inputs = case["inputs"]
     router = _golden_router(constants)
-    party_a = _golden_party(constants, inputs["a"])
-    party_b = _golden_party(constants, inputs["b"])
+    party_a = _golden_party(constants, inputs["a"], "inputs.a")
+    party_b = _golden_party(constants, inputs["b"], "inputs.b")
     result = evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router)
     reversed_result = evaluate_pair(party_b, party_a, bundle_provider=lambda: bundle, router=router)
     body, envelope = _golden_reader(result, inputs["meta"], inputs["release_id"])
     body_two, _ = _golden_reader(result, inputs["meta"], inputs["release_id"])
     body_ba, _ = _golden_reader(reversed_result, inputs["meta"], inputs["release_id"])
     adverse = []
-    for variant in inputs["adverse"]:
+    for index, variant in enumerate(inputs["adverse"]):
+        _golden_closed(variant, _GOLDEN_ADVERSE_KEYS, f"inputs.adverse[{index}]")
         override = {variant["field"]: variant["value"]}
-        mutated_a = _golden_party(constants, inputs["a"], override if variant["party"] == "a" else None)
-        mutated_b = _golden_party(constants, inputs["b"], override if variant["party"] == "b" else None)
+        mutated_a = _golden_party(constants, inputs["a"], "inputs.a", override if variant["party"] == "a" else None)
+        mutated_b = _golden_party(constants, inputs["b"], "inputs.b", override if variant["party"] == "b" else None)
         token = reason = None
         returned = False
         try:
@@ -620,8 +671,8 @@ def _golden_run_equal_mask_pair(case, constants, bundle) -> dict[str, Any]:
 
     inputs = case["inputs"]
     router = _golden_router(constants)
-    party_a = _golden_party(constants, inputs["a"])
-    party_b = _golden_party(constants, inputs["b"])
+    party_a = _golden_party(constants, inputs["a"], "inputs.a")
+    party_b = _golden_party(constants, inputs["b"], "inputs.b")
     result = evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router)
     result_two = evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router)
     result_ba = evaluate_pair(party_b, party_a, bundle_provider=lambda: bundle, router=router)
@@ -721,15 +772,14 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
         case_mismatches: list[Mismatch]
         try:
             observed = _golden_runner(case)(case, constants, bundle)
+            case_mismatches = _golden_diff(case_id, expected, observed)
         except _GoldenCaseMismatch as exc:
             case_mismatches = [Mismatch(case_id, exc.path, exc.expected, exc.actual)]
         except Exception as exc:
-            # A case that cannot run as the fixture states it (for example a
-            # CompatBoundaryError from a non-canonical identity) is that case's
-            # mismatch; it never aborts the comparison of the other cases.
+            # A case that cannot run or be compared as the fixture states it (for
+            # example a CompatBoundaryError from a non-canonical identity) is that
+            # case's mismatch; it never aborts the comparison of the other cases.
             case_mismatches = [Mismatch(case_id, "execution", "completed", f"{type(exc).__name__}: {exc}")]
-        else:
-            case_mismatches = _golden_diff(case_id, expected, observed)
         mismatches.extend(case_mismatches)
         outcomes.append(CaseOutcome(case_id, case["case_type"], case["kind"],
                                     "match" if not case_mismatches else "mismatch", expected, observed))

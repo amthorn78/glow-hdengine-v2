@@ -394,7 +394,7 @@ import subprocess
 
 from ci.checks import classify_ci_changes as classifier
 from engine.compat import compute
-from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
+from engine.config.registry_loader import AliasPolicyError, UnknownIdError, _load_active_mechanics_bundle_from_root
 from engine.narratives import loader as narrative_loader
 from engine.narratives import router as narrative_router
 from engine.narratives import state as narrative_state
@@ -608,6 +608,42 @@ def test_a_case_that_cannot_execute_is_its_own_mismatch_never_a_crash(bundle_roo
     assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"", b"GOLDEN_COMPARISON_MISMATCH:1\n")
 
 
+def _setter(*path, value):
+    def mutate(case):
+        target = case
+        for key in path[:-1]:
+            target = target[key]
+        target[path[-1]] = value
+    return mutate
+
+
+# Every input field is consumed or closed: an input that nothing reads, or an
+# unknown nested key, yields that case's mismatch instead of silent equality.
+UNCONSUMED_INPUTS = {
+    "g003_stated_operation": ("M10-G003", _setter("inputs", "operation", value="sum_v0"), "inputs.definition"),
+    "g003_stated_weight": ("M10-G003", _setter("inputs", "channels", 0, "weight", value=2), "inputs.definition"),
+    "g003_channel_extra_key": ("M10-G003", _setter("inputs", "channels", 0, "extra", value=1), "inputs.channels[0]"),
+    "g003_scenario_extra_key": ("M10-G003", _setter("inputs", "scenarios", 0, "extra", value=1), "inputs.scenarios[0]"),
+    "g001_row_extra_key": ("M10-G001", _setter("inputs", "channel_states", 0, "extra", value=1), "inputs.channel_states[0]"),
+    "g005_pair_label": ("M10-G005", _setter("inputs", "pairs", 0, "pair_id", value="first"), "inputs.pairs.pair_id"),
+    "g005_pair_extra_key": ("M10-G005", _setter("inputs", "pairs", 0, "extra", value=1), "inputs.pairs[0]"),
+    "g005_party_extra_key": ("M10-G005", _setter("inputs", "pairs", 1, "b", "extra", value=1), "inputs.pairs[1].b"),
+    "g007_adverse_extra_key": ("M10-G007", _setter("inputs", "adverse", 0, "extra", value=1), "inputs.adverse[0]"),
+    "g008_party_extra_key": ("M10-G008", _setter("inputs", "a", "extra", value=1), "inputs.a"),
+}
+
+
+@pytest.mark.parametrize("name", sorted(UNCONSUMED_INPUTS))
+def test_unconsumed_or_unknown_input_fields_are_mismatches(bundle_root, tmp_path, name) -> None:
+    case_id, mutate, path = UNCONSUMED_INPUTS[name]
+    document = _document()
+    _alter(document, case_id, mutate)
+    result = artifact_tools.compare_goldens(bundle_root, _write_document(tmp_path / f"{name}.json", document))
+    assert result.ok is False
+    assert [(row.case_id, row.path) for row in result.mismatches] == [(case_id, path)]
+    assert all(row.outcome == "match" for row in result.cases if row.case_id != case_id)
+
+
 # --- refusals ---------------------------------------------------------------------------
 
 def _refusal(root: Path, goldens: Path) -> str:
@@ -752,6 +788,77 @@ def test_inputs_that_cannot_be_inspected_or_read_refuse(bundle_root, tmp_path, c
     assert _refusal(bundle_root, goldens) == code
     result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
     assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", f"{code}\n".encode("ascii"))
+
+
+def test_annotation_digest_pins_the_committed_transcription() -> None:
+    assert artifact_tools._golden_annotation_digest(_document()) == artifact_tools.GOLDEN_ANNOTATION_SHA256
+    for name in ("g004_signal_q", "g008_identity_flip"):  # expected values and inputs stay outside the pin
+        altered = _document()
+        _alter(altered, *ALTERATIONS[name][:2])
+        assert artifact_tools._golden_annotation_digest(altered) == artifact_tools.GOLDEN_ANNOTATION_SHA256
+
+
+def _metadata(mutate):
+    def build():
+        document = _document()
+        mutate(document)
+        return document
+    return build
+
+
+ALTERED_ANNOTATIONS = {
+    "source_sha256_and_uuid_1": _metadata(lambda d: (d["source"].__setitem__("sha256", "0" * 64),
+                                                     d["constants"].__setitem__("uuid_1", "arbitrary"))),
+    "source_version": _metadata(lambda d: d["source"].__setitem__("version", "1.3.8")),
+    "constants_release_id": _metadata(lambda d: d["constants"].__setitem__("release_id", "b" * 64)),
+    "constants_meta": _metadata(lambda d: d["constants"]["meta"].__setitem__("engine_tag", "other")),
+    "constants_projection_field": _metadata(lambda d: d["constants"]["synthetic_projection_fields"].__setitem__("profile", "6/2")),
+    "constants_router_stub": _metadata(lambda d: d["constants"]["router_stub"].__setitem__("shared", "other")),
+    "case_realizable_claim": _metadata(lambda d: _case(d, "M10-G002").__setitem__("realizable_chart_claim", True)),
+    "case_provenance": _metadata(lambda d: _case(d, "M10-G006").__setitem__("input_provenance", ["pf01_9_5"])),
+    "case_title": _metadata(lambda d: _case(d, "M10-G004").__setitem__("title", "renamed")),
+    "case_notes": _metadata(lambda d: _case(d, "M10-G001").__setitem__("notes", ["edited"])),
+}
+
+
+@pytest.mark.parametrize("name", sorted(ALTERED_ANNOTATIONS))
+def test_altered_identity_or_annotations_refuse(bundle_root, tmp_path, capfdbinary, name) -> None:
+    goldens = _write_document(tmp_path / f"{name}.json", ALTERED_ANNOTATIONS[name]())
+    assert _refusal(bundle_root, goldens) == "GOLDENS_INVALID"
+    result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
+    assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"GOLDENS_INVALID\n")
+
+
+@pytest.mark.parametrize("tags", [[{"tag": "pf01_9_5"}], [["pf01_9_5"]], [1], [None]])
+def test_non_string_provenance_refuses(bundle_root, tmp_path, capfdbinary, tags) -> None:
+    document = _document()
+    _case(document, "M10-G001")["input_provenance"] = tags
+    goldens = _write_document(tmp_path / "provenance.json", document)
+    assert _refusal(bundle_root, goldens) == "GOLDENS_INVALID"
+    result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
+    assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"GOLDENS_INVALID\n")
+
+
+def test_deeply_nested_goldens_refuse(bundle_root, tmp_path) -> None:
+    path = tmp_path / "deep.json"
+    path.write_bytes(b'{"cases":' + b"[" * 100000 + b"]" * 100000 + b"}\n")
+    assert _refusal(bundle_root, path) == "GOLDENS_INVALID"
+
+
+def test_every_registry_admission_error_is_a_refusal(bundle_root, tmp_path, capfdbinary, monkeypatch) -> None:
+    duplicated = synthetic_complete_release_root(tmp_path / "duplicated")
+    manifest = json.loads((duplicated / "catalog/manifest.json").read_bytes())
+    manifest["files"].append(copy.deepcopy(manifest["files"][0]))
+    write_canonical(duplicated / "catalog/manifest.json", manifest)
+    assert _refusal(duplicated, GOLDENS) == "CANDIDATE_ADMISSION_REFUSED:DUPLICATE_MANIFEST_ENTRY"
+    result = _run_cli(["--compare-goldens", str(duplicated)], capfdbinary)
+    assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"",
+                      b"CANDIDATE_ADMISSION_REFUSED:DUPLICATE_MANIFEST_ENTRY\n")
+    for error in (UnknownIdError("UNKNOWN_CHANNEL", "unknown"), AliasPolicyError("ALIAS_FORBIDDEN", "alias")):
+        def refuse(root, _error=error):
+            raise _error
+        monkeypatch.setattr(artifact_tools, "_load_active_mechanics_bundle_from_root", refuse)
+        assert _refusal(bundle_root, GOLDENS) == f"CANDIDATE_ADMISSION_REFUSED:{error.code}"
 
 
 def test_rails_are_required_before_anything_runs(bundle_root, monkeypatch) -> None:
