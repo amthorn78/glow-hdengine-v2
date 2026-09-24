@@ -1,0 +1,35 @@
+{
+ "file_id": "1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO",
+ "captured": "2026-09-24T14:45:52.743Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+ "bytes": 31923,
+ "size_ok": true,
+ "sha256_ok": true,
+ "fence_lines": [
+  119,
+  286
+ ],
+ "fence_bytes": 18624,
+ "fence_sha256_ok": true,
+ "old_outside": {
+  "M2-R1": 1,
+  "M2-R2": 1,
+  "M2-R3": 1,
+  "M2-R4": 1,
+  "M2-R5": 1,
+  "M2-R6": 1,
+  "M2-R7": 1,
+  "M2-R8": 1,
+  "M2-R9": 1
+ },
+ "old_inside": {
+  "M2-R3": 1
+ },
+ "hub": {
+  "page": "3ce4590a05eb814f8892f88ff8539308",
+  "fetched": "2026-09-24T14:29:26.140Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/tool-results/mcp-Notion-notion-fetch-1790261153318.txt",
+  "children_titled": []
+ },
+ "pass": true
+}
