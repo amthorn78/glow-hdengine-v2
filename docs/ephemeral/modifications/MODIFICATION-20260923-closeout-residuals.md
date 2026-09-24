@@ -994,11 +994,11 @@ term this way too. No Notion page is written before it.
   clear takes these four steps and nothing more. Forward repair means `land.py plan` on a fresh fetch, which lands
   only the edits still missing, and the control readback rule's three cycles.
   1. **Failure record to `main`.** `git fetch origin main && git checkout -B docs/<yyyymmdd>-closeout-residuals-failure origin/main`;
-     `git checkout <execution branch> -- docs/ephemeral/modifications/evidence/closeout-residuals/execute`. In the
-     record, set `status: EXECUTING` and write §E: a row for every step run, with its disposition; the failing step
-     with its failed predicate and its output, copied from `$SCRATCH` into
-     `docs/ephemeral/modifications/evidence/closeout-residuals/failure/`; and every later step `NOT_RUN`, citing
-     the failure. Run `modification_validate.py`, commit (`closeout-residuals record: failed at <step>`), push, and open a
+     `mkdir -p docs/ephemeral/modifications/evidence/closeout-residuals/failure && git archive <execution branch> docs/ephemeral/modifications/evidence/closeout-residuals/execute | tar -x --strip-components=5 -C docs/ephemeral/modifications/evidence/closeout-residuals/failure`,
+     which copies `EX` to `failure/execute/`. It never goes to `EX`'s own path, so `EX/run.json` reaches `main` only
+     through the execution PR, and checkpoint 3's test stays true. In the record, set `status: EXECUTING` and write §E:
+     a row for every step run, with its disposition; the failing step with its failed predicate and its output,
+     copied from `$SCRATCH` into `failure/`; and every later step `NOT_RUN`, citing the failure. Run `modification_validate.py`, commit (`closeout-residuals record: failed at <step>`), push, and open a
      pull request against `main`. It carries no registry, graph, skill-text or rule change.
   2. **Sweep, read-only.** Fetch each of the 50 live bodies with edits and run `land.py state <PID> <PAGE>`
      (CL-40 with `--candidate-url <URL>` once `url` is recorded). Fetch the seven control pages and run
@@ -1169,3 +1169,35 @@ dry run took about 40 minutes of this session. Its five read-only workers used 0
 harness. This session's own tokens are not measured by the session. Still to come: the diff check, two reviewers at
 about 0.5M, and the return. EXECUTE's estimate stands at 8 h and 8M tokens. Twice the estimate triggers a re-price to
 Nathan (`D26-D`).
+
+#### Product Owner rulings on DN-1 to DN-8, 2026-09-24
+
+**Nathan, 2026-09-24**, answering the return above:
+
+> My rulings on DN-1 to DN-8. I accept all eight as you recommended:
+>
+> DN-1: the A5 edit doesn't apply to RS-40.
+> DN-2: stage 5 already made PART-11's edits. Record PART-11 as verified.
+> DN-3: the validator revision moves from 3.3.0 to 3.3.1.
+> DN-4: four merges: #478, #484, the execution PR and the close-out PR.
+> DN-5: the freeze lifts after the post-install check, not at readback.
+> DN-6: the missing Notion pointer edits and the AF-009 note belong to ITEM-18 and ITEM-37. No new items.
+> DN-7: ITEM-13's disposition names the oracle that ships inside the skill.
+> DN-8: option (A). Withdraw the three TRACK-STATUS edits.
+> One correction to DN-8: stage 5 didn't remove those tracking-page lines. They were already gone before stage 5
+> started. It doesn't change the ruling.
+
+**What this settles.** The plan's handling of DN-1 to DN-7 stands as written. DN-8 (A) is the plan, so
+`TRACK-STATUS-01` to `03` are withdrawn, X4.6 and every later `ctrl.py` call use
+`EV/resume-20260924/control-edits.json` (15 edits), and dated step 28 does not run. "This record's plan PR" in DN-4 and
+the interaction cost is #484. PART-11 is recorded as `VERIFIED` at §E, with stage 5 as the one that applied it.
+
+**The correction.** Where this successor and the ledger's `DRY_RUN` outcome say stage 5 removed or rewrote the
+tracking page's status lines, that is wrong. Nathan's correction above holds: the lines were gone before stage 5
+started. The ruling does not change, and the text above is left as written (a dated record gets a successor, not an
+edit).
+
+**One change to the successor after the dry run**, made before the diff check so the check covers it: failure-path
+step 1 copied `EX` to its own path on the failure-record branch. That would put `EX/run.json` on `main` through a
+failure-record PR, and checkpoint 3 would then read that as the execution PR's merge. Step 1 now copies `EX` to
+`failure/execute/`.
