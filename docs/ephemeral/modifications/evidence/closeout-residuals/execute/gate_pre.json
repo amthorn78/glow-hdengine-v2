@@ -1,0 +1,281 @@
+{
+ "gate": "MODIFICATION-20260923-closeout-residuals run_gate.py",
+ "set": "pre",
+ "repo": "/home/user/glow-hdengine-v2",
+ "tree": "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root",
+ "inst": "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502",
+ "cand": "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/gate/cand",
+ "out": "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/gate/pre",
+ "pre_rev": null,
+ "rows_total": 12,
+ "rows_ok": 12,
+ "rows_not_ok": [],
+ "not_run": [],
+ "ok": true,
+ "rows": [
+  {
+   "name": "freeze_recipe.sha256",
+   "cmd": [
+    "sha256",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "sha256": "3d6a38f3544868cbaa8118b60c381789625ab3c4095e863d96260caba4bbe2c9"
+   },
+   "observed": {
+    "sha256": "3d6a38f3544868cbaa8118b60c381789625ab3c4095e863d96260caba4bbe2c9"
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.skills_root",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "digest_form": true
+   },
+   "observed": {
+    "digest_form": true,
+    "stdout": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+    "equals_plan_time_value": true
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.flowmaster-validate",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/flowmaster-validate"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626"
+   },
+   "observed": {
+    "stdout": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.change-flow",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/change-flow"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47"
+   },
+   "observed": {
+    "stdout": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.glow-graph-contract",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/glow-graph-contract"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c"
+   },
+   "observed": {
+    "stdout": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.session-relay-flowmaster",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/session-relay-flowmaster"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4"
+   },
+   "observed": {
+    "stdout": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.glow-hde-pr-development",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/glow-hde-pr-development"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a"
+   },
+   "observed": {
+    "stdout": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.amthor-workspace-governance-audit",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/amthor-workspace-governance-audit"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab"
+   },
+   "observed": {
+    "stdout": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.glow-po-reporting",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/glow-po-reporting"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
+   },
+   "observed": {
+    "stdout": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "parts.freeze",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/home/user/glow-hdengine-v2/docs/graph/parts"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "56 980af73e656e20740663ae1dbfa8780eff61b41e2f754c5719c743e4647cae50"
+   },
+   "observed": {
+    "stdout": "56 980af73e656e20740663ae1dbfa8780eff61b41e2f754c5719c743e4647cae50",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "graph_parts.build.pre_reindex_working_tree",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root/glow-graph-contract/scripts/graph_parts.py",
+    "build",
+    "/home/user/glow-hdengine-v2/docs/graph/parts",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/gate/pre/g-before.md"
+   ],
+   "cwd": null,
+   "exit": 1,
+   "expected_exit": 1,
+   "expected": {
+    "stdout_lines": [],
+    "stderr_lines": [
+     "VALIDATION FAILED:",
+     "  global.json: 13 _other_edge_indices for 3 _other_edges",
+     "  prompts/CF-C-10: 4 edge_indices for 5 edges",
+     "  prompts/ESC-40: 3 edge_indices for 5 edges",
+     "  prompts/PR-35: 4 edge_indices for 5 edges",
+     "  prompts/QA-70: 5 edge_indices for 4 edges",
+     "  prompts/RS-40: 5 edge_indices for 6 edges",
+     "  edge indices are not exactly 0..228, each once (235 indices for 229 edges)",
+     "  run `graph_parts.py reindex <parts-dir>` to re-derive them from the assembled order"
+    ],
+    "output_written": false
+   },
+   "observed": {
+    "stdout_lines": [],
+    "stderr_lines": [
+     "VALIDATION FAILED:",
+     "  global.json: 13 _other_edge_indices for 3 _other_edges",
+     "  prompts/CF-C-10: 4 edge_indices for 5 edges",
+     "  prompts/ESC-40: 3 edge_indices for 5 edges",
+     "  prompts/PR-35: 4 edge_indices for 5 edges",
+     "  prompts/QA-70: 5 edge_indices for 4 edges",
+     "  prompts/RS-40: 5 edge_indices for 6 edges",
+     "  edge indices are not exactly 0..228, each once (235 indices for 229 edges)",
+     "  run `graph_parts.py reindex <parts-dir>` to re-derive them from the assembled order"
+    ],
+    "output_written": false
+   },
+   "mismatches": [],
+   "ok": true
+  },
+  {
+   "name": "freeze.skills_root.after",
+   "cmd": [
+    "/usr/local/bin/python3",
+    "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py",
+    "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/pkg-root"
+   ],
+   "cwd": null,
+   "exit": 0,
+   "expected_exit": 0,
+   "expected": {
+    "stdout": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae"
+   },
+   "observed": {
+    "stdout": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+    "stderr": ""
+   },
+   "mismatches": [],
+   "ok": true
+  }
+ ]
+}

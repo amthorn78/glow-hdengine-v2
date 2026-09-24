@@ -84,6 +84,9 @@ Every message ends in one of exactly three states, named:
 - **DECISION NEEDED** — with options and a recommendation
 - **NOTHING NEEDED** — work continues, no input required
 - **IN FLIGHT** — something is running; the Product Owner waits
+
+When a `NEXT_PROMPT_HANDOFF` block ends the message, as it does for a maintenance, repair, validation or review session, the block comes last and the named state is the line immediately before it. Nothing follows the block.
+
 **Observed failure:** a status message left it ambiguous whether a question was pending, and the Product Owner had to ask which it was.
 ### 3. Never phrase a request as an observation
 *"What I'd want before building v7 is…"* is a request for authorization wearing the costume of a remark. If input is needed, write **"I need X."** If it is not needed, do not mention it.

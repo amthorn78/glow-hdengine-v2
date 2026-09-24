@@ -1,0 +1,21 @@
+{
+ "pid": "PR-30",
+ "fetched": "2026-09-24T15:47:45.499Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c.jsonl",
+ "placement": {
+  "W-4": 2,
+  "ONCE": 1,
+  "OWN": 0,
+  "RECV": 0
+ },
+ "unfilled_tokens": 0,
+ "doubled_insertions": [],
+ "registry_findings": [],
+ "guard_failures": [],
+ "validator": {
+  "exit": 0,
+  "ok": true,
+  "errors": []
+ },
+ "pass": true
+}

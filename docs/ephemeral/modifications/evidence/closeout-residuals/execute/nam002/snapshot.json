@@ -1,0 +1,448 @@
+{
+ "schema_version": "amthor-workspace-governance-snapshot/1.0",
+ "run_id": "PART-10-NAM002",
+ "source_count": 55,
+ "sources": [
+  {
+   "source_id": "3db4590a05eb8119a5a8e4d083fcf360",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-C-10 — Prepare CRD Specification Kickoff Handoff — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb8173a73edc73f302a90a",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-C-20 — Create CRD Specification — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb8149a8d2ed42c9c01ffd",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-C-30 — Review and Approve CRD Specification — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81269931cee342ce8a0e",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-C-40 — Revise CRD Specification — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb815b84a5c5a5ace85fe1",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb810eb177f7dced41bc8f",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-E-20 — Create Epic Specification — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81b4be79f405566da9a7",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-E-30 — Review and Approve Epic Specification — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb8101b655ed223b11a85e",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-E-40 — Revise Epic Specification — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb8161b4d7cb6d07f5101c",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81f4812be61e8877c02c",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb8190a444d8818e445c1d",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81db9c88cde6027e07bf",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81ad8989faa77f441a64",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb811a8578d75885c16cac",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81c2b5d5ff46126f9e45",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81b4a649fdcdb1903345",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-E-30 — Review Bounded PF09 Revalidation — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81e78e82f83a5f2e4b68",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb8193a9a8d7ddd751cd2d",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8164ac09e722dc967f25",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "DOC-20 — Verify Final Repository Documentation Completion — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81d582b8d490e77f9f40",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "ESC-10 — Create QA Escalation Report — 091426.1",
+   "parent": "3db4590a05eb81cd938de84cfffead9c"
+  },
+  {
+   "source_id": "3db4590a05eb81bf9326e46a1017de38",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "ESC-25 — Execute Bounded Escalation Discovery — 091426.1",
+   "parent": "3db4590a05eb81cd938de84cfffead9c"
+  },
+  {
+   "source_id": "3db4590a05eb813e99b4e416bc7afdae",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 091426.1",
+   "parent": "3db4590a05eb81cd938de84cfffead9c"
+  },
+  {
+   "source_id": "3db4590a05eb81efb6d4cd8d02ba9756",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "ESC-40 — Review and Return Approved Remediation — 091426.1",
+   "parent": "3db4590a05eb81cd938de84cfffead9c"
+  },
+  {
+   "source_id": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1",
+   "parent": "3db4590a05eb81de9736ea69bac61016"
+  },
+  {
+   "source_id": "3db4590a05eb817aa191f1e822c30480",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81c4825df2ad0dec4750",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "IA-20 — Create Whole-Change Implementation Plan — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81c6bfb5f36f7df8f464",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "IA-30 — Review Whole-Change Implementation Plan — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8197bb1bc8f52f896969",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81d78eeae384e93dd697",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "IA-50 — IA Answer Seeder — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8141b5b2c8fbf7b725e2",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "IA-60 — Thoth Planning Research — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8108ad2dd4d0e20bd6c4",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091426.1",
+   "parent": "3db4590a05eb81d59059eb6b95ed5fcf"
+  },
+  {
+   "source_id": "3db4590a05eb81db98cce3e30a62bce5",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "OPS-10 — Create Bounded Ops Task — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81858a9dd361d3689ce8",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "OPS-20 — Execute Bounded Ops Task — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb816f91c9c394f9c9fa57",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "OPS-30 — Review Ops Execution Receipt — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb818e8359de1994e97a7d",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "PR-10 — Create PR Work-Unit Instructions — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8174abf8c04318ab04be",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "PR-20 — Create Detailed PR Implementation Plan — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8123afb8caeeaa83a294",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "PR-30 — PR Implementation Proceed — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8120b443ed2cb08b723c",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb818786c5cb6051b4d634",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "PR-40 — Review PR Work-Unit Lineage — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8138ac99c13cf6f2f282",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "PR-50 — Abort PR and Escalate — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb818bad2fcb4bc2610b29",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-10 — Audit Implementation and Establish QA Readiness — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb811a8d13c0bbbf77a848",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-100 — Execute Bounded QA Task — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb816984d1d34da0e08f40",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-110 — Review QA Evidence and Route the Next Action — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb81589d21e798cf38e8ba",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-120 — Create Final QA Report and RCA — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb816daa3adff37283482b",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-20 — Create Live QA Guide — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb81a3ac91f602bad8cfa2",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-50 — Create Whole-Change QA Audit and Plan — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb810b8aa3e1692830d4b8",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-60 — Create Whole-Change QA Plan — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb8143bf26d1459fbbcad7",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-70 — Review Whole-Change QA Plan — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb813ba9a9dbd9a641d36c",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-80 — Revise Whole-Change QA Plan — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb811e8582cf30238c5b9c",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "QA-90 — Create Bounded QA Execution Task — 091426.1",
+   "parent": "3db4590a05eb814d96d3dcfa8835f96d"
+  },
+  {
+   "source_id": "3db4590a05eb811ca0cdc66e0d508ac4",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81c183aac2ecb40b1497",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "RS-20 — Review Bounded Work-Unit Rescope — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81ed9fd3d2ef439ceaaf",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb8183b5ffdf4270133226",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091426.1",
+   "parent": "3db4590a05eb8195a2ccf7c0959a8b6e"
+  },
+  {
+   "source_id": "3db4590a05eb81b89fbaf4b31a3ed2a9",
+   "kind": "notion_page",
+   "complete": true,
+   "in_scope": true,
+   "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1",
+   "parent": "3db4590a05eb811b9c14f2ae89c28df7"
+  }
+ ],
+ "captured_at": "2026-09-24T13:49:29Z"
+}

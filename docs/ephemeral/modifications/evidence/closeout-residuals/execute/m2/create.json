@@ -1,0 +1,37 @@
+{
+ "page": "3e54590a05eb813c8d89d065026f694d",
+ "fetched": "2026-09-24T15:18:23.995Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c.jsonl",
+ "drive_source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c.jsonl",
+ "stage": "create",
+ "F1_title_and_parent": true,
+ "F1_children_titled": 1,
+ "F2_headings": true,
+ "F2_counts": {
+  "expected": 13,
+  "got": 13
+ },
+ "F3_active_empty_and_moved_rows": true,
+ "F4_moved_table": true,
+ "F5_review_table": true,
+ "F6_links": true,
+ "F6_counts": {
+  "expected": 8,
+  "got": 8
+ },
+ "F7_code_sha256_exact": true,
+ "F7_code_block": true,
+ "F7_code_blocks_found": 1,
+ "F7_trailing_space_lines": 0,
+ "F8_list_counts": true,
+ "F8_counts": {
+  "Inclusion criteria": 5,
+  "Routing instructions": 7,
+  "Classification test": 5,
+  "Candidate item format": 13,
+  "Scope-repair revision record": 3
+ },
+ "F9_text": true,
+ "F10_ids_and_titles": true,
+ "pass": true
+}

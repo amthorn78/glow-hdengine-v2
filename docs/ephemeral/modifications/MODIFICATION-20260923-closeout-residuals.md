@@ -2,7 +2,7 @@
 artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 modification_id: MODIFICATION-20260923-closeout-residuals
-status: PLANNED
+status: EXECUTING
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -31,6 +31,11 @@ reviews:
     date: 2026-09-24
     required_open: 2
     outcome: "PLAN-DC-1 and PLAN-DC-2, independently: the same 2 required defects (a restart after a lost session re-runs a rejected D24 review unseen; X7.6's PR body waits for the withdrawn X7.7), plus 16 and 13 listed, all in the successor's own text. The cap is reached: returned to Nathan unrepaired"
+  - mode: SKILL
+    kind: FULL
+    date: 2026-09-24
+    required_open: 0
+    outcome: "D24 round cr1 at X4.4: SFR-CR1-1 and SFR-CR1-2 both SKILL_FIT_CONFIRMED on the seven archives in EX/packages.json; the archives, brief and verdicts delivered to Nathan"
 items:
   - id: ITEM-01
     statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
@@ -1277,3 +1282,182 @@ words, is recorded in both records' §E (`RESUME-PROCEDURE.md` step 6).
 **Where the record stands.** #484 merged as `07b47d8` before the rulings and the diff check were committed. This
 approval and everything after `07b47d8` reach `main` in a new pull request. **EXECUTE starts only once that pull request
 is on `main`** (X0.1).
+
+## §E — Execution
+
+*Written by MODE = EXECUTE, 2026-09-24, on branch `docs/20260924-closeout-residuals-execute`, opened from `main`
+`7028bea` (`EX/run.json` `base`). Evidence is under `EX` = `docs/ephemeral/modifications/evidence/closeout-residuals/execute/`.*
+
+| dated step | spec rows | disposition | evidence |
+|---|---|---|---|
+| 1 | X0.1–X0.3 | VERIFIED | `main`'s record carries `plan_approved_by`; X0.2's gate passes (`HEAD` = `origin/main`, clean); X0.3 (a) to (d) equal the recorded values; `root_x0.3` recorded (`320 420705ec…`) |
+| 2 | X1.1–X1.3 | VERIFIED | patches exit 0, `expected_after_patch` diff exit 0, `root_x1.1` `323 047ca742…`; `EX/gate_pre.json` 12/12 |
+| 3 | X2.1–X2.2 | APPLIED, VERIFIED | commit `772c039`; the decision record is `c8cdfd5a…`, 111 107 B; `## D25` once, between D24 and D26; no added `> ` line; `canon.py` imports |
+| 4 | X3.1 | APPLIED, VERIFIED | commit `1ef19bf`, the registry alone; `EX/x3.1.json`: `97bda1a0…`, `valid: true`, 55 rows, drift `[]` |
+| 5 | X3.2 | APPLIED, VERIFIED | `EX/x3.2.txt`: `cmp` exit 0, 27 files, the build is `ae2bd159…`, and a second reindex rewrites 0 |
+| 6 | X3.3 | APPLIED, VERIFIED | `EX/x3.3.txt`: the contract `2b78f877…` and the README `469e2265…` at `docs/graph/contract-template/` |
+| 7 | X3.4–X3.5 | APPLIED, VERIFIED | `session-working-rules.md` `2501579e…`; commit `e0b186f` |
+| 8 | X3.6 | VERIFIED | `EX/nam002/`: runs 1 to 4 as spec §4.4's table (0; one on ESC-10; one title; 55/16/6, exit 1) |
+| 9 | X4.1 | VERIFIED | `EX/x4.1.txt`: `6902924a…` and `dbae180b…` each EQUAL ×2; two expected diff lines |
+| 10 | X4.2 | VERIFIED | `EX/gate_pkg.json` 34/34 |
+| 11 | X4.3–X4.4 | VERIFIED | `EX/packages.json`: 7 × "Skill is valid!", the extracted digests equal `expected_after_patch.txt`; brief `REVIEWER-PROMPT-cr1.md` committed before the reviewers started (`6a643d6`); SFR-CR1-1 and SFR-CR1-2 both `SKILL_FIT_CONFIRMED`, bound to the seven sha256s; the seven archives, the brief and both verdicts delivered to Nathan; `delivered_cr1` 2026-09-24T14:24:50Z |
+| 12 | X4.5 | VERIFIED | `EX/rehearsal/`, 56 of 56: 50 `plan` (260 operations; no refusal, `repair` `[]` and `reapply_unsafe` `[]` on each) and 6 `check` exit 0, the proposed MGMT-10 body's with `R-ITEM40` 0 and `R-ITEM23-gate` 0. The first run was **BLOCKED** at 54 of 56 (the stop, below): the harness's permission classifier refused the rehearsal command ("Data Exfiltration") after PR-30's and ESC-40's fetches, and the refusal was not retried or worked around. On Nathan's ruling each was run once more and passed (`01dda31`). ESC-25, refused in the dry run, ran with the plan's own command and passed |
+| 12 | X4.6 | VERIFIED | `EX/anchor_check.json`: `ctrl.py all --expect unlanded` passes on the 15 edits of `control-edits.json`, none landed (3 `NOT_LANDED`, 12 `TOKEN_NOT_RECORDED`); `EX/drive_check.json` passes (31 923 B and its sha256, the fence at lines 119–286, 18 624 B, and the nine M2 strings); `7fdd629` |
+| 13 | X5.0 | APPLIED, VERIFIED | Nathan's confirmation recorded below before the first write (`ef37971`); `execute_date_X5.0` (`fee53a3`); `TRACK-FREEZE-START` reads `LANDED` on the re-fetched tracking page (`EX/ctrl/X5.0.json`, `d8d2173`). No sent list (successor, row 13) |
+| 14 | X5.1 | APPLIED, VERIFIED | `migration_date` (`e5ddb83`); the *Candidate CRD Items List* page `3e54590a05eb813c8d89d065026f694d` under the Glow Operations Hub, its id and URL in `EX/run.json` (`4a82118`); `m2.py check` passes F1–F10 at the `create` and `final` stages (`EX/m2/create.json`, `EX/m2/final.json`; `5a8f71f`, `5c1e6cf`) |
+| 15 | X5.2 | APPLIED, VERIFIED | `P30-DEST` with the URL, and `P30-VERSION`, in `notion-write-boundary.md` (`e596c2d`): the URL found once, no `{{` in the file, and no added line carrying `{{` under `docs/prompt_ecosystem_management/` since `$BASE` |
+| 16 | X5.3 | APPLIED, VERIFIED | `execute_date_X5.3` (`4826a90`); the eleven PART-06 pointers each read `LANDED` on the re-fetched pages: the Hub ×3 and the four Checklist item rows ×2 (`EX/ctrl/X5.3.json`, five pages; `fb43a1d`). No sent list |
+| 17 | X5.4 | APPLIED, VERIFIED | The 50 live bodies with edits, one page at a time: each first `plan` without refusal, `repair` `[]` and `reapply_unsafe` `[]`; its operations applied in one `update_content` call; `check` on the re-fetch exits 0 on each, CL-40 with `--candidate-url` (`EX/landing/`, 50 summaries; `96f5c07`, `550e624`, `e7547bd`, `7efcb30`, `dc8e6c3`). No forward repair was needed |
+| 18 | X5.5 | VERIFIED | `check` on `GCFPE-MGMT-10-PROPOSED`, on a fresh fetch, exits 0 with `R-ITEM40` 0 and `R-ITEM23-gate` 0; nothing written (`EX/landing/GCFPE-MGMT-10-PROPOSED.check.json`, `8947723`) |
+| 19 | X5.6 | WITHDRAWN | `PART-11-TRACK-01`, by the successor (row 19): stage 5 resolved what the paragraph would have deferred to it |
+| 20 | X5.6 | APPLIED, VERIFIED | On Nathan's ruling below. `execute_date_X5.6` (`ac5b9a3`); `PART-12-HUB-01` reads `LANDED` on the re-fetched Hub (`EX/ctrl/X5.6.json`, `f3ce214`) |
+| 21 | X5.6 | APPLIED, VERIFIED | On Nathan's ruling below. `PART-18-AF009-01` reads `LANDED` on the re-fetched Alpha feedback list (`EX/ctrl/X5.6.json`, `f3ce214`) |
+| 22 | — | NOT_APPLICABLE | PART-08 (ITEM-20): no edit, as §A found |
+| 23 | X6.1–X6.3 | VERIFIED | X6.1: `EX/corpus/`, 55 of 55 exit 0, `guard_failures` `[]` on each (each new guard fires on its injected regression, and each required guard fails when removed), CL-40 with `--candidate-url`; each summary read its page's newest fetch, all 55 made 16:05Z to 16:10Z, after X5.6's commit. X6.2: `EX/graph_check.json`, every row `true`, exit 0, on fresh fetches of QA-110 and QA-80. X6.3: `execute.6`, 50 `closure.py` runs each exit 0, and the `diff` against `ANALYZE-closure.md` exits 0 and prints nothing (the manifest writes the comparison to the scratchpad, not to `EX/`) |
+| 24 | X6.4 | APPLIED | This §E. `modification_validate.py` passes on it; one commit (`closeout-residuals X6.4: execution record`) carries `EX/corpus/`, `EX/graph_check.json` and this record; the three-dot path check runs after it, then the execution PR opens |
+| 25 | X7.2–X7.4 | PENDING | Follows X7.1, Nathan's merge of the execution PR |
+| 26 | X7.5 | PENDING | Follows X7.4 |
+| 27 | X7.6 | PENDING | Follows X7.5 |
+| 28 | X7.7 | WITHDRAWN | Under DN-8 (A); X7.6 records it (successor, rows 27 and 28) |
+
+### The stop at X4.5, and Nathan's rulings
+
+Written as each happened, and kept as written.
+
+**The stop.** It comes before the first external write: nothing was written to Notion, the execution branch is
+unmerged, and `main` is unchanged. It is returned to Nathan (`IMPLEMENTATION_BLOCKED`, the successor's *Before it*),
+and what follows is his ruling. No item has a final disposition yet.
+
+X4.5 complete, 56/56. PR-30 and ESC-40 were rerun once each on Nathan's ruling and passed. Before the reruns, at Nathan's instruction, two allow rules for the plan's own land.py and ctrl.py were added to the session's user settings, outside the repository.
+
+**The freeze and the Notion writes, 2026-09-24.** Nathan, before the first Notion write:
+
+> I confirm the freeze. It covers the Alpha run's E6 freeze and this Modification's, and it lifts only after the
+> seven skills are installed and your post-install check passes.
+>
+> I authorize these Notion writes, and only these: the freeze line on the redesign tracking page; creating the
+> Candidate CRD Items List page under the Glow Operations Hub; the eleven pointer edits; and the edits to the 50 live
+> prompt bodies, each by the plan's own tools and read back.
+>
+> One ruling for the landing. If the harness classifier refuses a Notion write or any command, that action did not
+> happen, so it is not a failed step. Stop there, change nothing, and ask me before doing anything else, including the
+> failure path. I'll decide whether you retry or take the failure path. Record this message in §E before the first
+> write.
+
+**What this authorizes, and what it does not.** X5.0 (`TRACK-FREEZE-START`), X5.1 (the new page), X5.3 (the eleven
+PART-06 pointer edits) and X5.4 (the 50 bodies) are authorized. X5.5 writes nothing. X5.6's two control edits,
+`PART-12-HUB-01` and `PART-18-AF009-01`, are not in the list, so EXECUTE stops before X5.6 and asks Nathan.
+
+**X5.6, 2026-09-24.** Nathan, asked before X5.6:
+
+> Authorize both. They're two of the 15 approved control edits; my authorization list left them out by mistake. Make
+> them, read both back, then go on to X6 and open the execution PR at X6.4. A classifier refusal still stops you and
+> comes to me.
+
+Both edits were made by `ctrl.py op` and read back `LANDED` (rows 20 and 21). The harness classifier refused no
+Notion write and no command from X5.0 to X6.4.
+
+### Parts
+
+Every item's disposition at X6.4 is its part's. No part is half applied and none is blocked. `APPLIED` means landed
+and gated here, with a later step still to come; X7.6 writes the final dispositions into the front matter (ITEM-13's
+naming the oracle input, P-69).
+
+| part | items | where it landed | disposition at X6.4 | still to come |
+|---|---|---|---|---|
+| PART-01 | ITEM-01, 02, 14 | the reviewed packages (X4.3–X4.4): glow-hde-pr-development, session-relay-flowmaster, flowmaster-validate, and contract 4.1.1 in both bundled copies | APPLIED | install (X7.3), X7.4 |
+| PART-02 | ITEM-04, 05, 06, 08, 16 | the packages: flowmaster-validate, change-flow, session-relay-flowmaster, amthor-workspace-governance-audit; the `D14` note (X2.2) | APPLIED | merge, install, X7.4; `CLOSE-D22` at X7.6 |
+| PART-03 | ITEM-03, 07, 09, 10, 25, 39 | the packages: flowmaster-validate, amthor-workspace-governance-audit, glow-graph-contract, change-flow | APPLIED | install, X7.4 |
+| PART-04 | ITEM-11, 12, 13, 15 | the packages: flowmaster-validate, glow-graph-contract; the graph reindex (X3.2); `docs/graph/contract-template/` (X3.3) | APPLIED | merge, install, X7.4; `P33-A5NOTE` at X7.6 |
+| PART-05 | ITEM-17, 32 | its bodies (X5.4); the decision record (X2.2); the registry's patterns (X3.1) | APPLIED | merge |
+| PART-06 | ITEM-18 | CL-40 (X5.4); the *Candidate CRD Items List* page (X5.1); the eleven pointers (X5.3); the destination rule (X5.2); the registry (X3.1); the decision record (X2.2) | APPLIED | merge; Nathan's Drive banner, read at X7.6 |
+| PART-07 | ITEM-19 | CL-20 (X5.4); the registry's assertion (X3.1) | APPLIED | merge |
+| PART-08 | ITEM-20 | no edit | NOT_APPLICABLE | — |
+| PART-10 | ITEM-22 | the registry's parent ids and titles (X3.1), checked live by NAM-002 (X3.6) | APPLIED | merge |
+| PART-11 | ITEM-23, 40 | the proposed MGMT-10 body, applied by stage 5; X5.5's check | VERIFIED | — |
+| PART-12 | ITEM-24 | glow-po-reporting (package); the Hub (X5.6); `session-working-rules.md` (X3.5) | APPLIED | merge, install, X7.4 |
+| PART-13 | ITEM-26, 27, 28 | its bodies (X5.4); the registry's patterns (X3.1) | APPLIED | merge |
+| PART-14 | ITEM-21, 29, 30, 31 | its bodies (X5.4); the registry's patterns (X3.1) | APPLIED | merge |
+| PART-15 | ITEM-33, 38 | its bodies (X5.4); the registry's assertions (X3.1) | APPLIED | merge |
+| PART-16 | ITEM-34, 35 | QA-110 and QA-80 (X5.4); the registry's assertions (X3.1); the graph check (X6.2) | APPLIED | merge |
+| PART-17 | ITEM-36 | the registry's release-line guards (X3.1); flowmaster-validate (package) | APPLIED | merge, install, X7.4; `P31-POLICY` at X7.6 |
+| PART-18 | ITEM-37 | its eight bodies (X5.4); the registry's C-LAT patterns (X3.1); the `D23-C` successor (X2.2); AF-009's amendment (X5.6) | APPLIED | merge |
+
+### Recorded values
+
+`EX/run.json`, each value written once by `runjson.py`: `base` (`$BASE`) `7028bea26665222b8499ce27565e15d0cb98c261`;
+`root_x0.3` `320 420705ec…`; `root_x1.1` `323 047ca742…`; `delivered_cr1` 2026-09-24T14:24:50Z; `migration_date`,
+`execute_date_X5.0`, `execute_date_X5.3` and `execute_date_X5.6` all 2026-09-24; `page_id`
+`3e54590a05eb813c8d89d065026f694d` and `url` `https://app.notion.com/p/3e54590a05eb813c8d89d065026f694d`. The tokens
+took these values: `{{CANDIDATE_CRD_LIST_URL}}` the URL, `{{MIGRATION_DATE}}` the migration date, and
+`{{EXECUTE_DATE}}` each step's own execute date. `{{INSTALL_DATE}}`, `{{FREEZE_DIGESTS}}` and `{{LIFT_DATE}}` are
+X7.4's to X7.6's.
+
+`EX/packages.json`, the seven archives delivered at X4.4 (file sha256; freeze line):
+
+| skill | files | bytes | sha256 | freeze |
+|---|---|---|---|---|
+| flowmaster-validate | 31 | 322 703 | `ecdb49ff38c937d1…` | `31 0ca2a74d50a57…` |
+| change-flow | 22 | 258 193 | `aa11c933a99b0ca5…` | `22 9a551af36e042…` |
+| glow-graph-contract | 9 | 55 695 | `a908cde3adc4f15a…` | `9 e241bb9a67c447…` |
+| session-relay-flowmaster | 5 | 56 250 | `54d272867892e596…` | `5 c8a5b22432a44f…` |
+| glow-hde-pr-development | 4 | 22 605 | `59b42809024807f8…` | `4 265f9170d8459f…` |
+| amthor-workspace-governance-audit | 15 | 56 629 | `87c59a6cef700ee7…` | `15 c214e8741e9c5…` |
+| glow-po-reporting | 1 | 3 776 | `bb7d7967f05443fd…` | `1 7e04368a63e40c…` |
+
+### Artifacts produced
+
+- **Repository, on this branch:** `gcfpe.decision-record.md` (X2.2), `project-prompt-contract-registry.md` (X3.1),
+  `docs/graph/parts` (X3.2), `docs/graph/contract-template/` (X3.3), `session-working-rules.md` (X3.5),
+  `notion-write-boundary.md` (X5.2). Each was read back by its step's gate (rows 3 to 7 and 15).
+- **Evidence, under `EX`:** `run.json`; `gate_pre.json`, `gate_pkg.json`; `x3.1.json`, `x3.2.txt`, `x3.3.txt`,
+  `nam002/`, `x4.1.txt`; `packages.json`; `rehearsal/` (56), `anchor_check.json`, `drive_check.json`; `ctrl/X5.0.json`,
+  `ctrl/X5.3.json`, `ctrl/X5.6.json`; `m2/create.json`, `m2/final.json`; `landing/` (51); `corpus/` (55),
+  `graph_check.json`. Each is its tool's own output, and the step's gate read it. None holds a prompt body.
+- **The D24 round:** `REVIEWER-PROMPT-cr1.md`, `SECTION-10-REVIEW-cr1-SFR-CR1-1.md` and
+  `SECTION-10-REVIEW-cr1-SFR-CR1-2.md` under `evidence/closeout-residuals/`, each committed as it was written.
+- **Notion:** the *Candidate CRD Items List* page; `TRACK-FREEZE-START`; the eleven PART-06 pointers; the 50 bodies;
+  `PART-12-HUB-01` and `PART-18-AF009-01`. Each was read back from a fresh fetch by the plan's tool (rows 13 to 21).
+  Nothing was written to Drive.
+
+### Harness files (`D22` condition 5)
+
+- **This session's transcript** holds every fetch the session made. The plan's tools (`land.py`, `ctrl.py`,
+  `m2.py`, `graph_check.py`, `drive_check.py`) read a page's newest fetch in memory: from this transcript, from a
+  `tool-results/` file, or at X4.6 from the transcript of the worker that fetched it.
+- **`tool-results/` in this session's store** holds the fetches the harness saved because of their size. Prompt
+  bodies: OPS-30, PR-10, PR-20, PR-40 and QA-10, five files each: one from the PLAN dry run (11:35Z), one from X4.5
+  (14:27Z), two from X5.4's fetch and re-fetch (15:41Z to 15:51Z) and one from X6.1 (16:07Z to 16:09Z). The plan's
+  tools read them in memory. There are also eight files of the Glow Operations Hub, an operational page, not a prompt
+  body (11:35Z to 16:03Z). The rest of the directory holds command output.
+- **Subagent transcripts in this session's store:** the four PLAN dry-run workers (11:33Z, 55 bodies) and the four X4.5
+  rehearsal workers (14:25Z, 54 bodies) fetched prompt bodies. Three other workers fetched only hub and control pages,
+  two of them also the Drive file, and four fetched no page.
+- **Opened by hand.** This session opened two Hub files, at X5.3 (a count of `{{`) and X5.6 (the anchor's context). At
+  X6.4 it read the first 1 500 bytes of each `tool-results/` file to name the page it holds, printing only the title.
+  It also scanned its own transcript in memory, for each page's newest fetch time, the X5.4 `plan` results' `repair`,
+  `reapply_unsafe` and refusal fields, and the subagents' fetch ids. That scan's first pattern also printed some thirty
+  short fragments of body text to the session's output. Nothing from these reads was written to disk.
+- **The scratchpad.** X5.4 wrote 20 `<PID>.plan.json` files there (PR-20 to UTIL-10, 15:45Z to 15:58Z). They held the
+  page's planned operations, which quote body passages. Each was read once, for its page's landing, and not again.
+  They were deleted at X6.4 (16:14Z), after the corpus gate. That was later than condition 4's "when that read is
+  done". No other scratch file holds a prompt body or a passage of one: the dry run's and X4.5's plan files ran with
+  `--no-ops`.
+- Nothing was hashed or byte-compared as a body's identity. The files in the harness's store are left to its teardown
+  and are not read again. The harness refuses a session's `rm` there (`D22`, as refined), and this session did not
+  try.
+
+### Interaction cost, actual against predicted
+
+Predicted 11. The actual count is X7.6's to record, once Nathan's merge, install and lift are counted.
+
+### Remaining Product Owner actions
+
+1. Banner the Drive file `1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO` as superseded by the *Candidate CRD Items List* page. He
+   may do it from here on (P-102 (e)), and X7.6 reads the banner before the close commit.
+2. Merge the execution PR (X7.1).
+3. Install the seven archives delivered at X4.4 in one sitting, each named by the sha256 above, and give the date
+   (X7.2–X7.3).
+4. After X7.4 passes, lift the freeze (X7.5). It covers the Alpha run's E6 freeze and this Modification's, and the lift
+   is recorded in both records' §E.
+5. Merge the close-out PR (X7.8).

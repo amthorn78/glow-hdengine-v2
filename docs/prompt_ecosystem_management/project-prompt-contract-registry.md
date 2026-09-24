@@ -95,83 +95,83 @@ observation:
 lanes:
 - lane: GCFPE-MGMT
   title: GCFPE management
-  notion_parent_id: 3cc4590a05eb8101b5ded32c12616eb6
-  notion_parent_title: Glow HDE Prompt Flow Index
+  notion_parent_id: 3db4590a05eb81de9736ea69bac61016
+  notion_parent_title: Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: CF-PO
   title: Product Owner change-class selection
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: CF-C
   title: CRD specification
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: CF-E
   title: Epic specification
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: CL-C
   title: CRD closure
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: CL-E
   title: Epic closure and PF09 maintenance
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: CL
   title: Shared closure administration
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: DOC
   title: Repository documentation
-  notion_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  notion_parent_title: HDE IA
+  notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: ESC
   title: Escalation and remediation
-  notion_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
-  notion_parent_title: Escalation
+  notion_parent_id: 3db4590a05eb81cd938de84cfffead9c
+  notion_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: IA
   title: Whole-change implementation audit and plan
-  notion_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  notion_parent_title: HDE IA
+  notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: MGR
   title: Optional flow coordination
-  notion_parent_id: 3c74590a05eb811d8433e7022629e213
-  notion_parent_title: HDE Change Flow
+  notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: OPS
   title: Bounded operations
-  notion_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  notion_parent_title: HDE IA
+  notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: PR
   title: PR work-unit development
-  notion_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  notion_parent_title: HDE IA
+  notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: QA
   title: Whole-change QA
-  notion_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  notion_parent_title: HDE QA
+  notion_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  notion_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: RS
   title: Bounded rescope
-  notion_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  notion_parent_title: HDE IA
+  notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   active: true
 - lane: UTIL
   title: Exact redline utility
-  notion_parent_id: 3c74590a05eb8176baf8cb59f1631f3c
-  notion_parent_title: HDE TW
+  notion_parent_id: 3db4590a05eb811b9c14f2ae89c28df7
+  notion_parent_title: HDE TW — GCFPE-20260914.1 — 091426.1
   active: true
 prompts:
 - prompt_key: CF-C-10
@@ -221,8 +221,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-C-10.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -277,11 +277,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -290,6 +290,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE with the preserved source/change facts'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-C-20
   notion_page_id: 3db4590a05eb8173a73edc73f302a90a
@@ -334,8 +346,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-C-20.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -390,11 +402,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -403,6 +415,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'direct package contains the exact pending Specification, class/change lineage|recovery carries the original kickoff link, exact defect, class/change lineage'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-C-30
   notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
@@ -450,8 +474,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-C-30.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -506,11 +530,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -519,6 +543,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'and approval lineage, the carried conflict register'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-C-40
   notion_page_id: 3db4590a05eb81269931cee342ce8a0e
@@ -560,8 +596,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-C-40.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -616,11 +652,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -629,6 +665,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'actual mode, class/change/base lineage'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-E-10
   notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
@@ -677,8 +725,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-E-10.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -733,11 +781,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -746,6 +794,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE with the preserved source/change facts'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-E-20
   notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
@@ -790,8 +850,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-E-20.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -846,11 +906,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -859,6 +919,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'direct package contains the exact pending Specification, class/change lineage|recovery carries the original kickoff link, exact defect, class/change lineage'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-E-30
   notion_page_id: 3db4590a05eb81b4be79f405566da9a7
@@ -906,8 +978,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-E-30.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -962,11 +1034,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -975,6 +1047,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'and approval lineage, the carried conflict register'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-E-40
   notion_page_id: 3db4590a05eb8101b655ed223b11a85e
@@ -1016,8 +1100,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-E-40.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1072,11 +1156,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1085,6 +1169,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'actual mode, class/change/base lineage'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CF-PO-10
   notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
@@ -1131,8 +1227,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CF-PO-10.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1187,11 +1283,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1200,6 +1296,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CL-20
   notion_page_id: 3db4590a05eb81f4812be61e8877c02c
@@ -1250,8 +1356,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-20.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1278,6 +1384,22 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
+      rule_id: CTR-002
+    - value: 'Name the positive closure decision and every post-closure result artifact by repository path'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'that entry creates no runtime approval'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
+      rule_id: CTR-002
+    - value: 'when none is supplied, record the board update as pending, owned under PF04 §9\.1\.1'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1306,11 +1428,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1319,6 +1441,28 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'lineage into its result and handoff\b'
+      rule_id: TOP-001
+    - value: 'Carry the positive closure decision, complete post-closure results'
+      rule_id: TOP-001
+    - value: 'carrying the exact qualified condition, lineage, evidence'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Use only the read-only tools, stores, repository access[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'These candidate URL tokens must be replaced'
       rule_id: CTR-001
 - prompt_key: CL-30
   notion_page_id: 3db4590a05eb8190a444d8818e445c1d
@@ -1361,8 +1505,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-30.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1389,6 +1533,20 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
+      rule_id: CTR-002
+    - value: 'Name the positive closure decision and every post-closure result artifact by repository path'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'that entry creates no runtime approval'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1417,11 +1575,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1431,6 +1589,30 @@ prompts:
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
       rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'lineage into its result and handoff\b'
+      rule_id: TOP-001
+    - value: 'Carry the positive closure decision, complete post-closure results'
+      rule_id: TOP-001
+    - value: 'Carry the complete candidate, positive closure and architecture-decision lineage'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Use only the read-only tools, stores, repository access[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'These candidate URL tokens must be replaced'
+      rule_id: CTR-001
+    - value: 'decision lineage; existing ADR/conflict history'
+      rule_id: TOP-001
 - prompt_key: CL-40
   notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
   notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
@@ -1462,6 +1644,7 @@ prompts:
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
+    - Update the Notion page Candidate CRD Items List in place with this change's new CRD candidates, and no other Notion page; that page is the list's only store, named by a destination rule
     forbidden:
     - Edit PF10 directly
     - Merge a pull request or enable automatic merge
@@ -1478,8 +1661,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-40.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1504,6 +1687,16 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
+      rule_id: CTR-002
+    - value: 'Notion page `?Candidate CRD Items List`? \(`?https://app\.notion\.com/p/[0-9a-f]{32}(?:\?pvs=\d+)?`?\)'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1532,11 +1725,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1545,6 +1738,26 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'lineage into its result and handoff\b'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'It does not edit Canonical PF09, PF10, Canon, a board, registry, repository[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'These candidate URL tokens must be replaced'
+      rule_id: CTR-001
+    - value: 'This authoring candidate does not perform that update'
+      rule_id: CTR-001
+    - value: '\{\{CANDIDATE_CRD_LIST_URL\}\}'
       rule_id: CTR-001
 - prompt_key: CL-C-10
   notion_page_id: 3db4590a05eb81ad8989faa77f441a64
@@ -1591,8 +1804,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-C-10.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1617,6 +1830,20 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'that entry creates no runtime approval'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1645,11 +1872,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1658,6 +1885,26 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'lineage into its result and handoff\b'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'These candidate URL tokens must be replaced'
       rule_id: CTR-001
 - prompt_key: CL-E-10
   notion_page_id: 3db4590a05eb811a8578d75885c16cac
@@ -1705,8 +1952,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-E-10.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1731,6 +1978,20 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'that entry creates no runtime approval'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1759,11 +2020,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1772,6 +2033,26 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'lineage into its result and handoff\b'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'These candidate URL tokens must be replaced'
       rule_id: CTR-001
 - prompt_key: CL-E-20
   notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
@@ -1816,8 +2097,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-E-20.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1844,6 +2125,14 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1872,11 +2161,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -1885,6 +2174,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'revalidation session, read-only\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CL-E-30
   notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
@@ -1931,8 +2232,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-E-30.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -1959,6 +2260,12 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -1987,11 +2294,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2000,6 +2307,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: CL-E-40
   notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
@@ -2044,8 +2361,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/CL-E-40.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2072,6 +2389,12 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2100,11 +2423,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2113,6 +2436,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: DOC-10
   notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
@@ -2168,8 +2501,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/DOC-10.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2193,11 +2526,17 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2226,11 +2565,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2239,6 +2578,20 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: DOC-20
   notion_page_id: 3db4590a05eb8164ac09e722dc967f25
@@ -2302,8 +2655,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/DOC-20.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2327,11 +2680,19 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2360,11 +2721,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2373,6 +2734,22 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+      rule_id: CTR-001
+    - value: 'do not edit documentation, Canon, PF10, or repository state\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: ESC-10
   notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
@@ -2415,8 +2792,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/ESC-10.md
-  expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
-  expected_parent_title: Escalation
+  expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
+  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2441,6 +2818,14 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2469,11 +2854,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2482,6 +2867,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: ESC-25
   notion_page_id: 3db4590a05eb81bf9326e46a1017de38
@@ -2527,8 +2922,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/ESC-25.md
-  expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
-  expected_parent_title: Escalation
+  expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
+  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2553,6 +2948,16 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2581,11 +2986,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2594,6 +2999,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'read-only repository reviewer[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: ESC-30
   notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
@@ -2645,8 +3062,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/ESC-30.md
-  expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
-  expected_parent_title: Escalation
+  expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
+  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2671,6 +3088,14 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2699,11 +3124,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2712,6 +3137,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: ESC-40
   notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
@@ -2759,8 +3194,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/ESC-40.md
-  expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
-  expected_parent_title: Escalation
+  expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
+  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2785,6 +3220,14 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2813,11 +3256,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -2826,6 +3269,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: GCFPE-MGMT-10
   notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
@@ -2870,8 +3323,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/GCFPE-MGMT-10.md
-  expected_parent_id: 3cc4590a05eb8101b5ded32c12616eb6
-  expected_parent_title: Glow HDE Prompt Flow Index
+  expected_parent_id: 3db4590a05eb81de9736ea69bac61016
+  expected_parent_title: Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -2886,6 +3339,10 @@ prompts:
     forbidden_literals: []
     required_regex:
     - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
+      rule_id: CTR-002
+    - value: 'This prompt''s artifacts are written only under `docs/ephemeral/` and `docs/graph/`, the controls it maintains only under `docs/prompt_ecosystem_management/`'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -2912,12 +3369,26 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'does not execute product Change Flow, implementation, repository work[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written'
+      rule_id: CTR-001
 - prompt_key: IA-10
   notion_page_id: 3db4590a05eb817aa191f1e822c30480
   notion_url: https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480
@@ -2966,8 +3437,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/IA-10.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3020,11 +3491,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3033,6 +3504,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: IA-20
   notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
@@ -3080,8 +3563,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/IA-20.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3134,11 +3617,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3147,6 +3630,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: IA-30
   notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
@@ -3198,8 +3693,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/IA-30.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3223,8 +3718,6 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
@@ -3256,11 +3749,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3269,6 +3762,22 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'unresolved items/owners, next action, and expected (?:output|review state)'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: IA-40
   notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
@@ -3317,8 +3826,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/IA-40.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3371,11 +3880,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3384,6 +3893,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: IA-50
   notion_page_id: 3db4590a05eb81d78eeae384e93dd697
@@ -3432,8 +3951,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/IA-50.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3486,11 +4005,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3499,6 +4018,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: IA-60
   notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
@@ -3542,8 +4071,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/IA-60.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3596,11 +4125,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3609,6 +4138,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: MGR-10
   notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
@@ -3659,8 +4198,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/MGR-10.md
-  expected_parent_id: 3c74590a05eb811d8433e7022629e213
-  expected_parent_title: HDE Change Flow
+  expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
+  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3715,11 +4254,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3728,6 +4267,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: OPS-10
   notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
@@ -3776,8 +4325,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/OPS-10.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3804,6 +4353,16 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'Reviewers remain read-only toward the work they review'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3832,11 +4391,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3845,6 +4404,22 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\n]*CANON_CONFLICT_REGISTER)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'must preserve in its execution result and return handoff'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: OPS-20
   notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
@@ -3895,8 +4470,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/OPS-20.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -3923,6 +4498,12 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -3951,11 +4532,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -3964,6 +4545,20 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\n]*CANON_CONFLICT_REGISTER)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: OPS-30
   notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
@@ -4019,8 +4614,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/OPS-30.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4045,6 +4640,22 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'each input artifact by repository path; the artifacts hold the rest'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Reviewers remain read-only toward the work they review'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4073,11 +4684,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4087,6 +4698,26 @@ prompts:
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
       rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'native inputs, lineage, current state, gates, risks and required action'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'A saved attachment, link or scattered fields do not replace the handoff\.'
+      rule_id: TOP-001
 - prompt_key: PR-10
   notion_page_id: 3db4590a05eb818e8359de1994e97a7d
   notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
@@ -4134,8 +4765,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/PR-10.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4159,11 +4790,21 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4192,11 +4833,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4205,6 +4846,30 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'carry PR_INSTRUCTION_ID and its complete content|dependency and evidence history; read-only substantiation of the mismatch; completed work'
+      rule_id: TOP-001
+    - value: '(?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: PR-20
   notion_page_id: 3db4590a05eb8174abf8c04318ab04be
@@ -4249,8 +4914,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/PR-20.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4274,13 +4939,25 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     - value: 'accepts\s+a\s+`?PR_WORK_UNIT_LINEAGE_REVIEW`?\s+whose\s+result\s+is\s+`?REJECT'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4309,11 +4986,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4322,6 +4999,32 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'dependency/evidence history, completed work and unaffected obligations|all actual merge/commit/order/check evidence|current stage and suspended boundary, completed work, dependencies, evidence'
+      rule_id: TOP-001
+    - value: '(?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+      rule_id: CTR-001
+    - value: 'Do not mutate the repository in this authoring operation\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: PR-30
   notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
@@ -4369,8 +5072,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/PR-30.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4406,6 +5109,18 @@ prompts:
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
       rule_id: CTR-001
@@ -4433,11 +5148,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4447,6 +5162,24 @@ prompts:
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
       rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: '(?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'outside the approved Plan, return the metadata\b'
+      rule_id: TOP-001
 - prompt_key: PR-35
   notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
   notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
@@ -4525,6 +5258,16 @@ prompts:
       rule_id: CTR-002
     - value: 'The observed merge event is the fact PR-40 is entered on'
       rule_id: CTR-002
+    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
+      rule_id: CTR-002
+    - value: '`MERGE_OBSERVED`: [^\n]*?the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan'
+      rule_id: CTR-002
+    - value: 'seventh top-level PR-35 result'
+      rule_id: CTR-002
+    - value: 'for `MERGE_OBSERVED`, it is the same selected PR-40'
+      rule_id: CTR-002
+    - value: 'This prompt''s artifacts are written only under `docs/ephemeral/` and `docs/graph/`'
+      rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
       rule_id: CTR-001
@@ -4552,11 +5295,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4567,6 +5310,24 @@ prompts:
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
       rule_id: CTR-001
     - value: 'launched as a new session'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'sixth top-level PR-35 result'
+      rule_id: CTR-001
+    - value: 'The PR-40 handoff must say:|Nathan''s later paste asserts'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written'
       rule_id: CTR-001
   evidence_contract:
   - 'Complete prompt body extracted from Notion 2026-09-19: 17908 bytes'
@@ -4582,7 +5343,7 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/PR-35.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
   registry_note: Added 2026-09-17. Present in the 091426.1 candidate and absent from the 091326.2 predecessor; this entry was derived from the candidate body, not carried over.
 - prompt_key: PR-40
   notion_page_id: 3db4590a05eb818786c5cb6051b4d634
@@ -4601,10 +5362,11 @@ prompts:
   - PR_IMPLEMENTATION_PLAN_ID and complete PR_IMPLEMENTATION_PLAN
   - The complete PR-30 result with PR_CANDIDATE_PUBLISHED
   - 'The complete PR-35 result: MERGE_OBSERVED with the observed merge event, or, only where no MERGE_OBSERVED result was returned for this merge, the earlier MERGE_PENDING, which is historical pre-merge evidence.'
-  - The complete ordered PR_REFS for this work unit, with each actual PR reference, commit identity, order, review/check state and merge evidence
+  - The complete ordered PR_REFS for this work unit; PR-40 resolves each PR's commits, order, review/check state and merge evidence from repository evidence
   - CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved Specification, Implementation Audit, Plan, Plan review, dependency and acceptance/evidence lineage
   - Existing PR reviewer/session lineage for a rereview, the PR-30 and PR-35 session identities, the whole-change IA context and exact return owner
   - CANON_CONFLICT_REGISTER, recovery state, truthful pending, NOT PRODUCED and NOT EXECUTED values, and all actual access limitations
+  - The branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.
   - PR-40 is entered on the observed merge event for the identified PR, delivered to the subscribed PR-35 session as MERGE_OBSERVED, or, only where no MERGE_OBSERVED result was returned for this merge, on Nathan's assertion that he manually merged it.
   outputs:
   - artifact: PR_WORK_UNIT_LINEAGE_REVIEW
@@ -4638,8 +5400,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/PR-40.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4663,13 +5425,31 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
       rule_id: CTR-002
     - value: 'PR-40 is entered on the observed merge event'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'every native return names those artifacts'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 're-plans through `?PR-20`?, as \*\*PRECISE IN-SCOPE DEFECT → re-plan\*\* states'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
+      rule_id: CTR-002
+    - value: 'Reviewers remain read-only toward the work they review'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4698,11 +5478,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4714,6 +5494,36 @@ prompts:
       rule_id: CTR-001
     - value: 'original Proceed and a suitable actual authorized implementation vehicle'
       rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'PR instruction and implementation result; actual merged-state evidence|dependency, acceptance and evidence history; completed work|all completed review work; attempts; limitations'
+      rule_id: TOP-001
+    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+      rule_id: CTR-001
+    - value: 'ordinary in-scope defect remains with the existing PR owner'
+      rule_id: CTR-001
+    - value: 'operating read-only\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
+      rule_id: CTR-001
+    - value: 'RESCOPE_PROPOSAL_ID and complete RESCOPE_PROPOSAL\b'
+      rule_id: TOP-001
 - prompt_key: PR-50
   notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
   notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
@@ -4752,8 +5562,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/PR-50.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4774,6 +5584,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4800,11 +5612,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
       rule_id: CTR-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4813,6 +5625,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-10
   notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
@@ -4873,8 +5697,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-10.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -4899,6 +5723,26 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
+      rule_id: CTR-002
+    - value: 'every return package names those artifacts'
+      rule_id: CTR-002
+    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
+      rule_id: CTR-002
+    - value: 'each input artifact by repository path; the artifacts hold the rest'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+      rule_id: CTR-002
+    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
+      rule_id: CTR-002
+    - value: 'Reviewers remain read-only toward the work they review'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -4929,11 +5773,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -4943,6 +5787,28 @@ prompts:
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
       rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Catalogs and runtime handoffs carry\b'
+      rule_id: TOP-001
+    - value: 'native inputs, lineage, current state, gates, risks and required action'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'read-only audit and readiness role'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Embed only applicable workflow contracts'
+      rule_id: CTR-001
+    - value: 'A saved attachment, link or scattered fields do not replace the handoff\.'
+      rule_id: TOP-001
 - prompt_key: QA-100
   notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
   notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
@@ -4992,8 +5858,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-100.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5018,6 +5884,10 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5046,11 +5916,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5059,6 +5929,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-110
   notion_page_id: 3db4590a05eb816984d1d34da0e08f40
@@ -5115,8 +5995,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-110.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5141,6 +6021,12 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'a completed failing run is `ACCEPT` and continues to QA-120'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5169,11 +6055,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5182,6 +6068,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'code/Ops remediation\. Do not fix it here\.(?! This applies only before the whole approved run is complete)'
       rule_id: CTR-001
 - prompt_key: QA-120
   notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
@@ -5241,8 +6139,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-120.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5267,6 +6165,10 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5295,11 +6197,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5308,6 +6210,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-20
   notion_page_id: 3db4590a05eb816daa3adff37283482b
@@ -5354,8 +6266,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-20.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5380,6 +6292,14 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered on the observed merge event for the identified PR'
+      rule_id: CTR-002
+    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5408,11 +6328,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5421,6 +6341,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-50
   notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
@@ -5473,8 +6403,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-50.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5499,6 +6429,10 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5527,11 +6461,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5540,6 +6474,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-60
   notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
@@ -5586,8 +6530,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-60.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5614,6 +6558,10 @@ prompts:
     - value: '`ASK OK\?` is the line immediately before the block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5644,11 +6592,11 @@ prompts:
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5657,6 +6605,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-70
   notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
@@ -5701,8 +6659,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-70.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5729,6 +6687,10 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5757,11 +6719,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5770,6 +6732,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: QA-80
   notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
@@ -5812,8 +6784,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-80.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5840,6 +6812,12 @@ prompts:
     - value: '`ASK OK\?` is the line immediately before the block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'routed as \*Required result and routing\* states'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5870,11 +6848,11 @@ prompts:
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -5883,6 +6861,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: '`WRONG_ROUTE_APPROVED_BASE` terminally'
       rule_id: CTR-001
 - prompt_key: QA-90
   notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
@@ -5934,8 +6924,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/QA-90.md
-  expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
-  expected_parent_title: HDE QA
+  expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
+  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -5960,6 +6950,10 @@ prompts:
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -5988,11 +6982,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -6001,6 +6995,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: RS-10
   notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
@@ -6042,8 +7046,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/RS-10.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -6069,11 +7073,13 @@ prompts:
       rule_id: TOP-001
     - value: '`ASK OK\?` is the line immediately before the block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -6104,11 +7110,11 @@ prompts:
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -6117,6 +7123,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: RS-20
   notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
@@ -6168,8 +7186,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/RS-20.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -6193,11 +7211,15 @@ prompts:
       rule_id: CTR-002
     - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
       rule_id: TOP-001
-    - value: 'Decide it during work'
-      rule_id: CTR-002
     - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
       rule_id: CTR-002
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
+      rule_id: CTR-002
+    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -6226,11 +7248,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -6239,6 +7261,20 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Decide it during work'
       rule_id: CTR-001
 - prompt_key: RS-30
   notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
@@ -6280,8 +7316,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/RS-30.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -6308,6 +7344,10 @@ prompts:
     - value: '`ASK OK\?` is the line immediately before the block\.'
       rule_id: TOP-001
     - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
+      rule_id: CTR-002
+    - value: 'in the output artifact''s (?:existing )?permitted metadata'
+      rule_id: CTR-002
+    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
       rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
@@ -6338,11 +7378,11 @@ prompts:
       rule_id: TOP-001
     - value: '\bends? `ASK OK\?`'
       rule_id: CTR-002
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -6351,6 +7391,16 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 - prompt_key: RS-40
   notion_page_id: 3db4590a05eb8183b5ffdf4270133226
@@ -6405,8 +7455,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/RS-40.md
-  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
-  expected_parent_title: HDE IA
+  expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -6446,6 +7496,10 @@ prompts:
       rule_id: CTR-002
     - value: 'The observed merge event is the fact PR-40 is entered on'
       rule_id: CTR-002
+    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
+      rule_id: CTR-002
+    - value: '`MERGE_OBSERVED`: [^\n]*?the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan'
+      rule_id: CTR-002
     forbidden_regex:
     - value: 'addendum_id[\s\S]{0,400}?artifact_version'
       rule_id: CTR-001
@@ -6473,11 +7527,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -6488,6 +7542,22 @@ prompts:
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
       rule_id: CTR-001
     - value: 'launched as a new session'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
+      rule_id: CTR-001
+    - value: 'Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written'
       rule_id: CTR-001
 - prompt_key: UTIL-10
   notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
@@ -6530,8 +7600,8 @@ prompts:
   - GCFPE-20260914.1
   - '091426.1'
   - candidate/prompts/UTIL-10.md
-  expected_parent_id: 3c74590a05eb8176baf8cb59f1631f3c
-  expected_parent_title: HDE TW
+  expected_parent_id: 3db4590a05eb811b9c14f2ae89c28df7
+  expected_parent_title: HDE TW — GCFPE-20260914.1 — 091426.1
   supersedes: []
   superseded_by: null
   source_snapshot:
@@ -6584,11 +7654,11 @@ prompts:
       rule_id: CTR-001
     - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
       rule_id: TOP-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Prompt [Vv]ersion(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Ecosystem release(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: INV-003
-    - value: '\A(?:[ \t]*\n)*(?:[^\n]*\n(?:[ \t]*\n)*){0,7}[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?Set(?:\*\*|__|`)?[ \t]*:'
+    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
       rule_id: SRC-001
     - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
       rule_id: CTR-001
@@ -6597,6 +7667,18 @@ prompts:
     - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
       rule_id: CTR-001
     - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
+      rule_id: CTR-001
+    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
+      rule_id: TOP-001
+    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+      rule_id: TOP-001
+    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
+      rule_id: TOP-001
+    - value: 'unresolved items/owners, next action, and expected (?:output|review state)'
+      rule_id: TOP-001
+    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
+      rule_id: CTR-001
+    - value: 'Reviewers remain read-only(?! toward the work they review)'
       rule_id: CTR-001
 global_literals:
   approval_request: ASK OK?

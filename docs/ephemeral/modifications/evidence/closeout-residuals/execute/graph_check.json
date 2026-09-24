@@ -1,0 +1,13 @@
+{
+ "graph_QA-110_accept_to_QA-120_with_completed_failing_run": true,
+ "graph_QA-110_escalation_to_ESC-10": true,
+ "body_QA-110_states_accept_route": true,
+ "graph_QA-80_wrong_route_two_branches": true,
+ "body_QA-80_pointer": true,
+ "body_QA-80_section_states_both_branches": true,
+ "pass": true,
+ "source_files": {
+  "QA-110": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c.jsonl",
+  "QA-80": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c.jsonl"
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "summary": {
+  "sources": 55,
+  "rows": 55,
+  "unplaced_rows": [],
+  "NAM-002": 1,
+  "NAM-002_rows": [
+   "ESC-10"
+  ],
+  "NAM-001": [],
+  "other_errors": 0,
+  "other_prompt_findings": [],
+  "non_prompt_findings": [
+   "COL-002",
+   "SRC-001"
+  ],
+  "lanes": 16,
+  "lane_parent_findings": 0,
+  "lane_parent_lanes": [],
+  "title_findings": 0,
+  "title_hubs": [],
+  "title_references": {
+   "compared": 70,
+   "mismatched": 0
+  }
+ },
+ "verdict": "INDETERMINATE",
+ "lane_findings": [],
+ "title_findings": [],
+ "expectation_met": true
+}

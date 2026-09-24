@@ -1,0 +1,188 @@
+{
+ "expect": "unlanded",
+ "pages": [
+  {
+   "page": "3ce4590a05eb814f8892f88ff8539308",
+   "title": "Glow Operations Hub",
+   "fetched": "2026-09-24T14:29:26.140Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/tool-results/mcp-Notion-notion-fetch-1790261153318.txt",
+   "edits": [
+    {
+     "id": "PART-12-HUB-01",
+     "state": "NOT_LANDED",
+     "old_count": 1,
+     "new_present": false
+    },
+    {
+     "id": "PART-06-HUB-01",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}",
+      "{{MIGRATION_DATE}}",
+      "{{EXECUTE_DATE}}"
+     ],
+     "old_count": 1
+    },
+    {
+     "id": "PART-06-HUB-02",
+     "state": "NOT_LANDED",
+     "old_count": 1,
+     "new_present": false
+    },
+    {
+     "id": "PART-06-HUB-03",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  },
+  {
+   "page": "3e34590a05eb81e7927efe0541258916",
+   "title": "GCFPE MGMT Change-Process Redesign \u2014 Tracking",
+   "fetched": "2026-09-24T13:23:32.286Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+   "edits": [
+    {
+     "id": "TRACK-FREEZE-START",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{EXECUTE_DATE}}"
+     ],
+     "old_count": 1
+    },
+    {
+     "id": "TRACK-FREEZE-LIFT",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{LIFT_DATE}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  },
+  {
+   "page": "3df4590a05eb8111a6a5f67cb82f96f6",
+   "title": "GCFPE Alpha Feedback \u2014 Deferred Items \u2014 091426.1",
+   "fetched": "2026-09-24T00:11:08.183Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+   "edits": [
+    {
+     "id": "PART-18-AF009-01",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{EXECUTE_DATE}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  },
+  {
+   "page": "3d54590a05eb8142a187d32ad4435950",
+   "title": "Repository prompt-use provenance helper",
+   "fetched": "2026-09-08T07:23:26.492Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+   "edits": [
+    {
+     "id": "PART-06-ITEM1-01",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}"
+     ],
+     "old_count": 1
+    },
+    {
+     "id": "PART-06-ITEM1-02",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}",
+      "{{MIGRATION_DATE}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  },
+  {
+   "page": "3d54590a05eb8119affafcfb024ba990",
+   "title": "QA-10 substantive, paste-ready PF10 findings summary",
+   "fetched": "2026-09-08T07:23:28.047Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+   "edits": [
+    {
+     "id": "PART-06-ITEM2-01",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}"
+     ],
+     "old_count": 1
+    },
+    {
+     "id": "PART-06-ITEM2-02",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}",
+      "{{MIGRATION_DATE}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  },
+  {
+   "page": "3d54590a05eb8159a73cf6af261c1c2b",
+   "title": "QA-90 explicit Product Owner task selection",
+   "fetched": "2026-09-08T07:23:29.473Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+   "edits": [
+    {
+     "id": "PART-06-ITEM3-01",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}"
+     ],
+     "old_count": 1
+    },
+    {
+     "id": "PART-06-ITEM3-02",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}",
+      "{{MIGRATION_DATE}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  },
+  {
+   "page": "3d54590a05eb8118b229e0ca25bdfd42",
+   "title": "Combined audit-and-plan invocations for IA and QA preparation",
+   "fetched": "2026-09-08T07:23:30.741Z",
+   "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/subagents/agent-a6ab6d028d20bb041.jsonl",
+   "edits": [
+    {
+     "id": "PART-06-ITEM4-01",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}"
+     ],
+     "old_count": 1
+    },
+    {
+     "id": "PART-06-ITEM4-02",
+     "state": "TOKEN_NOT_RECORDED",
+     "missing": [
+      "{{CANDIDATE_CRD_LIST_URL}}",
+      "{{MIGRATION_DATE}}"
+     ],
+     "old_count": 1
+    }
+   ]
+  }
+ ],
+ "landed": [],
+ "mixed": [],
+ "doubled": [],
+ "bad": [],
+ "pass": true
+}

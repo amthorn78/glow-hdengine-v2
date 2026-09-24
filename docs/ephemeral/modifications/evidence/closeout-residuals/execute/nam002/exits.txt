@@ -1,0 +1,7 @@
+children exit 0
+run1-committed exit 0
+run2-inject-parent exit 0
+run3-inject-title exit 0
+run4-control-old exit 1
+control registry: git show 7028bea (BASE), sha256 8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4, 322556 B
+all four as spec §4.4's table

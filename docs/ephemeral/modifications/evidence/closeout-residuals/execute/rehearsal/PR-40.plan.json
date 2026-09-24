@@ -1,0 +1,216 @@
+{
+ "pid": "PR-40",
+ "fetched": "2026-09-23T13:19:20.724Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/tool-results/toolu_01Jn9FgUa8nwEFBSx2NAKQoT.json",
+ "ops_count": 23,
+ "reapply_unsafe": [],
+ "repair": [],
+ "rules": {
+  "R-A1a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A1c": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A1e": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2e": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2f1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A2g": {
+   "hits": 6,
+   "expected": 6,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-26-P1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-26-P4": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-S1a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-S1b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A7-S2": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-26-RSP": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-ITEM31": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-OWN": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A10": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-A3a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "R-CLAT": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-2": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-3": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-4": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-5": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-6": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "LPR-40-7": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true,
+   "state": "NOT_LANDED"
+  },
+  "CHECK R-26-FRAME": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  },
+  "CHECK R-26-BRANCH-RECV": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  },
+  "CHECK R-A7-LOCAL": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  },
+  "CHECK R-26-RSP-scan": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  }
+ },
+ "precheck": {
+  "placement": {
+   "W-4": 3,
+   "ONCE": 1,
+   "OWN": 1,
+   "RECV": 1
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ },
+ "landed_check": {
+  "placement": {
+   "W-4": 3,
+   "ONCE": 1,
+   "OWN": 1,
+   "RECV": 1
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ }
+}
