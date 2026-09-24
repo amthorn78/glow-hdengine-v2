@@ -95,8 +95,10 @@ party that did not author it has validated it, and each revision here was.
 `prompt_identity_header_valid` now:
 
 - requires identity — title, `Prompt ID:`, exactly one `Notion URL:` line whose page identity
-  matches the registry binding; rejects `Prompt version:`, `Set:` and `Ecosystem release:` in the
-  header window as `PROMPT_BODY_RELEASE_HEADER` (D23-G);
+  matches the registry binding; rejects a `Prompt version:`, `Set:` or `Ecosystem release:` label
+  line anywhere in the body, line-anchored, as `PROMPT_BODY_RELEASE_HEADER` (D23-G; the whole-body
+  check replaces the header window, per the `D23-G` successor of 2026-09-23 in
+  `gcfpe.decision-record.md`);
 - **rejects** a body carrying `Selection status:` or `Lifecycle:`, as `PROMPT_BODY_GOVERNANCE_STATE`
   — a separate check with its own code, because a body can be identity-valid and still carry
   governance state;

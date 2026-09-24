@@ -1,0 +1,21 @@
+{
+ "pid": "QA-10",
+ "fetched": "2026-09-24T15:51:30.296Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/tool-results/mcp-Notion-notion-fetch-1790268194668.txt",
+ "placement": {
+  "W-4": 2,
+  "ONCE": 1,
+  "OWN": 1,
+  "RECV": 0
+ },
+ "unfilled_tokens": 0,
+ "doubled_insertions": [],
+ "registry_findings": [],
+ "guard_failures": [],
+ "validator": {
+  "exit": 0,
+  "ok": true,
+  "errors": []
+ },
+ "pass": true
+}

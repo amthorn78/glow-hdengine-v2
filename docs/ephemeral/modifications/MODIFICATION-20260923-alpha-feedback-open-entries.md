@@ -1188,6 +1188,25 @@ the freeze start, as the prediction counted them.
 - **The prediction missed the size of the gate.** A run that re-pins R1 and changes six skills was
   priced at one review cycle.
 
+### Freeze lift, 2026-09-24
+
+Written by `MODIFICATION-20260923-closeout-residuals` at its X7.5, as Nathan directed. That Modification installed
+and verified the seven skills its reviewed packages changed. Its §E records its post-install check, and the lift on
+its D20 tracking page. Nathan, 2026-09-24:
+
+> I lift the freeze, effective now. It covers both the Alpha run's E6 freeze and this Modification's. Write the lift
+> line (X7.5) and record the lift, with this message quoted, in both records' §E. The old Drive file
+> (1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO) has been marked superseded by renaming it to SUPERSEDED — see Notion "Candidate
+> CRD Items List" — Candidate-CRD-Items-List.md. At X7.6, check the banner by that title, not by reading the file's
+> first lines, and record that change of check in §E. Then make the close commit and open the close-out PR. A
+> classifier refusal still stops you and comes to me.
+
+- **The E6 freeze is lifted.** This record's close-out PR,
+  [amthorn78/glow-hdengine-v2#477](https://github.com/amthorn78/glow-hdengine-v2/pull/477), had merged first
+  (`77d98dd`), as step 1 below required. Flow sessions may run again.
+- **This record's interaction cost is unchanged at 29.** The lift shares one term with the freeze start, as
+  *Interaction cost* above counted it.
+
 ### Remaining Product Owner actions
 
 1. **Merge the close-out PR, then lift the freeze** (spec v2 §11, step 8). Merge first: the

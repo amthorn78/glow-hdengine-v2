@@ -2,7 +2,7 @@
 artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 modification_id: MODIFICATION-20260923-closeout-residuals
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:
@@ -16,7 +16,7 @@ override:
   reason: ""
 interaction_cost_predicted: 11
 item_count_at_approval: 40
-interaction_cost_actual:
+interaction_cost_actual: 30
 estimate:
   plan: "2 h and 2.5M tokens for this resume under D26 (the dry run, one diff check of the successor, two returns); set 2026-09-24 by the resumed PLAN, for the work still to come (D26 transition)"
   execute: "8 h of session time and 8M tokens (X0 to X7.7, one D24 round of two reviewers, the 50-body landing and two corpus gates in lanes); Nathan's merges and install sitting add wall-clock time on top"
@@ -40,163 +40,163 @@ items:
   - id: ITEM-01
     statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
     source: "CLOSE-OUT-20260923 §4.A; glow-hde-pr-development/SKILL.md:143"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-02
     statement: "session-relay-flowmaster no longer tells a handoff to carry advice and identity that the named artifacts hold (D23-B)."
     source: "CLOSE-OUT-20260923 §4.A; session-relay-flowmaster/SKILL.md:281"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "flowmaster-validate's guidance no longer describes a `Selection status` body header, which its own validator rejects."
     source: "CLOSE-OUT-20260923 §4.A; flowmaster-validate/SKILL.md:178"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-04
     statement: "flowmaster-validate's guidance and profile staging_rule no longer presume a complete local copy of the prompt corpus (D22)."
     source: "CLOSE-OUT-20260923 §4.A; flowmaster-validate/SKILL.md:382, :398, :402; profile staging_rule"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-05
     statement: "amthor-workspace-governance-audit no longer snapshots or hashes prompt bodies (D22)."
     source: "CLOSE-OUT-20260923 §4.A; amthor-workspace-governance-audit/SKILL.md:109-113, its description, references/report-contracts.md:39"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-06
     statement: "session-relay-flowmaster no longer hashes prompt bodies (D22)."
     source: "CLOSE-OUT-20260923 §4.A; session-relay-flowmaster/SKILL.md:378"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-07
     statement: "The governance-audit behavioral fixture no longer rejects the cross-session PR-30 to PR-35 route that D23-D made lawful."
     source: "CLOSE-OUT-20260923 §4.A; amthor-workspace-governance-audit/references/behavioral-fixtures.md:49"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-08
     statement: "GCFPE stage prompts are no longer pinned by prompt-body content hash: one GCFPE override sentence outside the byte-identical protected core, in change-flow and session-relay-flowmaster, pins them by stable ID, version and direct Notion URL (A1-6 pattern). The core, flowmaster-primary, session-branch-flowmaster and tw-flowmaster are unchanged."
     source: "CLOSE-OUT-20260923 §4.A; protected core :72, :122 in change-flow and session-relay-flowmaster; Nathan 2026-09-23 accepted the override recommendation"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-09
     statement: "glow-graph-contract states the post-D23 graph counts."
     source: "CLOSE-OUT-20260923 §4.A; glow-graph-contract/SKILL.md:13, :133-134"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-10
     statement: "change-flow no longer calls 091426.1 the collision-checked reserved successor."
     source: "CLOSE-OUT-20260923 §4.A (carried); change-flow/SKILL.md:280"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-11
     statement: "flowmaster-validate/scripts/validate_gcfpe_current.py fails closed with a named result, not a NameError, when --bodies-stdin is used with the historical schema-3.1 alias contract."
     source: "CLOSE-OUT-20260923 §4.A (carried); located by the ANALYZE verification in flowmaster-validate/scripts/validate_gcfpe_current.py:605 (change-flow has no copy)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-12
     statement: "The graph's edge_indices bookkeeping matches its edges."
     source: "CLOSE-OUT-20260923 §4.A (carried)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-13
     statement: "The contract regenerator and the registry deriver live in glow-graph-contract as maintained scripts, and the pre-E2 contract they need is kept in the repository, so the shipped 091426.1 contract 6902924a… regenerates byte for byte from repository sources."
     source: "CLOSE-OUT-20260923 §4.A (carried)"
-    disposition: ""
+    disposition: VERIFIED  # one input, pinned by its digest, is the R1 oracle bundled in flowmaster-validate, a skill, not a repository file (P-69, DN-7)
   - id: ITEM-14
     statement: "session-relay-flowmaster no longer names Drive as the GCFPE artifact plane (D7): its text, its ARTIFACT_PLANE enum (with REPOSITORY), validate_relay_manifest.py, a self-test case and the manifest examples agree."
     source: "CLOSE-OUT-20260923 §4.A (carried); session-relay-flowmaster/SKILL.md:273, :358"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-15
     statement: "The five round-a5 non-blocking findings are repaired."
     source: "CLOSE-OUT-20260923 §4.A (carried); SECTION-10-REVIEW-a5-SFR-A5-1.md N1-N4, SECTION-10-REVIEW-a5-SFR-A5-2.md F1-F4"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-16
     statement: "D22 has guards that fire on regression: CONTRACT_REQUIRED holds ITEM-08's override sentence in change-flow and session-relay-flowmaster; CONTRACT_FORBIDDEN, or the owning skill's own suite, forbids every retired body-copying or body-hashing phrase this Modification removes from change-flow, session-relay-flowmaster, flowmaster-validate and amthor-workspace-governance-audit; a governance-audit fixture proves prompt-kind sources carry no digest. tw-flowmaster is excluded (out of scope), and the residual limit, prose paraphrase, is recorded under D14."
     source: "CLOSE-OUT-20260923 §4.A (carried); gcfpe.decision-record.md D22 (GUARD-001)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-17
     statement: "QA-10 no longer calls itself read-only while it saves three artifacts."
     source: "CLOSE-OUT-20260923 §4.E"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-18
     statement: "CL-40 names the store of the CRD candidate list it updates."
     source: "CLOSE-OUT-20260923 §4.E"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-19
     statement: "CL-20's board-update instruction names the board reference supplied by the change context, and records the update as pending with its PF04 §9.1.1 owner (the authorized manual operator and the actual receiving owners) when none is supplied."
     source: "CLOSE-OUT-20260923 §4.E"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-20
     statement: "OPS-10's and OPS-20's ban on page and file mentions says that it covers authored reusable text only, so it no longer reads as contradicting their own Notion URL line and the direct URL a handoff must carry."
     source: "CLOSE-OUT-20260923 §4.E"
-    disposition: ""
+    disposition: NOT_APPLICABLE
   - id: ITEM-21
     statement: "The four CL-* bodies' 'PR-40 merge-approval effect … defined above' names the PR-40 entry the section describes once ITEM-29 lands (MERGE_OBSERVED first, Nathan's assertion only as fallback), and states that entry approves nothing (Flow Index: a published page, a passing check or a historical receipt 'creates no runtime approval')."
     source: "CLOSE-OUT-20260923 §4.E"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-22
     statement: "The registry's 16 lane notion_parent_id and 55 row expected_parent_id values, and their 70 titles, name each prompt's actual 091426.1 parent page, so the governance audit's parent check (NAM-002) holds."
     source: "CLOSE-OUT-20260923 §4.D; ESC-10's page sits under the 091426.1 Escalation hub 3db4590a05eb81cd938de84cfffead9c while its row expects 3c74590a05eb8123bc55ca7f99ce176c"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-23
     statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY (D20 redesign) reserves no release-bound header line (D23-G), so it can be promoted without one."
     source: "CLOSE-OUT-20260923 §4.D; Notion page 3e34590a05eb811b93d2da9b4ef8106d, a child of the redesign tracking page"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-24
     statement: "When a maintenance or repair session's message to the Product Owner carries a NEXT_PROMPT_HANDOFF block, the named state (DECISION NEEDED / NOTHING NEEDED / IN FLIGHT) is the line immediately before the block, so the handoff-last ruling and the named-state rule agree in glow-po-reporting, the Hub worker communication rules and session-working-rules.md."
     source: "Product Owner ruling 2026-09-23 (a maintenance session's handoff goes last; gcfpe.decision-record.md D23 successor) against glow-po-reporting 'end in one of exactly three named states' and Hub 'Worker communication rules' §2"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-25
     statement: "glow-graph-contract says that the graph copies bundled in skills are validator fixtures built from docs/graph/parts, not sources."
     source: "Parent Modification Amendment 1 'Noticed, not in scope' (spec S-3); glow-graph-contract/SKILL.md:59"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-39
     statement: "No installed skill this Modification packages states the retired D18 Alpha state as current: change-flow/SKILL.md:335 ('the sole operative state is ALPHA_STOPPED…'), flowmaster-validate/SKILL.md:174, and the governance audit's interoperability-contracts.md:96 and behavioral-fixtures.md:59, with the validator markers that require change-flow's line (change-flow validate_gcfpe_20260914.py:1033, flowmaster-validate validate_gcfpe_20260914.py:2692) moved with it. The graph's and contracts' alpha_resumption_contract follows the Product Owner's answer (§A, Open questions 3)."
     source: "ANALYZE completeness review and broad match over the packaged skills, 2026-09-23 (ALPHA_STOPPED, PR04 not started, 'sole operative state')"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-26
     statement: "No body's routing, recovery or package sentence tells a handoff to carry lineage, decisions, completed work, evidence, a branch or commit, or other content its named artifacts hold; each such sentence names the artifacts instead (C-HANDOFF, D23-B)."
     source: "ANALYZE body sweep and adversarial re-check: HANDOFF_RESTATES_CONTENT, 123 REAL findings in 46 bodies (evidence/closeout-residuals/ANALYZE-body-evidence.md)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-27
     statement: "The shared sentences in 34 bodies that keep mappings 'in … metadata or [the] handoff' (A1) and in 34 bodies that keep or carry the CANON_CONFLICT_REGISTER in the handoff (A2) keep them in the output artifact only; the handoff names that artifact (C-ART, C-HANDOFF)."
     source: "ANALYZE anchor census A1 and A2; one verdict per shared sentence"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-28
     statement: "A registry guard (D14) fails when any retired handoff-content phrasing, branch or commit carriage, or 'or the handoff' storage clause returns to a body, each proven by an injected must-fail regression."
     source: "The parent's E4 gate passed every body ITEM-26 names (0 of 1 484 assertions); a guard that never fired is not a guard (GUARD-001)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-29
     statement: "Every one of the 21 bodies that describes PR-40 entry by Nathan's assertion alone (anchor A7) uses the parent's A1-5 wording and the D23 once-per-merge sentence verbatim: the MERGE_OBSERVED handoff from PR-35 or RS-40 first, Nathan's merge assertion only where no MERGE_OBSERVED result was returned for this merge, and PR-40 entered once per merge."
     source: "ANALYZE anchor census A7 (21 bodies)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-30
     statement: "PR-35's and RS-40's closed result lists include MERGE_OBSERVED, so C-DISPATCH's result is not barred as a 'sixth result'."
     source: "ANALYZE re-check: PR-35 OTHER_CONTRADICTION (REAL); completeness critic for RS-40"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-31
     statement: "PR-40 no longer says that an ordinary in-scope defect stays with the existing PR owner; a REJECT re-plans through PR-20 (C-REPLAN, D23-F)."
     source: "ANALYZE re-check: PR-40 OTHER_CONTRADICTION (REAL)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-32
     statement: "The 13 bodies that call themselves read-only, or say they do not edit the repository, while committing their own outputs scope that claim to exclude those outputs; the shared 'Reviewers remain read-only' sentence is scoped to the reviewed work; and PR-35, RS-40 and GCFPE-MGMT-10, which write outside docs/ephemeral/ and docs/graph/, scope the storage sentence to their artifacts (ruling 2)."
     source: "ANALYZE anchor census A5 and A6 (evidence/closeout-residuals/ANALYZE-anchor-census.md)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-33
     statement: "The 10 live bodies carrying 'Embed only applicable workflow contracts' (A3a) lose it, with its trailing 'do not restate them as independent reusable prompt policy' clause (A3b) where the two form one sentence; the 5 carrying 'candidate URL tokens must be replaced' (A4a) lose it; CL-40's 'This authoring candidate does not perform that update' (A4c) is resolved to match the PART-06 answer. Correctly scoped prohibitions (A3c, A3d, A4b) stay."
     source: "ANALYZE anchor census A3 and A4, one verdict per sentence"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-34
     statement: "QA-110 routes a completed failing run one way only, so ACCEPT and ESCALATION_REQUIRED no longer both claim it."
     source: "ANALYZE re-check: QA-110 OTHER_CONTRADICTION (REAL)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-35
     statement: "QA-80 states WRONG_ROUTE_APPROVED_BASE once, with the graph's two branches as conditions (terminal without a complete delta; QA-70 with one), not as two opposing rules."
     source: "ANALYZE re-check: QA-80 OTHER_CONTRADICTION (REAL); docs/graph/parts/prompts/QA-80.json"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-36
     statement: "The D23-G release-line check rejects a Prompt version:, Set: or Ecosystem release: label line anywhere in a body, not only in the first 8 non-blank lines, in the registry's 55 rows and in flowmaster-validate's PROMPT_BODY_RELEASE_HEADER."
     source: "ANALYZE verification B4a-c: both checks see 8 non-blank lines only"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-37
     statement: "C-LAT's 'Decide it during work' block in the eight bodies that implement nothing (PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20, IA-30) is changed as the Product Owner rules on the re-asked question (§A, Open questions 2), recorded as a D23-C successor."
     source: "ANALYZE completeness critic; C-LAT is placed verbatim by the parent's step 22 (spec v2 §3), so this changes a canonical placement and needs a Product Owner ruling"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-38
     statement: "PR-10's 'material change (D23-C) change' loses its doubled word, as a rider on PR-10's PART-15 edit. The '(D23-C)' form itself stays: it is the parent's recorded STEP22-BEFORE settlement (evidence/e3/E3-E4-report.md:112)."
     source: "ANALYZE sweep: PR-10, PR-35, PR-40, DOC-10 read 'material change (D23-C)'; spec v2 step 22"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-40
     statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY carries none of the classes the census measured on it and this Modification removes (anchors A1, A2, A3a with its A3b clause, A4a, A5 and A8; it has no handoff-content instruction), so its promotion cannot reintroduce them. Its read-only 'Must not: change anything' lines and its design-level contradictions are recorded for the D20 redesign's stage 5, not resolved here."
     source: "ANALYZE anchor census of page 3e34590a05eb811b93d2da9b4ef8106d (evidence/closeout-residuals/ANALYZE-anchor-census.md)"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     name: "Skill text applies D23-B and D7; the PR skill's revision moves and the contract is regenerated"
@@ -1315,10 +1315,10 @@ is on `main`** (X0.1).
 | 22 | — | NOT_APPLICABLE | PART-08 (ITEM-20): no edit, as §A found |
 | 23 | X6.1–X6.3 | VERIFIED | X6.1: `EX/corpus/`, 55 of 55 exit 0, `guard_failures` `[]` on each (each new guard fires on its injected regression, and each required guard fails when removed), CL-40 with `--candidate-url`; each summary read its page's newest fetch, all 55 made 16:05Z to 16:10Z, after X5.6's commit. X6.2: `EX/graph_check.json`, every row `true`, exit 0, on fresh fetches of QA-110 and QA-80. X6.3: `execute.6`, 50 `closure.py` runs each exit 0, and the `diff` against `ANALYZE-closure.md` exits 0 and prints nothing (the manifest writes the comparison to the scratchpad, not to `EX/`) |
 | 24 | X6.4 | APPLIED | This §E. `modification_validate.py` passes on it; one commit (`closeout-residuals X6.4: execution record`) carries `EX/corpus/`, `EX/graph_check.json` and this record; the three-dot path check runs after it, then the execution PR opens |
-| 25 | X7.2–X7.4 | PENDING | Follows X7.1, Nathan's merge of the execution PR |
-| 26 | X7.5 | PENDING | Follows X7.4 |
-| 27 | X7.6 | PENDING | Follows X7.5 |
-| 28 | X7.7 | WITHDRAWN | Under DN-8 (A); X7.6 records it (successor, rows 27 and 28) |
+| 25 | X7.2–X7.4 | VERIFIED | Nathan merged the execution PR, [amthorn78/glow-hdengine-v2#488](https://github.com/amthorn78/glow-hdengine-v2/pull/488) (`09be934`), and installed the seven archives in one sitting on 2026-09-24. X7.4 ran from `main` on the close branch: the seven installed freeze lines equal `EX/packages.json` (`EX/installed_freeze.txt`); `run_gate.py --set post` 28 of 28 rows (`EX/gate_post.json`); the corpus gate 55 of 55 (`EX/corpus-post/`). One commit, `c2c07f7` (*Install, freeze lift and close*) |
+| 26 | X7.5 | APPLIED | Nathan lifted the freeze on 2026-09-24 (quoted below). `lift_date` committed (`f9636f5`); `TRACK-FREEZE-LIFT` landed by `ctrl.py op` and read back `LANDED`, with `TRACK-FREEZE-START` still `LANDED`, from a fetch at 16:47:18.601Z (`EX/ctrl/X7.5.json`) |
+| 27 | X7.6 | APPLIED | The Drive banner read back by the file's title, as Nathan re-ruled (below); `close_date` 2026-09-24; `CLOSE-D22`, `P31-POLICY` and `P33-A5NOTE` applied; the `D25 applies from:` line; the dispositions; `status: COMPLETE`; one commit (`closeout-residuals X7.6: close`) and the close-out PR |
+| 28 | X7.7 | WITHDRAWN | Under DN-8 (A): `TRACK-STATUS-01` to `03` are not applied, and the close-out PR does not wait for them (successor, rows 27 and 28). Nothing runs after X7.6 but Nathan's merge (X7.8) |
 
 ### The stop at X4.5, and Nathan's rulings
 
@@ -1357,6 +1357,89 @@ PART-06 pointer edits) and X5.4 (the 50 bodies) are authorized. X5.5 writes noth
 Both edits were made by `ctrl.py op` and read back `LANDED` (rows 20 and 21). The harness classifier refused no
 Notion write and no command from X5.0 to X6.4.
 
+### Install, freeze lift and close, 2026-09-24
+
+Written as each happened, and kept as written.
+
+**The merge and the install.** Nathan merged the execution PR,
+[amthorn78/glow-hdengine-v2#488](https://github.com/amthorn78/glow-hdengine-v2/pull/488), as
+`09be934f3a7036d3d2d2c231dc9db7a2820819a8` (2026-09-24T16:32:06Z). He then installed the seven archives in one sitting,
+and gave the date:
+
+> #488 is merged (09be934). I've installed all seven skills in one sitting today, 2026-09-24: flowmaster-validate,
+> change-flow, glow-graph-contract, session-relay-flowmaster, glow-hde-pr-development,
+> amthor-workspace-governance-audit and glow-po-reporting. Record 2026-09-24 as the install date and run the X7.4
+> post-install check from main. If every digest matches, stop and ask me to lift the freeze; don't lift it or start the
+> close-out before I answer. If any digest differs, stop and tell me which. A classifier refusal still stops you and
+> comes to me.
+
+**The post-install verification (X7.4).** It ran from `main` at `09be934` on the close branch
+`docs/20260924-closeout-residuals-close`, against the installed tree:
+
+- `EX/installed_freeze.txt`: the seven installed freeze lines. Each equals its line in `EX/packages.json`: file count
+  and digest, from flowmaster-validate `31 0ca2a74d…` to glow-po-reporting `1 7e04368a…`.
+- `EX/gate_post.json`: `run_gate.py --set post`, 28 of 28 rows, `ok: true`.
+- `EX/corpus-post/`: the corpus gate on the installed skills, 55 of 55 bodies passing. Each reads its page's newest fetch
+  in memory (54 from this session's transcript, QA-10 from its `tool-results/` file).
+- `install_date` 2026-09-24 went into `EX/run.json` only after all three passed. The four were committed together
+  (`c2c07f7`, `closeout-residuals X7.4: post-install verification`).
+
+**The freeze lift (X7.5).** Nathan, answering the X7.4 return:
+
+> I lift the freeze, effective now. It covers both the Alpha run's E6 freeze and this Modification's. Write the lift
+> line (X7.5) and record the lift, with this message quoted, in both records' §E. The old Drive file
+> (1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO) has been marked superseded by renaming it to SUPERSEDED — see Notion "Candidate
+> CRD Items List" — Candidate-CRD-Items-List.md. At X7.6, check the banner by that title, not by reading the file's
+> first lines, and record that change of check in §E. Then make the close commit and open the close-out PR. A
+> classifier refusal still stops you and comes to me.
+
+This is the last of three sendings. The first was interrupted, and the second said "The Drive banner is in place."
+The lift itself is the same in all three. `lift_date` 2026-09-24 was committed (`f9636f5`, `closeout-residuals X7.5:
+lift date`) and pushed. `TRACK-FREEZE-LIFT` then landed on the D20 tracking page by `ctrl.py op`. The readback is
+from a fresh fetch at 16:47:18.601Z: `TRACK-FREEZE-LIFT` and `TRACK-FREEZE-START` both `LANDED`
+(`EX/ctrl/X7.5.json`, committed with this close). The lift is recorded in the Alpha record's §E too. Flow sessions
+may run again.
+
+**The Drive banner, and the change of check.** The spec's X7.6 reads the Drive file's first lines for Nathan's
+banner (P-83). That read, on the second sending, found the file beginning with its own old heading, with no banner.
+Before anything was written for X7.6, Nathan corrected himself:
+
+> Correction to my last message: the Drive banner is not in place; I stated that wrongly. Do not make the close
+> commit yet. PE37 is marking the Drive file superseded by renaming it to SUPERSEDED — see Notion "Candidate CRD Items
+> List" — Candidate-CRD-Items-List.md. Check the banner by that title (file 1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO), not by
+> reading the file's first lines. Record this change of check in §E with this message quoted, then continue with X7.6.
+> The freeze lift and everything else in my last message stand.
+
+The third sending, quoted above, carries the same change of check. So X7.6's banner check is now the file's title,
+read from its Drive metadata. Its first lines are no longer read:
+
+- **The first title read, before 16:50Z:** `Candidate-CRD-Items-List.md`, last modified 2026-09-08. The rename had
+  not landed, so the banner was absent and nothing was written for X7.6.
+- **The second read:** `SUPERSEDED — see Notion "Candidate CRD Items List" — Candidate-CRD-Items-List.md`, modified
+  2026-09-24T16:50:04.265Z, still 31 923 bytes. The banner is present, and X7.6 went on.
+
+This session wrote nothing to Drive.
+
+**The close (X7.6).**
+
+- `close_date` 2026-09-24 is in `EX/run.json`.
+- `apply_texts.py … close --run EX/run.json --installed-freeze EX/installed_freeze.txt` applied `P31-POLICY`,
+  `P33-A5NOTE` and `CLOSE-D22`, each once, and opened no quoted line. Results:
+  - `prompt-body-content-policy.md`: `c24061b8…` (7 125 B).
+  - `REVIEWER-PROMPT-a5.md`: `9e2d822c…` (19 234 B). Both equal the successor's proof.
+  - `gcfpe.decision-record.md`: `7b42ed4a…` (113 065 B). It differs from the proof's `b324490a…` only because the
+    proof used a stand-in install date, 2026-01-01. The byte count is the same.
+- No X7.4 failure record was written, so the `D25` line is written here (P-86, P-102 (g)):
+
+D25 applies from: 09be934f3a7036d3d2d2c231dc9db7a2820819a8, 2026-09-24
+
+- **The dispositions.** Every item is `VERIFIED` except ITEM-20, which is `NOT_APPLICABLE` (PART-08, no edit).
+  - ITEM-13's disposition names its one input from outside the repository, as P-69 and DN-7 require: the R1 oracle
+    bundled in flowmaster-validate, pinned by its digest.
+  - Each part's "still to come" in *Parts* below is now done: the merge (#488), the install and X7.4, the three close
+    texts, and Nathan's banner.
+- The harness classifier refused no Notion write and no command from X7.1 to X7.6.
+
 ### Parts
 
 Every item's disposition at X6.4 is its part's. No part is half applied and none is blocked. `APPLIED` means landed
@@ -1393,6 +1476,10 @@ took these values: `{{CANDIDATE_CRD_LIST_URL}}` the URL, `{{MIGRATION_DATE}}` th
 `{{EXECUTE_DATE}}` each step's own execute date. `{{INSTALL_DATE}}`, `{{FREEZE_DIGESTS}}` and `{{LIFT_DATE}}` are
 X7.4's to X7.6's.
 
+At X7.4 to X7.6, `EX/run.json` gained `install_date`, `lift_date` and `close_date`, all 2026-09-24. The install and
+lift tokens took that date, and the freeze-digest token took the seven lines of `EX/installed_freeze.txt`. The close
+date fills no text, because `TRACK-STATUS-01` to `03` are withdrawn.
+
 `EX/packages.json`, the seven archives delivered at X4.4 (file sha256; freeze line):
 
 | skill | files | bytes | sha256 | freeze |
@@ -1413,7 +1500,7 @@ X7.4's to X7.6's.
 - **Evidence, under `EX`:** `run.json`; `gate_pre.json`, `gate_pkg.json`; `x3.1.json`, `x3.2.txt`, `x3.3.txt`,
   `nam002/`, `x4.1.txt`; `packages.json`; `rehearsal/` (56), `anchor_check.json`, `drive_check.json`; `ctrl/X5.0.json`,
   `ctrl/X5.3.json`, `ctrl/X5.6.json`; `m2/create.json`, `m2/final.json`; `landing/` (51); `corpus/` (55),
-  `graph_check.json`. Each is its tool's own output, and the step's gate read it. None holds a prompt body.
+  `graph_check.json`; at X7.4 `installed_freeze.txt`, `gate_post.json` and `corpus-post/` (55); `ctrl/X7.5.json`. Each is its tool's own output, and the step's gate read it. None holds a prompt body.
 - **The D24 round:** `REVIEWER-PROMPT-cr1.md`, `SECTION-10-REVIEW-cr1-SFR-CR1-1.md` and
   `SECTION-10-REVIEW-cr1-SFR-CR1-2.md` under `evidence/closeout-residuals/`, each committed as it was written.
 - **Notion:** the *Candidate CRD Items List* page; `TRACK-FREEZE-START`; the eleven PART-06 pointers; the 50 bodies;
@@ -1443,21 +1530,39 @@ X7.4's to X7.6's.
   They were deleted at X6.4 (16:14Z), after the corpus gate. That was later than condition 4's "when that read is
   done". No other scratch file holds a prompt body or a passage of one: the dry run's and X4.5's plan files ran with
   `--no-ops`.
+- **X7.4 and X7.6.** X7.4's corpus gate re-fetched the 55 bodies at 16:42Z to 16:43Z. The harness saved five of them
+  to `tool-results/` because of their size: OPS-30, PR-10, PR-20, PR-40 and QA-10. The rest are in this session's
+  transcript. The gate read each in memory, and wrote only its per-page summaries to `EX/corpus-post/`. At X7.6 this
+  session read the first 1 500 bytes of each of the five files to name its page, printing only the title. X7.4's
+  scratch output (`gate-post/`, `gate_post.stderr`) holds skill trees and gate rows, no body.
 - Nothing was hashed or byte-compared as a body's identity. The files in the harness's store are left to its teardown
   and are not read again. The harness refuses a session's `rm` there (`D22`, as refined), and this session did not
   try.
 
 ### Interaction cost, actual against predicted
 
-Predicted 11. The actual count is X7.6's to record, once Nathan's merge, install and lift are counted.
+    interaction_cost = open rulings 4 + 2 + ANALYZE review rounds 3 + PLAN review rounds 9 + skill review cycles 1
+                       + installs 1 + merges 4 + freeze 1 + Drive banner 1 + rulings not predicted 4 = 30
+
+**Predicted 11 (§A), 12 (the dated plan), 26 (the successor, format 2.1). Actual 30: 29 so far, and the close-out
+PR's merge makes 30.** The terms are the successor's, each as it predicted, plus four rulings nobody predicted:
+
+- **Not predicted (4):**
+  - the X4.5 stop, whose ruling re-ran PR-30 and ESC-40 and added the two allow rules;
+  - X5.6's two control edits, which the Notion authorization had left out by mistake;
+  - the re-send of the seven archives after Nathan could not save them;
+  - the Drive banner's correction, which changed the check to the file's title.
+- **Merges (4):** #478, #484, #488 and the close-out PR.
+- **Freeze (1):** the confirmation and the lift.
+- Status notes and messages that only said "continue" are not counted.
+
+**Why it differs from 26.** Each of the four was a return that the plan had no step for. Two were the plan's own gaps:
+the authorization list's omission, and the banner check reading content that a rename does not change. One was a
+rerun, and one was a delivery the harness did not surface.
 
 ### Remaining Product Owner actions
 
-1. Banner the Drive file `1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO` as superseded by the *Candidate CRD Items List* page. He
-   may do it from here on (P-102 (e)), and X7.6 reads the banner before the close commit.
-2. Merge the execution PR (X7.1).
-3. Install the seven archives delivered at X4.4 in one sitting, each named by the sha256 above, and give the date
-   (X7.2–X7.3).
-4. After X7.4 passes, lift the freeze (X7.5). It covers the Alpha run's E6 freeze and this Modification's, and the lift
-   is recorded in both records' §E.
-5. Merge the close-out PR (X7.8).
+1. Merge the close-out PR (X7.8). No step waits on it: X7.7 is withdrawn (row 28).
+
+Done: the banner (by the file's title, read back above), the execution PR's merge (#488), the install on 2026-09-24,
+and the freeze lift on 2026-09-24.
