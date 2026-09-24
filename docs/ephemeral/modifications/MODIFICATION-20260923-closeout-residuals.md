@@ -2,7 +2,7 @@
 artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 modification_id: MODIFICATION-20260923-closeout-residuals
-status: PLANNED
+status: EXECUTING
 targets: [prompt, skill, rule, graph, registry, notion_control]
 gate_tier: 1
 closure:

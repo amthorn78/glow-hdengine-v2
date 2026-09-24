@@ -741,6 +741,24 @@ a fresh current-PF10 read, that it also state the provenance rule. Assertions ro
 721. All eight injected regressions were caught, the clean control passed, and a negative
 control confirms the guard does not fire on legitimate Canon drainage text, which must survive.
 
+### Note, 2026-09-23 — a phrase guard cannot see a paraphrase
+
+Recorded by `MODIFICATION-20260923-closeout-residuals` (ITEM-16), whose guards for `D22` pin exact
+phrases. The ruling above is left as written (`AUTH-001`); this records a limit of its second part.
+
+- **The guards pin phrases, not meaning.** `CONTRACT_REQUIRED` holds one exact override sentence in
+  `change-flow` and `session-relay-flowmaster`. `CONTRACT_FORBIDDEN`, or the owning skill's own
+  suite, forbids each exact retired body-copying or body-hashing phrase. A governance-audit fixture
+  proves that a prompt-kind source carries no digest.
+- **A paraphrase passes them.** The prose guard first prototyped for `D22` missed 30 of 30
+  paraphrased violations and flagged the edits' own prohibitions
+  (`docs/ephemeral/modifications/evidence/closeout-residuals/ANALYZE-skill-evidence.md`, ITEM-16).
+  The guards were narrowed to exact phrases for that reason.
+- **The residual limit is prose paraphrase.** A retired rule reintroduced in new words is not
+  mechanically detectable. Review holds it: the first part of this ruling, which asks what the text
+  makes an agent *do*, and the `D24` review of every skill change.
+- **An exact-phrase guard still meets the second part** once an injected regression has fired it.
+
 ## D15 — Ten qualifying-approval branches were still marked terminal after drainage removal
 
 Found 2026-09-18 while repairing the workflow skills, by a validator that had never been able
@@ -962,6 +980,29 @@ written (`AUTH-001`).
   and nothing else kept it current.
 - The Hub, register, Alpha checklist, run notes and HDE Change Flow Overview point to that section
   and no longer restate the state.
+
+### Successor, 2026-09-23 — `alpha_resumption_contract` is the promotion-time record
+
+**Product Owner, 2026-09-23:** *"ok approved"*, approving the recommendation on Open question 3 of
+`MODIFICATION-20260923-closeout-residuals`, answer (A).
+
+The successor above left Alpha state to the Epic's own artifacts. Machine records still carry the
+resumption contract as promotion recorded it: the graph's `global.json` and both `091426.1`
+contracts hold an `alpha_resumption_contract` with
+`state: ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR` and `next_intended_unit: HDE-EPIC040-PR04`,
+and two validator checks require those values.
+
+- **They are the promotion-time record, not current Alpha state.** Current Alpha state is what the
+  Epic's own artifacts record (the successor above). No prompt reads the block for routing.
+- **The values stay, and the graph does not change.** Its digest stays `ae2bd159…`, and the
+  regenerated contract carries the same block.
+- **The validator checks are renamed** from Alpha-state checks to promotion-record checks, with
+  their values unchanged: `flowmaster-validate`'s `ALPHA_STATE` and `ALPHA_TRIGGER` at
+  `validate_gcfpe_20260914.py:1901-1916` become `ALPHA_PROMOTION_RECORD` and
+  `ALPHA_PROMOTION_RECORD_TRIGGER` (with the fixture mutation renamed to match), and `change-flow`'s
+  two requires at `:1017-1018` are reworded (3.3.0 line numbers). The skills' prose says the same.
+- **Retiring the block was not chosen.** It would move the graph digest, and every proof token and
+  pin with it.
 
 ## D19 — A prose skill carries no advertised identity; its freeze digest is its identity
 
@@ -1444,6 +1485,51 @@ ecosystem worker output standard*: the response ends with its `NEXT_PROMPT_HANDO
 anything before the block is at most a few lines. This is the rule C-PLACE sets for prompt bodies,
 applied to maintenance, repair, validation and review sessions. The Hub standard says so.
 
+### Successor, 2026-09-23 — C-LAT's three steps leave the eight bodies that implement nothing (D23-C)
+
+**Product Owner, 2026-09-23**, on ITEM-37 of `MODIFICATION-20260923-closeout-residuals`. Offered a
+step 2 that hands the decision to the implementing PR owner, he replied *"yes those words don't
+seem to mean anything do they"*. Review then found that receiver wrong for `PR-40`, `IA-30` and
+`PR-10`, so the question was asked again, and he approved answer (a) with *"ok approved"*.
+
+C-LAT's placement by step 22 of `MODIFICATION-20260923-alpha-feedback-open-entries` (spec v2 §3)
+is superseded for eight bodies. `D23-C` above is left as written (`AUTH-001`).
+
+- **C-LAT's three-step *Decide it during work* block is removed from `PR-10`, `PR-20`, `PR-40`,
+  `RS-10`, `RS-20`, `DOC-10`, `DOC-20` and `IA-30`.** None of them implements anything, yet step 2
+  told each to decide, implement and test. `PR-40` sends an in-scope defect to a re-plan instead
+  (`D23-F`).
+- **The Material definition stays in all ten bodies, and so does each body's own routing.** A
+  material change still goes to rescope, and the rest is handled by the body's role.
+- **`PR-30` and `PR-35` keep the whole C-LAT.** They implement, and `D23-C`'s latitude is theirs.
+- **C-LAT's text is unchanged.** Only its placement changes.
+
+**Guard (`D14`).** In the registry, *Decide it during work* stops being required on those eight
+rows and becomes forbidden there (G-K51). The Material requirement stays on all ten rows, and
+`PR-30` and `PR-35` keep both. The forbidden pattern is fired by an injected regression.
+
+### Successor, 2026-09-23 — the release-line check covers the whole body (D23-G)
+
+Recorded by `MODIFICATION-20260923-closeout-residuals` (ITEM-36), whose analysis Nathan approved on
+2026-09-23 (*"yes"*). It applies `D23-G` as ruled, and rules nothing new.
+
+- **`D23-G` bars a release-bound label line anywhere in a body.** `prompt-body-content-policy.md`
+  forbids any field whose value changes because of a release event, with no header limit.
+- **Both checks saw only a header window**, the first eight non-blank lines: the registry's guards
+  on all 55 rows, and `flowmaster-validate`'s `PROMPT_BODY_RELEASE_HEADER`. A label line after the
+  window passed. The window was an implementation limit, not the rule.
+- **Both are widened to the whole body, line-anchored.** A `Prompt version:`, `Set:` or
+  `Ecosystem release:` label line fails wherever it stands, plain or decorated (bold, backticked,
+  numbered). A mention of a label inside a sentence does not.
+- **This supersedes one literal**, *"in the header window"*, which step 41 of
+  `MODIFICATION-20260923-alpha-feedback-open-entries` (spec v2 §3.5) placed in the Enforcement line
+  of `prompt-body-content-policy.md`. That line changes to "anywhere in the body, line-anchored" in
+  the same Modification. The spec is left as written (`AUTH-001`).
+
+**Guard (`D14`).** The registry's three window patterns are replaced in place by whole-body
+patterns, and `flowmaster-validate` gains fixtures for its check. Each fails on a label line
+injected past the eighth non-blank line, which the window let through.
+
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 
 **Product Owner, 2026-09-23:** *"It would be ideal if you could use sub agents to do the skill
@@ -1490,6 +1576,92 @@ The review must still be done by a party that did not author the change (standin
 None is mechanical. **A delivery is incomplete unless it carries** the committed brief and two
 verdict files, each bound to the delivered digests. That is checked by reading the delivery, and
 this entry says so rather than implying a guard exists.
+
+## D25 — The Candidate CRD Items List lives in Notion, and every prompt commits its output files
+
+**Product Owner, 2026-09-23**, during the analysis of `MODIFICATION-20260923-closeout-residuals`:
+*"candidate CRD can live in notion, I don't think it is a huge doc"*. Then: *"all output files are
+committed, that is the only way they are ever seen"*. And, approving the analysis's recommendation
+that `CL-40` write the list itself under a destination rule: *"ok approved"*.
+
+### What was wrong
+
+- **`CL-40` had no store for the list it updates** (ITEM-18). It adds each finished change's new
+  CRD candidates to the Candidate CRD Items List, but it named no store, and an authoring leftover
+  in its body read as forbidding the update its step 7 authorizes. No Notion page held the list.
+  The only copy was the Drive file `Candidate-CRD-Items-List.md`
+  (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`, last modified 2026-09-08), and Drive is not a storage
+  authority (`D7`). A flow prompt writes to Notion only under a destination rule
+  (`notion-write-boundary.md`), and no rule named a page. With no writer, the list goes stale,
+  which is the failure that retired the `D18` block.
+- **Bodies that commit their own output artifacts called themselves read-only** (ITEM-17, ITEM-32).
+  The analysis's census found the claim in 13 live bodies, among them `QA-10`, which called itself
+  read-only while it saves three artifacts. It found an unscoped "Reviewers remain read-only" in
+  four (`docs/ephemeral/modifications/evidence/closeout-residuals/ANALYZE-anchor-census.md`, A6
+  and A10). The behaviour was right and the wording wrong: each of those bodies writes, commits
+  and pushes its own artifacts.
+
+### The rulings
+
+**D25-A — The Candidate CRD Items List lives in Notion, and `CL-40` writes it (ruling 1; ruling 5,
+Open question 1, answer (A)).**
+
+- The list's one store is the Notion page *Candidate CRD Items List*, under the Glow Operations
+  Hub.
+- `GCFPE-MGMT-10` creates the page at EXECUTE of `MODIFICATION-20260923-closeout-residuals`, under
+  that run's task-level authorization. It migrates the Drive list into the page and reads the page
+  back against the Drive source.
+- A destination rule in `notion-write-boundary.md` names that page. Under it, `CL-40` updates the
+  page in place with each change's new CRD candidates, and writes no other Notion page.
+- `CL-40`'s registry `mutations` allow that write, and the authoring leftover goes (A4c).
+- The Drive file becomes Nathan's reference copy. He banners it as superseded, pointing to the
+  Notion page. The file is his, and nothing reads it as a store.
+
+**D25-B — Every prompt commits its output files (ruling 2).**
+
+- A prompt's output artifacts are written, committed and pushed. That is the only way they are
+  seen, so the commit stays.
+- Every statement in a body that the prompt is read-only, or does not change the repository,
+  excludes the prompt's own committed output artifacts (C-ART) and, by the approved plan (its decision
+  P-02), any pull request that carries them. The claim is scoped, and the behaviour does not change.
+- A reviewer stays read-only toward the work it reviews, and commits its own review artifacts.
+- Nothing else is excluded. Every other limit a body states on what it may change still holds.
+
+### Consequences
+
+- **Both are recorded before any EXECUTE edit** of `MODIFICATION-20260923-closeout-residuals`, in
+  its first execution commit. `D25-A` changes what `CL-40` writes and where (class A, PART-06).
+  `D25-B` aligns wording with what the bodies already do (class B, PART-05).
+- **The exact wording each ruling is applied with is in that Modification's execution specification**
+  (`docs/ephemeral/modifications/specs/EXECUTION-SPEC-20260923-closeout-residuals.md` §3.2), which its §P cites. It is
+  cited there, not restated here, so the two cannot drift (`DERIV-001`).
+- **`CL-40`'s rule is a flow prompt's own destination rule.** It names one page, and authorizes
+  `CL-40` alone. The line `notion-write-boundary.md` draws between executing the flow and
+  maintaining the ecosystem stands, and no other flow prompt gains a Notion write.
+- **The Drive list's only repository mention**
+  (`docs/ephemeral/HDE-EPIC040-PR40-workspace-register.md:206`) sits inside a dated 2026-09-09
+  snapshot of a Notion page, and stays as written (`AUTH-001`).
+- **`D25-B` gives no prompt a new write.** It corrects what bodies say about the writes they
+  already make.
+
+### The tested guard (`D14`)
+
+Registry assertions in `project-prompt-contract-registry.md`, listed in that Modification's execution
+specification (§4.2). Each
+is fired by an injected must-fail regression, on synthetic text at PLAN and again on the landed
+body at EXECUTE (`GUARD-001`):
+
+- **`D25-A`:** G-K43 forbids `CL-40`'s authoring leftover. G-K44 forbids the page-URL placeholder
+  in `CL-40`, so the corpus gate fails while the URL is unfilled. G-K45 requires `CL-40` to name
+  the page *Candidate CRD Items List* by its direct Notion URL.
+- **`D25-B`:** G-K35 forbids each carrying row's unscoped read-only claim. G-K36 requires the
+  scoping sentence on those rows. G-K37 forbids an unscoped "Reviewers remain read-only" on all 55
+  rows. G-K38 requires the scoped form on the four rows that carry it.
+
+The destination rule, `CL-40`'s `mutations` entry and the migrated list have no check that fires.
+Readback holds them, the list against its Drive source, and this entry records that rather than
+implying a guard. **`D25` applies from the merge that puts those guards on `main`, after they have fired on the landed bodies.
+That Modification's record (§E) states the merge commit and its date.**
 
 ## D26 — Review loops are bounded, a plan automates its normal path only, and a session resumes only at checkpoints
 
