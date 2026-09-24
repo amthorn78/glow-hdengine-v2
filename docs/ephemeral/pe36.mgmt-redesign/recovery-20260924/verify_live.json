@@ -1,0 +1,112 @@
+{
+ "checks": [
+  {
+   "claim": "PLAN-window Notion writes (after the 21:05Z ANALYZE approval) were only these: the Modification Backlog created at 00:09-00:11Z, a link to it on the Alpha Feedback page (00:11Z), and one Backlog update (last edited 00:29:29Z, holding MB-001 to MB-004). No prompt body was written.",
+   "verdict": "CONFIRMED",
+   "evidence": "Notion fetch of Backlog 3e54590a05eb81eb818fd0f42045167a: page_last_edited_at 2026-09-24T00:29:29.951Z, MB-001..MB-004 present. Notion search: Alpha Feedback page 3df4590a... timestamp 2026-09-24T00:11Z. RCA-20260924 §6 'Nothing was changed in production' lists the same three writes. The live MGMT-10 page was last edited 13:23Z (09-23) and the PE Metaprompt 17:17Z. No GCFPE page in search results carries a 09-24 timestamp except the Backlog and Alpha Feedback pages."
+  },
+  {
+   "claim": "Control-page writes after 17:27Z but before PLAN: close-out §6 edits (Flow Index, Hub, register, Alpha checklist, Alpha run notes, Overview, Expanded Repair Plan, old HDE TW page), with 'Notion last-edited 17:43Z for four of them, Hub 17:46Z'. The Tracking page was edited 17:45:35Z with status STAGE_4_FIRST_USE_COMPLETE_FOLLOW_UP_MODIFICATION_AT_INTAKE.",
+   "verdict": "CORRECTED",
+   "evidence": "CLOSE-OUT-20260923.md §6 (in 15b900a/537636e) lists the pages. Notion search timestamps are 17:43Z for Flow Index, register, Alpha checklist 3db4590a05eb812f..., Alpha run notes 3db4590a05eb8182..., Overview and Expanded Repair Plan, and 17:46Z for the Hub. Tracking page fetch: page_last_edited_at 2026-09-23T17:45:35.845Z, with the status line quoted exactly. The old HDE TW page timestamp was not checked.",
+   "correction": "Six pages carry 17:43Z, not four: Flow Index, register, Alpha checklist, Alpha run notes, HDE Change Flow Overview and Expanded Repair Plan. The Hub carries 17:46Z. The substance of the claim is unaffected: none of these is a body, skill, registry or graph change."
+  },
+  {
+   "claim": "No skill install after E6: the six installed freeze digests equal E6-report step 2. glow-graph-contract is unchanged at 6 4e671ddc.",
+   "verdict": "CONFIRMED",
+   "evidence": "I ran docs/prompt_ecosystem_management/freeze.py on /root/.claude/skills/synced/*/<skill> on 2026-09-24. Results: flowmaster-validate 31 a79401de…, change-flow 22 ee546df5…, glow-hde-pr-development 4 68077fa6…, session-relay-flowmaster 5 15aef989…, amthor 15 819915e4…, tw-flowmaster 2 fd6c344b…, glow-graph-contract 6 4e671ddc…. These equal E6-report.md:13, and the full hashes equal the worker's list. Directory mtimes of 09-24 09:33Z are a resync; the content digests did not change."
+  },
+  {
+   "claim": "Registry and graph did not change on main after 77d98dd. Graph parts are unchanged since d848942, and the build is 55 nodes / 229 edges / 575 074 B / ae2bd159.",
+   "verdict": "CONFIRMED",
+   "evidence": "git diff --name-only 77d98dd c2fbf3c shows no docs/graph path and no registry path outside docs/ephemeral. git diff --stat d848942 c2fbf3c -- docs/graph is empty. The registry's last commits are 2195652/3647916, squashed into 77d98dd. I rebuilt the graph in scratch with the installed graph_parts.py: 55 nodes, 229 edges, embedded JSON 575074 bytes, sha256 ae2bd159…, validation PASS."
+  },
+  {
+   "claim": "Live-governing documents changed on main after 17:27Z (all via c2fbf3c): notion-write-boundary.md (94bbc2a correction; ef2a0fa adds the Backlog as a maintenance destination), authoritative-surfaces.md (15b900a, ef2a0fa), gcfpe.decision-record.md (15b900a: D18 successor and D23 successor 'a maintenance handoff goes last'), modification-template.md (ef2a0fa rule 3).",
+   "verdict": "CONFIRMED",
+   "evidence": "git diff 77d98dd c2fbf3c -- docs/prompt_ecosystem_management/ touches exactly these 4 files, and the content matches the descriptions. Commit times: 94bbc2a 18:41:45Z, 15b900a 17:45:15Z, ef2a0fa 2026-09-24T00:11:52Z. c2fbf3c was merged 2026-09-24T09:29:18Z."
+  },
+  {
+   "claim": "Body counts per unit: C-ART 53 (all but MGMT-10 and PR-50), C-HANDOFF 53, S13V 25, S13P 8, C-PLACE 48 plus the ASK OK? variant 5, CTOP 54, C-LAT 10, C-DEC 3, C-SESSION 19, 154 header lines deleted, C-NOTION 8, S04 6, S05 10, C-SUB 2, C-DISPATCH 2, W-4 1.",
+   "verdict": "CONFIRMED",
+   "evidence": "evidence/e3/E3-E4-report.md 'E3: totals over 55 bodies' (:134-161). Spec v2 :3715-3716: the NPH53 set excludes GCFPE-MGMT-10 and PR-50. Spec v2 :3729 lists ASK4 = QA-60, QA-80, RS-10, RS-30; S18A 5 = ASK4 plus QA-50. Guard row sets are at spec v2 :3781-3808 (G05 NPH53, G08/G08A ASK4, G10/G11 LAT10, G12-G14 ALL55, G15/G18-G21 MAIN54)."
+  },
+  {
+   "claim": "D23-D: 79 same-session rewrites across 32 anchor classes (X01-X31), over about 40 bodies.",
+   "verdict": "CORRECTED",
+   "evidence": "The E3-E4-report.md 'Convergence classes' table (:164-) has 32 class rows. The distinct bodies named in them are CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-50, QA-60, RS-10 and RS-40. E3-E4-report :105 says 33 anchor classes, of which 32 fired and X07 matched nothing.",
+   "correction": "The 79 rewrites fell in 27 distinct bodies, not about 40. The 20 legitimate same-session phrases that remain are confirmed (E3-E4-report :106)."
+  },
+  {
+   "claim": "ITEM-37 (C-LAT in the 8 non-implementing bodies) needs Nathan's ruling on Open question 2.",
+   "verdict": "REFUTED",
+   "evidence": "MODIFICATION-20260923-closeout-residuals.md §A 'Product Owner rulings received during ANALYZE', ruling 5 (Nathan, 2026-09-23, 'ok approved'): 'Q2 (a): C-LAT's three-step Decide it during work block is removed from PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20 and IA-30; the Material definition and each body's own routing stay.' The Open-questions section also says 'All three were answered by ruling 5' (commit 7a3c070). PART-18's name reads 'as ruled on Open question 2'.",
+   "correction": "The ruling exists: option (a), remove the three-step block and keep the Material definition. Only the execution is pending, because closeout-residuals PLAN never reached approval."
+  },
+  {
+   "claim": "Not-tested statements: nothing searched the bodies for old handoff-content text (the later sweep found 123 REAL HANDOFF_RESTATES_CONTENT findings in 46 bodies after E4/E6 passed 0 of 1 484); the close-out sweep did not open prompt bodies; the skill sweep upheld 15 findings plus 6 added; the amthor behavioral fixture still rejects the cross-session route; the D23-G check sees only 8 non-blank lines; D22 has no guard.",
+   "verdict": "CONFIRMED",
+   "evidence": "ANALYZE-body-evidence.md :13-18 (123 REAL, 46 bodies). ITEM-28 source quotes '0 of 1 484'. CLOSE-OUT-20260923.md §1 table: the 8 groups include no prompt-body group, and 'skills' shows 26 found / 15 upheld / 6 added. The installed amthor references/behavioral-fixtures.md:49 still reads 'Reject PR-35 if it creates … cross-session route'. ITEM-36 source: 'both checks see 8 non-blank lines only'. Spec v2 :3964 confirms the first-8-nonblank-lines window. Commit 168944f records D22 as 'still unguarded'."
+  },
+  {
+   "claim": "The follow-up ANALYZE sweep found 158+26 REAL findings in 54 bodies.",
+   "verdict": "CORRECTED",
+   "evidence": "ANALYZE-body-evidence.md :8-14: '335 findings in 54 bodies … 158 REAL, 177 NOT_REAL, plus 26 further REAL'.",
+   "correction": "54 is the number of bodies with any of the 335 findings. The number of bodies with a REAL finding is not stated as 54: HANDOFF_RESTATES_CONTENT alone reaches 46, and the other classes reach 17, 12, 8 and 4, overlapping."
+  },
+  {
+   "claim": "Freeze: it started at the #474 merge (d848942, 13:11Z). Its lift is not recorded anywhere: E6-report step 8 reads 'pending', MODIFICATION :1113 reads 'APPLIED, freeze pending lift', :1161 and :1172 say the lift is still to come, and the Tracking page records no lift.",
+   "verdict": "CONFIRMED",
+   "evidence": "E6-report.md:11 (step 0 'Freeze started'), E6-report.md:19 ('| 8 | Nathan lifts the freeze | pending |'). MODIFICATION-20260923-alpha-feedback-open-entries.md:1113, :1161, :1172, and :1194 ('Merge the close-out PR, then lift the freeze'). The Tracking page fetch has no lift entry. No other file on c2fbf3c records an AF freeze lift (git grep)."
+  },
+  {
+   "claim": "closeout-residuals :611-614 ('PR05 planning waits on the freeze, which Nathan scheduled for after this run') supports the AF freeze still being in force.",
+   "verdict": "CORRECTED",
+   "evidence": "MODIFICATION-20260923-closeout-residuals.md:611-614 sits in '### Order, cut-over and freeze' point 4, 'Bodies land under a freeze. It starts before EXECUTE's first Notion write…'. The sentence describes that Modification's own planned EXECUTE freeze (steps 13 and 26, :844, :857), not the AF E6 freeze.",
+   "correction": "The AF freeze being unlifted rests only on E6-report step 8 and MODIFICATION :1113/:1161/:1172/:1194. The closeout-residuals line is not evidence for it."
+  },
+  {
+   "claim": "The last live body write was AF E6 step 4, bracketed by commits 456db4e (13:18:49Z) and d5c98bc (13:38:57Z). The PE Metaprompt was last written at about 17:17Z (commit 3647916, 17:21Z).",
+   "verdict": "CONFIRMED",
+   "evidence": "git show -s: 456db4e 2026-09-23T13:18:49Z 'E6: body landing and readback script'; d5c98bc 13:38:57Z 'E6 cut-over record: 55 bodies landed'. Notion search: PE Metaprompt 091426.1 timestamp 17:17Z; live MGMT-10 13:23Z. The unsampled bodies remain (inferred)."
+  },
+  {
+   "claim": "Pre-E2 contract 4.0.6 (2b78f877, 606 657 B) in evidence/pre-e2-contract regenerates the shipped 6902924a (613 326 B) through repair-a4/contract_recipe.py.",
+   "verdict": "CONFIRMED",
+   "evidence": "I ran it in /tmp/claude-0/recovery-scratch/verifier-a with the graph rebuilt from docs/graph/parts and the installed successor oracle (ede635b1). E2 output: 7a7fd028… 613162 B. Recipe output: 6902924a2de7f3d3… 613326 B. It is EQUAL to the installed flowmaster-validate and change-flow copies. The file's sha256 is 2b78f877…. Note: the promoted contract was 1c3c7969 (610 549 B, PROMOTION-RECORD-20260921.md:34), so 4.0.6 is the pre-AF state, not the promotion state; the worker states this too."
+  },
+  {
+   "claim": "Earlier skill packages are not in the repository; the rollback packages existed only at /tmp/claude-0/pkg/rollback/; the pre-AF digests are in spec v2 §2.",
+   "verdict": "CONFIRMED",
+   "evidence": "git log --all --name-only has no SKILL.md, .skill or .zip. /tmp/claude-0/pkg does not exist in this container. Spec v2 §2 (:391-406) lists the pre-AF digests the worker quotes. REVIEWER-PROMPT-a1.md:27 and a5.md:29 give the rollback path. The plan (MODIFICATION :874 and :889; spec v2 §11 'Held until … Nathan has received … the six rollback packages') says the rollback packages were to be delivered to Nathan. No §E or E6 record confirms that delivery, so whether Nathan holds them is UNVERIFIABLE from the repo."
+  },
+  {
+   "claim": "Bodies: there is no repository copy (corpus policy, D22), and Notion page history is the only source of pre-edit body text. For D23-G, the exact decorated header form and the Set: line are not recorded in the repository.",
+   "verdict": "CORRECTED",
+   "evidence": "Committed files on c2fbf3c hold full 091426.1 candidate body text. The v2 manifest contains 56 distinct 'Prompt ID:' values, and its entries begin 'CF-C-10 — … — 091426.1\\nPrompt Version: 091426.1\\nSet: Glow HDE Complete Prompt Flow 091426.1\\nPrompt ID: …\\nEcosystem release: GCFPE-20260914.1\\nSelection status: UNSELECTED_CANDIDATE …'. The files are docs/ephemeral/GCFPE-20260914.1-Independent-Repair-Batch-Postflight-Evidence-Manifest-v1.0-20260915.md and v2.0 (13.6 MB), WGA-GCFPE-REPAIR-INDEPENDENT-POSTFLIGHT-20260915.1-Evidence.json and GCFPE-Repair-Candidate-Reconciliation-and-Validation-v1.0-20260915.md.",
+   "correction": "Repository copies of the bodies do exist, but only as 2026-09-15 candidate-era snapshots. They predate promotion, the rounds 28-30 edits and the Lifecycle-line removals, so they are not the pre-E6 state. Using them as a restore source conflicts with prompt-corpus-policy.md ('never a source for later work'; no backup copies) and would need Nathan's ruling. They do record the undecorated header form, including the Set: value 'Glow HDE Complete Prompt Flow 091426.1', as of 09-15. For the exact pre-E6 text, Notion page history remains the only candidate, and it has not been verified to exist."
+  },
+  {
+   "claim": "The R1 historical oracle 52807e58 and runtime map 5574666e are kept in the installed skills, beside the successor ede635b1 and map aa6ed8e3.",
+   "verdict": "CONFIRMED",
+   "evidence": "sha256 of the installed flowmaster-validate/references/glow-hde-canonical-change-flow-r1.json is 52807e58…; of r1-20260923.json, ede635b1…; of change-flow runtime-map.json, 5574666e…; of runtime-map-20260923.json, aa6ed8e3…."
+  },
+  {
+   "claim": "Graph D23-E/F surfaces: PR-40 reject_replan→PR-20; merge_observed edges from PR-35 and RS-40; direct_PR35_to_PR40_automatic_edge stays false; edges 227→229.",
+   "verdict": "CONFIRMED",
+   "evidence": "docs/graph/parts/prompts/PR-40.json contains reject_replan. PR-35.json and RS-40.json each contain merge_observed. global.json:451 reads 'direct_PR35_to_PR40_automatic_edge': false. My rebuild gives 229 edges; spec v2 §2 gives 227 as the baseline."
+  },
+  {
+   "claim": "Installed skill revisions: glow-hde-pr-development 1.3.0, change-flow 3.3.0, session-relay-flowmaster 3.1.0, flowmaster-validate 3.3.0, tw-flowmaster 1.2.0.",
+   "verdict": "CONFIRMED",
+   "evidence": "The REVISION lines in the installed SKILL.md files match. amthor reads 1.12.0; the worker only claims '+1 minor', which was not checked against the prior value."
+  },
+  {
+   "claim": "Promotion baseline: D17, bbb1031 (#444); change-flow 21 14981ba7; flowmaster-validate 29 9c0ca6fe; contract 1c3c7969 (610 549 B); graph 1d0b7258 (569 902 B); 831 assertions.",
+   "verdict": "CONFIRMED",
+   "evidence": "docs/ephemeral/gcfpe.promotion-20260921/PROMOTION-RECORD-20260921.md:8, :21, :32-35. bbb1031 was committed 2026-09-21T23:48Z."
+  }
+ ],
+ "missed": "Before-state source the worker missed: committed 2026-09-15 candidate-era full body text of the 091426.1 prompts is in docs/ephemeral (Postflight-Evidence-Manifest v1.0/v2.0, WGA-...-Evidence.json, Repair-Candidate-Reconciliation). It is stale relative to the pre-E6 bodies, and prompt-corpus-policy.md bars it as a source without a ruling. It does record the old header format (Prompt Version / Set: Glow HDE Complete Prompt Flow 091426.1 / Ecosystem release). No live change was missed: no body, skill, registry or graph write after 17:27Z was found. Two things to fold into the worker's residual ranking. First, ITEM-37 is already ruled (Q2 (a), ruling 5), so its fix needs no further decision. Second, ITEM-39 has an execution consequence the ranking leaves out: the installed change-flow/SKILL.md:335 still states the 'sole operative state' as ALPHA_STOPPED with next_intended_unit HDE-EPIC040-PR04 at PR-10. A change-flow session started for PR05 planning would read a stale Alpha position.",
+ "summary": "Most load-bearing claims hold under primary checks:\n- **Live writes after 17:27Z:** no body, skill, registry or graph write landed after 17:27Z. Notion writes in the PLAN window were only the Backlog, the Alpha Feedback link and one Backlog update. The close-out §6 control-page edits (17:43-17:46Z) and the Tracking page edit (17:45:35Z) came before PLAN.\n- **Governing documents:** exactly 4 changed on main after the close-out.\n- **Skills:** the installed digests re-measured today equal E6.\n- **Contract:** the pre-E2 contract does regenerate the shipped 6902924a, and the result is byte-equal in both installed skills (reproduced here).\n- **Freeze:** E6 step 8 is 'pending', and no lift is recorded anywhere.\n\nCorrections:\n- **ITEM-37:** the worker says it still needs a ruling. REFUTED: Nathan ruled Q2 (a) in ruling 5.\n- **Convergence rewrites:** they span 27 bodies, not about 40.\n- **Pages at 17:43Z:** six pages carry that timestamp, not four.\n- **ANALYZE sweep:** '54 bodies' is where the 335 raw findings fell, not where REAL findings fell.\n- **Freeze evidence:** closeout-residuals :611-614 refers to that run's own planned freeze, so it is not evidence for the AF freeze.\n- **Body copies:** the claim of no repository body copy is wrong. Candidate-era (09-15) full body text is committed in docs/ephemeral. It is stale and policy-barred as a source, but it records the old header lines.\n- **Rollback packages:** they are absent from the repo and this container. The plan says they were to be delivered to Nathan, but no record confirms that delivery."
+}
