@@ -196,7 +196,7 @@ intake and register sections say 'conflict/ADR') and is silent after LCL-30-2. I
 ## PART-10 (ITEM-22): NAM-002, lane parents and parent titles on a live snapshot, EXECUTE procedure
 
 When: X3.6 (spec §9), after the registry commit (X3.1) and before any Notion write (P-77). A failure here stops
-EXECUTE with nothing outside the branch (P-57). Nothing is written to Notion and no prompt body is read: a hub page is a control page, and its child list
+EXECUTE with nothing outside the branch (P-84 revised). Nothing is written to Notion and no prompt body is read: a hub page is a control page, and its child list
 gives page IDs and titles only. `nam002_live.py` runs three checks from one `childlist.json` (its docstring states them):
 
 - NAM-002 (the governance audit's own rule): each row's page is listed under the hub its `expected_parent_id` names.
@@ -217,9 +217,11 @@ gives page IDs and titles only. `nam002_live.py` runs three checks from one `chi
    | `3db4590a05eb811b9c14f2ae89c28df7` | HDE TW — GCFPE-20260914.1 — 091426.1 | UTIL | 1: UTIL-10 |
    | `3db4590a05eb81de9736ea69bac61016` | Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1 | GCFPE-MGMT | 1: GCFPE-MGMT-10 |
 
-2. Write `$SCRATCH/nam002/childlist.json` in the shape the script documents; every hub carries its fetched `title`
-   (a hub without one is unusable input, exit 2). Keep every child; a child that is not a registry row does not enter
-   the snapshot:
+2. Right after the six fetches, build `$SCRATCH/nam002/childlist.json` with the committed helper (P-101), which reads
+   each hub's newest fetch in this session and copies nothing by hand:
+   `python3 $EV/engine/ctrl.py children 3db4590a05eb81d59059eb6b95ed5fcf 3db4590a05eb8195a2ccf7c0959a8b6e 3db4590a05eb814d96d3dcfa8835f96d 3db4590a05eb81cd938de84cfffead9c 3db4590a05eb811b9c14f2ae89c28df7 3db4590a05eb81de9736ea69bac61016 > $SCRATCH/nam002/childlist.json`
+   It writes the shape the script documents; every hub carries its fetched `title` (a hub without one is unusable
+   input, exit 2). It keeps every child; a child that is not a registry row does not enter the snapshot:
    `{"captured_at": "<UTC>", "hubs": [{"id": "<hub id>", "title": "<fetched page title>", "fetched": "<as-of>", "children": [{"id": "<page id>", "title": "<child title>"}]}]}`
 3. Obtain the pre-change registry for the control run from `$BASE`, the `main` commit X0.2 restarted the branch from
    and recorded (it carries the merged record PR; X0.3(a) checked its registry). Stop if the hash differs:
@@ -257,7 +259,8 @@ gives page IDs and titles only. `nam002_live.py` runs three checks from one `chi
    PART-10. Runs 2 and 3 are must-fail cases: each checks only its own injected finding, and each passes only when
    that one finding is produced; run 1 must pass first. Runs 2 and 3 cannot be combined (argparse exits 2).
 5. Copy `childlist.json`, the snapshot and the four results to `docs/ephemeral/modifications/evidence/closeout-residuals/execute/nam002/`
-   (hub and child IDs and titles only; P-83), with each run's exit status, for the X6.4 evidence commit.
+   (hub and child IDs and titles only; P-83), with each run's exit status; they are committed and pushed at X3.6 (P-87).
+   A result other than the table above stops EXECUTE before any Notion write (P-84 revised).
 
 How the script reads the snapshot: `build_snapshot()` makes one source per registry row, `{"source_id": <row
 notion_page_id>, "kind": "notion_page", "complete": true, "in_scope": true, "title": <child title>, "parent": <hub id>}`.
@@ -278,6 +281,9 @@ circular by construction. Results, as NAM-002 / lane-parent / title findings / m
 - Command line (`nam002_proof/run_cli.py` -> `cli_matrix.json`, ALL_OK = True): the four runs with each of three
   audit roots (the byte-identical `wga_scripts` copy, the installed audit, the r1 final copy) give, as exit / NAM-002 /
   lane-parent / title findings: 1 committed (new) 0/0/0/0; 2 inject parent ESC-10 0/1/0/0; 3 inject title Escalation hub 0/0/0/1; 4 control (old) 1/55/16/6. Unusable input exits 2: inject-title on a non-hub id (2), inject-title equal to the fetched title (2), --inject with --inject-title (2), a hub without its title (2), missing child-list file (2).
+PLAN live run (repair round 6, P-101; `nam002_live_plan/`): the six hubs were fetched live and the child list built by
+`ctrl.py children` (2026-09-24T04:10:57Z; HDE Change Flow 19, HDE IA 21, HDE QA 10, Escalation 4, HDE TW 2, Glow HDE Prompt Flow Index 4 children). Steps 3 and 4 then ran on it with the PLAN copy of the new registry (runs 1 to 3) and the pre-change
+registry `8b4e46ed…` (run 4). As NAM-002 / lane-parent / title findings / mismatched title references, expectation_met: run1 0 / 0 / 0 / 0 of 70, True; run2 1 / 0 / 0 / 0 of 70, True; run3 0 / 0 / 1 / 5 of 70, True; run4 55 / 16 / 6 / 70 of 70, False: the table above, on live hubs.
 Non-prompt findings from the minimal run manifest and workspace registry (COL-002, SRC-001) are not prompt findings and do not enter the gate.
 
 ## GUARD-001: the r1 LOCAL edits and their guards

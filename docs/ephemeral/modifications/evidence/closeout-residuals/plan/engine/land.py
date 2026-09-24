@@ -2,7 +2,13 @@
 """EXECUTE landing tool for MODIFICATION-20260923-closeout-residuals (the parent's evidence/e6/land.py, for these rules).
 
   land.py plan  <PID> <PAGE_ID> [--candidate-url URL] [--no-ops] [--registry R] [--guards G] [--skills K] [--harness-root H]
+                [--session S]
   land.py check <PID> <PAGE_ID> [--candidate-url URL] [--registry R] [--guards G] [--skills K] [--harness-root H]
+                [--session S]
+  land.py state <PID> <PAGE_ID> [--candidate-url URL] [--harness-root H] [--session S]
+
+Every mode reads only the running session's harness files ($CLAUDE_CODE_SESSION_ID; --session names another, or
+`any`), so another session's fetch of the same page is never taken for the one just made (P-101).
 
 --candidate-url is required, in both modes, for a body whose rules carry {{CANDIDATE_CRD_LIST_URL}} (CL-40): the
       token is filled before anything is compared, so a landed page carrying the real URL reads as landed (P-75).
@@ -13,8 +19,9 @@ plan: the newest fetch of the page (dryrun.latest_body: this session's harness f
       LANDED (a replacement whose anchor is gone and whose new text is present, a deletion whose anchor is gone, or an
       insertion whose every match is already followed by its new text), or MIXED. On an unlanded page every edit is
       NOT_LANDED and `repair` is []; on a partly landed page only the NOT_LANDED edits are planned and `repair` lists
-      the LANDED ones. Refuses: a body already landed (ALREADY_LANDED), a body with nothing to land (NOTHING_TO_LAND),
-      any MIXED edit or failing LOCAL-only check (COUNT_MISMATCH), a `{{` the edit introduces (P-48, P-59), operations
+      the LANDED ones. Refuses, in this order: any MIXED edit or failing LOCAL-only check (COUNT_MISMATCH); a body
+      whose every edit reads LANDED (ALREADY_LANDED; a landed deletion-only body included, P-96); a body this
+      Modification does not edit (NOTHING_TO_LAND); a `{{` the edit introduces (P-48, P-59); operations
       that do not reproduce the edit, and (P-76) a failing precheck (PRECHECK_FAILED) or landed check
       (LANDED_CHECK_FAILED). The precheck is `check`'s criteria on the text the operations produce; the landed check
       is `check` itself, the STALE test included, on that text, i.e. what the readback after the landing will run.
@@ -22,8 +29,12 @@ plan: the newest fetch of the page (dryrun.latest_body: this session's harness f
 check: the readback. The newest fetch of the page after the landing -> the row's registry assertions (0 findings), every
       new guard on the row (forbidden: silent, and fires on its injected regression; required: matches, and fails when
       removed), flowmaster-validate's body validator, no insertion doubled (P-88), and the placement counts. A page
-      that does not yet show the landing's new text reports STALE_READBACK_OR_NOT_LANDED. Prints the harness file it
+      on which any edit does not read LANDED reports STALE_READBACK_OR_NOT_LANDED (P-96). Prints the harness file it
       read (source_file, D22 condition 5); exits 1 unless `pass` is true. No body text is printed.
+state: read-only, for the stop sweep and the restoration check (P-98, P-99). Prints each edit's state and the page's
+      verdict: UNTOUCHED (every edit NOT_LANDED), LANDED (every edit LANDED), PARTIAL (anything else), or NO_EDITS for
+      a body this Modification does not edit; with source_file and fetched. Never refuses on the page's content;
+      exits 0. No body text is printed.
 There is no rollback journal and no reverse mode (P-58 as revised in repair round 4, D22): nothing keeps a copy of a
 body. A failed readback is repaired forward by `plan` on a fresh fetch, which plans only the edits still missing
 (P-88); a page it refuses stops the landing unit and returns to Nathan (spec §9 X5.4).
@@ -138,13 +149,11 @@ def checks(pid, text, a, mode):
     stored = C.collapse(text)
     has_news = any(pid in exp and exp[pid] > 0 for _, _, _, _, exp in R.RULES) or bool(R.LOCAL.get(pid))
     if mode == "check" and has_news and not landed(pid, text):
-        post, rep = R.apply(pid, text)
-        if not nothing_to_land(rep):
-            _, _, states = edit_states(pid, text)
-            return {"status": "STALE_READBACK_OR_NOT_LANDED", "pass": False,
-                    "not_landed": sorted(k for k, s in states.items() if s != "LANDED"),
-                    "note": "the page does not show every edit of this landing: re-fetch after the write's task has "
-                            "succeeded and check again; if it still does not, run plan on the fresh fetch (P-88)"}
+        _, rep_s, states = edit_states(pid, text)
+        return {"status": "STALE_READBACK_OR_NOT_LANDED", "pass": False,
+                "not_landed": sorted(k for k, s in states.items() if s != "LANDED" and rep_s[k]["expected"] > 0),
+                "note": "the page does not show every edit of this landing: re-fetch after the write's task has "
+                        "succeeded and check again; if it still does not, run plan on the fresh fetch (P-88)"}
     out = {"placement": {k: stored.count(C.collapse(v)) for k, v in
                          {"W-4": C.W4, "ONCE": C.ONCE, "OWN": R.OWN, "RECV": R.RECV}.items()},
            "unfilled_tokens": stored.count("{{"), "doubled_insertions": doubled(pid, stored)}
@@ -191,7 +200,7 @@ TOKEN_PIDS = sorted({p for rid, anchor, action, new, exp in R.RULES
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["plan", "check"])
+    ap.add_argument("mode", choices=["plan", "check", "state"])
     ap.add_argument("pid")
     ap.add_argument("page")
     ap.add_argument("--candidate-url")
@@ -200,10 +209,13 @@ def main():
     ap.add_argument("--skills", default=str(D.INSTALLED))
     ap.add_argument("--since-minutes", type=int, default=30)
     ap.add_argument("--harness-root", default=D.ROOT)
+    ap.add_argument("--session", default=D.SESSION or "any",
+                    help="the session whose harness files are read (default: the running session, P-101); any: all")
     ap.add_argument("--no-ops", action="store_true")
     a = ap.parse_args()
     D.SINCE = a.since_minutes * 60
     D.ROOT = a.harness_root
+    D.SESSION = None if a.session == "any" else a.session
     if a.pid in TOKEN_PIDS and not a.candidate_url:
         print(json.dumps({"pid": a.pid, "refused": "CANDIDATE_URL_REQUIRED (P-75)"}))
         raise SystemExit(2)
@@ -214,18 +226,27 @@ def main():
         res = checks(a.pid, body, a, "check")
         print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, **res}, indent=1, ensure_ascii=False))
         raise SystemExit(0 if res.get("pass") else 1)
-    post0, rep0 = R.apply(a.pid, body)
-    if nothing_to_land(rep0):
-        print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "NOTHING_TO_LAND: already landed or untouched; run check"}))
-        raise SystemExit(3)
     post, rep, states = edit_states(a.pid, body)
+    live = [k for k in states if rep[k]["expected"] > 0]
+    if a.mode == "state":
+        st = {k: states[k] for k in live}
+        verdict = ("NO_EDITS" if not live else "UNTOUCHED" if all(v == "NOT_LANDED" for v in st.values())
+                   else "LANDED" if all(v == "LANDED" for v in st.values()) else "PARTIAL")
+        print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "verdict": verdict, "states": st},
+                         indent=1))
+        return
+    post0, rep0 = R.apply(a.pid, body)
     bad = {k: v for k, v in rep.items() if not v["ok"]}
     if bad:
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "COUNT_MISMATCH", "rules": bad}, indent=1))
         raise SystemExit(4)
     repair = sorted(k for k, s in states.items() if s == "LANDED")
-    if not any(s == "NOT_LANDED" for k, s in states.items() if rep[k]["expected"] > 0):
-        print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "ALREADY_LANDED: every edit reads landed; run check, not plan"}))
+    if live and all(states[k] == "LANDED" for k in live):
+        print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE,
+                          "refused": "ALREADY_LANDED: every edit reads landed; run check, not plan"}))
+        raise SystemExit(3)
+    if not live or nothing_to_land(rep0):
+        print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "NOTHING_TO_LAND: this body has no edit to land"}))
         raise SystemExit(3)
     if not repair and post != post0:
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "ENGINE_DISAGREES: edit_states differs from apply"}))

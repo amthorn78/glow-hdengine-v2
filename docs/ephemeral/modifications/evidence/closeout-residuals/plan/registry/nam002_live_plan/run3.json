@@ -1,0 +1,60 @@
+{
+ "summary": {
+  "sources": 55,
+  "rows": 55,
+  "unplaced_rows": [],
+  "NAM-002": 0,
+  "NAM-002_rows": [],
+  "NAM-001": [],
+  "other_errors": 0,
+  "other_prompt_findings": [],
+  "non_prompt_findings": [
+   "COL-002",
+   "SRC-001"
+  ],
+  "lanes": 16,
+  "lane_parent_findings": 0,
+  "lane_parent_lanes": [],
+  "title_findings": 1,
+  "title_hubs": [
+   "3db4590a05eb81cd938de84cfffead9c"
+  ],
+  "title_references": {
+   "compared": 70,
+   "mismatched": 5
+  }
+ },
+ "verdict": "INDETERMINATE",
+ "lane_findings": [],
+ "title_findings": [
+  {
+   "check": "PARENT_TITLE",
+   "hub": "3db4590a05eb81cd938de84cfffead9c",
+   "fetched_title": "Escalation",
+   "references": 5,
+   "mismatches": [
+    {
+     "field": "lanes[ESC].notion_parent_title",
+     "value": "Escalation — GCFPE-20260914.1 — 091426.1"
+    },
+    {
+     "field": "ESC-10.expected_parent_title",
+     "value": "Escalation — GCFPE-20260914.1 — 091426.1"
+    },
+    {
+     "field": "ESC-25.expected_parent_title",
+     "value": "Escalation — GCFPE-20260914.1 — 091426.1"
+    },
+    {
+     "field": "ESC-30.expected_parent_title",
+     "value": "Escalation — GCFPE-20260914.1 — 091426.1"
+    },
+    {
+     "field": "ESC-40.expected_parent_title",
+     "value": "Escalation — GCFPE-20260914.1 — 091426.1"
+    }
+   ]
+  }
+ ],
+ "expectation_met": true
+}

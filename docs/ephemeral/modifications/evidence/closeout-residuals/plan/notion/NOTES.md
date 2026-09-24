@@ -1,8 +1,11 @@
-> ⚠️ **Superseded in part by PLAN repair rounds 2 to 4 (2026-09-24).** Everything below is the Notion worker's
-> original round-1 notes, preserved as written. Current values: `edits.json` holds 19 edits, each with its §9 step
-> and §P step in `when`; the repository texts are labelled by the step that commits them (P-73), not "commit 1/2";
-> the tokens and their fills are P-71's table, including `{{MIGRATION_DATE}}` (P-80); the self-link operations are
-> exact in `M2.json` `self_links`. The execution specification §7 governs.
+> ⚠️ **Superseded in part by PLAN repair rounds 2 to 6 (2026-09-24).** Everything below is the Notion worker's
+> original round-1 notes, preserved as written. Current values: `edits.json` holds 24 edits, each with its §9 step
+> and §P step in `when`; five of them apply only after a stop past X5.0 (`TRACK-UNIT-STOPPED`,
+> `TRACK-STATUS-STOP-01` to `03`, `TRACK-FREEZE-LIFT-STOP`; P-98, P-99). The repository texts are labelled by the
+> step that commits them (P-73), not "commit 1/2". Every token value is recorded in `EX/run.json` before the write
+> that carries it (P-96, whose table replaces P-71's fill times), and the apply-once test is `engine/ctrl.py`. The
+> self-link operations are exact in `M2.json` `self_links`, and the Drive checks are `engine/drive_check.py`. The
+> execution specification §7 governs.
 
 # Notion worker notes: PLAN repair round, MODIFICATION-20260923-closeout-residuals
 

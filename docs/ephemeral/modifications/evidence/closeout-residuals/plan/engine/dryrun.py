@@ -37,16 +37,23 @@ ROOT = "/root/.claude/projects/-home-user-glow-hdengine-v2"
 
 
 SOURCE = None
+TITLE = None  # the page title of the fetch latest_body last returned (ctrl.py children)
 SINCE = 30 * 60  # seconds: only files written in the last 30 minutes are opened (D22 condition 2: a harness file
                  # from an earlier task is never read again). Set by --since-minutes.
+
+
+SESSION = os.environ.get("CLAUDE_CODE_SESSION_ID") or None  # P-101: only the running session's harness files (its
+                 # transcript, tool results, subagents and workflows) are read, so a fetch made by another session is
+                 # never taken for the one just made. None (or --session any) reads every session under ROOT.
 
 
 def candidates():
     import time
     cutoff = time.time() - SINCE
-    files = glob.glob(ROOT + "/*.jsonl") + glob.glob(ROOT + "/*/subagents/**/*.jsonl", recursive=True) \
-        + glob.glob(ROOT + "/*/workflows/**/*.jsonl", recursive=True) + glob.glob(ROOT + "/*/tool-results/*") \
-        + glob.glob(ROOT + "/*/subagents/**/tool-results/*", recursive=True)
+    base = ROOT + "/" + SESSION if SESSION else ROOT + "/*"
+    files = glob.glob(base + ".jsonl") + glob.glob(base + "/subagents/**/*.jsonl", recursive=True) \
+        + glob.glob(base + "/workflows/**/*.jsonl", recursive=True) + glob.glob(base + "/tool-results/*") \
+        + glob.glob(base + "/subagents/**/tool-results/*", recursive=True)
     return sorted((f for f in set(files) if os.path.getmtime(f) >= cutoff), key=os.path.getmtime)
 
 
@@ -99,17 +106,22 @@ def latest_body(page):
                 m = re.search(r"<content>\n?(.*)</content>", inner, re.S)
                 if m:
                     ts = re.search(r"as of (\S+):", inner)
+                    tm = re.search(r"<properties>\n?(\{.*?\})\n?</properties>", inner, re.S)
+                    try:
+                        title = json.loads(tm.group(1)).get("title") if tm else None
+                    except Exception:
+                        title = None
                     # P-88: the newest capture wins. A tool-results file has no entry timestamp, so its capture time
                     # is the file's mtime; a page's "as of" need not advance when it is edited.
                     captured = entry_ts if f.endswith(".jsonl") else datetime.fromtimestamp(
                         os.path.getmtime(f), timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
-                    cand = ((captured or "", ts.group(1) if ts else ""), m.group(1), f)
+                    cand = ((captured or "", ts.group(1) if ts else ""), m.group(1), f, title)
                     if best is None or cand[0] >= best[0]:
                         best = cand
     if best is None:
         raise SystemExit(json.dumps({"page": page, "error": "NO_FETCH_FOUND", "harness_root": ROOT}))
-    global SOURCE
-    SOURCE = best[2]
+    global SOURCE, TITLE
+    SOURCE, TITLE = best[2], best[3]
     return best[0][1], best[1]
 
 

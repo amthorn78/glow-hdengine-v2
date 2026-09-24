@@ -731,7 +731,7 @@ Each applies a ruling or rule already in force.
 
 ## §P — Plan
 
-*Written by MODE = PLAN, 2026-09-23; repaired 2026-09-24 after the second, third and fourth PLAN reviews. The analysis was approved by
+*Written by MODE = PLAN, 2026-09-23; repaired 2026-09-24 after the second, third, fourth and fifth PLAN reviews. The analysis was approved by
 Nathan on 2026-09-23 ("yes"). Scope stays frozen at 40 items in 17 parts.*
 
 **The specification.** Every edit, literal, guard, package, command and check is in
@@ -759,28 +759,46 @@ orders them with an actor, a gate and a readback for each.
 7. **A fourth review** (`wf_05b74ccf-d84`, three lenses, each followed by a verifier that tried to refute its
    findings) returned 11 required findings: the stop and resume procedures, the day D25 applies, evidence that a new
    session could not recover, forward repair the engine could not do, one Notion formatting trap, asynchronous
-   writes and the manifest's removal commands. Repair round 5 answered them (P-84 to P-95; spec §2.7). **Pass 5
-   proved on every body** that the engine lands only what is missing and never lands an edit twice: of 516 partial
-   landings, 450 are repaired to exactly the landed page, 66 are refused (which stops the unit) and none is repaired
-   to anything else (spec §8.4). It found one engine defect on QA-10, fixed and re-run (P-88).
-8. **The skills.** Every suite passes on the patched tree, and every must-fail regression fires. The contract
+   writes and the manifest's removal commands. Repair round 5 answered them (P-84 to P-95; spec §2.7). **Pass 5**
+   tried, on every body, each landing operation left out alone and each applied alone: none was repaired to anything
+   but the landed page (spec §8.4). It found one engine defect on QA-10, fixed and re-run (P-88).
+8. **A fifth review** (`wf_ad66aa45-00a`, three lenses, each with a verifier) returned 10 distinct required defects.
+   A step resumed on a later day could not recognize its own landed edits. The stop's list of Notion writes could miss
+   an earlier session's. A stop's record never reached `main`. The stop marked everything `BLOCKED` while landed bodies
+   were still live. A resumed landing on a deletion-only body was refused. A lease push could be stale. The D24 brief
+   was left to author. A new session after the install would re-patch the installed tree. A tracking line claimed a
+   record before it existed. The verdict's binding reinterpreted the canonical template. Repair round 6 answered them
+   (P-96 to P-102; spec §2.8). **Pass 6 ran `land.py`'s own refusal chain on every body**: all 51 landed texts refuse
+   `ALREADY_LANDED`. Of 476 distinct partial landings, 410 are repaired to exactly the landed page, 66 are refused
+   (which stops the unit) and none is repaired to anything else (spec §8.5). The new read-only helpers ran on today's
+   pages: the control-page sequences, the anchor check, the Drive check, NAM-002 on the live hubs and the brief (spec
+   §8.7).
+9. **The skills.** Every suite passes on the patched tree, and every must-fail regression fires. The contract
    regenerates byte for byte. The suite gate is a script with its expected results built in.
 
 ### Rulings this plan applies
 
-The Product Owner rulings in §A (1 to 5) are applied as recorded. The PLAN decisions P-01 to P-95 (spec §1) apply them
+The Product Owner rulings in §A (1 to 5) are applied as recorded. The PLAN decisions P-01 to P-102 (spec §1) apply them
 or settle a finding; none needs a new ruling. These settle something the analysis left to PLAN:
 
 - **P-02:** R-OWN's sentence also covers the pull request that carries a prompt's outputs (D25-B credits it to the
   approved plan).
 - **P-37:** a prompt's own intake list may name `CANON_CONFLICT_REGISTER`.
 - **P-43:** the policy line and the repair-a4 note land after the install, in the close-out PR.
-- **P-57, P-58, P-84, P-85, P-88:** nothing leaves the branch before the first Notion write. A stop before it is
-  recorded on the branch and returns to PLAN, and EXECUTE then starts again from `main`. From the first Notion write
-  all 17 parts land as one unit. No copy of a body is kept (`D22`). A failed readback is repaired forward: the engine
-  lands only the edits still missing. A failure it cannot repair stops the unit: the control-page edits are reversed,
-  the new page goes to trash, every item is `BLOCKED`, and Nathan restores landed bodies from Notion's page history or
-  rules a forward fix.
+- **P-57, P-84 revised, P-88, P-97 to P-99:** nothing leaves the branch before the first Notion write. A stop before
+  it reaches `main` by a record pull request, and Nathan ends the Modification or approves a plan change, after which
+  EXECUTE starts again from `main`. From the first Notion write all 17 parts land as one unit. A failed readback is
+  repaired forward: the engine lands only the edits still missing. A failure it cannot repair stops the unit. EXECUTE
+  then sweeps Notion for every landed write, reverses the control-page edits, moves the new page to trash, and records
+  the stop on `main` at `EXECUTING`. Nathan restores the listed bodies, a restoration check verifies every page, and
+  then he ends the Modification or approves a plan change.
+- **No rollback journal (P-58 revised again, `D22`).** Nothing keeps a copy of a body, so restoring a landed body is
+  Nathan's action, from Notion's page history. The sweep tells him exactly which pages to restore, and the check tells
+  him when he is done.
+- **P-96:** every value a Notion write carries, such as a date or the page URL, is recorded in the evidence before
+  the write, so a step resumed on another day recognizes what already landed.
+- **P-100:** the reviewers' verdicts bind to the archives they read, and those archives are delivered to Nathan at the
+  review's end; nothing is re-packaged after that.
 - **P-86:** `D25` applies from the merge of the execution pull request; §E records that commit and its date.
 - **P-66:** the freeze runs from before the first Notion write until Nathan lifts it after the post-install
   verification (an upstream finding against §A order 4).
@@ -789,53 +807,62 @@ or settle a finding; none needs a new ruling. These settle something the analysi
 
 | # | part | target | edit | authority | verification | rollback |
 |---|---|---|---|---|---|---|
-| 1 | all | the base | Preconditions (spec §9 X0): record PR merged; branch restarted from `main`, `$BASE` recorded in `EX/run.json`; base checks | template rule 2 | the registry, the 7 installed packages, the graph and the engine self-test equal the recorded base; the root digest is recorded (P-79) | stop and report to Nathan |
+| 1 | all | the base | Preconditions (spec §9 X0): record PR merged; branch restarted from `main`, `$BASE` recorded in `EX/run.json`; base checks | template rule 2 | the registry, the 7 installed packages, the graph and the engine self-test equal the recorded base; the root digest is recorded (P-79) | stop: the stop record (P-84 revised, P-97) |
 | 2 | PART-01, 02, 03, 04, 12, 17 | the 7 skill packages, in the scratchpad | Build `$PKG` (the installed root with the 7 diffs applied); run the `pre` gate (X1) | classes B and C; unspent identity | every patch exits 0; each package digest equals the manifest; `run_gate.py --set pre` exits 0 | discard the scratch copies |
-| 3 | PART-06, 18 (class A); PART-05; PART-02; PART-03; PART-17 | `gcfpe.decision-record.md` and this record | Commit 1: `status: EXECUTING` and D25 (D25-A, D25-B), the D23-C, D23-G and D18 successors, the D14 note (spec §6, label `X2.2`; X2) | rulings 1, 2, 4, 5; §A order 2; P-81 | each anchor found once; `^## D25` = 1; no added line starts `> `; `canon.py` still reads two once-per-merge lines; `modification_validate.py` passes; the commit also carries `EX/run.json` and `EX/gate_pre.json` | before X5.0 nothing has left the branch: a stop is recorded in §E on the branch and returns to PLAN; EXECUTE then starts again at step 1 from `main` (P-84) |
+| 3 | PART-06, 18 (class A); PART-05; PART-02; PART-03; PART-17 | `gcfpe.decision-record.md` and this record | Commit 1: `status: EXECUTING` and D25 (D25-A, D25-B), the D23-C, D23-G and D18 successors, the D14 note (spec §6, label `X2.2`; X2) | rulings 1, 2, 4, 5; §A order 2; P-81 | each anchor found once; `^## D25` = 1; no added line starts `> `; `canon.py` still reads two once-per-merge lines; `modification_validate.py` passes; the commit also carries `EX/run.json` and `EX/gate_pre.json` | before X5.0 nothing has left the branch: a stop reaches `main` by a record PR (P-97); Nathan ends the Modification or approves a plan change, and EXECUTE then starts again at step 1 (P-84 revised) |
 | 4 | PART-10, 13–18 (the registry's guards and parent IDs) | `project-prompt-contract-registry.md` | `git apply EV/registry/registry.diff`, committed alone (spec §4; X3.1) | `D14`, `GUARD-001`; ITEM-22 | sha256 equals spec §4.1; `valid: true`; deriver drift `[]` | as step 3 |
 | 5 | PART-04 | `docs/graph/parts` | Reindex with `$PKG`'s builder (ITEM-12; X3.2) | class C | the stripped `git diff` equals the recorded diff; the build is byte-identical (`ae2bd159…`); a second reindex rewrites 0 | as step 3 |
 | 6 | PART-04 | `docs/graph/contract-template/` | `mkdir`; move the pre-E2 contract; add its README (ITEM-13; X3.3) | class C | sha256 `2b78f877…` and `469e2265…` at the new paths | as step 3 |
 | 7 | PART-12 | `session-working-rules.md` | `P32-SWR` (spec §6; X3.4–X3.5) | ITEM-24; P-32 | anchor found once; the sentence byte-equals P-32 | as step 3 |
-| 8 | PART-10 | the registry's parent IDs and titles | NAM-002 and the title and lane checks on a live snapshot of the hubs, committed to `EX/nam002/` (spec §4.4; X3.6) | ITEM-22; P-63, P-77 | 0 findings; exactly one on each injected fault; the old registry gives 55, exit 1 | as step 3 |
+| 8 | PART-10 | the registry's parent IDs and titles | NAM-002 and the title and lane checks on a live snapshot of the hubs (the child list by `ctrl.py children`), committed to `EX/nam002/` (spec §4.4; X3.6) | ITEM-22; P-63, P-77 | 0 findings; exactly one on each injected fault; the old registry gives 55, exit 1 | as step 3 |
 | 9 | PART-01 | the bundled 091426.1 contract | Regenerate 4.1.1 on the working tree (X4.1) | `D13`; Decision 1 | `6902924a…` EQUAL x2 from the kept template; `dbae180b…` in both copies | as step 3 |
 | 10 | PART-01, 02, 03, 04, 12, 17 | `$PKG` and the working tree | `run_gate.py --set pkg` (spec §5.3; X4.2) | `CHK-001` | exit 0, 34 rows equal to their expected results | as step 3 |
-| 11 | PART-01, 02, 03, 04, 12, 17 | the 7 packages | Package and extract (`execute.4b`); commit the filled brief; two fresh reviewer subagents; commit each verdict as it returns (X4.3–X4.4) | `D24` | `Skill is valid!` ×7; the extracted digests equal `expected_after_patch.txt` (`diff` exits 0); `SKILL_FIT_CONFIRMED` from both, bound to those freeze digests (P-93) | a rejection stops EXECUTE: the repair, or shipping without a part, is a plan change Nathan approves (P-84) |
-| 12 | all body parts; PART-06 | the 56 pages; the Drive file | Rehearsal: `land.py plan --no-ops` on a fresh fetch of each of the 51 bodies with edits, `check` on the 5 without (X4.5); then the read-only Drive check (X4.6) | P-76, P-77, P-88, P-95 | no refusal; `repair` `[]`; `precheck` and `landed_check` pass on every page; the 5 exit 0; the Drive bytes and the nine M2 strings match | nothing written to Notion; a failure stops EXECUTE as step 11 does (P-84) |
-| 13 | all | the freeze | Nathan confirms it; `TRACK-FREEZE-START` (spec §7.3; X5.0) | P-66 | readback | kept on a stop, beside `TRACK-UNIT-STOPPED` (P-85) |
-| 14 | PART-06 | Notion: the *Candidate CRD Items List* page | Create and migrate by method M2, with its self-links (spec §7.4; X5.1) | D25-A; P-47 | the Drive bytes match `2d7ff093…`; F1–F10 pass; no `{{`; a page this run already created is resumed, not created again (P-95) | move the page to trash (P-85) |
+| 11 | PART-01, 02, 03, 04, 12, 17 | the 7 packages | Package and extract (`execute.4b`, `EX/packages.json`); fill the PLAN-drafted brief (`fill_brief.py`) and commit it; two fresh reviewer subagents; commit each verdict as it returns; deliver the seven reviewed archives with the brief and verdicts (X4.3–X4.4) | `D24` | `Skill is valid!` ×7; the extracted digests equal `expected_after_patch.txt` (`diff` exits 0); `SKILL_FIT_CONFIRMED` from both, bound to the archive and freeze digests in the brief's §1; each delivered file's sha256 equals `EX/packages.json` (P-100) | a rejection stops EXECUTE: the repair, or shipping without a part, is a plan change Nathan approves (P-84 revised) |
+| 12 | all body parts; PART-06 | the 56 pages; the Drive file | Rehearsal: `land.py plan --no-ops` on a fresh fetch of each of the 51 bodies with edits, `check` on the 5 without (X4.5); then the read-only Drive and control-page anchor checks (X4.6) | P-76, P-77, P-88, P-95, P-102 | no refusal; `repair` `[]`; `precheck` and `landed_check` pass on every page; the 5 exit 0; `drive_check.py` passes (bytes, fence, the nine M2 strings, no collision); `ctrl.py all --expect unlanded` passes | nothing written to Notion; a failure stops EXECUTE as step 11 does (P-84 revised) |
+| 13 | all | the freeze | Nathan confirms it; the unit's date is recorded in `EX/run.json`; `TRACK-FREEZE-START` (spec §7.3; X5.0) | P-66, P-96 | `ctrl.py edits` reads `LANDED` | kept on a stop, beside `TRACK-UNIT-STOPPED` (P-98) |
+| 14 | PART-06 | Notion: the *Candidate CRD Items List* page | Create and migrate by method M2, with its self-links (spec §7.4; X5.1); the migration date is recorded before the create, and the page id and URL right after it | D25-A; P-47, P-96 | `drive_check.py` passes; F1–F10 pass; no `{{`; a page this run already created is resumed, not created again (P-95) | moved to trash if it exists (P-98) |
 | 15 | PART-06 | `notion-write-boundary.md` | `P30-DEST` with the URL, and `P30-VERSION` (X5.2) | D25-A | anchors found once; no new `{{` | the branch stays unmerged (the landing-unit rule) |
-| 16 | PART-06 | the Hub (×3), the four Checklist item rows (×2 each) | The eleven pointer edits (spec §7.4.5; X5.3) | P-46, P-67 | each edit applied once (P-90); readback | reversed in reverse order on the re-fetched text (P-85) |
-| 17 | PART-05, 06, 07, 13, 14, 15, 16, 18 | the 50 live bodies | Land each page from the engine; re-fetch; `check`, CL-40 with the URL (spec §3; X5.4) | the parts' classes; `D23`, `D25` | the first `plan` on each page has `repair` `[]`; `check` exits 0 on each page | repair forward: `plan` on a fresh fetch lands only what is missing (P-88); else the unit stops and returns to Nathan (P-85) |
+| 16 | PART-06 | the Hub (×3), the four Checklist item rows (×2 each) | The eleven pointer edits (spec §7.4.5; X5.3) | P-46, P-67 | each edit applied once (P-90, P-96); readback | reversed in reverse order on the re-fetched text (P-98) |
+| 17 | PART-05, 06, 07, 13, 14, 15, 16, 18 | the 50 live bodies | Land each page from the engine; re-fetch; `check`, CL-40 with the URL (spec §3; X5.4) | the parts' classes; `D23`, `D25` | the first `plan` on each page has `repair` `[]`; `check` exits 0 on each page | repair forward: `plan` on a fresh fetch lands only what is missing (P-88); else the unit stops, and the sweep lists each landed body for Nathan's restoration (P-98, P-99) |
 | 18 | PART-11 | the proposed MGMT-10 body | R-ITEM23 and its LOCAL preamble edit; the gates (X5.5) | ITEM-23, ITEM-40 | both gates read 0 on the readback | as step 17 |
-| 19 | PART-11 | Notion: the D20 redesign tracking page | `PART-11-TRACK-01` (spec §7.3; X5.6) | Decision 11 | readback | reversed as step 16 (P-85) |
+| 19 | PART-11 | Notion: the D20 redesign tracking page | `PART-11-TRACK-01` (spec §7.3; X5.6) | Decision 11 | readback | reversed as step 16 (P-98) |
 | 20 | PART-12 | Notion: Hub *Worker communication rules* §2 | `PART-12-HUB-01` (spec §7.1; X5.6) | ITEM-24 | readback | as step 19 |
 | 21 | PART-18 | Notion: the Alpha feedback list, AF-009 | `PART-18-AF009-01`, a dated amendment (spec §7.2; X5.6). The PE Metaprompt and the skills state no placement; no edit | P-44 | readback | as step 19 |
 | 22 | PART-08 | OPS-10, OPS-20 | No edit. ITEM-20 is `NOT_APPLICABLE`: the mention bans are correctly scoped (§A) | §A | §E records the disposition | — |
-| 23 | gate | the corpus | The Tier 1 gate (X6.1–X6.3): `land.py check` on all 55 live bodies; `graph_check.py`; `closure.py` | Tier 1; P-64 | 55/55 exit 0; exit 0; the closure comparison's `diff` exits 0 | repair forward; else the unit stops (P-85) |
+| 23 | gate | the corpus | The Tier 1 gate (X6.1–X6.3): `land.py check` on all 55 live bodies; `graph_check.py`; `closure.py` | Tier 1; P-64 | 55/55 exit 0; exit 0; the closure comparison's `diff` exits 0 | repair forward; else the unit stops (P-98) |
 | 24 | record | this record's §E and `EX/` | Write §E; commit the evidence; open the execution PR (X6.4) | template rules 5, 6 | `modification_validate.py` passes; only the three open paths change | — |
-| 25 | the packages | the installed tree | After Nathan merges: deliver the seven `.skill` files (X7.2); Nathan installs them (X7.3); digests, `run_gate.py --set post` and the corpus gate on the installed skills (X7.4) | `D24` | X7.4 runs on `main`; each extracted and installed digest equals its packaged digest; exit 0 (28 rows); 55/55 | reinstall the delivered file; any other failure: §E's X7.4 row and a record PR, the freeze held, returned to Nathan (P-82, P-94) |
-| 26 | close | the freeze; Notion: the D20 tracking page | After step 25 passes, Nathan lifts the freeze; `TRACK-FREEZE-LIFT` (X7.5) | P-66 | readback | — |
-| 27 | close | the decision record, the policy, the repair-a4 record, this record | The close commit: `CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`, §E's install record and actual cost, the `D25 applies from:` line, the dispositions, `COMPLETE`; the close-out PR opened (X7.6), after reading back Nathan's Drive banner | P-43, P-72, P-83, P-86 | the banner is present; the `D25` line is found once; `modification_validate.py` passes on `COMPLETE`; no committed `{{` | revert the commit |
-| 28 | close | Notion: the D20 tracking page | `TRACK-STATUS-01` to `03`, dated by the step-27 commit; their readback added to §E on the same PR (X7.7) | P-65, P-72 | readback; `modification_validate.py` passes | `new_str` → `old_str` |
+| 25 | the packages | the installed tree | After Nathan merges: Nathan installs the seven archives delivered at step 11 (X7.2–X7.3); the install date recorded; digests, `run_gate.py --set post` and the corpus gate on the installed skills (X7.4) | `D24` | X7.4 runs on `main`; each installed digest equals its freeze digest in `EX/packages.json`; exit 0 (28 rows); 55/55 | reinstall the delivered file; any other failure: §E's X7.4 row with the `D25 applies from:` line, and a record PR that merges before X7.4 runs again; the freeze held; returned to Nathan (P-82, P-94, P-97) |
+| 26 | close | the freeze; Notion: the D20 tracking page | After step 25 passes, Nathan lifts the freeze; the lift date recorded; `TRACK-FREEZE-LIFT` (X7.5) | P-66, P-96 | readback | — |
+| 27 | close | the decision record, the policy, the repair-a4 record, this record | The close commit: the close date recorded; `CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE` (`apply_texts.py`), §E's install record and actual cost, the `D25 applies from:` line unless present, the dispositions, `COMPLETE`; the close-out PR opened (X7.6), after reading back Nathan's Drive banner | P-43, P-72, P-83, P-86, P-102 | the banner is present; the `D25` line is found once; `modification_validate.py` passes on `COMPLETE`; the commit adds no `{{` | revert the commit |
+| 28 | close | Notion: the D20 tracking page | `TRACK-STATUS-01` to `03`, dated by the close date step 27 recorded; their readback added to §E on the same PR (X7.7) | P-65, P-72 | readback; `modification_validate.py` passes | `new_str` → `old_str` |
 
 **Order:** 1 to 12 in order, all before any Notion write. Then 13 to 21 in order: step 14 must pass before any body
 lands (PART-15 is after PART-06). Then 22 to 24. Step 25 follows Nathan's merge, and 26, 27 and 28 follow in that
-order.
+order. A stop follows spec §9's stop procedure (P-97 to P-99).
 
 ### Product Owner actions
 
 - **Approve this plan.** Recorded as `plan_approved_by`.
 - **Merge #478**, this record. Verified by `plan_approved_by` on `main`.
+- **Receive the seven packages** at step 11, with the brief and both verdicts; each caption leads with the archive's
+  sha256. **Install them only at step 25**, when EXECUTE asks. Verified by step 25's digest comparison.
 - **Confirm the freeze** at step 13 and **lift it** at step 26, once step 25's post-install verification passes. No
   flow session runs in between. Verified by the tracking page's two dated lines.
-- **Banner the Drive file** `Candidate-CRD-Items-List.md` as superseded, pointing to the new page, any time after step
-  14 and before step 27. Verified at step 27 by reading the file's first lines.
+- **Banner the Drive file** `Candidate-CRD-Items-List.md` as superseded, pointing to the new page, once step 24 has
+  passed and before step 27 (the page is permanent from then on). Verified at step 27 by reading the file's first
+  lines.
 - **Merge the execution PR** after step 24. Verified by the merge commit on `main`, which puts the reindex there
   before the install.
-- **Install the seven `.skill` packages in one sitting**, after that merge. Verified by step 25's digest comparison.
+- **Install the seven `.skill` packages in one sitting**, after that merge, and give the date. Verified by step 25's
+  digest comparison.
 - **Merge the close-out PR** after step 28. Verified by the merge commit.
-- **Rule on a stop, if one comes.** Before step 13, approve the plan change EXECUTE returns (P-84). After it, restore
-  the landed bodies §E lists from Notion's page history, or rule a forward fix (P-85). Verified by §E.
+- **Rule on a stop, if one comes.** Every stop reaches you as a record PR; merge it first.
+  - Before step 13 (P-84 revised): end the Modification, or approve the plan change a PLAN session writes.
+  - From step 13 to step 24 (P-99): restore each body the record lists, from Notion's page history, and ask for the
+    restoration check. Once it passes, end the Modification or approve a plan change, and lift the freeze when you
+    choose.
+  - At step 25 (P-94): rule a reinstall, or a plan change for new packages; no body is restored.
+  Verified by §E and the record PRs.
 
 ### Explicitly not in scope
 
@@ -863,6 +890,7 @@ Recorded in spec §10.1 and not edited here (template rule 1):
     interaction_cost = open rulings 3 + 2 + review cycles 1 + installs 1 + merges 3 + freeze 1 + Drive banner 1 = 12
 
 §A predicted 11 with two merges. The install has to follow the execution PR's merge (§A order 3), so the
-post-install record needs a third merge, the close-out PR. A D24 rejection would add 3: a plan approval, a further
-review round and a record merge (P-84). `interaction_cost_predicted` keeps §A's 11, and §E compares the actual cost
+post-install record needs a third merge, the close-out PR. A D24 rejection would add 4: the stop record's merge, a
+plan approval, a further review round and the plan-change merge (P-84 revised). A stop after step 13 adds the
+restoration and the restoration check's record merge (P-99). `interaction_cost_predicted` keeps §A's 11, and §E compares the actual cost
 against both.

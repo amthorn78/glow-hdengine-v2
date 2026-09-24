@@ -1,0 +1,8 @@
+{
+ "what": "PLAN test of EV/texts/apply_texts.py (P-102) on a scratch extract of HEAD's docs/prompt_ecosystem_management and REVIEWER-PROMPT-a5.md",
+ "X2.2": "five texts applied; gcfpe.decision-record.md sha256 6742d593..., 101936 B, '## D25' once: equal to the \u00a79-order proof's X2.1 row (skills/results/gate_proof_x.json steps[19])",
+ "X3.5": "P32-SWR applied",
+ "X5.2_without_run": "refused UNFILLED_TOKEN ({{CANDIDATE_CRD_LIST_URL}}), exit 1, nothing written",
+ "X5.2_with_run": "P30-DEST and P30-VERSION applied with a stand-in URL; no '{{' left in notion-write-boundary.md",
+ "close": "P31-POLICY, P33-A5NOTE and CLOSE-D22 applied with a stand-in install date and the expected freeze lines as bullets"
+}

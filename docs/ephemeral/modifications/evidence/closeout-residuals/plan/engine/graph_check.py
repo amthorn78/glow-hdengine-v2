@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """PART-16 gate (P-64): QA-110's and QA-80's landed text states the graph's branches (D13).
 
-  graph_check.py --qa110 <PAGE_ID> --qa80 <PAGE_ID> [--since-minutes 30] [--simulate]
+  graph_check.py --qa110 <PAGE_ID> --qa80 <PAGE_ID> [--since-minutes 30] [--simulate] [--harness-root H] [--session S]
 
 --simulate (PLAN rehearsal): apply the engine's edits in memory to the unedited bodies before checking them.
 
 The graph side is read from docs/graph/parts/prompts/QA-110.json and QA-80.json. The body side is the newest fetch of
-each page in this session's harness files (dryrun.latest_body; D22), read in memory. Output: booleans, and the harness
+each page in this session's harness files (dryrun.latest_body; D22; the running session only, P-101), read in memory. Output: booleans, and the harness
 file each body was read from (D22 condition 5).
 
 QA-110: the graph's ACCEPT branch goes to QA-120 and names "a completed failing run"; ESCALATION_REQUIRED goes to ESC-10.
@@ -49,9 +49,12 @@ def main():
     ap.add_argument("--since-minutes", type=int, default=30)
     ap.add_argument("--simulate", action="store_true")
     ap.add_argument("--harness-root", default=D.ROOT)
+    ap.add_argument("--session", default=D.SESSION or "any",
+                    help="the session whose harness files are read (default: the running session, P-101); any: all")
     a = ap.parse_args()
     D.SINCE = a.since_minutes * 60
     D.ROOT = a.harness_root
+    D.SESSION = None if a.session == "any" else a.session
     out, sources = {}, {}
     b110 = branches("QA-110")
     acc = [b for b in b110 if b[1] == ("ACCEPT",)]

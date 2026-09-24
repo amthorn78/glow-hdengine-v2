@@ -233,7 +233,7 @@ A("")
 A("## PART-10 (ITEM-22): NAM-002, lane parents and parent titles on a live snapshot, EXECUTE procedure")
 A("")
 A("When: X3.6 (spec §9), after the registry commit (X3.1) and before any Notion write (P-77). A failure here stops")
-A("EXECUTE with nothing outside the branch (P-57). Nothing is written to Notion and no prompt body is read: a hub page is a control page, and its child list")
+A("EXECUTE with nothing outside the branch (P-84 revised). Nothing is written to Notion and no prompt body is read: a hub page is a control page, and its child list")
 A("gives page IDs and titles only. `nam002_live.py` runs three checks from one `childlist.json` (its docstring states them):")
 A("")
 A("- NAM-002 (the governance audit's own rule): each row's page is listed under the hub its `expected_parent_id` names.")
@@ -256,9 +256,11 @@ for _l in T.new["lanes"]:
 for _o, _ot, _n, _nt, _ln, _rn in G.PARENT_MAP:
     A(f"   | `{_n}` | {_nt} | {', '.join(_lanes[_n])} | {len(_rows[_n])}: {', '.join(_rows[_n])} |")
 A("")
-A("2. Write `$SCRATCH/nam002/childlist.json` in the shape the script documents; every hub carries its fetched `title`")
-A("   (a hub without one is unusable input, exit 2). Keep every child; a child that is not a registry row does not enter")
-A("   the snapshot:")
+A("2. Right after the six fetches, build `$SCRATCH/nam002/childlist.json` with the committed helper (P-101), which reads")
+A("   each hub's newest fetch in this session and copies nothing by hand:")
+A("   `python3 $EV/engine/ctrl.py children 3db4590a05eb81d59059eb6b95ed5fcf 3db4590a05eb8195a2ccf7c0959a8b6e 3db4590a05eb814d96d3dcfa8835f96d 3db4590a05eb81cd938de84cfffead9c 3db4590a05eb811b9c14f2ae89c28df7 3db4590a05eb81de9736ea69bac61016 > $SCRATCH/nam002/childlist.json`")
+A("   It writes the shape the script documents; every hub carries its fetched `title` (a hub without one is unusable")
+A("   input, exit 2). It keeps every child; a child that is not a registry row does not enter the snapshot:")
 A("   `{\"captured_at\": \"<UTC>\", \"hubs\": [{\"id\": \"<hub id>\", \"title\": \"<fetched page title>\", \"fetched\": \"<as-of>\", \"children\": [{\"id\": \"<page id>\", \"title\": \"<child title>\"}]}]}`")
 A("3. Obtain the pre-change registry for the control run from `$BASE`, the `main` commit X0.2 restarted the branch from")
 A("   and recorded (it carries the merged record PR; X0.3(a) checked its registry). Stop if the hash differs:")
@@ -296,7 +298,8 @@ A("   NAM-001 (a WARNING on a prompt-title difference) is recorded and does not 
 A("   PART-10. Runs 2 and 3 are must-fail cases: each checks only its own injected finding, and each passes only when")
 A("   that one finding is produced; run 1 must pass first. Runs 2 and 3 cannot be combined (argparse exits 2).")
 A("5. Copy `childlist.json`, the snapshot and the four results to `docs/ephemeral/modifications/evidence/closeout-residuals/execute/nam002/`")
-A("   (hub and child IDs and titles only; P-83), with each run's exit status, for the X6.4 evidence commit.")
+A("   (hub and child IDs and titles only; P-83), with each run's exit status; they are committed and pushed at X3.6 (P-87).")
+A("   A result other than the table above stops EXECUTE before any Notion write (P-84 revised).")
 A("")
 A("How the script reads the snapshot: `build_snapshot()` makes one source per registry row, `{\"source_id\": <row")
 A("notion_page_id>, \"kind\": \"notion_page\", \"complete\": true, \"in_scope\": true, \"title\": <child title>, \"parent\": <hub id>}`.")
@@ -315,6 +318,8 @@ for _k, _v in _t7.items():
       f"{_v['title_references']['compared']}" + (f"; NAM-002 rows {_v['NAM-002_rows']}" if _v['NAM-002'] == 1 else "")
       + (f"; title hubs {_v['title_hubs']}" if _v['title_findings'] == 1 else ""))
 A(f"- `expectation_met`: {json.dumps(GT['T7_expectation_met'])}; T7 = {GT['T7_ok']}.")
+_lv = {k: json.load(open(HERE + f"/nam002_live_plan/{k}.json", encoding="utf-8")) for k in ("run1", "run2", "run3", "run4")}
+_cl = json.load(open(HERE + "/nam002_live_plan/childlist.json", encoding="utf-8"))
 _cm = json.load(open(HERE + "/nam002_proof/cli_matrix.json", encoding="utf-8"))
 _codes = {}
 for _k, _v in _cm["runs"].items():
@@ -324,6 +329,13 @@ A("  audit roots (the byte-identical `wga_scripts` copy, the installed audit, th
 A("  lane-parent / title findings: " + "; ".join(f"{k} " + " or ".join(f"{a}/{b}/{c}/{d}" for a, b, c, d in sorted(v))
                                            for k, v in _codes.items()) + ". Unusable input exits 2: "
   + ", ".join(f"{k} ({v['exit']})" for k, v in _cm["unusable_input"].items()) + ".")
+A("PLAN live run (repair round 6, P-101; `nam002_live_plan/`): the six hubs were fetched live and the child list built by")
+A(f"`ctrl.py children` ({_cl['captured_at']}; " + ", ".join(f"{h['title'].split(' — ')[0]} {len(h['children'])}" for h in _cl["hubs"])
+  + " children). Steps 3 and 4 then ran on it with the PLAN copy of the new registry (runs 1 to 3) and the pre-change")
+A("registry `8b4e46ed…` (run 4). As NAM-002 / lane-parent / title findings / mismatched title references, expectation_met: "
+  + "; ".join(f"{k} {v['summary']['NAM-002']} / {v['summary']['lane_parent_findings']} / {v['summary']['title_findings']} / "
+              f"{v['summary']['title_references']['mismatched']} of {v['summary']['title_references']['compared']}, {v['expectation_met']}"
+              for k, v in _lv.items()) + ": the table above, on live hubs.")
 A("Non-prompt findings from the minimal run manifest and workspace registry (" + ", ".join(_t7["new registry"]["non_prompt_findings"]) +
   ") are not prompt findings and do not enter the gate.")
 A("")

@@ -1,0 +1,562 @@
+{
+ "edits": 24,
+ "pages": 7,
+ "fetched": {
+  "3ce4590a05eb814f8892f88ff8539308": "2026-09-24T04:01:55.656Z",
+  "3e34590a05eb81e7927efe0541258916": "2026-09-23T17:45:35.844Z",
+  "3df4590a05eb8111a6a5f67cb82f96f6": "2026-09-24T00:11:08.183Z",
+  "3d54590a05eb8142a187d32ad4435950": "2026-09-08T07:23:26.492Z",
+  "3d54590a05eb8119affafcfb024ba990": "2026-09-08T07:23:28.047Z",
+  "3d54590a05eb8159a73cf6af261c1c2b": "2026-09-08T07:23:29.473Z",
+  "3d54590a05eb8118b229e0ca25bdfd42": "2026-09-08T07:23:30.741Z"
+ },
+ "all_ok": true,
+ "anchor_check_before_X5_0": {
+  "expect": "unlanded",
+  "landed": [],
+  "mixed": [],
+  "bad": [],
+  "pass": true
+ },
+ "anchor_check_all_dates": {
+  "expect": "unlanded",
+  "landed": [],
+  "mixed": [],
+  "bad": [],
+  "pass": true
+ },
+ "restoration_check_after_stop": {
+  "expect": "restored",
+  "landed": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03",
+   "TRACK-UNIT-STOPPED"
+  ],
+  "mixed": [],
+  "bad": [],
+  "pass": true
+ },
+ "restoration_check_all_dates": {
+  "expect": "restored",
+  "landed": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03",
+   "TRACK-UNIT-STOPPED"
+  ],
+  "mixed": [
+   "TRACK-STATUS-01",
+   "TRACK-STATUS-02",
+   "TRACK-STATUS-03"
+  ],
+  "bad": [],
+  "pass": true
+ },
+ "sequences": [
+  {
+   "sequence": "success",
+   "steps": 19,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_moved_date_misses": [
+    "PART-06-HUB-01",
+    "PART-11-TRACK-01",
+    "PART-18-AF009-01",
+    "TRACK-FREEZE-START"
+   ],
+   "rows": [
+    {
+     "edit": "TRACK-FREEZE-START",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-FREEZE-LIFT",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ]
+  },
+  {
+   "sequence": "stop",
+   "steps": 34,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_moved_date_misses": [
+    "TRACK-FREEZE-START"
+   ],
+   "rows": [
+    {
+     "edit": "TRACK-FREEZE-START",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-UNIT-STOPPED",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-FREEZE-LIFT-STOP",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ]
+  }
+ ]
+}
