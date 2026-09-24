@@ -1,0 +1,101 @@
+[
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 control: change-flow's own validator on the final tree",
+  "ok": true,
+  "detail": [
+   "exit 0",
+   "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 change-flow own validator: 'For HDE-EPIC040 Alpha, the sole operative state is' appended to the D18-successor paragraph (marker kept) -> FAIL",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "FAIL: retired skill clause present: For HDE-EPIC040 Alpha, the sole operative state is"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 control: same injection (appended to the D18-successor paragraph (marker kept)) with the new list entry removed -> PASS",
+  "ok": true,
+  "detail": [
+   "exit 0",
+   "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 change-flow own validator: 'For HDE-EPIC040 Alpha, the sole operative state is' appended at the end of SKILL.md (marker kept) -> FAIL",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "FAIL: retired skill clause present: For HDE-EPIC040 Alpha, the sole operative state is"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 control: same injection (appended at the end of SKILL.md (marker kept)) with the new list entry removed -> PASS",
+  "ok": true,
+  "detail": [
+   "exit 0",
+   "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 change-flow own validator: 'source revision/content identity' restored at its :295 site -> FAIL",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "FAIL: retired skill clause present: source revision/content identity"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 control: same injection (restored at its :295 site) with the new list entry removed -> PASS",
+  "ok": true,
+  "detail": [
+   "exit 0",
+   "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 change-flow own validator: 'source revision/content identity' appended at the end of SKILL.md -> FAIL",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "FAIL: retired skill clause present: source revision/content identity"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 control: same injection (appended at the end of SKILL.md) with the new list entry removed -> PASS",
+  "ok": true,
+  "detail": [
+   "exit 0",
+   "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 change-flow own validator: 'source revision/content identity' inside the marked prohibition block -> FAIL",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "FAIL: retired skill clause present: source revision/content identity"
+  ]
+ },
+ {
+  "group": "p25:change-flow-own-validator",
+  "case": "P-25 control: same injection (inside the marked prohibition block) with the new list entry removed -> PASS",
+  "ok": true,
+  "detail": [
+   "exit 0",
+   "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy"
+  ]
+ }
+]

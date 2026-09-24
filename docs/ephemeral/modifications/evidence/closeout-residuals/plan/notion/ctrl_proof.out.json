@@ -1,0 +1,1723 @@
+{
+ "edits": 24,
+ "pages": 7,
+ "fetched": {
+  "3ce4590a05eb814f8892f88ff8539308": "2026-09-24T04:18:31.010Z",
+  "3e34590a05eb81e7927efe0541258916": "2026-09-23T17:45:35.844Z",
+  "3df4590a05eb8111a6a5f67cb82f96f6": "2026-09-24T00:11:08.183Z",
+  "3d54590a05eb8142a187d32ad4435950": "2026-09-08T07:23:26.492Z",
+  "3d54590a05eb8119affafcfb024ba990": "2026-09-08T07:23:28.047Z",
+  "3d54590a05eb8159a73cf6af261c1c2b": "2026-09-08T07:23:29.473Z",
+  "3d54590a05eb8118b229e0ca25bdfd42": "2026-09-08T07:23:30.741Z"
+ },
+ "all_ok": true,
+ "anchor_check_before_X5_0": {
+  "expect": "unlanded",
+  "kept_from_stop": null,
+  "mixed_kept": [],
+  "sent": 0,
+  "waived": [],
+  "landed": [],
+  "mixed": [],
+  "doubled": [],
+  "bad": [],
+  "pass": true
+ },
+ "restoration_check_after_stop": {
+  "expect": "restored",
+  "kept_from_stop": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03",
+   "TRACK-UNIT-STOPPED"
+  ],
+  "mixed_kept": [],
+  "sent": 15,
+  "waived": [],
+  "landed": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03",
+   "TRACK-UNIT-STOPPED"
+  ],
+  "mixed": [],
+  "doubled": [],
+  "bad": [],
+  "pass": true
+ },
+ "restoration_check_after_x51_stop": {
+  "expect": "restored",
+  "kept_from_stop": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03",
+   "TRACK-UNIT-STOPPED"
+  ],
+  "mixed_kept": [],
+  "sent": 1,
+  "waived": [],
+  "landed": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03",
+   "TRACK-UNIT-STOPPED"
+  ],
+  "mixed": [],
+  "doubled": [],
+  "bad": [],
+  "pass": true
+ },
+ "restoration_check_after_mixed_stop": {
+  "expect": "restored",
+  "kept_from_stop": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03"
+  ],
+  "mixed_kept": [
+   "TRACK-UNIT-STOPPED"
+  ],
+  "sent": 1,
+  "waived": [],
+  "landed": [
+   "TRACK-FREEZE-START",
+   "TRACK-STATUS-STOP-01",
+   "TRACK-STATUS-STOP-02",
+   "TRACK-STATUS-STOP-03"
+  ],
+  "mixed": [
+   "TRACK-UNIT-STOPPED"
+  ],
+  "doubled": [],
+  "bad": [],
+  "pass": true
+ },
+ "sequences": [
+  {
+   "sequence": "success",
+   "steps": 19,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_next_day_misses": [
+    "PART-06-HUB-01",
+    "PART-11-TRACK-01",
+    "PART-18-AF009-01",
+    "TRACK-FREEZE-START"
+   ],
+   "rows": [
+    {
+     "edit": "TRACK-FREEZE-START",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-FREEZE-LIFT",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ]
+  },
+  {
+   "sequence": "stop",
+   "steps": 33,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_next_day_misses": [
+    "TRACK-FREEZE-START"
+   ],
+   "rows": [
+    {
+     "edit": "TRACK-FREEZE-START",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-UNIT-STOPPED",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ]
+  },
+  {
+   "sequence": "stop then lift",
+   "steps": 34,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_next_day_misses": [
+    "TRACK-FREEZE-START"
+   ],
+   "rows": [
+    {
+     "edit": "TRACK-FREEZE-START",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 1,
+     "end_of_page": true,
+     "doubled_then_undoubled": true,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-18-AF009-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-12-HUB-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-11-TRACK-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM4-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM3-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM2-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-ITEM1-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-03",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-02",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "PART-06-HUB-01",
+     "reverse": true,
+     "before": "LANDED",
+     "after": "NOT_LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-UNIT-STOPPED",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-FREEZE-LIFT-STOP",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ]
+  },
+  {
+   "sequence": "stop at X5.1",
+   "steps": 5,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_next_day_misses": [
+    "TRACK-FREEZE-START"
+   ],
+   "rows": [
+    {
+     "edit": "TRACK-FREEZE-START",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-UNIT-STOPPED",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 1,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ]
+  },
+  {
+   "sequence": "stop at X5.1, anchor duplicated by someone else",
+   "steps": 4,
+   "ok": true,
+   "resume_same_run_not_landed": [],
+   "resume_next_day_misses": [],
+   "rows": [
+    {
+     "edit": "TRACK-UNIT-STOPPED",
+     "reverse": false,
+     "before": "MIXED",
+     "listed_not_applied": true,
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-01",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-02",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    },
+    {
+     "edit": "TRACK-STATUS-STOP-03",
+     "reverse": false,
+     "before": "NOT_LANDED",
+     "after": "LANDED",
+     "old_count_after": 0,
+     "op_matches_again": 0,
+     "end_of_page": false,
+     "doubled_then_undoubled": null,
+     "others_not_landed": [],
+     "ok": true
+    }
+   ],
+   "lift_stop_state": "MIXED",
+   "listed_for_nathan": [
+    "TRACK-UNIT-STOPPED"
+   ]
+  }
+ ],
+ "stops_after_x53": [
+  {
+   "sequence": "stop after X5.3, a pointer doubled",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 13,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "state_before_stop": "DOUBLED",
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, a pointer doubled with text between",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [
+    "PART-06-ITEM1-02"
+   ],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [
+     "PART-06-ITEM1-02"
+    ],
+    "bad": [
+     "PART-06-ITEM1-02"
+    ],
+    "pass": false
+   },
+   "check_after_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, a sent edit stored differently",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [
+    "PART-06-HUB-02"
+   ],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [
+     "PART-06-HUB-02"
+    ],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [
+     "PART-06-HUB-02"
+    ],
+    "doubled": [],
+    "bad": [
+     "PART-06-HUB-02"
+    ],
+    "pass": false
+   },
+   "check_with_nathans_waiver": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [
+     "PART-06-HUB-02"
+    ],
+    "sent": 12,
+    "waived": [
+     "PART-06-HUB-02"
+    ],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [
+     "PART-06-HUB-02"
+    ],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "check_after_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, one reversal missed",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "check_with_the_pointer_left": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "PART-06-HUB-02",
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "PART-06-HUB-02",
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [
+     "PART-06-HUB-02"
+    ],
+    "pass": false
+   },
+   "ok": true
+  },
+  {
+   "sequence": "stop after X5.3, a stop line removed later",
+   "listed_by_sweep": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02",
+    "TRACK-FREEZE-START"
+   ],
+   "reversed": [
+    "PART-06-HUB-01",
+    "PART-06-HUB-02",
+    "PART-06-HUB-03",
+    "PART-06-ITEM1-01",
+    "PART-06-ITEM1-02",
+    "PART-06-ITEM2-01",
+    "PART-06-ITEM2-02",
+    "PART-06-ITEM3-01",
+    "PART-06-ITEM3-02",
+    "PART-06-ITEM4-01",
+    "PART-06-ITEM4-02"
+   ],
+   "listed_for_nathan": [],
+   "check_before_nathan": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [],
+    "pass": true
+   },
+   "check_with_the_stop_line_gone": {
+    "expect": "restored",
+    "kept_from_stop": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03",
+     "TRACK-UNIT-STOPPED"
+    ],
+    "mixed_kept": [],
+    "sent": 12,
+    "waived": [],
+    "landed": [
+     "TRACK-FREEZE-START",
+     "TRACK-STATUS-STOP-01",
+     "TRACK-STATUS-STOP-02",
+     "TRACK-STATUS-STOP-03"
+    ],
+    "mixed": [],
+    "doubled": [],
+    "bad": [
+     "TRACK-UNIT-STOPPED"
+    ],
+    "pass": false
+   },
+   "ok": true
+  }
+ ]
+}

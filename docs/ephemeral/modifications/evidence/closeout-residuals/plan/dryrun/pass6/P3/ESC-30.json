@@ -1,0 +1,174 @@
+{
+ "mode": "plan",
+ "pid": "ESC-30",
+ "page": "3db4590a05eb813e99b4e416bc7afdae",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan ESC-30 3db4590a05eb813e99b4e416bc7afdae --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "ESC-30",
+  "fetched": "2026-09-23T13:22:21.293Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 3,
+  "repair": [],
+  "rules": {
+   "R-A1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "proof": {
+  "ops": 3,
+  "state_fetch": "UNTOUCHED",
+  "state_landed": "LANDED",
+  "plan_on_landed_exit": 3,
+  "plan_on_landed_refused": "ALREADY_LANDED: every edit reads landed;",
+  "doubled_in_landed": [],
+  "partials": 6,
+  "partials_state_partial": 6,
+  "partials_repaired_exact": 6,
+  "partials_refused": 0,
+  "partials_repaired_wrong": 0,
+  "refusals": [],
+  "rows": [
+   {
+    "applied": [
+     1,
+     2
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1a",
+     "R-A1c",
+     "R-A2a"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     2
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2a",
+     "R-A7-S3"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1a",
+     "R-A1c",
+     "R-A7-S3"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A7-S3"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     1
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1a",
+     "R-A1c"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     2
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2a"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   }
+  ],
+  "pass": true
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "registry_pre_findings": [
+  [
+   "CTR-002",
+   "Required pattern absent: in the output artifact's (?:existing )?permitted metadata"
+  ],
+  [
+   "CTR-002",
+   "Required pattern absent: (?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff n"
+  ],
+  [
+   "CTR-002",
+   "Required pattern absent: a completed failing run is `ACCEPT` and continues to QA-120"
+  ],
+  [
+   "TOP-001",
+   "Forbidden pattern matched: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\\b|artifact/handoff metadata|"
+  ],
+  [
+   "TOP-001",
+   "Forbidden pattern matched: substantive artifact(?: metadata/content)? and handoffs?\\b|through (?:all next/recovery packa"
+  ],
+  [
+   "CTR-001",
+   "Forbidden pattern matched: code/Ops remediation\\. Do not fix it here\\.(?! This applies only before the whole approved ru"
+  ]
+ ],
+ "k47_registry_value_equals_guard": true,
+ "k47_hits_before": 1,
+ "k47_hits_after": 0,
+ "anchor_occurrences_before": 1,
+ "authored_occurrences_after": 1,
+ "item_marker": "4. ",
+ "words_in_item_before_insert": 24,
+ "last_6_body_words_before_insert": "remediation. Do not fix it here.",
+ "insert_ends_item_line": true,
+ "next_line_marker": "5. ",
+ "routing_accept_mentions_completed_failing_run": true
+}

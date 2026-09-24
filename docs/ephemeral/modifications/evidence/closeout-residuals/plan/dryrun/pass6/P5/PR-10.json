@@ -1,0 +1,931 @@
+{
+ "mode": "plan",
+ "pid": "PR-10",
+ "page": "3db4590a05eb818e8359de1994e97a7d",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan PR-10 3db4590a05eb818e8359de1994e97a7d --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "PR-10",
+  "fetched": "2026-09-23T13:19:07.698Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 15,
+  "repair": [],
+  "rules": {
+   "R-A1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2g": {
+    "hits": 4,
+    "expected": 4,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-CLAT": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM38": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-26-BRANCH-SEND": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-A7-LOCAL": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-26-RSP-scan": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "proof": {
+  "ops": 15,
+  "state_fetch": "UNTOUCHED",
+  "state_landed": "LANDED",
+  "plan_on_landed_exit": 3,
+  "plan_on_landed_refused": "ALREADY_LANDED: every edit reads landed;",
+  "doubled_in_landed": [],
+  "partials": 30,
+  "partials_state_partial": 30,
+  "partials_repaired_exact": 22,
+  "partials_refused": 8,
+  "partials_repaired_wrong": 0,
+  "refusals": [
+   "COUNT_MISMATCH"
+  ],
+  "rows": [
+   {
+    "applied": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     13,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2b"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     1
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2e"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     2
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-26-P4"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     3
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A7-S1a",
+     "R-A7-S1b"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     4
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1e",
+     "R-A3a"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     5
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A7-S2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     6
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-ITEM38"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     8
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-10-2",
+     "LPR-10-3"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     9
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-CLAT"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     10
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     11
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     12
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     13
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1b",
+     "R-A1c",
+     "R-A1d"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-26-P1"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   }
+  ],
+  "pass": true
+ }
+}

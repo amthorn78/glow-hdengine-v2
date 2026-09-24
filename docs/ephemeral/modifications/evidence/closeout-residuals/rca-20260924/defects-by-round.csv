@@ -1,0 +1,79 @@
+round,defect,reports,verifier,catA,originB,one_line
+1,R1-01,comp#0;exec#11(part),none,1,i-draft,Decision-record texts (D25 D23-C D14 note etc) undrafted and unordered
+1,R1-02,comp#1;exec#10,none,1,i-draft,PART-06 destination rule page migration Drive banner not planned
+1,R1-03,comp#2,none,2,i-draft,No execution sequence at all
+1,R1-04,comp#3,none,1,i-draft,PART-11 D20 tracking-page entry not planned
+1,R1-05,comp#4,none,1,i-draft,PART-12 Hub and session-working-rules edits missing
+1,R1-06,comp#5;exec#11(part),none,1,i-draft,PART-17 policy line edit undrafted
+1,R1-07,comp#6,none,1,i-draft,PART-18 PE Metaprompt overlay unchecked
+1,R1-08,comp#7,none,1,i-draft,PART-04 correction note undrafted
+1,R1-09,comp#8,none,1,i-draft,PART-08 has no entry (NOT_APPLICABLE unstated)
+1,R1-10,comp#9,none,1,i-draft,CL-30 second A2 carrier unedited and unguarded
+1,R1-11,comp#10,none,1,i-draft,R-OWN does not reach CL-40/MGMT-10 PR claims
+1,R1-12,comp#11;exec#1;exec#2;exec#3,none,1,i-draft,Rule table disagrees with bodies (R-A1a PR-10; R-A2g; R-A7-LOCAL DOC-20; R-A5 RS-40)
+1,R1-13,comp#12;exec#4;exec#5,none,1,i-draft,Guards G-K08 G-K19 G-K40 miss or false-fire
+1,R1-14,comp#13;exec#6,none,1,i-draft,BRANCH-RECV sentence trips G06
+1,R1-15,exec#0,none,1,i-draft,R-ITEM40 regex does not compile on 3.11
+1,R1-16,exec#7,none,1,i-draft,contract_recipe ONCE slice would read later successors
+1,R1-17,exec#8,none,4,i-draft,Regression strings quote >15 words (D22)
+1,R1-18,exec#9,none,1,i-draft,BRANCH-RECV/R-ITEM30d not mechanical; shared-vs-LOCAL order unstated
+2,R2-01,comp#0;exec#0;cons#1,none,2,i,Reindex needs patched builder that exists only after X3.1 (order)
+2,R2-02,exec#1;cons#2(part),none,2,i,No full skills root or candidate root; section 5.3 uses PLAN paths
+2,R2-03,exec#2;cons#2,none,2,i,Section 5.3 rows cannot reproduce after reindex/install
+2,R2-04,exec#3,none,2,i,execute.3 git mv and README source fail
+2,R2-05,exec#4;cons#0,none,1,i,PART-11 tracking entry hard-dated
+2,R2-06,comp#2,none,3,i,No part-level landing or rollback (template rule 6)
+2,R2-07,comp#3,none,1,i,W-4 required guard on 6 of 21 A7 rows
+2,R2-08,comp#1,none,2,i,Reindex diff comparison fails on git headers
+3,R3-01,comp#0;exec#0,none,2,i,land.py check never fills CL-40 URL so readback never passes
+3,R3-02,exec#1,none,3,ii r2 P-58,land.py reverse cannot reverse a pure deletion
+3,R3-03,comp#5;exec#3;cons#0,none,3,ii r2 P-58 / r3 P-58rev,Rollback journal conflicts with D22
+3,R3-04,comp#2;cons#1,none,3,ii r2 P-57,Two landing units split parts
+3,R3-05,comp#1;cons#2,none,3,ii r2 P-57 / r3 P-73,Body-unit failure paths leave parts half landed; rehearsal and NAM-002 after writes
+3,R3-06,comp#3;exec#2;cons#5,none,3,ii r2 P-57 / r3,X7.4 failure path needs unplanned revert PR
+3,R3-07,comp#4,none,3,i (partly ii r2-r3 journal),Session continuity: state in one session's scratchpad
+3,R3-08,cons#3,none,2,ii r2 P-60,Gates hard-code PLAN-time freeze digests (run_gate.py)
+3,R3-09,cons#4,none,2,ii r2 X0.4,X0.4 status commit before commit 1 makes D25 false
+4,R4-01,comp#0;cons#6,CONFIRMED,3,ii r4 P-57rev2,Resume after pre-X5.0 stop (D24 rejection) cannot run
+4,R4-02,comp#1;exec#2;cons#0,CONFIRMED,3,ii r4 P-58rev2,Stop reverses freeze line while keeping freeze; no order/trash/dispositions
+4,R4-03,exec#0,CONFIRMED,3,ii r4 P-58rev2,land.py cannot repair forward (COUNT_MISMATCH or double insert)
+4,R4-04,comp#3;exec#4;cons#1,CONFIRMED,1,ii r4 P-81,D25 closing sentence names no event; no step writes date
+4,R4-05,comp#4;cons#3,CONFIRMED,3,ii r4 P-78,P-78 new-session claim false (evidence uncommitted; verdicts no path; X5.1)
+4,R4-06,exec#1,CONFIRMED,1,i,AF-009 amendment puts code inside bold; readback cannot match
+4,R4-07,exec#3,CONFIRMED,2,i (r4 P-83 fix incomplete),allow_async:false can still return async_task never polled
+4,R4-08,cons#4,CONFIRMED,2,ii r2 P-60 / r4,rm -rf $VAR forms need human approval
+4,R4-09,comp#2,DOWNGRADED,3,ii r4 P-82,X7.4 failure cannot reach the record
+4,R4-10,cons#2,DOWNGRADED,4,ii r4,Spec section 1 lacks supersession marks DECISIONS has
+4,R4-11,cons#5,DOWNGRADED,2,ii r4 P-77/P-57rev2,Drive checks run after first Notion write
+5,R5-01,comp#0;exec#0;cons#2,CONFIRMED,3,ii r5 P-87/P-90 (r3 P-71),EXECUTE_DATE unrecorded: resumed step on later day misses landed control edits
+5,R5-02,comp#1,CONFIRMED,3,ii r5 P-85,Stop's list of Notion writes can miss an earlier session's write
+5,R5-03,comp#2;comp#4;comp#5,CONFIRMED,3,ii r5 P-84/P-85/P-93,Stop record stays on unmerged branch; verdicts/brief lost; cr1 reused; branch unnamed
+5,R5-04,comp#3;cons#1,CONFIRMED,3,ii r5 P-85,Stop sets BLOCKED while bodies live; forward fix has no vehicle
+5,R5-05,exec#1,CONFIRMED,3,ii r2 P-59 + r4 P-78,plan refuses NOTHING_TO_LAND before ALREADY_LANDED on resume
+5,R5-06,exec#2,DOWNGRADED,2,ii r4 P-83,force-with-lease push stale after remote branch deleted
+5,R5-07,exec#3,CONFIRMED,2,i,X4.4 must author the D24 brief sections 2-9
+5,R5-08,exec#4,CONFIRMED,3,ii r4 P-78,New session after install re-patches installed tree
+5,R5-09,cons#0,DOWNGRADED,3,ii r5 P-85,TRACK-UNIT-STOPPED claims states not yet true
+5,R5-10,cons#3,DOWNGRADED,3,ii r5 P-93,Verdict binding reinterprets canonical section 10; re-cut archives delivered
+6,R6-01,comp#0;exec#1,CONFIRMED,3,ii r6 P-97 (r5 P-94),X7.4 cannot run twice: reset guard refuses; restoration check no commit/PR
+6,R6-02,comp#1;exec#3,CONFIRMED,3,ii r6 P-97,Stop-record reset keeps dirty tree; commit names no files
+6,R6-03,comp#5;exec#0,CONFIRMED,3,ii r6 P-97/P-98,Stop returns to Nathan before stop lines applied
+6,R6-04,cons#2,CONFIRMED,3,ii r6 P-97,Stop record claims X7.4 stops too and mis-records them
+6,R6-05,comp#2,CONFIRMED,3,ii r6 P-98/P-99,Stop at X5.0 or MIXED anchor: restoration check can never pass
+6,R6-06,comp#3;exec#2;cons#0,CONFIRMED,3,ii r6 P-98,land.py state refuses CL-40 without URL on stop path
+6,R6-07,comp#4,CONFIRMED,3,ii r6 P-100,No delivery record; no route when Nathan lost archives
+6,R6-08,exec#4,CONFIRMED,3,ii r6 P-102(k) + r4 P-78,apply_texts inserts a text twice on re-run
+6,R6-09,exec#5,CONFIRMED,2,i,New page F1-F10 readback has no committed tool
+6,R6-10,cons#1,CONFIRMED,3,ii r6 P-96,X5.0/X7.5/stop write today's date each run
+7,R7-01,comp#0;cons#1;exec#0(part),CONFIRMED,3,ii r7 P-103/P-104,DOUBLED control edit escapes stop list reversal and restoration check
+7,R7-02,exec#0(part),CONFIRMED,3,ii r7 P-108(c)(d),MIXED edit the unit itself wrote passes the restoration check
+7,R7-03,comp#1;cons#0,CONFIRMED,3,ii r7 P-105/P-106,X5.1 cannot be re-run after step 7 or small create
+7,R7-04,comp#2,CONFIRMED,3,ii r7 P-107,Stop resumed in new session cannot name failing step or evidence
+7,R7-05,comp#4;comp#5;exec#2 (+comp#3 downgraded),CONFIRMED,3,ii r7 P-109/P-110,After X7.1 lost-archive and plan-change routes re-run gates that cannot pass and have no failure route
+7,R7-06,exec#1,CONFIRMED,3,ii r7 P-107/P-108(c),X5.0 concludes nothing written from one stale readback
+7,R7-07,cons#2,CONFIRMED,3,ii r6 P-100 + r7 P-109/P-110,fill_brief gives wrong variant after X7.1 and drops prior-file
+8,R8-01,comp#0;exec#0;cons#0,CONFIRMED,3,ii r8 P-112(d),Post-X7.1 merge test uses commit subjects that squash merge removes
+8,R8-02,comp#1,CONFIRMED,2,ii r7 P-111(c),X6.4 two-dot diff fails when main moves; stops a landed unit
+8,R8-03,exec#1;cons#2,CONFIRMED,3,ii r8 P-112(f),fill_brief --prior-file skips REPAIR_VERDICT_PENDING and PRIOR_ROUND_DELIVERED
+8,R8-04,cons#1,CONFIRMED,3,ii r8 P-112(d) vs r6 P-101,Rebuild boundary X7.3 conflicts with new rejoin at X7.2 after install
+8,R8-05,exec#2,DOWNGRADED,3,ii r6 P-99 / r7 P-108(f),Lift after a stop does not check a restoration check passed

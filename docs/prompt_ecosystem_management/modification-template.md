@@ -40,6 +40,8 @@ Copy everything between the markers. Delete the comments; keep the keys.
 3. **Scope freezes at `ANALYZE` approval.** The `items` list may not grow afterwards. A part may
    still be dropped, with the reason recorded as its items' disposition. New scope is a new
    Modification with `spawned_from` set — never a wider one. This is what bounds the review loops.
+   A finding outside the frozen scope is recorded on the GCFPE Modification Backlog (Notion,
+   `3e54590a05eb81eb818fd0f42045167a`) with a severity, and a later run takes it as an item.
 4. **Every §P step carries a verification that could fail.** A step whose check is "read it and
    see" is not a step (`CHK-001`, `D11`).
 5. **Every §E step and item carries a disposition.** A skipped step is a recorded disposition,

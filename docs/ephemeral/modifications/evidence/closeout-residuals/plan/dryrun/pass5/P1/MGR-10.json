@@ -1,0 +1,29 @@
+{
+ "mode": "check",
+ "pid": "MGR-10",
+ "page": "3db4590a05eb8108ad2dd4d0e20bd6c4",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py check MGR-10 3db4590a05eb8108ad2dd4d0e20bd6c4 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root",
+ "result": {
+  "pid": "MGR-10",
+  "fetched": "2026-09-23T13:29:42.793Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "placement": {
+   "W-4": 0,
+   "ONCE": 0,
+   "OWN": 0,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ },
+ "state_proof": null
+}

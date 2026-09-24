@@ -1,0 +1,42 @@
+diff -ruN a/SKILL.md b/SKILL.md
+--- a/SKILL.md	2026-09-23 13:11:38.887185264 +0000
++++ b/SKILL.md	2026-09-23 23:12:52.623953554 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Glow HDE PR Development
+ 
+-`GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.0`
++`GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.1`
+ 
+ Complete one approved PR work unit without losing prior work or wasting remote actions. PR-30 and PR-35 are two phases of the same native PR-execution authority, not separate work units. Keep the existing GCFPE actor, one Proceed per approved per-PR plan, scope, and manual-merge boundaries intact.
+ 
+@@ -140,7 +140,7 @@
+ 1. stop only the affected implementation work and preserve valid completed work;
+ 2. save a precise recovery/result artifact at a path under `docs/ephemeral/` in the repository;
+ 3. create and read back one complete formal bounded `RESCOPE_REQUEST`, record exactly one `PR_RETURN_PHASE` from `PR-30_PREPUBLICATION`, `PR-30_POSTPUBLICATION`, or `PR-35`, then resolve the exact selected same-whole-change-IA RS-20 identity required by the selected route;
+-4. return one populated, standalone, copy-paste-ready RS-20 review package containing the actual finding, affected boundary, change/work-unit identity, dedicated IA and PR sessions, immutable base plus current PF10/addenda, complete lineage, artifact repository paths, completed work, tests, reviews and CI evidence, original Proceed, constraints, unresolved items, required same-IA decision, exact return phase, and expected `RESCOPE_REVIEW` output.
++4. return one populated, standalone, copy-paste-ready RS-20 review package: a `NEXT_PROMPT_HANDOFF` that names the saved `RESCOPE_REQUEST` and the recovery/result artifact by repository path. The request holds the actual finding, affected boundary, change/work-unit identity, dedicated IA and PR sessions, immutable base plus current PF10/addenda, complete lineage, artifact repository paths, completed work, tests, reviews and CI evidence, original Proceed, constraints, unresolved items, required same-IA decision, exact return phase, and expected `RESCOPE_REVIEW` output; the package names the request and does not restate its contents.
+ 
+ Do not return a blank handoff template, routing metadata, or a title-only destination. Ordinary in-scope difficulty or review correction is not rescope. The PR session never approves its own rescope, rewrites its existing approved Specification or Implementation Plan, restarts work, or requests a new Proceed.
+ 
+diff -ruN a/scripts/validate_glow_hde_pr_development.py b/scripts/validate_glow_hde_pr_development.py
+--- a/scripts/validate_glow_hde_pr_development.py	2026-09-23 13:11:38.887185264 +0000
++++ b/scripts/validate_glow_hde_pr_development.py	2026-09-23 23:12:52.624303967 +0000
+@@ -23,7 +23,7 @@
+     combined = skill + "\n" + cases
+ 
+     required = {
+-        "revision": "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.0",
++        "revision": "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.1",
+         "stage availability": "Their absence does not block an otherwise complete ordinary PR intake.",
+         "conditional remedy evidence": "An existing QA Guide or other QA evidence may be read when specifically relevant",
+         "stage boundary": "Do not make a change-specific QA Guide",
+@@ -120,6 +120,8 @@
+         "followed in the same session by PR-35",
+         "`MERGE_PENDING`, `RESCOPE_PENDING`",
+         "ten-field",
++        # D23-B (ITEM-01): the RS-20 package names the saved RESCOPE_REQUEST; it does not carry its content.
++        "package containing the actual finding",
+     ]
+     for text in forbidden:
+         if text.lower() in combined.lower():

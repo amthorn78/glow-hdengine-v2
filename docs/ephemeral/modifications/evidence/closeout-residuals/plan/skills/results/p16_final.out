@@ -1,0 +1,15 @@
+{"tree": "final", "cases": 56, "all_ok": true, "not_ok": []}
+OK  line 40 FIRE   fired=True: **`Prompt version`**: x
+OK  line 40 FIRE   fired=True: 3. **`Set`**: x
+OK  line 40 FIRE   fired=True: Prompt version: x
+OK  line 40 FIRE   fired=True: - **Ecosystem release:** x
+OK  line 40 FIRE   fired=True: > Set: x
+OK  line 40 FIRE   fired=True: | Prompt Version: | x |
+OK  line 40 SILENT fired=False: - Settings: x
+OK  line 40 SILENT fired=False: Set up the run:
+OK  line 40 SILENT fired=False: Record the `Prompt version` in the report, never in the body.
+OK  line 40 SILENT fired=False: `Prompt version` belongs to the register
+OK  line 40 SILENT fired=False: The ecosystem release is named by the register.
+OK  line 40 SILENT fired=False: Settings: x
+OK  line 40 SILENT fired=False: Setup: x
+OK  line 40 SILENT fired=False: Prompt versioning is the register's job.

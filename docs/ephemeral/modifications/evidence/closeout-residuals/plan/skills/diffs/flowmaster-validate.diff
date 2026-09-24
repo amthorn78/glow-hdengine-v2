@@ -1,0 +1,641 @@
+diff -ruN a/SKILL.md b/SKILL.md
+--- a/SKILL.md	2026-09-23 13:11:39.011185271 +0000
++++ b/SKILL.md	2026-09-23 23:15:23.349425774 +0000
+@@ -5,8 +5,8 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.3.0
+-SKILL_TREE_SHA256: be70787af52e734256bebf8ec9b9a0e177bf9d59f4bd8703380d5ae1176fdf13
++FLOWMASTER_VALIDATE_REVISION: 3.3.1
++SKILL_TREE_SHA256: ed52208f48479124f39119a54f29774096381ab85f54109a73bc3a7f3cc572af
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+@@ -152,7 +152,7 @@
+ 
+ ## GCFPE release-profile validation boundary
+ 
+-The 20260914 candidate contract revision 4.1.0 binds the corrected complete raw-byte repair-plan and PF10 evidence, the corrected source manifest, and the preserved native recovery/owner graph. It checks QA-120 PASS by verified change class: Epic to CL-E-10 and CRD to CL-C-10, with separate Report/RCA and complete matching intake to continuing Isis. Validate the actual producer and both receiver bodies as well as graph/contract agreement; reject the wrong-class route even when all declarations agree. Missing or conflicting class or receiver evidence permits no closure handoff. Those pins describe the repair baseline; they never replace fresh runtime PF10 resolution. Deterministic agreement with these pins does not independently prove live source contents or semantic completeness.
++The 20260914 candidate contract revision 4.1.1 binds the corrected complete raw-byte repair-plan and PF10 evidence, the corrected source manifest, and the preserved native recovery/owner graph. It checks QA-120 PASS by verified change class: Epic to CL-E-10 and CRD to CL-C-10, with separate Report/RCA and complete matching intake to continuing Isis. Validate the actual producer and both receiver bodies as well as graph/contract agreement; reject the wrong-class route even when all declarations agree. Missing or conflicting class or receiver evidence permits no closure handoff. Those pins describe the repair baseline; they never replace fresh runtime PF10 resolution. Deterministic agreement with these pins does not independently prove live source contents or semantic completeness.
+ 
+ Resolve the live selected GCFPE release only from its release register and selected catalog. The current overlay `references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json` must match that live binding; the `gcfpe-current-direct-handoff-contract.json` alias is historical provenance and no longer a validation default. During candidate staging, validate the exact versioned successor through the paired `--gcfpe-contract` and `--gcfpe-candidate-root` arguments; a candidate pass never changes or proves production selection. The `GCFPE-20260914.1 / 091426.1` profile pins and re-reads a byte-identical candidate contract and 55-member frozen graph whose sole addition is PR-35. The 54-member `GCFPE-20260913.1 / 091326.2` alias is kept as a historical record and is validated only when passed explicitly.
+ 
+@@ -171,11 +171,11 @@
+ - `PR_RETURN_PHASE` is exactly `PR-30_PREPUBLICATION`, `PR-30_POSTPUBLICATION`, or `PR-35`. Prepublication has no open PR and returns directly to PR-30; the two published phases use RS-40 and preserve the same open PR. Reject/`IN_SCOPE_REPAIR` returns to the existing owner; `REVISION_REQUIRED` uses RS-30 and the same author/RS-20 owner; `SPECIFICATION_CHANGE_REQUIRED` is terminal to Nathan. No restart, base rewrite, duplicate Proceed, accepted-final replay, or automatic PR-50 route is lawful.
+ - PR-50 has exactly one manual boundary: Nathan / Product Owner invokes `Abort PR and Escalate` for an exact PR. It has zero prompt-, agent-, skill-, hub-, or automation-originated inbound edges. Other actors return evidence to Nathan without invoking PR-50.
+ - PR merges are Nathan / Product Owner manual actions. An agent never merges or enables automatic merge. PR-35 `MERGE_PENDING` is historical pre-merge evidence; only where no `MERGE_OBSERVED` result was returned for this merge, Nathan's later invocation asserts the manual merge; PR-40 independently verifies actual merged state and landed lineage read-only. At `MERGE_PENDING`, return control with the result, including the conditional `PR-40` block for Nathan, which is usable only after he merges and only where no `MERGE_OBSERVED` result was returned for this merge; stay subscribed and do not poll. When the active subscription delivers the merge of the identified PR — a merge Nathan performs — return `MERGE_OBSERVED` with the paste-ready `PR-40` handoff and return control. Nathan creates the PR-40 session and pastes it. The observed merge event is the fact PR-40 is entered on; `PR-40` still verifies the merged state and landed lineage independently. No agent merges, and no session is created by an agent. PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, otherwise the fallback block. Once either has been pasted, the other is void.
+-- Alpha remains `ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR`, PR03 remains `ACCEPTED_FINAL`, PR04 is not started, the next intended stage is PR-10, the handoff is `NOT_YET_APPROVED`, and Nathan is the sole resume authority. Completion prepares and reads back the fresh PR04 PR-10 handoff but does not execute it or resume Alpha.
++- The contract's and graph's `alpha_resumption_contract` is the record made at promotion, validated with its values unchanged by the promotion-record checks `ALPHA_PROMOTION_RECORD` and `ALPHA_PROMOTION_RECORD_TRIGGER`; it is not current Alpha state. Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record (`D18` successor), and this validator neither reads nor asserts it.
+ 
+ The versioned 37-case section-13 fixture suite must attribute every negative case to its exact expected rule and independently exercise combined negative variants. Static declarations and fixtures do not prove live Notion selection, repository readback, repository state, archival, or worker behavior; inspect those separately.
+ 
+-For a selected schema-4 production readback, every prompt body must use the neutral lifecycle header `Selection status: REGISTER_CONTROLLED`, one generic `Notion URL: <direct URL>` binding, and the exact sentence `Selection authority: The GCFPE Membership and Release Register exclusively determines selected lifecycle; this page header makes no independent selection claim.` The contract alias, not the prompt header, carries `SELECTED_PRODUCTION`; the live register remains the sole authority for that alias claim. Production validation rejects candidate URL labels, stale member lifecycles, retained `candidate_page_binding` fields, and stale selection status in any designated prompt reference.
++A prompt body's header is identity only: its title as the first line, `Prompt ID: <id>`, and exactly one generic `Notion URL: <direct URL>` binding. A body carries no governance state: a `Selection status:` or `Lifecycle:` line, or the retired `Selection authority:` sentence, anywhere in it is `PROMPT_BODY_GOVERNANCE_STATE`, and a `Candidate` or `Selected` label on the URL line is `PROMPT_BODY_IDENTITY`. Under `D23-G` it carries no release-bound line either: a `Prompt version:`, `Set:` or `Ecosystem release:` label line anywhere in the body is `PROMPT_BODY_RELEASE_HEADER`. The contract, not the prompt header, carries `SELECTED_PRODUCTION`, and the live register remains the sole authority for that claim; production contract validation still rejects stale member lifecycles and retained `candidate_page_binding` fields.
+ 
+ This validator remains read-only. It does not repair prompts, mutate skills, publish/archive pages, run workers, drain PF10, merge, resume Alpha, or activate automation.
+ 
+@@ -209,12 +209,12 @@
+ 
+ Use SKILLS_ROOT or --skills-root only for an exact fresh checkout or isolated test root. Do not point the validator at a mixture of installed and candidate files.
+ 
+-For a bounded candidate-overlay audit of the installed skill tree, pass its exact versioned contract and the complete candidate snapshot root together. The suite always runs the current-overlay regression first, then additionally validates the candidate contract, frozen graph and all section-13 fixtures. It reads no prompt bodies: under the Prompt Corpus Storage and Fidelity Policy there is no local corpus to scan, and body-level checks run only where a caller has read the relevant Notion pages. These read-only options leave the selected alias untouched and prove candidate consistency only; the selected Notion register and post-promotion readback remain separate requirements.
++For a bounded candidate-overlay audit of the installed skill tree, pass its exact versioned contract and a candidate root together; the root holds only `graph/GCFPE-20260914.1-Candidate-Graph-Contract.json`, which must equal the bundled graph, and never prompt bodies. The suite always runs the current-overlay regression first, then additionally validates the candidate contract, frozen graph and all section-13 fixtures. It reads no prompt bodies: under the Prompt Corpus Storage and Fidelity Policy there is no local corpus to scan, and body-level checks run only where a caller has read the relevant Notion pages. These read-only options leave the selected alias untouched and prove candidate consistency only; the selected Notion register and post-promotion readback remain separate requirements.
+ 
+ ~~~bash
+ python3 scripts/validate_flowmaster.py --strict-warnings \
+   --gcfpe-contract /exact/change-flow-skill/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json \
+-  --gcfpe-candidate-root /exact/GCFPE-20260914.1-candidate-snapshot
++  --gcfpe-candidate-root /exact/GCFPE-20260914.1-candidate-root
+ ~~~
+ 
+ Run the versioned GCFPE validator directly against the explicit candidate:
+@@ -222,7 +222,7 @@
+ ~~~bash
+ python3 scripts/validate_gcfpe_20260914.py /exact/change-flow-skill \
+   --contract /exact/change-flow-skill/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json \
+-  --candidate-root /exact/GCFPE-20260914.1-candidate-snapshot
++  --candidate-root /exact/GCFPE-20260914.1-candidate-root
+ python3 scripts/run_gcfpe_20260914_fixtures.py /exact/change-flow-skill \
+   --contract /exact/change-flow-skill/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
+ ~~~
+@@ -272,6 +272,8 @@
+ - exactly one specialization marker pair and one specialization revision;
+ - no specialization-only term in the generic core;
+ - no active legacy overlap;
++- no superseded contract phrase in a specialization's active text, and no retired
++  prompt-corpus phrase (`D22`) in this skill's own guidance, profile or options;
+ - domain self-containment and required domain contracts; and
+ - successful bundled self-tests.
+ 
+@@ -379,9 +381,9 @@
+ 
+ ## GCFPE direct-handoff profile validation
+ 
+-By default the suite validates the 091426.1 current overlay and its schema-4 fixtures; the 54-member `GCFPE-20260913.1 / 091326.2` alias is validated only when passed explicitly. When both explicit candidate arguments are supplied, it additionally validates `GCFPE-20260914.1 / 091426.1 / 55`, its recursively loaded corpus, its byte-pinned bundled contract and frozen graph, and all 37 section-13 fixtures. Candidate inputs never replace, redirect, or relax the current-overlay validation, which always runs the 091426.1 contract and its fixtures first. After promotion, the selected alias must resolve as the 55-member schema-4 production contract; the same release-aware validator and successor fixtures then validate that selected binding against the pinned semantic bundle.
++By default the suite validates the 091426.1 current overlay and its schema-4 fixtures; the 54-member `GCFPE-20260913.1 / 091326.2` alias is validated only when passed explicitly. When both explicit candidate arguments are supplied, it additionally validates `GCFPE-20260914.1 / 091426.1 / 55`, its byte-pinned bundled contract and frozen graph, and all 37 section-13 fixtures. Candidate inputs never replace, redirect, or relax the current-overlay validation, which always runs the 091426.1 contract and its fixtures first. After promotion, the selected alias must resolve as the 55-member schema-4 production contract; the same release-aware validator and successor fixtures then validate that selected binding against the pinned semantic bundle.
+ 
+-The successor validator checks exact membership and Notion bindings, state/edge closure, PR-30/PR-35 continuity, result vocabularies, action ledger/checkpoints, current-head readiness, PF10 cardinality/schema, the 14-member writer set, phase-aware rescope, manual abort/merge boundaries, complete handoffs, Markdown-only PFCanon behavior, Alpha hold, protected Primary/R1 identity, and prohibited routing. The fixture report separates 37 required fixture IDs, independent variants, and exact contract-mutation rule attribution.
++The successor validator checks exact membership and Notion bindings, state/edge closure, PR-30/PR-35 continuity, result vocabularies, action ledger/checkpoints, current-head readiness, PF10 cardinality/schema, the 14-member writer set, phase-aware rescope, manual abort/merge boundaries, complete handoffs, Markdown-only PFCanon behavior, the Alpha promotion record, protected Primary/R1 identity, and prohibited routing. The fixture report separates 37 required fixture IDs, independent variants, and exact contract-mutation rule attribution.
+ 
+ Historical validators and fixtures for prior integrated, final-scan, assessment-middleware, Epic-alpha, and Epic-reengineering layers remain provenance only. The active runner must not execute them as current GCFPE acceptance gates. Immutable R1 baseline checks and the ordinary Change Flow fixture suite remain active.
+ 
+@@ -395,8 +397,8 @@
+ 
+ ## Artifact creation order and native inputs
+ 
+-Validate the complete 55 prompt bodies against the source-grounded artifact-availability contract, independently of graph/contract-copy agreement. General PR prerequisites, approved PR bases and PR work products exclude change-specific QA Guide/Audit/Plan/review/tasks/results/final Report/RCA; PR local testing, acceptance evidence and code/security reviews remain required. Later remediation transports its approved bounded remedy, actual originating finding/reference and verification owner and may carry/read an existing Guide or other QA evidence when specifically relevant to the approved remedy. Require only the actual evidence on which that remedy depends, preserving its native status; do not make it an approved PR base or require future QA artifacts.
++Validate the prompt bodies the caller read from Notion and supplied on `--bodies-stdin` against the source-grounded artifact-availability contract, independently of graph/contract-copy agreement. General PR prerequisites, approved PR bases and PR work products exclude change-specific QA Guide/Audit/Plan/review/tasks/results/final Report/RCA; PR local testing, acceptance evidence and code/security reviews remain required. Later remediation transports its approved bounded remedy, actual originating finding/reference and verification owner and may carry/read an existing Guide or other QA evidence when specifically relevant to the approved remedy. Require only the actual evidence on which that remedy depends, preserving its native status; do not make it an approved PR base or require future QA artifacts.
+ 
+ Verify initial formation/planning does not require its own future approved output. QA-10 readiness cannot require a later Guide or QA Plan. QA-20 GUIDE_READY creates a Guide without a separate approval; QA-50 creates Audit then Plan, and QA-60 only completes Plan after an existing valid Audit. Preserve later QA-70 approval, selected task execution, reviewed evidence and separate final Report/RCA before Isis closure. Origin-scoped recovery uses actual existing evidence only.
+ 
+-Run the actual-source mutation cases against the supplied complete corpus, including restoration of the original PR-35 Guide prerequisite and wrong producer declarations even when copies agree. Report exact case counts and rule attributions. These bounded static and synthetic checks do not prove live provider truth or replace fresh independent semantic postflight.
++Run the actual-source mutation cases against the bodies supplied on stdin, including restoration of the original PR-35 Guide prerequisite and wrong producer declarations even when copies agree. Report exact case counts and rule attributions. These bounded static and synthetic checks do not prove live provider truth or replace fresh independent semantic postflight.
+diff -ruN a/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json b/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
+--- a/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-23 13:11:39.015444493 +0000
++++ b/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json	2026-09-23 23:15:23.300610850 +0000
+@@ -353,7 +353,7 @@
+     "version": "091426.1"
+   },
+   "contract_id": "GCFPE-20260914.1-091426.1-DIRECT-HANDOFF-SELECTED",
+-  "contract_revision": "4.1.0",
++  "contract_revision": "4.1.1",
+   "control_manifest": {
+     "candidate_contract_role": "UNSELECTED_VERSIONED_SKILL_REFERENCE; DOES_NOT ALTER LIVE SELECTION",
+     "candidate_controls_resolve_through_release_register_at_promotion": true,
+@@ -3023,7 +3023,7 @@
+       "PRODUCT_OWNER_DECISION_REQUIRED"
+     ],
+     "primary_skill": "glow-hde-pr-development",
+-    "primary_skill_revision": "1.3.0",
++    "primary_skill_revision": "1.3.1",
+     "r1_row": "GCF-17",
+     "recover_existing_work_before_create": true,
+     "resolve_known_findings_and_retest_before_coherent_corrective_push": true,
+diff -ruN a/references/gcfpe-20260914.1-091426.1-validation-profile.json b/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- a/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-23 13:11:39.017868843 +0000
++++ b/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-23 23:15:23.296876520 +0000
+@@ -5,7 +5,7 @@
+     "relative_to_change_flow": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+     "schema_version": "gcfpe-direct-handoff-contract/4.0",
+     "selection_status_during_staging": "UNSELECTED_CANDIDATE",
+-    "sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718"
++    "sha256": "dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c"
+   },
+   "candidate_member_count": 55,
+   "fixtures": {
+@@ -24,8 +24,8 @@
+     "sha256": "ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d"
+   },
+   "installed_skill_revisions": {
+-    "change-flow": "3.3.0",
+-    "glow-hde-pr-development": "1.3.0"
++    "change-flow": "3.3.1",
++    "glow-hde-pr-development": "1.3.1"
+   },
+   "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+   "prompt_version": "091426.1",
+@@ -40,7 +40,7 @@
+   "selected_member_count_during_staging": 54,
+   "selected_prompt_version_during_staging": "091326.2",
+   "selected_release_during_staging": "GCFPE-20260913.1",
+-  "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
++  "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20260914.1",
+-  "validator_revision": "3.3.0"
++  "validator_revision": "3.3.1"
+ }
+diff -ruN a/scripts/run_gcfpe_20260914_fixtures.py b/scripts/run_gcfpe_20260914_fixtures.py
+--- a/scripts/run_gcfpe_20260914_fixtures.py	2026-09-23 13:11:39.019050134 +0000
++++ b/scripts/run_gcfpe_20260914_fixtures.py	2026-09-23 23:12:52.615408304 +0000
+@@ -489,7 +489,7 @@
+     # could not fire, which is the defect class this package exists to remove.
+     mutation("reject-body-obligation-foreign-id", lambda c: c["plan_writer_contract"]["body_obligation_ids"].__setitem__("authoring_context_required", sorted(set(c["plan_writer_contract"]["body_obligation_ids"]["authoring_context_required"]) | {"CL-20"})), "PLAN_WRITER_BODY_OBLIGATION:authoring_context_required")
+     mutation("reject-incomplete-handoff", lambda c: c["transition_contract"].__setitem__("actual_pasteable_complete_prompt", False), "HANDOFF_CONTRACT")
+-    mutation("reject-alpha-execution", lambda c: c["alpha_resumption_contract"]["successor_trigger"].__setitem__("execute_pr10", True), "ALPHA_TRIGGER")
++    mutation("reject-alpha-execution", lambda c: c["alpha_resumption_contract"]["successor_trigger"].__setitem__("execute_pr10", True), "ALPHA_PROMOTION_RECORD_TRIGGER")
+     mutation("reject-primary-core-change", lambda c: c["protected_identities"].__setitem__("flowmaster_primary_core_changed", True), "PROTECTED_IDENTITIES")
+ 
+     selected = as_selected_production(source)
+@@ -552,6 +552,35 @@
+         ("reject-release-header-table-cell", "| Ecosystem release: | GCFPE-20260914.1 |"),
+     ):
+         cases.append({"name": name, "passed": prompt_body_release_header(clean_header[:1] + [offending] + clean_header[1:])})
++    # ITEM-36: the check covers the whole body. The former window saw the first eight non-blank lines only,
++    # so a label line after them passed; ordinary prose about releases must still pass.
++    body_prose = [f"Step {n}: read the named artifact and act on it." for n in range(1, 11)]
++    for name, offending in (
++        ("reject-release-label-past-header-window", "Prompt version: 091426.1"),
++        ("reject-release-label-past-header-window-decorated", "- **Ecosystem release:** GCFPE-20260914.1"),
++    ):
++        cases.append({"name": name, "passed": prompt_body_release_header(clean_header + body_prose + [offending])})
++    cases.append({
++        "name": "accept-release-prose-past-header-window",
++        "passed": not prompt_body_release_header(clean_header + body_prose + [
++            "The register names the selected ecosystem release; this body carries no release line.",
++            "A set of prompts is selected together.",
++        ]),
++    })
++    # P-16: a decorated label line deep in the body (line 40) is rejected once the decoration is removed;
++    # prose that starts with the same letters, or names the label without its colon, is not.
++    long_prose = [f"Step {n}: read the named artifact and act on it." for n in range(1, 36)]
++    for name, offending in (
++        ("reject-release-label-code-in-bold-at-line-40", "**`Prompt version`**: 091426.1"),
++        ("reject-release-label-ordered-item-code-in-bold-at-line-40", "3. **`Set`**: Glow HDE Complete Prompt Flow 091426.1"),
++    ):
++        cases.append({"name": name, "passed": prompt_body_release_header(clean_header + long_prose + [offending])})
++    for name, harmless in (
++        ("accept-settings-bullet-at-line-40", "- Settings: keep the defaults the handoff names."),
++        ("accept-set-up-prose-at-line-40", "Set up the run: read the handoff first."),
++        ("accept-code-label-without-colon-at-line-40", "`Prompt version` belongs to the register, never to a body."),
++    ):
++        cases.append({"name": name, "passed": not prompt_body_release_header(clean_header + long_prose + [harmless])})
+     # The prohibition is a separate check with its own error code, so it is falsified
+     # separately: a body may be identity-valid and still carry governance state.
+     cases.append({
+@@ -796,7 +825,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.3.0",
++        "validator_revision": "3.3.1",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+diff -ruN a/scripts/run_gcfpe_current_fixtures.py b/scripts/run_gcfpe_current_fixtures.py
+--- a/scripts/run_gcfpe_current_fixtures.py	2026-09-23 13:11:39.019155023 +0000
++++ b/scripts/run_gcfpe_current_fixtures.py	2026-09-23 23:12:52.615742958 +0000
+@@ -11,7 +11,7 @@
+ 
+ sys.dont_write_bytecode = True
+ 
+-from validate_gcfpe_current import validate_contract, project_fixture_decision
++from validate_gcfpe_current import validate_contract, project_fixture_decision, validate_prompt_bodies
+ 
+ EXPECTED_SCENARIOS = {
+     "SC-01-RESCOPE-REJECTED",
+@@ -271,6 +271,28 @@
+     candidate = copy.deepcopy(source)
+     candidate["native_remediation_contract"]["rs40_allowed"] = True
+     case("reject-remediation-rs40-incompatible-approval", candidate, "NATIVE_REMEDIATION_CONTRACT")
++
++    # ITEM-11: --bodies-stdin with this historical schema-3.1 alias. Body checks read only the bodies
++    # supplied and fail closed with named results; they once raised NameError on a removed `paths`.
++    # The bodies are synthetic, never a copy of a prompt page.
++    def body_case(name: str, bodies: dict[str, str], passes) -> None:
++        try:
++            body_errors = validate_prompt_bodies(bodies)
++        except Exception as exc:  # the defect this case pins
++            cases.append({"name": name, "passed": False, "errors": [f"{type(exc).__name__}: {exc}"]})
++            return
++        cases.append({"name": name, "passed": passes(body_errors), "errors": body_errors})
++
++    body_case(
++        "historical-alias-bodies-stdin-supplied-body-named-result",
++        {"RS-40": "RS-40 synthetic — 091326.2\nPrompt Version: 091326.2\nPrompt ID: RS-40\n"},
++        lambda errors: any(error.startswith("PROMPT_ROUTE_SEMANTICS:RS-40:") for error in errors),
++    )
++    body_case(
++        "historical-alias-bodies-stdin-absent-body-not-evaluated",
++        {"QA-10": "QA-10 synthetic — 091326.2\nPrompt Version: 091326.2\nPrompt ID: QA-10\n"},
++        lambda errors: bool(errors) and not any(error.startswith("PROMPT_ROUTE_SEMANTICS:") for error in errors),
++    )
+     return {
+         "release": source.get("target_release"),
+         "prompt_version": source.get("prompt_version"),
+diff -ruN a/scripts/validate_flowmaster.py b/scripts/validate_flowmaster.py
+--- a/scripts/validate_flowmaster.py	2026-09-23 13:11:39.020049956 +0000
++++ b/scripts/validate_flowmaster.py	2026-09-23 23:12:52.605548043 +0000
+@@ -146,8 +146,9 @@
+         "END TECHNICAL WRITING FLOW: NO TARGETS",
+     ),
+     "change-flow": (
+-        "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0",
++        "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.1",
+         "For every GCFPE main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never creates, spawns, launches or schedules a session; when no existing authoritative session can do the work, it returns the paste-ready `NEXT_PROMPT_HANDOFF` and stops for Nathan.",
++        "For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direct Notion URL, keeps no copy, hash or snapshot of its body, reads it from Notion again at each use, and stops under prompt drift when that identity resolves to a different version (`D22`).",
+         "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+         "R1_ROW_COVERAGE: 46/46",
+         "PRIMARY_CHANGE_REQUIRED = false",
+@@ -182,7 +183,8 @@
+         "END SESSION BRANCH FLOW: BLOCKED",
+     ),
+     "session-relay-flowmaster": (
+-        "SESSION_RELAY_FLOWMASTER_SPECIALIZATION_REVISION: 3.1.0",
++        "SESSION_RELAY_FLOWMASTER_SPECIALIZATION_REVISION: 3.2.0",
++        "For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direct Notion URL, keeps no copy, hash or snapshot of its body, reads it from Notion again at each use, and stops under prompt drift when that identity resolves to a different version (`D22`).",
+         "Outside a GCFPE main-ecosystem stage, when a required participant does not exist or cannot be confirmed reachable, return `SESSION_PROVISIONING_REQUIRED` for Session Branch Flowmaster.",
+         "This specialization cannot create a session. Outside a GCFPE main-ecosystem stage, when a required participant does not exist, return `SESSION_PROVISIONING_REQUIRED` and stop",
+         "For every GCFPE main-ecosystem stage, the core's option to create a fresh session does not apply: this skill never creates, spawns, launches or schedules a session; when no existing authoritative session can do the work, it returns the paste-ready `NEXT_PROMPT_HANDOFF` and stops for Nathan.",
+@@ -325,6 +327,8 @@
+         "ALLOW_CRD_ONLY_OPERATION",
+         "KRONOS_EXECUTES_OPS",
+         "KRONOS_EXECUTES_QA",
++        # D22 (ITEM-06, ITEM-16): a prompt is pinned by stable ID, version and URL, never by content.
++        "source revision/content identity",
+     ),
+     "session-branch-flowmaster": (
+         "activation phrase is part of provisioning",
+@@ -347,6 +351,37 @@
+         "preferred live control plane",
+         "launched as a new session",
+         "The Product Owner's PR-40 invocation supplies merge approval",
++        # MODIFICATION-20260923-closeout-residuals: ITEM-02 (no GCFPE model or reasoning advice in a
++        # handoff, D23-A/B), ITEM-06 (no prompt-body digest, D22), ITEM-14 (the repository, not Drive,
++        # is the GCFPE artifact plane, D7).
++        "exact predecessor assessment",
++        "predecessor assessment is the default",
++        "surface/model/reasoning recommendation",
++        "assess or preserve advice for the destination's whole operation",
++        "eligible human recommendation",
++        "optional digest",
++        "preferred artifact plane",
++        "ARTIFACT_PLANE: GOOGLE_DRIVE | NONE",
++        "Drive `Glow / Ops` contains",
++    ),
++}
++
++# D22 (ITEM-04, ITEM-16): flowmaster-validate's own retired phrases, which presumed a complete local
++# copy of the prompt corpus. Keyed by file, because this script is one of those files and holds the
++# other files' literals; its own entry is therefore written as two adjacent literals, which Python
++# joins, so the joined phrase never occurs in this file's text.
++SELF_FORBIDDEN = {
++    "SKILL.md": (
++        "its recursively loaded corpus",
++        "Validate the complete 55 prompt bodies",
++        "against the supplied complete corpus",
++        "the complete candidate snapshot root",
++    ),
++    "references/gcfpe-20260914.1-091426.1-validation-profile.json": (
++        "complete 55-member prompt corpus",
++    ),
++    "scripts/validate_flowmaster.py": (
++        "Candidate snapshot root " "containing prompts/",
+     ),
+ }
+ 
+@@ -634,9 +669,10 @@
+ # FMV-GCF-DISPATCH-001: C-DISPATCH and the D23-E sentence (PR-40 is entered once per merge) at every
+ # skill site that carries them. Positions are pinned, not only counts: the whole C-DISPATCH passage occurs
+ # once at each carrying site, and every other fallback predicate, and the fixture texts' D23-E sentence,
+-# occurs once inside its own sentence context. Every count reads the raw file, and any HTML comment other
+-# than a whole-line FLOWMASTER section marker is a finding: a comment can hide text from a rendered file
+-# or carry a contradicting instruction inside the pinned passage.
++# occurs once inside its own sentence context. Every count reads the raw file, and markup that hides text in
++# rendered Markdown (DISPATCH_HIDING_RE, below) is a finding unless it is one of the six whole-line
++# FLOWMASTER section markers: it can hide text from a rendered file or carry a contradicting instruction
++# inside the pinned passage.
+ DISPATCH_ONCE = "PR-40 is entered once per merge: paste the `MERGE_OBSERVED` handoff when one arrives, otherwise the fallback block. Once either has been pasted, the other is void."
+ DISPATCH_PREDICATE = "only where no `MERGE_OBSERVED` result was returned for this merge"
+ DISPATCH_BLOCK = (
+@@ -708,7 +744,20 @@
+         ),
+     ),
+ )
+-DISPATCH_ALLOWED_COMMENT_RE = re.compile(r"(?m)^<!-- FLOWMASTER_[A-Z_]+ -->$")
++# SFR-A5-2 F2: exactly the six section markers the carrying files use. Any other name could itself
++# carry an instruction that no rendered view shows.
++DISPATCH_ALLOWED_COMMENT_RE = re.compile(
++    r"(?m)^<!-- FLOWMASTER_(?:CORE|SPECIALIZATION|PROHIBITIONS)_(?:BEGIN|END) -->$"
++)
++# SFR-A5-1 N1 and N4, SFR-A5-2 F3 and F4: markup that hides text in rendered Markdown. `<!` opens every
++# comment, bogus comment, declaration and CDATA section; `<?` a processing instruction; the four raw
++# elements hide what follows when left unclosed; `[//]: #` is the reference-definition comment idiom;
++# `--!>` closes a comment. A bare `-->` opens and hides nothing, so `PR-35 --> PR-40` is ordinary prose
++# and is not matched. Known limit: elements such as `<div hidden>` or `<details>` hide text only in some
++# renderers and share their HTML block type with ordinary markup, so they are not matched.
++DISPATCH_HIDING_RE = re.compile(
++    r"(?im)<!|<\?|--!>|<(?:script|style|template|textarea)\b|^[ \t]{0,3}\[[^\]\n]*\]:[ \t]*#"
++)
+ CANDIDATE_VALIDATOR_RELATIVE = Path("scripts/validate_gcfpe_20260914.py")
+ MATRIX_BLOCK_RE = re.compile(r"(?ms)^```json\n(.*?)\n```$")
+ MATRIX_DIGEST_LINE_RE = re.compile(r"(?m)source_row_sha256: ([0-9a-f]{64})$")
+@@ -755,10 +804,14 @@
+             continue
+         problems = []
+         residue = DISPATCH_ALLOWED_COMMENT_RE.sub("", text)
+-        if any(token in residue for token in ("<!--", "-->", "--!>")):
++        hidden = sorted(set(match.strip() for match in DISPATCH_HIDING_RE.findall(residue)))
++        if hidden:
+             problems.append(
+-                "an HTML comment other than a whole-line FLOWMASTER section marker is present; "
+-                "it can hide or contradict the pinned text"
++                "markup that hides text in rendered Markdown is present (an HTML comment other than a "
++                "whole-line FLOWMASTER section marker, a `<!` or `<?` construct, a raw script, style, "
++                "template or textarea element, or a `[//]: #` reference comment): "
++                + ", ".join(hidden)
++                + "; it can hide or contradict the pinned text"
+             )
+         if text.count(DISPATCH_PREDICATE) != predicate_count:
+             problems.append(
+@@ -787,8 +840,19 @@
+     return count
+ 
+ 
++# SFR-A5-1 N2, SFR-A5-2 F1: one block-quote or list-item marker with at most one following space or tab.
++MATRIX_CONTAINER_MARKER_RE = re.compile(r"^[ ]{0,3}(?:>|[-*+](?=[ \t]|$)|\d{1,9}[.)](?=[ \t]|$))[ \t]?")
++# Four spaces, a tab, or one to three spaces and a tab reach column 4: an indented code block.
++MATRIX_INDENTED_CODE_RE = re.compile(r"^(?: {4}|\t| {1,3}\t)")
++
++
+ def matrix_indented_code_lines(text: str) -> int:
+-    """Non-blank lines outside fenced blocks that start with four spaces or a tab (an indented code block)."""
++    """Non-blank lines outside fenced blocks that render as an indented code block.
++
++    That includes indented code inside a block quote or list item (`>     {`, `-     {`, `1.     {`):
++    each container marker is removed with at most one following space or tab, and what remains is
++    counted when it starts with four spaces, a tab, or one to three spaces and a tab.
++    """
+ 
+     count, in_fence = 0, False
+     for line in text.split("\n"):
+@@ -796,7 +860,15 @@
+         if stripped.startswith(("```", "~~~")):
+             in_fence = not in_fence
+             continue
+-        if not in_fence and line.strip() and (line.startswith("    ") or line.startswith("\t")):
++        if in_fence or not line.strip():
++            continue
++        rest = line
++        while True:
++            reduced = MATRIX_CONTAINER_MARKER_RE.sub("", rest, count=1)
++            if reduced == rest:
++                break
++            rest = reduced
++        if rest.strip() and MATRIX_INDENTED_CODE_RE.match(rest):
+             count += 1
+     return count
+ 
+@@ -1254,7 +1326,7 @@
+     # compared to the unchanged, hash-verified oracle below.
+     maintenance_metadata = {
+         "CHANGE_FLOW_SPECIALIZATION_REVISION: 2.0.0":
+-            "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0",
++            "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.1",
+         "PROMPT_REPAIR_PLAN_STATUS = SUSPENDED_PENDING_REPAIR_SYSTEM_RECOVERY":
+             "PROMPT_REPAIR_PLAN_STATUS = RESOLVE_CURRENT_REGISTER",
+     }
+@@ -1352,6 +1424,20 @@
+                 f"{list(expected_projection)}, in that order",
+             )
+         )
++    # SFR-A5-1 N3: the keyed row comparison above cannot see a reorder of the same rows, and the oracle's
++    # own order is enforced (FMV-ORACLE-019), so the map is held to that order too.
++    map_rows = contract_map.get("runtime_rows") if contract_map else None
++    if isinstance(map_rows, list):
++        map_ids = [row.get("id") if isinstance(row, dict) else None for row in map_rows]
++        oracle_ids = [row.get("id") for row in oracle.get("runtime_rows", []) if isinstance(row, dict)]
++        if map_ids != oracle_ids and sorted(map(str, map_ids)) == sorted(map(str, oracle_ids)):
++            results.append(
++                finding(
++                    "FMV-GCF-MAP-005",
++                    subject,
++                    "runtime map rows are the pinned R1 oracle's rows in a different order",
++                )
++            )
+     rows = contract_map.get("runtime_rows", []) if contract_map else []
+     if isinstance(rows, list):
+         results.extend(graph_findings(rows, oracle, subject))
+@@ -1762,7 +1848,8 @@
+     parser.add_argument(
+         "--gcfpe-candidate-root",
+         type=Path,
+-        help="Candidate snapshot root containing prompts/ and graph/; requires --gcfpe-contract",
++        help="Candidate root holding graph/GCFPE-20260914.1-Candidate-Graph-Contract.json only; "
++        "no prompt bodies are read from it; requires --gcfpe-contract",
+     )
+     return parser.parse_args()
+ 
+@@ -1813,7 +1900,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.3.0",
++            "validator_revision": "3.3.1",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+@@ -1930,15 +2017,30 @@
+                             for item in change_findings
+                             if item["severity"] == "ERROR"
+                         )
+-                    lowered = text.lower()
+-                    for forbidden in (
+-                        () if name == "change-flow" else CONTRACT_FORBIDDEN.get(name, ())
+-                    ):
++                    # change-flow names its retired architecture inside the marked prohibition block,
++                    # which the oracle's prohibited-pattern rule governs, so its forbidden phrases are
++                    # matched against the active text outside that block (ITEM-16).
++                    lowered = (
++                        remove_marked_region(text, PROHIBITIONS_BEGIN, PROHIBITIONS_END)
++                        if name == "change-flow" else text
++                    ).lower()
++                    for forbidden in CONTRACT_FORBIDDEN.get(name, ()):
+                         if forbidden.lower() in lowered:
+                             errors.append(f"superseded contract present: {forbidden}")
+                 except ValidationError as exc:
+                     errors.append(str(exc))
+ 
++            if name == "flowmaster-validate":
++                for relative, phrases in SELF_FORBIDDEN.items():
++                    try:
++                        own = (path.parent / relative).read_text(encoding="utf-8").lower()
++                    except (OSError, UnicodeError) as exc:
++                        errors.append(f"retired-phrase scope unreadable: {relative}: {exc}")
++                        continue
++                    for phrase in phrases:
++                        if phrase.lower() in own:
++                            errors.append(f"retired D22 phrase present in {relative}: {phrase}")
++
+             report["skills"][name] = {
+                 "status": "PASS" if not errors else "FAIL",
+                 "core_sync": core_sync,
+diff -ruN a/scripts/validate_gcfpe_20260914.py b/scripts/validate_gcfpe_20260914.py
+--- a/scripts/validate_gcfpe_20260914.py	2026-09-23 13:11:39.020230961 +0000
++++ b/scripts/validate_gcfpe_20260914.py	2026-09-23 23:15:23.294396284 +0000
+@@ -973,8 +973,8 @@
+     "UNCHANGED": "UNCHANGED",
+     "WRONG_NATIVE_LANE": "UNCHANGED",
+ }
+-# D23-G: a body carries no release-bound header line (Prompt version, Set, Ecosystem release);
+-# prompt_body_release_header rejects one in the header window as PROMPT_BODY_RELEASE_HEADER.
++# D23-G: a body carries no release-bound label line (Prompt version, Set, Ecosystem release);
++# prompt_body_release_header rejects one anywhere in the body as PROMPT_BODY_RELEASE_HEADER.
+ PROMPT_ID_HEADER_RE = re.compile(r"(?m)^Prompt ID:\s*`?([A-Z0-9-]+)`?\s*$")
+ RELEASE_HEADER_KEYS = ("Prompt Version:", "Prompt version:", "Set:", "Ecosystem release:")
+ SELECTION_HEADER_KEYS = ("Selection status:", "Lifecycle:")
+@@ -1009,7 +1009,7 @@
+ SHA_RE = re.compile(r"^[0-9a-f]{64}$")
+ EXPECTED_FROZEN_GRAPH_SHA256 = "ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d"
+ EXPECTED_FROZEN_GRAPH_BYTES = 575074
+-EXPECTED_CANDIDATE_CONTRACT_SHA256 = "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718"
++EXPECTED_CANDIDATE_CONTRACT_SHA256 = "dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c"
+ EXPECTED_CANDIDATE_CONTRACT_BYTES = 613326
+ EXPECTED_FIXTURE_SHA256 = "c433aa09d63b4c8c42891d03086096a771f1092d8c24c325f1706ab00932fe71"
+ # Prohibited in a prompt body, not required in one. The register determines selected
+@@ -1143,9 +1143,14 @@
+ 
+ 
+ def prompt_body_release_header(nonblank: list[str]) -> bool:
+-    """True when the header window carries a release-bound line, which D23-G prohibits."""
++    """True when any body line is a release-bound label line, which D23-G prohibits.
+ 
+-    stripped = [governance_line_normalised(line) for line in nonblank[:8]]
++    The whole body, not a header window: `prompt-body-content-policy.md` forbids any field whose
++    value changes because of a release event, with no header limit, and the former eight-line window
++    let a label line after it through (MODIFICATION-20260923-closeout-residuals ITEM-36).
++    """
++
++    stripped = [governance_line_normalised(line) for line in nonblank]
+     return any(line.startswith(key) for line in stripped for key in RELEASE_HEADER_KEYS)
+ 
+ 
+@@ -1158,7 +1163,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+-        "validator_revision": "3.3.0",
++        "validator_revision": "3.3.1",
+         "target_release": "GCFPE-20260914.1",
+         "prompt_version": "091426.1",
+         "candidate_member_count": 55,
+@@ -1474,7 +1479,7 @@
+     errors: list[str] = []
+     errors += subset_errors(contract, {
+         "schema_version": "gcfpe-direct-handoff-contract/4.0",
+-        "contract_revision": "4.1.0",
++        "contract_revision": "4.1.1",
+         "target_release": "GCFPE-20260914.1",
+         "predecessor_release": "GCFPE-20260913.1",
+         "prompt_version": "091426.1",
+@@ -1813,7 +1818,7 @@
+     development = contract.get("pr_development_contract")
+     errors += subset_errors(development, {
+         "r1_row": "GCF-17", "phases": ["PR-30", "PR-35"],
+-        "primary_skill": "glow-hde-pr-development", "primary_skill_revision": "1.3.0",
++        "primary_skill": "glow-hde-pr-development", "primary_skill_revision": "1.3.1",
+         "pr30_ownership": [
+             "recovery", "implementation", "local testing", "coherent commit creation",
+             "deliberate initial publication", "complete PR-35 handoff to the dedicated PR-35 session",
+@@ -1898,6 +1903,9 @@
+     if PR35_TOP_LEVEL_ROLE_PHRASE not in str(((contract.get("member_registry") or {}).get("PR-35") or {}).get("receiving_role", "")):
+         errors.append("PR35_TOP_LEVEL_ROLE")
+ 
++    # The promotion-time record of the Alpha resumption contract (ruling 5 Q3 (A), 2026-09-23): these are
++    # the values promotion recorded, pinned unchanged. They are not current Alpha state, which the Epic's
++    # own artifacts record (D18 successor), and no prompt reads them for routing.
+     alpha = contract.get("alpha_resumption_contract")
+     errors += subset_errors(alpha, {
+         "state": "ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR",
+@@ -1906,14 +1914,14 @@
+         "current_handoff_status": "NOT_YET_APPROVED", "resume_authority": "Nathan / Product Owner",
+         "old_pr02_rs20_trigger": "HISTORICAL_NON_OPERATIVE",
+         "superseded_pr03_produced_pr04_handoff": "HISTORICAL_NON_OPERATIVE",
+-    }, "ALPHA_STATE")
++    }, "ALPHA_PROMOTION_RECORD")
+     trigger = alpha.get("successor_trigger", {}) if isinstance(alpha, dict) else {}
+     errors += subset_errors(trigger, {
+         "work_unit": "HDE-EPIC040-PR04", "receiving_session": "RETAINED_WHOLE_CHANGE_IA_SESSION",
+         "expected_output": "PR_INSTRUCTION", "prepare_only": True, "execute_pr10": False,
+         "begin_pr04_planning": False, "resume_alpha": False,
+         "product_owner_manual_invocation_required": True,
+-    }, "ALPHA_TRIGGER")
++    }, "ALPHA_PROMOTION_RECORD_TRIGGER")
+ 
+     errors += subset_errors(contract.get("rca_separation_contract"), {
+         "evidence_id": "PR03-R02", "classification": "ACCEPTED_TECHNICAL_HISTORY",
+@@ -2689,7 +2697,7 @@
+     expected_change_revision = installed_revisions.get("change-flow")
+     for marker in (
+         f"CHANGE_FLOW_SPECIALIZATION_REVISION: {expected_change_revision}", "PR-30 and PR-35 are two phases",
+-        "REMOTE_EVIDENCE_PENDING", "PR_REMOTE_ACTION_LEDGER", "ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR",
++        "REMOTE_EVIDENCE_PENDING", "PR_REMOTE_ACTION_LEDGER", "Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record",
+         "Only Nathan / Product Owner may manually invoke selected `PR-50",
+     ):
+         if marker not in skill_text:
+@@ -2699,7 +2707,7 @@
+     skills_root = change_skill_dir.parent
+     required_skills = {
+         "glow-hde-pr-development": (
+-            "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.0", "REMOTE_EVIDENCE_PENDING",
++            "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.1", "REMOTE_EVIDENCE_PENDING",
+             "PR_REMOTE_ACTION_LEDGER", "This skill never authorizes an agent to merge, enable auto-merge",
+             "The exact ordered nine-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product Owner Proceed; workspace/worktree; branch; pull request; PR instruction; detailed PR plan; primary skill authority; continuous recovery/artifact lineage",
+             "exactly one fenced `text` block whose first line is `NEXT_PROMPT_HANDOFF`",
+diff -ruN a/scripts/validate_gcfpe_current.py b/scripts/validate_gcfpe_current.py
+--- a/scripts/validate_gcfpe_current.py	2026-09-23 13:11:39.020568710 +0000
++++ b/scripts/validate_gcfpe_current.py	2026-09-23 23:12:52.614405034 +0000
+@@ -601,8 +601,11 @@
+         "ESC-30": ("current PF10 Markdown and applicable addenda", "immutable Plan/Guide/Specification bases"),
+         "IA-40": ("pending preapproval", "An approved Plan may appear only as wrong-route evidence"),
+     }
+-    for prompt_id, markers in required_markers.items():
+-        text = paths[prompt_id].read_text(encoding="utf-8")
++    # Only the bodies the caller supplied (ITEM-11). This loop once read `paths[prompt_id]`, a name
++    # removed with the corpus mirror, so --bodies-stdin with this historical schema-3.1 alias raised
++    # NameError instead of returning a named result. An absent body is not evaluated.
++    for prompt_id, text in sorted(bodies.items()):
++        markers = required_markers.get(prompt_id, ())
+         for marker in markers:
+             if marker not in text:
+                 errors.append(f"PROMPT_ROUTE_SEMANTICS:{prompt_id}:{marker}")
+@@ -634,8 +637,8 @@
+     for token in ACTIVE_LEGACY_TOKENS:
+         if token in active:
+             errors.append(f"LEGACY_ACTIVE:{token}")
+-    if skill_text.count("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0") != 1:
+-        errors.append("ACTIVE_CONTRACT_MISSING:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.0")
++    if skill_text.count("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.1") != 1:
++        errors.append("ACTIVE_CONTRACT_MISSING:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.3.1")
+     for marker in (
+         "docs/ephemeral",
+         "NEXT_PROMPT_HANDOFF", "glow-hde-pr-development", "PF10_BUILD_NOTES_ADDENDUM",
+@@ -651,7 +654,7 @@
+         errors.append("PR_DEVELOPMENT_SKILL_MISSING")
+     else:
+         for marker in (
+-            "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.0",
++            "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.1",
+             "## Recover before creating work", "run in two dedicated sessions", "RS-40", "PR-50",
+         ):
+             if marker not in pr_skill[1]:

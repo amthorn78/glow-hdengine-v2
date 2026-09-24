@@ -1,0 +1,61 @@
+{
+ "all_ok": true,
+ "cases": {
+  "first": {
+   "exit": 0,
+   "round": "cr1",
+   "tokens_left": false,
+   "prior_text": false,
+   "recut_text": false,
+   "first_text": true,
+   "ok": true
+  },
+  "recut": {
+   "exit": 0,
+   "round": "cr2",
+   "tokens_left": false,
+   "prior_text": false,
+   "recut_text": true,
+   "first_text": false,
+   "ok": true
+  },
+  "recut_after_rejection": {
+   "exit": 1,
+   "refused": "REPAIR_VERDICT_PENDING",
+   "ok": true
+  },
+  "recut_after_a_confirmed_record_quoting_both_words": {
+   "exit": 1,
+   "refused": "REPAIR_VERDICT_PENDING",
+   "ok": true
+  },
+  "recut_after_delivery": {
+   "exit": 1,
+   "refused": "PRIOR_ROUND_DELIVERED",
+   "ok": true
+  },
+  "plan_change_without_prior_file": {
+   "exit": 1,
+   "refused": "PLAN_CHANGE_ROUND_NEEDS_PRIOR_FILE",
+   "ok": true
+  },
+  "plan_change_with_prior_file": {
+   "exit": 0,
+   "round": "cr2",
+   "tokens_left": false,
+   "prior_text": true,
+   "recut_text": false,
+   "first_text": false,
+   "ok": true
+  },
+  "after_x71_plan_change_top_level_brief_delivered": {
+   "exit": 0,
+   "round": "cr2",
+   "tokens_left": false,
+   "prior_text": true,
+   "recut_text": false,
+   "first_text": false,
+   "ok": true
+  }
+ }
+}

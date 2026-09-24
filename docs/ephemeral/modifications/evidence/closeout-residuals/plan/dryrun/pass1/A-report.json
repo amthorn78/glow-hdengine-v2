@@ -1,0 +1,2527 @@
+[
+ {
+  "pid": "CF-C-10",
+  "page": "3db4590a05eb8119a5a8e4d083fcf360",
+  "fetched": "2026-09-23T13:19:42.836Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-10-1": 1,
+    "LCF-C-10-2": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-10-1": 1,
+    "LCF-C-10-2": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-C-10-1",
+    "reads_ok": true,
+    "note": "That recovery package names CLASS_SELECTION_REF, SOURCE_REF and the BLOCKED kickoff artifact by repository path"
+   },
+   {
+    "edit": "LCF-C-10-2",
+    "reads_ok": true,
+    "note": "carry an UNRESOLVED_CLASSIFICATION_CASE naming SOURCE_REF and the BLOCKED kickoff artifact; ... CF-PO-10 requests"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-C-10-1": [
+    "names ... by repository path",
+    "the BLOCKED kickoff artifact",
+    "the artifacts hold the rest"
+   ],
+   "LCF-C-10-2": [
+    "naming ... by repository path",
+    "the BLOCKED kickoff artifact",
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-E-10: every edit span word-for-word identical (inserted words and surrounding words).",
+  "notes": [
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-E-10",
+  "page": "3db4590a05eb815b84a5c5a5ace85fe1",
+  "fetched": "2026-09-23T13:28:00.706Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-10-1": 1,
+    "LCF-E-10-2": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-10-1": 1,
+    "LCF-E-10-2": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-E-10-1",
+    "reads_ok": true,
+    "note": "That recovery package names CLASS_SELECTION_REF, SOURCE_REF and the BLOCKED kickoff artifact by repository path"
+   },
+   {
+    "edit": "LCF-E-10-2",
+    "reads_ok": true,
+    "note": "carry an UNRESOLVED_CLASSIFICATION_CASE naming SOURCE_REF and the BLOCKED kickoff artifact; ... CF-PO-10 requests"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-E-10-1": [
+    "names ... by repository path",
+    "the BLOCKED kickoff artifact",
+    "the artifacts hold the rest"
+   ],
+   "LCF-E-10-2": [
+    "naming ... by repository path",
+    "the BLOCKED kickoff artifact",
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-C-10: every edit span word-for-word identical.",
+  "notes": [
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-C-20",
+  "page": "3db4590a05eb8173a73edc73f302a90a",
+  "fetched": "2026-09-23T13:26:41.035Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-20-1": 1,
+    "LCF-C-20-2": 1,
+    "LCF-C-20-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [
+   {
+    "type": "local_modify",
+    "target": "LCF-C-20-1",
+    "old": "The direct package names, by repository path, the exact pending Specification, the kickoff",
+    "new": "The direct package names, by repository path, the exact pending Specification, the kickoff,",
+    "why": "Readback: without the serial comma, 'only when they actually exist and the review requires them' can bind to 'the kickoff and current sources', making the kickoff (the sole substantive input, always present) conditional. The comma restores the original list structure (', and current sources only when ...'). Same patch on the CF-E-20 twin."
+   }
+  ],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-20-1": 1,
+    "LCF-C-20-2": 1,
+    "LCF-C-20-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-C-20-1",
+    "reads_ok": true,
+    "note": "The direct package names, by repository path, the exact pending Specification, the kickoff,"
+   },
+   {
+    "edit": "LCF-C-20-2",
+    "reads_ok": true,
+    "note": "and current sources only when ... the review requires them; the artifacts hold the rest."
+   },
+   {
+    "edit": "LCF-C-20-3",
+    "reads_ok": true,
+    "note": "That recovery names the original kickoff and all recoverable source/selection evidence by repository path"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-C-20-1": [
+    "names, by repository path,",
+    "the kickoff"
+   ],
+   "LCF-C-20-2": [
+    "the artifacts hold the rest"
+   ],
+   "LCF-C-20-3": [
+    "names ... by repository path",
+    "with the exact defect as minimum context only where no named artifact records it",
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-E-20: every edit span word-for-word identical; only the destination mention URL in the surrounding context differs (CF-C-30 vs CF-E-30, CF-C-10 vs CF-E-10), which is not edited.",
+  "notes": [
+   "First run before the patch also passed at rule level (LCF-C-20-1/2/3 each 1 hit, CHECK R-26-FRAME 0); the patch is readback-driven.",
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-E-20",
+  "page": "3db4590a05eb810eb177f7dced41bc8f",
+  "fetched": "2026-09-23T13:28:31.604Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-20-1": 1,
+    "LCF-E-20-2": 1,
+    "LCF-E-20-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [
+   {
+    "type": "local_modify",
+    "target": "LCF-E-20-1",
+    "old": "The direct package names, by repository path, the exact pending Specification, the kickoff",
+    "new": "The direct package names, by repository path, the exact pending Specification, the kickoff,",
+    "why": "Twin of the CF-C-20 patch (serial comma keeps the condition on the current sources only); twins stay word-for-word identical."
+   }
+  ],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-20-1": 1,
+    "LCF-E-20-2": 1,
+    "LCF-E-20-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-E-20-1",
+    "reads_ok": true,
+    "note": "The direct package names, by repository path, the exact pending Specification, the kickoff,"
+   },
+   {
+    "edit": "LCF-E-20-2",
+    "reads_ok": true,
+    "note": "and current sources only when ... the review requires them; the artifacts hold the rest."
+   },
+   {
+    "edit": "LCF-E-20-3",
+    "reads_ok": true,
+    "note": "That recovery names the original kickoff and all recoverable source/selection evidence by repository path"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-E-20-1": [
+    "names, by repository path,",
+    "the kickoff"
+   ],
+   "LCF-E-20-2": [
+    "the artifacts hold the rest"
+   ],
+   "LCF-E-20-3": [
+    "names ... by repository path",
+    "with the exact defect as minimum context only where no named artifact records it",
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-C-20: every edit span word-for-word identical (mention URLs in context differ, not edited).",
+  "notes": [
+   "First run before the patch also passed at rule level; the patch is readback-driven.",
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-C-30",
+  "page": "3db4590a05eb8149a8d2ed42c9c01ffd",
+  "fetched": "2026-09-23T13:27:04.309Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-30-1": 1,
+    "LCF-C-30-2": 1,
+    "LCF-C-30-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-30-1": 1,
+    "LCF-C-30-2": 1,
+    "LCF-C-30-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-C-30-1",
+    "reads_ok": true,
+    "note": "The complete package names the exact approved Specification and Thoth decision by repository path,"
+   },
+   {
+    "edit": "LCF-C-30-2",
+    "reads_ok": true,
+    "note": "by repository path, and the required IA/session binding or its truthful unassigned state"
+   },
+   {
+    "edit": "LCF-C-30-3",
+    "reads_ok": true,
+    "note": "or its truthful unassigned state; the artifacts hold the rest. IA-10 independently resolves"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-C-30-1": [
+    "names (replaces 'carries')"
+   ],
+   "LCF-C-30-2": [
+    "(none: deletion; 'path, and the' is kept body wording)"
+   ],
+   "LCF-C-30-3": [
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-E-30: every edit span word-for-word identical.",
+  "notes": [
+   "Not edited, outside the census sites: the CF-C-40 route's 'INITIAL_DENY carries ... / CORRECTION_REDLINE carries ... / DELTA_DENY carries ...' sentences, which list artifacts.",
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-E-30",
+  "page": "3db4590a05eb81b4be79f405566da9a7",
+  "fetched": "2026-09-23T13:28:53.874Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-30-1": 1,
+    "LCF-E-30-2": 1,
+    "LCF-E-30-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-30-1": 1,
+    "LCF-E-30-2": 1,
+    "LCF-E-30-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-E-30-1",
+    "reads_ok": true,
+    "note": "The complete package names the exact approved Specification and Thoth decision by repository path,"
+   },
+   {
+    "edit": "LCF-E-30-2",
+    "reads_ok": true,
+    "note": "by repository path, and the required IA/session binding or its truthful unassigned state"
+   },
+   {
+    "edit": "LCF-E-30-3",
+    "reads_ok": true,
+    "note": "or its truthful unassigned state; the artifacts hold the rest. IA-10 independently resolves"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-E-30-1": [
+    "names (replaces 'carries')"
+   ],
+   "LCF-E-30-2": [
+    "(none: deletion; 'path, and the' is kept body wording)"
+   ],
+   "LCF-E-30-3": [
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-C-30: every edit span word-for-word identical.",
+  "notes": [
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-C-40",
+  "page": "3db4590a05eb81269931cee342ce8a0e",
+  "fetched": "2026-09-23T13:27:38.648Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-40-1": 1,
+    "LCF-C-40-2": 1,
+    "LCF-C-40-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-C-40-1": 1,
+    "LCF-C-40-2": 1,
+    "LCF-C-40-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-C-40-1",
+    "reads_ok": true,
+    "note": "The direct package states the actual mode and names, by repository path, the exact produced artifact"
+   },
+   {
+    "edit": "LCF-C-40-2",
+    "reads_ok": true,
+    "note": "or correction assessment, and current PF10/overlay links only when the branch requires them"
+   },
+   {
+    "edit": "LCF-C-40-3",
+    "reads_ok": true,
+    "note": "only when the branch requires them; the artifacts hold the rest. APPROVED_BASE_FIRST_DELTA_AUTHORING returns"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-C-40-1": [
+    "states the actual mode and",
+    "names, by repository path,"
+   ],
+   "LCF-C-40-2": [
+    "(none: deletion; 'and current' is kept body wording)"
+   ],
+   "LCF-C-40-3": [
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-E-40: every edit span word-for-word identical; only the CF-C-30/CF-E-30 mention URL in context differs (not edited).",
+  "notes": [
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "CF-E-40",
+  "page": "3db4590a05eb8101b655ed223b11a85e",
+  "fetched": "2026-09-23T13:29:19.497Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-40-1": 1,
+    "LCF-E-40-2": 1,
+    "LCF-E-40-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "LCF-E-40-1": 1,
+    "LCF-E-40-2": 1,
+    "LCF-E-40-3": 1
+   },
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "LCF-E-40-1",
+    "reads_ok": true,
+    "note": "The direct package states the actual mode and names, by repository path, the exact produced artifact"
+   },
+   {
+    "edit": "LCF-E-40-2",
+    "reads_ok": true,
+    "note": "or correction assessment, and current PF10/overlay links only when the branch requires them"
+   },
+   {
+    "edit": "LCF-E-40-3",
+    "reads_ok": true,
+    "note": "only when the branch requires them; the artifacts hold the rest. APPROVED_BASE_FIRST_DELTA_AUTHORING returns"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "authored_phrases": {
+   "LCF-E-40-1": [
+    "states the actual mode and",
+    "names, by repository path,"
+   ],
+   "LCF-E-40-2": [
+    "(none: deletion; 'and current' is kept body wording)"
+   ],
+   "LCF-E-40-3": [
+    "the artifacts hold the rest"
+   ]
+  },
+  "twin_identity": "CF-C-40: every edit span word-for-word identical.",
+  "notes": [
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "UTIL-10",
+  "page": "3db4590a05eb81b89fbaf4b31a3ed2a9",
+  "fetched": "2026-09-23T13:23:01.028Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "R-26-P1b": 1
+   },
+   "checks": {},
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K11",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "R-26-P1b": 1
+   },
+   "checks": {},
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 1,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K11",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [
+    false
+   ],
+   "g06_fires_after": [
+    false
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-26-P1b",
+    "reads_ok": true,
+    "note": "ends with exactly one fenced `text` block beginning `NEXT_PROMPT_HANDOFF`. The block names the exact destination"
+   }
+  ],
+  "g06_after": true,
+  "open_issues": [],
+  "notes": [
+   "R-26-P1b removes the 20-word ', naming ... expected review state' tail; the handoff sentence now ends at the token and the C-HANDOFF sentence follows. G-K11 fires before, silent after.",
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ]
+ },
+ {
+  "pid": "PR-50",
+  "page": "3db4590a05eb8138ac99c13cf6f2f282",
+  "fetched": "2026-09-23T13:20:56.986Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a9a075723f66ad431.jsonl (inline fetch result in this worker's session transcript; no separate tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {
+    "R-OWN": {
+     "hits": 0,
+     "expected": 1,
+     "ok": false
+    }
+   },
+   "rules": {
+    "R-OWN": 0
+   },
+   "checks": {},
+   "check_failures": [],
+   "ops": {
+    "count": 0,
+    "reproduces_edit": true,
+    "max_old_str_lines": null
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 2,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [
+    [
+     "CTR-001",
+     "Forbidden pattern matched: (?:operating read-only|revalidation session, read-only|do not edit documentation, Canon, PF10, or repository state|read-only reposito"
+    ],
+    [
+     "CTR-002",
+     "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write"
+    ]
+   ],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K35",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": false,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "G-K35",
+    "G-K36",
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [],
+   "g06_fires_after": []
+  },
+  "patches": [
+   {
+    "type": "rule_anchor_override",
+    "target": "R-OWN / OWN_AT['PR-50']",
+    "old": "(?<=Do not mutate the repository in this authoring operation\\.)",
+    "new": "otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\\n]*\\.",
+    "why": "The old anchor reads 0 in PR-50 (the phrase is absent). The new anchor hits exactly once, in '## Authority and preservation', on the sentence G-K35 already fires on; R-OWN inserts the P-02 sentence after it. It is the anchor the engine lists for PR-20: the PR-20 and PR-50 OWN_AT anchors are swapped (batch E1's copy moved PR-20 to the 'authoring operation' anchor)."
+   }
+  ],
+  "final_run": {
+   "pass": true,
+   "dryrun_pass_flag": false,
+   "rule_mismatches": {},
+   "rules": {
+    "R-OWN": 1
+   },
+   "checks": {},
+   "check_failures": [],
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 2,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards_recorded": [
+    [
+     "CTR-002",
+     "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write"
+    ]
+   ],
+   "guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K35",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "guard_failures": [
+    "G-K36",
+    "PART-17",
+    "PART-17",
+    "PART-17"
+   ],
+   "validator_ok": true,
+   "validator_exit": 0,
+   "g06_fires_before": [],
+   "g06_fires_after": []
+  },
+  "readback": [
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "open PR, commits or evidence. Every statement in this prompt ... Do not rewrite any approved artifact."
+   }
+  ],
+  "g06_after": null,
+  "open_issues": [
+   "Engine merge: OWN_AT['PR-50'] and OWN_AT['PR-20'] are swapped in plan/r1/engine; take this batch's PR-50 anchor with E1's PR-20 anchor. G-K35's per-row split (P-02) must follow: PR-50's row carries 'otherwise mutating the workspace, worktree, branch, open PR, commits or evidence', PR-20's 'Do not mutate the repository in this authoring operation'.",
+   "Recorded, not repaired (registry draft): G-K36's required pattern still ends at 'commits and pushes\\.' (old R-OWN text), so it reads absent after the edit on PR-50; P-02 says G-K36 follows the new text."
+  ],
+  "notes": [
+   "PART-17 (3 new guards, old draft) show fires_on_injection=false: dryrun's load_guards injects the regression prose ('inject a label line after the first 8 ...') as the injected line, which is not a label line. Recorded, not repaired (guard data)."
+  ],
+  "g06_note": "G06 is not on this row (no NEXT_PROMPT_HANDOFF window guard in its registry assertions)."
+ }
+]

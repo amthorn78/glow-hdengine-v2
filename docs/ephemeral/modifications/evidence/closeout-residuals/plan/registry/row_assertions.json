@@ -1,0 +1,1346 @@
+[
+ {
+  "rule_id": "G-K01 R-A1a, R-A1b, R-A1c, R-A1d, R-A1e, R-A1f",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "pattern": "(?:metadata|lineage) or (?:the |returned |the returned )?handoff\\b|artifact/handoff metadata|, in (?:the )?returned handoff\\b",
+  "regression": "inject into CL-20: metadata or handoff",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "G-K02 R-A1a, R-A1b",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-05 (rows unchanged)",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-E-20",
+   "CL-E-30",
+   "CL-E-40",
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "OPS-10",
+   "OPS-20",
+   "PR-30",
+   "PR-40",
+   "QA-100",
+   "QA-110",
+   "QA-120",
+   "QA-20",
+   "QA-50",
+   "QA-60",
+   "QA-70",
+   "QA-80",
+   "QA-90",
+   "RS-10",
+   "RS-20",
+   "RS-30",
+   "CL-C-10",
+   "CL-E-10",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "QA-10"
+  ],
+  "pattern": "in the output artifact's (?:existing )?permitted metadata",
+  "regression": "in CL-20, put the retired wording back in place of the new text: in permitted metadata or handoff",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K03 R-A2a, R-A2b, R-A2c, R-A2d, R-A2e, R-A2f1, R-A2f2",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "pattern": "substantive artifact(?: metadata/content)? and handoffs?\\b|through (?:all next/recovery packages|every next and recovery package)\\b|review result and every native return\\b|and every return package\\b|receipt, review and handoff metadata|receipt and handoff when applicable",
+  "regression": "inject into CL-20: substantive artifact and handoff",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K04 R-A2a, R-A2b, R-A2c, R-A2d",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "QA-100",
+   "QA-110",
+   "QA-120",
+   "QA-20",
+   "QA-50",
+   "QA-60",
+   "QA-70",
+   "QA-80",
+   "QA-90",
+   "RS-10",
+   "RS-20",
+   "RS-30",
+   "CL-C-10",
+   "CL-E-10",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "PR-40",
+   "QA-10",
+   "OPS-10",
+   "OPS-20"
+  ],
+  "pattern": "(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names",
+  "regression": "in DOC-10, put the retired wording back in place of the new text: in the existing substantive artifact and handoff",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K05 R-A2e",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "CL-C-10",
+   "CL-E-10",
+   "OPS-10",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "PR-40",
+   "QA-10"
+  ],
+  "pattern": "unresolved facts in the output artifact, which each next or recovery handoff names",
+  "regression": "in CL-C-10, put the retired wording back in place of the new text: unresolved facts through all next/recovery packages",
+  "regression_words": 6
+ },
+ {
+  "rule_id": "G-K06 R-A2f1",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "PR-40"
+  ],
+  "pattern": "every native return names those artifacts",
+  "regression": "in PR-40, put the retired wording back in place of the new text: review result and every native return without deciding Canon",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K07 R-A2f2",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "QA-10"
+  ],
+  "pattern": "every return package names those artifacts",
+  "regression": "in QA-10, put the retired wording back in place of the new text: `QA_READINESS` and every return package",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K08 R-A2g",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-17",
+  "rows": [
+   "IA-10",
+   "IA-20",
+   "IA-30",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-40",
+   "QA-10"
+  ],
+  "pattern": "(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\\d+ complete native inputs|Complete RS-\\d+ package|Sole substantive input)\\b[^\\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\\d+ package):\\n(?:- [^\\n]*\\n)*?- [^\\n]*`?CANON_CONFLICT_REGISTER|(?:\\bsend\\b|\\bcarrying\\b)[^.\\n]*\\bconflict register\\b)",
+  "regression": "inject into IA-10: Complete native input package: PR_WORK_UNIT_LINEAGE_REVIEW with PENDING; CANON_CONFLICT_REGISTER",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K08 R-A2g",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-17",
+  "rows": [
+   "OPS-10",
+   "OPS-20"
+  ],
+  "pattern": "(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\\d+ complete native inputs|Complete RS-\\d+ package|Sole substantive input)\\b[^\\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\\d+ package):\\n(?:- [^\\n]*\\n)*?- [^\\n]*`?CANON_CONFLICT_REGISTER|(?:\\bsend\\b|\\bcarrying\\b)[^.\\n]*\\bconflict register\\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\\n]*CANON_CONFLICT_REGISTER)",
+  "regression": "inject into OPS-10: Complete return to ESC-30: ORIGINATING_FINDING_REF, CANON_CONFLICT_REGISTER",
+  "regression_words": 6,
+  "regressions_per_row": {
+   "OPS-10": "inject into OPS-10: Complete return to ESC-30: ORIGINATING_FINDING_REF, CANON_CONFLICT_REGISTER",
+   "OPS-20": "inject into OPS-20: RS-30 native revision: RESCOPE_REVIEW_ID, CANON_CONFLICT_REGISTER"
+  }
+ },
+ {
+  "rule_id": "G-K09 R-26-P1",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "pattern": "current status and lineage; decisions already made|Carry complete native inputs rather than referring to",
+  "regression": "inject into CL-20: current status and lineage; decisions already made",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K10 R-26-P1",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "OPS-10",
+   "OPS-20",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "PR-40",
+   "QA-10"
+  ],
+  "pattern": "Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\\.",
+  "regression": "in OPS-10, put the retired wording back in place of the new text: current status and lineage; decisions already made",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K11 R-26-P1b",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "IA-30",
+   "UTIL-10"
+  ],
+  "pattern": "unresolved items/owners, next action, and expected (?:output|review state)",
+  "regression": "inject into IA-30: unresolved items/owners, next action, and expected output",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K12 R-26-P3",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10"
+  ],
+  "pattern": "lineage into its result and handoff\\b",
+  "regression": "inject into CL-20: lineage into its result and handoff",
+  "regression_words": 6
+ },
+ {
+  "rule_id": "G-K13 R-26-P3",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10"
+  ],
+  "pattern": "PF10/addendum lineage into its result artifact, which the handoff names",
+  "regression": "in CL-20, put the retired wording back in place of the new text: PF10/addendum lineage into its result and handoff",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K14 R-26-P4",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-13",
+  "rows": [
+   "CL-C-10",
+   "CL-E-10",
+   "PR-40",
+   "QA-10",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "OPS-10",
+   "OPS-20",
+   "OPS-30"
+  ],
+  "pattern": "Catalogs and runtime handoffs carry\\b",
+  "regression": "inject into CL-C-10: Catalogs and runtime handoffs carry",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K15 R-26-TASK",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "OPS-30",
+   "QA-10"
+  ],
+  "pattern": "native inputs, lineage, current state, gates, risks and required action",
+  "regression": "inject into OPS-30: native inputs, lineage, current state, gates, risks and required action",
+  "regression_words": 10
+ },
+ {
+  "rule_id": "G-K16 R-26-TASK",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "OPS-30",
+   "QA-10"
+  ],
+  "pattern": "each input artifact by repository path; the artifacts hold the rest",
+  "regression": "in OPS-30, put the retired wording back in place of the new text: native inputs, lineage, current state, gates, risks and required action",
+  "regression_words": 10
+ },
+ {
+  "rule_id": "G-K17 R-26-CLOSE",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30"
+  ],
+  "pattern": "Carry the positive closure decision, complete post-closure results",
+  "regression": "inject into CL-20: Carry the positive closure decision, complete post-closure results",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K18 R-26-CLOSE",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30"
+  ],
+  "pattern": "Name the positive closure decision and every post-closure result artifact by repository path",
+  "regression": "in CL-20, put the retired wording back in place of the new text: Carry the positive closure decision, complete post-closure results",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CF-C-10",
+   "CF-E-10"
+  ],
+  "pattern": "recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE with the preserved source/change facts",
+  "regression": "inject into CF-C-10: recovery package carries the original CLASS_SELECTION_REF",
+  "regression_words": 6
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CF-C-20",
+   "CF-E-20"
+  ],
+  "pattern": "direct package contains the exact pending Specification, class/change lineage|recovery carries the original kickoff link, exact defect, class/change lineage",
+  "regression": "inject into CF-C-20: direct package contains the exact pending Specification, class/change lineage",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CF-C-30",
+   "CF-E-30"
+  ],
+  "pattern": "and approval lineage, the carried conflict register",
+  "regression": "inject into CF-C-30: and approval lineage, the carried conflict register",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CF-C-40",
+   "CF-E-40"
+  ],
+  "pattern": "actual mode, class/change/base lineage",
+  "regression": "inject into CF-C-40: actual mode, class/change/base lineage",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CL-20"
+  ],
+  "pattern": "carrying the exact qualified condition, lineage, evidence",
+  "regression": "inject into CL-20: carrying the exact qualified condition, lineage, evidence",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CL-30"
+  ],
+  "pattern": "Carry the complete candidate, positive closure and architecture-decision lineage",
+  "regression": "inject into CL-30: Carry the complete candidate, positive closure and architecture-decision lineage",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "CL-C-10",
+   "CL-E-10"
+  ],
+  "pattern": "Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states",
+  "regression": "inject into CL-C-10: Carry exact Epic Specification",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "OPS-10"
+  ],
+  "pattern": "must preserve in its execution result and return handoff",
+  "regression": "inject into OPS-10: must preserve in its execution result and return handoff",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "PR-10"
+  ],
+  "pattern": "carry PR_INSTRUCTION_ID and its complete content|dependency and evidence history; read-only substantiation of the mismatch; completed work",
+  "regression": "inject into PR-10: dependency and evidence history; read-only substantiation of the mismatch; completed work",
+  "regression_words": 11
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "PR-20"
+  ],
+  "pattern": "dependency/evidence history, completed work and unaffected obligations|all actual merge/commit/order/check evidence|current stage and suspended boundary, completed work, dependencies, evidence",
+  "regression": "inject into PR-20: dependency/evidence history, completed work and unaffected obligations",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K19 R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-06 (PR-10)",
+  "rows": [
+   "PR-40"
+  ],
+  "pattern": "PR instruction and implementation result; actual merged-state evidence|dependency, acceptance and evidence history; completed work|all completed review work; attempts; limitations",
+  "regression": "inject into PR-40: PR instruction and implementation result; actual merged-state evidence",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K20 R-26-BRANCH-SEND",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "PR-10",
+   "PR-20",
+   "PR-30"
+  ],
+  "pattern": "(?i)\\b(?:hands?|carry|carrying|carries)\\s+(?:the\\s+)?(?:one\\s+|exact\\s+|same\\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline",
+  "regression": "inject into PR-10: hands the workspace/worktree, branch",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K21 R-26-BRANCH-RECV, R-26-FRAME",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "",
+  "rows": [
+   "PR-35",
+   "PR-40",
+   "RS-20",
+   "RS-40"
+  ],
+  "pattern": "Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order",
+  "regression": "inject into PR-35: reviews/checks already observed, unresolved items",
+  "regression_words": 5,
+  "regressions_per_row": {
+   "PR-35": "inject into PR-35: reviews/checks already observed, unresolved items",
+   "PR-40": "inject into PR-40: with each actual PR reference, commit identity, order",
+   "RS-20": "inject into RS-20: Carry original Proceed, dedicated PR session, workspace/worktree, branch",
+   "RS-40": "inject into RS-40: current head; completed work, commits/local changes"
+  }
+ },
+ {
+  "rule_id": "G-K22 R-26-BRANCH-RECV",
+  "part": "PART-13",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-01 (unchanged)",
+  "rows": [
+   "PR-35",
+   "PR-40",
+   "RS-20",
+   "RS-40"
+  ],
+  "pattern": "verified at entry from the recorded vehicle and repository state; the handoff does not carry them",
+  "regression": "in PR-35, put the retired wording back in place of the new text: open PR, tests, reviews/checks already observed, unresolved items",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K23 R-A7-S1a, R-A7-S1b, R-A7-S2, R-A7-CL, R-A7-S3, R-ITEM21, R-A7-LOCAL",
+  "part": "PART-14",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "pattern": "Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\\b|PR-40 independently verifies the later asserted merge\\b|usable only after Nathan later manually merges the identified PR\\.|merge-approval effect is defined above",
+  "regression": "inject into CL-20: Nathan's later invocation asserts",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K24 R-A7-S1b, R-A7-S2, R-A7-CL, R-A7-S3",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-61",
+  "rows": [
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "QA-10",
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10",
+   "CL-E-20",
+   "CL-E-30",
+   "CL-E-40",
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "QA-20"
+  ],
+  "pattern": "PR-40 is entered on the observed merge event for the identified PR",
+  "regression": "in OPS-30, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+  "regression_words": 10,
+  "regressions_per_row": {
+   "OPS-30": "in OPS-30, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "PR-10": "in PR-10, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "PR-20": "in PR-20, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "PR-30": "in PR-30, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "QA-10": "in QA-10, put the retired wording back in place of the new text: Nathan's later PR-40 invocation asserts that a manual merge occurred;",
+   "CL-20": "in CL-20, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-30": "in CL-30, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-40": "in CL-40, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-C-10": "in CL-C-10, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-E-10": "in CL-E-10, put the retired wording back in place of the new text: Nathan's later manual PR-40 invocation asserts only that he manually merged the identified PR;",
+   "CL-E-20": "in CL-E-20, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "CL-E-30": "in CL-E-30, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "CL-E-40": "in CL-E-40, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "DOC-10": "in DOC-10, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "DOC-20": "in DOC-20, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-10": "in ESC-10, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-25": "in ESC-25, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-30": "in ESC-30, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "ESC-40": "in ESC-40, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+   "QA-20": "in QA-20, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage."
+  }
+ },
+ {
+  "rule_id": "G-K25 R-A7-S1b, R-A7-CL, R-A7-S3",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "PR-40",
+   "QA-10",
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10",
+   "CL-E-20",
+   "CL-E-30",
+   "CL-E-40",
+   "DOC-10",
+   "DOC-20",
+   "ESC-10",
+   "ESC-25",
+   "ESC-30",
+   "ESC-40",
+   "QA-20"
+  ],
+  "pattern": "PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives",
+  "regression": "in OPS-30, put the retired wording back in place of the new text: PR-40 independently verifies the later asserted merge and landed lineage.",
+  "regression_words": 10
+ },
+ {
+  "rule_id": "G-K26 R-A7-LOCAL",
+  "part": "PART-14",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-08, P-42",
+  "rows": [
+   "PR-10",
+   "PR-20",
+   "PR-40",
+   "DOC-10",
+   "DOC-20",
+   "RS-40"
+  ],
+  "pattern": "only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan's invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan's later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan's later merge assertion and PR-40's independent|needed after Nathan's assertion: continue to `?PR-40",
+  "regression": "inject into PR-10: only after Nathan asserts it occurred may PR-40",
+  "regression_words": 8,
+  "regressions_per_row": {
+   "PR-10": "inject into PR-10: only after Nathan asserts it occurred may PR-40",
+   "PR-20": "inject into PR-20: Nathan invokes PR-40 asserting that manual merge occurred",
+   "PR-40": "inject into PR-40: Nathan's invocation supplies only the later manual-merge assertion",
+   "DOC-10": "inject into DOC-10: Nathan manual merge, PR-40 read-only landed-lineage review",
+   "DOC-20": "inject into DOC-20: needed after Nathan's assertion: continue to `PR-40",
+   "RS-40": "inject into RS-40: only after Nathan asserts it occurred may PR-40"
+  }
+ },
+ {
+  "rule_id": "G-K27 R-ITEM21",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-C-10",
+   "CL-E-10"
+  ],
+  "pattern": "that entry creates no runtime approval",
+  "regression": "in CL-20, put the retired wording back in place of the new text: The specific Product Owner PR-40 merge-approval effect is defined above",
+  "regression_words": 10
+ },
+ {
+  "rule_id": "G-K28 R-ITEM30a, R-ITEM30b",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "PR-35",
+   "RS-40"
+  ],
+  "pattern": "`MERGE_OBSERVED`: [^\\n]*?the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan",
+  "regression": "in PR-35, put the retired wording back in place of the new text: - `MERGE_PENDING`: every readiness predicate above passes.",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K29 R-ITEM30a, R-ITEM30c",
+  "part": "PART-14",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "PR-35"
+  ],
+  "pattern": "sixth top-level PR-35 result",
+  "regression": "inject into PR-35: sixth top-level PR-35 result",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K30 R-ITEM30c",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "PR-35"
+  ],
+  "pattern": "seventh top-level PR-35 result",
+  "regression": "in PR-35, put the retired wording back in place of the new text: sixth top-level PR-35 result",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K31 R-ITEM30d",
+  "part": "PART-14",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "PR-35"
+  ],
+  "pattern": "The PR-40 handoff must say:|Nathan's later paste asserts",
+  "regression": "inject into PR-35: The PR-40 handoff must say:",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K32 R-ITEM30d",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "PR-35"
+  ],
+  "pattern": "for `MERGE_OBSERVED`, it is the same selected PR-40",
+  "regression": "in PR-35, put the retired wording back in place of the new text: conditionally usable only after Nathan's manual merge.",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K33 R-ITEM31",
+  "part": "PART-14",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "PR-40"
+  ],
+  "pattern": "ordinary in-scope defect remains with the existing PR owner",
+  "regression": "inject into PR-40: ordinary in-scope defect remains with the existing PR owner",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K34 R-ITEM31",
+  "part": "PART-14",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "PR-40"
+  ],
+  "pattern": "re-plans through `?PR-20`?, as \\*\\*PRECISE IN-SCOPE DEFECT → re-plan\\*\\* states",
+  "regression": "in PR-40, put the retired wording back in place of the new text: An ordinary in-scope defect remains with the existing PR owner.",
+  "regression_words": 10
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "CL-20",
+   "CL-30"
+  ],
+  "pattern": "Use only the read-only tools, stores, repository access[^.\\n]*\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into CL-20: Use only the read-only tools, stores, repository access.",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "CL-40"
+  ],
+  "pattern": "It does not edit Canonical PF09, PF10, Canon, a board, registry, repository[^.\\n]*\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into CL-40: It does not edit Canonical PF09, PF10, Canon, a board, registry, repository.",
+  "regression_words": 12
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "CL-E-20"
+  ],
+  "pattern": "revalidation session, read-only\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into CL-E-20: revalidation session, read-only.",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "DOC-20"
+  ],
+  "pattern": "do not edit documentation, Canon, PF10, or repository state\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into DOC-20: do not edit documentation, Canon, PF10, or repository state.",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "ESC-25"
+  ],
+  "pattern": "read-only repository reviewer[^.\\n]*\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into ESC-25: read-only repository reviewer.",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "GCFPE-MGMT-10"
+  ],
+  "pattern": "does not execute product Change Flow, implementation, repository work[^.\\n]*\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into GCFPE-MGMT-10: does not execute product Change Flow, implementation, repository work.",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "PR-20"
+  ],
+  "pattern": "Do not mutate the repository in this authoring operation\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into PR-20: Do not mutate the repository in this authoring operation.",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "PR-40"
+  ],
+  "pattern": "operating read-only\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into PR-40: operating read-only.",
+  "regression_words": 2
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "PR-50"
+  ],
+  "pattern": "otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\\n]*\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)",
+  "regression": "inject into PR-50: otherwise mutating the workspace, worktree, branch, open PR, commits or evidence.",
+  "regression_words": 11
+ },
+ {
+  "rule_id": "G-K35 R-OWN",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-02, P-03, P-40",
+  "rows": [
+   "QA-10"
+  ],
+  "pattern": "read-only audit and readiness role",
+  "regression": "inject into QA-10: read-only audit and readiness role",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K36 R-OWN",
+  "part": "PART-05",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-02",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-E-20",
+   "DOC-20",
+   "ESC-25",
+   "GCFPE-MGMT-10",
+   "PR-20",
+   "PR-40",
+   "PR-50",
+   "QA-10"
+  ],
+  "pattern": "Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\\.",
+  "regression": "in CL-20, put the retired wording back in place of the new text: excludes its own output artifacts, which it writes, commits and pushes.",
+  "regression_words": 11
+ },
+ {
+  "rule_id": "G-K37 R-A10",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "pattern": "Reviewers remain read-only(?! toward the work they review)",
+  "regression": "inject into CL-20: Reviewers remain read-only",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "G-K38 R-A10",
+  "part": "PART-05",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "OPS-10",
+   "OPS-30",
+   "PR-40",
+   "QA-10"
+  ],
+  "pattern": "Reviewers remain read-only toward the work they review",
+  "regression": "in OPS-10, put the retired wording back in place of the new text: Reviewers remain read-only and acceptance requires substantive evidence.",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K39 R-A5",
+  "part": "PART-05",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-04, P-62",
+  "rows": [
+   "GCFPE-MGMT-10",
+   "PR-35",
+   "RS-40"
+  ],
+  "pattern": "Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written",
+  "regression": "inject into GCFPE-MGMT-10: Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K40 R-A5",
+  "part": "PART-05",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-04",
+  "rows": [
+   "GCFPE-MGMT-10"
+  ],
+  "pattern": "This prompt's artifacts are written only under `docs/ephemeral/` and `docs/graph/`, the controls it maintains only under `docs/prompt_ecosystem_management/`",
+  "regression": "in GCFPE-MGMT-10, put the retired wording back in place of the new text: Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K40 R-A5",
+  "part": "PART-05",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-04",
+  "rows": [
+   "PR-35"
+  ],
+  "pattern": "This prompt's artifacts are written only under `docs/ephemeral/` and `docs/graph/`",
+  "regression": "in PR-35, put the retired wording back in place of the new text: Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written",
+  "regression_words": 9
+ },
+ {
+  "rule_id": "G-K41 R-A3a",
+  "part": "PART-15",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-C-10",
+   "CL-E-10",
+   "OPS-30",
+   "PR-10",
+   "PR-20",
+   "PR-30",
+   "PR-40",
+   "QA-10"
+  ],
+  "pattern": "Embed only applicable workflow contracts",
+  "regression": "inject into CL-20: Embed only applicable workflow contracts",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K42 R-A4a",
+  "part": "PART-15",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "CL-20",
+   "CL-30",
+   "CL-40",
+   "CL-C-10",
+   "CL-E-10"
+  ],
+  "pattern": "These candidate URL tokens must be replaced",
+  "regression": "inject into CL-20: These candidate URL tokens must be replaced",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K43 R-A4c, R-ITEM18",
+  "part": "PART-15",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "CL-40"
+  ],
+  "pattern": "This authoring candidate does not perform that update",
+  "regression": "inject into CL-40: This authoring candidate does not perform that update",
+  "regression_words": 8
+ },
+ {
+  "rule_id": "G-K44 R-ITEM18",
+  "part": "PART-06",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "CL-40"
+  ],
+  "pattern": "\\{\\{CANDIDATE_CRD_LIST_URL\\}\\}",
+  "regression": "inject into CL-40: (`{{CANDIDATE_CRD_LIST_URL}}`)",
+  "regression_words": 1
+ },
+ {
+  "rule_id": "G-K45 R-ITEM18",
+  "part": "PART-06",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "CL-40"
+  ],
+  "pattern": "Notion page `?Candidate CRD Items List`? \\(`?https://app\\.notion\\.com/p/[0-9a-f]{32}(?:\\?pvs=\\d+)?`?\\)",
+  "regression": "in CL-40, put the retired wording back in place of the new text: Notion page `Candidate CRD Items List` (`{{CANDIDATE_CRD_LIST_URL}}`)",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K46 R-ITEM19",
+  "part": "PART-07",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "CL-20"
+  ],
+  "pattern": "when none is supplied, record the board update as pending, owned under PF04 §9\\.1\\.1",
+  "regression": "in CL-20, put the retired wording back in place of the new text: 4. Include Master Scrum's precise board-update instruction for the board.",
+  "regression_words": 10
+ },
+ {
+  "rule_id": "G-K47 R-ITEM34",
+  "part": "PART-16",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "P-15 (revised)",
+  "rows": [
+   "QA-110"
+  ],
+  "pattern": "code/Ops remediation\\. Do not fix it here\\.(?! This applies only before the whole approved run is complete)",
+  "regression": "inject into QA-110: code/Ops remediation. Do not fix it here.",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K48 R-ITEM34",
+  "part": "PART-16",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "",
+  "rows": [
+   "QA-110"
+  ],
+  "pattern": "a completed failing run is `ACCEPT` and continues to QA-120",
+  "regression": "in QA-110, put the retired wording back in place of the new text: code/Ops remediation. Do not fix it here.",
+  "regression_words": 7
+ },
+ {
+  "rule_id": "G-K49 R-ITEM35",
+  "part": "PART-16",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "QA-80"
+  ],
+  "pattern": "`WRONG_ROUTE_APPROVED_BASE` terminally",
+  "regression": "inject into QA-80: `WRONG_ROUTE_APPROVED_BASE` terminally",
+  "regression_words": 2
+ },
+ {
+  "rule_id": "G-K50 R-ITEM35",
+  "part": "PART-16",
+  "kind": "required_regex",
+  "rule_code": "CTR-002",
+  "decision": "P-14 (unchanged)",
+  "rows": [
+   "QA-80"
+  ],
+  "pattern": "routed as \\*Required result and routing\\* states",
+  "regression": "in QA-80, put the retired wording back in place of the new text: return `WRONG_ROUTE_APPROVED_BASE` terminally",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "G-K51 R-CLAT",
+  "part": "PART-18",
+  "kind": "forbidden_regex",
+  "rule_code": "CTR-001",
+  "decision": "",
+  "rows": [
+   "PR-10",
+   "PR-20",
+   "PR-40",
+   "RS-10",
+   "RS-20",
+   "DOC-10",
+   "DOC-20",
+   "IA-30"
+  ],
+  "pattern": "Decide it during work",
+  "regression": "inject into PR-10: **Decide it during work:**",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K52 R-A2-CL30 (LCL-30-2, P-18)",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-18, P-42",
+  "rows": [
+   "CL-30"
+  ],
+  "pattern": "decision lineage; existing ADR/conflict history",
+  "regression": "inject into CL-30: decision lineage; existing ADR/conflict history",
+  "regression_words": 5
+ },
+ {
+  "rule_id": "G-K53 R-26-RSP (P-38)",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-38, P-42",
+  "rows": [
+   "PR-40"
+  ],
+  "pattern": "RESCOPE_PROPOSAL_ID and complete RESCOPE_PROPOSAL\\b",
+  "regression": "inject into PR-40: RESCOPE_PROPOSAL_ID and complete RESCOPE_PROPOSAL",
+  "regression_words": 4
+ },
+ {
+  "rule_id": "G-K54 LOPS-30-1, LQA-10-P19 (P-19, P-42)",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-19, P-42",
+  "rows": [
+   "OPS-30",
+   "QA-10"
+  ],
+  "pattern": "A saved attachment, link or scattered fields do not replace the handoff\\.",
+  "regression": "inject into OPS-30: A saved attachment, link or scattered fields do not replace the handoff.",
+  "regression_words": 12
+ },
+ {
+  "rule_id": "G-K55 LPR-30-2 (P-55)",
+  "part": "PART-13",
+  "kind": "forbidden_regex",
+  "rule_code": "TOP-001",
+  "decision": "P-55",
+  "rows": [
+   "PR-30"
+  ],
+  "pattern": "outside the approved Plan, return the metadata\\b",
+  "regression": "inject into PR-30: If that path is outside the approved Plan, return the metadata",
+  "regression_words": 11
+ },
+ {
+  "rule_id": "PART-17 ITEM-36 (replaces the \\A{0,7} window guard in place, same list position)",
+  "part": "PART-17",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "kind": "forbidden_regex",
+  "pattern": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?Prompt [Vv]ersion(?:\\*\\*|__|`){0,2}[ \\t]*:",
+  "rule_code": "SRC-001",
+  "decision": "P-16",
+  "regression": "inject into CL-20: **`Prompt version`**: 3.3.1",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "PART-17 ITEM-36 (replaces the \\A{0,7} window guard in place, same list position)",
+  "part": "PART-17",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "kind": "forbidden_regex",
+  "pattern": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?Ecosystem release(?:\\*\\*|__|`){0,2}[ \\t]*:",
+  "rule_code": "INV-003",
+  "decision": "P-16",
+  "regression": "inject into CL-20: **Ecosystem release:** GCFPE-20260914.1",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "PART-17 ITEM-36 (replaces the \\A{0,7} window guard in place, same list position)",
+  "part": "PART-17",
+  "rows": [
+   "ALL55 (every row)"
+  ],
+  "kind": "forbidden_regex",
+  "pattern": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?Set(?:\\*\\*|__|`){0,2}[ \\t]*:",
+  "rule_code": "SRC-001",
+  "decision": "P-16",
+  "regression": "inject into CL-20: 3. **`Set`**: 091426.1",
+  "regression_words": 3
+ },
+ {
+  "rule_id": "R-CLAT (PART-18, ITEM-37): required removed",
+  "part": "PART-18",
+  "rows": [
+   "PR-10",
+   "PR-20",
+   "PR-40",
+   "RS-10",
+   "RS-20",
+   "DOC-10",
+   "DOC-20",
+   "IA-30"
+  ],
+  "kind": "other",
+  "pattern": "Decide it during work",
+  "rule_code": "CTR-002 (removed from required_regex)",
+  "decision": "ITEM-37",
+  "regression": "none needed: the forbidden twin G-K51 carries the regression; the Material required regex stays on all 10 rows and PR-30/PR-35 keep the required decide pattern"
+ },
+ {
+  "rule_id": "PR-40 inputs (P-01)",
+  "part": "PART-13",
+  "rows": [
+   "PR-40"
+  ],
+  "kind": "other",
+  "pattern": "",
+  "rule_code": "none",
+  "decision": "P-01",
+  "regression": "not an assertion: the PR_REFS input follows LPR-40-4, and P-01's sentence becomes its own input entry before W-4 (LPR-40-5)"
+ },
+ {
+  "rule_id": "CL-40 mutations.allowed (PART-06)",
+  "part": "PART-06",
+  "rows": [
+   "CL-40"
+  ],
+  "kind": "other",
+  "pattern": "",
+  "rule_code": "none",
+  "decision": "ruling 5 Q1 (A)",
+  "regression": "not an assertion: one allowed entry names the Candidate CRD Items List page write"
+ },
+ {
+  "rule_id": "ITEM-07 (PART-03)",
+  "part": "PART-03",
+  "rows": [],
+  "kind": "other",
+  "pattern": "",
+  "rule_code": "none",
+  "regression": "none: a governance-audit behavioral-fixture prose line, not a registry row; §A lists ITEM-07 as unguarded (D24 review holds it)"
+ },
+ {
+  "rule_id": "R-ITEM38 (PART-15)",
+  "part": "PART-15",
+  "rows": [
+   "PR-10"
+  ],
+  "kind": "other",
+  "pattern": "material change \\(D23-C\\) change\\b",
+  "rule_code": "none",
+  "regression": "not placed: §A lists ITEM-38 as unguarded (a typo with no behaviour); the regex is the drafter's readback check only"
+ },
+ {
+  "rule_id": "R-ITEM23, R-ITEM40 (PART-11)",
+  "part": "PART-11",
+  "rows": [
+   "GCFPE-MGMT-10-PROPOSED (not a registry row)"
+  ],
+  "kind": "other",
+  "pattern": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?(?:Prompt [Vv]ersion|Ecosystem release|Set)(?:\\*\\*|__|`){0,2}[ \\t]*:",
+  "rule_code": "none",
+  "decision": "P-09, P-16",
+  "regression": "not placed: the proposed body has no registry row; the PART-11 gate runs R-ITEM40's pattern and then R-ITEM23's (this one) directly"
+ }
+]

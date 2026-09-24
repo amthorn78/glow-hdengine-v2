@@ -1,0 +1,2454 @@
+[
+ {
+  "pid": "OPS-10",
+  "page": "3db4590a05eb81db98cce3e30a62bce5",
+  "fetched": "2026-09-23T13:22:32.873Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl",
+  "harness_files_all": [
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl"
+  ],
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A1d": "1/1",
+    "R-A2c": "1/1",
+    "R-A2e": "1/1",
+    "R-A2g": "4/4",
+    "R-26-P1": "1/1",
+    "R-26-P4": "0/0",
+    "R-A10": "1/1",
+    "LOPS-10-1": "1/1",
+    "LOPS-10-2": "1/1"
+   },
+   "ops": {
+    "count": 10,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 11,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K05",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K08",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K38",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "same_as_first_run": true,
+   "reason": "no patch was needed; engine copy is byte-identical to plan/r1/engine (diff -r)",
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A1d": "1/1",
+    "R-A2c": "1/1",
+    "R-A2e": "1/1",
+    "R-A2g": "4/4",
+    "R-26-P1": "1/1",
+    "R-26-P4": "0/0",
+    "R-A10": "1/1",
+    "LOPS-10-1": "1/1",
+    "LOPS-10-2": "1/1"
+   },
+   "ops": {
+    "count": 10,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 11,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K05",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K08",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K19",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K38",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A2c",
+    "reads_ok": true,
+    "note": "one CANON_CONFLICT_REGISTER in applicable ⟦task, receipt … handoff names⟧ . It is carried"
+   },
+   {
+    "edit": "R-A2e",
+    "reads_ok": true,
+    "note": "decided items remain decided. ⟦Keep exact … handoff names⟧ . ⏎ ## Source"
+   },
+   {
+    "edit": "R-A10",
+    "reads_ok": true,
+    "note": "only when actually authorized. ⟦Reviewers remain … they review⟧ and acceptance still requires"
+   },
+   {
+    "edit": "R-A2g#1",
+    "reads_ok": true,
+    "note": "facts or exact gaps ⟦∅⟧ and truthful NOT EXECUTED"
+   },
+   {
+    "edit": "LOPS-10-1",
+    "reads_ok": true,
+    "note": "complete PF10/addendum lineage OPS-20 ⟦must preserve … handoff names⟧ . ⏎ Native operation"
+   },
+   {
+    "edit": "R-A2g#2",
+    "reads_ok": true,
+    "note": "redaction; residual state; recovery ⟦∅⟧ ; and truthful NOT"
+   },
+   {
+    "edit": "LOPS-10-2",
+    "reads_ok": true,
+    "note": "delivery evidence, REMEDIATION_REVIEW_ID and ⟦redlines when … access limitations⟧ . The result does"
+   },
+   {
+    "edit": "R-A2g#3",
+    "reads_ok": true,
+    "note": "disposition when already supplied ⟦∅⟧ ; current stage and"
+   },
+   {
+    "edit": "R-A2g#4",
+    "reads_ok": true,
+    "note": "author/reviewer/session, exact change/work-unit/baseline/dependency/evidence lineage ⟦∅⟧ and manual Product Owner"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "to permitted lineage metadata ⟦∅⟧ : usage ID, change"
+   },
+   {
+    "edit": "R-A1d",
+    "reads_ok": true,
+    "note": "only after they exist, ⟦in the … lineage metadata⟧ or later authorized record."
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "usage and task/result/attempt mappings ⟦in the … permitted metadata⟧ , label repository persistence"
+   },
+   {
+    "edit": "R-26-P1",
+    "reads_ok": true,
+    "note": "direct Notion page URL. ⟦Then give … not repeated.⟧ ⏎ Resolve the actual"
+   }
+  ],
+  "readback_reproduces_post": true,
+  "g06_before": false,
+  "g06_after": false,
+  "g06_silent_after": true,
+  "open_issues": [],
+  "batch_tests": {
+   "gk08": {
+    "P17X": {
+     "fires_before": true,
+     "hits_before": 2,
+     "hit_line_labels_before": [
+      [
+       "Complete",
+       "return",
+       "to",
+       "ESC-30"
+      ],
+      [
+       "RS-30",
+       "native",
+       "revision"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": true,
+     "fires_on_injection_RS30": true
+    },
+    "GK08_DRAFT": {
+     "fires_before": true,
+     "hits_before": 3,
+     "hit_line_labels_before": [
+      [
+       "Sole",
+       "substantive",
+       "input"
+      ],
+      [
+       "Native",
+       "inputs"
+      ],
+      [
+       "Native",
+       "inputs"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": false,
+     "fires_on_injection_RS30": false
+    },
+    "GK08_DRAFT+P17X": {
+     "fires_before": true,
+     "hits_before": 5,
+     "hit_line_labels_before": [
+      [
+       "Sole",
+       "substantive",
+       "input"
+      ],
+      [
+       "Native",
+       "inputs"
+      ],
+      [
+       "Complete",
+       "return",
+       "to",
+       "ESC-30"
+      ],
+      [
+       "Native",
+       "inputs"
+      ],
+      [
+       "RS-30",
+       "native",
+       "revision"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": true,
+     "fires_on_injection_RS30": true
+    }
+   },
+   "register_mentions_before_after": {
+    "before": 7,
+    "after": 2
+   },
+   "R-26-P4": {
+    "hits": 0,
+    "expected": 0,
+    "old_sentence_present_before": false
+   },
+   "R-A2g": {
+    "hits": 4,
+    "expected": 4,
+    "ok": true
+   },
+   "complete_return_to_ESC30_register_removed_by": "LOPS-10-2",
+   "rs30_native_revision_register_removed_by": "R-A2g (', CANON_CONFLICT_REGISTER' before ' and manual')",
+   "remaining_register_mentions": "carried-register preserve sentence (artifact home) and 'RS-10 native result' (the proposal's own content); G-K08 and P17X silent on both"
+  },
+  "guard_notes": [
+   "PART-17 (old draft) fires_on_injection=false is a harness artifact: dryrun.load_guards uses the regression description ('inject a label line after ...') as the injected line, which is not line-anchored at a label. With a real line-13 injection all three fire; the old-draft suffix misses '**`Prompt version`**: x' and '3. **`Set`**: x', which the P-16 RELEASE pattern catches (silent on '- Settings: x' and 'Set up the run:'). Recorded for the registry worker; not repaired here.",
+   "The PR drafter's amended G-K08 alone misses both P-17 sites ('Complete return to ESC-30', 'RS-30 native revision'): an injected register on either line does not fire it. The P-17 alternative is required; drafter pattern + P-17 alternative fires before (5 sites), silent after, and fires on both injections."
+  ]
+ },
+ {
+  "pid": "OPS-20",
+  "page": "3db4590a05eb81858a9dd361d3689ce8",
+  "fetched": "2026-09-23T13:23:01.175Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl",
+  "harness_files_all": [
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl"
+  ],
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A2d": "1/1",
+    "R-A2g": "4/4",
+    "R-26-P1": "1/1",
+    "R-26-P4": "0/0",
+    "LOPS-20-1": "1/1"
+   },
+   "ops": {
+    "count": 9,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 7,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K08",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "same_as_first_run": true,
+   "reason": "no patch was needed; engine copy is byte-identical to plan/r1/engine (diff -r)",
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A2d": "1/1",
+    "R-A2g": "4/4",
+    "R-26-P1": "1/1",
+    "R-26-P4": "0/0",
+    "LOPS-20-1": "1/1"
+   },
+   "ops": {
+    "count": 9,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 7,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K08",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A2d",
+    "reads_ok": true,
+    "note": "one `CANON_CONFLICT_REGISTER` in the ⟦task, execution … when applicable⟧ . It is carried"
+   },
+   {
+    "edit": "R-A2g#1",
+    "reads_ok": true,
+    "note": "facts or exact gaps ⟦∅⟧ and truthful current state."
+   },
+   {
+    "edit": "R-A2g#2",
+    "reads_ok": true,
+    "note": "redaction; residual state; recovery ⟦∅⟧ ; and truthful NOT"
+   },
+   {
+    "edit": "LOPS-20-1",
+    "reads_ok": true,
+    "note": "delivery evidence, REMEDIATION_REVIEW_ID and ⟦redlines when … access limitations⟧ . The result does"
+   },
+   {
+    "edit": "R-A2g#3",
+    "reads_ok": true,
+    "note": "Owner disposition when supplied ⟦∅⟧ ; current stage and"
+   },
+   {
+    "edit": "R-A2g#4",
+    "reads_ok": true,
+    "note": "author/reviewer/session, exact change/work-unit/baseline/dependency/evidence lineage ⟦∅⟧ and manual Product Owner"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "to permitted lineage metadata ⟦∅⟧ : usage ID, change"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "usage and task/result/attempt mappings ⟦in the … permitted metadata⟧ , label repository persistence"
+   },
+   {
+    "edit": "R-26-P1",
+    "reads_ok": true,
+    "note": "direct Notion page URL. ⟦Then give … not repeated.⟧ ⏎ Resolve the actual"
+   }
+  ],
+  "readback_reproduces_post": true,
+  "g06_before": false,
+  "g06_after": false,
+  "g06_silent_after": true,
+  "open_issues": [],
+  "batch_tests": {
+   "gk08": {
+    "P17X": {
+     "fires_before": true,
+     "hits_before": 2,
+     "hit_line_labels_before": [
+      [
+       "Complete",
+       "return",
+       "to",
+       "ESC-30"
+      ],
+      [
+       "RS-30",
+       "native",
+       "revision"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": true,
+     "fires_on_injection_RS30": true
+    },
+    "GK08_DRAFT": {
+     "fires_before": true,
+     "hits_before": 3,
+     "hit_line_labels_before": [
+      [
+       "Sole",
+       "substantive",
+       "input"
+      ],
+      [
+       "Native",
+       "inputs"
+      ],
+      [
+       "Native",
+       "inputs"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": false,
+     "fires_on_injection_RS30": false
+    },
+    "GK08_DRAFT+P17X": {
+     "fires_before": true,
+     "hits_before": 5,
+     "hit_line_labels_before": [
+      [
+       "Sole",
+       "substantive",
+       "input"
+      ],
+      [
+       "Native",
+       "inputs"
+      ],
+      [
+       "Complete",
+       "return",
+       "to",
+       "ESC-30"
+      ],
+      [
+       "Native",
+       "inputs"
+      ],
+      [
+       "RS-30",
+       "native",
+       "revision"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": true,
+     "fires_on_injection_RS30": true
+    }
+   },
+   "register_mentions_before_after": {
+    "before": 8,
+    "after": 3
+   },
+   "R-26-P4": {
+    "hits": 0,
+    "expected": 0,
+    "old_sentence_present_before": false
+   },
+   "R-A2g": {
+    "hits": 4,
+    "expected": 4,
+    "ok": true
+   },
+   "complete_return_to_ESC30_register_removed_by": "LOPS-20-1",
+   "rs30_native_revision_register_removed_by": "R-A2g (', CANON_CONFLICT_REGISTER' before ' and manual')",
+   "remaining_register_mentions": "carried-register preserve sentence (artifact home) and 'RS-10 native result' (the proposal's own content); G-K08 and P17X silent on both"
+  },
+  "guard_notes": [
+   "PART-17 (old draft) fires_on_injection=false is a harness artifact: dryrun.load_guards uses the regression description ('inject a label line after ...') as the injected line, which is not line-anchored at a label. With a real line-13 injection all three fire; the old-draft suffix misses '**`Prompt version`**: x' and '3. **`Set`**: x', which the P-16 RELEASE pattern catches (silent on '- Settings: x' and 'Set up the run:'). Recorded for the registry worker; not repaired here.",
+   "The PR drafter's amended G-K08 alone misses both P-17 sites ('Complete return to ESC-30', 'RS-30 native revision'): an injected register on either line does not fire it. The P-17 alternative is required; drafter pattern + P-17 alternative fires before (5 sites), silent after, and fires on both injections."
+  ]
+ },
+ {
+  "pid": "OPS-30",
+  "page": "3db4590a05eb816f91c9c394f9c9fa57",
+  "fetched": "2026-09-23T13:20:36.022Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01BnFk6Q9uJC9SXuXVJnhahb.json",
+  "harness_files_all": [
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl",
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/toolu_01BnFk6Q9uJC9SXuXVJnhahb.json"
+  ],
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1b": "1/1",
+    "R-A1c": "1/1",
+    "R-A1d": "1/1",
+    "R-A1e": "1/1",
+    "R-A2b": "1/1",
+    "R-A2e": "1/1",
+    "R-A2g": "5/5",
+    "R-26-P1": "1/1",
+    "R-26-P4": "1/1",
+    "R-26-TASK": "1/1",
+    "R-A7-S1a": "1/1",
+    "R-A7-S1b": "1/1",
+    "R-A7-S2": "1/1",
+    "R-A10": "1/1",
+    "R-A3a": "1/1",
+    "LOPS-30-1": "1/1"
+   },
+   "ops": {
+    "count": 15,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 17,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K05",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K08",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K15",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K16",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K24",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K25",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K38",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K41",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "same_as_first_run": true,
+   "reason": "no patch was needed; engine copy is byte-identical to plan/r1/engine (diff -r)",
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1b": "1/1",
+    "R-A1c": "1/1",
+    "R-A1d": "1/1",
+    "R-A1e": "1/1",
+    "R-A2b": "1/1",
+    "R-A2e": "1/1",
+    "R-A2g": "5/5",
+    "R-26-P1": "1/1",
+    "R-26-P4": "1/1",
+    "R-26-TASK": "1/1",
+    "R-A7-S1a": "1/1",
+    "R-A7-S1b": "1/1",
+    "R-A7-S2": "1/1",
+    "R-A10": "1/1",
+    "R-A3a": "1/1",
+    "LOPS-30-1": "1/1"
+   },
+   "ops": {
+    "count": 15,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 17,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K05",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K08",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K15",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K16",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K24",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K25",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K38",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K41",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A2b",
+    "reads_ok": true,
+    "note": "applicable substantive artifact metadata/content ⟦, which … handoff names⟧ . This is carried"
+   },
+   {
+    "edit": "R-A2e",
+    "reads_ok": true,
+    "note": "decided items remain decided. ⟦Keep exact … handoff names⟧ . ⏎ ## Source"
+   },
+   {
+    "edit": "R-26-P4",
+    "reads_ok": true,
+    "note": "stable names and directories. ⟦Catalogs carry … their lineage.⟧ Never substitute opaque Library"
+   },
+   {
+    "edit": "R-A7-S1a",
+    "reads_ok": true,
+    "note": "merges the identified PR ⟦and only … this merge⟧ . That earlier `MERGE_PENDING`"
+   },
+   {
+    "edit": "R-A7-S1b",
+    "reads_ok": true,
+    "note": "remains historical pre-merge evidence ⟦. PR-40 … is void.⟧ PR-40 independently verifies actual"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "runtime subject matter ⏎ ⟦∅⟧ Resolve the current authoritative"
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "existing permitted artifact metadata ⟦∅⟧ . Preserve approved artifact"
+   },
+   {
+    "edit": "R-A7-S2",
+    "reads_ok": true,
+    "note": "that reviewer's substantive decision. ⟦PR-40 is … merged it.⟧ PR-40 independently verifies actual"
+   },
+   {
+    "edit": "R-A10",
+    "reads_ok": true,
+    "note": "grant agents additional authority. ⟦Reviewers remain … they review⟧ and acceptance still requires"
+   },
+   {
+    "edit": "R-A2g#1",
+    "reads_ok": true,
+    "note": "and side-effect state; recovery ⟦∅⟧ ; and truthful absent-state"
+   },
+   {
+    "edit": "R-A2g#2",
+    "reads_ok": true,
+    "note": "redaction; residual state; recovery ⟦∅⟧ ; and the bounded"
+   },
+   {
+    "edit": "R-A2g#3",
+    "reads_ok": true,
+    "note": "attempts; access limits; recovery ⟦∅⟧ . ⏎ Current state",
+    "comment": "list now ends without 'and' (asyndetic); still grammatical"
+   },
+   {
+    "edit": "R-A2g#4",
+    "reads_ok": true,
+    "note": "exact owner/session; manual prerequisites ⟦∅⟧ ; and the native"
+   },
+   {
+    "edit": "R-A2g#5",
+    "reads_ok": true,
+    "note": "instructions; `CHANGE_CLASS`, `CHANGE_ID`, `OPS_UNIT_ID` ⟦∅⟧ ; and the native"
+   },
+   {
+    "edit": "LOPS-30-1",
+    "reads_ok": true,
+    "note": "terminal result emits none. ⟦∅⟧ Populate the exact immediate",
+    "comment": "sentence and its trailing space removed; no double space"
+   },
+   {
+    "edit": "R-26-TASK",
+    "reads_ok": true,
+    "note": "terminal result emits none. ⟦Populate the … the rest.⟧ A blocked or terminal"
+   },
+   {
+    "edit": "R-26-P1",
+    "reads_ok": true,
+    "note": "direct Notion page URL. ⟦Then give … not repeated.⟧ ⏎ Resolve the actual"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "artifact's permitted lineage metadata ⟦∅⟧ : usage ID, change"
+   },
+   {
+    "edit": "R-A1d",
+    "reads_ok": true,
+    "note": "after they actually exist, ⟦in the … lineage metadata⟧ or later authorized record."
+   },
+   {
+    "edit": "R-A1b",
+    "reads_ok": true,
+    "note": "usage and task/result/attempt mappings ⟦in the … permitted metadata⟧ , label repository persistence"
+   }
+  ],
+  "readback_reproduces_post": true,
+  "g06_before": false,
+  "g06_after": false,
+  "g06_silent_after": true,
+  "open_issues": [],
+  "batch_tests": {
+   "gk08": {
+    "P17X": {
+     "fires_before": false,
+     "hits_before": 0,
+     "hit_line_labels_before": [],
+     "silent_after": true,
+     "fires_on_injection_ESC30": true,
+     "fires_on_injection_RS30": true
+    },
+    "GK08_DRAFT": {
+     "fires_before": true,
+     "hits_before": 5,
+     "hit_line_labels_before": [
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": false,
+     "fires_on_injection_RS30": false
+    },
+    "GK08_DRAFT+P17X": {
+     "fires_before": true,
+     "hits_before": 5,
+     "hit_line_labels_before": [
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ],
+      [
+       "Native",
+       "inputs",
+       "and",
+       "artifact"
+      ]
+     ],
+     "silent_after": true,
+     "fires_on_injection_ESC30": true,
+     "fires_on_injection_RS30": true
+    }
+   },
+   "register_mentions_before_after": {
+    "before": 8,
+    "after": 3
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "old_sentence_present_before": true
+   },
+   "task_only_section_after": {
+    "heading_found": true,
+    "n_sentences": 4,
+    "sentences": [
+     "Before final output, … actual result branch.",
+     "Return exactly one … result emits none.",
+     "Populate the exact … hold the rest.",
+     "A blocked or … fabricated runnable package."
+    ],
+    "deleted_sentence_absent": true,
+    "task_new_in_section": true,
+    "double_space": false,
+    "space_before_newline": false,
+    "task_forbidden_absent": true
+   },
+   "task_only_section_before": {
+    "n_sentences": 5,
+    "deleted_sentence_line_end": false,
+    "deleted_sentence_followed_by_space": true
+   }
+  },
+  "guard_notes": [
+   "PART-17 (old draft) fires_on_injection=false is a harness artifact: dryrun.load_guards uses the regression description ('inject a label line after ...') as the injected line, which is not line-anchored at a label. With a real line-13 injection all three fire; the old-draft suffix misses '**`Prompt version`**: x' and '3. **`Set`**: x', which the P-16 RELEASE pattern catches (silent on '- Settings: x' and 'Set up the run:'). Recorded for the registry worker; not repaired here."
+  ]
+ },
+ {
+  "pid": "PR-30",
+  "page": "3db4590a05eb8123afb8caeeaa83a294",
+  "fetched": "2026-09-23T13:19:20.837Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl",
+  "harness_files_all": [
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl"
+  ],
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-BRANCH-SEND": 0
+   },
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A1e": "1/1",
+    "R-A2b": "1/1",
+    "R-A2e": "1/1",
+    "R-26-P1": "1/1",
+    "R-26-P4": "1/1",
+    "R-A7-S1a": "1/1",
+    "R-A7-S1b": "1/1",
+    "R-A7-S2": "1/1",
+    "R-A3a": "1/1",
+    "LPR-30-1": "1/1",
+    "LPR-30-2": "1/1"
+   },
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 13,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K05",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K20",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K24",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K25",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K41",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "same_as_first_run": true,
+   "reason": "no patch was needed; engine copy is byte-identical to plan/r1/engine (diff -r)",
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-26-BRANCH-SEND": 0
+   },
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A1e": "1/1",
+    "R-A2b": "1/1",
+    "R-A2e": "1/1",
+    "R-26-P1": "1/1",
+    "R-26-P4": "1/1",
+    "R-A7-S1a": "1/1",
+    "R-A7-S1b": "1/1",
+    "R-A7-S2": "1/1",
+    "R-A3a": "1/1",
+    "LPR-30-1": "1/1",
+    "LPR-30-2": "1/1"
+   },
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 13,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K05",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K10",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K14",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K20",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K24",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K25",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K41",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A2b",
+    "reads_ok": true,
+    "note": "applicable substantive artifact metadata/content ⟦, which … handoff names⟧ . This is carried"
+   },
+   {
+    "edit": "R-A2e",
+    "reads_ok": true,
+    "note": "decided items remain decided. ⟦Keep exact … handoff names⟧ . ⏎ ## Source"
+   },
+   {
+    "edit": "R-26-P4",
+    "reads_ok": true,
+    "note": "stable names and directories. ⟦Catalogs carry … their lineage.⟧ Never substitute opaque Library"
+   },
+   {
+    "edit": "R-A7-S1a",
+    "reads_ok": true,
+    "note": "merges the identified PR ⟦and only … this merge⟧ . That earlier `MERGE_PENDING`"
+   },
+   {
+    "edit": "R-A7-S1b",
+    "reads_ok": true,
+    "note": "remains historical pre-merge evidence ⟦. PR-40 … is void.⟧ PR-40 independently verifies actual"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "runtime subject matter ⏎ ⟦∅⟧ Resolve the current authoritative"
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "existing permitted artifact metadata ⟦∅⟧ . Preserve approved artifact"
+   },
+   {
+    "edit": "R-A7-S2",
+    "reads_ok": true,
+    "note": "that reviewer's substantive decision. ⟦PR-40 is … merged it.⟧ PR-40 independently verifies actual"
+   },
+   {
+    "edit": "LPR-30-1",
+    "reads_ok": true,
+    "note": "its own dedicated session. ⟦The handoff … the rest.⟧ Do not perform PR-35",
+    "comment": "through-span ends at 'and recovery lineage.'; next sentence 'Do not perform PR-35 work' kept"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "permitted artifact lineage metadata ⟦∅⟧ : usage ID, change"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "usage and task/result/attempt mappings ⟦in the … permitted metadata⟧ , label repository persistence"
+   },
+   {
+    "edit": "LPR-30-2",
+    "reads_ok": true,
+    "note": "reference actual PR/commit lineage. ⟦If that … output artifact⟧ and report the bounded",
+    "comment": "'record the metadata in the output artifact ... rather than writing it' reads correctly"
+   },
+   {
+    "edit": "R-26-P1",
+    "reads_ok": true,
+    "note": "direct Notion page URL. ⟦Then give … not repeated.⟧ ⏎ Resolve the actual"
+   }
+  ],
+  "readback_reproduces_post": true,
+  "g06_before": false,
+  "g06_after": false,
+  "g06_silent_after": true,
+  "open_issues": [],
+  "batch_tests": {
+   "branch_send": {
+    "before": 1,
+    "after": 0
+   },
+   "step6_sentences_after": [
+    "On coherent initial publication, … its own dedicated session.",
+    "The handoff names `PR_IMPLEMENTATION_RESULT`, … artifacts hold the rest.",
+    "Do not perform PR-35 … hand off to PR-40."
+   ]
+  },
+  "guard_notes": [
+   "PART-17 (old draft) fires_on_injection=false is a harness artifact: dryrun.load_guards uses the regression description ('inject a label line after ...') as the injected line, which is not line-anchored at a label. With a real line-13 injection all three fire; the old-draft suffix misses '**`Prompt version`**: x' and '3. **`Set`**: x', which the P-16 RELEASE pattern catches (silent on '- Settings: x' and 'Set up the run:'). Recorded for the registry worker; not repaired here."
+  ]
+ },
+ {
+  "pid": "RS-10",
+  "page": "3db4590a05eb811ca0cdc66e0d508ac4",
+  "fetched": "2026-09-23T13:21:44.109Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl",
+  "harness_files_all": [
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl"
+  ],
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A2a": "1/1",
+    "R-CLAT": "1/1"
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 5,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K51",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "same_as_first_run": true,
+   "reason": "no patch was needed; engine copy is byte-identical to plan/r1/engine (diff -r)",
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A2a": "1/1",
+    "R-CLAT": "1/1"
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 5,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K51",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "existing permitted artifact lineage ⟦∅⟧ : usage ID; actual"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "preserve complete usage/task/result/attempt mappings ⟦in the … permitted metadata⟧ , name the authorized"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "the existing substantive artifact ⟦, which … handoff names⟧ , within this actor's"
+   },
+   {
+    "edit": "R-CLAT",
+    "reads_ok": true,
+    "note": "by itself material. ⏎ ⟦∅⟧ For a real bounded",
+    "comment": "Material paragraph kept; next line 'For a real bounded delta' follows directly"
+   }
+  ],
+  "readback_reproduces_post": true,
+  "g06_before": false,
+  "g06_after": false,
+  "g06_silent_after": true,
+  "open_issues": [],
+  "batch_tests": {
+   "clat": {
+    "material_before": 1,
+    "material_after": 1,
+    "decide_before": 1,
+    "decide_after": 0,
+    "deleted_equals_canonical_decide": true,
+    "junction": "is not by itself material. | ⏎ For a real bounded",
+    "material_required_regex": [
+     {
+      "pattern_head": "\\*{0,2}Material\\*{0,2} means a change to the Epic-level comm",
+      "matches_after": true
+     }
+    ]
+   }
+  },
+  "guard_notes": [
+   "PART-17 (old draft) fires_on_injection=false is a harness artifact: dryrun.load_guards uses the regression description ('inject a label line after ...') as the injected line, which is not line-anchored at a label. With a real line-13 injection all three fire; the old-draft suffix misses '**`Prompt version`**: x' and '3. **`Set`**: x', which the P-16 RELEASE pattern catches (silent on '- Settings: x' and 'Set up the run:'). Recorded for the registry worker; not repaired here."
+  ]
+ },
+ {
+  "pid": "RS-30",
+  "page": "3db4590a05eb81ed9fd3d2ef439ceaaf",
+  "fetched": "2026-09-23T13:22:37.041Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl",
+  "harness_files_all": [
+   "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a1c75a8e7ff0baf87.jsonl"
+  ],
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A2a": "1/1"
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 4,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "patches": [],
+  "final_run": {
+   "same_as_first_run": true,
+   "reason": "no patch was needed; engine copy is byte-identical to plan/r1/engine (diff -r)",
+   "pass": false,
+   "rule_level_pass": true,
+   "pass_false_only_because": [
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false",
+    "PART-17 fires_on_injection=false"
+   ],
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rule_hits": {
+    "R-A1a": "1/1",
+    "R-A1c": "1/1",
+    "R-A2a": "1/1"
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 4,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_all": [],
+   "validator_ok": true,
+   "new_guards_recorded": [
+    {
+     "id": "G-K01",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K02",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K03",
+     "kind": "forbidden",
+     "fires_before": true,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K04",
+     "kind": "required_",
+     "matches_after": true,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K09",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K23",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K37",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ]
+  },
+  "readback": [
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "existing permitted artifact lineage ⟦∅⟧ : usage ID; actual"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "preserve complete usage/task/result/attempt mappings ⟦in the … permitted metadata⟧ , name the authorized"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "the existing substantive artifact ⟦, which … handoff names⟧ , within this actor's"
+   }
+  ],
+  "readback_reproduces_post": true,
+  "g06_before": false,
+  "g06_after": false,
+  "g06_silent_after": true,
+  "open_issues": [],
+  "batch_tests": {
+   "clat": {
+    "material_before": 0,
+    "material_after": 0,
+    "decide_before": 0,
+    "decide_after": 0,
+    "deleted_equals_canonical_decide": null
+   },
+   "clat_note": "RS-30 carries no C-LAT (neither paragraph); R-CLAT does not apply (not among the eight bodies, D23-C successor)"
+  },
+  "guard_notes": [
+   "PART-17 (old draft) fires_on_injection=false is a harness artifact: dryrun.load_guards uses the regression description ('inject a label line after ...') as the injected line, which is not line-anchored at a label. With a real line-13 injection all three fire; the old-draft suffix misses '**`Prompt version`**: x' and '3. **`Set`**: x', which the P-16 RELEASE pattern catches (silent on '- Settings: x' and 'Set up the run:'). Recorded for the registry worker; not repaired here."
+  ]
+ }
+]

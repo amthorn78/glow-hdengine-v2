@@ -1,0 +1,280 @@
+[
+ {
+  "group": "regress4:final",
+  "case": "PR control: drafted tree (expected PASS, actual PASS)",
+  "ok": true,
+  "detail": "exit 0: PASS: Glow HDE PR development skill structural contract"
+ },
+ {
+  "group": "regress4:final",
+  "case": "PR ITEM-01: old :143 package content list restored (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAIL: forbidden or unfinished content present: package containing the actual finding"
+ },
+ {
+  "group": "regress4:final",
+  "case": "PR revision: SKILL.md back to 1.3.0 against the 1.3.1 pin (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAIL: missing revision contract"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT control: drafted tree (expected PASS, actual PASS)",
+  "ok": true,
+  "detail": "exit 0: OK "
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 1 re-injected: from complete, pinned source snapshots (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 2 re-injected: before/after snapshots (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 3 re-injected: warnings, and exact retrieved representation (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 4 re-injected: Place retrieved representations in a local run snapshot (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 5 re-injected: Run `scripts/build_snapshot_manifest.py` to compute raw SHA-256 and structural digests. (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 6 re-injected: Hash the exact complete representation returned by the source interface (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 7 re-injected: expected base identity/version/hash (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-16 retired phrase 8 re-injected: Use complete pinned snapshots (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_retired_d22_phrases_absent"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-05: build_snapshot_manifest hashes prompt sources again (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=3) test_prompt_source_carries_no_digest_and_raises_no_src003"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-05: SRC-003 no longer skips prompt sources (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=3) test_prompt_source_carries_no_digest_and_raises_no_src003"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-05 control: SRC-003 disabled for every source (skill control must fire) (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=3) test_prompt_source_carries_no_digest_and_raises_no_src003"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT ITEM-05: the installed audit code under the drafted suite (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=3) test_prompt_source_carries_no_digest_and_raises_no_src003"
+ },
+ {
+  "group": "regress4:final",
+  "case": "AUDIT revision: SKILL.md back to 1.12.0 against the 1.13.0 pin (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: FAILED (failures=1) test_exact_gcf17_continuity_parity"
+ },
+ {
+  "group": "regress4:final",
+  "case": "RELAY control: drafted tree self-test (expected PASS, actual PASS)",
+  "ok": true,
+  "detail": "exit 0: 232 cases; not ok: []"
+ },
+ {
+  "group": "regress4:final",
+  "case": "RELAY ITEM-14: validator enum without REPOSITORY (installed :1095) (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": "exit 1: 232 cases; not ok: ['artifact_plane_repository', 'documented_v2_dispatch_example']"
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV control: combined drafts (expected PASS, actual PASS)",
+  "ok": true,
+  "detail": [
+   "exit 0"
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-08: relay override sentence removed (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "missing specialization contract: For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direc"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-08: relay override sentence edited by one word (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "missing specialization contract: For every GCFPE prompt, the core's pinning by complete content and its ledger's content hashes do not apply: this skill pins the prompt by stable ID, version and direc"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: exact predecessor assessment (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: exact predecessor assessment"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: predecessor assessment is the default (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: predecessor assessment is the default"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: surface/model/reasoning recommendation (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: surface/model/reasoning recommendation"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: assess or preserve advice for the destination's whole operation (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: assess or preserve advice for the destination's whole operation"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: eligible human recommendation (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: eligible human recommendation"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: optional digest (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: optional digest"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: preferred artifact plane (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: preferred artifact plane"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: ARTIFACT_PLANE: GOOGLE_DRIVE | NONE (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: ARTIFACT_PLANE: GOOGLE_DRIVE | NONE"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV ITEM-16 relay retired phrase re-injected: Drive `Glow / Ops` contains (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "superseded contract present: Drive `Glow / Ops` contains"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV relay revision back to 3.1.0 against the 3.2.0 pin (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-SKILL-STRUCTURE-001",
+    "missing specialization contract: SESSION_RELAY_FLOWMASTER_SPECIALIZATION_REVISION: 3.2.0"
+   ]
+  ]
+ },
+ {
+  "group": "regress4:final",
+  "case": "FV PR skill revision back to 1.3.0 against the 1.3.1 pins (expected FAIL, actual FAIL)",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   [
+    "FMV-GCF-CURRENT-001",
+    "SKILL_CONTRACT:glow-hde-pr-development:GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION: 1.3.1"
+   ]
+  ]
+ }
+]

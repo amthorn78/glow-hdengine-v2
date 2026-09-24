@@ -1,0 +1,91 @@
+{
+ "pid": "CF-PO-10",
+ "fetched": "2026-09-23T13:19:43.641Z",
+ "chars_before": 7044,
+ "chars_after": 7044,
+ "rules": {},
+ "rule_mismatches": {},
+ "ops": {
+  "count": 0,
+  "reproduces_edit": true,
+  "max_old_str_lines": null
+ },
+ "placement": {
+  "W-4": 0,
+  "ONCE": 0,
+  "OWN": 0,
+  "RECV": 0
+ },
+ "registry": {
+  "findings_before": 0,
+  "findings_after": []
+ },
+ "guards": [
+  {
+   "id": "G-K01",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K03",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K09",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K23",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K37",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  }
+ ],
+ "guard_failures": [],
+ "validator": {
+  "exit": 0,
+  "ok": true,
+  "errors": [],
+  "validated": [
+   "CF-PO-10"
+  ]
+ },
+ "pass": true
+}

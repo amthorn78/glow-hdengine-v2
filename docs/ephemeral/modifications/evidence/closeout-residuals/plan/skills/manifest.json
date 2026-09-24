@@ -1,0 +1,689 @@
+{
+ "modification": "MODIFICATION-20260923-closeout-residuals",
+ "installed_root": "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502",
+ "final_root": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/final",
+ "freeze_recipe": "/home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/freeze.py (sha256 3d6a38f3544868cbaa8118b60c381789625ab3c4095e863d96260caba4bbe2c9)",
+ "installed_root_freeze": {
+  "files_hashed": 320,
+  "digest": "420705ec2881bdd82cc46d32880fa02abb463460f081dfa728c3c4aca928f24a"
+ },
+ "final_root_freeze": {
+  "files_hashed": 323,
+  "digest": "047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae"
+ },
+ "unchanged_skills_equal_installed": {
+  "built-in-browser": true,
+  "chrome-browser": true,
+  "computer-use": true,
+  "deep-research": true,
+  "docx": true,
+  "flowmaster-primary": true,
+  "glow-artifact-storage": true,
+  "glow-merged-change-attribution-lock": true,
+  "glow-workspace-currency": true,
+  "glow-write-boundary": true,
+  "import-memory": true,
+  "morning": true,
+  "pdf": true,
+  "pptx": true,
+  "session-branch-flowmaster": true,
+  "skill-creator": true,
+  "tw-flowmaster": true,
+  "typesafe-ai": true,
+  "xlsx": true
+ },
+ "packages": [
+  {
+   "skill": "flowmaster-validate",
+   "revision": {
+    "marker": "FLOWMASTER_VALIDATE_REVISION",
+    "from": "3.3.0",
+    "to": "3.3.1",
+    "installed_skill_md_has_from": true,
+    "final_skill_md_has_to": true
+   },
+   "installed_freeze": {
+    "files_hashed": 31,
+    "digest": "a79401deaabe35ce1393d91e8d333e86c26a71500b3c5abd89ff5fdbaa7f8f48"
+   },
+   "final_freeze": {
+    "files_hashed": 31,
+    "digest": "0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626"
+   },
+   "installed_file_count": 31,
+   "final_file_count": 31,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "e4f005feac3dc7c5adf2181a9be42a4c7a806980ba642103d0a69a72e6a5edc4",
+     "final_sha256": "05a38c260ffda282a5fdbce69fb6c7fb9237c3ea8e2fa899247e803ea850b12c",
+     "installed_bytes": 38586,
+     "final_bytes": 39087
+    },
+    {
+     "file": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+     "installed_sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718",
+     "final_sha256": "dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c",
+     "installed_bytes": 613326,
+     "final_bytes": 613326
+    },
+    {
+     "file": "references/gcfpe-20260914.1-091426.1-validation-profile.json",
+     "installed_sha256": "1ef9b56f1edc87c30d40f6923f8001614c52136f86fa91022e23ab30bd78950b",
+     "final_sha256": "1690c91de5ab5d606ac7fffc8b4e26a0f791f0e5fb39e4c5d30fb34689e2bfb1",
+     "installed_bytes": 2488,
+     "final_bytes": 2454
+    },
+    {
+     "file": "scripts/run_gcfpe_20260914_fixtures.py",
+     "installed_sha256": "3a4a05c18d0a0c235a7b98baa3c4f7d7f283d4c1dc7a99f4daa6ec4fd0c50585",
+     "final_sha256": "13f09e23115648edc6dafefaed58586ae99af9245ea1160097afa6ca786fa434",
+     "installed_bytes": 56227,
+     "final_bytes": 58326
+    },
+    {
+     "file": "scripts/run_gcfpe_current_fixtures.py",
+     "installed_sha256": "317bb46c8ed615c0d5e5f3925dbd1d921488fa38287039f6741083c016eee891",
+     "final_sha256": "7682a963c122514b83336f5b9627523413a61018414d82bec052d041f23cb0d5",
+     "installed_bytes": 14460,
+     "final_bytes": 15749
+    },
+    {
+     "file": "scripts/validate_flowmaster.py",
+     "installed_sha256": "7b72f9e5c43827cdf46a90e59f6fd44fb3f3f7d4b7e000b1f500b12c03895f4b",
+     "final_sha256": "b1ad6ad00134c9211e84846528fa1512f1e0e6c485a692ce0464ede2672bd6c3",
+     "installed_bytes": 94109,
+     "final_bytes": 100486
+    },
+    {
+     "file": "scripts/validate_gcfpe_20260914.py",
+     "installed_sha256": "e51e8cb1b4827b1ab140e02fdf7f6292d0c014b7f3ef6b205f74bfa15378e907",
+     "final_sha256": "96bf18a4ddd58b2bb29fa3a0a6fda811ef664fdc732ac0015fe591edc9890613",
+     "installed_bytes": 150948,
+     "final_bytes": 151589
+    },
+    {
+     "file": "scripts/validate_gcfpe_current.py",
+     "installed_sha256": "176988cb8074d1b1849eb8a5140f751a8f8b38b04a4616a8520f6e89f02b1ed7",
+     "final_sha256": "70b344320101a93c7a064cafbacf8611dcdb0db645ae8e052befd1bcd5b40755",
+     "installed_bytes": 38934,
+     "final_bytes": 39210
+    }
+   ],
+   "added": [],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/flowmaster-validate.diff",
+    "sha256": "df1626cb8a6ef23b14473076477d6866de22b34d0ea4f74e245ff2e4f5714ddf",
+    "bytes": 49580,
+    "apply": "patch -p1 -d <copy of installed flowmaster-validate> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/flowmaster-validate.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  },
+  {
+   "skill": "change-flow",
+   "revision": {
+    "marker": "CHANGE_FLOW_SPECIALIZATION_REVISION",
+    "from": "3.3.0",
+    "to": "3.3.1",
+    "installed_skill_md_has_from": true,
+    "final_skill_md_has_to": true
+   },
+   "installed_freeze": {
+    "files_hashed": 22,
+    "digest": "ee546df57f3d5f0f0dc29c514376e64ca0fa830fe03e64ff7acd8645648bcb73"
+   },
+   "final_freeze": {
+    "files_hashed": 22,
+    "digest": "9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47"
+   },
+   "installed_file_count": 22,
+   "final_file_count": 22,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "8ad345f4e03392fbb88ecce7a61ac9172b1abbbe89881da9405bce87e23796e0",
+     "final_sha256": "712c73dd8ffec8d1c74b77b59309cce8a05969207ef2444fdd1f476de08c2c0d",
+     "installed_bytes": 83625,
+     "final_bytes": 83692
+    },
+    {
+     "file": "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+     "installed_sha256": "6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718",
+     "final_sha256": "dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c",
+     "installed_bytes": 613326,
+     "final_bytes": 613326
+    },
+    {
+     "file": "scripts/validate_gcfpe_20260914.py",
+     "installed_sha256": "c5f04fed4d2c3b1e0abfa68c93fde8f1812d4b6fdb9e6a2854d9d4d21a3b9396",
+     "final_sha256": "d6e74233e50e139b81b8ed56c21baa9303ee7fc71b9bae599ebfbdb18ce6d657",
+     "installed_bytes": 52094,
+     "final_bytes": 52654
+    }
+   ],
+   "added": [],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/change-flow.diff",
+    "sha256": "eca683016b2e0439498a6c464e52fb1ed54cf46a96987293517276e74a2bf1fe",
+    "bytes": 15679,
+    "apply": "patch -p1 -d <copy of installed change-flow> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/change-flow.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  },
+  {
+   "skill": "glow-graph-contract",
+   "revision": "none advertised (D19: freeze digest only)",
+   "installed_freeze": {
+    "files_hashed": 6,
+    "digest": "4e671ddc935b629f7285baeb42b93c9848b19fdeb1be39ebfcaa35c2d171f1b8"
+   },
+   "final_freeze": {
+    "files_hashed": 9,
+    "digest": "e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c"
+   },
+   "installed_file_count": 6,
+   "final_file_count": 9,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "2a49ef5a16bbe09dc67b7adc3c50bcd63a8b883f7e3ceaf0490c36fcd0135436",
+     "final_sha256": "abbb358423943af62c84e5aef84f9c5a10669a8d1c5f28ccef5d66c0c6721b8e",
+     "installed_bytes": 8342,
+     "final_bytes": 12872
+    },
+    {
+     "file": "scripts/graph_parts.py",
+     "installed_sha256": "0c24d1b2ee89e01e983fb66266715e715103730b87f1aba3dbead0e00d1c1cfd",
+     "final_sha256": "7fcbf6e56e3ccfd7d0211b17961dc8afaa0fad6757272ade4ba922924cacdd54",
+     "installed_bytes": 9254,
+     "final_bytes": 13185
+    }
+   ],
+   "added": [
+    {
+     "file": "scripts/contract_recipe.py",
+     "final_sha256": "2d0da78cac81228643d9915f391593663480f74ed8365144149a6681c03602f3",
+     "final_bytes": 4034,
+     "mode": "0o644"
+    },
+    {
+     "file": "scripts/regenerate_contract.py",
+     "final_sha256": "aad48cfae26b104f66dde219c7bfcdeb5771cfb945b63d381ed5aa4856420e33",
+     "final_bytes": 22791,
+     "mode": "0o644"
+    },
+    {
+     "file": "scripts/registry_deriver.py",
+     "final_sha256": "3072b1552ffd9a42be9691187f6f6869fe14f028be950e5c99ea0c81f84c20c1",
+     "final_bytes": 4320,
+     "mode": "0o644"
+    }
+   ],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/glow-graph-contract.diff",
+    "sha256": "8c8a817a1c0f3a6cf0261fb75bc61471ecd06cc86dd82fd7048195f7258d16f9",
+    "bytes": 50849,
+    "apply": "patch -p1 -d <copy of installed glow-graph-contract> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/glow-graph-contract.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  },
+  {
+   "skill": "session-relay-flowmaster",
+   "revision": {
+    "marker": "SESSION_RELAY_FLOWMASTER_SPECIALIZATION_REVISION",
+    "from": "3.1.0",
+    "to": "3.2.0",
+    "installed_skill_md_has_from": true,
+    "final_skill_md_has_to": true
+   },
+   "installed_freeze": {
+    "files_hashed": 5,
+    "digest": "15aef9890ebfa286bf56272e64cc9880d6dc57701d4e8b45e15fa6f45c3f2121"
+   },
+   "final_freeze": {
+    "files_hashed": 5,
+    "digest": "c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4"
+   },
+   "installed_file_count": 5,
+   "final_file_count": 5,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "ad46572b3b354a68a99830392731ed7c10bd43cf736e6d6579293e0faaa61357",
+     "final_sha256": "67f36b711d06b7c92e6198231537030de63da72b868dfe8cbc909ab37418e2cc",
+     "installed_bytes": 83634,
+     "final_bytes": 83019
+    },
+    {
+     "file": "references/manifest-v2-examples.md",
+     "installed_sha256": "62714426fa3583663eae2b744c975b0bbf1749824434364e7e379414185163b8",
+     "final_sha256": "4e2029776eea0fcad5a74051ca409e9a41c71834818ebc1cca05db3f7d7e3e1d",
+     "installed_bytes": 5343,
+     "final_bytes": 5609
+    },
+    {
+     "file": "scripts/validate_relay_manifest.py",
+     "installed_sha256": "7dd7f31ae511e08021ba286d63140846c13ac62c044ba6b074f846c5a888af06",
+     "final_sha256": "44f698bec607e7f3d902289af7dcd861bbad8b118f032fa30da2d146141f73ce",
+     "installed_bytes": 118562,
+     "final_bytes": 118888
+    }
+   ],
+   "added": [],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/session-relay-flowmaster.diff",
+    "sha256": "0e11d9d7d422c9610ae81259d2bec2070838288f5e5edde8d41b669a688a609f",
+    "bytes": 25640,
+    "apply": "patch -p1 -d <copy of installed session-relay-flowmaster> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/session-relay-flowmaster.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  },
+  {
+   "skill": "glow-hde-pr-development",
+   "revision": {
+    "marker": "GLOW_HDE_PR_DEVELOPMENT_SKILL_REVISION",
+    "from": "1.3.0",
+    "to": "1.3.1",
+    "installed_skill_md_has_from": true,
+    "final_skill_md_has_to": true
+   },
+   "installed_freeze": {
+    "files_hashed": 4,
+    "digest": "68077fa6620992997c8bb3949b1135ba47b1c5bd275610eb49c3b7d8d04ecf22"
+   },
+   "final_freeze": {
+    "files_hashed": 4,
+    "digest": "265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a"
+   },
+   "installed_file_count": 4,
+   "final_file_count": 4,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "a72ac38734459144bc020fffb29b3b6089daaa2d4d129ec1bdfbe47c9298b185",
+     "final_sha256": "f046565905b5095a0fa0d6eb992c123af7859231c67c6e79ee96726bb73527ba",
+     "installed_bytes": 30782,
+     "final_bytes": 30971
+    },
+    {
+     "file": "scripts/validate_glow_hde_pr_development.py",
+     "installed_sha256": "423c0844413359576d2616e3e1b96c17db0896d0853c92b04596f8cf4c18b5ef",
+     "final_sha256": "8d4b93b4ab918ef541123c7b8d142842b272990aad9e38ff25d6f69451d2c4d0",
+     "installed_bytes": 10905,
+     "final_bytes": 11063
+    }
+   ],
+   "added": [],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/glow-hde-pr-development.diff",
+    "sha256": "6dd7ea95f9cf4e4f544747731f354a202713a3fc58648bbd5a04145a325ab5fe",
+    "bytes": 3633,
+    "apply": "patch -p1 -d <copy of installed glow-hde-pr-development> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/glow-hde-pr-development.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  },
+  {
+   "skill": "amthor-workspace-governance-audit",
+   "revision": {
+    "marker": "WORKSPACE_GOVERNANCE_AUDITOR_REVISION",
+    "from": "1.12.0",
+    "to": "1.13.0",
+    "installed_skill_md_has_from": true,
+    "final_skill_md_has_to": true
+   },
+   "installed_freeze": {
+    "files_hashed": 15,
+    "digest": "819915e4a57184fd3af0c783f13e102892eb7182d0c951727869655d11ae078d"
+   },
+   "final_freeze": {
+    "files_hashed": 15,
+    "digest": "c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab"
+   },
+   "installed_file_count": 15,
+   "final_file_count": 15,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "1ee9af3a56b87bc92f46fe53e8da751518938a47dc5c3fef3e3a3caf6448dd28",
+     "final_sha256": "a856319d9b8be1ac73b2182e9295cb8844afae5fbb96315ab757ceabcb4e1981",
+     "installed_bytes": 24789,
+     "final_bytes": 25440
+    },
+    {
+     "file": "references/behavioral-fixtures.md",
+     "installed_sha256": "748e6b4784558ecaf97724cc7e721e9119207f7794b2c40184616cf343dcc0f6",
+     "final_sha256": "8e709563a6853c453e25c20275adffccb098cfacc0da75de16c015cca84bdced",
+     "installed_bytes": 7498,
+     "final_bytes": 8067
+    },
+    {
+     "file": "references/epic-reengineering-interoperability.md",
+     "installed_sha256": "04fa829a2ebd2d72253f9e0d9b85cd5ac5d1ab52798669d6b03e2f6fe50c8227",
+     "final_sha256": "5e318b09de43aa4ac770cc3613671d424b426f0edd7323da07aef06af5b3c587",
+     "installed_bytes": 18028,
+     "final_bytes": 18103
+    },
+    {
+     "file": "references/interoperability-contracts.md",
+     "installed_sha256": "32172ce85c1795d75cdbd19df86b7616e8884254dd776f09ef8c541e052eab7c",
+     "final_sha256": "50d3583ae0b104ba250a0a2552238a2a70b2706dc8f703f96bb19c14e06ca66c",
+     "installed_bytes": 17204,
+     "final_bytes": 17323
+    },
+    {
+     "file": "references/report-contracts.md",
+     "installed_sha256": "ba9919ba19b505c2997e1053f96344f262fcde30448fbee35ccfb4a3222c4c07",
+     "final_sha256": "5e27ad00499aa3d24ff7984e6ac07e30f6b1c4c37398844b05e899ec89c6f10f",
+     "installed_bytes": 2767,
+     "final_bytes": 2851
+    },
+    {
+     "file": "references/rule-catalog.md",
+     "installed_sha256": "2ee514fc9b9e6296dbb7ef49836f9fe3f530d2612414fb3a606d0c79124ca722",
+     "final_sha256": "7e0112fe68f1234a3b2e6f0cbace91cd6668cb29e482e4a885fc02de72ff5d92",
+     "installed_bytes": 3231,
+     "final_bytes": 3285
+    },
+    {
+     "file": "scripts/audit_workspace_governance.py",
+     "installed_sha256": "c4ca7f608c5e9bfdb23372e7e3dbd46621088eabb77379796bb6bd6ea07ef120",
+     "final_sha256": "d791acac7dfc4bdcb963141b59fab13b517a9c2ebb8ae26ee21b7adae711736b",
+     "installed_bytes": 44533,
+     "final_bytes": 45401
+    },
+    {
+     "file": "scripts/run_fixture_suite.py",
+     "installed_sha256": "878f6c2b8a3861ea18e988918d8f41fadba6bb96314f4aa71dddff2b144a3504",
+     "final_sha256": "5446f451b6f9bbebf109dcd9b0e9a32f4be4270837862127e2131271e266ee73",
+     "installed_bytes": 24568,
+     "final_bytes": 27558
+    }
+   ],
+   "added": [],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/amthor-workspace-governance-audit.diff",
+    "sha256": "3fe8cce016c8fbee73fe500477c1b3075d03dd100155f6327afdb207f44291c5",
+    "bytes": 27115,
+    "apply": "patch -p1 -d <copy of installed amthor-workspace-governance-audit> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/amthor-workspace-governance-audit.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  },
+  {
+   "skill": "glow-po-reporting",
+   "revision": "none advertised (D19: freeze digest only)",
+   "installed_freeze": {
+    "files_hashed": 1,
+    "digest": "3221ae8de6f6500d27154ed0e77c0241e1679999ce42a953a9f6fad4515a0464"
+   },
+   "final_freeze": {
+    "files_hashed": 1,
+    "digest": "7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
+   },
+   "installed_file_count": 1,
+   "final_file_count": 1,
+   "changed": [
+    {
+     "file": "SKILL.md",
+     "installed_sha256": "3784b2e75b925822a12f925fea60728666a062f504a5ae7c8e140b29bdd36754",
+     "final_sha256": "9831b3db48523819713e31068b5141e9e0469daa2e60470b35109d977c4137d8",
+     "installed_bytes": 7797,
+     "final_bytes": 8022
+    }
+   ],
+   "added": [],
+   "removed": [],
+   "diff": {
+    "path": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/glow-po-reporting.diff",
+    "sha256": "ff9452573addcd8c55fec2002157039533438f96e327a1d1c67349f6dc40ac34",
+    "bytes": 634,
+    "apply": "patch -p1 -d <copy of installed glow-po-reporting> < /tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/skills/diffs/glow-po-reporting.diff",
+    "round_trip_patch_exit": 0,
+    "round_trip_equal_final": true,
+    "patch_stderr": ""
+   }
+  }
+ ],
+ "root_manifest_json_equal": true,
+ "execute": {
+  "variables": {
+   "cwd": "the repository root; every relative path below is relative to it",
+   "ENV": "export PYTHONDONTWRITEBYTECODE=1 TMPDIR=$SCRATCH/tmp (mkdir -p $SCRATCH/tmp first)",
+   "EV": "docs/ephemeral/modifications/evidence/closeout-residuals/plan",
+   "EX": "docs/ephemeral/modifications/evidence/closeout-residuals/execute: EXECUTE's evidence (P-83, P-87); EX/run.json holds $BASE, the root digests, the page id and the token values (P-96)",
+   "INST": "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502",
+   "SCRATCH": "the executing session's scratchpad directory; never the repository or a skill",
+   "PKG": "$SCRATCH/pkg-root: a full copy of $INST with the seven packages replaced by their patched copies (execute.1.then); freeze.py $PKG is recorded (it is 323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae when no skill outside the seven has changed since PLAN; P-79)",
+   "GGC, FV, CF, RELAY, PR, AUDIT, REPORT": "$PKG/glow-graph-contract, $PKG/flowmaster-validate, $PKG/change-flow, $PKG/session-relay-flowmaster, $PKG/glow-hde-pr-development, $PKG/amthor-workspace-governance-audit, $PKG/glow-po-reporting",
+   "GATE": "$SCRATCH/gate: run_gate.py's --out; it builds the candidate root at $GATE/cand (graph/GCFPE-20260914.1-Candidate-Graph-Contract.json = $CF/references/gcfpe-20260914.1-091426.1-candidate-graph-contract.json, byte-equal to the graph bundled in $FV)",
+   "FVI, CFI": "$INST/flowmaster-validate, $INST/change-flow (installed, before the install sitting)",
+   "BASE": "the main commit X0.2 restarts the branch from: BASE=$(git rev-parse HEAD) right after the checkout, written to EX/run.json as \"base\" at X0.2 and read from there by every later step and session (P-87, P-102 (i)); GUARDS.md NAM-002 step 3 reads the pre-change registry from it"
+  },
+  "1_base_unchanged_before_applying": {
+   "commands": [
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/flowmaster-validate",
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/change-flow",
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/glow-graph-contract",
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/session-relay-flowmaster",
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/glow-hde-pr-development",
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/amthor-workspace-governance-audit",
+    "python3 docs/prompt_ecosystem_management/freeze.py $INST/glow-po-reporting"
+   ],
+   "expected_stdout": {
+    "flowmaster-validate": "31 a79401deaabe35ce1393d91e8d333e86c26a71500b3c5abd89ff5fdbaa7f8f48",
+    "change-flow": "22 ee546df57f3d5f0f0dc29c514376e64ca0fa830fe03e64ff7acd8645648bcb73",
+    "glow-graph-contract": "6 4e671ddc935b629f7285baeb42b93c9848b19fdeb1be39ebfcaa35c2d171f1b8",
+    "session-relay-flowmaster": "5 15aef9890ebfa286bf56272e64cc9880d6dc57701d4e8b45e15fa6f45c3f2121",
+    "glow-hde-pr-development": "4 68077fa6620992997c8bb3949b1135ba47b1c5bd275610eb49c3b7d8d04ecf22",
+    "amthor-workspace-governance-audit": "15 819915e4a57184fd3af0c783f13e102892eb7182d0c951727869655d11ae078d",
+    "glow-po-reporting": "1 3221ae8de6f6500d27154ed0e77c0241e1679999ce42a953a9f6fad4515a0464"
+   },
+   "whole_root": {
+    "command": "python3 docs/prompt_ecosystem_management/freeze.py $INST",
+    "expected_stdout_at_plan_time": "320 420705ec2881bdd82cc46d32880fa02abb463460f081dfa728c3c4aca928f24a",
+    "note": "the whole root also covers the 19 skills outside the seven packages; any sync of them changes it",
+    "when": "X0.3(e): recorded, not a stop. A value other than expected_stdout_at_plan_time means a skill outside the seven synced since PLAN; §E records it (P-79)"
+   },
+   "then": {
+    "when": "X1.1 (spec §9), before any repository change (P-56): the reindex needs $GGC, the registry gate needs its deriver. A new session rebuilds $PKG with it only at a step before X7.3: from X7.3 on $INST already holds the patched packages and the patches would not apply (P-101)",
+    "commands": [
+     "mkdir -p \"${SCRATCH:?}/tmp\" && rm -rf \"${PKG:?}\" && cp -r \"${INST:?}\" \"$PKG\"",
+     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf \"${PKG:?}/${s:?}\" && cp -r $INST/$s $PKG/$s && patch -p1 -s -d $PKG/$s < $EV/skills/diffs/$s.diff || { echo \"PATCH FAILED: $s\"; exit 1; }; done)",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/flowmaster-validate",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/change-flow",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-graph-contract",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/session-relay-flowmaster",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-hde-pr-development",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/amthor-workspace-governance-audit",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-po-reporting",
+     "python3 docs/prompt_ecosystem_management/freeze.py $PKG"
+    ],
+    "expected": [
+     "exit 0",
+     "exit 0: every patch exits 0 (the subshell exits 1 and names the package at the first failure)",
+     "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
+     "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+     "recorded (P-79): 323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae (final_root_freeze) when no skill outside the seven has changed since PLAN; any other value is recorded in §E and is not a stop, because only the seven package digests above are this Modification's"
+    ]
+   },
+   "expected_after_patch": {
+    "flowmaster-validate": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
+    "change-flow": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+    "glow-graph-contract": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+    "session-relay-flowmaster": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+    "glow-hde-pr-development": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+    "amthor-workspace-governance-audit": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+    "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
+   },
+   "when": "X0.3 (spec §9), before any repository change"
+  },
+  "2_graph_reindex_ITEM-12_repository_in_execution_PR_before_install": {
+   "commands": [
+    "python3 docs/prompt_ecosystem_management/freeze.py docs/graph/parts",
+    "python3 $GGC/scripts/graph_parts.py reindex docs/graph/parts",
+    "git diff --stat docs/graph/parts",
+    "git diff --no-color docs/graph/parts | grep -v -e '^diff --git' -e '^index ' | cmp - $EV/skills/results/parts_reindex.repo.diff",
+    "python3 docs/prompt_ecosystem_management/freeze.py docs/graph/parts",
+    "python3 $GGC/scripts/graph_parts.py build docs/graph/parts $SCRATCH/graph.md",
+    "python3 $GGC/scripts/graph_parts.py reindex docs/graph/parts"
+   ],
+   "expected": [
+    "56 980af73e656e20740663ae1dbfa8780eff61b41e2f754c5719c743e4647cae50 (today's parts, HEAD 705568e)",
+    "exit 0; 'reindex: 229 edges; 27 file(s) rewritten' and the 27 names (global.json + 26 prompt parts)",
+    "27 files changed, 107 insertions(+), 113 deletions(-); only edge_indices / _other_edge_indices change (results/parts_reindex.json holds the from/to table)",
+    "exit 0 (cmp prints nothing): the reindex diff, less its 27 'diff --git' and 27 'index' header lines, is byte-identical to the stored diff (sha256 b37fc1d7b79e0f4f88f9a1ae000e6e30123ea57782885171dd739b19e98ddb7b, 6296 B). Run it before staging docs/graph/parts",
+    "56 84dbb1fe5e7566b871ddc436bcbc875a772dcc695be221d2b4d45a18a470027f (the reindexed parts)",
+    "exit 0; 'build: 55 nodes, 229 edges, 55 state_routes'; 'embedded JSON 575074 bytes  sha256 ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d'; graph.md 575672 B sha256 a70a93263f2943be45450a210f62a82a2a27abfd49a259d04f838e469ba0cc24",
+    "exit 0; 'reindex: 229 edges; 0 file(s) rewritten' (idempotent)"
+   ],
+   "read_only_cross_check": "git apply --check $EV/skills/results/parts_reindex.repo.diff exits 0 before the reindex; git apply --check -R $EV/skills/results/parts_reindex.repo.diff exits 0 after it",
+   "note": "$GGC is the patched package in $PKG (execute.1.then, run first); the installed builder has no reindex and passes today's parts. The cmp check reads the unstaged working tree, so it runs before `git add`",
+   "when": "X3.2 (spec §9): after commit 1 (X2.2) and the registry commit (X3.1); the pre gate ran at X1.3 on the unchanged tree"
+  },
+  "3_contract_template_move_ITEM-13_repository_in_execution_PR": {
+   "commands": [
+    "sha256sum docs/ephemeral/modifications/evidence/pre-e2-contract/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json",
+    "mkdir -p docs/graph/contract-template",
+    "git mv docs/ephemeral/modifications/evidence/pre-e2-contract/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json",
+    "git rm docs/ephemeral/modifications/evidence/pre-e2-contract/README.md",
+    "cp $EV/skills/contract-template-README.md docs/graph/contract-template/README.md",
+    "git add docs/graph/contract-template/README.md",
+    "sha256sum docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json docs/graph/contract-template/README.md"
+   ],
+   "expected": [
+    "2b78f877e7a31efb2da8488d7f129794e60bcbdbf9f43e9851a319f83f06b53b, 606657 B",
+    "exit 0 (docs/graph/contract-template/ exists; without it git mv exits 128)",
+    "exit 0; rename, bytes unchanged",
+    "exit 0; the old README (839 B, sha256 995399d40b11f94b03058283059e78885bf2d5613769aa96c826f512850c7e2f) is removed and docs/ephemeral/modifications/evidence/pre-e2-contract/ no longer exists",
+    "exit 0; new README 1158 B",
+    "exit 0; the README is staged",
+    "2b78f877e7a31efb2da8488d7f129794e60bcbdbf9f43e9851a319f83f06b53b; 469e2265640439b0b126379c358aa7e862638c77240b2f0c6b52de8c5ba60fde"
+   ],
+   "note": "evidence/regenerate_contract.py and evidence/repair-a4/contract_recipe.py stay as dated records (drafter's recommendation, AUTH-001); the maintained copies are the glow-graph-contract scripts",
+   "when": "X3.3 (spec §9)"
+  },
+  "4_contract_regeneration_PART-01_after_steps_2_3_and_the_decision_record_commit": {
+   "commands": [
+    "python3 $GGC/scripts/graph_parts.py build docs/graph/parts $SCRATCH/graph.md",
+    "python3 $GGC/scripts/contract_recipe.py $SCRATCH/graph.md docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json $FV/references/glow-hde-canonical-change-flow-r1-20260923.json docs/prompt_ecosystem_management/gcfpe.decision-record.md $SCRATCH/contract-4.1.0.json --contract-revision 4.1.0 --primary-skill-revision 1.3.0 --check $CFI/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json $FVI/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+    "python3 $GGC/scripts/contract_recipe.py $SCRATCH/graph.md docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json $FV/references/glow-hde-canonical-change-flow-r1-20260923.json docs/prompt_ecosystem_management/gcfpe.decision-record.md $SCRATCH/contract-4.1.1.json --contract-revision 4.1.1 --primary-skill-revision 1.3.1 --check $CF/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json $FV/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+    "diff $SCRATCH/contract-4.1.0.json $SCRATCH/contract-4.1.1.json",
+    "python3 -c \"import sys,pathlib; sys.path.insert(0,'$FV/scripts'); import validate_gcfpe_20260914 as v; print(v.skill_tree_digest(pathlib.Path('$FV')))\""
+   ],
+   "expected": [
+    "exit 0; embedded JSON 575074 B sha256 ae2bd159…; graph.md 575672 B sha256 a70a93263f2943be45450a210f62a82a2a27abfd49a259d04f838e469ba0cc24",
+    "E2 7a7fd0285730622217cc2e2d117552a002f57f9e391eac1c3d94b553fabbb675 613162; recipe 6902924a2de7f3d348e75951fd5562632bcb690e3c4687c473695261b70f3718 613326; EQUAL x2; exit 0",
+    "E2 5ad52062133068fa5947eb512a52ddc72bd4791f65faa27444af3357495c03b2 613162; recipe dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c 613326; EQUAL x2 (the packages already carry the regenerated bytes and every pin); exit 0",
+    "exit 1 with exactly two changed lines (the contracts are canonical JSON, indent 2, sorted keys): \"contract_revision\": \"4.1.0\" -> \"4.1.1\" and \"primary_skill_revision\": \"1.3.0\" -> \"1.3.1\" (.pr_development_contract)",
+    "ed52208f48479124f39119a54f29774096381ab85f54109a73bc3a7f3cc572af (= SKILL_TREE_SHA256 on $FV/SKILL.md:9)"
+   ],
+   "note": "the oracle is byte-identical in $FV and $FVI (not a changed file). The recipe reads the two '> ' lines of the D23-E once-per-merge section only, bounded at the next '### ' or '## ' heading, and asserts there are exactly two (P-21), so entries added under D23 or later decisions do not change the output. $CFI and $FVI are the installed packages before the install sitting; $CF and $FV are in $PKG",
+   "when": "X4.1 (spec §9), after X2 and X3"
+  },
+  "4b_package_X4.3_after_the_pkg_gate": {
+   "when": "X4.3 (spec §9), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 records their delivery, each time followed by a new review round and delivery (P-100, P-109). Never after X7.1: nothing is re-cut then (P-112 (d))",
+   "commands": [
+    "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext && python3 docs/prompt_ecosystem_management/freeze.py $PKG > $SCRATCH/pkg-before.txt",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf \"${SCRATCH:?}/skills-ext/${s:?}\" && mkdir -p $SCRATCH/skills-ext/$s && (cd $SCRATCH/skills-ext/$s && unzip -q $SCRATCH/skills-out/$s.skill) || exit 1; done)",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $SCRATCH/skills-ext/$s/$s; done) > $SCRATCH/skills-ext/freeze.txt && cat $SCRATCH/skills-ext/freeze.txt && diff $SCRATCH/skills-ext/freeze.txt $EV/skills/expected_after_patch.txt",
+    "python3 $EV/skills/packages_json.py $SCRATCH/skills-out $SCRATCH/skills-ext/freeze.txt $EX/packages.json",
+    "python3 docs/prompt_ecosystem_management/freeze.py $PKG | diff - $SCRATCH/pkg-before.txt"
+   ],
+   "expected": [
+    "exit 0; $SCRATCH/pkg-before.txt holds $PKG's root digest before packaging",
+    "exit 0; 'Skill is valid!' once per package (seven); seven files <skill>.skill in $SCRATCH/skills-out",
+    "exit 0; each archive extracts to $SCRATCH/skills-ext/<skill>/<skill>/",
+    "seven lines '<skill> <files> <digest>' printed, then `diff` exits 0: each equals execute.1.expected_after_patch for that skill ($EV/skills/expected_after_patch.txt). A mismatch makes diff exit 1, and the step fails",
+    "exit 0; seven lines '<skill>.skill <entries> <bytes> <sha256> <files> <digest>', and EX/packages.json written with them and out_dir; committed and pushed with EX/gate_pkg.json. The archive sha256s vary with the tree's file mtimes (EV/skills/results/brief_fill_proof.json), so the archives reviewed at X4.4 are the ones delivered there (P-100)",
+    "`diff` exits 0: $PKG's root digest after packaging equals the one taken before it in this session (P-111 (e)); packaging wrote nothing into $PKG. It is not compared with X1.1's recorded value, which a new session's rebuild can differ from once a skill outside the seven has synced (P-79)"
+   ],
+   "note": "skill-creator runs from $PKG's copy (a full copy of $INST), never from $INST, and with PYTHONDONTWRITEBYTECODE=1, so nothing is written into a skill tree. The seven archives stay in $SCRATCH/skills-out until X4.4 delivers them"
+  },
+  "6_closure_X6.3": {
+   "when": "X6.3 (spec §9), after X6.2 (P-102 (b): the command lives here, unescaped, not only in §9's table)",
+   "commands": [
+    "for id in $(grep -o '^[A-Z][A-Z0-9-]*  -- closure' docs/ephemeral/modifications/evidence/closeout-residuals/ANALYZE-closure.md | cut -d' ' -f1); do python3 docs/prompt_ecosystem_management/closure.py $id; done > $SCRATCH/closure.now.txt",
+    "awk '/^```$/{f=!f; next} f' docs/ephemeral/modifications/evidence/closeout-residuals/ANALYZE-closure.md | diff - $SCRATCH/closure.now.txt"
+   ],
+   "expected": [
+    "exit 0; one closure block per live prompt ANALYZE listed",
+    "exit 0 (diff prints nothing): closure over the 50 live prompts is unchanged against ANALYZE-closure.md (proved on the reindexed tree at PLAN)"
+   ]
+  },
+  "5_after_the_install_sitting": {
+   "commands": [
+    "mkdir -p $EX && (for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $INST/$s; done) > $EX/installed_freeze.txt && cat $EX/installed_freeze.txt && diff $EX/installed_freeze.txt $EV/skills/expected_after_patch.txt"
+   ],
+   "expected_stdout": {
+    "flowmaster-validate": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
+    "change-flow": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+    "glow-graph-contract": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+    "session-relay-flowmaster": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+    "glow-hde-pr-development": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+    "amthor-workspace-governance-audit": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+    "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
+   },
+   "then": "python3 $EV/skills/run_gate.py --set post --inst $INST --out $GATE (suite_gate.post); exit 0, 28 rows ok",
+   "one_install_event": "flowmaster-validate 3.3.1 passes only with change-flow 3.3.1, relay 3.2.0, PR skill 1.3.1 and the dbae180b contract in both bundled copies; install the seven together",
+   "when": "X7.4 (spec §9), after Nathan's install sitting (X7.3)",
+   "expected": [
+    "seven lines '<skill> <files> <digest>' printed, then diff exits 0: each equals expected_stdout below and the freeze line recorded for its archive in EX/packages.json. EX/installed_freeze.txt fills {{FREEZE_DIGESTS}} (apply_texts.py --installed-freeze, P-96)"
+   ]
+  },
+  "suite_gate": {
+   "script": "$EV/skills/run_gate.py (expected results embedded; exit 0 only when every row is ok; writes only under --out and --cand, refuses either inside the repository or a skill tree)",
+   "pre": {
+    "when": "X1.3, once, on the unchanged working tree before commit 1 and the reindex",
+    "command": "python3 $EV/skills/run_gate.py --set pre --pkg-root $PKG --out $GATE",
+    "expected": "exit 0; gate_pre.json: 12 rows, all ok"
+   },
+   "pkg": {
+    "when": "X4.2, after commit 1 (X2), the registry, the reindex, the contract-template move, P32-SWR (X3) and the contract regeneration (X4.1)",
+    "command": "python3 $EV/skills/run_gate.py --set pkg --pkg-root $PKG --out $GATE",
+    "expected": "exit 0; gate_pkg.json: 34 rows, all ok"
+   },
+   "post": {
+    "when": "X7.4, after the install sitting, on main with the execution PR merged",
+    "command": "python3 $EV/skills/run_gate.py --set post --inst $INST --out $GATE",
+    "expected": "exit 0; gate_post.json: 28 rows, all ok"
+   }
+  },
+  "_changes_from_committed_manifest": [
+   "variables: TMPDIR is $SCRATCH/tmp (spec §9); PKG, EV, GATE and cwd defined; GGC..REPORT are $PKG's packages",
+   "1.then: builds the full skills root $PKG (a copy of $INST with the seven patched packages) and gates it on the whole-root freeze; runs at X1.1, before any repository change (P-56)",
+   "2: the new builder's expected refusal of today's parts runs as run_gate.py --set pre; the reindex-diff check is the mechanical cmp; the 'alternative' git apply became a read-only cross-check",
+   "3: mkdir -p before git mv; README source is $EV/skills/contract-template-README.md; README staged",
+   "4: the structural diff is a plain diff of the two canonical contracts; no PLAN scratch path",
+   "suite_gate (new): the three run_gate.py calls; 5.then points at suite_gate.post",
+   "repair round 3: 'when' fields follow spec §9 X0-X7; the pre gate runs at X1.3 (suite_gate.pre), no longer inside execute.2",
+   "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)",
+   "repair round 5: every `rm -rf` takes the guarded form \"${VAR:?}\" (P-92), which the session's safety check allows and which cannot expand to /; execute.4b compares the extracted freeze digests with expected_after_patch.txt by diff, so X4.3's gate fails mechanically on a mismatch; the archive sha256s go to EX/packages.json",
+   "repair round 6: BASE is read from EX/run.json; execute.1.then only before X7.3 (P-101); execute.4b writes EX/packages.json with packages_json.py and is never re-run after X4.4's delivery (P-100); execute.5 writes EX/installed_freeze.txt and compares it by diff; execute.6 carries X6.3's closure commands unescaped (P-102)",
+   "repair round 7 (P-111 (e)): execute.4b takes freeze.py $PKG before packaging and diffs it after, within the session; tested at PLAN on the pass-4 patched root (diff exit 0; results/manifest_r7_proof.json)",
+   "repair round 8 (P-112 (d)): execute.4b's 'when' says it never runs after X7.1; the X7.2 re-cut route is removed. No command changed"
+  ]
+ }
+}

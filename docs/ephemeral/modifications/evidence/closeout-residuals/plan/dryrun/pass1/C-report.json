@@ -1,0 +1,1811 @@
+[
+ {
+  "pid": "DOC-10",
+  "page": "3db4590a05eb8193a9a8d7ddd751cd2d",
+  "fetched": "2026-09-23T13:20:42.669Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-A7-LOCAL": 0
+   },
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ],
+    "R-CLAT": [
+     1,
+     1
+    ],
+    "LDOC-10-1": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 5,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-A7-LOCAL": 0
+   },
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ],
+    "R-CLAT": [
+     1,
+     1
+    ],
+    "LDOC-10-1": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 5,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'pre-merge evidence; PR-40 is entered on ...[W-4+ONCE]... verifies the merged state and landed lineage.'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'entry to existing permitted artifact lineage: usage ID; actual change identity'"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'mappings in the output artifact's permitted metadata, name the authorized owner'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'in the existing substantive artifact, which the handoff names, within this actor's permitted output.'"
+   },
+   {
+    "edit": "LDOC-10-1",
+    "reads_ok": true,
+    "note": "Execute 5: '...PR-40 read-only landed-lineage review entered on `MERGE_OBSERVED` or, [PRED], on Nathan's merge assertion, then DOC-20 completion verification.'"
+   },
+   {
+    "edit": "R-CLAT",
+    "reads_ok": true,
+    "note": "Material paragraph ends 'not by itself material.'; next line is the `INSTRUCTION_READY` route"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "note": "first run printed to terminal, not saved; engine unchanged, so first_run is taken from the identical final run",
+  "batch_task": {
+   "a7_local_sites": [
+    {
+     "site": "LDOC-10-1 (Execute 5)",
+     "check_alt": "negative-lookahead form",
+     "fires_before": 1,
+     "after": 0,
+     "proposed_guard": {
+      "kind": "forbidden_regex",
+      "rows": [
+       "DOC-10"
+      ],
+      "pattern": "Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)",
+      "regression": "inject into DOC-10: Nathan manual merge, PR-40 read-only landed-lineage review, then DOC-20 completion verification.",
+      "regression_words": 11,
+      "tested": {
+       "fires_before": 1,
+       "hits_after": 0,
+       "fires_on_injection": true
+      }
+     }
+    }
+   ],
+   "check_R-A7-LOCAL": {
+    "before": 1,
+    "after": 0
+   }
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "DOC-20",
+  "page": "3db4590a05eb8164ac09e722dc967f25",
+  "fetched": "2026-09-23T13:16:52.823Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-A7-LOCAL": 0
+   },
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ],
+    "R-OWN": [
+     1,
+     1
+    ],
+    "R-CLAT": [
+     1,
+     1
+    ],
+    "LDOC-20-1": [
+     1,
+     1
+    ],
+    "LDOC-20-2": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 7,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    [
+     "G-K36 (old draft text: requires 'commits and pushes\\.'; P-02's new text continues ', and any pull request that carries them.')",
+     "CTR-002"
+    ]
+   ],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K36",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-A7-LOCAL": 0
+   },
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ],
+    "R-OWN": [
+     1,
+     1
+    ],
+    "R-CLAT": [
+     1,
+     1
+    ],
+    "LDOC-20-1": [
+     1,
+     1
+    ],
+    "LDOC-20-2": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 7,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    [
+     "G-K36 (old draft text: requires 'commits and pushes\\.'; P-02's new text continues ', and any pull request that carries them.')",
+     "CTR-002"
+    ]
+   ],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K36",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "'...or repository state. Every statement in this prompt ... carries them. ## Required inputs'"
+   },
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'pre-merge evidence; PR-40 is entered on ...[W-4+ONCE]... verifies the merged state and landed lineage.'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'entry to existing permitted artifact lineage: usage ID; actual change identity'"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'mappings in the output artifact's permitted metadata, name the authorized owner'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'in the existing substantive artifact, which the handoff names, within this actor's permitted output.'"
+   },
+   {
+    "edit": "LDOC-20-1",
+    "reads_ok": true,
+    "note": "'`MERGE_PENDING` separately from the `MERGE_OBSERVED` merge event or, [PRED], Nathan's merge assertion, and from PR-40's independent landed-lineage evidence.'"
+   },
+   {
+    "edit": "R-CLAT",
+    "reads_ok": true,
+    "note": "Material paragraph ends 'not by itself material.'; next line is the QA-10 route bullet"
+   },
+   {
+    "edit": "LDOC-20-2",
+    "reads_ok": true,
+    "note": "'landed-lineage review needed after Nathan's merge assertion, [PRED]: continue to `PR-40 — Review PR'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "batch_task": {
+   "a7_local_sites": [
+    {
+     "site": "LDOC-20-1 (Required inputs)",
+     "fires_before": 1,
+     "after": 0,
+     "proposed_guard": {
+      "kind": "forbidden_regex",
+      "rows": [
+       "DOC-20"
+      ],
+      "pattern": "Nathan's later merge assertion and PR-40's independent",
+      "regression": "inject into DOC-20: separately from Nathan's later merge assertion and PR-40's independent landed-lineage evidence.",
+      "regression_words": 11,
+      "tested": {
+       "fires_before": 1,
+       "hits_after": 0,
+       "fires_on_injection": true
+      }
+     }
+    },
+    {
+     "site": "LDOC-20-2 (Result routing)",
+     "fires_before": 1,
+     "after": 0,
+     "proposed_guard": {
+      "kind": "forbidden_regex",
+      "rows": [
+       "DOC-20"
+      ],
+      "pattern": "needed after Nathan's assertion: continue to `?PR-40",
+      "regression": "inject into DOC-20: Actual merged-state or landed-lineage review needed after Nathan's assertion: continue to `PR-40`.",
+      "regression_words": 12,
+      "tested": {
+       "fires_before": 1,
+       "hits_after": 0,
+       "fires_on_injection": true
+      }
+     }
+    }
+   ],
+   "check_R-A7-LOCAL": {
+    "before": 2,
+    "after": 0
+   },
+   "g_k26_widening_option": "The three DOC patterns may instead be appended as alternatives to G-K26 (rows already include DOC-10, DOC-20). Tested: widened G-K26 fires 1 on DOC-10 and 2 on DOC-20 before, 0 after; matches no authored/canonical text and no LOCAL new_text. On its other rows (PR-10, PR-20, PR-40, RS-40) the three alternatives are already inside the engine's R-A7-LOCAL CHECK, so those rows' CHECK=0 results (other batches) imply silence."
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "ESC-10",
+  "page": "3db4590a05eb81d582b8d490e77f9f40",
+  "fetched": "2026-09-23T13:21:16.736Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'pre-merge evidence; PR-40 is entered on ...[W-4+ONCE]... verifies the merged state and landed lineage.'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'entry to existing permitted artifact lineage: usage ID; actual change identity'"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'mappings in the output artifact's permitted metadata, name the authorized owner'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'in the existing substantive artifact, which the handoff names, within this actor's permitted output.'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "ESC-25",
+  "page": "3db4590a05eb81bf9326e46a1017de38",
+  "fetched": "2026-09-23T13:21:49.906Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ],
+    "R-OWN": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 4,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    [
+     "G-K36 (old draft text: requires 'commits and pushes\\.'; P-02's new text continues ', and any pull request that carries them.')",
+     "CTR-002"
+    ]
+   ],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K36",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ],
+    "R-OWN": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 4,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    [
+     "G-K36 (old draft text: requires 'commits and pushes\\.'; P-02's new text continues ', and any pull request that carries them.')",
+     "CTR-002"
+    ]
+   ],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K36",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "'...or separately authorized bounded environment operator. Every statement ... carries them. Execute exactly one discovery task'"
+   },
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'pre-merge evidence; PR-40 is entered on ...[W-4+ONCE]... verifies the merged state and landed lineage.'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'entry to existing permitted artifact lineage: usage ID; actual change identity'"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'mappings in the output artifact's permitted metadata, name the authorized owner'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'in the existing substantive artifact, which the handoff names, within this actor's permitted output.'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "batch_task": {
+   "own_after_role_sentence": "lands once (placement OWN=1) after 'read-only repository reviewer ... bounded environment operator.'"
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "ESC-30",
+  "page": "3db4590a05eb813e99b4e416bc7afdae",
+  "fetched": "2026-09-23T13:22:21.293Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'pre-merge evidence; PR-40 is entered on ...[W-4+ONCE]... verifies the merged state and landed lineage.'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'entry to existing permitted artifact lineage: usage ID; actual change identity'"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'mappings in the output artifact's permitted metadata, name the authorized owner'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'in the existing substantive artifact, which the handoff names, within this actor's permitted output.'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "ESC-40",
+  "page": "3db4590a05eb81efb6d4cd8d02ba9756",
+  "fetched": "2026-09-23T13:22:59.282Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A1a": [
+     1,
+     1
+    ],
+    "R-A1c": [
+     1,
+     1
+    ],
+    "R-A2a": [
+     1,
+     1
+    ],
+    "R-A7-S3": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "'pre-merge evidence; PR-40 is entered on ...[W-4+ONCE]... verifies the merged state and landed lineage.'"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "'entry to existing permitted artifact lineage: usage ID; actual change identity'"
+   },
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "'mappings in the output artifact's permitted metadata, name the authorized owner'"
+   },
+   {
+    "edit": "R-A2a",
+    "reads_ok": true,
+    "note": "'in the existing substantive artifact, which the handoff names, within this actor's permitted output.'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "IA-10",
+  "page": "3db4590a05eb817aa191f1e822c30480",
+  "fetched": "2026-09-23T13:23:51.013Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A2g": [
+     1,
+     1
+    ],
+    "LIA-10-1": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A2g": [
+     1,
+     1
+    ],
+    "LIA-10-1": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "LIA-10-1",
+    "reads_ok": true,
+    "note": "FIRST_ENTRY: 'predecessor lineage, the `CANON_CONFLICT_REGISTER` carried in the approved Specification and Thoth decision, and the actual'"
+   },
+   {
+    "edit": "R-A2g",
+    "reads_ok": true,
+    "note": "PLAN_PENDING route: 'complete pending Plan, source/PF10 lineage, change/session identity, and readback links'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "batch_task": {
+   "unguarded_local": {
+    "edit": "LIA-10-1",
+    "reason": "drafter marks it optional; G-K08 does not reach this intake line (heading 'Required:'), so no current guard fires on it",
+    "optional_guard_tested": {
+     "pattern": "lineage, carried `?CANON_CONFLICT_REGISTER`?, and the actual source",
+     "regression": "inject into IA-10: - `CHANGE_CLASS`, `CHANGE_ID`, approval and predecessor lineage, carried `CANON_CONFLICT_REGISTER`, and the actual source/repository/access facts.",
+     "regression_words": 14,
+     "fires_before": 1,
+     "hits_after": 0,
+     "fires_on_injection": true
+    }
+   }
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "IA-20",
+  "page": "3db4590a05eb81c4825df2ad0dec4750",
+  "fetched": "2026-09-23T13:19:57.694Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A2g": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A2g": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 1,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-A2g",
+    "reads_ok": true,
+    "note": "PLAN_PENDING route: 'complete pending Plan, source/PF10 lineage, change/session identity, and readback links'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "open_issues": [
+   "Observation only (no change): IA-20's 'Required:' intake bullet ('..., and carried `CANON_CONFLICT_REGISTER`.') stays, while IA-10's analogous FIRST_ENTRY item gets optional LIA-10-1. DECISIONS does not settle whether IA-20 needs the same LOCAL; not added (would widen beyond the drafted edits)."
+  ]
+ },
+ {
+  "pid": "IA-30",
+  "page": "3db4590a05eb81c6bfb5f36f7df8f464",
+  "fetched": "2026-09-23T13:20:30.041Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A2g": [
+     1,
+     1
+    ],
+    "R-26-P1b": [
+     1,
+     1
+    ],
+    "R-CLAT": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-A2g": [
+     1,
+     1
+    ],
+    "R-26-P1b": [
+     1,
+     1
+    ],
+    "R-CLAT": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 5
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-A2g",
+    "reads_ok": true,
+    "note": "INITIAL_APPROVE route: 'exact planned `WORK_UNIT_ID`, dependency state, source/PF10 lineage, and IA session.'"
+   },
+   {
+    "edit": "R-A2g (untouched site)",
+    "reads_ok": true,
+    "note": "MATERIAL_PLAN_DELTA_REVIEW intake 'applicable addenda, conflict register, and same Isis/IA lineage' present before and after (1/1)"
+   },
+   {
+    "edit": "R-26-P1b",
+    "reads_ok": true,
+    "note": "'ends with exactly one fenced `text` block beginning `NEXT_PROMPT_HANDOFF`. The block names the exact destination'"
+   },
+   {
+    "edit": "R-CLAT",
+    "reads_ok": true,
+    "note": "'...not by itself material.' then 'Review the complete pending delta against the immutable base'"
+   }
+  ],
+  "g06_after": true,
+  "g06": {
+   "row_patterns": 1,
+   "fires_before": false,
+   "fires_after": false
+  },
+  "batch_task": {
+   "r_a2g": {
+    "site_scoped_anchor_hits": 1,
+    "general_alt_(?<=, )conflict_register_would_hit": 2,
+    "material_plan_delta_review_intake_item": {
+     "before": 1,
+     "after": 1
+    }
+   },
+   "R-26-P1b": {
+    "hits": 1
+   },
+   "R-CLAT": {
+    "hits": 1
+   }
+  },
+  "open_issues": []
+ },
+ {
+  "pid": "GCFPE-MGMT-10",
+  "page": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+  "fetched": "2026-09-21T22:56:04.638Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-OWN": [
+     1,
+     1
+    ],
+    "R-A5": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    [
+     "G-K36 (old draft text: requires 'commits and pushes\\.'; P-02's new text continues ', and any pull request that carries them.')",
+     "CTR-002"
+    ]
+   ],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K36",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {},
+   "rules": {
+    "R-OWN": [
+     1,
+     1
+    ],
+    "R-A5": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    [
+     "G-K36 (old draft text: requires 'commits and pushes\\.'; P-02's new text continues ', and any pull request that carries them.')",
+     "CTR-002"
+    ]
+   ],
+   "new_guard_results_recorded_not_repaired": [
+    {
+     "id": "G-K36",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true
+  },
+  "readback": [
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "'...skill review outside its stated gate, or Alpha work. Every statement ... carries them. ## Entry contract'"
+   },
+   {
+    "edit": "R-A5 (MGMT variant)",
+    "reads_ok": true,
+    "note": "'an open pull request is a complete outcome. This prompt's artifacts ... [A5_MGMT], and `docs/pfcanon/` is read-only.'"
+   }
+  ],
+  "g06_after": null,
+  "g06": {
+   "row_patterns": 0,
+   "note": "the registry row carries no G06 (NEXT_PROMPT_HANDOFF window) pattern"
+  },
+  "batch_task": {
+   "own_after_clause": "lands once (placement OWN=1) directly after the 'does not execute product Change Flow, ...' sentence",
+   "r_a5_sentence_end": "..., and `docs/pfcanon/` is read-only.",
+   "opens_pr_for_own_outputs": {
+    "verdict": "IMPLIED, not stated as an instruction",
+    "clause": "Nathan alone merges; an open pull request is a complete outcome.",
+    "supporting_clause": "committed and pushed on the batch branch, read back completely",
+    "probe": "'open a/the pull request|PR' 0 hits; 'pull request' 1 hit before (2 after, with OWN)"
+   }
+  },
+  "open_issues": [
+   "P-02 premise check: the live body never instructs opening a pull request. It pushes outputs on the batch branch and says 'an open pull request is a complete outcome.' P-02's 'and any pull request that carries them' is true as an exclusion, but DECISIONS' parenthetical 'both prompts open a PR for their own artifacts' is only implied for MGMT-10. Plan author to confirm this suffices (no edit made).",
+   "Notion reports the content 'as of 2026-09-21T22:56:04.638Z' while page_last_edited_at is 2026-09-23T13:23:25.044Z; the body was taken as returned."
+  ]
+ },
+ {
+  "pid": "GCFPE-MGMT-10-PROPOSED",
+  "page": "3e34590a05eb811b93d2da9b4ef8106d",
+  "fetched": "2026-09-23T00:49:47.074Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-af2a3192ceab2e578.jsonl (this worker's own transcript; every fetch returned inline, no tool-results file was created)",
+  "first_run": {
+   "pass": true,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-ITEM40": 0,
+    "CHECK R-ITEM23-gate": 0
+   },
+   "rules": {
+    "R-ITEM23": [
+     2,
+     2
+    ],
+    "LGCFPE-MGMT-10-PROPOSED-1": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": "NOT_A_REGISTRY_ROW",
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [],
+   "validator_ok": "NOT_RUN (no registry row)"
+  },
+  "patches": [],
+  "final_run": {
+   "pass": true,
+   "rule_mismatches": {},
+   "check_failures": [],
+   "checks": {
+    "CHECK R-ITEM40": 0,
+    "CHECK R-ITEM23-gate": 0
+   },
+   "rules": {
+    "R-ITEM23": [
+     2,
+     2
+    ],
+    "LGCFPE-MGMT-10-PROPOSED-1": [
+     1,
+     1
+    ]
+   },
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_after_non_new": "NOT_A_REGISTRY_ROW",
+   "registry_findings_after_new_guards": [],
+   "new_guard_results_recorded_not_repaired": [],
+   "validator_ok": "NOT_RUN (no registry row)"
+  },
+  "readback": [
+   {
+    "edit": "LGCFPE-MGMT-10-PROPOSED-1",
+    "reads_ok": true,
+    "note": "'`Prompt version` and `Ecosystem release` are not lines of this body, ... at promotion, and inventing them here would be'"
+   },
+   {
+    "edit": "R-ITEM23",
+    "reads_ok": true,
+    "note": "both label lines gone: 'Prompt ID: `GCFPE-MGMT-10`' is followed directly by '## Native purpose'"
+   }
+  ],
+  "g06_after": null,
+  "g06": {
+   "row_patterns": null,
+   "note": "no registry row (expected)"
+  },
+  "batch_task": {
+   "R-ITEM23": {
+    "hits": 2
+   },
+   "CHECK R-ITEM40": {
+    "before": 0,
+    "after": 0
+   },
+   "CHECK R-ITEM23-gate": {
+    "before": 2,
+    "after": 0
+   }
+  },
+  "open_issues": []
+ }
+]

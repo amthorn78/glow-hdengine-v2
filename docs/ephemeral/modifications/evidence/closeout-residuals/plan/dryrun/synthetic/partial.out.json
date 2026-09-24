@@ -1,0 +1,121 @@
+{
+ "ops": 3,
+ "subsets": 8,
+ "all_good": true,
+ "doubled_OWN_check": {
+  "doubled_insertions": [
+   "R-OWN"
+  ],
+  "pass": false
+ },
+ "rows": [
+  {
+   "applied": [],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    0
+   ],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [
+    "R-A1a",
+    "R-OWN"
+   ],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    1
+   ],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [
+    "R-A1c"
+   ],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    2
+   ],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [
+    "R-A7-S3"
+   ],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    0,
+    1
+   ],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [
+    "R-A1a",
+    "R-A1c",
+    "R-OWN"
+   ],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    0,
+    2
+   ],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [
+    "R-A1a",
+    "R-A7-S3",
+    "R-OWN"
+   ],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    1,
+    2
+   ],
+   "plan_exit": 0,
+   "refused": null,
+   "repair": [
+    "R-A1c",
+    "R-A7-S3"
+   ],
+   "equals_full": true,
+   "check_after_repair": true,
+   "good": true
+  },
+  {
+   "applied": [
+    0,
+    1,
+    2
+   ],
+   "plan_exit": 3,
+   "refused": "ALREADY_LANDED: every edit reads landed; run check, not plan",
+   "repair": null,
+   "check": true,
+   "good": true
+  }
+ ]
+}

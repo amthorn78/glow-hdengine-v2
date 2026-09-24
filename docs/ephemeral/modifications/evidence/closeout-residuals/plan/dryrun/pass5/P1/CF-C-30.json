@@ -1,0 +1,97 @@
+{
+ "mode": "plan",
+ "pid": "CF-C-30",
+ "page": "3db4590a05eb8149a8d2ed42c9c01ffd",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan CF-C-30 3db4590a05eb8149a8d2ed42c9c01ffd --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "CF-C-30",
+  "fetched": "2026-09-23T13:27:04.309Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 1,
+  "repair": [],
+  "rules": {
+   "LCF-C-30-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LCF-C-30-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LCF-C-30-3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "state_proof": {
+  "pristine_states": [
+   "NOT_LANDED"
+  ],
+  "ops": 1,
+  "relanded_all_LANDED": true,
+  "relanded_not_LANDED": [],
+  "landed_fn": true,
+  "doubled_in_landed": [],
+  "partials": 1,
+  "partials_repaired_exact": 1,
+  "partials_refused": 0,
+  "partials_repaired_wrong": 0,
+  "rows": [
+   {
+    "applied": [],
+    "outcome": "REPAIRED_EXACT",
+    "repair": []
+   }
+  ],
+  "pass": true
+ }
+}

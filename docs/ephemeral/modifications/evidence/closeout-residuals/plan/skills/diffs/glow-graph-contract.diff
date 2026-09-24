@@ -1,0 +1,905 @@
+diff -ruN a/SKILL.md b/SKILL.md
+--- a/SKILL.md	2026-09-23 00:55:33.861290408 +0000
++++ b/SKILL.md	2026-09-23 23:12:52.617320636 +0000
+@@ -1,16 +1,14 @@
+ ---
+ name: glow-graph-contract
+-description: Maintain the GCFPE candidate graph contract without hand-editing it. The graph is ~94% a machine-readable restatement of the prompt bodies in Notion, so it is held as small per-prompt parts in the repository at docs/graph/parts and rebuilt by script - state_routes derived from edges, header hash stamped automatically. The assembled graph is derived output and is never committed. Use this for ANY task that would otherwise edit, redline, synchronize, validate, or hash the candidate graph contract, or reconcile it after a prompt repair batch. Use it before writing a graph redline by hand, and before treating a graph hash mismatch as a defect. Do not hand-edit the graph contract when this skill applies.
++description: Maintain the GCFPE candidate graph contract without hand-editing it. The graph is a machine-readable restatement of the prompt bodies in Notion, so it is held as small per-prompt parts in the repository at docs/graph/parts and rebuilt by script - state_routes derived from edges, edge indices re-derived by reindex, header hash stamped automatically. The assembled graph is derived output and is never committed, and the direct-handoff contract is regenerated from it by script. Use this for ANY task that would otherwise edit, redline, synchronize, validate, or hash the candidate graph contract, regenerate the direct-handoff contract, check the registry's graph-derived fields, or reconcile any of them after a prompt repair batch. Use it before writing a graph redline by hand, and before treating a graph hash mismatch as a defect. Do not hand-edit the graph contract when this skill applies.
+ ---
+ 
+ # Candidate graph contract — build it, don't edit it
+ 
+-The candidate graph contract is a ~580 KB file describing all 55 prompts: their
++The candidate graph contract describes every prompt in the release: their
+ nodes, edges, state_routes and vocabularies. It looks like a source document.
+-It is not. Measured against the live contract:
+-
+-- **94.3%** of it is per-prompt data
+-- **100%** of its 277 `state_route` rows cite a prompt body as their source
++It is not: every one of its `state_route` rows cites a prompt body as its
++source (`source_evidence`).
+ 
+ It is a derived restatement of what the prompts in Notion already say. Treating
+ it as hand-maintained source is what made one seven-prompt batch cost three
+@@ -25,8 +23,9 @@
+ 
+ ## Where things live
+ 
+-    docs/graph/parts/global.json        the ~6% that is genuinely authored
+-    docs/graph/parts/prompts/*.json     55 files, one per prompt
++    docs/graph/parts/global.json        what is genuinely authored, not per prompt
++    docs/graph/parts/prompts/*.json     one file per prompt
++    docs/graph/contract-template/       the direct-handoff contract's template (below)
+ 
+ The parts are maintained source and live in the repository. They are read and
+ written like any other tracked file: edit, commit on a
+@@ -59,21 +58,39 @@
+ Any existing Drive or repository copy of an assembled graph is historical. Do not
+ update it, do not mint a replacement, and do not treat it as authoritative.
+ 
+-## The two scripts
+-
+-### `scripts/graph_parts.py` — split / build / verify
+-
+-    python3 graph_parts.py split  <graph.md> <parts-dir>
+-    python3 graph_parts.py build  <parts-dir> <graph.md>
+-    python3 graph_parts.py verify <parts-dir> <graph.md>
++The graph copies bundled in skills
++(`references/gcfpe-20260914.1-091426.1-candidate-graph-contract.json` in
++`change-flow` and `flowmaster-validate`) are validator fixtures built from
++`docs/graph/parts`, not sources. Never edit one or derive anything from it: a
++change starts in the parts, and the fixtures are rebuilt from them and
++re-bundled with their pins.
++
++## The scripts
++
++Run every script with `PYTHONDONTWRITEBYTECODE=1` and `TMPDIR` set to the
++scratchpad, and write its output there, never into `docs/graph/` or a skill.
++
++### `scripts/graph_parts.py` — split / build / verify / reindex
++
++    python3 graph_parts.py split   <graph.md> <parts-dir>
++    python3 graph_parts.py build   <parts-dir> <graph.md>
++    python3 graph_parts.py verify  <parts-dir> <graph.md>
++    python3 graph_parts.py reindex <parts-dir>
+ 
+ `split` decomposes a graph into `global.json` plus one small JSON file per
+ prompt. `build` reassembles, validates, and writes. `verify` rebuilds in memory
+-and compares semantically against a known-good file.
++and compares semantically against a known-good file. `reindex` rewrites every
++part's `edge_indices`, and `global.json`'s `_other_edge_indices`, to each
++edge's position in the assembled order. The order is the builder's own, so the
++built graph does not change: only index lists move, and a file whose indices
++already agree is not rewritten.
+ 
+ What building guarantees, structurally rather than by discipline:
+ 
+ - **`state_routes` cannot drift from `edges`** — they are derived on every build
++- **edge bookkeeping cannot drift from `edges`** — `build` fails when a part or
++  `global.json` carries a different number of indices than edges, or when the
++  indices are not exactly 0..N-1, each once; `reindex` repairs it
+ - **the header hash cannot go stale** — `complete_source_bytes` and
+   `complete_source_sha256` are stamped over the exact byte range they describe
+ - **scope is proven, not argued** — a batch edits only its own prompt parts, so
+@@ -81,6 +98,53 @@
+ - **no byte-exactness discipline is needed** — output is canonical
+   (`indent=2, sort_keys=True, ensure_ascii=False`)
+ 
++### `scripts/regenerate_contract.py` and `scripts/contract_recipe.py` — the direct-handoff contract
++
++The 091426.1 direct-handoff contract is derived too. Every path it shares with
++the graph is copied from a build, and every other value comes from the value
++table in `regenerate_contract.py`. `contract_recipe.py` runs the regenerator and
++then its one successor step, which appends the D23-E once-per-merge sentence,
++read from the decision record. Never edit the contract by hand; regenerate it.
++
++Inputs: a build of `docs/graph/parts`; the template
++`docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json`,
++which is the contract as installed before the D23 E2 regeneration (sha256
++`2b78f877…`, 606 657 B); the successor R1 oracle bundled in `flowmaster-validate`;
++and the decision record. The two release-bound values, `contract_revision` and
++the PR skill's `primary_skill_revision`, are required arguments with no default.
++
++    python3 scripts/graph_parts.py build docs/graph/parts "$SCRATCH/graph.md"
++    python3 scripts/contract_recipe.py "$SCRATCH/graph.md" \
++      docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json \
++      <flowmaster-validate>/references/glow-hde-canonical-change-flow-r1-20260923.json \
++      docs/prompt_ecosystem_management/gcfpe.decision-record.md \
++      "$SCRATCH/contract.json" \
++      --contract-revision <x.y.z> --primary-skill-revision <x.y.z> \
++      --check <change-flow>/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json \
++              <flowmaster-validate>/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json
++
++`--check` exits 1 unless every named contract is byte-equal to the output. Run
++with the bundled copies' own two revisions, it must report both EQUAL: that is
++the proof that the shipped contract regenerates from repository sources. A new
++contract is written to both bundled copies, and every pin of its digest and
++revisions moves with it in the same change.
++
++### `scripts/registry_deriver.py` — the registry's graph-derived fields
++
++Each registry row's `required_interfaces`, `outputs[].consumers` and
++`outputs[].states` are derived from its part (`D13`), never authored. The
++deriver compares every row with its part and reports the rows that drift;
++`--derive` also prints the values each drifting row must carry. It imports
++`load_data` from the governance-audit skill directory you pass, so both read the
++registry with one parser.
++
++    python3 scripts/registry_deriver.py <amthor-workspace-governance-audit-dir> \
++      docs/prompt_ecosystem_management/project-prompt-contract-registry.md \
++      docs/graph/parts [--derive]
++
++It never writes the registry. A registry edit is made line-anchored, in a pull
++request.
++
+ ### `scripts/apply_section7.py` — legacy redline applier
+ 
+ Applies a structured `section7_v2.json` patch to a pre-sync graph. Kept for
+@@ -93,10 +157,12 @@
+ 2. Edit only the parts for the prompts that batch owns, deriving each field from
+    that prompt's persisted Notion body. `source_evidence` cites the body, e.g.
+    `{"path": "candidate/prompts/b/IA-30.md", "section": "Required result and routing"}`.
+-3. `build` to the scratchpad. It validates before writing and fails closed.
+-4. Record the resulting proof token from the builder's output. Never compute or
++3. If you added, removed or moved an edge, run `reindex` on the parts. `build`
++   refuses index bookkeeping that does not match the edges.
++4. `build` to the scratchpad. It validates before writing and fails closed.
++5. Record the resulting proof token from the builder's output. Never compute or
+    edit a hash by hand.
+-5. Commit **the changed parts only** and open the pull request.
++6. Commit **the changed parts only** and open the pull request.
+ 
+ Do not invent a field value no prompt body supports. If one cannot be derived,
+ record it as a named blocker. A part file honest about three unresolved fields
+@@ -108,7 +174,7 @@
+ unit, and it is the whole reason the parts design exists — per-prompt diff,
+ per-prompt blame, per-prompt conflict resolution. Point reviewers at the parts.
+ 
+-A 580 KB assembled graph has no reviewable diff, which is exactly why it is not
++An assembled graph of this size has no reviewable diff, which is exactly why it is not
+ committed. If a reviewer wants to confirm the assembled result, they rebuild and
+ compare proof tokens; agreement is a one-line check, not a file read.
+ 
+@@ -130,8 +196,14 @@
+     data/batch-2/GCFPE-Batch-2-Repair-Report-v1.1-20260916.md
+     data/batch-2/MANIFEST.md            byte counts and SHA-256 for each artifact
+ 
+-The parts reproduce the Batch 2 Pass 3 synchronized contract exactly — verified
+-by `verify`: 55 nodes, 235 edges, 55 state_routes, zero differences.
++Those files are the Batch 2 record; the parts have moved on since. What the
++parts build is stated once, as a dated proof token (2026-09-23, `main` after
++`MODIFICATION-20260923-alpha-feedback-open-entries`):
++
++    edges 229 · embedded JSON 575074 B · sha256 ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d
++
++with 55 nodes, 55 `state_routes` keys and 282 `state_route` rows. It is a
++record, not a pin: after a later change, rebuild and compare tokens.
+ 
+     python3 scripts/graph_parts.py build docs/graph/parts "$SCRATCH/graph.md"
+ 
+diff -ruN a/scripts/contract_recipe.py b/scripts/contract_recipe.py
+--- a/scripts/contract_recipe.py	1970-01-01 00:00:00.000000000 +0000
++++ b/scripts/contract_recipe.py	2026-09-23 23:12:52.628753200 +0000
+@@ -0,0 +1,69 @@
++"""The recipe for the shipped 091426.1 direct-handoff contract: regenerate_contract.py `generate`, followed by
++the round-a3 H5 step, which sets the contract-only value route_graph_semantics.pr40_entry to the E2 value
++(regenerate_contract.W4) plus the D23-E once-per-merge sentence, read from the decision record: the two
++`> ` lines of that successor section, which ends at the next `### ` or `## ` heading.
++
++Maintained in glow-graph-contract (MODIFICATION-20260923-closeout-residuals ITEM-13), moved from
++docs/ephemeral/modifications/evidence/repair-a4/contract_recipe.py (SFR-A4-1 A4-O1). It no longer derives the
++repository or the regenerator from its own location: the decision record is an argument, and the regenerator
++is the one beside this file. The two release-bound revisions are required and pass through to `generate`.
++
++usage: PYTHONDONTWRITEBYTECODE=1 python3 contract_recipe.py <graph-md> <template-contract> <oracle-file>
++       <decision-record> <out-contract> --contract-revision <x.y.z> --primary-skill-revision <x.y.z>
++       [--check <shipped-contract> ...]   exit 1 unless every named contract is byte-equal to the recipe's output
++
++With --contract-revision 4.1.0 --primary-skill-revision 1.3.0, the template
++docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json and a build of
++docs/graph/parts at ae2bd159..., the output is 6902924a..., 613326 B: the contract shipped before PART-01.
++"""
++import argparse
++import hashlib
++import importlib.util
++import json
++import sys
++import tempfile
++from pathlib import Path
++
++sys.dont_write_bytecode = True
++HERE = Path(__file__).resolve().parent
++spec = importlib.util.spec_from_file_location("regenerate_contract", HERE / "regenerate_contract.py")
++rc = importlib.util.module_from_spec(spec); spec.loader.exec_module(rc)
++
++ap = argparse.ArgumentParser(prog="contract_recipe.py")
++ap.add_argument("graph_md"); ap.add_argument("template"); ap.add_argument("oracle")
++ap.add_argument("decision_record"); ap.add_argument("out")
++ap.add_argument("--contract-revision", required=True)
++ap.add_argument("--primary-skill-revision", required=True)
++ap.add_argument("--check", nargs="+", default=[])
++args = ap.parse_args()
++
++DR = Path(args.decision_record).read_text(encoding="utf-8")
++head = "### Successor, 2026-09-23 — PR-40 is entered once per merge (D23-E)"
++assert DR.count(head) == 1, "decision record: the D23-E once-per-merge successor heading must occur exactly once"
++# The section ends at the next level-2 or level-3 heading, so a later successor entry under D23, or a
++# later decision, never contributes a quoted line (MODIFICATION-20260923-closeout-residuals P-21).
++sec = DR[DR.index(head) + len(head):]
++ends = [i for i in (sec.find("\n### "), sec.find("\n## ")) if i >= 0]
++assert ends, "decision record: no heading follows the D23-E once-per-merge successor section"
++sec = sec[:min(ends)]
++quoted = [line for line in sec.split("\n") if line.startswith("> ")]
++assert len(quoted) == 2, f"decision record: the once-per-merge section holds {len(quoted)} '> ' lines, not exactly 2"
++ONCE = " ".join(line[2:].strip() for line in quoted)
++
++with tempfile.TemporaryDirectory() as d:
++    e2_out = Path(d) / "e2-contract.json"
++    assert rc.generate(args.graph_md, args.template, args.oracle, [str(e2_out)],
++                       args.contract_revision, args.primary_skill_revision) in (0, None)
++    e2 = e2_out.read_bytes()
++print("E2 regenerator output", hashlib.sha256(e2).hexdigest(), len(e2))
++canon = lambda obj: (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")  # noqa: E731
++c = json.loads(e2)
++assert canon(c) == e2 and c["route_graph_semantics"]["pr40_entry"] == rc.W4
++c["route_graph_semantics"]["pr40_entry"] = rc.W4 + " " + ONCE
++new = canon(c)
++Path(args.out).write_bytes(new)
++print("recipe output", hashlib.sha256(new).hexdigest(), len(new))
++bad = [p for p in args.check if Path(p).read_bytes() != new]
++for p in args.check:
++    print(("EQUAL    " if p not in bad else "DIFFERENT"), p)
++raise SystemExit(1 if bad else 0)
+diff -ruN a/scripts/graph_parts.py b/scripts/graph_parts.py
+--- a/scripts/graph_parts.py	2026-09-23 00:55:33.870203067 +0000
++++ b/scripts/graph_parts.py	2026-09-23 23:12:52.617996155 +0000
+@@ -1,14 +1,21 @@
+ #!/usr/bin/env python3
+ """Split a GCFPE candidate graph contract into per-prompt parts, and rebuild it.
+ 
+-Why: the graph is ~94% a machine-readable restatement of what the prompt bodies
++Why: the graph is a machine-readable restatement of what the prompt bodies
+ already say. Hand-maintaining it with redlines is what made Batch 2 expensive.
+ Held as parts and rebuilt, it cannot drift: state_routes are DERIVED from edges
+ every time, and the header hash is stamped by the builder, never by hand.
+ 
+-    split  <graph.md> <parts-dir>      # graph  -> parts
+-    build  <parts-dir> <graph.md>      # parts  -> graph (validates first)
+-    verify <parts-dir> <graph.md>      # build to memory and compare semantically
++    split   <graph.md> <parts-dir>     # graph  -> parts
++    build   <parts-dir> <graph.md>     # parts  -> graph (validates first)
++    verify  <parts-dir> <graph.md>     # build to memory and compare semantically
++    reindex <parts-dir>                # re-derive every edge index from the assembled order
++
++`build` refuses edge_indices bookkeeping that does not match the edges: a part
++or global.json with a different number of indices than edges, or indices that
++are not exactly 0..N-1, each once. After adding, removing or moving an edge, run
++`reindex`. It keeps the assembled order, so the build is unchanged, and rewrites
++only index lists.
+ """
+ import hashlib, json, os, sys
+ 
+@@ -117,6 +124,86 @@
+     print(f"split: {len(keys)} prompt parts + global.json -> {parts_dir}")
+ 
+ 
++# ---------- edge order and its bookkeeping ----------
++
++INDEX_ERRORS = []
++
++
++def ordered_edges(other_edges, other_eidx, parts):
++    """(owner, position in owner, index, edge) in the order the build emits edges.
++
++    The rule is the one the builder has always used: a known index keeps the
++    original ordering stable, an edge beyond its part's index list appends after
++    the largest global index, and ties keep file order. `reindex` writes exactly
++    these positions back, so it never changes the built bytes."""
++    pairs = [("global.json", j, i, e) for j, (i, e) in
++             enumerate(zip(other_eidx or range(len(other_edges)), other_edges))]
++    nxt = max((i for _, _, i, _ in pairs), default=-1) + 1
++    for p in parts:
++        ei = p.get("edge_indices") or []
++        for j, e in enumerate(p["edges"]):
++            # Known index keeps the original ordering stable; new edges append.
++            pairs.append((p["id"], j, ei[j] if j < len(ei) else nxt, e))
++            if j >= len(ei):
++                nxt += 1
++    return sorted(pairs, key=lambda t: t[2])
++
++
++def index_bookkeeping_errors(other_edges, other_eidx, parts):
++    """Every edge carries exactly one index, and the indices are exactly 0..N-1."""
++    errs = []
++    seen = list(range(len(other_edges))) if other_eidx is None else list(other_eidx)
++    if len(seen) != len(other_edges):
++        errs.append(f"global.json: {len(seen)} _other_edge_indices for "
++                    f"{len(other_edges)} _other_edges")
++    for p in parts:
++        ei = p.get("edge_indices") or []
++        if len(ei) != len(p["edges"]):
++            errs.append(f"prompts/{p['id']}: {len(ei)} edge_indices for {len(p['edges'])} edges")
++        seen.extend(ei)
++    total = len(other_edges) + sum(len(p["edges"]) for p in parts)
++    if sorted(seen) != list(range(total)):
++        errs.append(f"edge indices are not exactly 0..{total - 1}, each once "
++                    f"({len(seen)} indices for {total} edges)")
++    if errs:
++        errs.append("run `graph_parts.py reindex <parts-dir>` to re-derive them from the assembled order")
++    return errs
++
++
++def _write_json(path, obj):
++    open(path, "w", encoding="utf-8").write(
++        json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
++
++
++def reindex(parts_dir):
++    """Rewrite every edge index to that edge's position in the assembled order."""
++    gpath = os.path.join(parts_dir, "global.json")
++    glob = json.load(open(gpath, encoding="utf-8"))
++    pdir = os.path.join(parts_dir, "prompts")
++    names = [f for f in sorted(os.listdir(pdir)) if f.endswith(".json")]
++    parts = [json.load(open(os.path.join(pdir, f), encoding="utf-8")) for f in names]
++    if len({p["id"] for p in parts}) != len(parts):
++        sys.exit("reindex: two prompt parts share an id")
++    other_edges = glob.get("_other_edges", [])
++    order = ordered_edges(other_edges, glob.get("_other_edge_indices"), parts)
++    position = {(owner, j): k for k, (owner, j, _, _) in enumerate(order)}
++    changed = []
++    new = [position[("global.json", j)] for j in range(len(other_edges))]
++    if glob.get("_other_edge_indices") != new:
++        glob["_other_edge_indices"] = new
++        _write_json(gpath, glob)
++        changed.append("global.json")
++    for f, p in zip(names, parts):
++        new = [position[(p["id"], j)] for j in range(len(p["edges"]))]
++        if p.get("edge_indices") != new:
++            p["edge_indices"] = new
++            _write_json(os.path.join(pdir, f), p)
++            changed.append("prompts/" + f)
++    print(f"reindex: {len(order)} edges; {len(changed)} file(s) rewritten")
++    for name in changed:
++        print("  " + name)
++
++
+ # ---------- build ----------
+ 
+ def assemble(parts_dir):
+@@ -133,19 +220,12 @@
+              for f in sorted(os.listdir(pdir)) if f.endswith(".json")]
+ 
+     nodes, vocab, routes = list(other_nodes), dict(other_vocab), {}
+-    pairs = list(zip(other_eidx or range(len(other_edges)), other_edges))
+-    nxt = max((i for i, _ in pairs), default=-1) + 1
+     for p in parts:
+         if p.get("node"):
+             nodes.append(p["node"])
+-        ei = p.get("edge_indices") or []
+-        for j, e in enumerate(p["edges"]):
+-            # Known index keeps the original ordering stable; new edges append.
+-            pairs.append((ei[j] if j < len(ei) else nxt, e))
+-            if j >= len(ei):
+-                nxt += 1
+         vocab.update(p.get("state_vocabularies") or {})
+-    edges = [e for _, e in sorted(pairs, key=lambda t: t[0])]
++    INDEX_ERRORS[:] = index_bookkeeping_errors(other_edges, other_eidx, parts)
++    edges = [e for _, _, _, e in ordered_edges(other_edges, other_eidx, parts)]
+     for p in parts:
+         routes[p["id"]] = derive_state_routes(
+             edges, p["id"], p.get("state_route_order"), p.get("state_routes_extra"))
+@@ -187,7 +267,7 @@
+ 
+ def build(parts_dir, out_path, write=True):
+     prologue, obj, epilogue = assemble(parts_dir)
+-    errs = validate(obj)
++    errs = list(INDEX_ERRORS) + validate(obj)
+     if errs:
+         print("VALIDATION FAILED:", file=sys.stderr)
+         for e in errs[:20]:
+@@ -219,7 +299,9 @@
+ 
+ 
+ if __name__ == "__main__":
+-    if len(sys.argv) != 4:
++    COMMANDS = {"split": (split, 2), "build": (build, 2), "verify": (verify, 2),
++                "reindex": (reindex, 1)}
++    if len(sys.argv) < 2 or sys.argv[1] not in COMMANDS \
++            or len(sys.argv) != 2 + COMMANDS[sys.argv[1]][1]:
+         sys.exit(__doc__)
+-    cmd, a, b = sys.argv[1:4]
+-    {"split": split, "build": build, "verify": verify}[cmd](a, b)
++    COMMANDS[sys.argv[1]][0](*sys.argv[2:])
+diff -ruN a/scripts/regenerate_contract.py b/scripts/regenerate_contract.py
+--- a/scripts/regenerate_contract.py	1970-01-01 00:00:00.000000000 +0000
++++ b/scripts/regenerate_contract.py	2026-09-23 23:12:52.628556932 +0000
+@@ -0,0 +1,385 @@
++#!/usr/bin/env python3
++"""Contract regenerator for the 091426.1 direct-handoff contract (spec v2 §6; A1-2).
++
++Maintained in glow-graph-contract (MODIFICATION-20260923-closeout-residuals ITEM-13), moved from
++docs/ephemeral/modifications/evidence/regenerate_contract.py. The two release-bound values are no longer
++held in the value table: `contract_revision` and `pr_development_contract.primary_skill_revision` are
++required arguments of `generate`, so one table serves every revision.
++
++    regenerate(template, graph, graph_bytes, value_table) -> contract
++      1. deep-copy the template T;
++      2. write every mirrored path of §6.2 from the graph build G (42 contract paths + 12 fields x 55 members);
++      3. apply the contract-only value table (§6.3): set, delete (removal) and rename (delete old + set new);
++      4. serialise: json.dumps(indent=2, sort_keys=True, ensure_ascii=False) + "\\n", UTF-8.
++
++No value-table entry may target a mirrored path (checked). The value table is held here, never read from G.
++
++Commands (run with PYTHONDONTWRITEBYTECODE=1):
++  acceptance <base-parts-dir> <builder> <template-contract> <fv-scripts> <scratch>
++        strip every mirrored path from today's contract, regenerate from today's build with an empty value
++        table, require 2b78f877.../606657 B; then the negative control (one changed edge condition).
++  generate <graph-md-or-embedded-json> <template-contract> <oracle-file> <out-contract> [<out-contract> ...]
++           --contract-revision <x.y.z> --primary-skill-revision <x.y.z>
++        write the contract from the build, the §6.3 value table and the two revisions. 4.1.0 / 1.3.0 gives the
++        E2 contract 7a7fd028...; contract_recipe.py adds the D23-E step.
++
++The template is docs/graph/contract-template/gcfpe-20260914.1-091426.1-direct-handoff-contract-4.0.6.json.
++"""
++from __future__ import annotations
++
++import copy
++import hashlib
++import json
++import os
++import re
++import shutil
++import subprocess
++import sys
++
++sys.dont_write_bytecode = True
++
++MEMBER_PAIRS = {  # contract member_registry[id] field <- graph node field (§6.2)
++    "notion_url": "candidate_url",
++    "version": "candidate_version",
++    "title": "title",
++    "lane": "lane",
++    "native_function": "native_function",
++    "receiving_role": "receiving_role",
++    "session_class": "session_class",
++    "r1_mapping": "r1_mapping",
++    "output_artifacts": "output_artifacts",
++    "result_states": "result_states",
++    "predecessor": "predecessor",
++    "graph_predecessor_union_destinations": "predecessor_union_destinations",
++}
++
++TOP_AND_NESTED = [  # (contract path, graph getter) (§6.2)
++    (("selection_status",), lambda g, b: g["selection_status"]),
++    (("route_edges",), lambda g, b: g["edges"]),
++    (("state_routes",), lambda g, b: g["state_routes"]),
++    (("artifact_availability_contract",), lambda g, b: g["artifact_availability_contract"]),
++    (("qa_closure_contract",), lambda g, b: g["qa_closure_contract"]),
++    (("boundary_nodes",), lambda g, b: sorted(g["boundary_nodes"])),
++    (("boundary_transitions",), lambda g, b: g["boundary_transitions"]),
++    (("terminal_contract",), lambda g, b: g["terminal_contract"]),
++    (("post_merge_three_event_contract",), lambda g, b: g["post_merge_three_event_contract"]),
++    (("authoring_context_vocabulary",), lambda g, b: g["state_vocabularies"]["AUTHORING_CONTEXT"]),
++    (("transition_contract", "first_line"), lambda g, b: g["handoff_contract"]["first_line"]),
++    (("transition_contract", "fence_language"), lambda g, b: g["handoff_contract"]["fence_language"]),
++    (("transition_contract", "actual_branch_only"), lambda g, b: g["handoff_contract"]["actual_branch_only"]),
++    (("pf10_addendum_contract", "exact_producer_set"), lambda g, b: g["pf10_addendum_contract"]["exact_producer_set"]),
++    (("pf10_addendum_contract", "exactly_one_per_qualifying_approval"),
++     lambda g, b: g["pf10_addendum_contract"]["exactly_one_per_qualifying_approval"]),
++    (("pf10_addendum_contract", "producer_edits_pf10"), lambda g, b: g["pf10_addendum_contract"]["producer_edits_pf10"]),
++    (("pf10_addendum_contract", "producer_allocates_pf10_number"),
++     lambda g, b: g["pf10_addendum_contract"]["producer_allocates_pf10_number"]),
++    (("pf10_addendum_contract", "producer_claims_canonical_adoption"),
++     lambda g, b: g["pf10_addendum_contract"]["producer_claims_canonical_adoption"]),
++    (("pf10_addendum_contract", "native_outcome_normalization"),
++     lambda g, b: g["pf10_addendum_contract"]["native_outcome_normalization"]),
++    (("pf10_addendum_contract", "never_for"), lambda g, b: g["pf10_addendum_contract"]["never_for"]),
++    (("pr_development_contract", "pr30_result_vocabulary"), lambda g, b: g["state_vocabularies"]["PR-30_RESULT"]),
++    (("pr_development_contract", "pr35_result_vocabulary"), lambda g, b: g["state_vocabularies"]["PR-35_RESULT"]),
++    (("pr_return_phase_contract", "routes"), lambda g, b: g["state_vocabularies"]["PR_RETURN_PHASE"]),
++    (("rescope_contract", "decision_vocabulary"), lambda g, b: g["state_vocabularies"]["RS-20_DECISION"]),
++    (("pr_development_contract", "r1_row"), lambda g, b: g["pr_continuity_contract"]["r1_row"]),
++    (("pr_development_contract", "primary_skill"), lambda g, b: g["pr_continuity_contract"]["primary_skill"]),
++    (("pr_development_contract", "added_boundaries"), lambda g, b: g["pr_continuity_contract"]["adds"]),
++    (("pr_development_contract", "shared_exactly_one"), lambda g, b: g["pr_continuity_contract"]["shared_exactly_one"]),
++    (("pr_development_contract", "invented_session_inspection_endpoint_prohibited"),
++     lambda g, b: g["pr_continuity_contract"]["invented_session_inspection_endpoint_prohibited"]),
++    (("pr_development_contract", "unsupported_platform_limitation_claim_prohibited"),
++     lambda g, b: g["pr_continuity_contract"]["unsupported_platform_limitation_claim_prohibited"]),
++    (("route_graph", "prepublication_rescope"),
++     lambda g, b: g["pr_continuity_contract"]["phase_aware_rescope_sequences"]["PR-30_PREPUBLICATION"]),
++    (("route_graph", "postpublication_pr30_rescope"),
++     lambda g, b: g["pr_continuity_contract"]["phase_aware_rescope_sequences"]["PR-30_POSTPUBLICATION"]),
++    (("route_graph", "pr35_rescope"), lambda g, b: g["pr_continuity_contract"]["phase_aware_rescope_sequences"]["PR-35"]),
++    (("abort_prompt", "id"), lambda g, b: g["abort_contract"]["prompt"]),
++    (("abort_prompt", "invoker"), lambda g, b: g["abort_contract"]["manual_invoker"]),
++    (("abort_prompt", "exact_identified_pr_required"), lambda g, b: g["abort_contract"]["identified_pr_required"]),
++    (("abort_prompt", "prompt_originated_inbound_edges"), lambda g, b: g["abort_contract"]["prompt_inbound_edges"]),
++    (("abort_prompt", "automatic_inbound_edges"), lambda g, b: g["abort_contract"]["automatic_inbound_edges"]),
++    (("graph_proofs", "route_edge_count"), lambda g, b: len(g["edges"])),
++    (("source_snapshot", "frozen_candidate_graph", "sha256"), lambda g, b: hashlib.sha256(b).hexdigest()),
++    (("source_snapshot", "corrected_source_manifest", "sha256"),
++     lambda g, b: g["source_bindings"]["source_manifest_file_sha256"]),
++    (("source_snapshot", "corrected_source_manifest", "source_snapshot_sha256"),
++     lambda g, b: g["source_bindings"]["source_snapshot_sha256"]),
++]
++
++# ---------------------------------------------------------------------------------------------
++# §6.3 contract-only value table. Ops: ("set", path, value) | ("delete", path). A W-8 rename is a
++# delete of the old key plus a set of the new one. SUCCESSOR_ORACLE_SHA256 is the one E2 value
++# (§5.11 step 2); `generate` re-checks it against the oracle file's bytes.
++# ---------------------------------------------------------------------------------------------
++SUCCESSOR_ORACLE_SHA256 = "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52"
++W4 = ("PR-40 is entered on the observed merge event for the identified PR, delivered to the subscribed PR-35 session "
++      "as MERGE_OBSERVED, or, only where no MERGE_OBSERVED result was returned for this merge, on Nathan's assertion "
++      "that he manually merged it.")
++W8_CONTINUATION = ("PR-30 to PR-35 is one lawful phase continuation inside GCF-17 into PR-35's own top-level session, "
++                   "which Nathan creates by pasting PR-30's handoff; not a new work unit, and never a subagent.")
++W8_REPLAN = ("A PR-40 REJECT for an in-scope defect in landed work re-plans through PR-20 in a new top-level session "
++             "that Nathan creates, with a new Proceed for the new plan (D23-F).")
++TC = ("transition_contract",)
++VALUE_TABLE = [
++    # transition_contract (V-6): four deletions, five additions, the 12-entry prohibited list.
++    ("delete", TC + ("status_completed_work_decisions_constraints_unresolved_authority",)),
++    ("delete", TC + ("epic_change_and_work_unit",)),
++    ("delete", TC + ("next_action_and_expected_output",)),
++    ("delete", TC + ("every_required_repository_and_pr_reference",)),
++    ("set", TC + ("artifact_repository_paths_with_labels",), True),
++    ("set", TC + ("pr_reference_when_continuing",), True),
++    ("set", TC + ("exceptional_context_only",), True),
++    ("set", TC + ("no_branch_or_commit",), True),
++    ("set", TC + ("no_restated_artifact_content",), True),
++    ("set", TC + ("prohibited_references",), [
++        "Library ID", "unlinked filename", "above", "conversation reconstruction",
++        "model/strength/reasoning/eligibility/suitability/account/configuration route",
++        "branch", "commit", "restated artifact content",
++        "menu", "metadata-only summary", "blank form", "placeholder after publication"]),
++    # receiver_compatibility (V-5): all seven receivers.
++    ("set", ("receiver_compatibility",), {
++        "PR-20": {"accepted_inputs": ["PR_INSTRUCTION", "PR-40:PR_WORK_UNIT_LINEAGE_REVIEW:REJECT"],
++                  "earlier_cycle_pr_is_landed_history": True, "existing_work_unit_replan": True,
++                  "new_proceed_for_new_plan": True, "new_top_level_session_created_by_nathan": True},
++        "PR-30": {"accepted_contexts": ["PROCEEDED_PREPUBLICATION", "OPEN_PR_POSTPUBLICATION_RECOVERY"],
++                  "accepted_final_replay": False, "delta_in_force_from_turn_after_addendum_created": True,
++                  "overlay_approvals": ["RS-20:APPROVE", "ESC-40:APPROVE", "IA-30:QUALIFYING_DELTA_APPROVE"]},
++        "PR-35": {"context": "SAME_PR_WORK_UNIT_AFTER_INITIAL_PUBLICATION", "dedicated_top_level_pr35_session": True,
++                  "same_workspace_worktree_branch_open_pr_original_proceed": True},
++        "PR-40": {"attribution_skill_read_only": True,
++                  "entry_fact": "MERGE_OBSERVED_OR_NATHAN_ASSERTION_WHERE_NO_MERGE_OBSERVED",
++                  "independent_actual_merged_state_and_landed_lineage_verification": True,
++                  "prior_merge_pending_is_historical_premerge_evidence": True},
++        "RS-20": {"accepted_inputs": ["RESCOPE_REQUEST", "RESCOPE_PROPOSAL"], "bounded_implementation_delta_only": True,
++                  "decision_owner": "SAME_WHOLE_CHANGE_IA"},
++        "RS-30": {"invented_ia_denial": False, "same_artifact_type_author_and_decision_owner": True},
++        "RS-40": {"accepted_approval": "RS-20:RESCOPE_REVIEW:APPROVE", "contexts": ["PR-30_POSTPUBLICATION", "PR-35"],
++                  "delta_in_force_from_turn_after_addendum_created": True, "original_proceed": True,
++                  "requires_existing_open_pr": True},
++    }),
++    # route_graph (V-4, C8): contract-only keys; the three rescope sequences are mirrored.
++    ("set", ("route_graph", "ordinary_pr_work_unit"), ["PR-10", "PR-20", "NATHAN_PROCEED", "PR-30", "PR-35", "PR-40"]),
++    ("set", ("route_graph", "pr35_merge_pending_fallback"), ["PR-35", "NATHAN_MANUAL_MERGE_ASSERTION", "PR-40"]),
++    ("set", ("route_graph", "pr40_reject_replan"), ["PR-40", "PR-20", "NATHAN_PROCEED", "PR-30"]),
++    # route_graph_semantics (W-4, W-8): rename + two values.
++    ("delete", ("route_graph_semantics", "same_session_phase_continuation")),
++    ("set", ("route_graph_semantics", "pr30_to_pr35_phase_continuation"), W8_CONTINUATION),
++    ("set", ("route_graph_semantics", "pr40_entry"), W4),
++    ("set", ("route_graph_semantics", "pr40_reject_replan"), W8_REPLAN),
++    # pr_development_contract contract-only fields (A1-6, W-8).
++    ("set", ("pr_development_contract", "pr30_ownership"), [
++        "recovery", "implementation", "local testing", "coherent commit creation",
++        "deliberate initial publication", "complete PR-35 handoff to the dedicated PR-35 session"]),
++    # rescope_contract.preserved_lineage[1] (sweep:10).
++    ("set", ("rescope_contract", "preserved_lineage"), [
++        "PR_RETURN_PHASE", "PR_PHASE_SESSION", "WORKSPACE", "WORKTREE", "BRANCH", "OPEN_PR_WHEN_ONE_EXISTS", "COMMIT",
++        "ORIGINAL_PROCEED", "COMPLETED_WORK", "TESTS", "REVIEWS", "CI_STATE", "DECISION", "ARTIFACTS",
++        "UNRESOLVED_WORK"]),
++    # protected identities and graph proofs (A1-2, V-7).
++    ("set", ("protected_identities", "r1_oracle_changed"), True),
++    ("set", ("protected_identities", "r1_oracle_sha256"), SUCCESSOR_ORACLE_SHA256),
++    ("set", ("graph_proofs", "protected_r1_46_rows_unchanged"), False),
++    # §12 OQ-14 / §5.8: the historical oracle and map filenames join the non-executable references.
++    ("set", ("historical_non_executable_references",), [
++        "integrated-qa-readiness-correction.json", "final-cycle-scan-extension.json",
++        "alpha-feedback-correction.json", "strength-analyzer-middleware-correction.json",
++        "epic-alpha-repair-correction.json", "epic-reengineering-correction.json",
++        "glow-hde-canonical-change-flow-r1.json", "glow-hde-canonical-change-flow-r1-runtime-map.json"]),
++]
++
++
++REVISION_RE = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
++
++
++def revision_ops(contract_revision: str, primary_skill_revision: str) -> list[tuple]:
++    """The two release-bound values, supplied by the caller and never defaulted (ITEM-13, PART-01).
++
++    Until 2026-09-23 they were the table's "4.1.0" and "1.3.0" entries; those arguments still reproduce the E2
++    contract byte for byte."""
++    for value in (contract_revision, primary_skill_revision):
++        assert REVISION_RE.fullmatch(value), f"not a x.y.z revision: {value!r}"
++    return [("set", ("contract_revision",), contract_revision),
++            ("set", ("pr_development_contract", "primary_skill_revision"), primary_skill_revision)]
++
++
++def mirrored_paths(graph: dict) -> list[tuple]:
++    paths = [p for p, _ in TOP_AND_NESTED]
++    for node in graph["nodes"]:
++        for field in MEMBER_PAIRS:
++            paths.append(("member_registry", node["id"], field))
++    return paths
++
++
++def _set(obj: dict, path: tuple, value) -> None:
++    for key in path[:-1]:
++        obj = obj.setdefault(key, {})
++    obj[path[-1]] = copy.deepcopy(value)
++
++
++def _delete(obj: dict, path: tuple) -> None:
++    for key in path[:-1]:
++        obj = obj[key]
++    del obj[path[-1]]
++
++
++def _overlaps(a: tuple, b: tuple) -> bool:
++    n = min(len(a), len(b))
++    return a[:n] == b[:n]
++
++
++def strip(contract: dict, graph: dict) -> dict:
++    out = copy.deepcopy(contract)
++    for path in mirrored_paths(graph):
++        _delete(out, path)
++    return out
++
++
++def regenerate(template: dict, graph: dict, graph_bytes: bytes, value_table=()) -> dict:
++    out = copy.deepcopy(template)
++    assert "PF10_POST_DRAIN_VERIFICATION" not in graph["state_vocabularies"], "retired drainage vocabulary in graph"
++    assert "pf10_post_drain_verification" not in out, "retired drainage key in template"
++    mirrored = mirrored_paths(graph)
++    for op in value_table:
++        assert op[1][0] != "member_registry" and not any(_overlaps(op[1], m) for m in mirrored), \
++            f"value-table entry targets a mirrored path: {op[1]}"
++    for path, get in TOP_AND_NESTED:
++        _set(out, path, get(graph, graph_bytes))
++    for node in graph["nodes"]:
++        for field, gfield in MEMBER_PAIRS.items():
++            _set(out, ("member_registry", node["id"], field), node[gfield])
++    for op in value_table:
++        if op[0] == "set":
++            _set(out, op[1], op[2])
++        elif op[0] == "delete":
++            _delete(out, op[1])
++        else:
++            raise ValueError(op)
++    assert set(out["member_registry"]) == {n["id"] for n in graph["nodes"]}, "member set != graph node set"
++    return out
++
++
++def serialise(contract: dict) -> bytes:
++    return (json.dumps(contract, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
++
++
++def graph_block(path: str) -> bytes:
++    """§6.1 input 1: embedded JSON of a graph_parts.py build (or an already-extracted block)."""
++    raw = open(path, encoding="utf-8").read()
++    if raw.lstrip().startswith("{"):
++        return raw.encode("utf-8")
++    lines = raw.split("\n")
++    start = next(i for i, line in enumerate(lines) if line == "```json")
++    end = max(i for i, line in enumerate(lines) if line == "```")
++    return ("\n".join(lines[start + 1:end]) + "\n").encode("utf-8")
++
++
++def _build(builder: str, parts: str, out_md: str) -> tuple[dict, bytes, str]:
++    r = subprocess.run([sys.executable, builder, "build", parts, out_md], capture_output=True, text=True,
++                       env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
++    assert r.returncode == 0 and "WARNING" not in r.stdout + r.stderr, r.stdout + r.stderr
++    b = graph_block(out_md)
++    return json.loads(b), b, " | ".join(r.stdout.split("\n")).strip()
++
++
++def acceptance(base_parts: str, builder: str, template_path: str, fv_scripts: str, scratch: str) -> int:
++    sys.path.insert(0, fv_scripts)
++    import validate_gcfpe_20260914 as V  # noqa: E402
++    target_sha, target_bytes = "2b78f877e7a31efb2da8488d7f129794e60bcbdbf9f43e9851a319f83f06b53b", 606657
++    os.makedirs(scratch, exist_ok=True)
++    t_bytes = open(template_path, "rb").read()
++    assert hashlib.sha256(t_bytes).hexdigest() == target_sha
++    contract = json.loads(t_bytes)
++    rep: dict = {}
++    g0, b0, rep["build_today"] = _build(builder, base_parts, os.path.join(scratch, "graph_today.md"))
++    rep["build_today_bytes_sha256"] = [len(b0), hashlib.sha256(b0).hexdigest()]
++    paths = mirrored_paths(g0)
++    rep["mirrored_paths"] = [len(paths), sum(1 for p in paths if p[0] != "member_registry"),
++                             sum(1 for p in paths if p[0] == "member_registry")]
++    stripped = strip(contract, g0)
++    sb = serialise(stripped)
++    rep["stripped_template"] = [len(sb), hashlib.sha256(sb).hexdigest()]
++    rep["noop_on_stripped_equals_target"] = hashlib.sha256(sb).hexdigest() == target_sha
++    regen = regenerate(stripped, g0, b0)
++    out = serialise(regen)
++    rep["regenerated"] = [len(out), hashlib.sha256(out).hexdigest()]
++    rep["ACCEPTANCE_PASS"] = hashlib.sha256(out).hexdigest() == target_sha and len(out) == target_bytes
++    rep["validate_graph_contract"] = V.validate_graph_contract(regen, g0)
++    rep["validate_contract"] = V.validate_contract(regen)
++    rep["routing_surface"] = list(V.routing_surface(regen))
++    lo = []
++    for i in range(len(TOP_AND_NESTED)):
++        saved = TOP_AND_NESTED[:]
++        del TOP_AND_NESTED[i]
++        try:
++            if hashlib.sha256(serialise(regenerate(stripped, g0, b0))).hexdigest() == target_sha:
++                lo.append(".".join(saved[i][0]))
++        finally:
++            TOP_AND_NESTED[:] = saved
++    saved_pairs = dict(MEMBER_PAIRS)
++    for f in list(saved_pairs):
++        MEMBER_PAIRS.pop(f)
++        try:
++            if hashlib.sha256(serialise(regenerate(stripped, g0, b0))).hexdigest() == target_sha:
++                lo.append("member_registry.*." + f)
++        finally:
++            MEMBER_PAIRS.clear(); MEMBER_PAIRS.update(saved_pairs)
++    rep["leave_one_out_not_load_bearing"] = lo
++    # Negative control: one changed edge condition in a scratch copy of the parts.
++    neg = os.path.join(scratch, "parts_neg")
++    shutil.rmtree(neg, ignore_errors=True)
++    shutil.copytree(base_parts, neg)
++    p10 = os.path.join(neg, "prompts", "PR-10.json")
++    part = json.load(open(p10, encoding="utf-8"))
++    hits = 0
++    for e in part["edges"]:
++        for br in e["route_branches"]:
++            if br["branch_id"] == "material_boundary" and e["to"] == "RS-10":
++                br["condition"] += " (negative control)"
++                hits += 1
++    assert hits == 1
++    open(p10, "w", encoding="utf-8").write(json.dumps(part, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
++    g1, b1, rep["neg_build"] = _build(builder, neg, os.path.join(scratch, "graph_neg.md"))
++    rep["neg_build_bytes_sha256"] = [len(b1), hashlib.sha256(b1).hexdigest()]
++    regen1 = regenerate(stripped, g1, b1)
++    rep["neg_changed_top_level_keys"] = sorted(k for k in set(regen) | set(regen1) if regen.get(k) != regen1.get(k))
++    rep["neg_regenerated_vs_new_graph"] = V.validate_graph_contract(regen1, g1)
++    rep["neg_stale_contract_vs_new_graph"] = V.validate_graph_contract(contract, g1)
++    rep["neg_routing_surface"] = list(V.routing_surface(regen1))
++    rep["NEGATIVE_CONTROL_PASS"] = (rep["neg_regenerated_vs_new_graph"] == []
++                                    and rep["neg_stale_contract_vs_new_graph"] != [])
++    print(json.dumps(rep, indent=1))
++    return 0 if rep["ACCEPTANCE_PASS"] and rep["NEGATIVE_CONTROL_PASS"] and not lo else 1
++
++
++def generate(graph_path: str, template_path: str, oracle_path: str, outs: list[str],
++             contract_revision: str, primary_skill_revision: str) -> int:
++    gb = graph_block(graph_path)
++    g = json.loads(gb)
++    assert hashlib.sha256(open(oracle_path, "rb").read()).hexdigest() == SUCCESSOR_ORACLE_SHA256, "oracle digest"
++    assert g["protected_identities"]["r1_oracle_sha256"] == SUCCESSOR_ORACLE_SHA256, "graph G16 not applied"
++    t = json.loads(open(template_path, "rb").read())
++    out = serialise(regenerate(t, g, gb, VALUE_TABLE + revision_ops(contract_revision, primary_skill_revision)))
++    for p in outs:
++        open(p, "wb").write(out)
++    print(json.dumps({"graph": [len(gb), hashlib.sha256(gb).hexdigest()],
++                      "contract": [len(out), hashlib.sha256(out).hexdigest()], "written": outs}, indent=1))
++    return 0
++
++
++if __name__ == "__main__":
++    if len(sys.argv) < 2:
++        raise SystemExit(__doc__)
++    if sys.argv[1] == "acceptance":
++        raise SystemExit(acceptance(*sys.argv[2:7]))
++    if sys.argv[1] == "generate":
++        import argparse
++        ap = argparse.ArgumentParser(prog="regenerate_contract.py generate")
++        ap.add_argument("graph"); ap.add_argument("template"); ap.add_argument("oracle")
++        ap.add_argument("outs", nargs="+")
++        ap.add_argument("--contract-revision", required=True)
++        ap.add_argument("--primary-skill-revision", required=True)
++        a = ap.parse_args(sys.argv[2:])
++        raise SystemExit(generate(a.graph, a.template, a.oracle, a.outs, a.contract_revision, a.primary_skill_revision))
++    raise SystemExit(__doc__)
+diff -ruN a/scripts/registry_deriver.py b/scripts/registry_deriver.py
+--- a/scripts/registry_deriver.py	1970-01-01 00:00:00.000000000 +0000
++++ b/scripts/registry_deriver.py	2026-09-23 23:12:52.628836916 +0000
+@@ -0,0 +1,99 @@
++#!/usr/bin/env python3
++"""The registry deriver: the D13-derived fields of every registry row, checked against the graph parts.
++
++Extracted from the section 7.5 rule of docs/ephemeral/modifications/evidence/e1_registry_apply.py
++(execution spec v2, 7.5; MODIFICATION-20260923-closeout-residuals ITEM-13). For each registry row r and
++its part P = <parts-dir>/prompts/<r.prompt_key>.json:
++
++    derived = sorted({e["to"] for e in P["edges"] if e["to_kind"] == "prompt" and e["to"] != P["id"]})
++    r["required_interfaces"] == derived                              # list equality
++    union of r["outputs"][*]["consumers"] == set(derived)            # union over outputs (IA-40 has two)
++    union of r["outputs"][*]["states"] == set(P["node"]["result_states"])
++
++The registry is read with the governance-audit skill's own load_data, imported from the skill directory
++given, so the two never parse it differently. This script never writes the registry; a registry edit is
++made line-anchored in a pull request.
++
++usage: PYTHONDONTWRITEBYTECODE=1 python3 registry_deriver.py <amthor-workspace-governance-audit-dir>
++       <registry.md> <parts-dir> [--derive]
++exit 0 when no row drifts, 1 when any does, 2 on unusable input.
++"""
++import argparse
++import importlib.util
++import json
++import os
++import sys
++
++sys.dont_write_bytecode = True
++
++
++def load_data_from(audit_root):
++    script = os.path.join(audit_root, "scripts", "audit_workspace_governance.py")
++    if not os.path.isfile(script):
++        sys.exit(f"registry_deriver: no governance-audit script at {script}")
++    spec = importlib.util.spec_from_file_location("audit_workspace_governance", script)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module.load_data
++
++
++def load_parts(parts_dir):
++    pdir = os.path.join(parts_dir, "prompts")
++    parts = {}
++    for name in sorted(os.listdir(pdir)):
++        if name.endswith(".json"):
++            part = json.load(open(os.path.join(pdir, name), encoding="utf-8"))
++            parts[part["id"]] = part
++    return parts
++
++
++def derive(part):
++    """The values section 7.5 derives for one row: consumers written sorted, states in ASCII order."""
++    interfaces = sorted({e["to"] for e in part["edges"]
++                         if e.get("to_kind") == "prompt" and e["to"] != part["id"]})
++    return {"required_interfaces": interfaces, "consumers": interfaces,
++            "states": sorted(part["node"]["result_states"])}
++
++
++def drift(registry, parts):
++    """Rows whose derived fields disagree with their part, in registry order."""
++    out, missing = [], []
++    for row in registry["prompts"]:
++        key = row["prompt_key"]
++        if key not in parts:
++            missing.append(key)
++            continue
++        want = derive(parts[key])
++        outputs = row.get("outputs") or []
++        consumers = {c for o in outputs for c in (o.get("consumers") or [])}
++        states = {s for o in outputs for s in (o.get("states") or [])}
++        if (row.get("required_interfaces") != want["required_interfaces"]
++                or consumers != set(want["consumers"]) or states != set(want["states"])):
++            out.append(key)
++    return out, missing
++
++
++def main():
++    ap = argparse.ArgumentParser(prog="registry_deriver.py")
++    ap.add_argument("audit_root", help="the amthor-workspace-governance-audit skill directory")
++    ap.add_argument("registry", help="project-prompt-contract-registry.md")
++    ap.add_argument("parts_dir", help="docs/graph/parts")
++    ap.add_argument("--derive", action="store_true", help="also print the values each drifting row must carry")
++    args = ap.parse_args()
++    registry = load_data_from(args.audit_root)(args.registry)
++    if not isinstance(registry, dict) or not isinstance(registry.get("prompts"), list):
++        print(json.dumps({"error": "registry has no prompts list"}))
++        return 2
++    parts = load_parts(args.parts_dir)
++    rows, missing = drift(registry, parts)
++    report = {"rows": len(registry["prompts"]), "parts": len(parts), "drift": rows, "rows_without_part": missing}
++    if args.derive:
++        report["derived"] = {key: derive(parts[key]) for key in rows}
++    print(json.dumps(report, indent=1, ensure_ascii=False))
++    if missing:
++        return 2
++    return 1 if rows else 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

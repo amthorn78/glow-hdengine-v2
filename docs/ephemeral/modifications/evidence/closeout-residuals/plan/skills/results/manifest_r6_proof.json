@@ -1,0 +1,7 @@
+{
+ "what": "PLAN test of the manifest commands repair round 6 changed or added (P-100 to P-102), 2026-09-24, main session, in the PLAN scratchpad",
+ "execute.4b packages_json.py": "run on seven archives cut from the pass-4 patched root: exit 0, seven lines; see brief_fill_proof.json",
+ "execute.5": "run with the pass-4 patched root standing in for $INST and a scratch EX: seven freeze lines written to installed_freeze.txt, diff against expected_after_patch.txt exits 0",
+ "execute.6": "run on the working tree (HEAD de3d3d5): the closure loop exits 0 (450 lines), and the diff against ANALYZE-closure.md's fenced block exits 0",
+ "not_rerun": "the round-5 \u00a79-order proof (gate_proof_x.json) ran the round-5 manifest; the three changes above are tested here, and no other command changed"
+}

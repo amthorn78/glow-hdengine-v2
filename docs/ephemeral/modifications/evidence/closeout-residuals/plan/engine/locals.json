@@ -1,0 +1,673 @@
+{
+ "CF-C-10": [
+  {
+   "id": "LCF-C-10-1",
+   "item": "ITEM-26 (R-26-FRAME, self-recovery package)",
+   "section": "Required result and routing",
+   "anchor": "carries the original CLASS_SELECTION_REF, source references, exact omission, preserved analysis, and correction required",
+   "action": "replace",
+   "new_text": "names CLASS_SELECTION_REF, SOURCE_REF and the BLOCKED kickoff artifact by repository path; the artifacts hold the rest",
+   "why": "This is the frame target the R-26-FRAME notes give for CF-C-10. The BLOCKED SPECIFICATION_KICKOFF records the omission, analysis and correction ('state: BLOCKED with the exact blocker and owner'). The final period stays outside the anchor. Result: 'That recovery package names CLASS_SELECTION_REF, SOURCE_REF and the BLOCKED kickoff artifact by repository path; the artifacts hold the rest.'"
+  },
+  {
+   "id": "LCF-C-10-2",
+   "item": "ITEM-26 (R-26-FRAME, CF-PO-10 unresolved-class package)",
+   "section": "Required result and routing",
+   "anchor": "with the preserved source/change facts; CF-PO-10 requests",
+   "action": "replace",
+   "new_text": "naming SOURCE_REF and the BLOCKED kickoff artifact by repository path; the artifacts hold the rest. CF-PO-10 requests",
+   "why": "Follows the fix hint: keep the UNRESOLVED_CLASSIFICATION_CASE label, which marks the condition, and name SOURCE_REF and the BLOCKED kickoff by path instead of the facts they hold. Result: '... carry an UNRESOLVED_CLASSIFICATION_CASE naming SOURCE_REF and the BLOCKED kickoff artifact by repository path; the artifacts hold the rest. CF-PO-10 requests Nathan's exact decision and must return terminally if it remains unavailable.'"
+  }
+ ],
+ "CF-E-10": [
+  {
+   "id": "LCF-E-10-1",
+   "item": "ITEM-26 (R-26-FRAME, self-recovery package)",
+   "section": "Required result and routing",
+   "anchor": "carries the original CLASS_SELECTION_REF, source references, exact omission, preserved analysis, and correction required",
+   "action": "replace",
+   "new_text": "names CLASS_SELECTION_REF, SOURCE_REF and the BLOCKED kickoff artifact by repository path; the artifacts hold the rest",
+   "why": "Same text as CF-C-10 (twin rule). The BLOCKED kickoff records the omission, analysis and correction."
+  },
+  {
+   "id": "LCF-E-10-2",
+   "item": "ITEM-26 (R-26-FRAME, CF-PO-10 unresolved-class package)",
+   "section": "Required result and routing",
+   "anchor": "with the preserved source/change facts; CF-PO-10 requests",
+   "action": "replace",
+   "new_text": "naming SOURCE_REF and the BLOCKED kickoff artifact by repository path; the artifacts hold the rest. CF-PO-10 requests",
+   "why": "Same text as CF-C-10 (twin rule). It keeps the case label and names the artifacts that hold the source and change facts."
+  }
+ ],
+ "CF-C-20": [
+  {
+   "id": "LCF-C-20-1",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-C-30), 1 of 2",
+   "section": "Required result and routing",
+   "anchor": "The direct package contains the exact pending Specification, class/change lineage, relevant kickoff decision/evidence,",
+   "action": "replace",
+   "new_text": "The direct package names, by repository path, the exact pending Specification, the kickoff,",
+   "why": "Follows the fix hint: name the pending Specification, the kickoff and the required sources by path, and drop the lineage and decision restatement. The original ' and current sources only when ...' follows unchanged, and edit 2 closes the sentence."
+  },
+  {
+   "id": "LCF-C-20-2",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-C-30), 2 of 2",
+   "section": "Required result and routing",
+   "anchor": "current sources only when they actually exist and the review requires them",
+   "action": "insert_after",
+   "new_text": "; the artifacts hold the rest",
+   "why": "Adds the frame's fixed close. Anchor does not overlap edit 1. Result: 'The direct package names, by repository path, the exact pending Specification, the kickoff and current sources only when they actually exist and the review requires them; the artifacts hold the rest.'"
+  },
+  {
+   "id": "LCF-C-20-3",
+   "item": "ITEM-26 (R-26-FRAME, recovery to CF-C-10)",
+   "section": "Required result and routing",
+   "anchor": "carries the original kickoff link, exact defect, class/change lineage, and all recoverable source/selection evidence",
+   "action": "replace",
+   "new_text": "names the original kickoff and all recoverable source/selection evidence by repository path, with the exact defect as minimum context only where no named artifact records it; the artifacts hold the rest",
+   "why": "Follows the fix hint: name the kickoff and the evidence artifacts by path, with the defect only if no artifact records it (C-HANDOFF 'only for a condition those artifacts do not already record'). Result: 'That recovery names the original kickoff ... the artifacts hold the rest.'"
+  }
+ ],
+ "CF-E-20": [
+  {
+   "id": "LCF-E-20-1",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-E-30), 1 of 2",
+   "section": "Required result and routing",
+   "anchor": "The direct package contains the exact pending Specification, class/change lineage, relevant kickoff decision/evidence,",
+   "action": "replace",
+   "new_text": "The direct package names, by repository path, the exact pending Specification, the kickoff,",
+   "why": "Same text as CF-C-20 (twin rule)."
+  },
+  {
+   "id": "LCF-E-20-2",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-E-30), 2 of 2",
+   "section": "Required result and routing",
+   "anchor": "current sources only when they actually exist and the review requires them",
+   "action": "insert_after",
+   "new_text": "; the artifacts hold the rest",
+   "why": "Same text as CF-C-20 (twin rule). Anchor does not overlap edit 1."
+  },
+  {
+   "id": "LCF-E-20-3",
+   "item": "ITEM-26 (R-26-FRAME, recovery to CF-E-10)",
+   "section": "Required result and routing",
+   "anchor": "carries the original kickoff link, exact defect, class/change lineage, and all recoverable source/selection evidence",
+   "action": "replace",
+   "new_text": "names the original kickoff and all recoverable source/selection evidence by repository path, with the exact defect as minimum context only where no named artifact records it; the artifacts hold the rest",
+   "why": "Same text as CF-C-20 (twin rule)."
+  }
+ ],
+ "CF-C-30": [
+  {
+   "id": "LCF-C-30-1",
+   "item": "ITEM-26/27 (R-26-FRAME, package to IA-10), 1 of 3",
+   "section": "Required result and routing",
+   "anchor": "The complete package carries the exact approved Specification",
+   "action": "replace",
+   "new_text": "The complete package names the exact approved Specification",
+   "why": "Changes the carry verb to C-HANDOFF's naming verb. 'and Thoth decision by repository path' follows unchanged."
+  },
+  {
+   "id": "LCF-C-30-2",
+   "item": "ITEM-26/27 (R-26-FRAME, package to IA-10), 2 of 3",
+   "section": "Required result and routing",
+   "anchor": "path, class/change and approval lineage, the carried conflict register, actual existing source/repository/access facts, and the",
+   "action": "replace",
+   "new_text": "path, and the",
+   "why": "Follows the fix hint: drop the lineage, the register and the restated source/repository/access facts. The approved Specification holds the register, as R-A2g expects for IA-10's intake, and IA-10 resolves its own sources, as the next sentence already says."
+  },
+  {
+   "id": "LCF-C-30-3",
+   "item": "ITEM-26/27 (R-26-FRAME, package to IA-10), 3 of 3",
+   "section": "Required result and routing",
+   "anchor": "required IA/session binding or its truthful unassigned state",
+   "action": "insert_after",
+   "new_text": "; the artifacts hold the rest",
+   "why": "Adds the frame close. The IA-10 receiving role and session binding (C-HANDOFF 'the receiving role and session') is kept. Result: 'The complete package names the exact approved Specification and Thoth decision by repository path, and the required IA/session binding or its truthful unassigned state; the artifacts hold the rest.' Anchor does not overlap edit 2."
+  }
+ ],
+ "CF-E-30": [
+  {
+   "id": "LCF-E-30-1",
+   "item": "ITEM-26/27 (R-26-FRAME, package to IA-10), 1 of 3",
+   "section": "Required result and routing",
+   "anchor": "The complete package carries the exact approved Specification",
+   "action": "replace",
+   "new_text": "The complete package names the exact approved Specification",
+   "why": "Same text as CF-C-30 (twin rule)."
+  },
+  {
+   "id": "LCF-E-30-2",
+   "item": "ITEM-26/27 (R-26-FRAME, package to IA-10), 2 of 3",
+   "section": "Required result and routing",
+   "anchor": "path, class/change and approval lineage, the carried conflict register, actual existing source/repository/access facts, and the",
+   "action": "replace",
+   "new_text": "path, and the",
+   "why": "Same text as CF-C-30 (twin rule)."
+  },
+  {
+   "id": "LCF-E-30-3",
+   "item": "ITEM-26/27 (R-26-FRAME, package to IA-10), 3 of 3",
+   "section": "Required result and routing",
+   "anchor": "required IA/session binding or its truthful unassigned state",
+   "action": "insert_after",
+   "new_text": "; the artifacts hold the rest",
+   "why": "Same text as CF-C-30 (twin rule)."
+  }
+ ],
+ "CF-C-40": [
+  {
+   "id": "LCF-C-40-1",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-C-30), 1 of 3",
+   "section": "Required result and routing",
+   "anchor": "The direct package contains the exact produced artifact and application record",
+   "action": "replace",
+   "new_text": "The direct package states the actual mode and names, by repository path, the exact produced artifact and application record",
+   "why": "Follows the fix hint: name the produced artifact, the application record and the prior redline or assessment by path, with the review mode. The mode is kept as the routing label the next sentence relies on (APPROVED_BASE_FIRST_DELTA_AUTHORING returns as APPROVED_BASE_DELTA_REVIEW)."
+  },
+  {
+   "id": "LCF-C-40-2",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-C-30), 2 of 3",
+   "section": "Required result and routing",
+   "anchor": "actual mode, class/change/base lineage, and current",
+   "action": "replace",
+   "new_text": "and current",
+   "why": "Drops the class/change/base lineage. The mode moved to the start of the sentence in edit 1."
+  },
+  {
+   "id": "LCF-C-40-3",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-C-30), 3 of 3",
+   "section": "Required result and routing",
+   "anchor": "PF10/overlay links only when the branch requires them",
+   "action": "insert_after",
+   "new_text": "; the artifacts hold the rest",
+   "why": "Adds the frame close. Anchor does not overlap edit 2. Result: 'The direct package states the actual mode and names, by repository path, the exact produced artifact and application record, the prior decision/redlines or correction assessment, and current PF10/overlay links only when the branch requires them; the artifacts hold the rest.'"
+  }
+ ],
+ "CF-E-40": [
+  {
+   "id": "LCF-E-40-1",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-E-30), 1 of 3",
+   "section": "Required result and routing",
+   "anchor": "The direct package contains the exact produced artifact and application record",
+   "action": "replace",
+   "new_text": "The direct package states the actual mode and names, by repository path, the exact produced artifact and application record",
+   "why": "Same text as CF-C-40 (twin rule)."
+  },
+  {
+   "id": "LCF-E-40-2",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-E-30), 2 of 3",
+   "section": "Required result and routing",
+   "anchor": "actual mode, class/change/base lineage, and current",
+   "action": "replace",
+   "new_text": "and current",
+   "why": "Same text as CF-C-40 (twin rule)."
+  },
+  {
+   "id": "LCF-E-40-3",
+   "item": "ITEM-26 (R-26-FRAME, direct package to CF-E-30), 3 of 3",
+   "section": "Required result and routing",
+   "anchor": "PF10/overlay links only when the branch requires them",
+   "action": "insert_after",
+   "new_text": "; the artifacts hold the rest",
+   "why": "Same text as CF-C-40 (twin rule)."
+  }
+ ],
+ "GCFPE-MGMT-10": [],
+ "GCFPE-MGMT-10-PROPOSED": [
+  {
+   "id": "LGCFPE-MGMT-10-PROPOSED-1",
+   "item": "ITEM-23 (R-ITEM23 companion: stale preamble sentence)",
+   "section": "(page preamble, above the first ---)",
+   "anchor": "are left unstamped on purpose — those are set when the register promotes it",
+   "action": "replace",
+   "new_text": "are not lines of this body, because bodies carry no release-bound header line (`D23-G`); the register records its version at promotion",
+   "why": "R-ITEM23's notes call for a LOCAL edit here, so that once the two label lines go the preamble does not promise them. The new text converges on C-VERSION ('Bodies carry no release-bound header line.'). The line still begins with a backticked label and has no colon after it, so neither R-ITEM23's pattern nor ITEM-40's gate matches it. Result: '`Prompt version` and `Ecosystem release` are not lines of this body, because bodies carry no release-bound header line (`D23-G`); the register records its version at promotion, and inventing them here would be putting a release decision in a prompt body.'"
+  }
+ ],
+ "UTIL-10": [],
+ "CL-20": [
+  {
+   "id": "LCL-20-1",
+   "item": "ITEM-26 (R-26-FRAME site: CL-30 route)",
+   "section": "Next step and recovery",
+   "anchor": "carrying the exact qualified condition, lineage, evidence, owner, gates",
+   "action": "replace",
+   "new_text": "naming the positive closure decision and the `POST_CLOSURE_RECORD`, which records the exact qualified condition, by repository path; the artifacts hold the rest.",
+   "why": "Span: from the anchor to the end of its sentence. The kept subject is the sentence's opening, naming the conditional ADR route to CL-30. The original names no artifact, so the names come from this body's Inputs and Required result, following the finding's fix hint. Per C-HANDOFF and C-PLACE."
+  }
+ ],
+ "CL-30": [
+  {
+   "id": "LCL-30-1",
+   "item": "ITEM-26 (R-26-FRAME site; also the census A2 borderline 'existing ADR/conflict history' carriage)",
+   "section": "Next step and recovery",
+   "anchor": "Carry the complete candidate, positive closure and architecture-decision lineage",
+   "action": "replace",
+   "new_text": "Name the complete `ADR_CANDIDATE` and the positive closure decision by repository path; the artifacts hold the rest.",
+   "why": "Span: from the anchor to the end of its sentence (regex: Carry the complete candidate, positive closure[^.\\n]*\\.). Follows the fix hint 'name ADR_CANDIDATE and the closure decision by repository path'. ADR_CANDIDATE already holds the target, owner, history and pending state (Required result, C-ART). CL-30's own intake list (## Inputs) stays (NOT_REAL); the outgoing 'Complete ADR candidate' package's input list is the second A2 carrier, owned by LCL-30-2 (DECISIONS P-18)."
+  },
+  {
+   "id": "LCL-30-2",
+   "item": "ITEM-27 (A2, DECISIONS P-18: second census A2 carrier)",
+   "section": "Direct native branch packages / Complete ADR candidate",
+   "anchor": "; existing ADR/conflict history;",
+   "action": "replace",
+   "new_text": ";",
+   "why": "P-18: the outgoing ADR package's 'Inputs and lineage' list drops only its conflict-history item, as R-A2g does elsewhere; the named `ADR_CANDIDATE` and the positive closure decision it keeps hold that history (C-ART, C-HANDOFF). Span: anchor only; unique in the body before and after LCL-30-1 (the Next-step sentence uses commas). CL-30's own intake list (## Inputs) and its Carried Canon-conflict register section stay (NOT_REAL). Guard: forbidden `decision lineage; existing ADR/conflict history` on CL-30's row."
+  }
+ ],
+ "CL-40": [],
+ "CL-C-10": [
+  {
+   "id": "LCL-C-10-1",
+   "item": "ITEM-26 (R-26-FRAME site: CL-20 route)",
+   "section": "Next step and recovery",
+   "anchor": "Carry exact CRD Specification, Implementation Plan/review, final accepted PR/Ops/documentation",
+   "action": "replace",
+   "new_text": "Name the `CHANGE_CLOSURE_DECISION` and each already-produced addendum by repository path; the artifacts hold the rest.",
+   "why": "Span: from the anchor to the end of its sentence (regex: Carry exact CRD Specification[^.\\n]*\\.). Uses the fix hint's own words. CHANGE_CLOSURE_DECISION already holds the upstream evidence, delivered-scope disposition, retrospective/RCA synthesis, open findings and Isis session/time (Required result). The sentence before it and the CL-40 sentence after it stay. The CL-E-10 twin takes the same text."
+  },
+  {
+   "id": "LCL-C-10-2",
+   "item": "ITEM-26 (R-26-FRAME site: package rule)",
+   "section": "Next step and recovery",
+   "anchor": "Each runnable direct-native package states its prompt/directory, actor and retained session",
+   "action": "replace",
+   "new_text": "Each runnable direct-native package names its destination, receiving role and session, and input artifacts by repository path; the artifacts hold the rest.",
+   "why": "Span: from the anchor to the end of its sentence (regex: Each runnable direct-native package states[^.\\n]*\\.). This is the rule-notes target plus the frame tail (C-HANDOFF, C-PLACE). The next sentence, 'A task-only handoff transports information only ...', stays."
+  }
+ ],
+ "CL-E-10": [
+  {
+   "id": "LCL-E-10-1",
+   "item": "ITEM-26 (R-26-FRAME site: CL-20 route)",
+   "section": "Next step and recovery",
+   "anchor": "Carry exact Epic Specification, Strategy Card, Plan/review, PR/Ops/documentation",
+   "action": "replace",
+   "new_text": "Name the `CHANGE_CLOSURE_DECISION` and each already-produced addendum by repository path; the artifacts hold the rest.",
+   "why": "Span: from the anchor to the end of its sentence (regex: Carry exact Epic Specification[^.\\n]*\\.). Same text as the CL-C-10 twin. The next sentence, 'Post-closure administration is not an acceptance blocker.', stays."
+  },
+  {
+   "id": "LCL-E-10-2",
+   "item": "ITEM-26 (R-26-FRAME site: package rule)",
+   "section": "Next step and recovery",
+   "anchor": "Each runnable package states prompt/directory, actor/session, inputs/lineage, state",
+   "action": "replace",
+   "new_text": "Each runnable package names its destination, receiving role and session, and input artifacts by repository path; the artifacts hold the rest.",
+   "why": "Span: from the anchor to the end of its sentence (regex: Each runnable package states[^.\\n]*\\.). This keeps CL-E-10's own subject 'Each runnable package', because the frame forbids new wording in slots, so it differs from CL-C-10 by 'direct-native'. If the reviewer prefers identical twin text, use CL-C-10's."
+  }
+ ],
+ "CL-E-20": [],
+ "CL-E-30": [],
+ "CL-E-40": [],
+ "DOC-10": [
+  {
+   "id": "LDOC-10-1",
+   "item": "ITEM-29 (R-A7-LOCAL site)",
+   "section": "Execute (step 5)",
+   "anchor": "Nathan manual merge, PR-40 read-only landed-lineage review",
+   "action": "replace",
+   "new_text": "Nathan manual merge, PR-40 read-only landed-lineage review entered on `MERGE_OBSERVED` or, only where no `MERGE_OBSERVED` result was returned for this merge, on Nathan's merge assertion",
+   "why": "The span is exactly the anchor. The C-DISPATCH fallback predicate is verbatim. The list continues with ', then DOC-20 completion verification.' This avoids the A7 guard phrases."
+  }
+ ],
+ "DOC-20": [
+  {
+   "id": "LDOC-20-1",
+   "item": "ITEM-29 (R-A7-LOCAL site 1)",
+   "section": "Required inputs",
+   "anchor": "separately from Nathan's later merge assertion and PR-40's independent landed-lineage evidence",
+   "action": "replace",
+   "new_text": "separately from the `MERGE_OBSERVED` merge event or, only where no `MERGE_OBSERVED` result was returned for this merge, Nathan's merge assertion, and from PR-40's independent landed-lineage evidence",
+   "why": "The span is exactly the anchor. The C-DISPATCH fallback predicate is verbatim. The sentence's final period stays."
+  },
+  {
+   "id": "LDOC-20-2",
+   "item": "ITEM-29 (R-A7-LOCAL site 2)",
+   "section": "Result routing",
+   "anchor": "landed-lineage review needed after Nathan's assertion:",
+   "action": "replace",
+   "new_text": "landed-lineage review needed after Nathan's merge assertion, only where no `MERGE_OBSERVED` result was returned for this merge:",
+   "why": "The span is exactly the anchor, so the PR-40 destination, mention and 'expect the read-only review' stay. It adds only the fallback predicate, as R-A7-LOCAL directs. Whether DOC-20 may route to PR-40 at all stays the open design issue."
+  }
+ ],
+ "ESC-10": [],
+ "ESC-25": [],
+ "ESC-30": [],
+ "ESC-40": [],
+ "IA-10": [],
+ "IA-20": [],
+ "IA-30": [],
+ "OPS-10": [
+  {
+   "id": "LOPS-10-1",
+   "item": "ITEM-26 (PART-13), R-26-FRAME site",
+   "section": "Complete OPS_TASK in READY state → OPS-20",
+   "anchor": "must preserve in its execution result and return handoff",
+   "action": "replace",
+   "new_text": "must preserve in its execution result, which its return handoff names",
+   "why": "The REAL finding's fix hint, which converges on C-ART ('The handoff names that artifact'). The FRAME fragment guard is silent afterwards. The sentence is not a package list, so the naming/by-path frame does not fit."
+  },
+  {
+   "id": "LOPS-10-2",
+   "item": "ITEM-27 (A2, PART-13), census package carrier missed by R-A2g",
+   "section": "Remediation discovery task → ESC-25 and ESC-30",
+   "anchor": "redlines when applicable, CANON_CONFLICT_REGISTER, all actual evidence, attempts and access limitations",
+   "action": "replace",
+   "new_text": "redlines when applicable, all actual evidence, attempts and access limitations",
+   "why": "The census A2 verdict (REAL, overrides the lane's ARTIFACT_NOT_HANDOFF) covers a register carried by a return package. R-A2g's alternatives miss the mid-list form. Only the register item goes; the rest of the sentence was judged NOT_REAL and stays."
+  }
+ ],
+ "OPS-20": [
+  {
+   "id": "LOPS-20-1",
+   "item": "ITEM-27 (A2, PART-13), census package carrier missed by R-A2g",
+   "section": "Remediation discovery task → ESC-25 then ESC-30",
+   "anchor": "redlines when applicable, CANON_CONFLICT_REGISTER, all evidence, attempts and access limitations",
+   "action": "replace",
+   "new_text": "redlines when applicable, all evidence, attempts and access limitations",
+   "why": "Same as the OPS-10 ESC-30 return: the census A2 REAL verdict applies to a register carried by a return package, and R-A2g's alternatives miss the mid-list form. Only the register item goes."
+  }
+ ],
+ "OPS-30": [
+  {
+   "id": "LOPS-30-1",
+   "item": "ITEM-26 (PART-13), REAL finding 'Task-only next-step transport'",
+   "section": "Task-only next-step transport",
+   "anchor": "A saved attachment, link or scattered fields do not replace the handoff.",
+   "action": "delete",
+   "new_text": "",
+   "why": "Second half of the finding's fix hint: read with C-ART, 'a link does not replace the handoff' can be taken as requiring content in the block. C-PLACE ('ends with the `NEXT_PROMPT_HANDOFF` block') and C-HANDOFF already require the block. Deletion includes the following space; python confirms 1 hit on line 126, and the section then reads: result branch, R-26-TASK sentence, blocked/terminal sentence."
+  }
+ ],
+ "PR-10": [
+  {
+   "id": "LPR-10-1",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "INSTRUCTION_READY → PR-20",
+   "anchor": "Complete native input package: carry PR_INSTRUCTION_ID and its complete content",
+   "action": "replace",
+   "new_text": "Complete native input package naming PR_INSTRUCTION_ID by repository path; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its line (the whole package line). REAL finding: the PR-20 handoff was told to carry the instruction's content, lineage, scope, acceptance and states. It now names the one substantive input by path, as C-HANDOFF requires. This absorbs the R-A2g hit on the line. Python: anchor unique before and after the shared rules; every forbidden guard reads 0 afterwards."
+  },
+  {
+   "id": "LPR-10-2",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-SEND)",
+   "section": "INSTRUCTION_READY → PR-20 (Direct continuation after PR-20)",
+   "anchor": "PR-30 then hands the workspace/worktree, branch, open PR, instruction, Plan, original Proceed,",
+   "action": "replace",
+   "new_text": "PR-30 then hands off directly to PR-35 — Resolve PR Reviews and Reach Merge Readiness, which runs in its own dedicated session, naming `PR_IMPLEMENTATION_RESULT` by repository path and the pull request reference; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor through 'which runs in its own dedicated session.' (the end of that sentence). REAL finding: PR-30's handoff was described as carrying branch, commit and completed work. It is now the C-HANDOFF result path plus the PR reference; PR-35 recovers branch and head at its own entry. Python-tested."
+  },
+  {
+   "id": "LPR-10-3",
+   "item": "ITEM-29 (R-A7-LOCAL)",
+   "section": "INSTRUCTION_READY → PR-20 (Direct continuation after PR-20)",
+   "anchor": "only after Nathan asserts it occurred may PR-40",
+   "action": "replace",
+   "new_text": "only after the merge is observed as `MERGE_OBSERVED` or, only where no `MERGE_OBSERVED` result was returned for this merge, asserted by Nathan, may PR-40",
+   "why": "SPAN: the anchor only. This is R-A7-LOCAL's PR-10 text with the C-DISPATCH predicate verbatim. The sentence continues 'independently verify the merged state and landed lineage.' Python-tested."
+  },
+  {
+   "id": "LPR-10-4",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "MATERIAL SCOPE, ARCHITECTURE, REQUIREMENT OR DESIGN CHANGE → RS-10 and RS-20",
+   "anchor": "RS-10 complete native inputs: GCF-17.RESCOPE coverage; exact PR_INSTRUCTION_ID or FINDING_REF;",
+   "action": "replace",
+   "new_text": "RS-10 complete native inputs: GCF-17.RESCOPE coverage, naming PR_INSTRUCTION_ID or FINDING_REF, the Specification, Implementation Audit, Implementation Plan and PLAN_REVIEW, and any existing RESCOPE_PROPOSAL_ID or RESCOPE_REVIEW_ID by repository path; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its line. REAL finding: the list carried dependency and evidence history and completed work. It now keeps only the artifacts and IDs the line already named. This absorbs the R-A2g hit on the line. The shared FRAME fragment misses this line (see R-26-FRAME note). Python-tested."
+  }
+ ],
+ "PR-20": [
+  {
+   "id": "LPR-20-1",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-SEND)",
+   "section": "COMPLETE APPROVED-SCOPE PLAN → PR-30 (Complete native input package, 4th bullet)",
+   "anchor": "Exact CHANGE_CLASS, CHANGE_ID, branch and repository/reference baseline; planned files/components; exclusions;",
+   "action": "replace",
+   "new_text": "`PR_IMPLEMENTATION_PLAN` and `PR_INSTRUCTION` are each named by repository path; the artifacts hold the baseline, scope, acceptance and the rest.",
+   "why": "SPAN: from the anchor to the end of its bullet line (the '- ' prefix stays). This is the finding's own fix hint. It absorbs the R-A2g hit on this bullet. Python-tested."
+  },
+  {
+   "id": "LPR-20-2",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-SEND)",
+   "section": "COMPLETE APPROVED-SCOPE PLAN → PR-30 (Native PR-30 operation and result)",
+   "anchor": "carrying the one workspace/worktree, branch, open PR, instruction, Plan, original Proceed, commits,",
+   "action": "replace",
+   "new_text": "naming `PR_IMPLEMENTATION_RESULT` by repository path and the pull request reference; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor through 'and unresolved lineage.' (the end of that sentence). The sentence now reads '... to PR-35's own dedicated session naming `PR_IMPLEMENTATION_RESULT` ...'. This is the fix hint: PR-30 returns a C-HANDOFF block naming the result and the PR reference. Python-tested."
+  },
+  {
+   "id": "LPR-20-3",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-SEND)",
+   "section": "PR-35 REVIEW AND READINESS PHASE IN ITS OWN DEDICATED SESSION",
+   "anchor": "Complete native input package: the exact PR-30 result; PR-35's own dedicated session, entered",
+   "action": "replace",
+   "new_text": "Complete native input package: PR-35's own dedicated session, entered from PR-30's handoff, naming the PR-30 result (`PR_IMPLEMENTATION_RESULT`), the PR instruction and the detailed Plan by repository path and the pull request reference; the artifacts hold the rest. The branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.",
+   "why": "SPAN: from the anchor to the end of its line. REAL finding: the package listed branch, commit and remote-head references and completed work. The second sentence is R-26-BRANCH-RECV's authored text, reused so that PR-20's description matches PR-35's entry check. Python-tested."
+  },
+  {
+   "id": "LPR-20-4",
+   "item": "ITEM-29 (R-A7-LOCAL)",
+   "section": "PR-40 DOWNSTREAM LINEAGE REVIEW (Destination prompt and directory)",
+   "anchor": "and Nathan invokes PR-40 asserting that manual merge occurred",
+   "action": "replace",
+   "new_text": "and the merge is observed as `MERGE_OBSERVED` or, only where no `MERGE_OBSERVED` result was returned for this merge, asserted by Nathan",
+   "why": "SPAN: the anchor only. The line then continues with the observed merge or, on fallback, Nathan's assertion. The C-DISPATCH predicate is verbatim. Python-tested."
+  },
+  {
+   "id": "LPR-20-5",
+   "item": "ITEM-29 (R-A7-LOCAL)",
+   "section": "PR-40 DOWNSTREAM LINEAGE REVIEW (Complete native input package, 3rd bullet)",
+   "anchor": "Nathan's PR-40 invocation asserts that the identified PR was manually merged;",
+   "action": "replace",
+   "new_text": "The complete PR-35 result: MERGE_OBSERVED with the observed merge event, or, only where no MERGE_OBSERVED result was returned for this merge, the earlier MERGE_PENDING, which is historical pre-merge evidence, with Nathan's assertion that he manually merged the identified PR. Neither substitutes for PR-40's independent verification of actual merged state and landed lineage.",
+   "why": "SPAN: from the anchor to the end of its bullet line. It opens with the registry PR-40 input string (spec v2 §3.4), verbatim, then adds the fallback assertion and keeps the line's own independent-verification tail. It removes the A7 guard phrase 'Nathan's PR-40 invocation asserts'. Python-tested."
+  },
+  {
+   "id": "LPR-20-6",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "PR-40 DOWNSTREAM LINEAGE REVIEW (Complete native input package, 2nd bullet)",
+   "anchor": "Exact CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, Specification/Implementation Audit/Plan/review lineage, continuing reviewer/session identity",
+   "action": "replace",
+   "new_text": "Exact CHANGE_CLASS, CHANGE_ID and WORK_UNIT_ID and the continuing reviewer/session identity; the artifacts hold the rest, and PR-40 resolves merge, commit, order and check evidence from repository evidence.",
+   "why": "SPAN: from the anchor to the end of its bullet line. REAL finding: the package carried commit evidence, which C-HANDOFF forbids outright. The tail converges on the parent's PR-40 R-26-BRANCH-RECV wording. Python-tested."
+  },
+  {
+   "id": "LPR-20-7",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "MATERIAL ... → RS-10, RS-20, RS-30 (Complete RS-10 package, 1st bullet)",
+   "anchor": "GCF-17.RESCOPE; exact PR_INSTRUCTION_ID, CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved SPECIFICATION_ID",
+   "action": "replace",
+   "new_text": "GCF-17.RESCOPE, naming PR_INSTRUCTION_ID, the current PR plan, SPECIFICATION_ID, IMPLEMENTATION_AUDIT_ID, IMPLEMENTATION_PLAN_ID and PLAN_REVIEW_ID by repository path; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its bullet line. REAL finding: dependency and evidence history, completed work and unaffected obligations. 'The current PR plan' is chosen from the line's own words ('current PR-plan state'): the draft plan holds the boundary finding. Python-tested."
+  },
+  {
+   "id": "LPR-20-8",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "MATERIAL ... → RS-10, RS-20, RS-30 (Complete RS-30 package, 1st bullet, 3rd sentence)",
+   "anchor": "Also carry the originating stage, CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved Specification/Plan/review,",
+   "action": "replace",
+   "new_text": "Also name the approved Specification/Plan/review by repository path, with the Product Owner/manual prerequisites as minimum context; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its line. The two sentences before it on the same line stay, since they already name artifacts. REAL finding: completed work, dependencies and evidence. It also removes the register item that R-A2g does not match. Python-tested."
+  }
+ ],
+ "PR-30": [
+  {
+   "id": "LPR-30-1",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-SEND)",
+   "section": "Execute (step 6)",
+   "anchor": "Carry the exact dedicated session, open PR, instruction, detailed Plan, original Proceed, immutable base,",
+   "action": "replace",
+   "new_text": "The handoff names `PR_IMPLEMENTATION_RESULT`, the instruction and the detailed Plan by repository path, and the pull request reference; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor through 'and recovery lineage.' (the end of that sentence). The step's first sentence and 'Do not perform PR-35 work or hand off to PR-40.' stay. This is the fix hint: PR_IMPLEMENTATION_RESULT holds completed work, tests and constraints. The instruction and Plan are named because PR-35's intake requires them. Checked by reading: the BRANCH-SEND guard no longer matches."
+  },
+  {
+   "id": "LPR-30-2",
+   "item": "ITEM-27 (A1 variant; R-A1e note)",
+   "section": "GCFPE identity, maintenance and prompt-use evidence",
+   "anchor": "If that path is outside the approved Plan, return the metadata",
+   "action": "replace",
+   "new_text": "If that path is outside the approved Plan, record the metadata in the output artifact",
+   "why": "SPAN: the anchor only. The sentence continues 'and report the bounded scope gap rather than writing it.' 'Return the metadata' left the returned handoff as a possible home (census A1 variant: REAL). It now names the output artifact (C-ART)."
+  }
+ ],
+ "PR-35": [
+  {
+   "id": "LPR-35-1",
+   "item": "ITEM-26 / ITEM-28 (R-26-FRAME + R-26-BRANCH-RECV)",
+   "section": "Required inputs and continuity identity (package list, 8th bullet)",
+   "anchor": "exact repository, authorized local root, open PR, tests, publication state, reviews/checks already observed,",
+   "action": "replace",
+   "new_text": "exact repository, authorized local root, open PR and artifact links; and",
+   "why": "SPAN: from the anchor to the end of its bullet line (the '- ' prefix stays). This is the parent's text in the R-26-BRANCH-RECV notes. Tests, publication state and reviews are read from the PR-30 result, which the 7th bullet already names, and from the provider."
+  },
+  {
+   "id": "LPR-35-2",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-RECV)",
+   "section": "Required inputs and continuity identity (after the package list)",
+   "anchor": "exact `PR_RETURN_PHASE` and rescope lineage when entering from an eligible RS-40 continuation.",
+   "action": "insert_after",
+   "new_text": "\nThe branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.",
+   "why": "Inserted once, as its own line after the last bullet of the package list and before the C-PROCEED paragraph. This is R-26-BRANCH-RECV's authored text, verbatim, and meets its required guard on the PR-35 row. Recover step 1 and Review-first step 1 already perform this check."
+  }
+ ],
+ "PR-40": [
+  {
+   "id": "LPR-40-1",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "ACCEPT → same whole-change IA owner (Complete native input package, 2nd bullet)",
+   "anchor": "Complete Specification, Implementation Audit, Plan, Plan review, PR instruction and implementation result; actual merged-state",
+   "action": "replace",
+   "new_text": "Specification, Implementation Audit, Plan, Plan review, PR instruction and implementation result, each named by repository path, and the same whole-change IA identity; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its bullet line (the '- ' prefix stays). REAL finding: the package restated merged-state evidence, commit order, coverage, attribution, outcomes and the register, which PR_WORK_UNIT_LINEAGE_REVIEW (1st bullet) holds. This absorbs the R-A2g hit. Python-tested."
+  },
+  {
+   "id": "LPR-40-2",
+   "item": "ITEM-26 (R-26-FRAME)",
+   "section": "MATERIAL ... → RS-10, RS-20, RS-30 (RS-10 package, 1st bullet)",
+   "anchor": "GCF-17.RESCOPE; the complete PR_WORK_UNIT_LINEAGE_REVIEW finding; PR_INSTRUCTION_ID; PR_IMPLEMENTATION_PLAN_ID",
+   "action": "replace",
+   "new_text": "GCF-17.RESCOPE, naming the PR_WORK_UNIT_LINEAGE_REVIEW finding, PR_INSTRUCTION_ID, PR_IMPLEMENTATION_PLAN_ID, the PR-30 and PR-35 results, SPECIFICATION_ID, IMPLEMENTATION_AUDIT_ID and PLAN_REVIEW_ID by repository path, with the exact PR refs; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its bullet line. REAL finding: commit evidence, acceptance and evidence history, and completed work. PR references stay, as C-HANDOFF allows. Python-tested."
+  },
+  {
+   "id": "LPR-40-3",
+   "item": "ITEM-26 / ITEM-29 (R-26-FRAME; A7 package item)",
+   "section": "PENDING MERGE OR UNAVAILABLE EVIDENCE",
+   "anchor": "Complete native input package: PR_WORK_UNIT_LINEAGE_REVIEW with PENDING; exact missing PR or repository fact",
+   "action": "replace",
+   "new_text": "Complete native input package: PR_WORK_UNIT_LINEAGE_REVIEW with PENDING, PR_INSTRUCTION_ID, PR_IMPLEMENTATION_PLAN_ID and the PR-30 and PR-35 results, each by repository path; the exact missing PR or repository fact, its evidence owner and the exact manual prerequisite as minimum context; the artifacts hold the rest.",
+   "why": "SPAN: from the anchor to the end of its line. This is the parent's R-26-FRAME target text for PR-40, verbatim. It also removes the package's 'Nathan's manual-merge assertion' item and the R-A2g hit. Python-tested."
+  },
+  {
+   "id": "LPR-40-4",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-RECV)",
+   "section": "Inputs (4th bullet)",
+   "anchor": ", with each actual PR reference, commit identity, order, review/check state and merge evidence",
+   "action": "replace",
+   "new_text": "; PR-40 resolves each PR's commits, order, review/check state and merge evidence from repository evidence",
+   "why": "SPAN: the anchor only. The bullet's final period stays. This is the parent's python-tested PR-40 text from the R-26-BRANCH-RECV notes; Execute step 2 already does this. Python-tested here too."
+  },
+  {
+   "id": "LPR-40-5",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-RECV)",
+   "section": "Inputs (after the package list, before the W-4 paragraph)",
+   "anchor": "NOT PRODUCED and NOT EXECUTED values, and all actual access limitations.",
+   "action": "insert_after",
+   "new_text": "\nThe branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.",
+   "why": "R-26-BRANCH-RECV's authored sentence, placed once after the list. It meets the rule's required guard on the PR-40 row (1 match after the edits). The anchor is the end of the last Inputs bullet and is unique. Python-tested."
+  },
+  {
+   "id": "LPR-40-6",
+   "item": "ITEM-29 (R-A7-LOCAL)",
+   "section": "Read-only review boundary",
+   "anchor": "Nathan's invocation supplies only the later manual-merge assertion and review authorization",
+   "action": "replace",
+   "new_text": "The pasted handoff supplies the observed merge event or, only where no `MERGE_OBSERVED` result was returned for this merge, Nathan's manual-merge assertion, and review authorization",
+   "why": "SPAN: the anchor only. The sentence continues ', not a review verdict or merge proof.'. This is the parent's python-tested text from the R-A7-LOCAL notes."
+  },
+  {
+   "id": "LPR-40-7",
+   "item": "ITEM-29 (R-A7-LOCAL)",
+   "section": "Execute (step 1)",
+   "anchor": "historical PR-35 `MERGE_PENDING` result, Nathan's later manual-merge assertion,",
+   "action": "replace",
+   "new_text": "PR-35 `MERGE_OBSERVED` result or, only where no `MERGE_OBSERVED` result was returned for this merge, the historical PR-35 `MERGE_PENDING` result and Nathan's manual-merge assertion,",
+   "why": "SPAN: the anchor only. This is the parent's python-tested text from the R-A7-LOCAL notes."
+  }
+ ],
+ "PR-50": [],
+ "RS-10": [],
+ "RS-20": [
+  {
+   "id": "LRS-20-1",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-RECV)",
+   "section": "Required inputs",
+   "anchor": "Carry original Proceed, dedicated PR session, workspace/worktree, branch, open PR/head only when one exists,",
+   "action": "replace",
+   "new_text": "The request or proposal records the original Proceed, the recorded phase's own dedicated session, the open PR reference only when one exists, and the instruction and Plan by repository path; `RESCOPE_REVIEW` records the vehicle state it relies on. The branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.",
+   "why": "SPAN: from the anchor through 'and unresolved work.' (the end of that sentence). The next sentence, 'Planning, Ops, documentation, ... carry only actual state.', stays. This is the fix hint: record vehicle state in RESCOPE_REVIEW, and the handoff carries only the PR reference and artifact paths. The last sentence is R-26-BRANCH-RECV's text, verbatim, for its required guard on RS-20. Checked by reading: the forbidden fragment is gone."
+  }
+ ],
+ "RS-30": [],
+ "RS-40": [
+  {
+   "id": "LRS-40-1",
+   "item": "ITEM-26 / ITEM-28 (R-26-BRANCH-RECV)",
+   "section": "Required inputs",
+   "anchor": "the recorded phase's own dedicated session, workspace/worktree, branch, pull request, and current head;",
+   "action": "replace",
+   "new_text": "the recorded phase's own dedicated session, pull request reference and artifacts by repository path; and the return condition. The branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.",
+   "why": "SPAN: from the anchor through 'and return condition.' (the end of the first Required inputs sentence). 'Reject a missing or contradictory open-PR identity ...' stays. This is the fix hint: branch, head and commits become entry-recovery checks, as in PR-35 step 13. Completed work, tests, reviews and CI are held by the named artifacts. The last sentence is R-26-BRANCH-RECV's text, verbatim."
+  },
+  {
+   "id": "LRS-40-2",
+   "item": "ITEM-29 / ITEM-30 (R-A7-LOCAL)",
+   "section": "Public result and routing (MERGE_PENDING bullet)",
+   "anchor": "Return one conditional block for use only after Nathan manually merges the identified PR;",
+   "action": "replace",
+   "new_text": "Return one conditional block for use only after Nathan manually merges the identified PR and only where no `MERGE_OBSERVED` result was returned for this merge;",
+   "why": "SPAN: the anchor only. Adds the C-DISPATCH fallback predicate, verbatim, as R-A7-LOCAL's RS-40 note directs."
+  },
+  {
+   "id": "LRS-40-3",
+   "item": "ITEM-29 (R-A7-LOCAL)",
+   "section": "Public result and routing (MERGE_PENDING bullet)",
+   "anchor": "states that Nathan's later invocation asserts the manual merge, ",
+   "action": "delete",
+   "new_text": "",
+   "why": "SPAN: the anchor only, including its trailing space. The bullet then keeps its PR-40 destination and its independent-verification clause. This removes the A7 guard phrase 'Nathan's later invocation asserts'."
+  }
+ ],
+ "QA-10": [
+  {
+   "id": "LQA-10-P03",
+   "item": "ITEM-17 (P-03)",
+   "section": "role",
+   "anchor": "This is a read-only audit and readiness role.",
+   "action": "replace",
+   "new_text": "This is an audit and readiness role.",
+   "why": "ITEM-17 read literally: QA-10 no longer calls itself read-only; R-OWN's sentence follows."
+  },
+  {
+   "id": "LQA-10-P19",
+   "item": "ITEM-26 (PART-13), P-19: QA-10 twin of LOPS-30-1",
+   "section": "Task-only next-step transport",
+   "anchor": "A saved attachment, link or scattered fields do not replace the handoff.",
+   "action": "delete",
+   "new_text": "",
+   "why": "P-19: the twin of OPS-30's LOPS-30-1 in the same section (dry run F: 1 hit)."
+  }
+ ],
+ "QA-100": [],
+ "QA-110": [],
+ "QA-120": [],
+ "QA-20": [],
+ "QA-50": [],
+ "QA-60": [],
+ "QA-70": [],
+ "QA-80": [],
+ "QA-90": []
+}

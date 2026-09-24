@@ -1,0 +1,160 @@
+[
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:ITEM-11 --bodies-stdin on the schema-3.1 alias gives NameError",
+  "ok": true,
+  "detail": [
+   "NameError",
+   "name 'paths' is not defined"
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:ITEM-36 label line past line 8 passes (defect)",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:P-16 '**`Prompt version`**: x' at line 40 passes (defect)",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:P-16 '3. **`Set`**: x' at line 40 passes (defect)",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:P-16 '- Settings: x' at line 40 stays silent",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:P-16 'Set up the run:' at line 40 stays silent",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:P-16 'Record the `Prompt version` in the report.' at line 40 stays silent",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "base:RULING-5-Q3-A changed record value gives ALPHA_STATE",
+  "ok": true,
+  "detail": [
+   "ALPHA_STATE"
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:ITEM-11 --bodies-stdin on the schema-3.1 alias gives NAMED_RESULT",
+  "ok": true,
+  "detail": [
+   "NAMED_RESULT",
+   [
+    "PROMPT_BODY_IDENTITY:QA-10",
+    "PROMPT_DRAIN_BEFORE_RELIANCE:QA-10",
+    "PROMPT_HANDOFF_COUNT:QA-10"
+   ]
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:ITEM-36 label line past line 8 rejected",
+  "ok": true,
+  "detail": true
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:P-16 '**`Prompt version`**: x' at line 40 rejected",
+  "ok": true,
+  "detail": true
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:P-16 '3. **`Set`**: x' at line 40 rejected",
+  "ok": true,
+  "detail": true
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:P-16 '- Settings: x' at line 40 stays silent",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:P-16 'Set up the run:' at line 40 stays silent",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:P-16 'Record the `Prompt version` in the report.' at line 40 stays silent",
+  "ok": true,
+  "detail": false
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:RULING-5-Q3-A changed record value gives ALPHA_PROMOTION_RECORD",
+  "ok": true,
+  "detail": [
+   "ALPHA_PROMOTION_RECORD"
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:ITEM-12 builder rejects one index dropped from PR-10",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "VALIDATION FAILED:",
+   "  prompts/PR-10: 4 edge_indices for 5 edges",
+   "  edge indices are not exactly 0..228, each once (228 indices for 229 edges)"
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:ITEM-12 builder rejects a duplicate index in QA-10",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "VALIDATION FAILED:",
+   "  edge indices are not exactly 0..228, each once (229 indices for 229 edges)",
+   "  run `graph_parts.py reindex <parts-dir>` to re-derive them from the assembled order"
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:ITEM-12 builder rejects an edge added to UTIL-10 without reindex",
+  "ok": true,
+  "detail": [
+   "exit 1",
+   "VALIDATION FAILED:",
+   "  prompts/UTIL-10: 2 edge_indices for 3 edges",
+   "  edge indices are not exactly 0..229, each once (229 indices for 230 edges)"
+  ]
+ },
+ {
+  "group": "regress_plan:function_level",
+  "case": "final:ITEM-12 reindex repairs the added edge; build passes",
+  "ok": true,
+  "detail": [
+   "exit 0/0",
+   [
+    "reindex: 230 edges; 25 file(s) rewritten"
+   ],
+   [
+    "build: 55 nodes, 230 edges, 55 state_routes",
+    "       embedded JSON 576731 bytes  sha256 9818fbc7517560cfa0cc7a52e2a976a9abe11a64d22e52137254e56adbbacb8c"
+   ]
+  ]
+ }
+]

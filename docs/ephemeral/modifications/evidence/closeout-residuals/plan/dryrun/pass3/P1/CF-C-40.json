@@ -1,0 +1,52 @@
+{
+ "mode": "plan",
+ "pid": "CF-C-40",
+ "page": "3db4590a05eb81269931cee342ce8a0e",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan CF-C-40 3db4590a05eb81269931cee342ce8a0e --registry $P3/registry.new.md --guards EV/registry/row_assertions.json --skills $P3/pkg-root --no-ops --candidate-url https://app.notion.com/p/00000000000000000000000000000000",
+ "result": {
+  "pid": "CF-C-40",
+  "fetched": "2026-09-23T13:27:38.648Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 1,
+  "rules": {
+   "LCF-C-40-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LCF-C-40-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LCF-C-40-3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

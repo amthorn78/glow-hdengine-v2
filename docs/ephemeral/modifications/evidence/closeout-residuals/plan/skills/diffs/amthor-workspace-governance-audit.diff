@@ -1,0 +1,265 @@
+diff -ruN a/SKILL.md b/SKILL.md
+--- a/SKILL.md	2026-09-23 13:11:38.947185267 +0000
++++ b/SKILL.md	2026-09-23 23:12:52.625279007 +0000
+@@ -1,13 +1,13 @@
+ ---
+ name: amthor-workspace-governance-audit
+-description: "Audit workspace-wide skill identity and declared project prompt/workflow contracts from complete, pinned source snapshots and versioned registries. Use for workspace skill inventory, cross-project namespace preflight, skill-registration postflight, prompt-ecosystem baseline or targeted audits, repair-batch preflight/postflight, final workflow validation, and prompt-to-skill interoperability checks. Read-only: do not apply changes, publish pages, edit skills, run PF23, or automate PF10."
++description: "Audit workspace-wide skill identity and declared project prompt/workflow contracts from complete sources and versioned registries: skill and file sources are pinned in snapshots, and prompt bodies are read live, never snapshotted or hashed. Use for workspace skill inventory, cross-project namespace preflight, skill-registration postflight, prompt-ecosystem baseline or targeted audits, repair-batch preflight/postflight, final workflow validation, and prompt-to-skill interoperability checks. Read-only: do not apply changes, publish pages, edit skills, run PF23, or automate PF10."
+ ---
+ 
+ # Workspace Governance Audit
+ 
+ Audit declared governance against observed reality without mutating either. Treat the Workspace Skill Registry as the single workspace skill identity model and a Project Prompt Contract Registry as the expected prompt/workflow model for one declared project.
+ 
+-**WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.12.0
++**WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.13.0
+ 
+ **WORKSPACE_SKILL_REGISTRY_SCHEMA_VERSION:** 1.0
+ 
+@@ -52,7 +52,7 @@
+ - Every main-ecosystem prompt (all but GCFPE-MGMT-10) runs as its own top-level session Nathan creates; none runs as a subagent, forked or workflow agent; none creates, launches or schedules a session; workers within a task are allowed.
+ - Preserve native QA selection, per-task scope/evidence/attempt/result/reviewer identity, substantive planning, engineering, independent review, Ops, evidence, closure, and manual Product Owner boundaries.
+ 
+-This skill remains read-only. It checks those contracts and runtime evidence but does not execute PR work, publish prompts, drain PF10, contact sessions, resume a paused Alpha, or repair the ecosystem. Route authorized correction to the selected GCFPE management surface and the appropriate authoring or skill-maintenance owner.
++This skill remains read-only. It checks those contracts and runtime evidence but does not execute PR work, publish prompts, drain PF10, contact sessions, resume or advance Alpha, or repair the ecosystem. Route authorized correction to the selected GCFPE management surface and the appropriate authoring or skill-maintenance owner.
+ 
+ ## GCFPE role, approval, and flow preservation
+ 
+@@ -68,7 +68,7 @@
+ | --- | --- | --- |
+ | `BASELINE` | Establish complete pre-repair reality | Project profile, prompt registry, complete lane scope |
+ | `BATCH_PREFLIGHT` | Test whether a proposed prompt batch is bounded and coherent | Exact targets and direct producer/consumer closure |
+-| `BATCH_POSTFLIGHT` | Compare published results with one approved change set | Exact approved change-set identity and before/after snapshots |
++| `BATCH_POSTFLIGHT` | Compare published results with one approved change set | Exact approved change-set identity and each target's before and after identity; prompt bodies are read live |
+ | `TARGETED` | Investigate one prompt, lane, interface, skill, or finding | Exact `TARGETS` |
+ | `FINAL_VALIDATION` | Determine readiness for representative live workflows | Complete repaired suite and applicable skills |
+ | `SKILL_NAMESPACE_PREFLIGHT` | Detect cross-project identity, trigger, scope, dependency, and write-authority clashes | Proposed skill record plus complete workspace registry |
+@@ -105,12 +105,12 @@
+ 1. Resolve every exact source identity before interpreting content.
+ 2. Enumerate the complete declared scope, including duplicate titles and unexpected records.
+ 3. Fetch or read every source completely. Do not treat a search result, snippet, preview, title, path, or URL as content.
+-4. Record source identity, kind, title/path/parent, exposed version or last-edited value, retrieval time, completeness, warnings, and exact retrieved representation.
+-5. Place retrieved representations in a local run snapshot. Do not let deterministic scripts access the network.
+-6. Run `scripts/build_snapshot_manifest.py` to compute raw SHA-256 and structural digests.
++4. Record source identity, kind, title/path/parent, exposed version or last-edited value, retrieval time, completeness and warnings, and, for a skill or file source, its exact retrieved representation.
++5. Place retrieved skill and file representations in a local run snapshot. A prompt body is never snapshotted: it is read from Notion for the check in hand, and a file a deterministic script reads it from is a transient read under `D22`'s conditions, never hashed, byte-compared or reused. Do not let deterministic scripts access the network.
++6. Run `scripts/build_snapshot_manifest.py` to compute raw SHA-256 and structural digests of skill and file sources. A prompt-kind source (`prompt`, `notion_prompt` or `notion_page`) is identified by page ID, title, parent and version and carries no digest; `SRC-003` does not apply to it.
+ 7. Stop with `SRC-001 SOURCE_INCOMPLETE` when a decisive source cannot be retrieved completely.
+ 
+-Hash the exact complete representation returned by the source interface. Do not claim byte identity with Notion's internal storage. Preserve meaningful whitespace inside code, YAML, JSON, exact sentinels, and templates.
++Hash the exact complete representation of a skill or file source returned by its interface; never hash a prompt body. Do not claim byte identity with Notion's internal storage. Preserve meaningful whitespace inside code, YAML, JSON, exact sentinels, and templates.
+ 
+ ## Validate declared state deterministically
+ 
+diff -ruN a/references/behavioral-fixtures.md b/references/behavioral-fixtures.md
+--- a/references/behavioral-fixtures.md	2026-09-23 13:11:38.947185267 +0000
++++ b/references/behavioral-fixtures.md	2026-09-23 23:12:52.626109378 +0000
+@@ -8,6 +8,7 @@
+ - YAML timestamp metadata is normalized to deterministic JSON text.
+ - Incomplete decisive source emits `SRC-001`.
+ - Changed content changes its raw digest.
++- A prompt-kind source (`prompt`, `notion_prompt` or `notion_page`) carries no digest or size, and changed prompt text raises no `SRC-003`; a changed skill source still does.
+ - Duplicate observed page title remains separately identified by page ID.
+ 
+ ## Workspace registry fixtures
+@@ -46,7 +47,7 @@
+ ## GCFPE v2 repair interoperability fixtures
+ 
+ - Accept one selected PR-30 → PR-35 continuation only when both phases share exactly one value for every field. The exact ordered nine-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product Owner Proceed; workspace/worktree; branch; pull request; PR instruction; detailed PR plan; primary skill authority; continuous recovery/artifact lineage.
+-- Reject PR-35 if it creates a role, session, approval, authority transfer, Product Owner gate, second Proceed, work unit, duplicate branch/PR/work vehicle, merge authority, R1 row, or cross-session route.
++- Accept the PR-30 → PR-35 route across sessions only into PR-35's own dedicated top-level session that Nathan created and entered by pasting PR-30's handoff (`D23-D`). Reject PR-35 if it creates a role, session, approval, authority transfer, Product Owner gate, second Proceed, work unit, duplicate branch/PR/work vehicle, merge authority or R1 row, or if it runs as a subagent, forked agent or workflow agent of PR-30 or of any other session.
+ - Require PR-30 to recover before creation, test locally, commit coherently, publish deliberately, then emit `PR_CANDIDATE_PUBLISHED` with one complete PR-35 handoff. Reject direct PR-30 → PR-40.
+ - Require PR-35 to resolve then-known findings and retest before a coherent corrective push; reject waiting on or intentionally triggering fresh CI while substantive findings remain and reject `[skip ci]` without Nathan's direct specific authorization.
+ - Accept `MERGE_PENDING` only with resolved current-head reviews/threads, current-head required CI or an exact valid waiver, verified remote-head identity and mergeability. Treat it as historical pre-merge evidence; separately require Nathan's later manual-merge assertion, usable only where no `MERGE_OBSERVED` result was returned for this merge, and PR-40's independent merged-state/landed-lineage verification.
+@@ -56,4 +57,4 @@
+ - Require the exact six PF10 producers `{CF-C-30, CF-E-30, IA-30, QA-70, RS-20, ESC-40}` and the complete addendum/anchor schema. Reject empty addenda for initial approval, rejection/denial, `REVISION_REQUIRED`, pending, unchanged, editorial, or `IN_SCOPE_REPAIR`; reject QA-10, OPS-30, or CL-40 as producers.
+ - Exercise current-PF10 resolution independently: unresolvable or incompletely read authority is `SOURCE_RESOLUTION_ERROR` with no fallback; a resolved authority is worked from as read, with the PF10 version recorded as provenance. Reject any construction that stops, waits, or routes on whether the approved delta is yet present, absent, or worded differently.
+ - Reject any prompt-, agent-, skill-, hub-, fixture-, or automation-originated PR-50 inbound edge. Only Nathan's direct identified-PR invocation is lawful.
+-- Require Alpha state PR03 accepted-final and PR04 not started; accept a complete saved PR04 PR-10 handoff for Nathan, but reject executing PR-10 or beginning PR04 during repair validation.
++- Read HDE-EPIC040 Alpha state only from the Epic's own artifacts under `docs/ephemeral/` (`D18` successor). Accept the contract's and graph's `alpha_resumption_contract` only as the record made at promotion; reject treating it, a skill or a Notion page as current Alpha state, and reject resuming or advancing Alpha during repair validation.
+diff -ruN a/references/epic-reengineering-interoperability.md b/references/epic-reengineering-interoperability.md
+--- a/references/epic-reengineering-interoperability.md	2026-09-23 13:11:38.950698458 +0000
++++ b/references/epic-reengineering-interoperability.md	2026-09-23 23:12:52.625587789 +0000
+@@ -59,4 +59,4 @@
+ 
+ Validate complete affected bodies and all-member dispositions, graph closure, exact native phase inputs, actual final outputs, both ADR classes and approve/change/reject batches, late addenda, source feasibility and historical semantic counterexamples. Static string presence is insufficient. Preserve actual QA membership/attempt rules, manual merge and Proceed, CRD compatibility, PF20/PF30 section-only outputs, PF09 substantive build-note addenda, bounded direct CRD candidate records and CL-40 terminal ownership. Header parity is Epic-only and not a new QA/OPS execution-copy gate. Permanent source drainage and pending informational PF10 publication are distinct from unresolved governing decisions.
+ 
+-Use complete pinned snapshots and meaningful positive/negative fixtures; distinguish deterministic, isolated prompt-output and live evidence. Do not relabel historical counts or unresolved stalls as observed success. Require independent meaning/feasibility/role-boundary review before selecting published, fully read-back compatible candidates. Preserve old selected lineage until compatibility, archive original pages intact and verify guide pointers, installed persisted skills and selected identities. No Technical Writing or protected Primary-core change is authorized.
++Use complete sources, with skills and files pinned in snapshots and prompt bodies read live under `D22`, and meaningful positive/negative fixtures; distinguish deterministic, isolated prompt-output and live evidence. Do not relabel historical counts or unresolved stalls as observed success. Require independent meaning/feasibility/role-boundary review before selecting published, fully read-back compatible candidates. Preserve old selected lineage until compatibility, archive original pages intact and verify guide pointers, installed persisted skills and selected identities. No Technical Writing or protected Primary-core change is authorized.
+diff -ruN a/references/interoperability-contracts.md b/references/interoperability-contracts.md
+--- a/references/interoperability-contracts.md	2026-09-23 13:11:38.951800151 +0000
++++ b/references/interoperability-contracts.md	2026-09-23 23:12:52.626321939 +0000
+@@ -93,7 +93,7 @@
+ 
+ Resolve actual GCFPE selection from the register. Do not use legacy member counts, middleware fixtures, or historical correction layers as current authority. Historical files remain non-executable provenance only.
+ 
+-For v2 repair candidate/selected successor `GCFPE-20260914.1` at prompt version `091426.1`, validate exactly 55 prompt members (54 retained logical IDs plus sole PR-35); direct native transitions and exact terminal routes; repository Markdown storage under `docs/ephemeral` and Markdown-only PFCanon contracts at `docs/pfcanon`; complete paste-ready handoffs; PR-30/PR-35 skill/recovery/action-economy/review/CI/current-head behavior; exactly six PF10 producers `{CF-C-30, CF-E-30, IA-30, QA-70, RS-20, ESC-40}`; the immutable base/overlay contract; phase-aware rescope continuation; three-event post-merge chain; Nathan-only otherwise unreachable PR-50; PE metaprompt, procedure, hubs, Alpha record, contracts/fixtures and archive lineage; protected Primary-core byte identity and 46-row R1; and absence of active Library IDs, native-document PFCanon routes, invented endpoints, stale Alpha state, model/strength assessment, Analyzer, or configuration routing. Alpha remains stopped with PR03 accepted-final and PR04 not started; validation/promotion prepares but never executes the PR04 PR-10 handoff.
++For v2 repair candidate/selected successor `GCFPE-20260914.1` at prompt version `091426.1`, validate exactly 55 prompt members (54 retained logical IDs plus sole PR-35); direct native transitions and exact terminal routes; repository Markdown storage under `docs/ephemeral` and Markdown-only PFCanon contracts at `docs/pfcanon`; complete paste-ready handoffs; PR-30/PR-35 skill/recovery/action-economy/review/CI/current-head behavior; exactly six PF10 producers `{CF-C-30, CF-E-30, IA-30, QA-70, RS-20, ESC-40}`; the immutable base/overlay contract; phase-aware rescope continuation; three-event post-merge chain; Nathan-only otherwise unreachable PR-50; PE metaprompt, procedure, hubs, Alpha record, contracts/fixtures and archive lineage; protected Primary-core byte identity and 46-row R1; and absence of active Library IDs, native-document PFCanon routes, invented endpoints, stale Alpha state, model/strength assessment, Analyzer, or configuration routing. Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record (`D18` successor); the contract's and graph's `alpha_resumption_contract` is the record made at promotion, never current Alpha state, and validation neither resumes nor advances Alpha.
+ 
+ ## Bounded rescope receiver compatibility
+ 
+diff -ruN a/references/report-contracts.md b/references/report-contracts.md
+--- a/references/report-contracts.md	2026-09-23 13:11:38.952325462 +0000
++++ b/references/report-contracts.md	2026-09-23 23:12:52.625413613 +0000
+@@ -36,7 +36,7 @@
+ 
+ ## Proposed change set
+ 
+-Record exact target, expected base identity/version/hash, requested operation, intended result, required approval, validation rule, owner, and source-disposition boundary. The artifact is a proposal only and has no mutation authority.
++Record exact target, expected base identity and version (a prompt by stable ID, version and direct Notion URL; a skill or file also by hash), requested operation, intended result, required approval, validation rule, owner, and source-disposition boundary. The artifact is a proposal only and has no mutation authority.
+ 
+ ## Proposed PF10 Addenda
+ 
+diff -ruN a/references/rule-catalog.md b/references/rule-catalog.md
+--- a/references/rule-catalog.md	2026-09-23 13:11:38.952481635 +0000
++++ b/references/rule-catalog.md	2026-09-23 23:12:52.625705911 +0000
+@@ -6,7 +6,7 @@
+ | --- | --- | --- |
+ | `SRC-001` | BLOCKER | Decisive source is incomplete or unavailable |
+ | `SRC-002` | BLOCKER | Source changed after snapshot pinning |
+-| `SRC-003` | ERROR | Snapshot identity or digest does not match the declared source |
++| `SRC-003` | ERROR | Snapshot identity or digest does not match the declared skill or file source; a prompt-kind source carries no digest |
+ | `INV-001` | ERROR | Expected active record is absent from observed scope |
+ | `INV-002` | WARNING | Unexpected active record is present in observed scope |
+ | `INV-003` | ERROR | Duplicate active identity or live function |
+diff -ruN a/scripts/audit_workspace_governance.py b/scripts/audit_workspace_governance.py
+--- a/scripts/audit_workspace_governance.py	2026-09-23 13:11:38.952679729 +0000
++++ b/scripts/audit_workspace_governance.py	2026-09-23 23:12:52.627412039 +0000
+@@ -45,6 +45,15 @@
+     "a", "an", "and", "as", "at", "by", "for", "from", "in", "into",
+     "of", "on", "or", "the", "to", "use", "when", "with", "without",
+ }
++# D22: a prompt body enters a run only as a transient read. A prompt-kind source is identified by its
++# page ID, title, parent and version, never by its bytes, so it carries no digest or size, and SRC-003
++# does not apply to it.
++PROMPT_SOURCE_KINDS = frozenset({"prompt", "notion_prompt", "notion_page"})
++
++
++def _is_prompt_source(source: dict[str, Any]) -> bool:
++    kind = source.get("kind")
++    return isinstance(kind, str) and kind in PROMPT_SOURCE_KINDS
+ 
+ 
+ FENCED_YAML_BLOCK = re.compile(
+@@ -455,17 +464,22 @@
+         resolved = (root / relative).resolve()
+         if root not in resolved.parents and resolved != root:
+             raise ValueError(f"Source path escapes snapshot root: {relative}")
+-        data = resolved.read_bytes()
+-        text = data.decode("utf-8", errors="replace")
+-        record = {key: value for key, value in raw.items() if key != "sha256" and key != "structural_sha256"}
++        record = {key: value for key, value in raw.items() if key not in {"sha256", "structural_sha256", "size_bytes"}}
+         record.setdefault("source_id", str(relative))
+         record.setdefault("kind", "local_text")
+         record.setdefault("complete", True)
+         record.setdefault("warnings", [])
+         record["path"] = str(relative)
+-        record["sha256"] = sha256_bytes(data)
+-        record["structural_sha256"] = structural_digest(text)
+-        record["size_bytes"] = len(data)
++        if _is_prompt_source(record):
++            # D22: the body is read by the audit when it evaluates assertions; it is never hashed here.
++            if not resolved.is_file():
++                raise FileNotFoundError(f"Prompt source file is missing: {relative}")
++        else:
++            data = resolved.read_bytes()
++            text = data.decode("utf-8", errors="replace")
++            record["sha256"] = sha256_bytes(data)
++            record["structural_sha256"] = structural_digest(text)
++            record["size_bytes"] = len(data)
+         sources.append(json_compatible(record))
+     sources.sort(key=lambda item: (str(item.get("kind")), str(item.get("source_id"))))
+     snapshot_identity = sha256_text(canonical_json([{key: value for key, value in source.items() if key != "retrieved_at"} for source in sources]))
+@@ -569,6 +583,8 @@
+         source_id = str(source.get("source_id", source.get("path", "unknown")))
+         if not source.get("complete", False):
+             findings.append(_finding("SRC-001", "BLOCKER", "source", source_id, "Source marked incomplete", "Complete decisive source", "A decisive absence or conflict cannot be proven", "Retrieve the complete source", evidence_refs=[source_id]))
++        if _is_prompt_source(source):
++            continue  # D22: a prompt-kind source carries no digest, so SRC-003 does not apply to it
+         text = _read_snapshot_text(snapshot, source)
+         if text is not None and sha256_text(text) != source.get("sha256"):
+             findings.append(_finding("SRC-003", "BLOCKER", "source", source_id, "Current local snapshot bytes no longer match the pinned hash", "Pinned source remains immutable", "Audit evidence changed during or after pinning", "Rebuild and repin the snapshot", evidence_refs=[source_id]))
+@@ -582,7 +598,7 @@
+             findings.append(_finding("INV-002", "WARNING", "skill", name, "Installed skill absent from registry", "Every installed personal skill registered", "Cross-project collision checks are incomplete", "Propose a workspace registry record"))
+ 
+     if project_registry is not None:
+-        observed_prompts = {str(s.get("source_id")): s for s in sources if s.get("kind") in {"prompt", "notion_prompt", "notion_page"} and s.get("in_scope", True)}
++        observed_prompts = {str(s.get("source_id")): s for s in sources if _is_prompt_source(s) and s.get("in_scope", True)}
+         expected_prompts = {str(r.get("notion_page_id")): r for r in project_registry.get("prompts") or [] if isinstance(r, dict) and r.get("lifecycle") != "ARCHIVED"}
+         for page_id in sorted(set(expected_prompts) - set(observed_prompts)):
+             record = expected_prompts[page_id]
+diff -ruN a/scripts/run_fixture_suite.py b/scripts/run_fixture_suite.py
+--- a/scripts/run_fixture_suite.py	2026-09-23 13:11:38.953500429 +0000
++++ b/scripts/run_fixture_suite.py	2026-09-23 23:12:52.628231728 +0000
+@@ -23,6 +23,18 @@
+ SKILL_ROOT = Path(__file__).resolve().parents[1]
+ EXACT_GCF17_CONTINUITY = "The exact ordered nine-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product Owner Proceed; workspace/worktree; branch; pull request; PR instruction; detailed PR plan; primary skill authority; continuous recovery/artifact lineage"
+ RETIRED_GCF17_CONTINUITY = "The exact ordered ten-field GCF-17 continuity list is: `WORK_UNIT_ID`; original Product Owner Proceed; dedicated PR-development session; workspace/worktree; branch; pull request; PR instruction; detailed PR plan; primary skill authority; continuous recovery/artifact lineage"
++# D22 (ITEM-05, ITEM-16): the phrases this skill retired when it stopped snapshotting and hashing prompt
++# bodies. Checked case-insensitively in every Markdown file of the skill; only this suite holds them.
++RETIRED_D22_PHRASES = (
++    "from complete, pinned source snapshots",
++    "before/after snapshots",
++    "warnings, and exact retrieved representation",
++    "Place retrieved representations in a local run snapshot",
++    "Run `scripts/build_snapshot_manifest.py` to compute raw SHA-256 and structural digests.",
++    "Hash the exact complete representation returned by the source interface",
++    "expected base identity/version/hash",
++    "Use complete pinned snapshots",
++)
+ 
+ 
+ def skill(name: str, uid: str, key: str, *, function: str | None = None, scope: str = "WORKSPACE_SHARED", projects: list[str] | None = None, mutation: str = "READ_ONLY", surfaces: list[str] | None = None, dependencies: list[str] | None = None, package: str | None = None, notion: str | None = None, use_when: list[str] | None = None, precedence: dict | None = None, supersedes: list[str] | None = None) -> dict:
+@@ -230,6 +242,30 @@
+             self.assertEqual(snapshot["sources"][0]["retrieved_at"], "2026-08-29T22:30:00+00:00")
+             json.dumps(snapshot)
+ 
++    def test_prompt_source_carries_no_digest_and_raises_no_src003(self) -> None:
++        # D22 (ITEM-05): a prompt body is read, never hashed. Every prompt kind carries no digest or size,
++        # even when the index supplies one, and changed prompt text raises no SRC-003. The skill source is
++        # the control: it keeps its digests, and changing it after pinning still raises SRC-003.
++        for kind in ("prompt", "notion_prompt", "notion_page"):
++            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
++                root = Path(tmp)
++                (root / "prompt.md").write_text("IA-10 synthetic body\n", encoding="utf-8")
++                (root / "skill.md").write_text("# Skill\n", encoding="utf-8")
++                index = {"sources": [
++                    {"source_id": "page-1", "kind": kind, "path": "prompt.md", "complete": True, "sha256": "0" * 64, "size_bytes": 1},
++                    {"source_id": "alpha-audit", "kind": "installed_skill", "path": "skill.md", "complete": True},
++                ]}
++                snapshot = build_snapshot_manifest(root, "fixture", index)
++                by_id = {source["source_id"]: source for source in snapshot["sources"]}
++                for field in ("sha256", "structural_sha256", "size_bytes"):
++                    self.assertNotIn(field, by_id["page-1"], f"{kind} carries {field}")
++                    self.assertIn(field, by_id["alpha-audit"])
++                (root / "prompt.md").write_text("IA-10 synthetic body, edited after the manifest\n", encoding="utf-8")
++                (root / "skill.md").write_text("# Skill, edited after the manifest\n", encoding="utf-8")
++                result = audit_governance(run_manifest("SKILL_REGISTRATION_POSTFLIGHT"), workspace_registry(), snapshot, semantic_packet={"complete": True, "findings": []})
++                src003 = {f["subject"]["id"] for f in result["findings"] if f["rule_id"] == "SRC-003"}
++                self.assertEqual(src003, {"alpha-audit"})
++
+     def test_incomplete_source_blocks_audit(self) -> None:
+         with tempfile.TemporaryDirectory() as tmp:
+             root = Path(tmp)
+@@ -305,13 +341,19 @@
+         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+         interoperability = (SKILL_ROOT / "references/interoperability-contracts.md").read_text(encoding="utf-8")
+         fixtures = (SKILL_ROOT / "references/behavioral-fixtures.md").read_text(encoding="utf-8")
+-        self.assertIn("WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.12.0", skill)
++        self.assertIn("WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.13.0", skill)
+         self.assertIn(EXACT_GCF17_CONTINUITY, skill)
+         self.assertIn(EXACT_GCF17_CONTINUITY, interoperability)
+         self.assertIn(EXACT_GCF17_CONTINUITY, fixtures)
+         for text in (skill, interoperability, fixtures):
+             self.assertNotIn(RETIRED_GCF17_CONTINUITY, text)
+ 
++    def test_retired_d22_phrases_absent(self) -> None:
++        for path in sorted(SKILL_ROOT.rglob("*.md")):
++            text = path.read_text(encoding="utf-8").lower()
++            for phrase in RETIRED_D22_PHRASES:
++                self.assertNotIn(phrase.lower(), text, f"{path.relative_to(SKILL_ROOT)}: {phrase}")
++
+     def test_exact_fenced_text_handoff_parity(self) -> None:
+         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+         interoperability = (SKILL_ROOT / "references/interoperability-contracts.md").read_text(encoding="utf-8")

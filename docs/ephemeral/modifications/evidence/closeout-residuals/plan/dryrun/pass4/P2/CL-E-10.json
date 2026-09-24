@@ -1,0 +1,124 @@
+{
+ "mode": "plan",
+ "pid": "CL-E-10",
+ "page": "3db4590a05eb811a8578d75885c16cac",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan CL-E-10 3db4590a05eb811a8578d75885c16cac --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "CL-E-10",
+  "fetched": "2026-09-23T13:29:31.478Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_ce55a240-5a1/agent-ab7ca8a552ea2992a.jsonl",
+  "ops_count": 11,
+  "rules": {
+   "R-A1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-P3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-CL": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-ITEM21": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A4a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LCL-E-10-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "LCL-E-10-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

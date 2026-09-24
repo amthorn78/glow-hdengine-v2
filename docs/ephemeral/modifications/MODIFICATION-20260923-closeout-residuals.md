@@ -1,0 +1,930 @@
+---
+artifact_type: GCFPE_MODIFICATION_RECORD
+modification_id: MODIFICATION-20260923-closeout-residuals
+status: PLANNED
+targets: [prompt, skill, rule, graph, registry, notion_control]
+gate_tier: 1
+closure:
+  upstream: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, CL-20, CL-30, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, GCFPE-MGMT-10, IA-10, IA-20, IA-30, IA-40, IA-50, MGR-10, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30, RS-40]
+  downstream: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CF-PO-10, CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, ESC-10, ESC-25, ESC-30, ESC-40, IA-10, IA-20, IA-30, IA-40, IA-50, IA-60, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-10, QA-100, QA-110, QA-120, QA-20, QA-50, QA-60, QA-70, QA-80, QA-90, RS-10, RS-20, RS-30, RS-40]
+  state_sharers: [CF-C-10, CF-C-20, CF-C-30, CF-C-40, CF-E-10, CF-E-20, CF-E-30, CF-E-40, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, DOC-10, DOC-20, ESC-25, ESC-30, ESC-40, IA-10, IA-20, IA-30, IA-40, IA-60, OPS-10, OPS-20, OPS-30, PR-10, PR-20, PR-30, PR-35, PR-40, QA-100, QA-110, QA-20, QA-50, QA-60, QA-70, QA-90, RS-10, RS-20, RS-30, RS-40, UTIL-10]
+readiness: READY
+override:
+  by: ""
+  overrides: []
+  reason: ""
+interaction_cost_predicted: 11
+item_count_at_approval: 40
+interaction_cost_actual:
+items:
+  - id: ITEM-01
+    statement: "The RS-20 package that glow-hde-pr-development describes carries no lineage or evidence that the named artifacts already hold (D23-B)."
+    source: "CLOSE-OUT-20260923 §4.A; glow-hde-pr-development/SKILL.md:143"
+    disposition: ""
+  - id: ITEM-02
+    statement: "session-relay-flowmaster no longer tells a handoff to carry advice and identity that the named artifacts hold (D23-B)."
+    source: "CLOSE-OUT-20260923 §4.A; session-relay-flowmaster/SKILL.md:281"
+    disposition: ""
+  - id: ITEM-03
+    statement: "flowmaster-validate's guidance no longer describes a `Selection status` body header, which its own validator rejects."
+    source: "CLOSE-OUT-20260923 §4.A; flowmaster-validate/SKILL.md:178"
+    disposition: ""
+  - id: ITEM-04
+    statement: "flowmaster-validate's guidance and profile staging_rule no longer presume a complete local copy of the prompt corpus (D22)."
+    source: "CLOSE-OUT-20260923 §4.A; flowmaster-validate/SKILL.md:382, :398, :402; profile staging_rule"
+    disposition: ""
+  - id: ITEM-05
+    statement: "amthor-workspace-governance-audit no longer snapshots or hashes prompt bodies (D22)."
+    source: "CLOSE-OUT-20260923 §4.A; amthor-workspace-governance-audit/SKILL.md:109-113, its description, references/report-contracts.md:39"
+    disposition: ""
+  - id: ITEM-06
+    statement: "session-relay-flowmaster no longer hashes prompt bodies (D22)."
+    source: "CLOSE-OUT-20260923 §4.A; session-relay-flowmaster/SKILL.md:378"
+    disposition: ""
+  - id: ITEM-07
+    statement: "The governance-audit behavioral fixture no longer rejects the cross-session PR-30 to PR-35 route that D23-D made lawful."
+    source: "CLOSE-OUT-20260923 §4.A; amthor-workspace-governance-audit/references/behavioral-fixtures.md:49"
+    disposition: ""
+  - id: ITEM-08
+    statement: "GCFPE stage prompts are no longer pinned by prompt-body content hash: one GCFPE override sentence outside the byte-identical protected core, in change-flow and session-relay-flowmaster, pins them by stable ID, version and direct Notion URL (A1-6 pattern). The core, flowmaster-primary, session-branch-flowmaster and tw-flowmaster are unchanged."
+    source: "CLOSE-OUT-20260923 §4.A; protected core :72, :122 in change-flow and session-relay-flowmaster; Nathan 2026-09-23 accepted the override recommendation"
+    disposition: ""
+  - id: ITEM-09
+    statement: "glow-graph-contract states the post-D23 graph counts."
+    source: "CLOSE-OUT-20260923 §4.A; glow-graph-contract/SKILL.md:13, :133-134"
+    disposition: ""
+  - id: ITEM-10
+    statement: "change-flow no longer calls 091426.1 the collision-checked reserved successor."
+    source: "CLOSE-OUT-20260923 §4.A (carried); change-flow/SKILL.md:280"
+    disposition: ""
+  - id: ITEM-11
+    statement: "flowmaster-validate/scripts/validate_gcfpe_current.py fails closed with a named result, not a NameError, when --bodies-stdin is used with the historical schema-3.1 alias contract."
+    source: "CLOSE-OUT-20260923 §4.A (carried); located by the ANALYZE verification in flowmaster-validate/scripts/validate_gcfpe_current.py:605 (change-flow has no copy)"
+    disposition: ""
+  - id: ITEM-12
+    statement: "The graph's edge_indices bookkeeping matches its edges."
+    source: "CLOSE-OUT-20260923 §4.A (carried)"
+    disposition: ""
+  - id: ITEM-13
+    statement: "The contract regenerator and the registry deriver live in glow-graph-contract as maintained scripts, and the pre-E2 contract they need is kept in the repository, so the shipped 091426.1 contract 6902924a… regenerates byte for byte from repository sources."
+    source: "CLOSE-OUT-20260923 §4.A (carried)"
+    disposition: ""
+  - id: ITEM-14
+    statement: "session-relay-flowmaster no longer names Drive as the GCFPE artifact plane (D7): its text, its ARTIFACT_PLANE enum (with REPOSITORY), validate_relay_manifest.py, a self-test case and the manifest examples agree."
+    source: "CLOSE-OUT-20260923 §4.A (carried); session-relay-flowmaster/SKILL.md:273, :358"
+    disposition: ""
+  - id: ITEM-15
+    statement: "The five round-a5 non-blocking findings are repaired."
+    source: "CLOSE-OUT-20260923 §4.A (carried); SECTION-10-REVIEW-a5-SFR-A5-1.md N1-N4, SECTION-10-REVIEW-a5-SFR-A5-2.md F1-F4"
+    disposition: ""
+  - id: ITEM-16
+    statement: "D22 has guards that fire on regression: CONTRACT_REQUIRED holds ITEM-08's override sentence in change-flow and session-relay-flowmaster; CONTRACT_FORBIDDEN, or the owning skill's own suite, forbids every retired body-copying or body-hashing phrase this Modification removes from change-flow, session-relay-flowmaster, flowmaster-validate and amthor-workspace-governance-audit; a governance-audit fixture proves prompt-kind sources carry no digest. tw-flowmaster is excluded (out of scope), and the residual limit, prose paraphrase, is recorded under D14."
+    source: "CLOSE-OUT-20260923 §4.A (carried); gcfpe.decision-record.md D22 (GUARD-001)"
+    disposition: ""
+  - id: ITEM-17
+    statement: "QA-10 no longer calls itself read-only while it saves three artifacts."
+    source: "CLOSE-OUT-20260923 §4.E"
+    disposition: ""
+  - id: ITEM-18
+    statement: "CL-40 names the store of the CRD candidate list it updates."
+    source: "CLOSE-OUT-20260923 §4.E"
+    disposition: ""
+  - id: ITEM-19
+    statement: "CL-20's board-update instruction names the board reference supplied by the change context, and records the update as pending with its PF04 §9.1.1 owner (the authorized manual operator and the actual receiving owners) when none is supplied."
+    source: "CLOSE-OUT-20260923 §4.E"
+    disposition: ""
+  - id: ITEM-20
+    statement: "OPS-10's and OPS-20's ban on page and file mentions says that it covers authored reusable text only, so it no longer reads as contradicting their own Notion URL line and the direct URL a handoff must carry."
+    source: "CLOSE-OUT-20260923 §4.E"
+    disposition: ""
+  - id: ITEM-21
+    statement: "The four CL-* bodies' 'PR-40 merge-approval effect … defined above' names the PR-40 entry the section describes once ITEM-29 lands (MERGE_OBSERVED first, Nathan's assertion only as fallback), and states that entry approves nothing (Flow Index: a published page, a passing check or a historical receipt 'creates no runtime approval')."
+    source: "CLOSE-OUT-20260923 §4.E"
+    disposition: ""
+  - id: ITEM-22
+    statement: "The registry's 16 lane notion_parent_id and 55 row expected_parent_id values, and their 70 titles, name each prompt's actual 091426.1 parent page, so the governance audit's parent check (NAM-002) holds."
+    source: "CLOSE-OUT-20260923 §4.D; ESC-10's page sits under the 091426.1 Escalation hub 3db4590a05eb81cd938de84cfffead9c while its row expects 3c74590a05eb8123bc55ca7f99ce176c"
+    disposition: ""
+  - id: ITEM-23
+    statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY (D20 redesign) reserves no release-bound header line (D23-G), so it can be promoted without one."
+    source: "CLOSE-OUT-20260923 §4.D; Notion page 3e34590a05eb811b93d2da9b4ef8106d, a child of the redesign tracking page"
+    disposition: ""
+  - id: ITEM-24
+    statement: "When a maintenance or repair session's message to the Product Owner carries a NEXT_PROMPT_HANDOFF block, the named state (DECISION NEEDED / NOTHING NEEDED / IN FLIGHT) is the line immediately before the block, so the handoff-last ruling and the named-state rule agree in glow-po-reporting, the Hub worker communication rules and session-working-rules.md."
+    source: "Product Owner ruling 2026-09-23 (a maintenance session's handoff goes last; gcfpe.decision-record.md D23 successor) against glow-po-reporting 'end in one of exactly three named states' and Hub 'Worker communication rules' §2"
+    disposition: ""
+  - id: ITEM-25
+    statement: "glow-graph-contract says that the graph copies bundled in skills are validator fixtures built from docs/graph/parts, not sources."
+    source: "Parent Modification Amendment 1 'Noticed, not in scope' (spec S-3); glow-graph-contract/SKILL.md:59"
+    disposition: ""
+  - id: ITEM-39
+    statement: "No installed skill this Modification packages states the retired D18 Alpha state as current: change-flow/SKILL.md:335 ('the sole operative state is ALPHA_STOPPED…'), flowmaster-validate/SKILL.md:174, and the governance audit's interoperability-contracts.md:96 and behavioral-fixtures.md:59, with the validator markers that require change-flow's line (change-flow validate_gcfpe_20260914.py:1033, flowmaster-validate validate_gcfpe_20260914.py:2692) moved with it. The graph's and contracts' alpha_resumption_contract follows the Product Owner's answer (§A, Open questions 3)."
+    source: "ANALYZE completeness review and broad match over the packaged skills, 2026-09-23 (ALPHA_STOPPED, PR04 not started, 'sole operative state')"
+    disposition: ""
+  - id: ITEM-26
+    statement: "No body's routing, recovery or package sentence tells a handoff to carry lineage, decisions, completed work, evidence, a branch or commit, or other content its named artifacts hold; each such sentence names the artifacts instead (C-HANDOFF, D23-B)."
+    source: "ANALYZE body sweep and adversarial re-check: HANDOFF_RESTATES_CONTENT, 123 REAL findings in 46 bodies (evidence/closeout-residuals/ANALYZE-body-evidence.md)"
+    disposition: ""
+  - id: ITEM-27
+    statement: "The shared sentences in 34 bodies that keep mappings 'in … metadata or [the] handoff' (A1) and in 34 bodies that keep or carry the CANON_CONFLICT_REGISTER in the handoff (A2) keep them in the output artifact only; the handoff names that artifact (C-ART, C-HANDOFF)."
+    source: "ANALYZE anchor census A1 and A2; one verdict per shared sentence"
+    disposition: ""
+  - id: ITEM-28
+    statement: "A registry guard (D14) fails when any retired handoff-content phrasing, branch or commit carriage, or 'or the handoff' storage clause returns to a body, each proven by an injected must-fail regression."
+    source: "The parent's E4 gate passed every body ITEM-26 names (0 of 1 484 assertions); a guard that never fired is not a guard (GUARD-001)"
+    disposition: ""
+  - id: ITEM-29
+    statement: "Every one of the 21 bodies that describes PR-40 entry by Nathan's assertion alone (anchor A7) uses the parent's A1-5 wording and the D23 once-per-merge sentence verbatim: the MERGE_OBSERVED handoff from PR-35 or RS-40 first, Nathan's merge assertion only where no MERGE_OBSERVED result was returned for this merge, and PR-40 entered once per merge."
+    source: "ANALYZE anchor census A7 (21 bodies)"
+    disposition: ""
+  - id: ITEM-30
+    statement: "PR-35's and RS-40's closed result lists include MERGE_OBSERVED, so C-DISPATCH's result is not barred as a 'sixth result'."
+    source: "ANALYZE re-check: PR-35 OTHER_CONTRADICTION (REAL); completeness critic for RS-40"
+    disposition: ""
+  - id: ITEM-31
+    statement: "PR-40 no longer says that an ordinary in-scope defect stays with the existing PR owner; a REJECT re-plans through PR-20 (C-REPLAN, D23-F)."
+    source: "ANALYZE re-check: PR-40 OTHER_CONTRADICTION (REAL)"
+    disposition: ""
+  - id: ITEM-32
+    statement: "The 13 bodies that call themselves read-only, or say they do not edit the repository, while committing their own outputs scope that claim to exclude those outputs; the shared 'Reviewers remain read-only' sentence is scoped to the reviewed work; and PR-35, RS-40 and GCFPE-MGMT-10, which write outside docs/ephemeral/ and docs/graph/, scope the storage sentence to their artifacts (ruling 2)."
+    source: "ANALYZE anchor census A5 and A6 (evidence/closeout-residuals/ANALYZE-anchor-census.md)"
+    disposition: ""
+  - id: ITEM-33
+    statement: "The 10 live bodies carrying 'Embed only applicable workflow contracts' (A3a) lose it, with its trailing 'do not restate them as independent reusable prompt policy' clause (A3b) where the two form one sentence; the 5 carrying 'candidate URL tokens must be replaced' (A4a) lose it; CL-40's 'This authoring candidate does not perform that update' (A4c) is resolved to match the PART-06 answer. Correctly scoped prohibitions (A3c, A3d, A4b) stay."
+    source: "ANALYZE anchor census A3 and A4, one verdict per sentence"
+    disposition: ""
+  - id: ITEM-34
+    statement: "QA-110 routes a completed failing run one way only, so ACCEPT and ESCALATION_REQUIRED no longer both claim it."
+    source: "ANALYZE re-check: QA-110 OTHER_CONTRADICTION (REAL)"
+    disposition: ""
+  - id: ITEM-35
+    statement: "QA-80 states WRONG_ROUTE_APPROVED_BASE once, with the graph's two branches as conditions (terminal without a complete delta; QA-70 with one), not as two opposing rules."
+    source: "ANALYZE re-check: QA-80 OTHER_CONTRADICTION (REAL); docs/graph/parts/prompts/QA-80.json"
+    disposition: ""
+  - id: ITEM-36
+    statement: "The D23-G release-line check rejects a Prompt version:, Set: or Ecosystem release: label line anywhere in a body, not only in the first 8 non-blank lines, in the registry's 55 rows and in flowmaster-validate's PROMPT_BODY_RELEASE_HEADER."
+    source: "ANALYZE verification B4a-c: both checks see 8 non-blank lines only"
+    disposition: ""
+  - id: ITEM-37
+    statement: "C-LAT's 'Decide it during work' block in the eight bodies that implement nothing (PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20, IA-30) is changed as the Product Owner rules on the re-asked question (§A, Open questions 2), recorded as a D23-C successor."
+    source: "ANALYZE completeness critic; C-LAT is placed verbatim by the parent's step 22 (spec v2 §3), so this changes a canonical placement and needs a Product Owner ruling"
+    disposition: ""
+  - id: ITEM-38
+    statement: "PR-10's 'material change (D23-C) change' loses its doubled word, as a rider on PR-10's PART-15 edit. The '(D23-C)' form itself stays: it is the parent's recorded STEP22-BEFORE settlement (evidence/e3/E3-E4-report.md:112)."
+    source: "ANALYZE sweep: PR-10, PR-35, PR-40, DOC-10 read 'material change (D23-C)'; spec v2 step 22"
+    disposition: ""
+  - id: ITEM-40
+    statement: "The unpromoted GCFPE-MGMT-10 PROPOSED BODY carries none of the classes the census measured on it and this Modification removes (anchors A1, A2, A3a with its A3b clause, A4a, A5 and A8; it has no handoff-content instruction), so its promotion cannot reintroduce them. Its read-only 'Must not: change anything' lines and its design-level contradictions are recorded for the D20 redesign's stage 5, not resolved here."
+    source: "ANALYZE anchor census of page 3e34590a05eb811b93d2da9b4ef8106d (evidence/closeout-residuals/ANALYZE-anchor-census.md)"
+    disposition: ""
+parts:
+  - id: PART-01
+    name: "Skill text applies D23-B and D7; the PR skill's revision moves and the contract is regenerated"
+    items: [ITEM-01, ITEM-02, ITEM-14]
+    class: B
+    after: [PART-04]
+  - id: PART-02
+    name: "Skills stop copying and hashing prompt bodies, and D22 gets its guards"
+    items: [ITEM-04, ITEM-05, ITEM-06, ITEM-08, ITEM-16]
+    class: B
+    after: []
+  - id: PART-03
+    name: "Skill text states what rulings already settled"
+    items: [ITEM-03, ITEM-07, ITEM-09, ITEM-10, ITEM-25, ITEM-39]
+    class: B
+    after: []
+  - id: PART-04
+    name: "Validator and graph-tooling defects"
+    items: [ITEM-11, ITEM-12, ITEM-13, ITEM-15]
+    class: C
+    after: []
+  - id: PART-05
+    name: "Read-only claims scoped to the body's own committed outputs"
+    items: [ITEM-17, ITEM-32]
+    class: B
+    after: []
+  - id: PART-06
+    name: "CL-40's Candidate CRD Items List lives in Notion"
+    items: [ITEM-18]
+    class: A
+    after: []
+  - id: PART-07
+    name: "CL-20 board-update destination"
+    items: [ITEM-19]
+    class: D
+    after: []
+  - id: PART-08
+    name: "OPS-10 and OPS-20 page-mention rule scoped"
+    items: [ITEM-20]
+    class: B
+    after: []
+  - id: PART-10
+    name: "Registry parent ids match the 091426.1 hubs"
+    items: [ITEM-22]
+    class: C
+    after: []
+  - id: PART-11
+    name: "The MGMT-10 proposed body is fixed before promotion"
+    items: [ITEM-23, ITEM-40]
+    class: B
+    after: []
+  - id: PART-12
+    name: "Named state sits immediately before a handoff block"
+    items: [ITEM-24]
+    class: B
+    after: []
+  - id: PART-13
+    name: "Bodies' handoff sentences follow C-HANDOFF and C-ART"
+    items: [ITEM-26, ITEM-27, ITEM-28]
+    class: B
+    after: []
+  - id: PART-14
+    name: "PR-40 entry and results follow D23-E and D23-F in every body"
+    items: [ITEM-21, ITEM-29, ITEM-30, ITEM-31]
+    class: B
+    after: []
+  - id: PART-15
+    name: "Author-only leftovers removed from live bodies"
+    items: [ITEM-33, ITEM-38]
+    class: D
+    after: [PART-06]
+  - id: PART-16
+    name: "Two routing contradictions in QA-110 and QA-80"
+    items: [ITEM-34, ITEM-35]
+    class: D
+    after: []
+  - id: PART-17
+    name: "D23-G release-line check covers the whole body"
+    items: [ITEM-36]
+    class: B
+    after: []
+  - id: PART-18
+    name: "C-LAT in the non-implementing bodies, as ruled on Open question 2"
+    items: [ITEM-37]
+    class: A
+    after: []
+request: |
+  477 merged. yes, fix 1-4. The next action in Alph is planning for PR05. That will be done after this MGMT run is complete.
+requested_by: Nathan
+analyze_approved_by: Nathan
+analyze_approved_date: 2026-09-23
+plan_approved_by: ""
+plan_approved_date: ""
+supersedes: ""
+spawned_from: MODIFICATION-20260923-alpha-feedback-open-entries
+shares_package_with: []
+---
+
+# MODIFICATION-20260923-closeout-residuals
+
+Brings the installed skills and five prompt bodies into line with D23 and D22, closing the items
+the previous Modification's close-out left for Nathan (`evidence/e6/CLOSE-OUT-20260923.md` §4.A
+and §4.E).
+
+## Intake
+
+Spawned from `MODIFICATION-20260923-alpha-feedback-open-entries`, whose scope froze at ANALYZE
+approval (`D20`). Nathan's "yes, fix 1-4" (2026-09-23) answers the close-out report's four
+questions. Questions 1 and 2 are this Modification: 1 is the installed-skill text, with the
+protected-core hash pin fixed by a GCFPE override outside the core, and 2 folds the body defects
+into the same run. Questions 3 (the D18 Alpha-state block) and 4 (older stale lines on Notion
+control pages) are maintenance edits made directly by `GCFPE-MGMT-10` and recorded in the close-out
+file, not here, except the two §4.D items that change the registry or a prompt body (ITEM-22 and
+ITEM-23), which need this Modification's gates.
+
+Every item is `NEW`: none is ruled on in the decision record `D1`–`D24`, and none is an open
+Alpha Feedback entry. Each item's source line is where it was found; ANALYZE re-verifies each
+against the installed tree or the live body before planning an edit.
+
+**Not included:** the four `tw-flowmaster` findings on its GCFPE binding (`:278`, `:311`–`:315`)
+and AF-012 for TW. The TW ecosystem is out of scope (Nathan, 2026-09-23).
+
+**Parts.** PART-01 to PART-03 each carry one rule across the skills that state it, so each lands
+whole. PART-02 puts `D22`'s guard in the same part as the repairs, because a guard that lands before
+them fails on the installed text and one that lands after leaves them unguarded. PART-04 groups the
+tooling defects. Each body defect is its own part (PART-05 to PART-09, PART-11), since none depends on
+another. PART-10 is a registry-only change. Whatever the grouping, template rule 7 still sends every change to the same skill through
+one package, one review and one install.
+
+## §A — Analysis
+
+*Written by MODE = ANALYZE, 2026-09-23. Two review rounds checked it:*
+
+- *round one, `wf_1ac3cdc2-156`: 11 required findings;*
+- *round two, `wf_4bf0baec-6cc`: 14 required findings, all against the repair;*
+- *round three: a verifier's check of round two.*
+
+*This version answers both rounds and a third verifier's check. The sub-points still open are named in the closing section.
+Evidence, all under `evidence/closeout-residuals/`:*
+
+- *`ANALYZE-body-evidence.md`: the sweep, its re-check verdicts, and the re-verification of ITEMs 17–21
+  and 23;*
+- *`ANALYZE-anchor-census.md`: one verdict per shared sentence;*
+- *`ANALYZE-skill-evidence.md`: skill items, the registry mapping and the revision pins;*
+- *`ANALYZE-closure.md`: `closure.py` output.*
+
+### Product Owner rulings received during ANALYZE
+
+1. **The Candidate CRD Items List lives in Notion** (Nathan, 2026-09-23: *"candidate CRD can live in
+   notion, I don't think it is a huge doc"*). No Notion page for it exists yet. The only copy is the
+   Drive file `Candidate-CRD-Items-List.md` (`1JPN7WcqCddC2J7UKkHdO4gnIPYRJPGJO`, 31 923 B, last
+   modified 2026-09-08). ITEM-18 therefore needs a Notion page. Whether CL-40 itself writes it is *Open question 1*.
+2. **Every prompt commits its output files** (Nathan, 2026-09-23: *"all output files are committed,
+   that is the only way they are ever seen"*). A body that calls itself read-only, or says it does not
+   edit the repository, while it commits its own output artifacts has the wording wrong, not the
+   behaviour. The fix scopes the claim so that it excludes the prompt's own committed outputs (C-ART).
+   The commit stays.
+3. **This Modification is widened** to the stale body text left in place by D23's placements (Nathan,
+   2026-09-23: *"yes. we may as well widen. This process seems to be working so far. I want this system
+   tight"*). ANALYZE was not yet approved, so no override is needed.
+   - **Measured classes:** a sweep of seven classes found handoff content lists, PR-40 entry without
+     `MERGE_OBSERVED`, read-only claims beside commits, author-only leftovers and other contradictions.
+     The undefined-reference and mention-ban classes came back empty.
+   - **How scope was set:** an adversarial re-check judged every finding. An exact census then gave
+     each shared sentence one verdict for all its carriers.
+   - **C-LAT placement:** raised by the completeness critic, not by the sweep.
+4. **ITEM-37, first answer.**
+   - **What was put to Nathan:** option (b), "in those eight bodies step 2 reads 'hand it to the
+     implementing PR owner, who decides, implements, tests and records it'. The test is unchanged."
+   - **His reply:** *"yes those words don't seem to mean anything do they"*.
+   - **Why it is asked again:** review showed (b)'s receiver wrong for PR-40, which runs after the merge
+     and whose defects re-plan through PR-20 (D23-F), and for IA-30 and PR-10, which run before any PR
+     owner exists. A different reading would change what he approved, so the question is re-asked
+     below. It is not decided here.
+
+5. **Open questions 1–3 answered** (Nathan, 2026-09-23: *"ok approved"*, to the three recommendations):
+   - **Q1 (A):** CL-40 writes the Candidate CRD Items List in Notion, under a destination rule naming that
+     one page.
+   - **Q2 (a):** C-LAT's three-step *Decide it during work* block is removed from PR-10, PR-20, PR-40,
+     RS-10, RS-20, DOC-10, DOC-20 and IA-30; the Material definition and each body's own routing stay.
+   - **Q3 (A):** the graph's and contracts' `alpha_resumption_contract` stays as the promotion-time
+     record; the two validator checks are renamed to promotion-record checks, and the graph does not
+     change.
+
+### Open questions for the Product Owner
+
+All three were answered by ruling 5 and are kept as asked.
+
+1. **PART-06: does CL-40 write the Candidate CRD Items List in Notion itself?**
+   - **What CL-40 does:** it runs at the end of each change, scans for PF09 gaps and CRD candidates, and
+     adds new candidates to the list.
+   - **What breaks:** a flow prompt is read-only to Notion unless a destination rule names the page.
+     With no writer, the list goes stale, which is the failure that retired the D18 block.
+   - **(A) Recommended.** A destination rule names the one page, CL-40's registry `mutations` row
+     allows the write, and CL-40's A4c sentence goes. The cost is one policy entry.
+   - **(B)** CL-40 records candidates only in its committed `CYCLE_GAP_SCAN`, and Nathan or a
+     maintenance run copies them over. Then CL-40's step 7 and its A4c sentence must change too, so it
+     stops attempting the update.
+   - **(B)'s cost:** no new write path in this run, and the same edit count. It adds one copying round
+     trip after every change, indefinitely.
+2. **ITEM-37, re-asked: C-LAT in the eight bodies that implement nothing.**
+   - **What the bodies are:** PR-10 writes work-unit instructions; PR-20 plans; PR-40 reviews after
+     the merge; RS-10 proposes a rescope; RS-20 reviews one; DOC-10 writes documentation instructions;
+     DOC-20 verifies them; IA-30 reviews the whole-change plan.
+   - **What breaks:** each carries C-LAT's three steps. Step 2 tells it to "decide it, implement it,
+     test it", which none of them can do. PR-40, a read-only reviewer, is told to implement a fix, where
+     D23-F sends it to REJECT and re-plan.
+   - **(a) Recommended. Remove the three-step block and keep the Material definition.** Each body's
+     own routing already sends a material change to rescope, and handles the rest by its role. The
+     three steps are an implementor's procedure.
+   - **(b′) Remove step 2 only, keeping steps 1 and 3.** PR-40 would still read "otherwise, do not do
+     it; record it as a candidate", which contradicts its REJECT route for an in-scope defect.
+   - **(c) Leave the text as placed.**
+   - **Cost:** (a) and (b′) cost the same, 8 body edits and a registry pattern each; (c) costs nothing.
+3. **ITEM-39: the retired Alpha state inside the graph and the contracts.**
+   - **What it is:** the graph's `global.json` and both 091426.1 contracts carry an
+     `alpha_resumption_contract` with `state: ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR` and
+     `next_intended_unit: HDE-EPIC040-PR04`. flowmaster-validate requires those values
+     (`validate_gcfpe_20260914.py:1901-1908`).
+   - **What breaks:** a machine record, validated on every run, asserts an Alpha state that was
+     discharged on 2026-09-21. Today no prompt reads it for routing.
+   - **(A) Recommended. Keep it as the promotion-time record.** The fields describe the resumption
+     contract at promotion. The skills' prose says so, the validator check is renamed from a state check
+     to a promotion-record check, and nothing that moves the graph digest is touched.
+   - **(A)'s cost:** two check renames inside PART-03, and nothing else.
+   - **(B) Retire it** from the graph, both contracts and the validators, including change-flow's
+     `:1017-1018` successor-trigger check. The graph digest moves off `ae2bd159…`, and every recorded
+     proof token and pin moves with it: the Flow Index, the register, `authoritative-surfaces.md`,
+     `ecosystem-change-management.md`, the v5.0.0 pointer, validators and profiles.
+   - **(B)'s cost:** a new part, after PART-01, that edits `global.json`, rebuilds the graph and
+     regenerates the contract a second time; about a dozen Notion and repository token updates; and a
+     likely extra review cycle (+1). It would also replace Decision 1's "the graph is not regenerated"
+     and PART-04's byte-identical gate, which would then apply only to the reindex, before the
+     retirement.
+
+### Items whose premise the verification refuted
+
+- **ITEM-20, proposed `NOT_APPLICABLE`.**
+  - The sweep and the re-check found OPS-10's and OPS-20's mention bans correctly scoped
+    (`LINK_OR_MENTION_BAN`: 0 REAL, 6 NOT_REAL).
+  - They are correctly scoped: OPS-10's ban governs the `OPS_TASK` text it authors, and OPS-20's governs
+    reusable handoffs, not a runtime handoff's direct URL. The census rule keeps correctly scoped
+    prohibitions, and the same rule keeps A3c, A3d and A4b.
+  - PART-08 therefore lands empty, and §E records the verdict.
+- **ITEM-21 keeps its four bodies and loses its premise.** The reference does resolve, to *Product Owner
+  merge action*. ITEM-21 now makes that reference name the PR-40 entry the section will describe once
+  ITEM-29 lands: `MERGE_OBSERVED` first, the assertion only as fallback. It also says that entry
+  approves nothing.
+- **ITEM-38 is reduced to PR-10's doubled word.** `material change (D23-C)` is the parent's recorded
+  STEP22-BEFORE settlement (`evidence/e3/E3-E4-report.md:112`). The typo is fixed as a rider on PR-10's
+  PART-15 edit and has no guard, since it has no behaviour.
+
+### Already landed during ANALYZE
+
+- **ITEM-13's input.** The pre-E2 contract `2b78f877…` was kept at `evidence/pre-e2-contract/` in
+  commit `245b21b`. PART-04 moves it to `docs/graph/` (maintained source) and uses it only to prove the
+  regenerator: regenerating from it must give the shipped `6902924a…` byte for byte.
+
+### Per part: class, tier, targets and gates
+
+| part | class | tier, and why | targets | gates |
+|---|---|---|---|---|
+| PART-01 | B | 0: skill text and the contract's revision fields; no prompt produces anything different | skill: PR skill (01), relay (02, 14: text, `validate_relay_manifest.py`, self-test, examples), flowmaster-validate (`CONTRACT_FORBIDDEN`). Contract: regenerated with `primary_skill_revision` 1.3.1 and `contract_revision` 4.1.0 → 4.1.1, both bundled copies (change-flow, flowmaster-validate), and every pin (`EXPECTED_CANDIDATE_CONTRACT_SHA256`, `validation-profile.json:8`, `validation-profile.json:27-28` `installed_skill_revisions`, the contract-revision pins at change-flow `:751` and flowmaster-validate `:1477`, and `primary_skill_revision` at flowmaster-validate `:1816`). After PART-04 (regenerator) | readback; forbidden literals fired by injected regressions; the regenerated contract passes both validators; D24 review; install |
+| PART-02 | B | 0: skill text, code and guards; the core bytes do not move | skill: flowmaster-validate, change-flow, relay, governance audit (text, code, fixture); decision record: a `D14` note recording the prose-paraphrase limit of ITEM-16's guards | ITEM-16 guards fired by injected regressions; the governance-audit fixture; `core_sync` true; D24; install |
+| PART-03 | B | 0: skill prose brought into line with settled rulings (D23-G, D23-D, D13, D18's successor, promotion) | skill: flowmaster-validate (03, 39), governance audit (07, 39), glow-graph-contract (09 including its description, 25), change-flow (09's `:802` comment, 10, 39 at `:335`), the two validator markers that require change-flow's `:335`; under Open question 3 (A), the checks at flowmaster-validate `:1901-1908` and change-flow `:1017-1018` renamed from Alpha-state checks to promotion-record checks, values unchanged | readback; the moved markers fire on the old text; D24; install |
+| PART-04 | C | 0: validators and graph tooling are controls; the build stays byte-identical | skill: flowmaster-validate (11, 15), glow-graph-contract (12 with `reindex` and its documentation, 13); graph: `docs/graph/parts` reindex; `docs/graph/` home for the pre-E2 contract; a dated correction note on the repair-a4 record's C8 and §2 | build byte-identical (`ae2bd159…`); the builder rejects an injected count mismatch; fixture cases for 11; the five a5 regressions; the regenerator reproduces `6902924a…` from the kept input; D24; install |
+| PART-05 | B | 0: wording aligned with what the bodies already do (ruling 2); nothing they produce changes | prompt: 15 bodies (CL-20, CL-30, CL-40, CL-E-20, DOC-20, ESC-25, GCFPE-MGMT-10, OPS-10, OPS-30, PR-20, PR-35, PR-40, PR-50, QA-10, RS-40); decision record: ruling 2's entry; registry patterns | readback; a forbidden pattern per retired phrasing, including A10, fired by regression |
+| PART-06 | A | 1: changes what CL-40 writes and where | prompt: CL-40. Notion: a new *Candidate CRD Items List* page under the Glow Operations Hub, created by `GCFPE-MGMT-10` at EXECUTE and migrated from Drive `1JPN7Wcq…`. Rule: the destination rule (answer (A)). Registry: CL-40 `mutations`, guard. Decision record: ruling 1's entry. Product Owner action: banner the Drive file as superseded (Drive is his). The only repository mention of the Drive list (`docs/ephemeral/HDE-EPIC040-PR40-workspace-register.md:206`) is inside a dated 2026-09-09 snapshot of a Notion page and stays as written (`AUTH-001`) | decision-record entry committed before any EXECUTE edit; readback of the migrated list against the Drive source; guard fired by regression; corpus gate |
+| PART-07 | D | 1: changes what the closure memo records when no board is supplied | prompt: CL-20; registry assertion | assertion added and fired by regression |
+| PART-08 | B | 0: wording only, and proposed `NOT_APPLICABLE` | prompt: OPS-10, OPS-20 | none: proposed `NOT_APPLICABLE` |
+| PART-10 | C | 0: registry data (a control) | registry: 71 parent IDs and 70 titles | NAM-002 run on a snapshot of actual parents, and failing on one injected wrong parent |
+| PART-11 | B | 0: not a release member | Notion: the proposed MGMT-10 body (23, 40); the redesign tracking page records ITEM-40's deferred contradictions and read-only lines for stage 5 | readback; the gate runs directly, as PLAN's patterns for A1, A2, A3a, A4a, A5 and A8 plus the whole-body release-line pattern, against the body; it needs no other part to have landed |
+| PART-12 | B | 0: reporting format | skill: `glow-po-reporting`; Notion: Hub *Worker communication rules*; rule: `session-working-rules.md` | readback; D24; install |
+| PART-13 | B | 1: changes what handoffs carry | prompt: 48 bodies (46 with REAL routing findings, and every A1 and A2 carrier); registry patterns (ITEM-28) | patterns fired by injected regressions; corpus gate |
+| PART-14 | B | 1: changes PR-35's and RS-40's lawful results and how PR-40 is entered | prompt: 21 bodies with A7 (CL-20, CL-30, CL-40, CL-C-10, CL-E-10, CL-E-20, CL-E-30, CL-E-40, DOC-10, DOC-20, ESC-10, ESC-25, ESC-30, ESC-40, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10, QA-20), plus PR-35, RS-40 (30) and PR-40 (31); registry patterns | forbidden patterns for assertion-only entry and for "ordinary in-scope defect remains with the existing PR owner"; required A1-5 wording; required `MERGE_OBSERVED` in PR-35's and RS-40's result lists; each fired by regression; corpus gate |
+| PART-15 | D | 1: CL-40's A4c changes whether CL-40 updates the list | prompt: 11 bodies (CL-20, CL-30, CL-40, CL-C-10, CL-E-10, OPS-30, PR-10, PR-20, PR-30, PR-40, QA-10); registry assertions. After PART-06 | assertions added and fired by regression |
+| PART-16 | D | 1: changes result routing text | prompt: QA-110, QA-80; registry assertions | assertions fired by regression; text matches the graph (`D13`) |
+| PART-17 | B | 0: guard widening | registry: the release-line guards on 55 rows; skill: flowmaster-validate `PROMPT_BODY_RELEASE_HEADER`; rule: `prompt-body-content-policy.md` | 0 live label lines, so no false positive; a label injected past line 8 fails |
+| PART-18 | A | 1: changes a canonical placement | prompt: the 8 bodies (per Open question 2); registry: C-LAT patterns on those rows; decision record: `D23-C` successor; the PE Metaprompt GCFPE overlay and any skill copy stating C-LAT's placement | successor committed before any EXECUTE edit; pattern fired by regression; corpus gate |
+
+Notes on the table:
+
+- **PART-09 was dissolved.** ITEM-21 moved to PART-14.
+- **ITEM-14 moved from PART-03 to PART-01.**
+- **PART-17 is within D23-G.** `prompt-body-content-policy.md` already forbids "any field whose value
+  changes because of a release event", with no header limit. The check's eight-line window was an
+  implementation limit, not the rule.
+- **No graph part changes routing.** The Modification is Tier 1 (`gate_tier: 1`) because PARTs 06, 07,
+  13, 14, 15, 16 and 18 change what prompts produce.
+
+**Closure.** 50 live prompts touched, radius **55 of 55**. The Tier 1 gate is the full corpus: the
+registry validator over all 55 live bodies, and every installed suite. The front matter holds the
+unions: 51 upstream, 50 downstream, 43 state sharers. Per prompt (full output in
+`ANALYZE-closure.md`):
+
+| prompt | upstream | downstream | state sharers | radius |
+|---|---|---|---|---|
+| CF-C-10 | 4 | 4 | 19 | 22 |
+| CF-C-20 | 1 | 2 | 21 | 22 |
+| CF-C-30 | 2 | 2 | 2 | 5 |
+| CF-C-40 | 1 | 1 | 3 | 4 |
+| CF-E-10 | 4 | 4 | 19 | 22 |
+| CF-E-20 | 1 | 2 | 21 | 22 |
+| CF-E-30 | 2 | 2 | 2 | 5 |
+| CF-E-40 | 1 | 1 | 3 | 4 |
+| CL-20 | 2 | 5 | 0 | 7 |
+| CL-30 | 1 | 1 | 0 | 2 |
+| CL-40 | 4 | 1 | 7 | 12 |
+| CL-C-10 | 1 | 2 | 1 | 4 |
+| CL-E-10 | 1 | 3 | 1 | 5 |
+| CL-E-20 | 4 | 2 | 21 | 26 |
+| CL-E-30 | 2 | 2 | 5 | 8 |
+| CL-E-40 | 2 | 2 | 0 | 4 |
+| DOC-10 | 1 | 3 | 20 | 22 |
+| DOC-20 | 0 | 4 | 23 | 25 |
+| ESC-10 | 3 | 1 | 0 | 4 |
+| ESC-25 | 4 | 1 | 21 | 22 |
+| ESC-30 | 6 | 2 | 19 | 24 |
+| ESC-40 | 1 | 3 | 3 | 6 |
+| GCFPE-MGMT-10 | 0 | 1 | 0 | 1 |
+| IA-10 | 3 | 5 | 19 | 24 |
+| IA-20 | 2 | 4 | 19 | 22 |
+| IA-30 | 4 | 2 | 6 | 10 |
+| OPS-10 | 1 | 3 | 19 | 21 |
+| OPS-20 | 1 | 3 | 22 | 24 |
+| OPS-30 | 1 | 3 | 4 | 8 |
+| PR-10 | 3 | 3 | 19 | 24 |
+| PR-20 | 3 | 2 | 19 | 22 |
+| PR-30 | 3 | 3 | 3 | 6 |
+| PR-35 | 4 | 3 | 3 | 7 |
+| PR-40 | 3 | 3 | 6 | 11 |
+| PR-50 | 0 | 0 | 0 | 0 |
+| QA-10 | 3 | 2 | 0 | 4 |
+| QA-100 | 2 | 1 | 22 | 23 |
+| QA-110 | 3 | 4 | 7 | 10 |
+| QA-120 | 1 | 5 | 0 | 5 |
+| QA-20 | 1 | 2 | 19 | 20 |
+| QA-50 | 1 | 4 | 19 | 22 |
+| QA-60 | 1 | 3 | 19 | 22 |
+| QA-70 | 3 | 2 | 3 | 7 |
+| QA-80 | 3 | 1 | 1 | 4 |
+| QA-90 | 5 | 3 | 3 | 8 |
+| RS-10 | 8 | 1 | 1 | 10 |
+| RS-20 | 5 | 4 | 4 | 9 |
+| RS-30 | 1 | 1 | 1 | 2 |
+| RS-40 | 1 | 4 | 3 | 5 |
+| UTIL-10 | 0 | 0 | 7 | 7 |
+
+### Scope, and how it was measured
+
+- **Bodies.** Three passes, all under `D22`, with every body read completely.
+  1. **Sweep:** seven classes, matched by effect. 335 findings.
+  2. **Adversarial re-check:** 158 REAL, 177 NOT_REAL, plus 26 REAL findings added by the re-check.
+  3. **Exact census:** ten anchors over the 55 live bodies and the proposed MGMT-10 body.
+
+  The census governs shared sentences: one verdict per sentence, applied to every carrier. One rule
+  decides the author-directed rows and the mention bans alike: a positive instruction to the prompt's
+  author, which an executor could act on, goes; a prohibition correctly scoped to what the executor
+  actually writes stays. A3b goes with A3a where the two form one sentence (its "them" refers to A3a's
+  contracts); PLAN confirms this per body. Measured part scopes:
+  - PART-05: 15 bodies;
+  - PART-13: 48;
+  - PART-14: 21, plus PR-35 and RS-40;
+  - PART-15: 11;
+  - PART-17: 0 live label lines;
+  - touched overall: **50 of 55**.
+- **Skills.**
+  - A broad paragraph scan of every GCFPE-bound skill's `SKILL.md`, references and scripts looked for
+    a body noun with a copy or identity verb (D22), a handoff with a carry verb (D23-B), `drive` (D7),
+    and numeric counts. It returned 31 candidate sites, each read in turn.
+  - A second broad match looked for the retired Alpha state (ALPHA_STOPPED, "PR04 not started", "sole
+    operative state"). It found 4 prose sites plus the machine records, which are Open question 3.
+  - Two verifiers reproduced or refuted every surviving item (`ANALYZE-skill-evidence.md`).
+- **Registry.** The six-ID mapping, measured from the parent pages' child lists, is in
+  `ANALYZE-skill-evidence.md`.
+
+### Decisions this analysis made
+
+Each applies a ruling or rule already in force.
+
+1. **Revisions move** (`skill-identity-and-freeze.md`: "Corrected bytes never reuse one"):
+
+   | item | from | to |
+   |---|---|---|
+   | flowmaster-validate | 3.3.0 | 3.3.1 |
+   | change-flow | 3.3.0 | 3.3.1 |
+   | relay | 3.1.0 | 3.2.0 |
+   | PR skill | 1.3.0 | 1.3.1 |
+   | governance audit | 1.12.0 | 1.13.0 |
+   | the 091426.1 contract | 4.1.0 | 4.1.1 |
+
+   - The contract is regenerated because it carries the PR skill's revision. The graph is not
+     regenerated.
+   - glow-graph-contract and glow-po-reporting advertise no revision, so their identity is the freeze
+     digest (`D19`).
+2. **The relay's GCFPE model and reasoning advice is deleted (ITEM-02).** This applies the
+   retired-assessment rule.
+3. **The governance audit changes its code as well as its text (ITEM-05).**
+4. **The relay keeps `GOOGLE_DRIVE` for non-GCFPE projects and adds `REPOSITORY` (ITEM-14).**
+5. **Graph counts appear once, as a dated proof token (ITEM-09),** in the text and the description.
+6. **The registry deriver imports the governance audit's `load_data` (ITEM-13).** That keeps one
+   parser, and the two packages are installed together.
+7. **CL-20's board stays a runtime reference (ITEM-19),** pending with its PF04 §9.1.1 owner when none
+   is supplied.
+8. **QA-80 and QA-110 follow the graph (`D13`).**
+9. **ITEM-11 is fixed in place.**
+10. **Where a handoff block closes a message, the named state goes immediately before it (ITEM-24).**
+11. **ITEM-40 covers only the classes this Modification removes.** The census found design-level
+    contradictions in the proposed MGMT-10 body: result codes, which session writes the approval fields,
+    and artifact locations, among others. They go to the D20 redesign's stage 5, "fix what the pilot
+    exposes". They are recorded on the redesign tracking page at EXECUTE and not resolved here, because
+    each needs a design choice that the D20 track owns.
+
+### Order, cut-over and freeze
+
+1. **Record pull request.** This record, with its ANALYZE and PLAN, merges from
+   `claude/epic-tesla-17406z` before EXECUTE (the parent's #474 pattern). The close-out §6 commits
+   travel with it. A merge preserves the record and approves nothing (`D21-C`).
+2. **Execution branch.** EXECUTE's first commit is the decision-record entries: ruling 1 and ruling 2
+   (PART-06, PART-05), ruling 4 and Open question 2's answer as a `D23-C` successor (PART-18), and
+   Open question 3's answer. `GCFPE-MGMT-10` commits them before any other edit, which meets the class
+   A gate.
+3. **One install event.** All seven packages are reviewed together: two D24 reviewer subagents, with
+   the filled brief committed before either is spawned. They are installed in one sitting. Three
+   couplings force this:
+   - flowmaster-validate pins change-flow's and the relay's revisions and the contract digest;
+   - glow-graph-contract imports the governance audit;
+   - PART-01's regenerated contract ships in two packages.
+
+   The graph-parts reindex reaches `main` in the execution pull request before the stricter builder
+   is installed.
+4. **Bodies land under a freeze.** It starts before EXECUTE's first Notion write and lifts after full
+   readback and the corpus gate. The new registry patterns are evaluated against the landed bodies in
+   the same sitting, and the execution pull request merges only after that. PR05 planning waits on
+   the freeze, which Nathan scheduled for after this run.
+
+### Unguarded items, with the reason
+
+- **ITEMs 03, 07, 09, 10 and 25** are skill prose with no suite that reads meaning; the D24 review
+  holds them.
+- **ITEM-39** is guarded only at change-flow's `:335`, by the moved validator markers. Its other three
+  prose sites have no guard: flowmaster-validate `SKILL.md:174`, and the governance audit's `:96` and
+  `:59`.
+- **ITEM-24** is prose in a prose skill.
+- **ITEM-38** is a typo with no behaviour.
+- **ITEM-36** is itself a guard.
+
+### Contradictions and risks
+
+- **The parent's gate passed every one of these findings,** with 0 of 1 484 assertions failing,
+  because its guards tested presence, not removal. Every new class therefore gets forbidden patterns
+  fired by injected regressions (`GUARD-001`).
+- **D22's prose guard is weaker than prototyped.** It missed 30 of 30 paraphrases, so ITEM-16 now pins
+  exact phrases. The residual limit is prose paraphrase.
+- **Notion storage.** A strikethrough across bold and code turned into literal tildes today, and at E6
+  a blank-line window was exposed on 10 bodies. So EXECUTE uses exact-anchor replacements, puts no
+  strikethrough in bodies, reads everything back in full, and reads the migrated list back against
+  Drive.
+- **D24 coupling.** PART-01 spans 4 packages (the PR skill, relay, flowmaster-validate, and change-flow through the contract copy), PART-02 spans 4 and PART-03 spans 4. One rejected edit
+  blocks its part, re-cuts several packages, and needs fresh reviewers. The parent took five rounds.
+- **Which MGMT-10 body governs this run.** The live 091426.1 body, as read when the run began. PART-05's
+  edit to it applies to later runs. PART-11 (ITEMs 23 and 40) edits the proposed body, which does not
+  govern this run.
+- **change-flow tells agents Alpha is stopped today** (`:335`). Any session that loads change-flow
+  before this Modification installs reads a false Alpha state. PR05 planning is scheduled after this
+  run, which is the reason not to plan PR05 earlier.
+- **Canonical texts are not edited,** except by the Open question 2 answer. PR-35's "as before" is
+  canonical C-SUB wording and stays.
+- **Not included.**
+  - **TW, which is out of scope.** tw-flowmaster's GCFPE binding keeps the core's content pin, an
+    "optional digest" (`:306`) and three model-advice lines (`:313`–`:317`), with no D22 override or
+    guard. AF-012 also stays open for TW.
+  - **The proposed MGMT-10 body's design contradictions,** which go to D20 stage 5.
+- **Defect classes matched:**
+  - `DERIV-001`: handoffs restating artifacts;
+  - `GUARD-001`: guards that never fired;
+  - `SCOPE-001`: measured by effect;
+  - `FUNC-001`: read-only claims judged by behaviour;
+  - `NORM-001`: harmless prohibitions left alone.
+- **Findings on upstream sections** (template rule 1, recorded rather than edited):
+  - the opening sentence's "five prompt bodies" is now 50 live bodies plus the proposed MGMT-10 body;
+  - the Intake's "none is ruled on in D1–D24" is false for ITEM-08 (the A1-6 precedent), ITEM-24 (a D23
+    successor) and ITEM-29 (D23-E);
+  - its part paragraph names PART-09, which no longer exists.
+
+### Readiness and interaction cost
+
+`readiness: READY`. Open questions 1–3 were answered by ruling 5.
+
+**ANALYZE approved** by Nathan, 2026-09-23 (*"yes"*, confirming that his "ok approved" also approved the analysis). Scope froze at 40 items in 17 parts.
+
+    interaction_cost = open rulings 3 + 2 + review cycles 1 + installs 1 + merges 2 + freeze 1 + Drive banner 1 = 11
+
+- **Counting convention:** the parent's. One install event counts 1. Merges count the record PR and
+  the execution PR. The freeze start and lift counts 1. Nathan's Drive banner (PART-06) counts 1.
+- **Already spent in ANALYZE:** four Product Owner answers (rulings 1–4). The widening is ruling 3.
+- **What a split would save:**
+  - Moving PART-06 or PART-18 to its own run saves one ruling here. It costs that run's own two
+    approvals and a merge, and a second registry edit and readback. That is a net loss of 2 or more.
+  - Moving Open question 3 to its own run saves 1 here and costs that run's 2 approvals and a merge, a
+    net loss of 2.
+- **Calibration:** the parent predicted 11 and took 29, four of them extra review rounds. Each extra
+  round here adds 1.
+
+### Repairs from the ANALYZE reviews
+
+- **Round one** (11 required findings):
+  - lane verdicts reconciled by the census;
+  - ITEMs 20, 21 and 38 dispositioned;
+  - class errors corrected;
+  - class A gates;
+  - revisions moved;
+  - ruling 4 re-asked;
+  - order, cut-over and freeze;
+  - PART-06 as a question;
+  - ITEM-16 without TW.
+- **Round two** (14 required findings):
+  - one rule for author-directed text and mention bans, with A3 and A4 split per sentence;
+  - ITEM-37 re-asked, not decided;
+  - `contract_revision` moved and the regeneration placed in PART-01, after PART-04;
+  - the tier rationale restored and the split saving stated;
+  - PART-06's page parent, creator and Drive action;
+  - ITEM-39 measured, with change-flow `:335`, its validator markers, and the machine records as a
+    question;
+  - A10 counted;
+  - ITEM-40 limited to this Modification's classes;
+  - PART-15 ordered after PART-06;
+  - ITEM-21 reworded;
+  - the PART-40 typo removed;
+  - package spans corrected;
+  - ITEM-20 attributed to the sweep.
+- **Round three** (a verifier's check of round two: 4 findings not yet resolved and 5 new):
+  - the mention-ban premise restated as "correctly scoped";
+  - `validation-profile.json:27-28` and flowmaster-validate `:1816` added to PART-01's pins;
+  - ITEM-13 names `6902924a…`;
+  - PART-08's tier;
+  - the split-saving claim corrected;
+  - the Drive mention recorded as a dated snapshot;
+  - ITEM-39's three unguarded sites listed;
+  - PART-01 spans 4 packages;
+  - ITEM-40 and PART-11's gate limited to the classes measured on the proposed body;
+  - Open question 3 carried by PART-03 (A) or a new part (B), with costs;
+  - option costs added;
+  - A3b goes with A3a where they form one sentence;
+  - the skill-evidence table updated;
+  - PART-18's name made neutral;
+  - Decision 11's tracking-page record placed in PART-11;
+  - ITEM-16's D14 note placed in PART-02.
+- **Non-blocking sub-points still open:**
+  - skill hit counts per class: only the 31-site total is recorded;
+  - the merge count depends on Nathan merging the record PR separately (#478).
+
+## §P — Plan
+
+*Written by MODE = PLAN, 2026-09-23; repaired 2026-09-24 after the second to seventh PLAN reviews. The analysis was approved by
+Nathan on 2026-09-23 ("yes"). Scope stays frozen at 40 items in 17 parts.*
+
+**The specification.** Every edit, literal, guard, package, command and check is in
+`docs/ephemeral/modifications/specs/EXECUTION-SPEC-20260923-closeout-residuals.md` (the spec, below). Its evidence
+is in `evidence/closeout-residuals/plan/` (`EV`). The steps below cite the spec's sections, and §9 of the spec
+orders them with an actor, a gate and a readback for each.
+
+**How the plan was built and checked:**
+
+1. **A first PLAN workflow** (`wf_73fca782-464`) drafted the rules, the edits to all 51 bodies (read completely),
+   the registry and the seven skill packages. Its two reviewers returned 26 required findings.
+2. **A repair round** (`wf_22dee43c-01f`) worked from one decision file (`EV/DECISIONS.md`). It drafted the
+   repository texts and the control-page edits, cut the seven packages as one tree, and repaired the registry guards.
+3. **The body edits became one engine** (`EV/engine/`). EXECUTE lands with the same code the dry runs used.
+4. **Dry runs.** Pass 1 was rule level. Pass 2 was the complete check: 56 of 56 bodies passed (50 live, 5 untouched
+   live, and the proposed MGMT-10 body).
+5. **A second review** (`wf_045af16b-3ed`, three lenses) returned 7 required findings on order, paths, landing units
+   and one guard. Repair round 2 (`wf_9c136682-f25`) answered them (P-55 to P-70; spec §2.4), and repair round 3
+   settled the close order and the tokens (P-66 revised, P-71 to P-74; spec §2.5).
+6. **A third review** (`wf_b886670d-753`, three lenses) returned 16 required findings, several shared between lenses.
+   The main ones were that the readback could never pass on CL-40, that the rollback journal conflicted with `D22`,
+   that the two landing units split parts, and that the failure paths were incomplete. Repair round 4 answered them
+   (P-57 and P-58 revised again, P-75 to P-83; spec §2.6). **Pass 4 rehearsed `land.py` itself**, including the
+   readback each landing will run, on every body (spec §8).
+7. **A fourth review** (`wf_05b74ccf-d84`, three lenses, each followed by a verifier that tried to refute its
+   findings) returned 11 required findings: the stop and resume procedures, the day D25 applies, evidence that a new
+   session could not recover, forward repair the engine could not do, one Notion formatting trap, asynchronous
+   writes and the manifest's removal commands. Repair round 5 answered them (P-84 to P-95; spec §2.7). **Pass 5**
+   tried, on every body, each landing operation left out alone and each applied alone: none was repaired to anything
+   but the landed page (spec §8.4). It found one engine defect on QA-10, fixed and re-run (P-88).
+8. **A fifth review** (`wf_ad66aa45-00a`, three lenses, each with a verifier) returned 10 distinct required defects.
+   A step resumed on a later day could not recognize its own landed edits. The stop's list of Notion writes could miss
+   an earlier session's. A stop's record never reached `main`. The stop marked everything `BLOCKED` while landed bodies
+   were still live. A resumed landing on a deletion-only body was refused. A lease push could be stale. The D24 brief
+   was left to author. A new session after the install would re-patch the installed tree. A tracking line claimed a
+   record before it existed. The verdict's binding reinterpreted the canonical template. Repair round 6 answered them
+   (P-96 to P-102; spec §2.8). **Pass 6 ran `land.py`'s own refusal chain on every body**: all 51 landed texts refuse
+   `ALREADY_LANDED`. Of 476 distinct partial landings, 410 are repaired to exactly the landed page, 66 are refused
+   (which stops the unit) and none is repaired to anything else (spec §8.5). The new read-only helpers ran on today's
+   pages: the control-page sequences, the anchor check, the Drive check, NAM-002 on the live hubs and the brief (spec
+   §8.7).
+9. **A sixth review** (`wf_bafe0805-392`, three lenses, each with a verifier) returned 10 distinct required defects.
+   The step after the install could not be resumed in a new session. A stop could carry half-applied edits to `main`,
+   and returned to Nathan before its tracking lines were written. A stop at the first Notion write, or on a changed
+   tracking page, left a check that could never pass. The sweep could not read CL-40 before the page existed. Nothing
+   recorded that the packages were delivered. A re-run could insert a text twice, in the repository or in Notion. The
+   new page's readback had no tool. A resumed step could re-date its own writes. Repair round 7 answered them (P-103
+   to P-111; spec §2.9): one branch rule for every start and resume, a stop record that returns only when complete,
+   values recorded once, a delivery record, and tools for the new page. **Pass 7 re-ran every body** with operations
+   that, sent a second time, match nothing: 0 of 262 could land twice (spec §8.5).
+10. **A seventh review** (`wf_ca01df8d-ee0`, three lenses, each with a verifier) returned 7 distinct required defects.
+   A control edit sent twice could survive a stop unlisted, and one the unit wrote could pass the restoration check.
+   The new page's step could not be resumed. A resumed stop could not name its failure. After the execution PR's
+   merge, a lost archive or a failure had no working route. One stale readback at the first Notion write recorded
+   that nothing was written. The reviewer brief after the merge said the wrong thing. Repair round 8 answered them
+   (P-112; spec §2.10): a committed list of the control edits the unit writes, a stop that commits its failure
+   first, a page step that reads its stage from the page, readbacks that retry, and no re-cut after the merge. The
+   proofs now include checks that must fail: a missed reversal, a doubled pointer, a stop line removed (spec §8.7).
+11. **The skills.** Every suite passes on the patched tree, and every must-fail regression fires. The contract
+   regenerates byte for byte. The suite gate is a script with its expected results built in.
+
+### Rulings this plan applies
+
+The Product Owner rulings in §A (1 to 5) are applied as recorded. The PLAN decisions P-01 to P-112 (spec §1) apply them
+or settle a finding; none needs a new ruling. These settle something the analysis left to PLAN:
+
+- **P-02:** R-OWN's sentence also covers the pull request that carries a prompt's outputs (D25-B credits it to the
+  approved plan).
+- **P-37:** a prompt's own intake list may name `CANON_CONFLICT_REGISTER`.
+- **P-43:** the policy line and the repair-a4 note land after the install, in the close-out PR.
+- **P-57, P-84 revised, P-88, P-98, P-99, P-107, P-108, P-112:** nothing leaves the branch before the freeze line,
+  the first Notion write. A stop before that line is listed for writing reaches `main` by a record pull request, and
+  Nathan ends the Modification or approves a plan change, after which EXECUTE starts again from `main`. From that
+  listing all 17 parts land as one unit. A failed readback is repaired forward: the engine lands only the edits still
+  missing. A failure it cannot repair stops the unit. EXECUTE then commits the failure, sweeps Notion for every
+  landed write, reverses every control-page edit it listed or finds landed, moves the new page to trash, records the
+  stop on `main` at `EXECUTING`, and writes the tracking page's stop lines before returning. Nathan restores the listed bodies, a restoration check verifies every page, and
+  then he ends the Modification or approves a plan change.
+- **No rollback journal (P-58 revised again, `D22`).** Nothing keeps a copy of a body, so restoring a landed body is
+  Nathan's action, from Notion's page history. The sweep tells him exactly which pages to restore, and the check tells
+  him when he is done.
+- **P-96, P-103, P-104, P-106:** every value a Notion write carries, such as a date or the page URL, is recorded once
+  in the evidence before the write, every Notion call is built so that sent twice it lands once, and every start or
+  resume of EXECUTE follows one branch rule. So any step can be resumed in a new session, on any day, without landing
+  anything twice.
+- **P-100, P-109:** the reviewers' verdicts bind to the archives they read, and those archives are delivered to Nathan
+  at the review's end, one per message, and the delivery is recorded; nothing is re-packaged after that. After the
+  execution PR merges nothing is re-cut at all: an archive he no longer holds he saves again from its message
+  (P-112 (d)).
+- **P-86:** `D25` applies from the merge of the execution pull request; §E records that commit and its date.
+- **P-66:** the freeze runs from before the first Notion write until Nathan lifts it after the post-install
+  verification (an upstream finding against §A order 4).
+
+### Steps
+
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| 1 | all | the base | Preconditions (spec §9 X0): record PR merged; branch restarted from `main`, `$BASE` recorded in `EX/run.json`; base checks | template rule 2 | the registry, the 7 installed packages, the graph and the engine self-test equal the recorded base; the root digest is recorded (P-79) | stop: the stop record (P-84 revised, P-107) |
+| 2 | PART-01, 02, 03, 04, 12, 17 | the 7 skill packages, in the scratchpad | Build `$PKG` (the installed root with the 7 diffs applied); run the `pre` gate (X1) | classes B and C; unspent identity | every patch exits 0; each package digest equals the manifest; `run_gate.py --set pre` exits 0 | discard the scratch copies |
+| 3 | PART-06, 18 (class A); PART-05; PART-02; PART-03; PART-17 | `gcfpe.decision-record.md` and this record | Commit 1: `status: EXECUTING` and D25 (D25-A, D25-B), the D23-C, D23-G and D18 successors, the D14 note (spec §6, label `X2.2`; X2) | rulings 1, 2, 4, 5; §A order 2; P-81 | each anchor found once; `^## D25` = 1; no added line starts `> `; `canon.py` still reads two once-per-merge lines; `modification_validate.py` passes; the commit also carries `EX/run.json` and `EX/gate_pre.json` | before X5.0 nothing has left the branch: a stop reaches `main` by a record PR (P-107); Nathan ends the Modification or approves a plan change, and EXECUTE then starts again at step 1 (P-84 revised) |
+| 4 | PART-10, 13–18 (the registry's guards and parent IDs) | `project-prompt-contract-registry.md` | `git apply EV/registry/registry.diff`, committed alone (spec §4; X3.1) | `D14`, `GUARD-001`; ITEM-22 | sha256 equals spec §4.1; `valid: true`; deriver drift `[]` | as step 3 |
+| 5 | PART-04 | `docs/graph/parts` | Reindex with `$PKG`'s builder (ITEM-12; X3.2) | class C | the stripped `git diff` equals the recorded diff; the build is byte-identical (`ae2bd159…`); a second reindex rewrites 0 | as step 3 |
+| 6 | PART-04 | `docs/graph/contract-template/` | `mkdir`; move the pre-E2 contract; add its README (ITEM-13; X3.3) | class C | sha256 `2b78f877…` and `469e2265…` at the new paths | as step 3 |
+| 7 | PART-12 | `session-working-rules.md` | `P32-SWR` (spec §6; X3.4–X3.5) | ITEM-24; P-32 | anchor found once; the sentence found once afterwards and byte-equal to P-32; a re-run applies nothing (P-104) | as step 3 |
+| 8 | PART-10 | the registry's parent IDs and titles | NAM-002 and the title and lane checks on a live snapshot of the hubs (the child list by `ctrl.py children`), committed to `EX/nam002/` (spec §4.4; X3.6) | ITEM-22; P-63, P-77 | 0 findings; exactly one on each injected fault; the old registry gives 55, exit 1 | as step 3 |
+| 9 | PART-01 | the bundled 091426.1 contract | Regenerate 4.1.1 on the working tree (X4.1) | `D13`; Decision 1 | `6902924a…` EQUAL x2 from the kept template; `dbae180b…` in both copies | as step 3 |
+| 10 | PART-01, 02, 03, 04, 12, 17 | `$PKG` and the working tree | `run_gate.py --set pkg` (spec §5.3; X4.2) | `CHK-001` | exit 0, 34 rows equal to their expected results | as step 3 |
+| 11 | PART-01, 02, 03, 04, 12, 17 | the 7 packages | Package and extract (`execute.4b`, `EX/packages.json`); fill the PLAN-drafted brief (`fill_brief.py`) and commit it; two fresh reviewer subagents; commit each verdict as it returns; deliver the seven reviewed archives, one per message, then the brief and verdicts, and record the delivery in `EX/run.json` (X4.3–X4.4) | `D24` | `Skill is valid!` ×7; the extracted digests equal `expected_after_patch.txt` (`diff` exits 0); `SKILL_FIT_CONFIRMED` from both, bound to the archive and freeze digests in the brief's §1; each delivered file's sha256 equals `EX/packages.json`; `delivered_cr<k>` committed (P-100, P-109) | a rejection stops EXECUTE: the repair, or shipping without a part, is a plan change Nathan approves (P-84 revised) |
+| 12 | all body parts; PART-06 | the 56 pages; the Drive file | Rehearsal: `land.py plan --no-ops` on a fresh fetch of each of the 51 bodies with edits, `check` on the 5 without (X4.5); then the read-only Drive and control-page anchor checks (X4.6) | P-76, P-77, P-88, P-95, P-102 | no refusal; `repair` `[]`; `reapply_unsafe` `[]`; `precheck` and `landed_check` pass on every page; the 5 exit 0; `drive_check.py` passes (bytes, fence, the nine M2 strings, no collision); `ctrl.py all --expect unlanded` passes | nothing written to Notion; a failure stops EXECUTE as step 11 does (P-84 revised) |
+| 13 | all | the freeze | Nathan confirms it; the unit's date is recorded in `EX/run.json` and the line listed in `EX/ctrl/sent.txt`; `TRACK-FREEZE-START` (spec §7.3; X5.0) | P-66, P-96, P-104, P-112 | `ctrl.py edits` reads `LANDED`, a stale readback retried (P-112 (e)) | kept on a stop, beside `TRACK-UNIT-STOPPED` (P-98). A failure before the line is listed stops EXECUTE as before step 13; from the listing on it is a stop past X5.0, whose sweep finds whether the line landed (P-112 (e)) |
+| 14 | PART-06 | Notion: the *Candidate CRD Items List* page | Create and migrate by method M2, with its self-links (spec §7.4; X5.1); the migration date is recorded before the create, and the page id and URL right after it | D25-A; P-47, P-96 | `drive_check.py` passes; `m2.py check` passes F1–F10 at both stages (P-105); no `{{`; a page this run already created is resumed from the stage it reads, not created again (P-95, P-112 (b)) | moved to trash if it exists (P-98) |
+| 15 | PART-06 | `notion-write-boundary.md` | `P30-DEST` with the URL, and `P30-VERSION` (X5.2) | D25-A | anchors found once; no new `{{` | the branch stays unmerged (the landing-unit rule) |
+| 16 | PART-06 | the Hub (×3), the four Checklist item rows (×2 each) | The eleven pointer edits (spec §7.4.5; X5.3) | P-46, P-67 | each edit applied once (P-90, P-96, P-103); readback | reversed in reverse order on the re-fetched text, a doubled pointer undoubled first; the restoration check tests every pointer the unit listed (P-98, P-112 (a)) |
+| 17 | PART-05, 06, 07, 13, 14, 15, 16, 18 | the 50 live bodies | Land each page from the engine; re-fetch; `check`, CL-40 with the URL (spec §3; X5.4) | the parts' classes; `D23`, `D25` | every `plan` applied has `reapply_unsafe` `[]`; the first on each page has `repair` `[]`, or, on an X5.4 a session continued, its repair is applied once and checked (P-111 (a), P-112 (k)); `check` exits 0 on each page | repair forward: `plan` on a fresh fetch lands only what is missing (P-88); else the unit stops, and the sweep lists each landed body for Nathan's restoration (P-98, P-99) |
+| 18 | PART-11 | the proposed MGMT-10 body | R-ITEM23 and its LOCAL preamble edit; the gates (X5.5) | ITEM-23, ITEM-40 | both gates read 0 on the readback | as step 17 |
+| 19 | PART-11 | Notion: the D20 redesign tracking page | `PART-11-TRACK-01` (spec §7.3; X5.6) | Decision 11 | readback | reversed as step 16 (P-98) |
+| 20 | PART-12 | Notion: Hub *Worker communication rules* §2 | `PART-12-HUB-01` (spec §7.1; X5.6) | ITEM-24 | readback | as step 19 |
+| 21 | PART-18 | Notion: the Alpha feedback list, AF-009 | `PART-18-AF009-01`, a dated amendment (spec §7.2; X5.6). The PE Metaprompt and the skills state no placement; no edit | P-44 | readback | as step 19 |
+| 22 | PART-08 | OPS-10, OPS-20 | No edit. ITEM-20 is `NOT_APPLICABLE`: the mention bans are correctly scoped (§A) | §A | §E records the disposition | — |
+| 23 | gate | the corpus | The Tier 1 gate (X6.1–X6.3): `land.py check` on all 55 live bodies; `graph_check.py`; `closure.py` | Tier 1; P-64 | 55/55 exit 0; exit 0; the closure comparison's `diff` exits 0 | repair forward; else the unit stops (P-98) |
+| 24 | record | this record's §E and `EX/` | Write §E; commit the evidence; open the execution PR (X6.4) | template rules 5, 6 | `modification_validate.py` passes; only the three open paths change, checked before the PR opens | the unit stops (P-98, P-99), as step 23 |
+| 25 | the packages | the installed tree | After Nathan merges: Nathan installs the seven archives delivered at step 11 (X7.2–X7.3); digests, `run_gate.py --set post` and the corpus gate on the installed skills, and when all three pass the install date recorded (X7.4) | `D24` | X7.4 starts from `main` and resumes on its own branch (P-110); each installed digest equals its freeze digest in `EX/packages.json`; exit 0 (28 rows); 55/55; the summaries and the install date committed together | reinstall the delivered file, saved again from its message if needed; any other failure from the merge to X7.4: §E's row with the `D25 applies from:` line, and a record PR that merges before the step runs again; the freeze held; returned to Nathan (P-82, P-94, P-110, P-112 (d)) |
+| 26 | close | the freeze; Notion: the D20 tracking page | After step 25 passes, Nathan lifts the freeze; the lift date recorded; `TRACK-FREEZE-LIFT` (X7.5) | P-66, P-96 | readback | — |
+| 27 | close | the decision record, the policy, the repair-a4 record, this record | The close commit: the close date recorded; `CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE` (`apply_texts.py`), §E's install record and actual cost, the `D25 applies from:` line unless present, the dispositions, `COMPLETE`; the close-out PR opened (X7.6), after reading back Nathan's Drive banner | P-43, P-72, P-83, P-86, P-102 | the banner is present; the `D25` line is found once; `modification_validate.py` passes on `COMPLETE`; the commit adds no `{{` | revert the commit |
+| 28 | close | Notion: the D20 tracking page | `TRACK-STATUS-01` to `03`, dated by the close date step 27 recorded; their readback added to §E on the same PR (X7.7) | P-65, P-72 | readback; `modification_validate.py` passes | `new_str` → `old_str` |
+
+**Order:** 1 to 12 in order, all before any Notion write. Then 13 to 21 in order: step 14 must pass before any body
+lands (PART-15 is after PART-06). Then 22 to 24. Step 25 follows Nathan's merge, and 26, 27 and 28 follow in that
+order. A stop before step 25 follows spec §9's stop procedure (P-98, P-99, P-107, P-108, P-112); a failure from
+Nathan's merge to step 25 is recorded by P-110 and P-112 (d).
+
+### Product Owner actions
+
+- **Approve this plan.** Recorded as `plan_approved_by`.
+- **Merge #478**, this record. Verified by `plan_approved_by` on `main`.
+- **Receive the seven packages** at step 11, one per message, then the brief and both verdicts. Each caption leads
+  with the archive's sha256, and each message says what changed, where it installs and the freeze line you should see
+  after installing. **Install them only at step 25**, when EXECUTE asks, and keep the messages: an archive you no
+  longer hold you can save again from its message. If you cannot, say so: EXECUTE re-sends it when its session still
+  holds the same bytes, and otherwise records the failure for your ruling; nothing is re-cut after the execution PR's
+  merge (P-112 (d)). Verified by step 25's digest comparison.
+- **Confirm the freeze** at step 13 and **lift it** at step 26, once step 25's post-install verification passes. No
+  flow session runs in between. Verified by the tracking page's two dated lines.
+- **Banner the Drive file** `Candidate-CRD-Items-List.md` as superseded, pointing to the new page, once step 24 has
+  passed and before step 27 (the page is permanent from then on). Verified at step 27 by reading the file's first
+  lines.
+- **Merge the execution PR** after step 24. Verified by the merge commit on `main`, which puts the reindex there
+  before the install.
+- **Install the seven `.skill` packages in one sitting**, after that merge, and give the date. Verified by step 25's
+  digest comparison.
+- **Merge the close-out PR** after step 28. Verified by the merge commit.
+- **Rule on a stop, if one comes.** Every stop reaches you as a record PR, complete when you receive it (after a stop
+  past the freeze line's listing at step 13, the tracking page's stop lines are already written and read back); merge
+  it first (P-107).
+  - Before the freeze line is listed at step 13 (P-84 revised, P-107, P-112 (e)): end the Modification, or approve
+    the plan change a PLAN session writes. The freeze you confirmed at step 13 lapses with the stop.
+  - From that listing to step 24 (P-99, P-108, P-112 (a)): restore each body and control-page edit the record lists,
+    from Notion's page history, or say that a listed control edit stays as it is; then ask for the restoration check,
+    which opens its own PR. Once it passes, end the Modification or approve a plan change, and lift the freeze when
+    you choose.
+  - From your merge of the execution PR to step 25 (P-110, P-112 (d)): rule a reinstall, or a plan change, which names
+    its own steps and rejoins at step 25, not at step 1; no body is restored.
+  Verified by §E and the record PRs.
+
+### Explicitly not in scope
+
+- The TW ecosystem, including tw-flowmaster's GCFPE binding and AF-012 for TW.
+- The proposed MGMT-10 body's design-level contradictions: D20 stage 5 (recorded on the tracking page, step 19).
+- The follow-ups in spec §10.2, recorded on the GCFPE Modification Backlog as MB-001 (S2), MB-002 (S3), MB-003 (S3) and
+  MB-004 (S3). A later Modification takes each as an item.
+- The kept NOT_REAL sentences in spec §10.3.
+- The content of the Drive file after migration, which is Nathan's.
+- Re-running any earlier Modification's gates, and editing any completed record (P-54).
+
+### Findings on upstream sections
+
+Recorded in spec §10.1 and not edited here (template rule 1):
+- the census's RS-40 A5 row;
+- the census summary for the proposed MGMT-10 body;
+- `validator_revision`'s absence from §A's Decision 1;
+- the merge count;
+- the freeze window;
+- the Notion targets §A omitted;
+- ITEM-13's oracle input.
+
+### Interaction cost, as planned
+
+    interaction_cost = open rulings 3 + 2 + review cycles 1 + installs 1 + merges 3 + freeze 1 + Drive banner 1 = 12
+
+§A predicted 11 with two merges. The install has to follow the execution PR's merge (§A order 3), so the
+post-install record needs a third merge, the close-out PR. A D24 rejection would add 4: the stop record's merge, a
+plan approval, a further review round and the plan-change merge (P-84 revised). A stop after step 13 adds the
+restoration and the restoration check's pull request (P-99, P-108). An archive you can no longer save from its
+message, when the session no longer holds its bytes either, becomes a recorded failure and a plan change
+(P-112 (d)). `interaction_cost_predicted` keeps §A's 11, and §E compares the actual cost
+against both.

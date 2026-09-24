@@ -1,0 +1,21 @@
+{
+ "mode": "graph",
+ "pid": "graph_check",
+ "page": "3db4590a05eb816984d1d34da0e08f40",
+ "exit": 0,
+ "cmd": "python3 EV/engine/graph_check.py --qa110 3db4590a05eb816984d1d34da0e08f40 --qa80 3db4590a05eb813ba9a9dbd9a641d36c --simulate",
+ "result": {
+  "graph_QA-110_accept_to_QA-120_with_completed_failing_run": true,
+  "graph_QA-110_escalation_to_ESC-10": true,
+  "body_QA-110_states_accept_route": true,
+  "graph_QA-80_wrong_route_two_branches": true,
+  "body_QA-80_pointer": true,
+  "body_QA-80_section_states_both_branches": true,
+  "pass": true,
+  "source_files": {
+   "QA-110": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+   "QA-80": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl"
+  }
+ },
+ "state_proof": null
+}

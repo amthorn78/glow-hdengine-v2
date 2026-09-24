@@ -1,0 +1,1693 @@
+[
+ {
+  "pid": "CL-20",
+  "page": "3db4590a05eb81f4812be61e8877c02c",
+  "fetched": "2026-09-23T13:26:57.675Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1e": 1,
+    "R-26-P3": 1,
+    "R-26-CLOSE": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-OWN": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "R-ITEM19": 1,
+    "LCL-20-1": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 10,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 15,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-20"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1e": 1,
+    "R-26-P3": 1,
+    "R-26-CLOSE": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-OWN": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "R-ITEM19": 1,
+    "LCL-20-1": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 10,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 15,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-20"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "mappings in the output artifact's permitted metadata, label repository persistence pending"
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "exact resolved evidence in the existing permitted artifact metadata. Preserve approved artifact versions"
+   },
+   {
+    "edit": "R-26-P3",
+    "reads_ok": true,
+    "note": "carries the exact PF10/addendum lineage into its result artifact, which the handoff names."
+   },
+   {
+    "edit": "R-26-CLOSE",
+    "reads_ok": true,
+    "note": "after the CL-40 route: Name the positive closure decision and every post-closure result artifact"
+   },
+   {
+    "edit": "R-A7-CL",
+    "reads_ok": true,
+    "note": "historical pre-merge evidence. [W-4] [ONCE] PR-40 independently verifies actual merged state"
+   },
+   {
+    "edit": "R-ITEM21",
+    "reads_ok": true,
+    "note": "substantive decision. PR-40's entry ... that entry creates no runtime approval and supplies"
+   },
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "actually supplied by the post-closure preparation package. [OWN] Do not inspect, mutate"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "section now opens: Resolve the current authoritative subject-matter sources at execution"
+   },
+   {
+    "edit": "R-A4a",
+    "reads_ok": true,
+    "note": "Use only the binding for the actual result branch. then the binding list"
+   },
+   {
+    "edit": "R-ITEM19",
+    "reads_ok": true,
+    "note": "any still-open follow-up items. Name the board by ... receiving owners. The operator"
+   },
+   {
+    "edit": "LCL-20-1",
+    "reads_ok": true,
+    "note": "HDE Change Flow, naming the positive closure decision and the POST_CLOSURE_RECORD"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "G-K36 (OLD draft, pre-P-02 text ending 'commits and pushes\\.') matches_after False; the P-02 sentence is present exactly once (placement OWN=1, direct check True). It passes once G-K36 follows P-02. Not repaired here.",
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [
+   "R-OWN hits 1 at 'Use only the read-only tools, stores, repository access ...' (placement OWN=1).",
+   "R-26-CLOSE (1), R-ITEM21 (1) and R-ITEM19 (1) read as full grammatical sentences at their sites."
+  ],
+  "open_issues": []
+ },
+ {
+  "pid": "CL-30",
+  "page": "3db4590a05eb8190a444d8818e445c1d",
+  "fetched": "2026-09-23T13:27:36.082Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1e": 1,
+    "R-26-P3": 1,
+    "R-26-CLOSE": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-OWN": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "LCL-30-1": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 9,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 14,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-30"
+    ]
+   }
+  },
+  "patches": [
+   {
+    "type": "local_add",
+    "target": "LCL-30-2",
+    "old": null,
+    "new": {
+     "anchor": "; existing ADR/conflict history;",
+     "action": "replace",
+     "new_text": ";",
+     "span": "anchor",
+     "order": "after LCL-30-1"
+    },
+    "why": "DECISIONS P-18: drop only the conflict-history item from the outgoing ADR package's 'Inputs and lineage' list, as R-A2g does elsewhere (ITEM-27, census A2). The anchor is unique before and after LCL-30-1 (the Next-step sentence joins with commas)."
+   },
+   {
+    "type": "local_modify",
+    "target": "LCL-30-1 (why field only)",
+    "old": "The 'Complete ADR candidate' Inputs and lineage receiver list stays (NOT_REAL).",
+    "new": "CL-30's own intake list (## Inputs) stays (NOT_REAL); the outgoing 'Complete ADR candidate' package's input list is the second A2 carrier, owned by LCL-30-2 (DECISIONS P-18).",
+    "why": "The drafter's note called the outgoing package a receiver list, which P-18 reverses. Documentation only: the edit itself is unchanged."
+   }
+  ],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1e": 1,
+    "R-26-P3": 1,
+    "R-26-CLOSE": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-OWN": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "LCL-30-1": 1,
+    "LCL-30-2": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 10,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 14,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-30"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "mappings in the output artifact's permitted metadata, label repository persistence pending"
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "exact resolved evidence in the existing permitted artifact metadata. Preserve approved artifact versions"
+   },
+   {
+    "edit": "R-26-P3",
+    "reads_ok": true,
+    "note": "carries the exact PF10/addendum lineage into its result artifact, which the handoff names."
+   },
+   {
+    "edit": "R-26-CLOSE",
+    "reads_ok": true,
+    "note": "after the CL-40 route: Name the positive closure decision and every post-closure result artifact"
+   },
+   {
+    "edit": "R-A7-CL",
+    "reads_ok": true,
+    "note": "historical pre-merge evidence. [W-4] [ONCE] PR-40 independently verifies actual merged state"
+   },
+   {
+    "edit": "R-ITEM21",
+    "reads_ok": true,
+    "note": "substantive decision. PR-40's entry ... that entry creates no runtime approval and supplies"
+   },
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "actually supplied by the conditional preparation package. [OWN] Do not inspect, mutate"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "section now opens: Resolve the current authoritative subject-matter sources at execution"
+   },
+   {
+    "edit": "R-A4a",
+    "reads_ok": true,
+    "note": "Use only the binding for the actual result branch. then the binding list"
+   },
+   {
+    "edit": "LCL-30-1",
+    "reads_ok": true,
+    "note": "governing target contract. Name the complete ADR_CANDIDATE ... This handoff does not write"
+   },
+   {
+    "edit": "LCL-30-2",
+    "reads_ok": true,
+    "note": "intended target and owner; full change/class/decision lineage; classifications; actual review status"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "G-K36 (OLD draft, pre-P-02 text ending 'commits and pushes\\.') matches_after False; the P-02 sentence is present exactly once (placement OWN=1, direct check True). It passes once G-K36 follows P-02. Not repaired here.",
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [
+   "P-18: LCL-30-2 hits 1 in the outgoing '### Complete ADR candidate' package (destination: the repository or manual/TW maintenance route); 'existing ADR/conflict history' count 2 -> 0 (LCL-30-1 removes the Next-step one, LCL-30-2 the package one); ADR_CANDIDATE and the positive closure decision stay named in that list.",
+   "Not edited (NOT_REAL): CL-30's own intake list '## Inputs' ('existing conflict/ADR classifications', 'relevant existing ADRs and history') and '## Carried Canon-conflict register' ('existing conflict/ADR history', count 1 -> 1).",
+   "R-OWN hits 1 at 'Use only the read-only tools, stores, repository access ...' (placement OWN=1); R-26-CLOSE (1) and R-ITEM21 (1) read correctly."
+  ],
+  "open_issues": [
+   {
+    "id": "B-OI-2",
+    "status": "MERGE_NOTE",
+    "issue": "LCL-30-2 and the LCL-30-1 why edit exist only in this copy's locals.json. build_locals.py regenerates locals.json from plan_result.json and would drop them; the merge must add a P-18 block to build_locals.py (like P-03's) or merge locals.json directly."
+   }
+  ],
+  "proposed_guard": {
+   "rule_id": "G-K?? (new CL-30 slot, P-18/P-28)",
+   "rows": [
+    "CL-30"
+   ],
+   "kind": "forbidden_regex",
+   "pattern": "decision lineage; existing ADR/conflict history",
+   "rule_code": "TOP-001",
+   "regression": "inject into CL-30: full change/class/decision lineage; existing ADR/conflict history; classifications; actual review status",
+   "pattern_words": 5,
+   "regression_words": 10,
+   "site": "Direct native branch packages / Complete ADR candidate / Inputs and lineage",
+   "why": "On the unedited body it fires only at the package site (the Next-step sentence uses commas; the intake and register sections use 'conflict/ADR' order), and it is silent after LCL-30-2. It complements G-K19's CL-30 alternative, which guards LCL-30-1.",
+   "dry_run_result": {
+    "id": "G-K-CL30",
+    "kind": "forbidden",
+    "fires_before": true,
+    "silent_after": true,
+    "fires_on_injection": true
+   },
+   "tested_with": "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r1/dry/B/guards.with_cl30.json (a copy of the OLD draft plus this one entry)"
+  }
+ },
+ {
+  "pid": "CL-40",
+  "page": "3db4590a05eb81db9c88cde6027e07bf",
+  "fetched": "2026-09-23T13:28:08.922Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-26-P3": 1,
+    "R-A7-CL": 1,
+    "R-OWN": 1,
+    "R-A4a": 1,
+    "R-A4c": 1,
+    "R-ITEM18": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 5,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 9,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-001",
+     "summary": "Forbidden pattern matched: \\{\\{CANDIDATE_CRD_LIST_URL\\}\\}",
+     "new_guard": "G-K44"
+    },
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    },
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Notion page `?Candidate CRD Items List`? \\(`?https://app\\.notion\\.com/p/[0-9a-f]{32}(?:\\?pvs=\\d+)?`?\\)",
+     "new_guard": "G-K45"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K44",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": false,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K45",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-40"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-26-P3": 1,
+    "R-A7-CL": 1,
+    "R-OWN": 1,
+    "R-A4a": 1,
+    "R-A4c": 1,
+    "R-ITEM18": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 5,
+    "reproduces_edit": true,
+    "max_old_str_lines": 2
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 9,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-001",
+     "summary": "Forbidden pattern matched: \\{\\{CANDIDATE_CRD_LIST_URL\\}\\}",
+     "new_guard": "G-K44"
+    },
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    },
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Notion page `?Candidate CRD Items List`? \\(`?https://app\\.notion\\.com/p/[0-9a-f]{32}(?:\\?pvs=\\d+)?`?\\)",
+     "new_guard": "G-K45"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "G-K44",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": false,
+     "fires_on_injection": true
+    },
+    {
+     "id": "G-K45",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-40"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-26-P3",
+    "reads_ok": true,
+    "note": "carries the exact PF10/addendum lineage into its result artifact, which the handoff names."
+   },
+   {
+    "edit": "R-A7-CL",
+    "reads_ok": true,
+    "note": "historical pre-merge evidence. [W-4] [ONCE] PR-40 independently verifies actual merged state"
+   },
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "runtime, or prompt contract. [OWN] It does not create a CRD, Epic Plan"
+   },
+   {
+    "edit": "R-A4a",
+    "reads_ok": true,
+    "note": "Use only the binding for the actual result branch. then the binding list"
+   },
+   {
+    "edit": "R-A4c",
+    "reads_ok": true,
+    "note": "registry, repository, PR, or development mutation. then ## Required operation"
+   },
+   {
+    "edit": "R-ITEM18",
+    "reads_ok": true,
+    "note": "paragraph opener: The Candidate CRD Items List is the Notion page ... may be updated"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "G-K36 (OLD draft, pre-P-02 text ending 'commits and pushes\\.') matches_after False; the P-02 sentence is present exactly once (placement OWN=1, direct check True). It passes once G-K36 follows P-02. Not repaired here.",
+   "G-K44 fires after and G-K45 is absent: expected while the {{CANDIDATE_CRD_LIST_URL}} placeholder is unfilled (the URL is filled at EXECUTE, P-30).",
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [
+   "R-OWN (P-02 text, with 'and any pull request that carries them') hits 1 and lands immediately after the Boundaries sentence 'It does not edit Canonical PF09, PF10, Canon, a board, registry, repository, ...', before 'It does not create a CRD, ... PR, ...'. Because it scopes every statement in the prompt, it excepts the PR that carries CL-40's own artifacts, so that claim and Save's 'an open pull request is a complete outcome' are now consistent.",
+   "R-ITEM18 hits 1, inserting before 'The existing noncanonical Candidate CRD Items List may be updated in place' with the {{CANDIDATE_CRD_LIST_URL}} placeholder (count 0 -> 1). This is expected at this stage: G-K44 fires and G-K45 is absent until EXECUTE fills the URL (P-30).",
+   "R-A4c hits 1 and deletes ' This authoring candidate does not perform that update.'; the paragraph now ends on the narrow-exception sentence."
+  ],
+  "open_issues": []
+ },
+ {
+  "pid": "CL-C-10",
+  "page": "3db4590a05eb81ad8989faa77f441a64",
+  "fetched": "2026-09-23T13:28:52.686Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1b": 1,
+    "R-A1c": 1,
+    "R-A1d": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-26-P3": 1,
+    "R-26-P4": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "LCL-C-10-1": 1,
+    "LCL-C-10-2": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 14,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-C-10"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1b": 1,
+    "R-A1c": 1,
+    "R-A1d": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-26-P3": 1,
+    "R-26-P4": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "LCL-C-10-1": 1,
+    "LCL-C-10-2": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 14,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-C-10"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1b",
+    "reads_ok": true,
+    "note": "mappings in the output artifact's existing permitted metadata, label repository persistence pending"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "compact GCFPE_PROMPT_USES entry to the existing artifact's permitted lineage metadata: usage ID"
+   },
+   {
+    "edit": "R-A1d",
+    "reads_ok": true,
+    "note": "after they actually exist, in the output artifact's lineage metadata or later authorized record."
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "exact resolved evidence in the existing permitted artifact metadata. Preserve approved artifact versions"
+   },
+   {
+    "edit": "R-A2b",
+    "reads_ok": true,
+    "note": "CANON_CONFLICT_REGISTER in existing applicable substantive artifact metadata/content, which the handoff names."
+   },
+   {
+    "edit": "R-A2e",
+    "reads_ok": true,
+    "note": "remain decided. Keep exact register lineage ... in the output artifact, which ... handoff names."
+   },
+   {
+    "edit": "R-26-P3",
+    "reads_ok": true,
+    "note": "carries the exact PF10/addendum lineage into its result artifact, which the handoff names."
+   },
+   {
+    "edit": "R-26-P4",
+    "reads_ok": true,
+    "note": "exact stable names and directories. Catalogs carry the verified direct Notion links ... Never substitute"
+   },
+   {
+    "edit": "R-A7-CL",
+    "reads_ok": true,
+    "note": "historical pre-merge evidence. [W-4] [ONCE] PR-40 independently verifies actual merged state"
+   },
+   {
+    "edit": "R-ITEM21",
+    "reads_ok": true,
+    "note": "substantive decision. PR-40's entry ... that entry creates no runtime approval and supplies"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "section now opens: Resolve the current authoritative subject-matter sources at execution"
+   },
+   {
+    "edit": "R-A4a",
+    "reads_ok": true,
+    "note": "Use only the binding for the actual result branch. then the binding list"
+   },
+   {
+    "edit": "LCL-C-10-1",
+    "reads_ok": true,
+    "note": "after the CL-20 route sentence: Name the CHANGE_CLOSURE_DECISION ... The later CL-40"
+   },
+   {
+    "edit": "LCL-C-10-2",
+    "reads_ok": true,
+    "note": "authority, evidence or route. Each runnable direct-native package names ... A task-only handoff"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [
+   "The drafter's observation is recorded as B-OI-1 with a judgement (kept as artifact naming); not edited."
+  ],
+  "open_issues": [
+   {
+    "id": "B-OI-1",
+    "status": "JUDGED_KEEP_NO_EDIT",
+    "bodies": [
+     "CL-C-10",
+     "CL-E-10"
+    ],
+    "issue": "The CLOSE route still reads 'return the complete closure decision and actual already-produced addendum direct links directly to CL-20' (CL-E-10: 'complete Epic closure decision'), directly before LCL-C-10-1's / LCL-E-10-1's new 'Name the CHANGE_CLOSURE_DECISION and each already-produced addendum by repository path' sentence.",
+    "judgement": "Kept as artifact naming, not an ITEM-26 site. The sentence routes the CHANGE_CLOSURE_DECISION artifact itself and locators for the addenda. It does not tell the handoff to carry lineage, evidence or other content those artifacts hold, and the ANALYZE body sweep raised no finding on it. Residual: the paragraph now names the addenda twice with two locator forms (direct links, then repository path). DECISIONS does not settle aligning that wording, so it is left unedited; the plan author may confirm or rule."
+   }
+  ]
+ },
+ {
+  "pid": "CL-E-10",
+  "page": "3db4590a05eb811a8578d75885c16cac",
+  "fetched": "2026-09-23T13:29:31.478Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1b": 1,
+    "R-A1c": 1,
+    "R-A1d": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-26-P3": 1,
+    "R-26-P4": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "LCL-E-10-1": 1,
+    "LCL-E-10-2": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 14,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-10"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1b": 1,
+    "R-A1c": 1,
+    "R-A1d": 1,
+    "R-A1e": 1,
+    "R-A2b": 1,
+    "R-A2e": 1,
+    "R-26-P3": 1,
+    "R-26-P4": 1,
+    "R-A7-CL": 1,
+    "R-ITEM21": 1,
+    "R-A3a": 1,
+    "R-A4a": 1,
+    "LCL-E-10-1": 1,
+    "LCL-E-10-2": 1,
+    "CHECK R-26-FRAME": 0
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 11,
+    "reproduces_edit": true,
+    "max_old_str_lines": 4
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 14,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-10"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1b",
+    "reads_ok": true,
+    "note": "mappings in the output artifact's existing permitted metadata, label repository persistence pending"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "compact GCFPE_PROMPT_USES entry to the existing artifact's permitted lineage metadata: usage ID"
+   },
+   {
+    "edit": "R-A1d",
+    "reads_ok": true,
+    "note": "after they actually exist, in the output artifact's lineage metadata or later authorized record."
+   },
+   {
+    "edit": "R-A1e",
+    "reads_ok": true,
+    "note": "exact resolved evidence in the existing permitted artifact metadata. Preserve approved artifact versions"
+   },
+   {
+    "edit": "R-A2b",
+    "reads_ok": true,
+    "note": "CANON_CONFLICT_REGISTER in existing applicable substantive artifact metadata/content, which the handoff names."
+   },
+   {
+    "edit": "R-A2e",
+    "reads_ok": true,
+    "note": "remain decided. Keep exact register lineage ... in the output artifact, which ... handoff names."
+   },
+   {
+    "edit": "R-26-P3",
+    "reads_ok": true,
+    "note": "carries the exact PF10/addendum lineage into its result artifact, which the handoff names."
+   },
+   {
+    "edit": "R-26-P4",
+    "reads_ok": true,
+    "note": "exact stable names and directories. Catalogs carry the verified direct Notion links ... Never substitute"
+   },
+   {
+    "edit": "R-A7-CL",
+    "reads_ok": true,
+    "note": "historical pre-merge evidence. [W-4] [ONCE] PR-40 independently verifies actual merged state"
+   },
+   {
+    "edit": "R-ITEM21",
+    "reads_ok": true,
+    "note": "substantive decision. PR-40's entry ... that entry creates no runtime approval and supplies"
+   },
+   {
+    "edit": "R-A3a",
+    "reads_ok": true,
+    "note": "section now opens: Resolve the current authoritative subject-matter sources at execution"
+   },
+   {
+    "edit": "R-A4a",
+    "reads_ok": true,
+    "note": "Use only the binding for the actual result branch. then the binding list"
+   },
+   {
+    "edit": "LCL-E-10-1",
+    "reads_ok": true,
+    "note": "after the CL-20 route sentence: Name the CHANGE_CLOSURE_DECISION ... Post-closure administration is not"
+   },
+   {
+    "edit": "LCL-E-10-2",
+    "reads_ok": true,
+    "note": "scope change, authority or route. Each runnable package names ... A task-only handoff"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [
+   "Twin of CL-C-10's CLOSE-route observation (B-OI-1): 'return the complete Epic closure decision and ... addendum direct links' is kept, not edited."
+  ],
+  "open_issues": []
+ },
+ {
+  "pid": "CL-E-20",
+  "page": "3db4590a05eb81c2b5d5ff46126f9e45",
+  "fetched": "2026-09-23T13:30:03.477Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A7-S3": 1,
+    "R-OWN": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 6,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-20"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A7-S3": 1,
+    "R-OWN": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 3,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "registry_findings_before": 6,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [
+    {
+     "rule_code": "CTR-002",
+     "summary": "Required pattern absent: Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it write",
+     "new_guard": "G-K36"
+    }
+   ],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "G-K36",
+     "kind": "required_",
+     "matches_after": false,
+     "fires_on_removal": true
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-20"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "usage/task/result/attempt mappings in the output artifact's permitted metadata, name the authorized owner"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "GCFPE_PROMPT_USES entry to existing permitted artifact lineage: usage ID; actual change identity"
+   },
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "pre-merge evidence; [W-4] [ONCE] PR-40 independently verifies the merged state and landed lineage."
+   },
+   {
+    "edit": "R-OWN",
+    "reads_ok": true,
+    "note": "Lead Developer revalidation session, read-only. [OWN] Perform one bounded post-Epic PF09 revalidation"
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "G-K36 (OLD draft, pre-P-02 text ending 'commits and pushes\\.') matches_after False; the P-02 sentence is present exactly once (placement OWN=1, direct check True). It passes once G-K36 follows P-02. Not repaired here.",
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [],
+  "open_issues": []
+ },
+ {
+  "pid": "CL-E-30",
+  "page": "3db4590a05eb81b4a649fdcdb1903345",
+  "fetched": "2026-09-23T13:30:45.395Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A7-S3": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 4,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-30"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A7-S3": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 4,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-30"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "usage/task/result/attempt mappings in the output artifact's permitted metadata, name the authorized owner"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "GCFPE_PROMPT_USES entry to existing permitted artifact lineage: usage ID; actual change identity"
+   },
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "pre-merge evidence; [W-4] [ONCE] PR-40 independently verifies the merged state and landed lineage."
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [],
+  "open_issues": []
+ },
+ {
+  "pid": "CL-E-40",
+  "page": "3db4590a05eb81e78e82f83a5f2e4b68",
+  "fetched": "2026-09-23T13:19:58.391Z",
+  "harness_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/agent-a18a5aab946da5a9b.jsonl",
+  "first_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A7-S3": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 4,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-40"
+    ]
+   }
+  },
+  "patches": [],
+  "final_run": {
+   "pass": false,
+   "rule_level_pass": true,
+   "rules": {
+    "R-A1a": 1,
+    "R-A1c": 1,
+    "R-A7-S3": 1
+   },
+   "rule_mismatches": {},
+   "check_failures": {},
+   "ops": {
+    "count": 2,
+    "reproduces_edit": true,
+    "max_old_str_lines": 3
+   },
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "registry_findings_before": 4,
+   "registry_findings_after_non_new": [],
+   "registry_findings_after_new_guards": [],
+   "guard_failures_new_GK_PART17": [
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    },
+    {
+     "id": "PART-17",
+     "kind": "forbidden",
+     "fires_before": false,
+     "silent_after": true,
+     "fires_on_injection": false
+    }
+   ],
+   "validator_ok": true,
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": [],
+    "validated": [
+     "CL-E-40"
+    ]
+   }
+  },
+  "readback": [
+   {
+    "edit": "R-A1a",
+    "reads_ok": true,
+    "note": "usage/task/result/attempt mappings in the output artifact's permitted metadata, name the authorized owner"
+   },
+   {
+    "edit": "R-A1c",
+    "reads_ok": true,
+    "note": "GCFPE_PROMPT_USES entry to existing permitted artifact lineage: usage ID; actual change identity"
+   },
+   {
+    "edit": "R-A7-S3",
+    "reads_ok": true,
+    "note": "pre-merge evidence; [W-4] [ONCE] PR-40 independently verifies the merged state and landed lineage."
+   }
+  ],
+  "g06_after": true,
+  "g06_detail": "G06 (registry TOP-001 NEXT_PROMPT_HANDOFF window regex) silent on the post-edit body; also silent before",
+  "guard_notes": [
+   "PART-17 (x3, OLD draft): fires_before False, silent_after True, fires_on_injection False, because each regression string is a description, not a label line. Not repaired here.",
+   "Every other new G-K guard on this row fires before, is silent after and fires on its injection (forbidden), or matches after and fires on removal (required)."
+  ],
+  "batch_task_confirmations": [],
+  "open_issues": []
+ }
+]

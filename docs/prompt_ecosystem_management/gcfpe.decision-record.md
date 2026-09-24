@@ -945,6 +945,24 @@ progresses the current Plan, it does not re-author it. Merge and abort remain Na
 
 ---
 
+### Successor, 2026-09-23 — Alpha state is recorded in the repository; the Flow Index block is retired
+
+**Product Owner, 2026-09-23:** *"yes, fix 1-4"*. Question 3 of the close-out report
+(`docs/ephemeral/modifications/evidence/e6/CLOSE-OUT-20260923.md` §4.B) recommended retiring the
+block. PART-02 of `MODIFICATION-20260923-alpha-feedback-open-entries` had left it in place by an
+earlier ruling. This supersedes that ruling, and *Where the state lives* above, which is left as
+written (`AUTH-001`).
+
+- **No Notion page holds Alpha state.** The Flow Index section *Alpha state — recorded in the
+  repository, not here* replaces the `Sole operative Alpha state` block. The block is kept beneath
+  it as a retired, dated record.
+- **Alpha state is what the Epic's own artifacts record** under `docs/ephemeral/`, landed by pull
+  request. A work unit's acceptance is its PR-40 lineage review.
+- **Why:** the block was four stages behind. Development sessions do not write to Notion (C-NOTION),
+  and nothing else kept it current.
+- The Hub, register, Alpha checklist, run notes and HDE Change Flow Overview point to that section
+  and no longer restate the state.
+
 ## D19 — A prose skill carries no advertised identity; its freeze digest is its identity
 
 **Product Owner, 2026-09-22.** Asked whether the three prose skills revised in PE36's Task 01
@@ -1415,6 +1433,13 @@ written (`AUTH-001`), and this supersedes it for the PE Metaprompt only.
 
 Recorded in `MODIFICATION-20260923-alpha-feedback-open-entries` as an `override` of the scope
 freeze, and in its close-out, `evidence/e6/CLOSE-OUT-20260923.md`.
+
+### Successor, 2026-09-23 — a maintenance session's handoff also goes last
+
+**Product Owner, 2026-09-23**, answering the close-out's open question on the Hub's *Prompt
+ecosystem worker output standard*: the response ends with its `NEXT_PROMPT_HANDOFF` block, and
+anything before the block is at most a few lines. This is the rule C-PLACE sets for prompt bodies,
+applied to maintenance, repair, validation and review sessions. The Hub standard says so.
 
 ## D24 — The independent skill review is run by reviewer subagents; Nathan installs approved packages
 

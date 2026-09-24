@@ -1,0 +1,47 @@
+{
+ "mode": "plan",
+ "pid": "CL-E-40",
+ "page": "3db4590a05eb81e78e82f83a5f2e4b68",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan CL-E-40 3db4590a05eb81e78e82f83a5f2e4b68 --registry $P3/registry.new.md --guards EV/registry/row_assertions.json --skills $P3/pkg-root --no-ops --candidate-url https://app.notion.com/p/00000000000000000000000000000000",
+ "result": {
+  "pid": "CL-E-40",
+  "fetched": "2026-09-23T13:19:58.391Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_a465047b-110/agent-a5dc2f967a978440e.jsonl",
+  "ops_count": 2,
+  "rules": {
+   "R-A1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   },
+   "R-A7-S3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

@@ -1,0 +1,1085 @@
+{
+ "mode": "plan",
+ "pid": "QA-10",
+ "page": "3db4590a05eb818bad2fcb4bc2610b29",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan QA-10 3db4590a05eb818bad2fcb4bc2610b29 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "QA-10",
+  "fetched": "2026-09-23T13:21:56.515Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/tool-results/mcp-Notion-notion-fetch-1790223113609.txt",
+  "ops_count": 18,
+  "repair": [],
+  "rules": {
+   "R-A1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2f2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2g": {
+    "hits": 6,
+    "expected": 6,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-TASK": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-OWN": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A10": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LQA-10-P03": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LQA-10-P19": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 1,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "proof": {
+  "ops": 18,
+  "state_fetch": "UNTOUCHED",
+  "state_landed": "LANDED",
+  "plan_on_landed_exit": 3,
+  "plan_on_landed_refused": "ALREADY_LANDED: every edit reads landed;",
+  "doubled_in_landed": [],
+  "partials": 36,
+  "partials_state_partial": 36,
+  "partials_repaired_exact": 24,
+  "partials_refused": 12,
+  "partials_repaired_wrong": 0,
+  "refusals": [
+   "COUNT_MISMATCH"
+  ],
+  "rows": [
+   {
+    "applied": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     14,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     15,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     16,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "LQA-10-P19",
+     "R-26-P1",
+     "R-26-P4",
+     "R-26-TASK",
+     "R-A10",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2f2",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P03",
+     "R-OWN"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     1
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2b"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     2
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2e"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     3
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-26-P4"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     4
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A7-S1a",
+     "R-A7-S1b"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     5
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1e",
+     "R-A3a"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     6
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A7-S2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A10"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     8
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2f2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     9
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     10
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     11
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     12
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     13
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     14
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 4,
+    "refused": "COUNT_MISMATCH",
+    "repair": null,
+    "outcome": "REFUSED"
+   },
+   {
+    "applied": [
+     15
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LQA-10-P19",
+     "R-26-TASK"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     16
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-26-P1"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     17
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1b",
+     "R-A1c",
+     "R-A1d"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   }
+  ],
+  "pass": true
+ }
+}

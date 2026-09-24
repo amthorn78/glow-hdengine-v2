@@ -1,0 +1,54 @@
+{
+ "mode": "plan",
+ "pid": "IA-20",
+ "page": "3db4590a05eb81c4825df2ad0dec4750",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan IA-20 3db4590a05eb81c4825df2ad0dec4750 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "IA-20",
+  "fetched": "2026-09-23T13:19:57.694Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 1,
+  "rules": {
+   "R-A2g": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ }
+}

@@ -1,0 +1,238 @@
+{
+ "pid": "CL-C-10",
+ "fetched": "2026-09-23T13:28:52.686Z",
+ "chars_before": 36934,
+ "chars_after": 36930,
+ "rules": {
+  "R-A1b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A1c": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A1d": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A1e": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A2b": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A2e": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-26-P3": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-26-P4": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A7-CL": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-ITEM21": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A3a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "R-A4a": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "LCL-C-10-1": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "LCL-C-10-2": {
+   "hits": 1,
+   "expected": 1,
+   "ok": true
+  },
+  "CHECK R-26-FRAME": {
+   "hits": 0,
+   "expected": 0,
+   "ok": true
+  }
+ },
+ "rule_mismatches": {},
+ "ops": {
+  "count": 11,
+  "reproduces_edit": true,
+  "max_old_str_lines": 4
+ },
+ "placement": {
+  "W-4": 1,
+  "ONCE": 1,
+  "OWN": 0,
+  "RECV": 0
+ },
+ "registry": {
+  "findings_before": 14,
+  "findings_after": []
+ },
+ "guards": [
+  {
+   "id": "G-K01",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K02",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K03",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K04",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K05",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K09",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K12",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K13",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K14",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K19",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K23",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K25",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K27",
+   "kind": "required_",
+   "matches_after": true,
+   "fires_on_removal": true
+  },
+  {
+   "id": "G-K37",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K41",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "G-K42",
+   "kind": "forbidden",
+   "fires_before": true,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  },
+  {
+   "id": "PART-17",
+   "kind": "forbidden",
+   "fires_before": false,
+   "silent_after": true,
+   "fires_on_injection": true
+  }
+ ],
+ "guard_failures": [],
+ "validator": {
+  "exit": 0,
+  "ok": true,
+  "errors": [],
+  "validated": [
+   "CL-C-10"
+  ]
+ },
+ "pass": true
+}
