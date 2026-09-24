@@ -461,7 +461,8 @@ def check(path):
     # --- scope freeze ---
     # The field is REQUIRED once scope is frozen. Without that, the guard is opt-in: a
     # Modification that simply never sets it can grow items freely after approval, and scope
-    # freeze is the rule that bounds the review loops. Found by the stage 4 pilot; PAIR-001.
+    # freeze is the rule that bounds scope (review rounds are bounded by D26, below). Found by the
+    # stage 4 pilot; PAIR-001.
     frozen_at = fm.get("item_count_at_approval")
     if status in FROZEN and "scope_freeze" in waived:
         pass  # waived by the Product Owner, and the override block records it

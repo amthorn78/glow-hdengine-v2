@@ -17,7 +17,7 @@ waits on him, and nothing here asks him to choose between options.
 |---|---|---|---|
 | 1 | **Merge the stage 5 pull request.** Merging preserves the record (`D21-C`). `D26` is recorded from his instruction of 2026-09-24; a part he corrects is corrected by a successor section in the decision record | **Nathan** | D26 is on `main`, and `modification_validate.py --selftest` on `main` passes 64/64 |
 | 2 | **Create the MGMT-10 session** with the kickoff below, and give Nathan its link | **PE37** | the session exists; its id and link are recorded in this file's *Record* section |
-| 3 | **Resume the plan under D26** (detail below) and return it with its open findings listed | **the MGMT-10 session** | the record is `PLANNED` at format 2.1, with a §P successor, a `reviews` ledger holding one `DRY_RUN` and at most one `DIFF_CHECK`, and an `estimate`; the result is `PRODUCT_OWNER_ACTION_PENDING` |
+| 3 | **Resume the plan under D26** (detail below) and return it with its open findings listed | **the MGMT-10 session** | the record is `PLANNED` at format 2.1, with a §P successor, a `reviews` ledger holding one `DRY_RUN` and at most one `DIFF_CHECK`, and an `estimate`; the result is `PRODUCT_OWNER_ACTION_PENDING`, carrying a `DECISION NEEDED` for the seven upstream findings (step 3, item 6) |
 | 4 | **Approve the plan.** The session records `plan_approved_by` from his words | **Nathan**, the process's gate | `plan_approved_by` is set, quoting him |
 | 5 | **Execute it** the way E6 did (detail below) | **the same MGMT-10 session**; Nathan installs and merges | the record is `COMPLETE`, or stopped on D26-B's path and back with Nathan |
 | 6 | **Lift the freeze:** the Alpha run's E6 freeze and the follow-up's, recorded in both Modifications' §E | **Nathan** | both §E sections record the lift, with its date and his words |
@@ -32,7 +32,11 @@ waits on him, and nothing here asks him to choose between options.
 2. **Write a successor section below the dated §P.** The dated plan is not rewritten. The successor
    names the minimal execution in the recovery analysis §4.3:
    - **the content as it stands:** the 51 body edits, the 7 skill diffs, the registry diff and its
-     guards, the graph reindex, the 11 repository texts and the 19 Notion edits;
+     guards, the graph reindex, the 11 repository texts and the Notion edits, **less
+     `PART-11-TRACK-01`**. That edit writes a dated paragraph to the redesign tracking page saying
+     the proposed body's contradictions are not resolved and wait for stage 5. Stage 5 resolved
+     them (`MGMT-10-REVISION.md`), so the paragraph would be false when written. It is withdrawn,
+     not rewritten;
    - **the normal-path tools as they stand:** `land.py`, `run_gate.py`, `apply_texts.py`, `m2.py`
      and the first-round D24 brief, with **R8-02 fixed**: X6.4's two-dot
      `git diff --name-only origin/main HEAD` becomes a three-dot merge-base diff, and X7.6 uses the
@@ -61,7 +65,15 @@ waits on him, and nothing here asks him to choose between options.
    `reviewer-prompt-template.md`, committed before the reviewer is spawned. Enter it as `PLAN` /
    `DIFF_CHECK`. There are no full reviews: the eight rounds already reviewed the content, and the
    recovery analysis §4.3 found it stable since round 6.
-6. **Return the plan** as `PRODUCT_OWNER_ACTION_PENDING`, with every open finding listed as an
+6. **Put the seven findings on upstream sections to Nathan.** The dated §P records them under
+   *Findings on upstream sections* (spec §10.1): the census's RS-40 A5 row; the census summary for
+   the proposed MGMT-10 body; `validator_revision`'s absence from §A's Decision 1; the merge count;
+   the freeze window; the Notion targets §A omitted; ITEM-13's oracle input. Under template rule 1
+   (v2.1) each goes to Nathan in the step 7 return as one `DECISION NEEDED`, each with the §A text
+   it contradicts, the plan's current handling and the session's recommendation. They are not
+   listed as accepted risks, and the plan is not approved past them. The census-summary finding is
+   answered by stage 5 (`MGMT-10-REVISION.md`); say so.
+7. **Return the plan** as `PRODUCT_OWNER_ACTION_PENDING`, with every open finding listed as an
    accepted risk (including round 8's 27 non-blocking findings, and the downgraded
    lift-after-stop finding, which goes with the machinery), and the estimate against what has been
    spent. Validate with `modification_validate.py` before returning.

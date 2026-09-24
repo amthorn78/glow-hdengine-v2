@@ -92,7 +92,9 @@ proposing to change it.
 
 **"Non-blocking" is not a disposition.** Findings parked as non-blocking survived across
 sessions and then took one pass to clear. Drive every finding to resolution in the session
-that finds it, or name the specific Product Owner decision it needs.
+that finds it, or name the specific Product Owner decision it needs. Resolution is defined in
+`ecosystem-change-management.md` `DISP-001`: fixed, declined with reasoning, or listed as an
+accepted risk in an approval Nathan gives (`D26`).
 
 **Evidence must be extracted programmatically.** Both defects found in the 2026-09-18
 verification were in the evidence, not in Notion: a worker flattened curly quotes in three
