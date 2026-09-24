@@ -1310,3 +1310,21 @@ unmerged, and `main` is unchanged. It is returned to Nathan (`IMPLEMENTATION_BLO
 and what follows is his ruling. No item has a final disposition yet.
 
 X4.5 complete, 56/56. PR-30 and ESC-40 were rerun once each on Nathan's ruling and passed. Before the reruns, at Nathan's instruction, two allow rules for the plan's own land.py and ctrl.py were added to the session's user settings, outside the repository.
+
+**The freeze and the Notion writes, 2026-09-24.** Nathan, before the first Notion write:
+
+> I confirm the freeze. It covers the Alpha run's E6 freeze and this Modification's, and it lifts only after the
+> seven skills are installed and your post-install check passes.
+>
+> I authorize these Notion writes, and only these: the freeze line on the redesign tracking page; creating the
+> Candidate CRD Items List page under the Glow Operations Hub; the eleven pointer edits; and the edits to the 50 live
+> prompt bodies, each by the plan's own tools and read back.
+>
+> One ruling for the landing. If the harness classifier refuses a Notion write or any command, that action did not
+> happen, so it is not a failed step. Stop there, change nothing, and ask me before doing anything else, including the
+> failure path. I'll decide whether you retry or take the failure path. Record this message in §E before the first
+> write.
+
+**What this authorizes, and what it does not.** X5.0 (`TRACK-FREEZE-START`), X5.1 (the new page), X5.3 (the eleven
+PART-06 pointer edits) and X5.4 (the 50 bodies) are authorized. X5.5 writes nothing. X5.6's two control edits,
+`PART-12-HUB-01` and `PART-18-AF009-01`, are not in the list, so EXECUTE stops before X5.6 and asks Nathan.
