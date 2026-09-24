@@ -1308,3 +1308,5 @@ is on `main`** (X0.1).
 **The stop.** It comes before the first external write: nothing was written to Notion, the execution branch is
 unmerged, and `main` is unchanged. It is returned to Nathan (`IMPLEMENTATION_BLOCKED`, the successor's *Before it*),
 and what follows is his ruling. No item has a final disposition yet.
+
+X4.5 complete, 56/56. PR-30 and ESC-40 were rerun once each on Nathan's ruling and passed. Before the reruns, at Nathan's instruction, two allow rules for the plan's own land.py and ctrl.py were added to the session's user settings, outside the repository.
