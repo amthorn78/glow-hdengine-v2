@@ -603,22 +603,22 @@
    "when": "X4.1 (spec §9), after X2 and X3"
   },
   "4b_package_X4.3_after_the_pkg_gate": {
-   "when": "X4.3 (spec §9), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 delivers them, and then followed by a new review round (P-100); never after the delivery",
+   "when": "X4.3 (spec §9), after the pkg gate (X4.2). Run again only when the session holding the archives ends before X4.4 records their delivery, or at X7.2 when Nathan no longer holds a delivered archive, and each time followed by a new review round and delivery (P-100, P-109)",
    "commands": [
-    "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext",
+    "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext && python3 docs/prompt_ecosystem_management/freeze.py $PKG > $SCRATCH/pkg-before.txt",
     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf \"${SCRATCH:?}/skills-ext/${s:?}\" && mkdir -p $SCRATCH/skills-ext/$s && (cd $SCRATCH/skills-ext/$s && unzip -q $SCRATCH/skills-out/$s.skill) || exit 1; done)",
     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $SCRATCH/skills-ext/$s/$s; done) > $SCRATCH/skills-ext/freeze.txt && cat $SCRATCH/skills-ext/freeze.txt && diff $SCRATCH/skills-ext/freeze.txt $EV/skills/expected_after_patch.txt",
     "python3 $EV/skills/packages_json.py $SCRATCH/skills-out $SCRATCH/skills-ext/freeze.txt $EX/packages.json",
-    "python3 docs/prompt_ecosystem_management/freeze.py $PKG"
+    "python3 docs/prompt_ecosystem_management/freeze.py $PKG | diff - $SCRATCH/pkg-before.txt"
    ],
    "expected": [
-    "exit 0",
+    "exit 0; $SCRATCH/pkg-before.txt holds $PKG's root digest before packaging",
     "exit 0; 'Skill is valid!' once per package (seven); seven files <skill>.skill in $SCRATCH/skills-out",
     "exit 0; each archive extracts to $SCRATCH/skills-ext/<skill>/<skill>/",
     "seven lines '<skill> <files> <digest>' printed, then `diff` exits 0: each equals execute.1.expected_after_patch for that skill ($EV/skills/expected_after_patch.txt). A mismatch makes diff exit 1, and the step fails",
     "exit 0; seven lines '<skill>.skill <entries> <bytes> <sha256> <files> <digest>', and EX/packages.json written with them and out_dir; committed and pushed with EX/gate_pkg.json. The archive sha256s vary with the tree's file mtimes (EV/skills/results/brief_fill_proof.json), so the archives reviewed at X4.4 are the ones delivered there (P-100)",
-    "the value X1.1 recorded: packaging wrote nothing into $PKG"
+    "`diff` exits 0: $PKG's root digest after packaging equals the one taken before it in this session (P-111 (e)); packaging wrote nothing into $PKG. It is not compared with X1.1's recorded value, which a new session's rebuild can differ from once a skill outside the seven has synced (P-79)"
    ],
    "note": "skill-creator runs from $PKG's copy (a full copy of $INST), never from $INST, and with PYTHONDONTWRITEBYTECODE=1, so nothing is written into a skill tree. The seven archives stay in $SCRATCH/skills-out until X4.4 delivers them"
   },
@@ -681,7 +681,8 @@
    "repair round 3: 'when' fields follow spec §9 X0-X7; the pre gate runs at X1.3 (suite_gate.pre), no longer inside execute.2",
    "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)",
    "repair round 5: every `rm -rf` takes the guarded form \"${VAR:?}\" (P-92), which the session's safety check allows and which cannot expand to /; execute.4b compares the extracted freeze digests with expected_after_patch.txt by diff, so X4.3's gate fails mechanically on a mismatch; the archive sha256s go to EX/packages.json",
-   "repair round 6: BASE is read from EX/run.json; execute.1.then only before X7.3 (P-101); execute.4b writes EX/packages.json with packages_json.py and is never re-run after X4.4's delivery (P-100); execute.5 writes EX/installed_freeze.txt and compares it by diff; execute.6 carries X6.3's closure commands unescaped (P-102)"
+   "repair round 6: BASE is read from EX/run.json; execute.1.then only before X7.3 (P-101); execute.4b writes EX/packages.json with packages_json.py and is never re-run after X4.4's delivery (P-100); execute.5 writes EX/installed_freeze.txt and compares it by diff; execute.6 carries X6.3's closure commands unescaped (P-102)",
+   "repair round 7 (P-111 (e)): execute.4b takes freeze.py $PKG before packaging and diffs it after, within the session; tested at PLAN on the pass-4 patched root (diff exit 0)"
   ]
  }
 }

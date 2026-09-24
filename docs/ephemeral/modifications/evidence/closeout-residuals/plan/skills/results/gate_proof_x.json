@@ -3,7 +3,7 @@
  "order": "X0.3(b), X1.1, X1.2, X1.3 pre, X2.1 (texts X2.2), X3.1 registry.diff, X3.2 execute.2, X3.3 execute.3, X3.4 (texts X3.5), X4.1 execute.4, X4.2 pkg, X4.3 execute.4b (package, extract, compare), X7.4 post with $PKG standing in for the installed root",
  "all_exit_as_expected": true,
  "unexpected_exits": [],
- "note": "X4.1's plain diff of the 4.1.0 and 4.1.1 contracts exits 1 by design (two changed lines, manifest execute.4 expected). The whole skills root is measured and compared within each run (P-79). Each step keeps its full output (at most 400 lines: the first and last 200); paths are shown as $SCRATCH and $REPO",
+ "note": "X4.1's plain diff of the 4.1.0 and 4.1.1 contracts exits 1 by design (two changed lines, manifest execute.4 expected). The whole skills root is measured and compared within each run (P-79). Each step keeps up to 400 lines of its output (the first and last 200); two steps, X4.2 and X7.4 post, were cut (1007 and 818 lines); paths are shown as $SCRATCH and $REPO",
  "x43": {
   "skill_is_valid_count": 7,
   "freeze_compare_diff_exit": [

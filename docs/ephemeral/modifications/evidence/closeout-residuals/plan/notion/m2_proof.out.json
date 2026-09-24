@@ -1,0 +1,115 @@
+{
+ "drive_source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/subagents/workflows/wf_bafe0805-392/agent-afe382a6da0cc12db.jsonl",
+ "create_bytes": 33856,
+ "final_bytes": 34039,
+ "small_bytes": 14899,
+ "all_ok": true,
+ "cases": {
+  "create verbatim": {
+   "pass": true,
+   "failed": [],
+   "trailing": 0,
+   "links": 8,
+   "ok": true
+  },
+  "final verbatim": {
+   "pass": true,
+   "failed": [],
+   "trailing": 0,
+   "links": 11,
+   "ok": true
+  },
+  "final, Notion-style rendering": {
+   "pass": true,
+   "failed": [
+    "F7_code_sha256_exact"
+   ],
+   "trailing": 1,
+   "links": 11,
+   "ok": true
+  },
+  "a moved-items row dropped": {
+   "pass": false,
+   "failed": [
+    "F10_ids_and_titles",
+    "F3_active_empty_and_moved_rows",
+    "F4_moved_table",
+    "F6_links"
+   ],
+   "trailing": 0,
+   "links": 10,
+   "expected_failure": "F4_moved_table",
+   "ok": true
+  },
+  "one code byte changed": {
+   "pass": false,
+   "failed": [
+    "F7_code_block",
+    "F7_code_sha256_exact"
+   ],
+   "trailing": 0,
+   "links": 11,
+   "expected_failure": "F7_code_block",
+   "ok": true
+  },
+  "one link removed": {
+   "pass": false,
+   "failed": [
+    "F6_links"
+   ],
+   "trailing": 0,
+   "links": 10,
+   "expected_failure": "F6_links",
+   "ok": true
+  },
+  "a heading changed": {
+   "pass": false,
+   "failed": [
+    "F2_headings"
+   ],
+   "trailing": 0,
+   "links": 11,
+   "expected_failure": "F2_headings",
+   "ok": true
+  },
+  "a paragraph word changed": {
+   "pass": false,
+   "failed": [
+    "F9_text"
+   ],
+   "trailing": 0,
+   "links": 11,
+   "expected_failure": "F9_text",
+   "ok": true
+  },
+  "a routing item removed": {
+   "pass": false,
+   "failed": [
+    "F8_list_counts",
+    "F9_text"
+   ],
+   "trailing": 0,
+   "links": 11,
+   "expected_failure": "F8_list_counts",
+   "ok": true
+  },
+  "the title wrong": {
+   "pass": false,
+   "failed": [
+    "F1_title_and_parent"
+   ],
+   "trailing": 0,
+   "links": 11,
+   "expected_failure": "F1_title_and_parent",
+   "ok": true
+  },
+  "fallback: small create then insert-op": {
+   "pass": true,
+   "failed": [],
+   "trailing": 0,
+   "links": 8,
+   "op_matches_again": 0,
+   "ok": true
+  }
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "mode": "check",
+ "pid": "IA-50",
+ "page": "3db4590a05eb81d78eeae384e93dd697",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py check IA-50 3db4590a05eb81d78eeae384e93dd697 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root",
+ "result": {
+  "pid": "IA-50",
+  "fetched": "2026-09-23T13:21:22.132Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "placement": {
+   "W-4": 0,
+   "ONCE": 0,
+   "OWN": 0,
+   "RECV": 0
+  },
+  "unfilled_tokens": 0,
+  "doubled_insertions": [],
+  "registry_findings": [],
+  "guard_failures": [],
+  "validator": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  },
+  "pass": true
+ },
+ "proof": null
+}

@@ -1,0 +1,418 @@
+{
+ "mode": "plan",
+ "pid": "PR-35",
+ "page": "3db4590a05eb8120b443ed2cb08b723c",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan PR-35 3db4590a05eb8120b443ed2cb08b723c --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "PR-35",
+  "fetched": "2026-09-23T13:19:01.920Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 8,
+  "reapply_unsafe": [],
+  "repair": [],
+  "rules": {
+   "R-A1f": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM30a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM30c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM30d1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM30d2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A5": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-35-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-35-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-26-BRANCH-RECV": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 1
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 1
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "proof": {
+  "ops": 8,
+  "reapply_unsafe": [],
+  "reapply_unsafe_old_str_words": [],
+  "state_fetch": "UNTOUCHED",
+  "state_landed": "LANDED",
+  "plan_on_landed_exit": 3,
+  "plan_on_landed_refused": "ALREADY_LANDED: every edit reads landed;",
+  "doubled_in_landed": [],
+  "partials": 16,
+  "partials_state_partial": 16,
+  "partials_repaired_exact": 16,
+  "partials_refused": 0,
+  "partials_repaired_wrong": 0,
+  "refusals": [],
+  "rows": [
+   {
+    "applied": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-2",
+     "R-A1f",
+     "R-A5",
+     "R-ITEM30a",
+     "R-ITEM30c",
+     "R-ITEM30d1",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "R-A1f",
+     "R-A5",
+     "R-ITEM30a",
+     "R-ITEM30c",
+     "R-ITEM30d1",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "LPR-35-2",
+     "R-A1f",
+     "R-A5",
+     "R-ITEM30a",
+     "R-ITEM30c",
+     "R-ITEM30d1"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "LPR-35-2",
+     "R-A1f",
+     "R-A5",
+     "R-ITEM30c",
+     "R-ITEM30d1",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "LPR-35-2",
+     "R-A1f",
+     "R-A5",
+     "R-ITEM30a",
+     "R-ITEM30d1",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "LPR-35-2",
+     "R-A1f",
+     "R-ITEM30a",
+     "R-ITEM30c",
+     "R-ITEM30d1",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "LPR-35-2",
+     "R-A1f",
+     "R-A5",
+     "R-ITEM30a",
+     "R-ITEM30c",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1",
+     "LPR-35-2",
+     "R-A5",
+     "R-ITEM30a",
+     "R-ITEM30c",
+     "R-ITEM30d1",
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-1"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     1
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "LPR-35-2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     2
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-ITEM30d2"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     3
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-ITEM30a"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     4
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-ITEM30c"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     5
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A5"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     6
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-ITEM30d1"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     7
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1f"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   }
+  ],
+  "pass": true
+ }
+}

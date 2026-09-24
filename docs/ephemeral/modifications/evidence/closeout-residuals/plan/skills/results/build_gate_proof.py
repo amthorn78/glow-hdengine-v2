@@ -1,4 +1,4 @@
-"""Build EV/skills/results/gate_proof_x.json from the round-5 proof run: the full per-step output and each set's rows."""
+"""Build EV/skills/results/gate_proof_x.json from the round-5 proof run: up to 400 lines of each step's output (the first and last 200; X4.2 and X7.4 post were cut) and each set's rows."""
 import json
 S = "/tmp/claude-0/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5/scratchpad/plan/r5/proof"
 EVR = "/home/user/glow-hdengine-v2/docs/ephemeral/modifications/evidence/closeout-residuals/plan/skills/results"
@@ -20,7 +20,7 @@ bad = [x["cmd"][:80] for x in steps if x["exit"] != (1 if x["step"] == "X4.1" an
 out = {"what": "the committed manifest's execute commands, run literally in spec §9 order on a fresh copy of the repository (scratch), 2026-09-24, after repair round 5 (the guarded rm forms, P-92; X4.3's digest comparison by diff)",
        "order": "X0.3(b), X1.1, X1.2, X1.3 pre, X2.1 (texts X2.2), X3.1 registry.diff, X3.2 execute.2, X3.3 execute.3, X3.4 (texts X3.5), X4.1 execute.4, X4.2 pkg, X4.3 execute.4b (package, extract, compare), X7.4 post with $PKG standing in for the installed root",
        "all_exit_as_expected": not bad, "unexpected_exits": bad,
-       "note": "X4.1's plain diff of the 4.1.0 and 4.1.1 contracts exits 1 by design (two changed lines, manifest execute.4 expected). The whole skills root is measured and compared within each run (P-79). Each step keeps its full output (at most 400 lines: the first and last 200); paths are shown as $SCRATCH and $REPO",
+       "note": "X4.1's plain diff of the 4.1.0 and 4.1.1 contracts exits 1 by design (two changed lines, manifest execute.4 expected). The whole skills root is measured and compared within each run (P-79). Each step keeps up to 400 lines of its output (the first and last 200); two steps, X4.2 and X7.4 post, were cut (1007 and 818 lines); paths are shown as $SCRATCH and $REPO",
        "x43": {"skill_is_valid_count": sum(l.count("Skill is valid!") for x in x43 for l in x["output"]),
                "freeze_compare_diff_exit": [x["exit"] for x in x43 if "expected_after_patch.txt" in x["cmd"]],
                "archives": [l.split()[0] + " " + l.split("/")[-1] for x in x43 if x["cmd"].startswith("sha256sum") for l in x["output"]]},

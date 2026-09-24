@@ -1,0 +1,115 @@
+{
+ "mode": "plan",
+ "pid": "QA-120",
+ "page": "3db4590a05eb81589d21e798cf38e8ba",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan QA-120 3db4590a05eb81589d21e798cf38e8ba --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "QA-120",
+  "fetched": "2026-09-23T13:23:26.846Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 2,
+  "reapply_unsafe": [],
+  "repair": [],
+  "rules": {
+   "R-A1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "proof": {
+  "ops": 2,
+  "reapply_unsafe": [],
+  "reapply_unsafe_old_str_words": [],
+  "state_fetch": "UNTOUCHED",
+  "state_landed": "LANDED",
+  "plan_on_landed_exit": 3,
+  "plan_on_landed_refused": "ALREADY_LANDED: every edit reads landed;",
+  "doubled_in_landed": [],
+  "partials": 2,
+  "partials_state_partial": 2,
+  "partials_repaired_exact": 2,
+  "partials_refused": 0,
+  "partials_repaired_wrong": 0,
+  "refusals": [],
+  "rows": [
+   {
+    "applied": [
+     1
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A2a"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   },
+   {
+    "applied": [
+     0
+    ],
+    "state": "PARTIAL",
+    "plan_exit": 0,
+    "refused": null,
+    "repair": [
+     "R-A1a",
+     "R-A1c"
+    ],
+    "outcome": "REPAIRED_EXACT"
+   }
+  ],
+  "pass": true
+ }
+}

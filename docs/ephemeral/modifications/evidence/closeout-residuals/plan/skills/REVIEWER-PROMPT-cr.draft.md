@@ -72,7 +72,8 @@ by the recipe docs/prompt_ecosystem_management/freeze.py <dir>:
   glow-hde-pr-development 4 68077fa6620992997c8bb3949b1135ba47b1c5bd275610eb49c3b7d8d04ecf22
   amthor-workspace-governance-audit 15 819915e4a57184fd3af0c783f13e102892eb7182d0c951727869655d11ae078d
   glow-po-reporting 1 3221ae8de6f6500d27154ed0e77c0241e1679999ce42a953a9f6fad4515a0464
-Repaired trees, once extracted (the freeze digests in §1; EV/skills/expected_after_patch.txt):
+Repaired tree: the seven packages once extracted, 87 files in all, digests as in §1 and
+EV/skills/expected_after_patch.txt:
   flowmaster-validate 31 0ca2a74d…, change-flow 22 9a551af3…, glow-graph-contract 9 e241bb9a…,
   session-relay-flowmaster 5 c8a5b224…, glow-hde-pr-development 4 265f9170…,
   amthor-workspace-governance-audit 15 c214e874…, glow-po-reporting 1 7e04368a….
@@ -82,7 +83,8 @@ time; it is not an identity of this change (P-79). Do not chase it.
 
 === 4. WHERE THE REPOSITORY EVIDENCE IS ===
 Repository amthorn78/glow-hdengine-v2, local clone /home/user/glow-hdengine-v2. Branch
-claude/epic-tesla-17406z — read its HEAD ({{HEAD}} when this brief was committed). NOT MERGED: the
+claude/epic-tesla-17406z — read its HEAD, not a pinned commit. When this brief was committed, HEAD was
+{{HEAD}}. NOT MERGED: the
 execution pull request is opened only after the Notion landing passes (spec §9 X6.4), so main has none
 of this attempt's commits.
 **If that branch does not exist when you look, it merged and was deleted.** Read the same paths on
@@ -186,8 +188,9 @@ PYTHONDONTWRITEBYTECODE=1.
      Read each tool's own top-level flag by name. A green section count beside a false suite flag
      means the suite failed.
   c. Confirm the extracted trees differ from the installed tree only in the files listed here, and
-     that the list accounts for every difference (diff -rq -x __pycache__ <installed>/<skill>
-     "$R/ext/<skill>/<skill>"; derived at PLAN by that command against the patched trees):
+     that the list accounts for every difference:
+       (derived at PLAN by diff -rq -x __pycache__ <installed>/<skill> <patched>/<skill>, and pasted;
+       re-derive it with diff -rq -x __pycache__ <installed>/<skill> "$R/ext/<skill>/<skill>")
        flowmaster-validate: SKILL.md; references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json;
          references/gcfpe-20260914.1-091426.1-validation-profile.json; scripts/run_gcfpe_20260914_fixtures.py;
          scripts/run_gcfpe_current_fixtures.py; scripts/validate_flowmaster.py;

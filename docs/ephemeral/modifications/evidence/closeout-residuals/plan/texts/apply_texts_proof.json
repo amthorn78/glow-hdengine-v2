@@ -1,8 +1,9 @@
 {
- "what": "PLAN test of EV/texts/apply_texts.py (P-102) on a scratch extract of HEAD's docs/prompt_ecosystem_management and REVIEWER-PROMPT-a5.md",
- "X2.2": "five texts applied; gcfpe.decision-record.md sha256 6742d593..., 101936 B, '## D25' once: equal to the \u00a79-order proof's X2.1 row (skills/results/gate_proof_x.json steps[19])",
- "X3.5": "P32-SWR applied",
- "X5.2_without_run": "refused UNFILLED_TOKEN ({{CANDIDATE_CRD_LIST_URL}}), exit 1, nothing written",
- "X5.2_with_run": "P30-DEST and P30-VERSION applied with a stand-in URL; no '{{' left in notion-write-boundary.md",
+ "what": "PLAN test of EV/texts/apply_texts.py (P-102, P-104) on a scratch extract of HEAD's docs/prompt_ecosystem_management and REVIEWER-PROMPT-a5.md, repair round 7",
+ "X2.2": "first run: five texts NOT_APPLIED then applied; gcfpe.decision-record.md sha256 6742d593..., 101936 B, '## D25' once: equal to the \u00a79-order proof's X2.1 row (skills/results/gate_proof_x.json steps[19])",
+ "rerun": "each label run a second time (X2.2, X3.5, X5.2 with --run, close with --run and --installed-freeze): every edit reads APPLIED, nothing is written, the file hashes are unchanged",
+ "partial": "with P29-D14 alone taken back out after X2.2 and close, X2.2 again applies only P29-D14 (the others read APPLIED); the decision record then equals a fresh X2.2 plus close (sha256 901fb877...)",
+ "doubled": "with P32-SWR's text present twice, X3.5 reads MIXED and exits 1, writing nothing",
+ "X5.2_without_run": "refused UNFILLED_TOKEN ({{CANDIDATE_CRD_LIST_URL}}), exit 1, nothing written (round-6 test, unchanged code path)",
  "close": "P31-POLICY, P33-A5NOTE and CLOSE-D22 applied with a stand-in install date and the expected freeze lines as bullets"
 }

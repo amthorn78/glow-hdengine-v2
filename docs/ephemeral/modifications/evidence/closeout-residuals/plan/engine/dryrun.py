@@ -125,15 +125,32 @@ def latest_body(page):
     return best[0][1], best[1]
 
 
+def occ(text, s):
+    """Occurrences of s in text, overlapping ones included (P-103): "occurs exactly once" must hold however a search
+    is anchored, so two overlapping matches count as two."""
+    n, i = 0, text.find(s)
+    while i >= 0:
+        n += 1
+        i = text.find(s, i + 1)
+    return n
+
+
 def ops_for(old, new):
+    """The minimal search-and-replace operations that turn `old` into `new` (Notion update_content). Each old_str
+    occurs exactly once in `old`. P-103: each old_str is also grown, within the unchanged lines that follow its change,
+    until it no longer occurs in `new`, so the same operation applied again to a page that already carries it matches
+    nothing and Notion refuses it (a stale fetch cannot land an insertion twice). Where the lines that follow cannot
+    make it absent (an insertion at the very end), the minimal old_str is kept, and reapply_unsafe() names it."""
     a, b = old.splitlines(keepends=True), new.splitlines(keepends=True)
+    codes = difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes()
     out = []
-    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+    for k, (tag, i1, i2, j1, j2) in enumerate(codes):
         if tag == "equal":
             continue
+        o2 = i2
         while True:
             s = "".join(a[i1:i2])
-            if s.strip() and old.count(s) == 1:
+            if s.strip() and occ(old, s) == 1:
                 break
             if i1 > 0 and (not out or i1 > out[-1][1]):
                 i1 -= 1; j1 -= 1
@@ -143,14 +160,41 @@ def ops_for(old, new):
                 return None
         if out and i1 < out[-1][1]:
             p = out.pop(); i1, j1 = p[0], p[2]
+        # P-103: grow forward within the unchanged block after this change (never into the next change), then
+        # backward, merging with earlier operations, until old_str no longer occurs in `new`; if no growth short of
+        # the whole text does it, keep the minimal operation
+        room = (codes[k + 1][2] - codes[k + 1][1]) if k + 1 < len(codes) and codes[k + 1][0] == "equal" else 0
+        g1, g2, h1, h2, popped = i1, i2, j1, j2, []
+        while occ(new, "".join(a[g1:g2])) > 0:
+            if g2 < o2 + room:
+                g2 += 1; h2 += 1
+            elif g1 > 0:
+                g1 -= 1; h1 -= 1
+                if out and g1 < out[-1][1]:
+                    p = out.pop(); popped.append(p); g1, h1 = p[0], p[2]
+            else:
+                break
+        if occ(new, "".join(a[g1:g2])) == 0 and (g1, g2) != (0, len(a)):
+            i1, i2, j1, j2 = g1, g2, h1, h2
+        else:
+            out.extend(reversed(popped))
         out.append([i1, i2, j1, j2])
     return [{"old_str": "".join(a[i1:i2]), "new_str": "".join(b[j1:j2])} for i1, i2, j1, j2 in out]
+
+
+def reapply_unsafe(body, ops):
+    """Indexes of the operations whose old_str still occurs in the text all of them produce (P-103): applied a second
+    time, on a stale read of a landed page, such an operation would land again."""
+    landed = simulate(body, ops)
+    if landed is None:
+        return None
+    return [i for i, op in enumerate(ops) if occ(landed, op["old_str"]) > 0]
 
 
 def simulate(body, ops):
     t = body
     for op in ops:
-        if t.count(op["old_str"]) != 1:
+        if occ(t, op["old_str"]) != 1:
             return None
         t = t.replace(op["old_str"], op["new_str"])
     return t

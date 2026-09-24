@@ -217,7 +217,8 @@ gives page IDs and titles only. `nam002_live.py` runs three checks from one `chi
    | `3db4590a05eb811b9c14f2ae89c28df7` | HDE TW — GCFPE-20260914.1 — 091426.1 | UTIL | 1: UTIL-10 |
    | `3db4590a05eb81de9736ea69bac61016` | Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1 | GCFPE-MGMT | 1: GCFPE-MGMT-10 |
 
-2. Right after the six fetches, build `$SCRATCH/nam002/childlist.json` with the committed helper (P-101), which reads
+2. Right after the six fetches, `mkdir -p "$SCRATCH/nam002"` (P-111 (f)), then build `$SCRATCH/nam002/childlist.json` with the
+   committed helper (P-101), which reads
    each hub's newest fetch in this session and copies nothing by hand:
    `python3 $EV/engine/ctrl.py children 3db4590a05eb81d59059eb6b95ed5fcf 3db4590a05eb8195a2ccf7c0959a8b6e 3db4590a05eb814d96d3dcfa8835f96d 3db4590a05eb81cd938de84cfffead9c 3db4590a05eb811b9c14f2ae89c28df7 3db4590a05eb81de9736ea69bac61016 > $SCRATCH/nam002/childlist.json`
    It writes the shape the script documents; every hub carries its fetched `title` (a hub without one is unusable

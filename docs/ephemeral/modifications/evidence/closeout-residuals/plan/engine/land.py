@@ -10,8 +10,10 @@
 Every mode reads only the running session's harness files ($CLAUDE_CODE_SESSION_ID; --session names another, or
 `any`), so another session's fetch of the same page is never taken for the one just made (P-101).
 
---candidate-url is required, in both modes, for a body whose rules carry {{CANDIDATE_CRD_LIST_URL}} (CL-40): the
+--candidate-url is required by plan and check for a body whose rules carry {{CANDIDATE_CRD_LIST_URL}} (CL-40): the
       token is filled before anything is compared, so a landed page carrying the real URL reads as landed (P-75).
+      state fills X4.5's stand-in URL when none is given (P-108): no body can carry the page URL before X5.1 records
+      it, so the stand-in gives an unlanded page's true verdict, and the output says `candidate_url: stand-in`.
 plan: the newest fetch of the page (dryrun.latest_body: this session's harness files written in the last 30 minutes;
       D22) -> the edits still missing from it (edit_states, P-88) -> the minimal search-and-replace operations for
       Notion `update_content`, printed to stdout for the landing call in hand and written nowhere. Each edit is
@@ -25,7 +27,10 @@ plan: the newest fetch of the page (dryrun.latest_body: this session's harness f
       that do not reproduce the edit, and (P-76) a failing precheck (PRECHECK_FAILED) or landed check
       (LANDED_CHECK_FAILED). The precheck is `check`'s criteria on the text the operations produce; the landed check
       is `check` itself, the STALE test included, on that text, i.e. what the readback after the landing will run.
-      --no-ops (the rehearsal) prints counts and both checks, never the operations.
+      --no-ops (the rehearsal) prints counts and both checks, never the operations. Each operation's old_str occurs
+      once in the fetched body and, wherever the unchanged lines after it allow, nowhere in the landed text, so the
+      same operation sent again on a stale read of a landed page matches nothing and Notion refuses it (P-103);
+      `reapply_unsafe` lists the operations for which that could not be done (an insertion at the very end).
 check: the readback. The newest fetch of the page after the landing -> the row's registry assertions (0 findings), every
       new guard on the row (forbidden: silent, and fires on its injected regression; required: matches, and fails when
       removed), flowmaster-validate's body validator, no insertion doubled (P-88), and the placement counts. A page
@@ -33,8 +38,8 @@ check: the readback. The newest fetch of the page after the landing -> the row's
       read (source_file, D22 condition 5); exits 1 unless `pass` is true. No body text is printed.
 state: read-only, for the stop sweep and the restoration check (P-98, P-99). Prints each edit's state and the page's
       verdict: UNTOUCHED (every edit NOT_LANDED), LANDED (every edit LANDED), PARTIAL (anything else), or NO_EDITS for
-      a body this Modification does not edit; with source_file and fetched. Never refuses on the page's content;
-      exits 0. No body text is printed.
+      a body this Modification does not edit; with source_file and fetched. Refuses nothing: exits 0 whenever the
+      page's fetch is found. No body text is printed.
 There is no rollback journal and no reverse mode (P-58 as revised in repair round 4, D22): nothing keeps a copy of a
 body. A failed readback is repaired forward by `plan` on a fresh fetch, which plans only the edits still missing
 (P-88); a page it refuses stops the landing unit and returns to Nathan (spec §9 X5.4).
@@ -53,6 +58,7 @@ import closeout_rules as R  # noqa: E402
 import dryrun as D  # noqa: E402
 
 TOKEN = "{{CANDIDATE_CRD_LIST_URL}}"
+STAND_IN = "https://app.notion.com/p/" + "0" * 32     # X4.5's stand-in (P-76), and `state`'s when no URL is recorded
 URL_RE = re.compile(r"https://app\.notion\.com/p/[0-9a-f]{32}")
 
 
@@ -216,9 +222,14 @@ def main():
     D.SINCE = a.since_minutes * 60
     D.ROOT = a.harness_root
     D.SESSION = None if a.session == "any" else a.session
+    stand_in = False
     if a.pid in TOKEN_PIDS and not a.candidate_url:
-        print(json.dumps({"pid": a.pid, "refused": "CANDIDATE_URL_REQUIRED (P-75)"}))
-        raise SystemExit(2)
+        if a.mode != "state":
+            print(json.dumps({"pid": a.pid, "refused": "CANDIDATE_URL_REQUIRED (P-75)"}))
+            raise SystemExit(2)
+        # P-108: before X5.1 records the URL no body can carry it (X5.4 follows X5.1), so the stand-in gives the true
+        # verdict of an unlanded page; a page landed with a real URL does not read UNTOUCHED under it either
+        a.candidate_url, stand_in = STAND_IN, True
     if a.candidate_url:
         fill(a.candidate_url)
     ts, body = D.latest_body(a.page)
@@ -232,8 +243,8 @@ def main():
         st = {k: states[k] for k in live}
         verdict = ("NO_EDITS" if not live else "UNTOUCHED" if all(v == "NOT_LANDED" for v in st.values())
                    else "LANDED" if all(v == "LANDED" for v in st.values()) else "PARTIAL")
-        print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "verdict": verdict, "states": st},
-                         indent=1))
+        print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "verdict": verdict, "states": st,
+                          **({"candidate_url": "stand-in"} if stand_in else {})}, indent=1))
         return
     post0, rep0 = R.apply(a.pid, body)
     bad = {k: v for k, v in rep.items() if not v["ok"]}
@@ -261,8 +272,9 @@ def main():
     landed_text = D.simulate(body, ops)
     pre = checks(a.pid, landed_text, a, "precheck")
     after = checks(a.pid, landed_text, a, "check")
-    summary = {"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "ops_count": len(ops), "repair": repair, "rules": rep,
-               "precheck": pre, "landed_check": after}
+    unsafe = D.reapply_unsafe(body, ops)
+    summary = {"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "ops_count": len(ops), "reapply_unsafe": unsafe,
+               "repair": repair, "rules": rep, "precheck": pre, "landed_check": after}
     if not pre.get("pass") or not after.get("pass"):
         print(json.dumps({**summary, "refused": "PRECHECK_FAILED" if not pre.get("pass") else "LANDED_CHECK_FAILED"},
                          indent=1, ensure_ascii=False))
@@ -270,8 +282,8 @@ def main():
     if a.no_ops:
         print(json.dumps(summary, indent=1, ensure_ascii=False))
         return
-    print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "repair": repair, "ops": ops, "rules": rep,
-                      "precheck": pre, "landed_check": after}, ensure_ascii=False))
+    print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "repair": repair, "ops": ops,
+                      "reapply_unsafe": unsafe, "rules": rep, "precheck": pre, "landed_check": after}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

@@ -11,9 +11,14 @@ and the token refusal. Tokens are filled before anything is written (P-48, P-96)
   {{INSTALL_DATE}}            EX/run.json "install_date" (X7.6; recorded at X7.4 from Nathan's confirmation)
   {{FREEZE_DIGESTS}}          the seven lines '<skill> <files> <digest>' X7.4 wrote to EX/installed_freeze.txt, as
                               Markdown bullets '- `<skill>` `<files> <digest>`' in that order (P-68)
-Each anchor must occur exactly once when applied. Refuses, writing nothing, when a token has no value, when a filled
-text still carries '{{', or when an anchor count is not 1 (the files edited before a refusal are left as they are:
-run it on a clean tree and `git checkout -- <file>` to retry). Prints one JSON line per edit and the gate results.
+Idempotent (P-104): each edit is first stated on its file. APPLIED: its filled text already stands at its anchor
+once, with its anchor once (texts inserted at one anchor stack, so a landed text need not stand directly against
+it); for replace, the anchor is gone and the new text is there. It is skipped. NOT_APPLIED: the anchor occurs exactly once and the new text does not occur, so it is applied.
+Anything else (the text twice, the anchor missing or repeated) is MIXED, and the run is refused before any write. So
+a label re-run in a new session, over a tree where some or all of it already landed, writes each text once. Refuses,
+writing nothing, when a token has no value, when a filled text still carries '{{', or when any edit is MIXED.
+Afterwards each inserted text occurs exactly once in its file, and each replaced anchor not at all. Prints one JSON
+line per edit and the gate results.
 """
 import argparse
 import hashlib
@@ -23,6 +28,14 @@ import sys
 from pathlib import Path
 
 sys.dont_write_bytecode = True
+
+
+def occ(text, s):
+    n, i = 0, text.find(s)
+    while i >= 0:
+        n += 1
+        i = text.find(s, i + 1)
+    return n
 
 
 def fills(a):
@@ -60,27 +73,55 @@ def main():
                               "tokens": sorted(set(re.findall(r"\{\{[A-Z_]+\}\}", t)))}))
             raise SystemExit(1)
         texts[e["id"]] = t
-    added_quote_lines, files = [], set()
-    for e in edits:
-        p = repo / e["file"]
-        text = p.read_text(encoding="utf-8")
-        n = text.count(e["anchor"])
-        if n != 1:
-            print(json.dumps({"id": e["id"], "anchor_count": n, "applied": False}))
-            raise SystemExit(1)
-        nt = texts[e["id"]]
-        if e["action"] == "insert_after":
-            new = text.replace(e["anchor"], e["anchor"] + nt)
-        elif e["action"] == "insert_before":
-            new = text.replace(e["anchor"], nt + e["anchor"])
-        elif e["action"] == "replace":
-            new = text.replace(e["anchor"], nt)
-        else:
+    def state(text, e):
+        a_, nt = e["anchor"], texts[e["id"]]
+        joined = {"insert_after": a_ + nt, "insert_before": nt + a_}.get(e["action"])
+        if e["action"] == "replace":
+            if occ(text, a_) == 0 and occ(text, nt) >= 1:
+                return "APPLIED"
+            return "NOT_APPLIED" if occ(text, a_) == 1 else "MIXED"
+        if joined is None:
             raise SystemExit(f"unknown action {e['action']}")
-        added_quote_lines += [ln for ln in nt.split("\n") if ln.startswith("> ")]
-        p.write_text(new, encoding="utf-8")
+        # texts inserted at the same anchor stack (P29-D23C and P29-D23G both before `## D24`), so a landed insertion
+        # need not stand directly against its anchor: it is applied when its text is there once and the anchor once
+        if occ(text, a_) == 1 and occ(text, nt) == 1:
+            return "APPLIED"
+        return "NOT_APPLIED" if occ(text, a_) == 1 and occ(text, nt) == 0 else "MIXED"
+
+    # state every edit first, in order, on the text as the earlier edits of this label leave it; write nothing
+    # unless none is MIXED
+    work, plan = {}, []
+    for e in edits:
+        f = e["file"]
+        text = work.get(f, (repo / f).read_text(encoding="utf-8"))
+        st = state(text, e)
+        if st == "MIXED":
+            print(json.dumps({"id": e["id"], "state": "MIXED", "anchor_count": occ(text, e["anchor"]),
+                              "text_count": occ(text, texts[e["id"]])}))
+            raise SystemExit(1)
+        if st == "NOT_APPLIED":
+            nt = texts[e["id"]]
+            text = text.replace(e["anchor"], {"insert_after": e["anchor"] + nt, "insert_before": nt + e["anchor"],
+                                              "replace": nt}[e["action"]], 1)
+        work[f] = text
+        plan.append((e, st))
+    added_quote_lines, files = [], set()
+    for e, st in plan:
+        nt = texts[e["id"]]
+        if st == "NOT_APPLIED":
+            added_quote_lines += [ln for ln in nt.split("\n") if ln.startswith("> ")]
         files.add(e["file"])
-        print(json.dumps({"id": e["id"], "file": e["file"], "action": e["action"], "anchor_count": n, "applied": True}))
+        print(json.dumps({"id": e["id"], "file": e["file"], "action": e["action"], "state": st,
+                          "applied": st == "NOT_APPLIED"}))
+    for f, text in work.items():
+        if text != (repo / f).read_text(encoding="utf-8"):
+            (repo / f).write_text(text, encoding="utf-8")
+    for e, st in plan:
+        text = work[e["file"]]
+        once = occ(text, e["anchor"]) == 0 if e["action"] == "replace" else occ(text, texts[e["id"]]) == 1
+        if not once:
+            print(json.dumps({"id": e["id"], "refused": "NOT_ONCE_AFTER"}))
+            raise SystemExit(1)
     out = {"edits_applied": [e["id"] for e in edits], "files": sorted(files),
            "added_lines_starting_quote": len(added_quote_lines)}
     for fn in sorted(files):

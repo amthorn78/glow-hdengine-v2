@@ -17,7 +17,9 @@ the brief before either reviewer starts. Fills the draft's six tokens (EV/skills
                 plan change (the newest earlier brief is under attempt-*/: the text comes from --prior-file, which
                 the PLAN session writes, with a '## PRIOR' and a '## REREVIEW' section).
 Refuses (exit 1, nothing printed) when EX/packages.json does not hold the seven packages with the freeze lines of
-EV/skills/expected_after_patch.txt, when a plan-change round has no --prior-file, or when any {{ remains.
+EV/skills/expected_after_patch.txt, when a plan-change round has no --prior-file, when a re-cut round follows a round
+whose verdict file reads SKILL_REPAIR_REQUIRED first (REPAIR_VERDICT_PENDING: that is a stop, P-84 revised), or when
+any {{ remains.
 """
 import argparse
 import json
@@ -62,6 +64,14 @@ def main():
         prior = quoted(draft, "`{{PRIOR}}`, first variant")
         rereview = "NONE, first review."
     elif briefs[-1].parent == DIR:
+        # a re-cut round never re-rolls a rejection (D24 condition 5): a SKILL_REPAIR_REQUIRED verdict of the earlier
+        # round is a stop before X5.0 (P-84 revised), not a reason for another round on the same bytes
+        for v in sorted(DIR.glob(f"SECTION-10-REVIEW-cr{k - 1}-*.md")):
+            t = v.read_text(encoding="utf-8")
+            first = min(((t.find(w), w) for w in ("SKILL_REPAIR_REQUIRED", "SKILL_FIT_CONFIRMED") if w in t),
+                        default=(-1, None))[1]
+            if first == "SKILL_REPAIR_REQUIRED":
+                refuse("REPAIR_VERDICT_PENDING", verdict=str(v))
         prior = quoted(draft, "`{{PRIOR}}`, second variant").replace("<k-1>", str(k - 1))
         rereview = f"Give the disposition of every finding in round cr{k - 1}'s verdict files, if any."
     else:
