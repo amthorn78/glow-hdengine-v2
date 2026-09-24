@@ -1090,6 +1090,9 @@ needs its own authorization, and the Class A prompt rewrite needs it most.
 **The pilot is not optional.** *"The new process works"* is a claim, and this ecosystem's failures
 are uniformly claims made before the measurement that would have checked them.
 
+*Pointer, 2026-09-24: the claim above that the scope freeze bounds the review loops is superseded by
+`D26`, which bounds them.*
+
 ## D21 — One run is one Modification; parts carry failure; one session can carry the whole process
 
 **Product Owner, 2026-09-23**, on the first triage run turning one list into six Modifications:
@@ -1487,3 +1490,148 @@ The review must still be done by a party that did not author the change (standin
 None is mechanical. **A delivery is incomplete unless it carries** the committed brief and two
 verdict files, each bound to the delivered digests. That is checked by reading the delivery, and
 this entry says so rather than implying a guard exists.
+
+## D26 — Review loops are bounded, a plan automates its normal path only, and a session resumes only at checkpoints
+
+**Product Owner, 2026-09-24**, after reading the recovery analysis of the eight PLAN review rounds on
+`MODIFICATION-20260923-closeout-residuals`:
+
+> "the main thing is that this needs to be A PROCESS. this ad-hoc deciding and choosing is going to
+> lead me to more weeks of bullshit. I need to know how to resume the process with it working
+> correctly, and to fix the process parts that were broken. Not just random out of sync decisions"
+
+> "So I need a process fix, prompt fixes, design fixes, and prompt to hand back to the alpha run
+> system that will fix this IN STEP with the process."
+
+The evidence is `docs/ephemeral/pe36.mgmt-redesign/RECOVERY-ANALYSIS-20260924.md` (§4.4 the rules
+that drove the loop, §6 the escalation triggers, §7 the stopping rule) and
+`docs/ephemeral/modifications/evidence/closeout-residuals/RCA-20260924-closeout-residuals.md`
+(§4 root causes, §7 corrective actions). The wording below is PE37's, written from those documents
+as stage 5 of the `D20` redesign. It binds from the merge of the stage 5 pull request; a part Nathan
+corrects is corrected by a successor section here, not by an edit in place.
+
+### What was wrong, in one line
+
+**Nothing bounded a review loop.** The scope freeze bounds the item list, and `D20` and the template
+claimed it bounded the loops too. It did not: the growth was in failure-path machinery the plan
+built for itself, which no item list reaches. Eight PLAN rounds ran with "clean" as the only exit,
+every finding was repaired, most new findings sat in the last repair's own text, and the rounds cost
+nothing on the record.
+
+### The rulings
+
+**D26-A — Reviews are bounded.** One rule for every maintenance review loop: an `ANALYZE` review, a
+`PLAN` review and a `D24` skill review.
+
+1. **A dry run first.** Before any full review, run every normal-path gate and readback on the text
+   as it would land, read-only against the live pages, and check that every step's verification
+   names a committed command.
+2. **At most two full reviews per mode, then at most one check of the repair's diff.** The two are
+   the first review and one after its repair. Then the output goes to Nathan with every open finding
+   listed by path, likelihood and consequence, however many there are. For skill packages: after two
+   consecutive `SKILL_REPAIR_REQUIRED` rounds, Nathan decides before a third.
+3. **What counts as required:** a defect on the normal path; a silent wrong edit to a prompt body,
+   governed document or control page; a silent breach of a Product Owner ruling, however unlikely; a
+   plausible path with a silent or destructive outcome. A failure that ends in a loud stop and a
+   return to Nathan is listed, not required. Verifiers refute by default.
+4. **Non-blocking findings are listed, not repaired.** They go into the approval request as accepted
+   risks, each with a reason. Repairing one is Nathan's opt-in, priced as another round.
+5. **Stop early and return to Nathan** when the count of distinct confirmed required defects does not
+   at least halve from one round to the next; when most of a round's findings sit in text the last
+   repair added; or when time or tokens pass twice the estimate. The return is a `DECISION NEEDED`
+   carrying the trend and the open findings.
+6. **A session never tightens an exit rule.** Every stopping rule a session states names who set it
+   and when. "Clean" is not an exit rule anyone set.
+
+The review brief for `ANALYZE` and `PLAN` reviews is the second template in
+`reviewer-prompt-template.md`, filled and committed under `docs/ephemeral/` before any reviewer is
+spawned, as `D24` condition 2 already requires for skill reviews.
+
+**D26-B — A plan automates its normal path only.** A failure after the first external write ends
+the same way every time, and the plan builds nothing more for it:
+
+1. commit a failure record that reaches `main`, in a record pull request;
+2. sweep read-only, so the record says what is live;
+3. keep the freeze;
+4. return to Nathan.
+
+**Where a rollback would need a copy of a Notion prompt body that `D22` forbids, the rollback is
+Nathan's restoration from Notion page history.** The Modification stays `EXECUTING` until he has
+restored the bodies, and nothing further is automated. This is the carve-out in "a part lands whole
+or not at all" (`D21-B`): the part is recorded blocked with its applied steps named, and restoring
+them is his.
+
+**D26-C — A session resumes only at checkpoints.**
+
+- At a mode boundary.
+- Before the first external write, by restarting the mode.
+- At each post-merge step, started from `main`, with the merge detected by files on `main` and never
+  by commit subjects, because this repository squash-merges.
+
+Within one session, keep what makes a step safe after compaction: values recorded once, apply-once
+tests, and operations that are safe to send twice. Resuming in a fresh session anywhere else is not
+designed for, and the plan builds no routing for it.
+
+**D26-D — Cost is on the record.** `ANALYZE` states a time and token estimate for `PLAN` and
+`EXECUTE`. `interaction_cost` counts `ANALYZE` and `PLAN` review rounds as well as skill review
+cycles. An estimate passed twice over is re-priced to Nathan, not absorbed.
+
+**D26-E — Verifying a rule change searches for surviving old text.** The check is broad match minus
+permitted exceptions (`SCOPE-001`) for text the new rule contradicts, not only a search for the new
+wording. The Alpha run's completion check tested only the new wording and reported the D23 change
+complete while about 50 bodies still contradicted it.
+
+**D26-F — The multi-agent mode is one bounded pass on a named trigger, then off.** The triggers are
+the recovery analysis §6's five:
+
+1. a completion claim is refuted, or a check is shown to test only the new wording;
+2. a dry run or preflight fails on the normal path;
+3. a path could silently breach a Product Owner ruling or silently mis-edit a live page;
+4. a new oracle, validator or guard whose failure would be silent;
+5. a change across more than about ten live bodies or more than one skill package.
+
+More defects found in text the last repair added is **not** a trigger. It is the non-convergence
+signal in D26-A rule 5, and the response is to return to Nathan.
+
+### What it supersedes, and what it does not
+
+- **`D20`'s consequence "This is the rule that bounds the review loops"**, and the same claim in the
+  template's rule 3. The scope freeze bounds scope, not review rounds; D26-A bounds those.
+- **`D24` condition 5's uncapped re-review.** A `SKILL_REPAIR_REQUIRED` finding is still repaired and
+  re-reviewed by fresh reviewers on the new bytes, within D26-A rule 2's cap.
+- **`DISP-001`'s reading as "repair everything".** A finding is resolved when it is fixed, declined
+  with reasoning, or listed as an accepted risk in an approval request Nathan approves
+  (`ecosystem-change-management.md`).
+
+It reopens none of `D20`, `D21`, `D22`, `D23` or `D24` otherwise, and it approves no plan.
+
+### Transition
+
+A Modification begun before D26 adopts format 2.1 when it next changes mode. The mode that adopts
+it sets `estimate` for the work still to come and starts the `reviews` ledger empty. Review rounds
+run before D26 are cited from its RCA and are not entered in the ledger.
+`MODIFICATION-20260923-closeout-residuals` is the first: it resumes at `PLAN` under D26
+(`docs/ephemeral/pe37.stage5/RESUME-PROCEDURE.md`).
+
+### The tested guard (`D14`)
+
+`modification_validate.py`, for a record with `format: "2.1"`:
+
+- `reviews` is a list of `{mode, kind, date, required_open, outcome}`, with `mode` one of `ANALYZE`,
+  `PLAN`, `SKILL` and `kind` one of `DRY_RUN`, `FULL`, `DIFF_CHECK`;
+- per mode, at most two `FULL` and one `DIFF_CHECK`, unless a recorded override names `review_cap`;
+- `PLAN`'s first `FULL` review comes after a `PLAN` `DRY_RUN`, unless the override names `dry_run`;
+- `estimate` carries `plan` and `execute` at `ANALYZED` and later, except in a terminal state.
+
+A record with no `format` validates exactly as before, and a must-pass case holds that. Each check
+has an injected must-fail regression and a must-pass case; the shipped template validates at
+`INTAKE`, `ANALYZING` and `ANALYZED`. The selftest runs 64 cases, up from 39. A scratch copy with one
+check disabled fails that check's regressions: 8 cases for the ledger's shape, 3 for the cap, 3 for
+the dry run, 2 for the estimate, 17 for the format itself, and 1 for the rule that only an
+attributed override (`by` and `reason`) waives a D26 check
+(`docs/ephemeral/pe37.stage5/guard_proof.py`).
+
+**The session behaviours have no mechanical guard:** stopping on the non-convergence signal,
+re-pricing at twice the estimate, labelling who set an exit rule, and quoting a commitment and
+Nathan's reply word for word in a compaction summary. `session-working-rules.md` states them, and
+this entry says so rather than implying a guard exists for them.

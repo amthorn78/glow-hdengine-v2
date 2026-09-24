@@ -1,7 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CHANGE_MANAGEMENT_MODEL
-artifact_version: "1.1"
+artifact_version: "1.2"
 created_date: 2026-09-18
+revised_date: 2026-09-24 — DISP-001 and §5 item 6: what resolves a finding (D26)
 status: BINDING
 authority: Product Owner approval, 2026-09-18 (strategic assessment of the repair process)
 applies_to: The prompt-management ecosystem generally, not one release
@@ -223,6 +224,11 @@ pass.
 the current execution step. It is **not** a resolution. Drive every finding to resolution
 in the session that finds it, or name the specific Product Owner decision it needs.
 
+**What resolves a finding (`D26`, 2026-09-24):** it is fixed; or it is declined with reasoning; or
+it is listed as an accepted risk, with its reason, in an approval request Nathan approves. This is
+tested when a change closes, not at each review round: a review round that leaves findings listed
+is working as designed, and repairing every finding at every round is what `D26-A` stops.
+
 ### STALE-001 — A committed copy of derived output
 
 **Symptom:** a derived artifact is stored, drifts from its source, and is then read as
@@ -304,8 +310,9 @@ A change to this ecosystem is done when all seven hold. Not six.
    producer/consumer interfaces closing.
 5. **Recorded** at a named path (§2, Step 5) — repository document, Notion page, or both
    where each is authoritative for its layer.
-6. **No open findings.** Every finding resolved, or named as a specific Product Owner
-   decision with a brief. Nothing parked (`DISP-001`).
+6. **No open findings.** Every finding resolved — fixed, declined with reasoning, or accepted
+   as a listed risk in an approval Nathan gave — or named as a specific Product Owner decision
+   with a brief. Nothing parked (`DISP-001`, `D26`).
 7. **Successor-legible.** A session with no transcript can pick it up from the succession
    record and the three governing documents alone.
 

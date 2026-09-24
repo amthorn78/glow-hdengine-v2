@@ -28,6 +28,17 @@ What it checks, and the rule each check enforces:
   scope freeze: items may not be added after approval -- checked by item_count_at_approval
   COMPLETE requires interaction_cost_actual to be set, which is what calibrates the prediction
 
+For a record with `format: "2.1"` or later (D26), and never for a legacy record with no format:
+  `reviews` is a list of {mode, kind, date, required_open, outcome}: every ANALYZE, PLAN and SKILL
+    review round, in order
+  REVIEW CAP     per mode, at most 2 FULL reviews and 1 DIFF_CHECK, unless the override names
+                 review_cap
+  DRY RUN FIRST  PLAN's first FULL review comes after a PLAN DRY_RUN, unless the override names
+                 dry_run
+  ESTIMATE       `estimate` carries plan and execute from ANALYZED on, except in a terminal state
+The session behaviours D26 also asks for -- stopping when defects do not halve, re-pricing at twice
+the estimate, naming who set an exit rule -- have no mechanical check here, and D26 says so.
+
 readiness is ADVISORY and never blocks. It reports what ANALYZE concluded; it does not refuse.
 The gates here exist to stop a SESSION proceeding on its own judgement, never to stop the Product
 Owner. A policy gate -- scope freeze above all -- is waived by a recorded override block:
@@ -65,7 +76,8 @@ APPLIED = {"APPLIED", "VERIFIED"}
 READINESS = ["READY", "SPLIT_RECOMMENDED", "NEEDS_RULING"]
 # Policy gates the Product Owner may waive with a recorded override. Everything else this
 # script checks is well-formedness: an override cannot make a malformed record well-formed.
-OVERRIDABLE = ["scope_freeze", "readiness", "modification_class", "gate_tier", "deferral"]
+OVERRIDABLE = ["scope_freeze", "readiness", "modification_class", "gate_tier", "deferral",
+               "review_cap", "dry_run"]
 TARGETS = ["prompt", "skill", "rule", "graph", "registry", "notion_control"]
 DISPOSITIONS = ["APPLIED", "VERIFIED", "BLOCKED", "NOT_APPLICABLE"]
 
@@ -82,6 +94,14 @@ TERMINAL = ["BLOCKED", "ABANDONED"]
 
 REQUIRED_ALWAYS = ["artifact_type", "modification_id", "status", "request", "items"]
 REQUIRED_BEYOND_INTAKE = ["targets", "gate_tier", "readiness"]
+
+# Format 2.1 (D26): the review ledger, its caps, the dry run and the estimate. A record with no
+# `format` is a legacy record and is checked exactly as before.
+FORMAT_D26 = (2, 1)
+REVIEW_MODES = ["ANALYZE", "PLAN", "SKILL"]
+REVIEW_KINDS = ["DRY_RUN", "FULL", "DIFF_CHECK"]
+REVIEW_CAP = {"FULL": 2, "DIFF_CHECK": 1}
+NEEDS_ESTIMATE = ["ANALYZED", "PLANNING", "PLANNED", "EXECUTING", "COMPLETE"]
 
 
 def split_frontmatter(text):
@@ -197,6 +217,109 @@ def _half_applied(parts, items):
     return bad
 
 
+def _format(fm):
+    """(version tuple or None for a legacy record, failure string or None)."""
+    raw = fm.get("format")
+    if raw in (None, ""):
+        return None, None
+    try:
+        return tuple(int(n) for n in str(raw).split(".")), None
+    except ValueError:
+        return None, f"format {raw!r} is not a version such as \"2.1\""
+
+
+def _waived(fm):
+    """The policy gates an attributed override waives for the D26 checks.
+
+    An override counts only with a `by` and a `reason`. check() reports a malformed override only
+    past INTAKE and short of a terminal state, so without this an unattributed block on an INTAKE or
+    ABANDONED record would waive the review cap silently."""
+    override = fm.get("override") or {}
+    if not isinstance(override, dict):
+        return []
+    if not (str(override.get("by") or "").strip() and str(override.get("reason") or "").strip()):
+        return []
+    raw = override.get("overrides")
+    return [raw] if isinstance(raw, str) else list(raw or [])
+
+
+def _reviews_shape(fm):
+    """The ledger is a list of well-formed rounds. Returns (failures, rounds that parsed)."""
+    if "reviews" not in fm:
+        return ["format 2.1 requires reviews, the review ledger: [] when no round has run (D26)"], []
+    rounds = fm.get("reviews")
+    if rounds is None:
+        rounds = []
+    if not isinstance(rounds, list):
+        return ["reviews must be a list of rounds"], []
+    bad, good = [], []
+    for n, r in enumerate(rounds, 1):
+        if not isinstance(r, dict):
+            bad.append(f"review {n} is not a mapping")
+            continue
+        before = len(bad)
+        if r.get("mode") not in REVIEW_MODES:
+            bad.append(f"review {n} mode {r.get('mode')!r} not in {REVIEW_MODES}")
+        if r.get("kind") not in REVIEW_KINDS:
+            bad.append(f"review {n} kind {r.get('kind')!r} not in {REVIEW_KINDS}")
+        if not str(r.get("date") or "").strip():
+            bad.append(f"review {n} has no date")
+        opened = r.get("required_open")
+        if isinstance(opened, bool) or not isinstance(opened, int) or opened < 0:
+            bad.append(f"review {n} required_open must be a count of 0 or more, got {opened!r}")
+        if not str(r.get("outcome") or "").strip():
+            bad.append(f"review {n} has no outcome")
+        if len(bad) == before:
+            good.append(r)
+    return bad, good
+
+
+def _review_caps(rounds, waived):
+    """At most two full reviews and one diff check per mode (D26-A rule 2)."""
+    if "review_cap" in waived:
+        return []
+    bad = []
+    for mode in REVIEW_MODES:
+        for kind, cap in REVIEW_CAP.items():
+            n = sum(1 for r in rounds if r["mode"] == mode and r["kind"] == kind)
+            if n > cap:
+                bad.append(f"REVIEW CAP: {n} {mode} {kind} rounds, cap {cap}; the output goes to Nathan "
+                           "with its open findings listed, and a further round is his override "
+                           "(review_cap)")
+    return bad
+
+
+def _dry_run_first(rounds, waived):
+    """PLAN's first full review comes after a PLAN dry run (D26-A rule 1)."""
+    if "dry_run" in waived:
+        return []
+    for r in rounds:
+        if r["mode"] == "PLAN" and r["kind"] == "DRY_RUN":
+            return []
+        if r["mode"] == "PLAN" and r["kind"] == "FULL":
+            return ["DRY RUN FIRST: PLAN's first FULL review precedes any PLAN DRY_RUN; run every "
+                    "normal-path gate read-only before a full review, or record Nathan's override (dry_run)"]
+    return []
+
+
+def _estimate_check(fm, status):
+    """ANALYZE prices PLAN and EXECUTE before anything is approved (D26-D)."""
+    if status not in NEEDS_ESTIMATE:
+        return []
+    est = fm.get("estimate")
+    if not isinstance(est, dict) or not all(str(est.get(k) or "").strip() for k in ("plan", "execute")):
+        return [f"ESTIMATE: status {status} requires estimate with plan and execute set, the time and "
+                "tokens each will take; it is what re-pricing at twice the estimate is measured against"]
+    return []
+
+
+def _d26_checks(fm, status):
+    """Format 2.1 only. A legacy record never reaches here."""
+    bad, rounds = _reviews_shape(fm)
+    waived = _waived(fm)
+    return bad + _review_caps(rounds, waived) + _dry_run_first(rounds, waived) + _estimate_check(fm, status)
+
+
 def check(path):
     """Return a list of failure strings; empty means the file passes."""
     bad = []
@@ -241,6 +364,12 @@ def check(path):
 
     parts_bad, parts = _parts_checks(fm, items)
     bad.extend(parts_bad)
+
+    version, format_bad = _format(fm)
+    if format_bad:
+        bad.append(format_bad)
+    elif version is not None and version >= FORMAT_D26:
+        bad.extend(_d26_checks(fm, status))
 
     if status == "INTAKE":
         # A triage draft is held to what triage writes, and nothing further: its parts, and an
@@ -332,7 +461,8 @@ def check(path):
     # --- scope freeze ---
     # The field is REQUIRED once scope is frozen. Without that, the guard is opt-in: a
     # Modification that simply never sets it can grow items freely after approval, and scope
-    # freeze is the rule that bounds the review loops. Found by the stage 4 pilot; PAIR-001.
+    # freeze is the rule that bounds scope (review rounds are bounded by D26, below). Found by the
+    # stage 4 pilot; PAIR-001.
     frozen_at = fm.get("item_count_at_approval")
     if status in FROZEN and "scope_freeze" in waived:
         pass  # waived by the Product Owner, and the override block records it
@@ -558,6 +688,188 @@ _INTAKE_REGRESSIONS = [
      lambda s: s.replace("    items: [ITEM-02]\n    after: [PART-01]\n", "    items: [ITEM-01]\n"), "is in no part"),
 ]
 
+_GOOD_D26 = """---
+artifact_type: GCFPE_MODIFICATION_RECORD
+format: "2.1"
+modification_id: MODIFICATION-20260924-selftest-d26
+status: COMPLETE
+targets: [skill]
+gate_tier: 0
+readiness: READY
+modification_class: B
+interaction_cost_predicted: 6
+interaction_cost_actual: 6
+estimate:
+  plan: "2 h, 0.5M tokens"
+  execute: "3 h, 1M tokens"
+reviews:
+  - mode: ANALYZE
+    kind: FULL
+    date: 2026-09-24
+    required_open: 1
+    outcome: "one required defect; repaired"
+  - mode: ANALYZE
+    kind: FULL
+    date: 2026-09-24
+    required_open: 0
+    outcome: "clean"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-24
+    required_open: 0
+    outcome: "every normal-path gate passed read-only"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-09-24
+    required_open: 2
+    outcome: "two required defects; repaired"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-24
+    required_open: 0
+    outcome: "repair diff clean; to Nathan with two accepted risks"
+  - mode: SKILL
+    kind: FULL
+    date: 2026-09-24
+    required_open: 0
+    outcome: "SKILL_FIT_CONFIRMED twice"
+item_count_at_approval: 1
+items:
+  - id: ITEM-01
+    statement: "a real statement"
+    disposition: VERIFIED
+request: "the request"
+analyze_approved_by: Nathan
+plan_approved_by: Nathan
+---
+# t
+## §A — Analysis
+enough text here to clear the emptiness check on this section, comfortably.
+## §P — Plan
+enough text here to clear the emptiness check on this section, comfortably.
+## §E — Execution
+enough text here to clear the emptiness check on this section, comfortably.
+"""
+
+_THIRD_PLAN_FULL = """  - mode: SKILL
+    kind: FULL"""
+_EXTRA_PLAN_FULLS = """  - mode: PLAN
+    kind: FULL
+    date: 2026-09-24
+    required_open: 1
+    outcome: "after repair"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-09-24
+    required_open: 1
+    outcome: "a third round"
+""" + _THIRD_PLAN_FULL
+
+_D26_REGRESSIONS = [
+    ("format 2.1 record with no review ledger",
+     lambda s: s.split("reviews:\n", 1)[0] + "item_count_at_approval:" + s.split("item_count_at_approval:", 1)[1],
+     "requires reviews"),
+    ("format 2.1 record with an empty review ledger",
+     lambda s: s.split("reviews:\n", 1)[0] + "reviews: []\nitem_count_at_approval:" + s.split("item_count_at_approval:", 1)[1],
+     None),  # must PASS: [] is the ledger before any round has run
+    ("review ledger that is not a list",
+     lambda s: s.split("reviews:\n", 1)[0] + "reviews: three rounds\nitem_count_at_approval:" + s.split("item_count_at_approval:", 1)[1],
+     "must be a list"),
+    ("review round with a mode outside the vocabulary",
+     lambda s: s.replace("  - mode: SKILL", "  - mode: EXECUTE"), "mode 'EXECUTE' not in"),
+    ("review round with a kind outside the vocabulary",
+     lambda s: s.replace("    kind: DIFF_CHECK", "    kind: LIGHT_TOUCH"), "kind 'LIGHT_TOUCH' not in"),
+    ("review round with no date",
+     lambda s: s.replace("    date: 2026-09-24\n    required_open: 0\n    outcome: \"clean\"",
+                         "    date: \"\"\n    required_open: 0\n    outcome: \"clean\""), "has no date"),
+    ("review round with a negative required count",
+     lambda s: s.replace("required_open: 2", "required_open: -2"), "required_open must be"),
+    ("review round with a required count that is not a number",
+     lambda s: s.replace("required_open: 2", "required_open: some"), "required_open must be"),
+    ("review round with no outcome",
+     lambda s: s.replace('outcome: "clean"', 'outcome: ""'), "has no outcome"),
+    ("a third full PLAN review",
+     lambda s: s.replace(_THIRD_PLAN_FULL, _EXTRA_PLAN_FULLS), "REVIEW CAP"),
+    ("a second diff check in one mode",
+     lambda s: s.replace(_THIRD_PLAN_FULL, """  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-24
+    required_open: 0
+    outcome: "a second diff check"
+""" + _THIRD_PLAN_FULL), "REVIEW CAP"),
+    ("a third full PLAN review that Nathan overrode",
+     lambda s: s.replace(_THIRD_PLAN_FULL, _EXTRA_PLAN_FULLS).replace(
+         "item_count_at_approval: 1",
+         'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: [review_cap]\n  reason: "one more"'),
+     None),  # must PASS: the cap stops a session, never Nathan
+    ("two full reviews in each of two modes",
+     lambda s: s.replace("""  - mode: SKILL
+    kind: FULL
+    date: 2026-09-24
+    required_open: 0""", """  - mode: SKILL
+    kind: FULL
+    date: 2026-09-24
+    required_open: 1
+    outcome: "SKILL_REPAIR_REQUIRED"
+  - mode: SKILL
+    kind: FULL
+    date: 2026-09-24
+    required_open: 0"""),
+     None),  # must PASS: the cap is per mode
+    ("a full PLAN review with no dry run before it",
+     lambda s: s.replace("""  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-24
+    required_open: 0
+    outcome: "every normal-path gate passed read-only"
+""", ""), "DRY RUN FIRST"),
+    ("a full PLAN review whose only dry run came after it",
+     lambda s: s.replace("""  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-24
+    required_open: 0
+    outcome: "every normal-path gate passed read-only"
+""", "").replace(_THIRD_PLAN_FULL, """  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-24
+    required_open: 0
+    outcome: "late"
+""" + _THIRD_PLAN_FULL), "DRY RUN FIRST"),
+    ("an ANALYZE dry run taken for PLAN's",
+     lambda s: s.replace("""  - mode: PLAN
+    kind: DRY_RUN""", """  - mode: ANALYZE
+    kind: DRY_RUN"""), "DRY RUN FIRST"),
+    ("a third full review waived by an unattributed override on an abandoned record",
+     lambda s: s.replace("status: COMPLETE", "status: ABANDONED").replace(_THIRD_PLAN_FULL, _EXTRA_PLAN_FULLS)
+                .replace("item_count_at_approval: 1",
+                         'item_count_at_approval: 1\noverride:\n  overrides: [review_cap]\n  reason: "x"'),
+     "REVIEW CAP"),
+    ("a full PLAN review with no dry run, which Nathan overrode",
+     lambda s: s.replace("""  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-24
+    required_open: 0
+    outcome: "every normal-path gate passed read-only"
+""", "").replace(
+         "item_count_at_approval: 1",
+         'item_count_at_approval: 1\noverride:\n  by: Nathan\n  overrides: [dry_run]\n  reason: "x"'),
+     None),  # must PASS
+    ("no estimate past ANALYZE",
+     lambda s: s.replace('  execute: "3 h, 1M tokens"', '  execute: ""'), "ESTIMATE"),
+    ("an estimate that is not a mapping",
+     lambda s: s.replace('estimate:\n  plan: "2 h, 0.5M tokens"\n  execute: "3 h, 1M tokens"', "estimate: soon"),
+     "ESTIMATE"),
+    ("no estimate on a record abandoned during analysis",
+     lambda s: s.replace("status: COMPLETE", "status: ABANDONED").replace('  plan: "2 h, 0.5M tokens"', '  plan: ""'),
+     None),  # must PASS: a terminal record is not asked for fields it never reached
+    ("a format that is not a version",
+     lambda s: s.replace('format: "2.1"', 'format: "two point one"'), "is not a version"),
+    ("a legacy record, with no format, that ran three full reviews and set no estimate",
+     lambda s: s.replace('format: "2.1"\n', "").replace(_THIRD_PLAN_FULL, _EXTRA_PLAN_FULLS)
+                .replace('  execute: "3 h, 1M tokens"', '  execute: ""'),
+     None),  # must PASS: legacy records validate exactly as before D26
+]
+
 
 def _run_cases(td, name, fixture, regressions, filename):
     """Validate a known-good fixture, then each injected regression against it."""
@@ -594,7 +906,8 @@ def selftest():
         for name, fixture, regressions, filename in (
                 ("record with no parts", _GOOD, _REGRESSIONS, "MODIFICATION-single.md"),
                 ("batch with parts", _GOOD_BATCH, _BATCH_REGRESSIONS, "MODIFICATION-batch.md"),
-                ("triage draft", _GOOD_INTAKE, _INTAKE_REGRESSIONS, "MODIFICATION-intake.md")):
+                ("triage draft", _GOOD_INTAKE, _INTAKE_REGRESSIONS, "MODIFICATION-intake.md"),
+                ("format 2.1 record", _GOOD_D26, _D26_REGRESSIONS, "MODIFICATION-d26.md")):
             f, t = _run_cases(td, name, fixture, regressions, filename)
             failures += f
             total += t
@@ -636,7 +949,15 @@ def _template_cases():
     for key, value in (("targets", "[prompt]"), ("gate_tier", "1"), ("readiness", "READY")):
         at_analyzing = re.sub(rf"^{key}:[^\n]*", f"{key}: {value}", at_analyzing, count=1, flags=re.M)
     at_analyzing = re.sub(r"^(\s+class:)[^\n]*", r"\1 B", at_analyzing, count=1, flags=re.M)
-    return [("as shipped, at INTAKE", text), ("filled as ANALYZE fills it, at ANALYZING", at_analyzing)]
+    # At ANALYZED the analysis is written and the estimate is set (D26-D); nothing is approved yet.
+    at_analyzed = at_analyzing.replace("status: ANALYZING", "status: ANALYZED", 1)
+    at_analyzed = at_analyzed.replace('  plan: ""', '  plan: "2 h, 0.5M tokens"', 1)
+    at_analyzed = at_analyzed.replace('  execute: ""', '  execute: "3 h, 1M tokens"', 1)
+    at_analyzed = at_analyzed.replace("### Readiness and interaction cost\n",
+                                      "### Readiness and interaction cost\n\ninteraction_cost = 0 + 2 + 1 + 0 + 1 = 4; "
+                                      "READY.\n", 1)
+    return [("as shipped, at INTAKE", text), ("filled as ANALYZE fills it, at ANALYZING", at_analyzing),
+            ("filled at ANALYZED, with the estimate set", at_analyzed)]
 
 
 def main(argv):
