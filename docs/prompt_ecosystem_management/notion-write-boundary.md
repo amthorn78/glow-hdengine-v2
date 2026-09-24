@@ -117,8 +117,9 @@ mint a Notion page because the work felt significant.
 
 - **The register remains the sole selection authority.** Reading it is how selection is resolved.
 - **Ecosystem-maintenance work still records its state in Notion**, because that *is* its
-  authorized destination — the round-tracking page, the release register, the Alpha feedback list
-  and the release controls each have an established destination rule. A `GCFPE-MGMT-10` run or a
+  authorized destination — the round-tracking page, the release register, the Alpha feedback list,
+  the Modification backlog (added 2026-09-24) and the release controls each have an established
+  destination rule. A `GCFPE-MGMT-10` run or a
   prompt-repair round writing to those pages is authorized by that rule, not by inference.
 - **Prompt bodies are still authored and revised in Notion in place**, for the members that are
   Notion-managed. See `prompt-corpus-policy.md`.

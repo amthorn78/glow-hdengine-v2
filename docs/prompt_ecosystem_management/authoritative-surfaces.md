@@ -82,6 +82,7 @@ never committed. **A session that cannot find the builder has not lost it — it
 |---|---|---|
 | Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1 | `3db4590a05eb81de9736ea69bac61016` | Operational mapping index: families, actors, artifacts, lifecycle, selected topology. `REGISTER_CONTROLLED` |
 | GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | `3dc4590a05eb81a9adf1d8f800863937` | **Closed 2026-09-23** (Product Owner): historical repair plan and batch checklists. Parent of the live Alpha Feedback page |
+| GCFPE Modification Backlog | `3e54590a05eb81eb818fd0f42045167a` | Created 2026-09-24 (Product Owner). Defects a maintenance run finds outside its Modification's frozen scope, each with a severity S1–S4; beside the Alpha Feedback list, which holds the Product Owner's own feedback and deferrals. Written by `GCFPE-MGMT-10` runs under the maintenance destination rule |
 | GCFPE Membership and Release Register | `3d24590a05eb81ce942ad994cfca9fa1` | **Sole selection authority.** Selection is resolved only here |
 | Register entry — GCFPE-20260914.1 | `3db4590a05eb816f925ef3b0659de3b8` | The promotion transaction and its archival receipt |
 | Glow HDE Complete Prompt Set — 091426.1 | `3db4590a05eb81738ef1d846e3c0df8c` | The 55-member selected catalog. `REGISTER_CONTROLLED` |

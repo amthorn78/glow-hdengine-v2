@@ -4161,20 +4161,21 @@ move on to the next step of that part.
 
 ### 10.2 Follow-ups outside the frozen scope
 
-These go to a new Modification with `spawned_from: MODIFICATION-20260923-closeout-residuals`, opened after this one
-completes. None is edited here.
+Recorded on the **GCFPE Modification Backlog** (Notion `3e54590a05eb81eb818fd0f42045167a`, created 2026-09-24 at the
+Product Owner's instruction), each with a severity. A later Modification takes each as an item. None is edited here.
 
-1. **PR-20's PR-40 DOWNSTREAM** says "REJECT returns precise in-scope findings to the PR owner", which contradicts
-   C-REPLAN and D23-F. ITEM-31 covers PR-40's own body only.
-2. **DOC-20 routes to PR-40** after Nathan's merge assertion. That may conflict with "PR-40 is entered once per
-   merge". This plan adds only the fallback predicate (R-A7-LOCAL).
-3. **The governance audit's `references/epic-reengineering-interoperability.md:55-56`** still describes an Analyzer,
-   `MODEL_HANDOFF` and model advice, against the retired-assessment rule in the same skill.
-4. **RS-30** keeps "Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written". That is correct for
-   RS-30, which writes only there (the census verdict "correct elsewhere"), so it is listed only to show it was seen.
-5. **GCFPE-MGMT-10's live page** fetches "as of 2026-09-21T22:56Z" although Notion records a 2026-09-23 edit. The
-   dry run used the content as fetched. At X4.4 the landing re-fetches, and `update_content` refuses an `old_str` that
-   no longer matches, so a stale read cannot land.
+| backlog | severity | what |
+|---|---|---|
+| MB-001 | S2 | DOC-20 routes to PR-40 after Nathan's merge assertion, which may be a second PR-40 entry for one merge (against once-per-merge). This plan adds only the fallback predicate (R-A7-LOCAL) |
+| MB-002 | S3 | PR-20's PR-40 DOWNSTREAM says "REJECT returns precise in-scope findings to the PR owner", against C-REPLAN and D23-F. ITEM-31 covers PR-40's own body only |
+| MB-003 | S3 | The governance audit's `references/epic-reengineering-interoperability.md:55-56` still describes an Analyzer, `MODEL_HANDOFF` and model advice, against the same skill's retired-assessment rule |
+
+Seen and not defects, so not on the backlog:
+- **RS-30** keeps "Repository paths outside `docs/ephemeral/` and `docs/graph/` are not written", which is correct for
+  RS-30 (the census verdict "correct elsewhere").
+- **GCFPE-MGMT-10's live page** fetches "as of 2026-09-21T22:56Z" although Notion records a 2026-09-23 edit. The dry
+  run used the content as fetched; at X4.4 the landing re-fetches, and `update_content` refuses an `old_str` that no
+  longer matches, so a stale read cannot land.
 
 ### 10.3 Kept sentences (NOT_REAL), so that ITEM-26 is verified against the measured scope
 

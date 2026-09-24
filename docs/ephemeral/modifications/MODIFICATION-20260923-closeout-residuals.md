@@ -813,7 +813,8 @@ CL-40 only after step 11. Then 20–22. Step 23 follows Nathan's merge and insta
 
 - The TW ecosystem, including tw-flowmaster's GCFPE binding and AF-012 for TW.
 - The proposed MGMT-10 body's design-level contradictions: D20 stage 5 (recorded on the tracking page, step 16).
-- The follow-ups in spec §10.2. They become a new Modification with `spawned_from` set to this one.
+- The follow-ups in spec §10.2, recorded on the GCFPE Modification Backlog as MB-001 (S2), MB-002 (S3) and MB-003 (S3).
+  A later Modification takes each as an item.
 - The kept NOT_REAL sentences in spec §10.3.
 - The content of the Drive file after migration, which is Nathan's.
 - Re-running any earlier Modification's gates, and editing any completed record (P-54).
