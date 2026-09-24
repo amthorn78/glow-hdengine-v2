@@ -1,0 +1,61 @@
+{
+ "out_dir": "/tmp/claude-0/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c/scratchpad/skills-out",
+ "archives": [
+  {
+   "skill": "flowmaster-validate",
+   "file": "flowmaster-validate.skill",
+   "files": 31,
+   "bytes": 322703,
+   "sha256": "ecdb49ff38c937d12332dd4ab99978fa6c0f6d33c77db06bfd758af17eb5bed0",
+   "freeze": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626"
+  },
+  {
+   "skill": "change-flow",
+   "file": "change-flow.skill",
+   "files": 22,
+   "bytes": 258193,
+   "sha256": "aa11c933a99b0ca590ed54a8fae4f7a1c5a1946a0754374f2183ce84800ca13b",
+   "freeze": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47"
+  },
+  {
+   "skill": "glow-graph-contract",
+   "file": "glow-graph-contract.skill",
+   "files": 9,
+   "bytes": 55695,
+   "sha256": "a908cde3adc4f15a3454589b42141734a9119ac4fe917d2159e86e4218bd3b49",
+   "freeze": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c"
+  },
+  {
+   "skill": "session-relay-flowmaster",
+   "file": "session-relay-flowmaster.skill",
+   "files": 5,
+   "bytes": 56250,
+   "sha256": "54d272867892e596cda9d54b2bd2c8e005f34f3ea799692c30672191526746a8",
+   "freeze": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4"
+  },
+  {
+   "skill": "glow-hde-pr-development",
+   "file": "glow-hde-pr-development.skill",
+   "files": 4,
+   "bytes": 22605,
+   "sha256": "59b42809024807f81eac7ba766617ba9cec0cf96ee85b07da68b7ec8dfcdacf2",
+   "freeze": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a"
+  },
+  {
+   "skill": "amthor-workspace-governance-audit",
+   "file": "amthor-workspace-governance-audit.skill",
+   "files": 15,
+   "bytes": 56629,
+   "sha256": "87c59a6cef700ee7dd2c32f0a378225319b5837d49af52a239cd1a4c007615e7",
+   "freeze": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab"
+  },
+  {
+   "skill": "glow-po-reporting",
+   "file": "glow-po-reporting.skill",
+   "files": 1,
+   "bytes": 3776,
+   "sha256": "bb7d7967f05443fda739918e1ce6e636658501443f03e39caafafa149015906c",
+   "freeze": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1"
+  }
+ ]
+}
