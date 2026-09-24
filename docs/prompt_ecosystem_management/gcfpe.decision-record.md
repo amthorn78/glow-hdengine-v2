@@ -1272,6 +1272,34 @@ in its `SKILL.md` and in two script comments. No check pins that wording, and no
 session keeps a body on disk. The guard is still owed, now to the next change that touches a
 validator or skill (`GUARD-001`). Until then, this ruling is applied but not guarded.
 
+### Status, 2026-09-24 — guarded
+
+`MODIFICATION-20260923-closeout-residuals` (ITEM-16) carried the guard the status above owed. It
+was installed on 2026-09-24, with these freeze digests (`freeze.py`, files hashed and digest):
+
+- `flowmaster-validate` `31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626`
+- `change-flow` `22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47`
+- `glow-graph-contract` `9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c`
+- `session-relay-flowmaster` `5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4`
+- `glow-hde-pr-development` `4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a`
+- `amthor-workspace-governance-audit` `15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab`
+- `glow-po-reporting` `1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1`
+
+The status above is left as written (`AUTH-001`).
+
+- **`CONTRACT_REQUIRED`** in `flowmaster-validate` holds ITEM-08's override sentence in
+  `change-flow` and `session-relay-flowmaster`: a GCFPE prompt is pinned by stable ID, version and
+  direct Notion URL, and no copy, hash or snapshot of its body is kept.
+- **`CONTRACT_FORBIDDEN`**, or the owning skill's own suite, forbids every retired body-copying or
+  body-hashing phrase that Modification removed from `change-flow`, `session-relay-flowmaster`,
+  `flowmaster-validate` and `amthor-workspace-governance-audit`.
+- **A governance-audit fixture** proves that a prompt-kind source carries no digest.
+- **Each fired on an injected regression**, and each is silent on the installed text.
+- **What they cannot see** is prose paraphrase, recorded under `D14` (its note of 2026-09-23). As
+  before, no repository check sees a harness session directory, so condition 5, the report, still
+  makes every transient file visible.
+- `tw-flowmaster` was outside that Modification's scope, and carries no `D22` guard.
+
 ## D23 — The Alpha Feedback rule changes: artifacts hold results, handoffs are short, implementors have latitude, PR-35 has its own session, releases stop copying unchanged prompts
 
 **Product Owner, 2026-09-23.** He approved the analysis of

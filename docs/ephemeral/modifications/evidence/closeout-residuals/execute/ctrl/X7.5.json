@@ -1,0 +1,19 @@
+{
+ "page": "3e34590a05eb81e7927efe0541258916",
+ "fetched": "2026-09-24T16:47:18.601Z",
+ "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/219095eb-5889-516e-828c-322c5d5d5b5c.jsonl",
+ "edits": [
+  {
+   "id": "TRACK-FREEZE-START",
+   "state": "LANDED",
+   "old_count": 1,
+   "new_present": true
+  },
+  {
+   "id": "TRACK-FREEZE-LIFT",
+   "state": "LANDED",
+   "old_count": 1,
+   "new_present": true
+  }
+ ]
+}
