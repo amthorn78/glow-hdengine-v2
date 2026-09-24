@@ -15,7 +15,7 @@ role_change: false
 | | |
 |---|---|
 | Predecessor | **PE36**, `session_01Aniz3abekzoEbAax1UbWar`. **Retired 2026-09-24** |
-| Successor | **PE37**, created 2026-09-24 by PE36 at Nathan's instruction. Session id: *PENDING — recorded when the session exists* |
+| Successor | **PE37**, `session_018teDumz2XyKdoXF9p3BKFM`. Created 2026-09-24 at 10:52Z by PE36 at Nathan's instruction, in the same environment, with PE36 as its parent |
 | Charter | **General prompt engineering and maintenance, with one authorized task:** the stage 5 process fix |
 | Baseline | `main @ 4c57d92` |
 | Installed skills | flowmaster-validate 31 `a79401de…`, change-flow 22 `ee546df5…`, glow-hde-pr-development 4 `68077fa6…`, session-relay-flowmaster 5 `15aef989…`, amthor-workspace-governance-audit 15 `819915e4…`, tw-flowmaster 2 `fd6c344b…`, glow-graph-contract 6 `4e671ddc…`. E6 step 2, re-measured 2026-09-24 |
@@ -140,9 +140,11 @@ measure that was easiest to compute.**
 
 ## PE37's first actions, in order
 
-1. **Record your session id** in this record's table, in place: it is a current-state field.
+1. **Confirm your session id** against this record's table. PE36 recorded it when it created you. If
+   it is wrong, correct it in place: it is a current-state field.
 2. **Confirm the baseline yourself:**
-   - `main` is at or after `4c57d92`, with this record merged;
+   - `main` is at or after `4c57d92`. This record is in PR #480; read it from that PR's branch until
+     it merges, and branch your own work from `main` once it has;
    - `freeze.py` on each installed skill directory matches the table above;
    - the follow-up record reads PLANNED with an empty `plan_approved_by`;
    - `modification_validate.py --selftest` passes 39/39.
