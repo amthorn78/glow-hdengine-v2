@@ -2,8 +2,8 @@
 
 usage: PYTHONDONTWRITEBYTECODE=1 python3 run_proof_x.py <real-repo> <proof-dir> <apply_texts.py>
 Order: X1.1 execute.1.then; X1.2 mkdir; X1.3 suite_gate.pre; X2.1 texts "X2.2"; X3.1 registry.diff (+ sha256);
-X3.2 execute.2; X3.3 execute.3; X3.4 texts "X3.5"; X4.1 execute.4; X4.2 suite_gate.pkg; X7.4 suite_gate.post with
-$PKG standing in as $INST. Writes <proof-dir>/proof_x.json; nothing outside <proof-dir>.
+X3.2 execute.2; X3.3 execute.3; X3.4 texts "X3.5"; X4.1 execute.4; X4.2 suite_gate.pkg; X4.3 execute.4b (package and
+extract); X7.4 suite_gate.post with $PKG standing in as $INST. Writes <proof-dir>/proof_x.json; nothing outside <proof-dir>.
 """
 import json, os, shutil, subprocess, sys
 from pathlib import Path
@@ -48,6 +48,8 @@ sh("X3.4 texts X3.5", f"python3 {apply_texts} . {EV}/texts/edits.json X3.5")
 for c in ex[K4]["commands"]:
     sh("X4.1", c)
 sh("X4.2 pkg", ex["suite_gate"]["pkg"]["command"])
+for c in ex["4b_package_X4.3_after_the_pkg_gate"]["commands"]:
+    sh("X4.3", c)
 sh("X7.4 post ($PKG as $INST)", ex["suite_gate"]["post"]["command"], {"INST": str(PKG)})
 sh("git status", "git status --short | grep -v '^??'")
 json.dump(LOG, open(proof / "proof_x.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)

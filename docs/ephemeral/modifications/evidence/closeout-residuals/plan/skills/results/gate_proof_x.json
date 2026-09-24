@@ -1,8 +1,8 @@
 {
- "what": "the committed manifest's execute commands, run literally in spec §9 order on a fresh copy of the repository (scratch), 2026-09-24",
- "order": "X0.3(b), X1.1, X1.2, X1.3 pre, X2.1 (texts X2.2), X3.1 registry.diff, X3.2 execute.2, X3.3 execute.3, X3.4 (texts X3.5), X4.1 execute.4, X4.2 pkg, X7.4 post with $PKG standing in for the installed root",
+ "what": "the committed manifest's execute commands, run literally in spec §9 order on a fresh copy of the repository (scratch), 2026-09-24, after repair round 4",
+ "order": "X0.3(b), X1.1, X1.2, X1.3 pre, X2.1 (texts X2.2), X3.1 registry.diff, X3.2 execute.2, X3.3 execute.3, X3.4 (texts X3.5), X4.1 execute.4, X4.2 pkg, X4.3 execute.4b (package and extract), X7.4 post with $PKG standing in for the installed root",
  "all_exit_as_expected": true,
- "note": "X4.1's plain diff of the 4.1.0 and 4.1.1 contracts exits 1 by design (two changed lines, manifest execute.4 expected)",
+ "note": "X4.1's plain diff of the 4.1.0 and 4.1.1 contracts exits 1 by design (two changed lines, manifest execute.4 expected). The whole skills root is measured and compared within each run (P-79)",
  "sets": {
   "pre": {
    "exit": 0,
@@ -22,7 +22,12 @@
     "parts.freeze",
     "graph_parts.build.pre_reindex_working_tree",
     "freeze.skills_root.after"
-   ]
+   ],
+   "skills_root_measured": {
+    "digest_form": true,
+    "stdout": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+    "equals_plan_time_value": true
+   }
   },
   "pkg": {
    "exit": 0,
@@ -64,7 +69,12 @@
     "registry_deriver.installed_audit_1.12.0.repo_parts",
     "registry_deriver.installed_audit_1.12.0.pre_reindex_parts",
     "freeze.skills_root.after"
-   ]
+   ],
+   "skills_root_measured": {
+    "digest_form": true,
+    "stdout": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+    "equals_plan_time_value": true
+   }
   },
   "post": {
    "exit": 0,
@@ -100,7 +110,12 @@
     "graph_parts.reindex.copy_idempotent",
     "registry_deriver.patched_audit.repo_parts",
     "freeze.skills_root.after"
-   ]
+   ],
+   "skills_root_measured": {
+    "digest_form": true,
+    "stdout": "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+    "equals_plan_time_value": true
+   }
   }
  },
  "steps": [
@@ -255,7 +270,10 @@
    "output_head": [
     "{",
     " \"gate\": \"MODIFICATION-20260923-closeout-residuals run_gate.py\",",
-    " \"set\": \"pre\","
+    " \"set\": \"pre\",",
+    " \"repo\": \".\",",
+    " \"tree\": \"$SCRATCH/pkg-root\",",
+    " \"inst\": \"/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502\","
    ]
   },
   {
@@ -265,7 +283,10 @@
    "output_head": [
     "{\"id\": \"P29-D25\", \"file\": \"docs/prompt_ecosystem_management/gcfpe.decision-record.md\", \"action\": \"insert_after\", \"anchor_count\": 1, \"applied\": true, \"has_token\": false}",
     "{\"id\": \"P29-D23C\", \"file\": \"docs/prompt_ecosystem_management/gcfpe.decision-record.md\", \"action\": \"insert_before\", \"anchor_count\": 1, \"applied\": true, \"has_token\": false}",
-    "{\"id\": \"P29-D23G\", \"file\": \"docs/prompt_ecosystem_management/gcfpe.decision-record.md\", \"action\": \"insert_before\", \"anchor_count\": 1, \"applied\": true, \"has_token\": false}"
+    "{\"id\": \"P29-D23G\", \"file\": \"docs/prompt_ecosystem_management/gcfpe.decision-record.md\", \"action\": \"insert_before\", \"anchor_count\": 1, \"applied\": true, \"has_token\": false}",
+    "{\"id\": \"P29-D18\", \"file\": \"docs/prompt_ecosystem_management/gcfpe.decision-record.md\", \"action\": \"insert_before\", \"anchor_count\": 1, \"applied\": true, \"has_token\": false}",
+    "{\"id\": \"P29-D14\", \"file\": \"docs/prompt_ecosystem_management/gcfpe.decision-record.md\", \"action\": \"insert_before\", \"anchor_count\": 1, \"applied\": true, \"has_token\": false}",
+    "{\"edits_applied\": [\"P29-D25\", \"P29-D23C\", \"P29-D23G\", \"P29-D18\", \"P29-D14\"], \"files\": [\"docs/prompt_ecosystem_management/gcfpe.decision-record.md\"], \"added_lines_starting_quote\": 0, \"docs/prompt_ecosy"
    ]
   },
   {
@@ -291,7 +312,10 @@
    "output_head": [
     "reindex: 229 edges; 27 file(s) rewritten",
     "  global.json",
-    "  prompts/CF-C-10.json"
+    "  prompts/CF-C-10.json",
+    "  prompts/ESC-40.json",
+    "  prompts/OPS-10.json",
+    "  prompts/OPS-20.json"
    ]
   },
   {
@@ -301,7 +325,10 @@
    "output_head": [
     "docs/graph/parts/global.json          | 12 +-----------",
     " docs/graph/parts/prompts/CF-C-10.json |  3 ++-",
-    " docs/graph/parts/prompts/ESC-40.json  |  4 +++-"
+    " docs/graph/parts/prompts/ESC-40.json  |  4 +++-",
+    " docs/graph/parts/prompts/OPS-10.json  | 10 +++++-----",
+    " docs/graph/parts/prompts/OPS-20.json  | 10 +++++-----",
+    " docs/graph/parts/prompts/OPS-30.json  | 10 +++++-----"
    ]
   },
   {
@@ -421,7 +448,10 @@
    "output_head": [
     "{",
     " \"graph\": [",
-    "  575074,"
+    "  575074,",
+    "  \"ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d\"",
+    " ],",
+    " \"contract\": ["
    ]
   },
   {
@@ -431,7 +461,10 @@
    "output_head": [
     "{",
     " \"graph\": [",
-    "  575074,"
+    "  575074,",
+    "  \"ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d\"",
+    " ],",
+    " \"contract\": ["
    ]
   },
   {
@@ -441,7 +474,10 @@
    "output_head": [
     "356c356",
     "<   \"contract_revision\": \"4.1.0\",",
-    "---"
+    "---",
+    ">   \"contract_revision\": \"4.1.1\",",
+    "3026c3026",
+    "<     \"primary_skill_revision\": \"1.3.0\","
    ]
   },
   {
@@ -459,7 +495,73 @@
    "output_head": [
     "{",
     " \"gate\": \"MODIFICATION-20260923-closeout-residuals run_gate.py\",",
-    " \"set\": \"pkg\","
+    " \"set\": \"pkg\",",
+    " \"repo\": \".\",",
+    " \"tree\": \"$SCRATCH/pkg-root\",",
+    " \"inst\": \"/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502\","
+   ]
+  },
+  {
+   "step": "X4.3",
+   "cmd": "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext",
+   "exit": 0,
+   "output_head": [
+    ""
+   ]
+  },
+  {
+   "step": "X4.3",
+   "cmd": "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
+   "exit": 0,
+   "output_head": [
+    "📦 Packaging skill: $SCRATCH/pkg-root/flowmaster-validate",
+    "   Output directory: $SCRATCH/skills-out",
+    "",
+    "🔍 Validating skill...",
+    "✅ Skill is valid!",
+    ""
+   ]
+  },
+  {
+   "step": "X4.3",
+   "cmd": "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf $SCRATCH/skills-ext/$s && mkdir -p $SCRATCH/skills-ext/$s && (cd $SCRATCH/skills-ext/$s && unzip -q $SCRATCH/skills-out/$s.skill) || exit 1; done)",
+   "exit": 0,
+   "output_head": [
+    ""
+   ]
+  },
+  {
+   "step": "X4.3",
+   "cmd": "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $SCRATCH/skills-ext/$s/$s; done)",
+   "exit": 0,
+   "output_head": [
+    "flowmaster-validate 31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
+    "change-flow 22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+    "glow-graph-contract 9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+    "session-relay-flowmaster 5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+    "glow-hde-pr-development 4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+    "amthor-workspace-governance-audit 15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab"
+   ]
+  },
+  {
+   "step": "X4.3",
+   "cmd": "sha256sum $SCRATCH/skills-out/*.skill",
+   "exit": 0,
+   "output_head": [
+    "e789a638b2b6ffafafccfbb5d334a046a9743244505f466e52bca8b6cfd542d9  $SCRATCH/skills-out/amthor-workspace-governance-audit.skill",
+    "9036a4c2c42bf1a019ecce6815d5ce62e0804b021e23745b2c19d4b61971fc7a  $SCRATCH/skills-out/change-flow.skill",
+    "06004dad153a6eb0343a59b80155ba4bf20b47daae457e3d35ad349511bcc853  $SCRATCH/skills-out/flowmaster-validate.skill",
+    "58e99dd792de351e12decc193af60ff93a64c7fdecadc138a2bb2307b95bae95  $SCRATCH/skills-out/glow-graph-contract.skill",
+    "9fa893b8972b2547ad05a04d5f27ab88778cc7c548f236ac8745d2b98602e1b6  $SCRATCH/skills-out/glow-hde-pr-development.skill",
+    "13518e256653a8210cec6f11145b2019044008fa1c8ad9ad66dde77ad7cd2ca5  $SCRATCH/skills-out/glow-po-reporting.skill"
+   ]
+  },
+  {
+   "step": "X4.3",
+   "cmd": "python3 docs/prompt_ecosystem_management/freeze.py $PKG",
+   "exit": 0,
+   "output_head": [
+    "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae"
    ]
   },
   {
@@ -469,7 +571,10 @@
    "output_head": [
     "{",
     " \"gate\": \"MODIFICATION-20260923-closeout-residuals run_gate.py\",",
-    " \"set\": \"post\","
+    " \"set\": \"post\",",
+    " \"repo\": \".\",",
+    " \"tree\": \"$SCRATCH/pkg-root\",",
+    " \"inst\": \"$SCRATCH/pkg-root\","
    ]
   }
  ]

@@ -205,21 +205,21 @@ Standing rules for every worker:
 - **P-56 Order.** The seven packages are patched into the scratchpad (and the full skills root and the candidate root
   built) before any repository change that needs them: the reindex needs the new builder, the registry gate needs the
   new deriver. The contract regeneration runs after commit 1, the reindex and the contract-template move.
-- **P-57 One landing unit.** Every part that edits a prompt body or the registry (PART-05, 06, 07, 10, 11, 13, 14, 15,
+- **P-57 One landing unit.** *[Superseded in repair round 4 by P-57 and P-58 (revised again).]* Every part that edits a prompt body or the registry (PART-05, 06, 07, 10, 11, 13, 14, 15,
   16, 17, 18) lands as one unit, because one page carries several parts' edits and one registry diff carries their
   guards. Before the first Notion write to a body, `land.py plan --no-ops` rehearses every page and must print no
   refusal. PART-06's page must exist first (PART-15 is after PART-06). If a page then fails `check` and cannot be
   repaired forward in the same sitting, every landed page is reversed from the rollback journal (P-58), the registry
   commit is reverted, and the unit is BLOCKED as a whole (template rule 6). The skill parts (PART-01 to 04, 12) are
   a separate unit held by the D24 review.
-- **P-58 Rollback journal.** `land.py plan --journal DIR` writes each page's operations to `DIR/<PID>.ops.json` in the
+- **P-58 Rollback journal.** *[Superseded in repair round 4 by P-57 and P-58 (revised again).]* `land.py plan --journal DIR` writes each page's operations to `DIR/<PID>.ops.json` in the
   session scratchpad, so a reversal is mechanical. Under D22 this is part of the landing transaction in hand: outside
   the repository, never hashed or compared, read only to reverse the landing it records, deleted when the unit passes
   its gate or has been reversed, and reported in §E. No other use.
 - **P-59 land.py hardening.** `--no-ops` prints counts only (the rehearsal). The token test refuses only a `{{` the
   edit introduces. A body where every rule and edit reads 0 and every CHECK passes is reported NOTHING_TO_LAND (run
   check), which covers deletion-only bodies. `check` reports STALE_READBACK, not a failure, when a page that should
-  carry new text does not yet show it; the executor re-fetches, and only a non-stale failure is reversed.
+  carry new text does not yet show it; the executor re-fetches, and only a non-stale failure is acted on (repaired forward: P-58 (revised again)).
 - **P-60 The suite gate is a script.** `EV/skills/run_gate.py --set pre|pkg|post` runs each set with its expected
   results embedded and exits non-zero on any difference: `pre` (before the reindex: today's parts fail the new
   builder with exactly 7 bookkeeping errors), `pkg` (the patched tree and the reindexed working tree), `post` (the
@@ -258,7 +258,7 @@ Standing rules for every worker:
   line on the tracking page states only the install, the verification and the lift. This replaces "to the close-out
   merge" (P-66); §A order 4's "after full readback and the corpus gate" stays an upstream finding (spec §10.1),
   because the bodies land before the skills are installed.
-- **P-58 (revised) Journal retention.** The rollback journal is kept until X7.4 passes, the last gate that can call
+- **P-58 (revised) Journal retention.** *[Superseded in repair round 4 by P-57 and P-58 (revised again).]* The rollback journal is kept until X7.4 passes, the last gate that can call
   for a reversal of the body unit, and deleted at X7.5 (or at once after a reversal). It stays in the session
   scratchpad throughout and is reported in §E.
 - **P-71 Tokens and their fills.** Every token in the Notion and repository edits, and what fills it. A new text that
@@ -267,16 +267,16 @@ Standing rules for every worker:
   | token | filled with | where |
   |---|---|---|
   | `{{CANDIDATE_CRD_LIST_URL}}` | the page URL from X5.1, normalized to `https://app.notion.com/p/<32 hex>` | body rules (R-ITEM18), `P30-DEST`, ten of the eleven PART-06 pointer edits, M2-R4, R5 and R9 (the page's self-links) |
-  | `{{EXECUTE_DATE}}` | the UTC date (YYYY-MM-DD) of the Notion write that carries it | `TRACK-FREEZE-START`, `PART-11-TRACK-01`, `PART-18-AF009-01`, `PART-06-HUB-01` and the four `PART-06-ITEM*-02` edits, M2-R1, and the M2 callout and revision bullet |
+  | `{{EXECUTE_DATE}}` | the UTC date (YYYY-MM-DD) of the Notion write that carries it | `TRACK-FREEZE-START`, `PART-11-TRACK-01`, `PART-18-AF009-01`, and `PART-06-HUB-01`'s "Corrected" note |
+  | `{{MIGRATION_DATE}}` | the UTC date of the X5.1 page creation (P-80, repair round 4) | M2-R1, the M2 callout and revision bullet, `PART-06-HUB-01`'s "held the list until" and the four `PART-06-ITEM*-02` edits |
   | `{{INSTALL_DATE}}` | the UTC date of Nathan's install sitting (X7.3), as X7.4 records it | `CLOSE-D22` |
-  | `{{FREEZE_DIGESTS}}` | the seven `<skill> <files> <digest>` lines of X7.4's comparison (P-68) | `CLOSE-D22` |
+  | `{{FREEZE_DIGESTS}}` | seven Markdown bullet lines, one per package in manifest order, ``- `<skill>` `<files> <digest>` ``, from X7.4's comparison (P-68) | `CLOSE-D22` |
   | `{{LIFT_DATE}}` | the UTC date Nathan lifts the freeze (X7.5) | `TRACK-FREEZE-LIFT` |
   | `{{CLOSE_DATE}}` | the UTC date of the close commit that sets `COMPLETE` (X7.6) | `TRACK-STATUS-01` to `03` |
-- **P-72 Close order.** X7.4 verifies the install. X7.5: Nathan lifts the freeze; `TRACK-FREEZE-LIFT` lands; the
-  journal is deleted. X7.6: the close commit (`CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`, §E's install record and the
+- **P-72 Close order.** X7.4 verifies the install. X7.5: Nathan lifts the freeze; `TRACK-FREEZE-LIFT` lands. X7.6: the close commit (`CLOSE-D22`, `P31-POLICY`, `P33-A5NOTE`, §E's install record and the
   X7.5 readback, the dispositions, the actual cost, `COMPLETE`) on the designated branch restarted from `main`, and the
   close-out PR opened. X7.7: `TRACK-STATUS-01` to `03` land, dated by that commit, and their readback is added to §E in
-  a second commit on the same PR. X7.8: Nathan banners the Drive file and merges the close-out PR. No tracking line
+  a second commit on the same PR. X7.8: Nathan merges the close-out PR (the Drive banner is read back at X7.6, P-83). No tracking line
   claims a state before the record holds it.
 - **P-73 Commit labels and the registry commit.** `EV/texts/edits.json` labels each text by the step that commits it:
   `X2.2` (the decision record), `X3.5` (`P32-SWR`), `X5.2` (`P30-DEST`, `P30-VERSION`) and `close` (X7.6). The former
@@ -286,3 +286,56 @@ Standing rules for every worker:
   `build_guards_md.py` ran in the PLAN scratchpad beside a copy of the governance audit's scripts and record how the
   diff, the guard file and `GUARDS.md` were made. EXECUTE runs none of them: it uses `registry.diff`,
   `row_assertions.json` and `nam002_live.py` (with `--audit-root`).
+
+### Repair round 4 (2026-09-24): review round 3 (`wf_b886670d-753`)
+
+- **P-57 (revised again) One landing unit, from the first Notion write.** Before X5.0 nothing leaves the branch: no
+  Notion write, no merge, no install. A failure before X5.0, a D24 rejection included, stops EXECUTE with the branch
+  unmerged, and the fix is a change to the approved plan: EXECUTE returns to PLAN and Nathan approves the change.
+  Shipping without a rejected part is such a change (template rule 7). From X5.0 all 17 parts land as one unit: the
+  page, the destination rule, the pointers, the 51 bodies and the control-page edits. The packages are installed only
+  after the unit has passed (X6) and the execution PR has merged (X7.1), so no part straddles two units. Supersedes
+  P-57 and its revision.
+- **P-58 (revised again) No rollback journal.** `D22` prohibits backups without exception, and a file of a body's
+  replaced text, kept to restore it later, is one. So nothing keeps a copy of a body. The rehearsal (X4.5) proves,
+  before any write, that each page's operations reproduce the edit and that the readback will pass on the text they
+  produce (P-76). A readback that fails after a landing is repaired forward: the engine re-reads the page and lands
+  what is missing. A failure that cannot be repaired forward in the sitting stops the unit: EXECUTE sets the record
+  `BLOCKED`, lists in §E every write already made (page, time, edit), reverses the control-page edits (§7 holds each
+  `old_str`; control pages are not bodies), moves the new page to trash, keeps the freeze, leaves the branch unmerged
+  and returns to Nathan. Restoring a landed body is his action, from Notion's page history, or he rules a forward fix.
+  `land.py` loses `--journal` and `reverse`. Supersedes P-58 and P-58 (revised).
+- **P-75 The readback fills the page URL.** `land.py check`, like `plan`, fills `{{CANDIDATE_CRD_LIST_URL}}` before it
+  compares, and refuses to run on a body whose rules carry the token (CL-40) without `--candidate-url`. Without the
+  fill, a correctly landed CL-40 read as not landed, for ever.
+- **P-76 The rehearsal runs the readback.** `land.py plan` computes, on the text its operations produce, both the
+  precheck and `check` itself, the STALE test included, and refuses unless both pass (`PRECHECK_FAILED`,
+  `LANDED_CHECK_FAILED`). So the rehearsal proves the readback each landing will run. Pass 4 (spec §8) ran it on all
+  51 bodies.
+- **P-77 No Notion write before the checks that need none.** NAM-002 (PART-10) reads only the registry and the hubs'
+  child lists, so it runs at X3.6, after the registry commit. The rehearsal runs at X4.5, after the D24 review. Both
+  come before X5.0.
+- **P-78 Sessions.** Any step can run in a new session. Each needs only the repository, the installed skills and fresh
+  Notion reads, or rebuilds the rest from them: `$PKG` by `execute.1.then`, the packages by `execute.4b`, whose
+  extracted freeze digests reproduce X4.3's. The D24 verdicts bind to those freeze digests, not to the archives' own
+  sha256, which vary with timestamps. A landing resumed in a new session runs `check` on a page that reports
+  `ALREADY_LANDED`.
+- **P-79 The whole skills root is measured, not held to a constant.** It also covers skills this Modification does not
+  change, which may sync at any time. X0.3 and X1.1 record it, and `run_gate.py` checks that each run leaves it as it
+  found it. Only the seven package digests are held to expected values.
+- **P-80 `{{MIGRATION_DATE}}`** is the UTC date of the X5.1 page creation. The page's callout, revision bullet and
+  M2-R1, and the pointers' "held the list until" and "moved" clauses carry it, so every record dates the move alike even
+  if X5.3 falls on a later day. `{{EXECUTE_DATE}}` stays the date of the write for a "Corrected" note.
+- **P-81 Commit 1 carries the status change.** X2.1 sets `status: EXECUTING` and commit 1 holds it with the
+  decision-record entries, so D25's "in its first execution commit" and §A order 2 both hold. D25's closing sentence
+  no longer waits on a later update: it points to this record's §E for the date the guards landed.
+- **P-82 The post-install failure path is forward only.** At X7.4 the bodies and the registry are on `main`. An
+  installed digest that differs from X4.3's is fixed by reinstalling the delivered file (X7.3 again). Any other failure
+  stops EXECUTE with the freeze held and returns to Nathan with the failing rows. Nothing is reversed automatically.
+- **P-83 Mechanics.** EXECUTE's evidence goes to `docs/ephemeral/modifications/evidence/closeout-residuals/execute/`:
+  the NAM-002 files (X3.6), the gate summaries (X1.3, X4.2, X7.4), the rehearsal, landing and corpus results (X4.5,
+  X5.4, X6.1) and nothing else; no body text (`D22`). Every `notion-update-page` call uses `allow_async: false`. The
+  first push after X0.2 and after X7.6 uses `git push --force-with-lease`, because the squash merge leaves the remote
+  branch's old history in place. X4.3's packaging and extraction commands are exact (`execute.4b`). The page's three
+  self-link spots and their step-7 operations are exact (`M2.json` `self_links`). The Drive banner is read back by
+  MGMT-10 before the close commit (X7.6).

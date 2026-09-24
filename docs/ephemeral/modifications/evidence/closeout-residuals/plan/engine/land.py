@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
 """EXECUTE landing tool for MODIFICATION-20260923-closeout-residuals (the parent's evidence/e6/land.py, for these rules).
 
-  land.py plan    <PID> <PAGE_ID> --candidate-url URL [--no-ops | --journal DIR] [--registry R] [--guards G] [--skills K]
-  land.py check   <PID> <PAGE_ID> [--registry R] [--guards G] [--skills K]
-  land.py reverse <PID> <PAGE_ID> --journal DIR
+  land.py plan  <PID> <PAGE_ID> [--candidate-url URL] [--no-ops] [--registry R] [--guards G] [--skills K]
+  land.py check <PID> <PAGE_ID> [--candidate-url URL] [--registry R] [--guards G] [--skills K]
 
---no-ops (P-59): the rehearsal. Prints counts, refusals and the precheck, never the operations.
---journal DIR (P-58): also writes the operations to DIR/<PID>.ops.json (the rollback journal: session scratchpad only,
-      read only to reverse this landing, deleted when the landing unit passes its gate or has been reversed; D22).
-reverse: reads DIR/<PID>.ops.json and the newest fetch of the page, confirms each landed new_str occurs exactly once,
-      and prints the reversing operations (new_str -> old_str, in reverse order) for one `update_content` call.
-
+--candidate-url is required, in both modes, for a body whose rules carry {{CANDIDATE_CRD_LIST_URL}} (CL-40): the
+      token is filled before anything is compared, so a landed page carrying the real URL reads as landed (P-75).
 plan: the newest fetch of the page (dryrun.latest_body: this session's harness files written in the last 30 minutes;
       D22) -> closeout_rules.apply -> the minimal search-and-replace operations for Notion `update_content`, printed to
-      stdout for the landing call in hand and written nowhere. Refuses: a body already landed (every non-empty new text
-      of its rules and LOCAL edits already present), any rule or LOCAL count off its expected value, any `{{` left in
-      the edited body (P-48), and operations that do not reproduce the edit. It also prints the precheck: `check` run on
-      the text the operations produce, as Notion will store it.
+      stdout for the landing call in hand and written nowhere. Refuses: a body already landed (ALREADY_LANDED), a body
+      with nothing to land (NOTHING_TO_LAND), any rule or LOCAL count off its expected value, a `{{` the edit
+      introduces (P-48, P-59), operations that do not reproduce the edit, and (P-76) a failing precheck
+      (PRECHECK_FAILED) or landed check (LANDED_CHECK_FAILED). The precheck is `check`'s criteria on the text the
+      operations produce; the landed check is `check` itself, the STALE test included, on that text, i.e. what the
+      readback after the landing will run. --no-ops (the rehearsal) prints counts and both checks, never the
+      operations.
 check: the readback. The newest fetch of the page after the landing -> the row's registry assertions (0 findings), every
       new guard on the row (forbidden: silent, and fires on its injected regression; required: matches, and fails when
-      removed), flowmaster-validate's body validator, and the placement counts. No body text is printed.
+      removed), flowmaster-validate's body validator, and the placement counts. A page that does not yet show the
+      landing's new text reports STALE_READBACK_OR_NOT_LANDED: re-fetch and check again (the update may be async). No
+      body text is printed.
+There is no rollback journal and no reverse mode (P-58 as revised in repair round 4, D22): nothing keeps a copy of a
+body. A failed readback is repaired forward from this engine's own texts; a page that cannot be repaired forward stops
+the landing unit and returns to Nathan (spec §9 X5.4).
 """
 import argparse
 import json
@@ -68,18 +71,18 @@ def nothing_to_land(rep):
     return all(v["hits"] == 0 for v in rules) and checks_ok
 
 
-def checks(pid, text, a):
-    """The readback checks on `text` as stored; the dryrun's registry, guard and validator checks, without the rules."""
+def checks(pid, text, a, mode):
+    """The readback checks on `text` as stored; the dryrun's registry, guard and validator checks, without the rules.
+    mode "check" (the readback, and plan's landed check) also reports a page that does not show the landing."""
     import os
     import subprocess
     stored = C.collapse(text)
     has_news = any(pid in exp and exp[pid] > 0 for _, _, _, _, exp in R.RULES) or bool(R.LOCAL.get(pid))
-    if a.mode == "check" and has_news and not landed(pid, text):
+    if mode == "check" and has_news and not landed(pid, text):
         post, rep = R.apply(pid, text)
         if not nothing_to_land(rep):
             return {"status": "STALE_READBACK_OR_NOT_LANDED", "pass": False,
-                    "note": "the page does not show this landing's new text: re-fetch and run check again; reverse only on a "
-                            "failure of a readback that shows the landing (P-59)"}
+                    "note": "the page does not show this landing's new text: re-fetch and run check again (P-59)"}
     out = {"placement": {k: stored.count(C.collapse(v)) for k, v in
                          {"W-4": C.W4, "ONCE": C.ONCE, "OWN": R.OWN, "RECV": R.RECV}.items()},
            "unfilled_tokens": stored.count("{{")}
@@ -120,9 +123,13 @@ def checks(pid, text, a):
     return out
 
 
+TOKEN_PIDS = sorted({p for rid, anchor, action, new, exp in R.RULES
+                     for p, n in exp.items() if n > 0 and TOKEN in (R._pick(new, p) or "")})
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["plan", "check", "reverse"])
+    ap.add_argument("mode", choices=["plan", "check"])
     ap.add_argument("pid")
     ap.add_argument("page")
     ap.add_argument("--candidate-url")
@@ -131,28 +138,17 @@ def main():
     ap.add_argument("--skills", default=str(D.INSTALLED))
     ap.add_argument("--since-minutes", type=int, default=30)
     ap.add_argument("--no-ops", action="store_true")
-    ap.add_argument("--journal")
     a = ap.parse_args()
     D.SINCE = a.since_minutes * 60
-    ts, body = D.latest_body(a.page)
-    if a.mode == "check":
-        print(json.dumps({"pid": a.pid, "fetched": ts, **checks(a.pid, body, a)}, indent=1, ensure_ascii=False))
-        return
-    if a.mode == "reverse":
-        if not a.journal:
-            raise SystemExit(json.dumps({"refused": "REVERSE_NEEDS_JOURNAL"}))
-        ops = json.loads((Path(a.journal) / f"{a.pid}.ops.json").read_text(encoding="utf-8"))["ops"]
-        rev = [{"old_str": o["new_str"], "new_str": o["old_str"]} for o in reversed(ops)]
-        t = body
-        for o in rev:
-            if t.count(o["old_str"]) != 1:
-                print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "REVERSE_NOT_UNIQUE"}))
-                raise SystemExit(7)
-            t = t.replace(o["old_str"], o["new_str"])
-        print(json.dumps({"pid": a.pid, "fetched": ts, "ops": rev}, ensure_ascii=False))
-        return
+    if a.pid in TOKEN_PIDS and not a.candidate_url:
+        print(json.dumps({"pid": a.pid, "refused": "CANDIDATE_URL_REQUIRED (P-75)"}))
+        raise SystemExit(2)
     if a.candidate_url:
         fill(a.candidate_url)
+    ts, body = D.latest_body(a.page)
+    if a.mode == "check":
+        print(json.dumps({"pid": a.pid, "fetched": ts, **checks(a.pid, body, a, "check")}, indent=1, ensure_ascii=False))
+        return
     if landed(a.pid, body):
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "ALREADY_LANDED: run check, not plan"}))
         raise SystemExit(3)
@@ -171,19 +167,20 @@ def main():
     if ops is None or D.simulate(body, ops) != post:
         print(json.dumps({"pid": a.pid, "fetched": ts, "refused": "OPS_DO_NOT_REPRODUCE"}))
         raise SystemExit(6)
-    a.mode = "precheck"
-    pre = checks(a.pid, D.simulate(body, ops), a)
-    if a.journal:
-        jd = Path(a.journal)
-        jd.mkdir(parents=True, exist_ok=True)
-        jf = jd / f"{a.pid}.ops.json"
-        jf.write_text(json.dumps({"pid": a.pid, "page": a.page, "fetched": ts, "ops": ops}, ensure_ascii=False), encoding="utf-8")
-        jf.chmod(0o600)
+    landed_text = D.simulate(body, ops)
+    pre = checks(a.pid, landed_text, a, "precheck")
+    after = checks(a.pid, landed_text, a, "check")
+    summary = {"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "ops_count": len(ops), "rules": rep,
+               "precheck": pre, "landed_check": after}
+    if not pre.get("pass") or not after.get("pass"):
+        print(json.dumps({**summary, "refused": "PRECHECK_FAILED" if not pre.get("pass") else "LANDED_CHECK_FAILED"},
+                         indent=1, ensure_ascii=False))
+        raise SystemExit(8)
     if a.no_ops:
-        print(json.dumps({"pid": a.pid, "fetched": ts, "source_file": D.SOURCE, "ops_count": len(ops),
-                          "rules": rep, "precheck": pre}, indent=1, ensure_ascii=False))
+        print(json.dumps(summary, indent=1, ensure_ascii=False))
         return
-    print(json.dumps({"pid": a.pid, "fetched": ts, "ops": ops, "rules": rep, "precheck": pre}, ensure_ascii=False))
+    print(json.dumps({"pid": a.pid, "fetched": ts, "ops": ops, "rules": rep, "precheck": pre, "landed_check": after},
+                     ensure_ascii=False))
 
 
 if __name__ == "__main__":

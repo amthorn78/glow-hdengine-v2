@@ -469,10 +469,11 @@
    "EV": "docs/ephemeral/modifications/evidence/closeout-residuals/plan",
    "INST": "/root/.claude/skills/synced/b25b7d44-c28f-42bf-b704-023250711755_bb1d0f6b-2c07-427b-9e63-27cb0b082502",
    "SCRATCH": "the executing session's scratchpad directory; never the repository or a skill",
-   "PKG": "$SCRATCH/pkg-root: a full copy of $INST with the seven packages replaced by their patched copies (execute.1.then); freeze.py $PKG prints 323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae",
+   "PKG": "$SCRATCH/pkg-root: a full copy of $INST with the seven packages replaced by their patched copies (execute.1.then); freeze.py $PKG is recorded (it is 323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae when no skill outside the seven has changed since PLAN; P-79)",
    "GGC, FV, CF, RELAY, PR, AUDIT, REPORT": "$PKG/glow-graph-contract, $PKG/flowmaster-validate, $PKG/change-flow, $PKG/session-relay-flowmaster, $PKG/glow-hde-pr-development, $PKG/amthor-workspace-governance-audit, $PKG/glow-po-reporting",
    "GATE": "$SCRATCH/gate: run_gate.py's --out; it builds the candidate root at $GATE/cand (graph/GCFPE-20260914.1-Candidate-Graph-Contract.json = $CF/references/gcfpe-20260914.1-091426.1-candidate-graph-contract.json, byte-equal to the graph bundled in $FV)",
-   "FVI, CFI": "$INST/flowmaster-validate, $INST/change-flow (installed, before the install sitting)"
+   "FVI, CFI": "$INST/flowmaster-validate, $INST/change-flow (installed, before the install sitting)",
+   "BASE": "the main commit X0.2 restarts the branch from: BASE=$(git rev-parse HEAD) right after the checkout, recorded in §E (GUARDS.md NAM-002 step 3 reads the pre-change registry from it)"
   },
   "1_base_unchanged_before_applying": {
    "commands": [
@@ -496,7 +497,8 @@
    "whole_root": {
     "command": "python3 docs/prompt_ecosystem_management/freeze.py $INST",
     "expected_stdout_at_plan_time": "320 420705ec2881bdd82cc46d32880fa02abb463460f081dfa728c3c4aca928f24a",
-    "note": "the whole root also covers the 19 skills outside the seven packages; any sync of them changes it"
+    "note": "the whole root also covers the 19 skills outside the seven packages; any sync of them changes it",
+    "when": "X0.3(e): recorded, not a stop. A value other than expected_stdout_at_plan_time means a skill outside the seven synced since PLAN; §E records it (P-79)"
    },
    "then": {
     "when": "X1.1 (spec §9), before any repository change (P-56): the reindex needs $GGC, the registry gate needs its deriver",
@@ -522,7 +524,7 @@
      "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
      "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
      "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
-     "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae (manifest final_root_freeze)"
+     "recorded (P-79): 323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae (final_root_freeze) when no skill outside the seven has changed since PLAN; any other value is recorded in §E and is not a stop, because only the seven package digests above are this Modification's"
     ]
    },
    "expected_after_patch": {
@@ -599,6 +601,26 @@
    "note": "the oracle is byte-identical in $FV and $FVI (not a changed file). The recipe reads the two '> ' lines of the D23-E once-per-merge section only, bounded at the next '### ' or '## ' heading, and asserts there are exactly two (P-21), so entries added under D23 or later decisions do not change the output. $CFI and $FVI are the installed packages before the install sitting; $CF and $FV are in $PKG",
    "when": "X4.1 (spec §9), after X2 and X3"
   },
+  "4b_package_X4.3_after_the_pkg_gate": {
+   "when": "X4.3 (spec §9), after the pkg gate (X4.2); again at X7.2 when that runs in a new session (P-78)",
+   "commands": [
+    "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf $SCRATCH/skills-ext/$s && mkdir -p $SCRATCH/skills-ext/$s && (cd $SCRATCH/skills-ext/$s && unzip -q $SCRATCH/skills-out/$s.skill) || exit 1; done)",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $SCRATCH/skills-ext/$s/$s; done)",
+    "sha256sum $SCRATCH/skills-out/*.skill",
+    "python3 docs/prompt_ecosystem_management/freeze.py $PKG"
+   ],
+   "expected": [
+    "exit 0",
+    "exit 0; 'Skill is valid!' once per package (seven); seven files <skill>.skill in $SCRATCH/skills-out",
+    "exit 0; each archive extracts to $SCRATCH/skills-ext/<skill>/<skill>/",
+    "seven lines '<skill> <files> <digest>', each equal to execute.1.expected_after_patch for that skill",
+    "seven sha256 lines, recorded in §E (they vary with archive timestamps; the D24 verdicts bind to the freeze digests, P-78)",
+    "the value X1.1 recorded: packaging wrote nothing into $PKG"
+   ],
+   "note": "skill-creator runs from $PKG's copy (a full copy of $INST), never from $INST, and with PYTHONDONTWRITEBYTECODE=1, so nothing is written into a skill tree"
+  },
   "5_after_the_install_sitting": {
    "commands": [
     "python3 docs/prompt_ecosystem_management/freeze.py $INST/flowmaster-validate",
@@ -642,12 +664,13 @@
   },
   "_changes_from_committed_manifest": [
    "variables: TMPDIR is $SCRATCH/tmp (spec §9); PKG, EV, GATE and cwd defined; GGC..REPORT are $PKG's packages",
-   "1.then: builds the full skills root $PKG (a copy of $INST with the seven patched packages) and gates it on the whole-root freeze; runs at X0.3, before any repository change (P-56)",
+   "1.then: builds the full skills root $PKG (a copy of $INST with the seven patched packages) and gates it on the whole-root freeze; runs at X1.1, before any repository change (P-56)",
    "2: the new builder's expected refusal of today's parts runs as run_gate.py --set pre; the reindex-diff check is the mechanical cmp; the 'alternative' git apply became a read-only cross-check",
    "3: mkdir -p before git mv; README source is $EV/skills/contract-template-README.md; README staged",
    "4: the structural diff is a plain diff of the two canonical contracts; no PLAN scratch path",
    "suite_gate (new): the three run_gate.py calls; 5.then points at suite_gate.post",
-   "repair round 3: 'when' fields follow spec §9 X0-X7; the pre gate runs at X1.3 (suite_gate.pre), no longer inside execute.2"
+   "repair round 3: 'when' fields follow spec §9 X0-X7; the pre gate runs at X1.3 (suite_gate.pre), no longer inside execute.2",
+   "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)"
   ]
  }
 }

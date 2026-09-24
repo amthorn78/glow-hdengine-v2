@@ -1,3 +1,9 @@
+> ⚠️ **Superseded in part by PLAN repair rounds 2 to 4 (2026-09-24).** Everything below is the Notion worker's
+> original round-1 notes, preserved as written. Current values: `edits.json` holds 19 edits, each with its §9 step
+> and §P step in `when`; the repository texts are labelled by the step that commits them (P-73), not "commit 1/2";
+> the tokens and their fills are P-71's table, including `{{MIGRATION_DATE}}` (P-80); the self-link operations are
+> exact in `M2.json` `self_links`. The execution specification §7 governs.
+
 # Notion worker notes: PLAN repair round, MODIFICATION-20260923-closeout-residuals
 
 Worker: PLAN r1 Notion worker, 2026-09-23. Nothing was written to Notion, Drive, the repository or

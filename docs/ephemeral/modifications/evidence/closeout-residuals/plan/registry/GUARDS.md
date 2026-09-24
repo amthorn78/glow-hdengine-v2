@@ -195,8 +195,8 @@ intake and register sections say 'conflict/ADR') and is silent after LCL-30-2. I
 
 ## PART-10 (ITEM-22): NAM-002, lane parents and parent titles on a live snapshot, EXECUTE procedure
 
-When: X5.8 (spec §9), after the registry commit (X3.1) on the execution branch and the landing of the bodies (X5.5),
-before the corpus gate (X6.1). Nothing is written to Notion and no prompt body is read: a hub page is a control page, and its child list
+When: X3.6 (spec §9), after the registry commit (X3.1) and before any Notion write (P-77). A failure here stops
+EXECUTE with nothing outside the branch (P-57). Nothing is written to Notion and no prompt body is read: a hub page is a control page, and its child list
 gives page IDs and titles only. `nam002_live.py` runs three checks from one `childlist.json` (its docstring states them):
 
 - NAM-002 (the governance audit's own rule): each row's page is listed under the hub its `expected_parent_id` names.
@@ -221,11 +221,11 @@ gives page IDs and titles only. `nam002_live.py` runs three checks from one `chi
    (a hub without one is unusable input, exit 2). Keep every child; a child that is not a registry row does not enter
    the snapshot:
    `{"captured_at": "<UTC>", "hubs": [{"id": "<hub id>", "title": "<fetched page title>", "fetched": "<as-of>", "children": [{"id": "<page id>", "title": "<child title>"}]}]}`
-3. Obtain the pre-change registry for the control run from the record merge base: the `main` commit that X0.2 restarted
-   the branch from (it carries the merged record PR; X0.3(a) checked its registry). Stop if the hash differs:
+3. Obtain the pre-change registry for the control run from `$BASE`, the `main` commit X0.2 restarted the branch from
+   and recorded (it carries the merged record PR; X0.3(a) checked its registry). Stop if the hash differs:
 
    ```sh
-   git show <record merge base>:docs/prompt_ecosystem_management/project-prompt-contract-registry.md > $SCRATCH/reg-old.md
+   git show $BASE:docs/prompt_ecosystem_management/project-prompt-contract-registry.md > $SCRATCH/reg-old.md
    sha256sum $SCRATCH/reg-old.md   # 8b4e46ed2dc24442e3dadc416dfe4c810a048788bf03c799808927a54c2677d4, 322556 bytes
    ```
 
@@ -256,8 +256,8 @@ gives page IDs and titles only. `nam002_live.py` runs three checks from one `chi
    NAM-001 (a WARNING on a prompt-title difference) is recorded and does not fail the gate: prompt titles are outside
    PART-10. Runs 2 and 3 are must-fail cases: each checks only its own injected finding, and each passes only when
    that one finding is produced; run 1 must pass first. Runs 2 and 3 cannot be combined (argparse exits 2).
-5. Keep `childlist.json`, the snapshot and the four results as EXECUTE evidence (hub and child IDs and titles only),
-   with each run's exit status.
+5. Copy `childlist.json`, the snapshot and the four results to `docs/ephemeral/modifications/evidence/closeout-residuals/execute/nam002/`
+   (hub and child IDs and titles only; P-83), with each run's exit status, for the X6.4 evidence commit.
 
 How the script reads the snapshot: `build_snapshot()` makes one source per registry row, `{"source_id": <row
 notion_page_id>, "kind": "notion_page", "complete": true, "in_scope": true, "title": <child title>, "parent": <hub id>}`.

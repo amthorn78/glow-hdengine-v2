@@ -11,13 +11,15 @@ Every expected exit code and key result is embedded below; the gate exits 0 only
                  own (now reindexed) docs/graph/parts: the build must exit 0 with the proof token ae2bd159...;
                  the pre-reindex build is re-run on the parts at --pre-rev read from git (not the working tree);
                  registry_deriver runs with the patched audit (1.13.0) and with --inst's installed audit
-                 (1.12.0). Needs --pkg-root. The pkg-root must first give freeze 323 047ca742...
+                 (1.12.0). Needs --pkg-root.
     --set post   At X7.4: the same as pkg on --inst (then the installed patched tree) and main's reindexed parts,
                  without the pre-reindex rows and the 1.12.0-audit rows.
 
-The first rows are preconditions (freeze recipe hash, whole-root freeze, seven package freezes); when one
-fails, the remaining rows are not run and the gate fails. The last row re-takes the whole-root freeze, so a
-suite that wrote into the skill tree fails the gate.
+The first rows are preconditions (freeze recipe hash, the whole-root freeze measured, the seven package freezes
+against their expected digests); when one fails, the remaining rows are not run and the gate fails. The whole-root
+digest is recorded, with whether it equals the PLAN-time value, but not asserted: it also covers the skills this
+Modification does not change (P-79). The last row re-takes it and must equal the first, so a suite that wrote into
+the skill tree fails the gate.
 
 The gate writes only under --out (logs, build outputs, a copy of the parts for the idempotence check, the
 extracted pre-reindex parts) and under --cand when it builds the candidate root. It never writes the
@@ -34,6 +36,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -50,7 +53,8 @@ PRE_REV_DEFAULT = "77d98ddf2bab9e37bd09fdf8f894e166ca23788e"
 
 FREEZE_RECIPE = "docs/prompt_ecosystem_management/freeze.py"
 FREEZE_RECIPE_SHA256 = "3d6a38f3544868cbaa8118b60c381789625ab3c4095e863d96260caba4bbe2c9"
-ROOT_FREEZE = "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae"  # manifest final_root_freeze
+ROOT_FREEZE_AT_PLAN = "323 047ca74293082dd1d824c1e74f2aef17945bea1f609f365afcc31106b4de00ae"  # manifest final_root_freeze (recorded, not asserted: P-79)
+ROOT_BEFORE = {}
 PACKAGE_FREEZE = {  # manifest execute.1.expected_after_patch
     "flowmaster-validate": "31 0ca2a74d50a57803e2c4b8426a84f43877f68f6d1c93731d54368f413e5c5626",
     "change-flow": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
@@ -214,7 +218,14 @@ def preconditions(g, tree):
                   {"sha256": FREEZE_RECIPE_SHA256}, {"sha256": sha256_file(recipe) if recipe.is_file() else None})
     if not ok:
         return False
-    ok = g.freeze("freeze.skills_root", tree, ROOT_FREEZE) and ok
+    # P-79: the whole root also covers skills this Modification does not change, which may sync at any time, so its
+    # digest is measured here and compared at the end of the run (nothing wrote into the tree), not held to a constant.
+    r = subprocess.run([PY, str(recipe), str(tree)], capture_output=True, text=True, env=g.env)
+    ROOT_BEFORE["stdout"] = r.stdout.strip()
+    ok = g.record("freeze.skills_root", [PY, str(recipe), str(tree)], None, r.returncode, 0,
+                  {"digest_form": True},
+                  {"digest_form": bool(re.fullmatch(r"\d+ [0-9a-f]{64}", r.stdout.strip())), "stdout": r.stdout.strip(),
+                   "equals_plan_time_value": r.stdout.strip() == ROOT_FREEZE_AT_PLAN}) and ok
     for skill, digest in PACKAGE_FREEZE.items():
         ok = g.freeze(f"freeze.{skill}", tree / skill, digest) and ok
     return ok
@@ -430,7 +441,7 @@ def main():
                 if extracted and (pre_parts / "prompts").is_dir():
                     deriver(g, tree, inst_audit, pre_parts, "registry_deriver.installed_audit_1.12.0.pre_reindex_parts",
                             "1.12.0", INSTALLED_AUDIT_1_12_0_FREEZE)
-        g.freeze("freeze.skills_root.after", tree, ROOT_FREEZE)
+        g.freeze("freeze.skills_root.after", tree, ROOT_BEFORE.get("stdout"))
     else:
         not_run.append("every row after the preconditions")
 
