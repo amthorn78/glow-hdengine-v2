@@ -123,5 +123,5 @@ stop there: EXECUTE starts only after Nathan's approval is recorded in plan_appr
 
 | | |
 |---|---|
-| Stage 5 pull request | *filled when opened* |
+| Stage 5 pull request | #481, opened 2026-09-24 from `docs/20260924-pe37-stage5`; not merged |
 | MGMT-10 session | *filled at step 2* |
