@@ -123,6 +123,6 @@ stop there: EXECUTE starts only after Nathan's approval is recorded in plan_appr
 
 | | |
 |---|---|
-| Stage 5 pull request | #481, opened 2026-09-24 from `docs/20260924-pe37-stage5`; not merged |
-| MGMT-10 session | *filled at step 2* |
+| Stage 5 pull request | #481, merged 2026-09-24 as `7fabc9d`. Step 1 done: D26 is on `main` and the selftest passes 64/64 there |
+| MGMT-10 session | **Not created by PE37.** `create_session` was refused on 2026-09-24 at about 11:25Z: *"caller session is at lineage depth 8 (limit 8); cannot spawn or re-arm further child sessions"*. Step 2 passes to Nathan: he starts the session with the kickoff above (`<STAGE5_PR>` = #481). Its id is recorded here when he gives it |
 | Blocker on step 2, found 2026-09-24 | PE37 is at session lineage depth 8, the platform's limit. Scheduling a check-in was refused with *"caller session is at lineage depth 8 (limit 8); cannot spawn or re-arm further child sessions"*. That refusal covers creating the MGMT-10 session as well. It was not tested, because a test would create the session before #481 merges. If step 2 fails the same way, Nathan starts the session himself with the kickoff above, and PE37 records its id here |
