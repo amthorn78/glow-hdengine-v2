@@ -74,7 +74,7 @@ OWN_AT = {
     "PR-40": r"(?<=operating read-only\.)",
     "CL-E-20": r"(?<=revalidation session, read-only\.)",
     "DOC-20": r"(?<=do not edit documentation, Canon, PF10, or repository state\.)",
-    "QA-10": r"(?<=This is a read-only audit and readiness role\.)",
+    "QA-10": r"(?:(?<=This is a read-only audit and readiness role\.)|(?<=This is an audit and readiness role\.))",  # P-88: before or after LQA-10-P03
     "PR-50": r"otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\n]*\.",  # dry A
     "ESC-25": r"read-only repository reviewer[^.\n]*\.",
     "PR-20": r"(?<=Do not mutate the repository in this authoring operation\.)",  # dry E1: Execute step 2

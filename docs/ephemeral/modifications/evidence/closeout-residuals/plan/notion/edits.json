@@ -63,13 +63,22 @@
   "why": "P-65, P-66 (revised); the matching lift line for TRACK-FREEZE-START (§P Product Owner actions: 'Verified by the tracking page's two dated lines'). Same placement and anchor, so it lands after PART-11-TRACK-01. old_str occurs once as fetched and once after the X5.0 and X5.6 insertions (simulated). It states only what is true when it is written: the install, X7.4's verification and Nathan's lift. It says nothing of the close-out PR, which is opened after it (X7.6). {{LIFT_DATE}} is the UTC date Nathan lifts the freeze (P-71)."
  },
  {
+  "id": "TRACK-UNIT-STOPPED",
+  "page_id": "3e34590a05eb81e7927efe0541258916",
+  "page_title": "GCFPE MGMT Change-Process Redesign — Tracking",
+  "old_str": "**The three decisions below are recorded as",
+  "new_str": "**{{EXECUTE_DATE}}: the closeout-residuals Modification stopped.** `MODIFICATION-20260923-closeout-residuals` is `BLOCKED`: its landing unit did not pass, so the freeze holds until Nathan lifts it. The record's §E, on the unmerged execution branch, lists every Notion write already made; Nathan restores those bodies from page history or rules a forward fix.\n**The three decisions below are recorded as",
+  "when": "Only on the stop path after X5.0 (spec §9, 'The landing unit', stop step 4); never on a run whose unit passes",
+  "why": "P-85. The freeze line (TRACK-FREEZE-START) stays, because the freeze is kept; this line records the stop beside it, so the page never shows a freeze without its reason. Same anchor and placement as the other dated lines, so it follows whatever has already landed there. No code span inside the bold run (P-91). {{EXECUTE_DATE}} is the UTC date of this write (P-71)."
+ },
+ {
   "id": "PART-18-AF009-01",
   "page_id": "3df4590a05eb8111a6a5f67cb82f96f6",
   "page_title": "GCFPE Alpha Feedback — Deferred Items — 091426.1",
   "old_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold.",
-  "new_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold. **Amended {{EXECUTE_DATE}} (`D23-C` successor; `MODIFICATION-20260923-closeout-residuals` PART-18):** C-LAT's three-step *Decide it during work* block now sits whole only in PR-30 and PR-35, which implement; PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20 and IA-30 keep its Material definition and their own routing. The parenthesis above is left as written (`AUTH-001`).",
+  "new_str": "Scope is the PR lane; the ESC remediation lane keeps its own threshold. **Amended {{EXECUTE_DATE}}** (`D23-C` successor; `MODIFICATION-20260923-closeout-residuals` PART-18): C-LAT's three-step *Decide it during work* block now sits whole only in PR-30 and PR-35, which implement; PR-10, PR-20, PR-40, RS-10, RS-20, DOC-10, DOC-20 and IA-30 keep its Material definition and their own routing. The parenthesis above is left as written (`AUTH-001`).",
   "when": "X5.6; §P step 21",
-  "why": "PART-18 / ITEM-37 / Q2 (a): the AF-009 disposition states C-LAT's placement (\"C-LAT, in the ten bodies with a rescope threshold\"). The disposition is dated 2026-09-23, so it is amended by an appended note, not rewritten (AUTH-001; the page already uses this convention, e.g. AF-004 \"superseded by D22\"). old_str is the disposition paragraph's last sentence and occurs once on the page. The page is not among PART-18's named targets (PE Metaprompt overlay, skill copies); it is a Notion control page stating the placement, and the Alpha feedback list is an established MGMT-10 destination (notion-write-boundary.md:119-122). {{EXECUTE_DATE}} is the UTC date of this write (P-71). Included (P-67): a consequence of ITEM-37 that §A's target list omitted."
+  "why": "PART-18 / ITEM-37 / Q2 (a): the AF-009 disposition states C-LAT's placement (\"C-LAT, in the ten bodies with a rescope threshold\"). The disposition is dated 2026-09-23, so it is amended by an appended note, not rewritten (AUTH-001; the page already uses this convention, e.g. AF-004 \"superseded by D22\"). old_str is the disposition paragraph's last sentence and occurs once on the page. The page is not among PART-18's named targets (PE Metaprompt overlay, skill copies); it is a Notion control page stating the placement, and the Alpha feedback list is an established MGMT-10 destination (notion-write-boundary.md:119-122). {{EXECUTE_DATE}} is the UTC date of this write (P-71). Included (P-67): a consequence of ITEM-37 that §A's target list omitted. Repair round 5 (P-91): no code span sits inside bold, because Notion reads such a run back split around the code and the literal new_str would not be found on the page."
  },
  {
   "id": "PART-06-HUB-01",
@@ -114,7 +123,7 @@
   "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
   "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{MIGRATION_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
   "when": "X5.3; §P step 16 — after the new page's readback passes (X5.1)",
-  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}. {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{MIGRATION_DATE}} and {{CANDIDATE_CRD_LIST_URL}} (P-71, P-80). {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
  },
  {
   "id": "PART-06-ITEM2-01",
@@ -132,7 +141,7 @@
   "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
   "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{MIGRATION_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
   "when": "X5.3; §P step 16 — after the new page's readback passes (X5.1)",
-  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}. {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{MIGRATION_DATE}} and {{CANDIDATE_CRD_LIST_URL}} (P-71, P-80). {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
  },
  {
   "id": "PART-06-ITEM3-01",
@@ -150,7 +159,7 @@
   "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
   "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{MIGRATION_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
   "when": "X5.3; §P step 16 — after the new page's readback passes (X5.1)",
-  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}. {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{MIGRATION_DATE}} and {{CANDIDATE_CRD_LIST_URL}} (P-71, P-80). {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
  },
  {
   "id": "PART-06-ITEM4-01",
@@ -168,6 +177,6 @@
   "old_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.",
   "new_str": "Preserve the original local number and all dated facts in the same Drive file. This row is the current item-level tracking identity; other references are evidence or historical pointers.\n{{MIGRATION_DATE}}: the Candidate CRD Items List moved from the Drive file to the Notion page [Candidate CRD Items List]({{CANDIDATE_CRD_LIST_URL}}) (`D25-A`; `MODIFICATION-20260923-closeout-residuals` PART-06). This item's original local number and dated facts are preserved there, in its moved-items history; the Drive file is Nathan's reference copy and is not updated.",
   "when": "X5.3; §P step 16 — after the new page's readback passes (X5.1)",
-  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{EXECUTE_DATE}} and {{CANDIDATE_CRD_LIST_URL}}. {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
+  "why": "PART-06: the row's dated 2026-09-08 \"Movement history\" entry directs preservation \"in the same Drive file\". It is dated, so it is not rewritten (AUTH-001); a dated movement entry is appended after it. old_str occurs once in the page content. Fill {{MIGRATION_DATE}} and {{CANDIDATE_CRD_LIST_URL}} (P-71, P-80). {{MIGRATION_DATE}} is the UTC date of the X5.1 page creation, so the move is dated alike everywhere (P-80)."
  }
 ]

@@ -503,8 +503,8 @@
    "then": {
     "when": "X1.1 (spec §9), before any repository change (P-56): the reindex needs $GGC, the registry gate needs its deriver",
     "commands": [
-     "mkdir -p $SCRATCH/tmp && rm -rf $PKG && cp -r $INST $PKG",
-     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf $PKG/$s && cp -r $INST/$s $PKG/$s && patch -p1 -s -d $PKG/$s < $EV/skills/diffs/$s.diff || { echo \"PATCH FAILED: $s\"; exit 1; }; done)",
+     "mkdir -p \"${SCRATCH:?}/tmp\" && rm -rf \"${PKG:?}\" && cp -r \"${INST:?}\" \"$PKG\"",
+     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf \"${PKG:?}/${s:?}\" && cp -r $INST/$s $PKG/$s && patch -p1 -s -d $PKG/$s < $EV/skills/diffs/$s.diff || { echo \"PATCH FAILED: $s\"; exit 1; }; done)",
      "python3 docs/prompt_ecosystem_management/freeze.py $PKG/flowmaster-validate",
      "python3 docs/prompt_ecosystem_management/freeze.py $PKG/change-flow",
      "python3 docs/prompt_ecosystem_management/freeze.py $PKG/glow-graph-contract",
@@ -606,8 +606,8 @@
    "commands": [
     "mkdir -p $SCRATCH/skills-out $SCRATCH/skills-ext",
     "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do (cd $PKG/skill-creator && python3 -m scripts.package_skill $PKG/$s $SCRATCH/skills-out) || { echo \"PACKAGE FAILED: $s\"; exit 1; }; done)",
-    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf $SCRATCH/skills-ext/$s && mkdir -p $SCRATCH/skills-ext/$s && (cd $SCRATCH/skills-ext/$s && unzip -q $SCRATCH/skills-out/$s.skill) || exit 1; done)",
-    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $SCRATCH/skills-ext/$s/$s; done)",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do rm -rf \"${SCRATCH:?}/skills-ext/${s:?}\" && mkdir -p $SCRATCH/skills-ext/$s && (cd $SCRATCH/skills-ext/$s && unzip -q $SCRATCH/skills-out/$s.skill) || exit 1; done)",
+    "(for s in flowmaster-validate change-flow glow-graph-contract session-relay-flowmaster glow-hde-pr-development amthor-workspace-governance-audit glow-po-reporting; do printf '%s ' $s; python3 docs/prompt_ecosystem_management/freeze.py $SCRATCH/skills-ext/$s/$s; done) > $SCRATCH/skills-ext/freeze.txt && cat $SCRATCH/skills-ext/freeze.txt && diff $SCRATCH/skills-ext/freeze.txt $EV/skills/expected_after_patch.txt",
     "sha256sum $SCRATCH/skills-out/*.skill",
     "python3 docs/prompt_ecosystem_management/freeze.py $PKG"
    ],
@@ -615,8 +615,8 @@
     "exit 0",
     "exit 0; 'Skill is valid!' once per package (seven); seven files <skill>.skill in $SCRATCH/skills-out",
     "exit 0; each archive extracts to $SCRATCH/skills-ext/<skill>/<skill>/",
-    "seven lines '<skill> <files> <digest>', each equal to execute.1.expected_after_patch for that skill",
-    "seven sha256 lines, recorded in §E (they vary with archive timestamps; the D24 verdicts bind to the freeze digests, P-78)",
+    "seven lines '<skill> <files> <digest>' printed, then `diff` exits 0: each equals execute.1.expected_after_patch for that skill ($EV/skills/expected_after_patch.txt). A mismatch makes diff exit 1, and the step fails",
+    "seven sha256 lines, recorded in EX/packages.json and committed (they vary with archive timestamps; the D24 verdicts bind to the freeze digests, P-78, P-93)",
     "the value X1.1 recorded: packaging wrote nothing into $PKG"
    ],
    "note": "skill-creator runs from $PKG's copy (a full copy of $INST), never from $INST, and with PYTHONDONTWRITEBYTECODE=1, so nothing is written into a skill tree"
@@ -670,7 +670,8 @@
    "4: the structural diff is a plain diff of the two canonical contracts; no PLAN scratch path",
    "suite_gate (new): the three run_gate.py calls; 5.then points at suite_gate.post",
    "repair round 3: 'when' fields follow spec §9 X0-X7; the pre gate runs at X1.3 (suite_gate.pre), no longer inside execute.2",
-   "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)"
+   "repair round 4: 4b (packaging, X4.3) added with exact commands; the whole-root digest is recorded, not asserted (P-79); BASE defined (P-83)",
+   "repair round 5: every `rm -rf` takes the guarded form \"${VAR:?}\" (P-92), which the session's safety check allows and which cannot expand to /; execute.4b compares the extracted freeze digests with expected_after_patch.txt by diff, so X4.3's gate fails mechanically on a mismatch; the archive sha256s go to EX/packages.json"
   ]
  }
 }

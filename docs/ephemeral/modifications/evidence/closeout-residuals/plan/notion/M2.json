@@ -19,7 +19,7 @@
    "location": "Header metadata, line 3 (Updated); before the fence",
    "old": "Updated: 2026-09-08",
    "new": "Updated: {{MIGRATION_DATE}} (migrated to Notion)",
-   "why": "The file date goes stale when the list moves. It becomes the execute date with a short note. The old string excludes the line's two trailing spaces (a Markdown hard break), which stay in place."
+   "why": "The file date goes stale when the list moves. It becomes the migration date ({{MIGRATION_DATE}}, P-80) with a short note. The old string excludes the line's two trailing spaces (a Markdown hard break), which stay in place."
   },
   {
    "id": "M2-R2",

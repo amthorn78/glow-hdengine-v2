@@ -1,0 +1,831 @@
+{
+ "mode": "plan",
+ "pid": "PR-10",
+ "page": "3db4590a05eb818e8359de1994e97a7d",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan PR-10 3db4590a05eb818e8359de1994e97a7d --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "PR-10",
+  "fetched": "2026-09-23T13:19:07.698Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 15,
+  "repair": [],
+  "rules": {
+   "R-A1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2g": {
+    "hits": 4,
+    "expected": 4,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S1a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-S2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-CLAT": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM38": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LPR-10-4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-26-BRANCH-SEND": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-A7-LOCAL": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-26-RSP-scan": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 2,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "state_proof": {
+  "pristine_states": [
+   "NOT_LANDED"
+  ],
+  "ops": 15,
+  "relanded_all_LANDED": true,
+  "relanded_not_LANDED": [],
+  "landed_fn": true,
+  "doubled_in_landed": [],
+  "partials": 30,
+  "partials_repaired_exact": 22,
+  "partials_refused": 8,
+  "partials_repaired_wrong": 0,
+  "rows": [
+   {
+    "applied": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     13,
+     14
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P1",
+     "R-26-P4",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-1",
+     "LPR-10-2",
+     "LPR-10-3",
+     "LPR-10-4",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A2g",
+     "R-A3a",
+     "R-A7-S1a",
+     "R-A7-S1b",
+     "R-A7-S2",
+     "R-CLAT",
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     0
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A2b"
+    ]
+   },
+   {
+    "applied": [
+     1
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A2e"
+    ]
+   },
+   {
+    "applied": [
+     2
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-26-P4"
+    ]
+   },
+   {
+    "applied": [
+     3
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A7-S1a",
+     "R-A7-S1b"
+    ]
+   },
+   {
+    "applied": [
+     4
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A1e",
+     "R-A3a"
+    ]
+   },
+   {
+    "applied": [
+     5
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A7-S2"
+    ]
+   },
+   {
+    "applied": [
+     6
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-ITEM38"
+    ]
+   },
+   {
+    "applied": [
+     7
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     8
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LPR-10-2",
+     "LPR-10-3"
+    ]
+   },
+   {
+    "applied": [
+     9
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-CLAT"
+    ]
+   },
+   {
+    "applied": [
+     10
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     11
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     12
+    ],
+    "outcome": "REFUSED_COUNT_MISMATCH"
+   },
+   {
+    "applied": [
+     13
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A1b",
+     "R-A1c",
+     "R-A1d"
+    ]
+   },
+   {
+    "applied": [
+     14
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-26-P1"
+    ]
+   }
+  ],
+  "pass": true
+ }
+}

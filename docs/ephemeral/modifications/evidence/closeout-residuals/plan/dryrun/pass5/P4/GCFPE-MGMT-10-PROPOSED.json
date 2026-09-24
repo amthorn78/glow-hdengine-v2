@@ -1,0 +1,121 @@
+{
+ "mode": "plan",
+ "pid": "GCFPE-MGMT-10-PROPOSED",
+ "page": "3e34590a05eb811b93d2da9b4ef8106d",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan GCFPE-MGMT-10-PROPOSED 3e34590a05eb811b93d2da9b4ef8106d --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "GCFPE-MGMT-10-PROPOSED",
+  "fetched": "2026-09-23T00:49:47.074Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 2,
+  "repair": [],
+  "rules": {
+   "R-ITEM23": {
+    "hits": 2,
+    "expected": 2,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LGCFPE-MGMT-10-PROPOSED-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "CHECK R-ITEM40": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "CHECK R-ITEM23-gate": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "gates": {
+    "R-ITEM40": 0,
+    "R-ITEM23-gate": 0
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 0,
+    "ONCE": 0,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "gates": {
+    "R-ITEM40": 0,
+    "R-ITEM23-gate": 0
+   },
+   "pass": true
+  }
+ },
+ "state_proof": {
+  "pristine_states": [
+   "NOT_LANDED"
+  ],
+  "ops": 2,
+  "relanded_all_LANDED": true,
+  "relanded_not_LANDED": [],
+  "landed_fn": true,
+  "doubled_in_landed": [],
+  "partials": 4,
+  "partials_repaired_exact": 4,
+  "partials_refused": 0,
+  "partials_repaired_wrong": 0,
+  "rows": [
+   {
+    "applied": [
+     1
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-ITEM23"
+    ]
+   },
+   {
+    "applied": [
+     0
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LGCFPE-MGMT-10-PROPOSED-1"
+    ]
+   },
+   {
+    "applied": [
+     0
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LGCFPE-MGMT-10-PROPOSED-1"
+    ]
+   },
+   {
+    "applied": [
+     1
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-ITEM23"
+    ]
+   }
+  ],
+  "pass": true
+ }
+}

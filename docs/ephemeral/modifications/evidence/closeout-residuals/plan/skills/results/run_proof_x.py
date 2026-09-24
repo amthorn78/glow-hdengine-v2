@@ -26,7 +26,8 @@ LOG = []
 def sh(step, cmd, extra=None):
     r = subprocess.run(["bash", "-c", cmd], cwd=repo, capture_output=True, text=True, env={**env, **(extra or {})})
     out = (r.stdout + r.stderr).strip().split("\n")
-    LOG.append({"step": step, "cmd": cmd, "exit": r.returncode, "output_head": out[:6], "output_tail": out[-3:], "output_lines": len(out)})
+    full = out if len(out) <= 400 else out[:200] + [f"... {len(out) - 400} lines omitted ..."] + out[-200:]
+    LOG.append({"step": step, "cmd": cmd, "exit": r.returncode, "output": full, "output_lines": len(out)})
     print(f"[{step}] exit {r.returncode}: {cmd[:100]}", file=sys.stderr)
     return r
 K2 = "2_graph_reindex_ITEM-12_repository_in_execution_PR_before_install"

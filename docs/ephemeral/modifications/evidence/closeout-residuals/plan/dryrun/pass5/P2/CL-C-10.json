@@ -1,0 +1,587 @@
+{
+ "mode": "plan",
+ "pid": "CL-C-10",
+ "page": "3db4590a05eb81ad8989faa77f441a64",
+ "exit": 0,
+ "cmd": "python3 EV/engine/land.py plan CL-C-10 3db4590a05eb81ad8989faa77f441a64 --registry $P4/registry.new.md --guards EV/registry/row_assertions.json --skills $P4/pkg-root --no-ops",
+ "result": {
+  "pid": "CL-C-10",
+  "fetched": "2026-09-23T13:28:52.686Z",
+  "source_file": "/root/.claude/projects/-home-user-glow-hdengine-v2/398e36e8-b34a-56a2-83e3-75550250e4f5.jsonl",
+  "ops_count": 11,
+  "repair": [],
+  "rules": {
+   "R-A1b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1c": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1d": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A1e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2b": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A2e": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P3": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-26-P4": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A7-CL": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-ITEM21": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A3a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "R-A4a": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LCL-C-10-1": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "LCL-C-10-2": {
+    "hits": 1,
+    "expected": 1,
+    "ok": true,
+    "state": "NOT_LANDED"
+   },
+   "CHECK R-26-FRAME": {
+    "hits": 0,
+    "expected": 0,
+    "ok": true
+   }
+  },
+  "precheck": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  },
+  "landed_check": {
+   "placement": {
+    "W-4": 1,
+    "ONCE": 1,
+    "OWN": 0,
+    "RECV": 0
+   },
+   "unfilled_tokens": 0,
+   "doubled_insertions": [],
+   "registry_findings": [],
+   "guard_failures": [],
+   "validator": {
+    "exit": 0,
+    "ok": true,
+    "errors": []
+   },
+   "pass": true
+  }
+ },
+ "state_proof": {
+  "pristine_states": [
+   "NOT_LANDED"
+  ],
+  "ops": 11,
+  "relanded_all_LANDED": true,
+  "relanded_not_LANDED": [],
+  "landed_fn": true,
+  "doubled_in_landed": [],
+  "partials": 22,
+  "partials_repaired_exact": 22,
+  "partials_refused": 0,
+  "partials_repaired_wrong": 0,
+  "rows": [
+   {
+    "applied": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A2b",
+     "R-A2e",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1b",
+     "R-A1c",
+     "R-A1d",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1",
+     "LCL-C-10-2",
+     "R-26-P3",
+     "R-26-P4",
+     "R-A1e",
+     "R-A2b",
+     "R-A2e",
+     "R-A3a",
+     "R-A4a",
+     "R-A7-CL",
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     0
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-26-P3"
+    ]
+   },
+   {
+    "applied": [
+     1
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A2b"
+    ]
+   },
+   {
+    "applied": [
+     2
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A2e"
+    ]
+   },
+   {
+    "applied": [
+     3
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-26-P4"
+    ]
+   },
+   {
+    "applied": [
+     4
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A7-CL"
+    ]
+   },
+   {
+    "applied": [
+     5
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A1e",
+     "R-A3a"
+    ]
+   },
+   {
+    "applied": [
+     6
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-ITEM21"
+    ]
+   },
+   {
+    "applied": [
+     7
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-1"
+    ]
+   },
+   {
+    "applied": [
+     8
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "LCL-C-10-2"
+    ]
+   },
+   {
+    "applied": [
+     9
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A4a"
+    ]
+   },
+   {
+    "applied": [
+     10
+    ],
+    "outcome": "REPAIRED_EXACT",
+    "repair": [
+     "R-A1b",
+     "R-A1c",
+     "R-A1d"
+    ]
+   }
+  ],
+  "pass": true
+ }
+}

@@ -1,0 +1,1483 @@
+{
+ "pass": "5",
+ "what": "land.py plan --no-ops on the 51 bodies with edits and land.py check on the 5 untouched, on fresh fetches, with the new registry (97bda1a0...) and the full patched skills root ($PKG, freeze 323 047ca742...), plus, per plan body and in memory on the same fetch, the landing-state proof (P-88); graph_check.py --simulate for QA-110 and QA-80",
+ "run": "2026-09-24, main session",
+ "candidate_url": "https://app.notion.com/p/00000000000000000000000000000000 (placeholder of the right form)",
+ "finding_during_pass": {
+  "QA-10 first run": "state proof FAILED: on the landed text R-OWN read MIXED (relanded_not_LANDED ['R-OWN']), because LQA-10-P03 rewrites the sentence R-OWN is anchored after; 36 partials, 12 repaired exact, 24 refused, 0 wrong",
+  "fix": "closeout_rules.OWN_AT['QA-10'] matches that sentence before or after LQA-10-P03 (P-88); read only for QA-10, so the 50 other rows, run before the fix, are unaffected",
+  "QA-10 re-run": "state proof passes; 24 repaired exact, 12 refused, 0 wrong (the row below)"
+ },
+ "longest_non_path_string": 246,
+ "totals": {
+  "bodies": 56,
+  "plan_pass": 51,
+  "check_pass": 5,
+  "graph_check_pass": true,
+  "refusals": 0,
+  "pristine_not_landed": 51,
+  "relanded_all_landed": 51,
+  "no_doubled": 51,
+  "partials": 516,
+  "partials_repaired_exact": 450,
+  "partials_refused": 66,
+  "partials_repaired_wrong": 0
+ },
+ "rows": [
+  {
+   "batch": "P1",
+   "pid": "CF-C-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:19:42.836Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-C-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:26:41.035Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-C-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:27:04.309Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-C-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:27:38.648Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-E-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:28:00.706Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-E-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:28:31.604Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-E-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:28:53.874Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-E-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:29:19.497Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P1",
+   "pid": "CF-PO-10",
+   "mode": "check",
+   "exit": 0,
+   "refused": null,
+   "precheck": null,
+   "landed_check": true,
+   "repair": null,
+   "ops_count": null,
+   "fetched": "2026-09-23T13:19:43.641Z",
+   "proof": null
+  },
+  {
+   "batch": "P1",
+   "pid": "MGR-10",
+   "mode": "check",
+   "exit": 0,
+   "refused": null,
+   "precheck": null,
+   "landed_check": true,
+   "repair": null,
+   "ops_count": null,
+   "fetched": "2026-09-23T13:29:42.793Z",
+   "proof": null
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 10,
+   "fetched": "2026-09-23T13:26:57.675Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 10,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 20,
+    "partials_repaired_exact": 20,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 10,
+   "fetched": "2026-09-23T13:27:36.082Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 10,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 20,
+    "partials_repaired_exact": 20,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 5,
+   "fetched": "2026-09-23T13:28:08.922Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 5,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 10,
+    "partials_repaired_exact": 10,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-C-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 11,
+   "fetched": "2026-09-23T13:28:52.686Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 11,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 22,
+    "partials_repaired_exact": 22,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-E-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 11,
+   "fetched": "2026-09-23T13:29:31.478Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 11,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 22,
+    "partials_repaired_exact": 22,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-E-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:30:03.477Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-E-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:30:45.395Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "CL-E-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:19:58.391Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "PR-50",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:20:56.986Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P2",
+   "pid": "UTIL-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:23:01.028Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "DOC-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 5,
+   "fetched": "2026-09-23T13:20:42.669Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 5,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 10,
+    "partials_repaired_exact": 10,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "DOC-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 7,
+   "fetched": "2026-09-23T13:16:52.823Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 7,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 14,
+    "partials_repaired_exact": 14,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "ESC-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:21:16.736Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "ESC-25",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 4,
+   "fetched": "2026-09-23T13:21:49.906Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 4,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 8,
+    "partials_repaired_exact": 8,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "ESC-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:22:21.293Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "ESC-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:22:59.282Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "IA-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:23:51.013Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "IA-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 1,
+   "fetched": "2026-09-23T13:19:57.694Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 1,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 1,
+    "partials_repaired_exact": 1,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "IA-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:20:30.041Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P3",
+   "pid": "IA-40",
+   "mode": "check",
+   "exit": 0,
+   "refused": null,
+   "precheck": null,
+   "landed_check": true,
+   "repair": null,
+   "ops_count": null,
+   "fetched": "2026-09-23T13:20:55.193Z",
+   "proof": null
+  },
+  {
+   "batch": "P3",
+   "pid": "IA-50",
+   "mode": "check",
+   "exit": 0,
+   "refused": null,
+   "precheck": null,
+   "landed_check": true,
+   "repair": null,
+   "ops_count": null,
+   "fetched": "2026-09-23T13:21:22.132Z",
+   "proof": null
+  },
+  {
+   "batch": "P3",
+   "pid": "IA-60",
+   "mode": "check",
+   "exit": 0,
+   "refused": null,
+   "precheck": null,
+   "landed_check": true,
+   "repair": null,
+   "ops_count": null,
+   "fetched": "2026-09-23T13:21:46.154Z",
+   "proof": null
+  },
+  {
+   "batch": "P4",
+   "pid": "GCFPE-MGMT-10-PROPOSED",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T00:49:47.074Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "GCFPE-MGMT-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-21T22:56:04.638Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "OPS-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 10,
+   "fetched": "2026-09-23T13:22:32.873Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 10,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 20,
+    "partials_repaired_exact": 12,
+    "partials_refused": 8,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "OPS-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 9,
+   "fetched": "2026-09-23T13:23:01.175Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 9,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 18,
+    "partials_repaired_exact": 10,
+    "partials_refused": 8,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "OPS-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 15,
+   "fetched": "2026-09-23T13:20:36.022Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 15,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 30,
+    "partials_repaired_exact": 20,
+    "partials_refused": 10,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "PR-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 11,
+   "fetched": "2026-09-23T13:19:20.837Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 11,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 22,
+    "partials_repaired_exact": 22,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "RS-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:21:44.109Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P4",
+   "pid": "RS-30",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:22:37.041Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P5",
+   "pid": "PR-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 15,
+   "fetched": "2026-09-23T13:19:07.698Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 15,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 30,
+    "partials_repaired_exact": 22,
+    "partials_refused": 8,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P5",
+   "pid": "PR-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 19,
+   "fetched": "2026-09-23T13:19:18.271Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 19,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 38,
+    "partials_repaired_exact": 30,
+    "partials_refused": 8,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P5",
+   "pid": "PR-35",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 8,
+   "fetched": "2026-09-23T13:19:01.920Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 8,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 16,
+    "partials_repaired_exact": 16,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P5",
+   "pid": "PR-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 23,
+   "fetched": "2026-09-23T13:19:20.724Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 23,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 46,
+    "partials_repaired_exact": 34,
+    "partials_refused": 12,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P5",
+   "pid": "RS-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 4,
+   "fetched": "2026-09-23T13:22:10.719Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 4,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 8,
+    "partials_repaired_exact": 8,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P5",
+   "pid": "RS-40",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:19:10.807Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-10",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 18,
+   "fetched": "2026-09-23T13:21:56.515Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 18,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 36,
+    "partials_repaired_exact": 24,
+    "partials_refused": 12,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-100",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:22:31.666Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-110",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:22:53.747Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-120",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:23:26.846Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-20",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:23:53.729Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-50",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:24:32.097Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-60",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:19:43.022Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-70",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:20:13.280Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-80",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 3,
+   "fetched": "2026-09-23T13:20:40.037Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 3,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 6,
+    "partials_repaired_exact": 6,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "QA-90",
+   "mode": "plan",
+   "exit": 0,
+   "refused": null,
+   "precheck": true,
+   "landed_check": true,
+   "repair": [],
+   "ops_count": 2,
+   "fetched": "2026-09-23T13:21:06.317Z",
+   "proof": {
+    "pristine_states": [
+     "NOT_LANDED"
+    ],
+    "ops": 2,
+    "relanded_all_LANDED": true,
+    "relanded_not_LANDED": [],
+    "landed_fn": true,
+    "doubled_in_landed": [],
+    "partials": 4,
+    "partials_repaired_exact": 4,
+    "partials_refused": 0,
+    "partials_repaired_wrong": 0,
+    "pass": true
+   }
+  },
+  {
+   "batch": "P6",
+   "pid": "graph_check",
+   "mode": "graph",
+   "exit": 0,
+   "refused": null,
+   "precheck": null,
+   "landed_check": true,
+   "repair": null,
+   "ops_count": null,
+   "fetched": null,
+   "proof": null
+  }
+ ]
+}

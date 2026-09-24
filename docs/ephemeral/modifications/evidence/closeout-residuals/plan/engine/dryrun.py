@@ -99,14 +99,18 @@ def latest_body(page):
                 m = re.search(r"<content>\n?(.*)</content>", inner, re.S)
                 if m:
                     ts = re.search(r"as of (\S+):", inner)
-                    cand = ((ts.group(1) if ts else "", entry_ts or ""), m.group(1), f)
+                    # P-88: the newest capture wins. A tool-results file has no entry timestamp, so its capture time
+                    # is the file's mtime; a page's "as of" need not advance when it is edited.
+                    captured = entry_ts if f.endswith(".jsonl") else datetime.fromtimestamp(
+                        os.path.getmtime(f), timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+                    cand = ((captured or "", ts.group(1) if ts else ""), m.group(1), f)
                     if best is None or cand[0] >= best[0]:
                         best = cand
     if best is None:
-        raise SystemExit(json.dumps({"page": page, "error": "NO_FETCH_FOUND"}))
+        raise SystemExit(json.dumps({"page": page, "error": "NO_FETCH_FOUND", "harness_root": ROOT}))
     global SOURCE
     SOURCE = best[2]
-    return best[0][0], best[1]
+    return best[0][1], best[1]
 
 
 def ops_for(old, new):
@@ -170,7 +174,7 @@ def main():
     ap.add_argument("page")
     ap.add_argument("--registry", default=str(C.REPO / "docs/prompt_ecosystem_management/project-prompt-contract-registry.md"))
     ap.add_argument("--guards", default=str(HERE.parent / "registry/row_assertions.json"))
-    ap.add_argument("--skills", default=str(INSTALLED), help="at PLAN the final trial tree; at EXECUTE the patched tree (X3.1)")
+    ap.add_argument("--skills", default=str(INSTALLED), help="at PLAN the final trial tree; at EXECUTE the patched tree ($PKG, built at X1.1)")
     ap.add_argument("--since-minutes", type=int, default=30)
     ap.add_argument("--candidate-url", help="fills {{CANDIDATE_CRD_LIST_URL}} (R-ITEM18); a dry run may use a well-formed stand-in")
     a = ap.parse_args()
