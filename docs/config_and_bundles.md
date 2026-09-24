@@ -2,6 +2,7 @@
 
 ## Governed config artifacts (D5)
 - Generated with `python tools/config/generate_config_artifacts.py` under closed rails (determinism helper required).
+- `python tools/config/generate_config_artifacts.py --compare-goldens <candidate-root>` is the read-only Magic-10 golden comparison mode (HDE-EPIC040-PR05): it admits the explicit candidate root through the admission owner, runs `tests/fixtures/magic10/v1/goldens.json` (PF01 §9.5 M10-G001–G008) through the canonical kernel and application entrypoints, reports every mismatch, and cannot write, activate or generate anything; `--report <external path>` saves the complete report.
 - Current governed files include `config/bands_4B60_v1.json` and `config/toggles_v1.json` (Magic-10 banding and feature toggles).
 - Governed outputs must be path-proofed and indexed (`docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`). No manual edits.
 - Acceptance mapping: `audit/EPIC-018_config_acceptance_map.json` links PF09 tasks to config artifacts, tokens, and tests; treat it as governed evidence with `.path_proof.txt`.

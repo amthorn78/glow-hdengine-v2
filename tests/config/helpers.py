@@ -47,11 +47,10 @@ def catalog_root(tmp_path: Path, *, source_root: Path | None = None) -> Path:
     return tmp_path
 
 
-_SYNTHETIC_PLACEHOLDERS = {
-    "tools/bodygraph/check_magic10_gate_readiness.py": (
-        b'"""Synthetic nonfunctional future-owner placeholder."""\n'
-    ),
-}
+# HDE-EPIC040-PR05 landed the last future-owner member
+# (tools/bodygraph/check_magic10_gate_readiness.py), so the synthetic release
+# now copies every roster member's real bytes; no placeholder remains.
+_SYNTHETIC_PLACEHOLDERS: dict[str, bytes] = {}
 
 _SYNTHETIC_FUTURE_CANONICAL_JSON = {
     "adapter/schemas/error_v1.schema.json",

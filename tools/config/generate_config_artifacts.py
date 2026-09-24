@@ -6,6 +6,7 @@ import copy
 import hashlib
 import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import Mapping
 
@@ -16,8 +17,9 @@ if str(ROOT) not in sys.path:
 from engine.config.registry_loader import _capture_registry_config, _capture_mechanics_config  # noqa: E402
 from engine.serializer import canon  # noqa: E402
 from tools.config.artifacts import (  # noqa: E402
-    BAND_EDGES_PATH, MAGIC10_CONFIG_PATH, build_band_edges,
-    build_magic10_config, require_closed_rails, _destination_state, _publish_prepared,
+    BAND_EDGES_PATH, GOLDENS_DEFAULT_PATH, MAGIC10_CONFIG_PATH, GoldenComparisonRefusal,
+    build_band_edges, build_magic10_config, compare_goldens, render_golden_report,
+    require_closed_rails, _destination_state, _publish_prepared,
 )
 from tools.generate_registry_report import REPORT_PATH, _build_registry_report, _verify_report_source  # noqa: E402
 
@@ -259,13 +261,81 @@ def publish_config_family(root: Path | None = None) -> None:
                                   produce=produce, verify=verify, source_verify=source_verify)
 
 
+# ---------------------------------------------------------------------------
+# HDE-EPIC040-PR05: read-only golden comparison mode.  It dispatches only to
+# ``compare_goldens``/``render_golden_report`` and the external report writer;
+# it never reaches the generation, check or publication paths above.
+# ---------------------------------------------------------------------------
+GOLDEN_COMPARISON_MISMATCH_EXIT_CODE = 1
+GOLDEN_COMPARISON_REFUSAL_EXIT_CODE = 5
+
+
+def _golden_report_destination(report_path: Path, candidate_root: Path) -> Path:
+    """Refuse a report path inside the candidate root or the repository, or unsafe on disk."""
+    parent = Path(os.path.realpath(Path(os.path.abspath(report_path)).parent))
+    destination = parent / Path(report_path).name
+    forbidden = (Path(os.path.realpath(candidate_root)), Path(os.path.realpath(ROOT)))
+    if (not destination.name or destination.name in {".", ".."} or not parent.is_dir()
+            or destination.is_symlink() or (destination.exists() and not destination.is_file())
+            or any(destination == root or destination.is_relative_to(root) for root in forbidden)):
+        raise GoldenComparisonRefusal("REPORT_PATH_INVALID")
+    return destination
+
+
+def _write_golden_report(destination: Path, payload: bytes) -> None:
+    descriptor, temporary = tempfile.mkstemp(dir=destination.parent, prefix=".golden-report-", suffix=".tmp")
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(payload)
+        os.replace(temporary, destination)
+    except BaseException:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+        raise
+
+
+def _compare_goldens_main(candidate_root: Path, goldens: Path, report: Path | None) -> int:
+    try:
+        try:
+            require_closed_rails()
+        except SystemExit as exc:
+            raise GoldenComparisonRefusal(str(exc.code)) from None
+        destination = _golden_report_destination(report, candidate_root) if report is not None else None
+        result = compare_goldens(candidate_root, goldens)
+        payload = render_golden_report(result)
+        if destination is not None:
+            _write_golden_report(destination, payload)
+    except GoldenComparisonRefusal as exc:
+        sys.stderr.write(f"{exc.code}\n")
+        return GOLDEN_COMPARISON_REFUSAL_EXIT_CODE
+    if result.ok:
+        sys.stdout.buffer.write(payload)
+        sys.stdout.flush()
+        return 0
+    sys.stderr.write(f"GOLDEN_COMPARISON_MISMATCH:{len(result.mismatches)}\n")
+    return GOLDEN_COMPARISON_MISMATCH_EXIT_CODE
+
+
 def _main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Generate governed config artifacts under closed rails")
     parser.add_argument("--allow-aliases", action="store_true", help="Enable explicit input-only alias allow-list mode")
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument("--check", action="store_true", help="Validate committed three-primary bytes without writing")
     modes.add_argument("--publish-family", action="store_true", help="Publish the scoped config, catalog logs, bundles and required evidence companions from this checkout")
+    modes.add_argument("--compare-goldens", metavar="CANDIDATE_ROOT", help="Read-only: admit the explicit candidate root and compare the PF01 §9.5 golden collection through the canonical entrypoints; exit 0 on match, 1 on mismatch, 5 on refusal")
+    parser.add_argument("--goldens", metavar="PATH", help="Golden collection for --compare-goldens (default: tests/fixtures/magic10/v1/goldens.json)")
+    parser.add_argument("--report", metavar="PATH", help="With --compare-goldens: write the complete canonical report to this path outside the candidate root and the repository")
     args = parser.parse_args(argv)
+    if args.compare_goldens is not None:
+        if args.allow_aliases:
+            parser.error("--compare-goldens requires the canonical goldens without aliases")
+        return _compare_goldens_main(
+            Path(args.compare_goldens),
+            Path(args.goldens) if args.goldens else GOLDENS_DEFAULT_PATH,
+            Path(args.report) if args.report else None,
+        )
+    if args.goldens or args.report:
+        parser.error("--goldens and --report apply only to --compare-goldens")
     if args.publish_family:
         if args.allow_aliases:
             parser.error("--publish-family requires the canonical source without aliases")
