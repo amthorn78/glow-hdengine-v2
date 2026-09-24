@@ -1,0 +1,220 @@
+{
+ "governing_rules": [
+  {
+   "rule": "Template rule 3: scope freezes at ANALYZE approval; 'This is what bounds the review loops'; out-of-scope findings go to the Modification Backlog",
+   "where": "docs/prompt_ecosystem_management/modification-template.md:40-44; the same claim is in D20 consequences (gcfpe.decision-record.md:1071-1073), the redesign analysis §3.1 (GCFPE-MGMT-REDESIGN-ANALYSIS-v1.0.md:227-244) and modification_validate.py:335",
+   "authored_by": "PE36 main session (71511b9 on 2026-09-22 and a63bf80 on 2026-09-23, session_01Aniz3...). The Modification session added the Backlog sentence at :43-44 (c2fbf3c).",
+   "how_it_contributed": "The freeze held: no item was added after 21:05 (RCA §6). The PLAN loop ran anyway, because all the growth was in machinery (spec 190,729 to 425,130 B, §3 up only 2.7%), which the freeze does not reach. The rule's claim to bound loops gave false assurance. The redesign's RC6 (:162-175) named non-converging review loops, and its only fix was this freeze. The rule also offers no disposition for an in-scope NON_BLOCKING finding, since the Backlog takes only out-of-scope findings. So every in-scope finding was repaired: of 132 disposition rows, none was declined (RCA RC4). RCA RC6 confirmed.",
+   "evidence": "modification-template.md:40-44; RCA-20260924 §4 RC6 and §6; process-review.json analyses[1].tables[1] (section growth); redesign :162-175 and :238-240 ('This is what stops twenty review rounds')",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Replace 'This is what bounds the review loops' with 'It bounds scope, not review rounds; rule 8 bounds those'. Add rule 8 (the PLAN review cap, see stopping rules). Allow an in-scope NON_BLOCKING finding the disposition ACCEPTED_RISK, listed in the approval request. Record the D20 correction as a successor note, not an in-place edit (AUTH-001)."
+  },
+  {
+   "rule": "Template rule 6 (a part lands whole or not at all; roll back what was applied), its validator check, and its interaction with D22 (no copy of a body, so no rollback journal)",
+   "where": "modification-template.md:49-50; modification_validate.py:188-197, which fires at COMPLETE or BLOCKED (:278-279); D21-B at gcfpe.decision-record.md:1120-1123; D22 at gcfpe.decision-record.md:1160-1230",
+   "authored_by": "Rule 6 and the validator: PE36 main session (a63bf80). D22: the Modification session (d848942, 2026-09-23), recording Nathan's ruling. Its 'Status' successor is 77d98dd.",
+   "how_it_contributed": "Rolling back 51 live Notion bodies needs their prior text, and D22 forbids keeping it. Repair round 2 added a rollback journal. Round 3 found that it breaches D22 (R3-03). The session then replaced it with a single landing unit for all 17 parts, a stop sweep, a stop record, a restoration check, a lift and an end route. The validator's half-applied check pushed the design toward automated reversal: the plan keeps a stopped unit's record at EXECUTING. Round 3's reviewers named the lighter route (a Product Owner ruling for a transient journal), and the session never asked Nathan. 47 of the 52 required findings in rounds 3 to 8 sit in these areas (inferred classification). D22 itself held, and no body was copied.",
+   "evidence": "RCA §4 RC2 and §6 ('D22 held throughout'); defects-by-round.csv R3-03 and R3-05; MODIFICATION-20260923-closeout-residuals.md:807-817 (P-57, P-58 revised again, 'No rollback journal')",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add to rule 6: 'Where a rollback would need a copy of a Notion body that D22 forbids, the rollback is Nathan's restoration from Notion page history. A read-only sweep lists the pages. The record stays EXECUTING until he has restored them, and the plan automates nothing further.' Keep D22 unchanged."
+  },
+  {
+   "rule": "Template §P standard: 'A plan is complete when it could be executed mechanically with no interpretation'",
+   "where": "modification-template.md:172-174; its origin is the redesign's PLAN closure test (GCFPE-MGMT-REDESIGN-ANALYSIS-v1.0.md:443-446)",
+   "authored_by": "PE36 main session (71511b9; wording in a63bf80)",
+   "how_it_contributed": "The session applied the standard to every recovery branch. Each recovery written to it is itself a set of steps that can fail or lose its session, so the standard has no fixed point there. The §9 preamble grew from 56 to 3,019 words, and P-112 alone runs to 2,338 words. The standard was also justified: the AF plan was approved without meeting it, and the AF EXECUTE preflight showed that plan would fail (Amendment 1 table, AF record :745-760).",
+   "evidence": "RCA RC6 and §3 ('Where the growth went'); MODIFICATION-20260923-alpha-feedback-open-entries.md:745-760",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Append: '...on its normal path. A failure path must end in: commit the failure record, stop, return to Nathan. It need not be automated.'"
+  },
+  {
+   "rule": "Template rule 4: every §P step carries a verification that could fail",
+   "where": "modification-template.md:45-46",
+   "authored_by": "PE36 main session (71511b9)",
+   "how_it_contributed": "The effect was small and indirect (inferred). Every added recovery step needed its own failing check, which fed the must-fail proofs in spec §8.7 and the growth of §8 from 2,140 to 30,562 B. The rule is sound. The AF §P steps whose verification was 'package review' or 'scratch copy' (AF record :629-653) are exactly what the preflight caught.",
+   "evidence": "process-review.json analyses[1].findings[14] (§8 growth); AF record :629-653",
+   "recovery_class": "KEEP",
+   "smallest_patch": "None"
+  },
+  {
+   "rule": "Template rule 5: every §E step and item carries a disposition; 'Silence is impossible by construction'",
+   "where": "modification-template.md:47-48",
+   "authored_by": "PE36 main session (71511b9)",
+   "how_it_contributed": "The rule governs §E, but reviewers applied it to plan design. It meant every failure path needed a planned, automated disposition route, which is one of the three 'real gaps' behind the machinery (RCA RC2; process-review critiques[1].missing[0]).",
+   "evidence": "RCA RC2 ('rule 5: every step gets a disposition'); process-review.json critiques[1].missing[0]",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add: 'A stop is a disposition. Steps after it are recorded NOT_RUN with a reference to the stop, and the plan need not route each one.'"
+  },
+  {
+   "rule": "Template rule 1: a mode that believes an upstream section is wrong 'records a finding and returns'",
+   "where": "modification-template.md:32-35",
+   "authored_by": "PE36 main session (cacd5a1)",
+   "how_it_contributed": "PLAN recorded 7 findings against §A, including a change to §A's freeze window, and kept going. The session read the rule as 'do not edit upstream': the record says 'not edited here (template rule 1)'. It did not read the rule as 'return to Nathan'. The ambiguity plausibly let a trigger pass that would have reached Nathan around 00:32 (inferred).",
+   "evidence": "MODIFICATION-20260923-closeout-residuals.md:909-918; RCA RC5 ('A governing trigger to return was missed')",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Change 'and returns' to 'and returns to the Product Owner with a DECISION NEEDED before continuing'."
+  },
+  {
+   "rule": "interaction_cost formula: open rulings + 2 + review cycles + installs + merges",
+   "where": "modification-template.md:161-166",
+   "authored_by": "PE36 main session (71511b9; text at :165-166 in a63bf80)",
+   "how_it_contributed": "'Review cycles' counts only the D24 skill review. The eight PLAN rounds therefore cost nothing on paper: the plan's cost stayed at 12 (closeout record :920-930). The AF run predicted 11 and took 29, and the only recalibration was '+1 per extra round' in ANALYZE (closeout record :681). The formula carries no time or token price, so the approved estimate of '1-2M tokens, about an hour' was never re-checked.",
+   "evidence": "RCA RC6 and RC5 ('never re-priced'); AF record :1157-1190; closeout record :665-682 and :920-930",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Count ANALYZE and PLAN review rounds in 'review cycles', and require §A and §P to state a time and token estimate that later reports are compared against."
+  },
+  {
+   "rule": "D20: the redesign rulings, including 'Scope freezes... This is the rule that bounds the review loops' and 'The pilot is not optional'",
+   "where": "gcfpe.decision-record.md:1021-1091",
+   "authored_by": "PE36 main session (71511b9), recording Nathan's rulings of 2026-09-22",
+   "how_it_contributed": "D20 made scope freeze the only answer to the loop problem the audit had measured (RC6: twenty rounds on PR #425). It required a pilot, but PLAN and EXECUTE were never piloted. The first real use of PLAN and EXECUTE was the live change to all 55 bodies and 6 skills, and the second was a 40-item follow-up. Both ran under the proposed, unpromoted MGMT-10 body.",
+   "evidence": "gcfpe.decision-record.md:1071-1073 and :1089-1090; redesign :162-175",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add a D20 successor note: the scope freeze bounds scope only, and review rounds are bounded by template rule 8. The rulings D20-A to D20-C stand."
+  },
+  {
+   "rule": "Redesign analysis stages 4 and 5: pilot on 'one real, small, already-known change', then 'fix what the pilot exposes; only then declare the model standing'",
+   "where": "docs/ephemeral/pe36.mgmt-redesign/GCFPE-MGMT-REDESIGN-ANALYSIS-v1.0.md:680-688 and :789-833; PILOT-FINDINGS-stage4.md",
+   "authored_by": "PE36 main session (71511b9, later cacd5a1 and a63bf80)",
+   "how_it_contributed": "The stage 4 pilot (AF-005) ran ANALYZE only and ended ABANDONED (MODIFICATION-20260922-af005...md:4). Stage 5 never ran. The AF Modification (55 live bodies, 6 packages, a new R1 oracle successor) and then closeout-residuals (40 items, 17 parts) became the pilot at full size. Correction to RCA RC7: the unpiloted process was already at full size in the AF run, whose PLAN was approved but not executable. The closeout PLAN's over-review followed that under-review (inferred).",
+   "evidence": "MODIFICATION-20260922-af005-workspace-currency-hardening.md:4 (status ABANDONED) and :26-29 (no approvals); redesign :680-688; AF record :745-760",
+   "recovery_class": "DEFER",
+   "smallest_patch": "Record the AF and closeout-residuals runs as the stage 4 evidence. Make stage 5 the single vehicle for the rule patches listed here. Do not declare the model standing, or promote the MGMT-10 body, until stage 5 lands."
+  },
+  {
+   "rule": "D21-D (one session carries the whole process) and D21-E (delegate by workload, never by change)",
+   "where": "gcfpe.decision-record.md:1128-1133; template rule 2 at modification-template.md:36-39 ('a fresh one resume it')",
+   "authored_by": "PE36 main session (a63bf80), recording Nathan's 2026-09-23 direction",
+   "how_it_contributed": "One session ran 14 h 44 m. During PLAN it made 1,058 turns and was compacted 7 times, and the compaction summaries turned 'continue when the review is done' into 'repaired until clean' (RCA RC1). Rule 2's promise that a fresh session can resume fed P-78, 'Any step can run in a new session', and its idempotence, lease and routing machinery. D21-E was not followed: PLAN ran 87 subagents, each round had 3 lenses and 3 verifiers, and 25-33% of the reports were duplicates (RC9).",
+   "evidence": "RCA §3, RC1, RC2 and RC9; process-review.json synthesis.root_causes[0]",
+   "recovery_class": "KEEP",
+   "smallest_patch": "None to D21. Put the compaction-faithfulness rule in session-working-rules.md (see below)."
+  },
+  {
+   "rule": "D24 condition 5 ('Any SKILL_REPAIR_REQUIRED finding is repaired and re-reviewed by fresh reviewers') and condition 6 (a verdict is scoped to exact bytes), with template rule 7 (one package set, one review)",
+   "where": "gcfpe.decision-record.md:1459-1476; modification-template.md:51-56",
+   "authored_by": "D24: the Modification session (d848942), recording Nathan's ruling. Rule 7: PE36 main session (cacd5a1, a63bf80).",
+   "how_it_contributed": "Nothing caps condition 5. There is no round limit, no severity threshold (the verdict is binary), and one dissenting reviewer forces a full round. Any byte change, even optional hardening, voids a confirmation, and fresh reviewers raise new residuals each round. The AF skill review ran a1 to a5, with all six packages in each round. It stayed bounded only because Nathan approved each repair set, which is why interaction cost went from 11 to 29. In the closeout PLAN, condition 5 also produced machinery and findings: R5-03 (D24 verdicts lost), R5-07 (the D24 brief) and R8-03 (a rejection could be re-rolled). The redesign's RC6 (:167-170) had already named the byte-scope mechanism as the cause of looping.",
+   "evidence": "SECTION-10-REVIEW-a1..a5 verdict lines; AF record :1112 (E5 row) and :1175-1180; round8-review-results.json via RCA §8 item 3; redesign :167-170",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add to condition 5: 'After two consecutive SKILL_REPAIR_REQUIRED rounds, the next round goes to Nathan as a DECISION NEEDED, with the trend, before it is run. Non-blocking findings from a round in which both reviewers confirm go to the Backlog by default. Folding them in voids the confirmation and is priced as at least one further round.'"
+  },
+  {
+   "rule": "DISP-001 ('Drive every finding to resolution in the session that finds it, or name the specific Product Owner decision it needs') and Definition of done item 6, 'No open findings'",
+   "where": "docs/prompt_ecosystem_management/ecosystem-change-management.md:217-224 and :307-308",
+   "authored_by": "PE31-era sessions (a46cef5, 2026-09-18), recording Nathan's rule of 2026-09-18",
+   "how_it_contributed": "The session never cited either rule (inferred influence). Both can be read as 'repair everything', and nothing was declined in the 132 disposition rows. Both of round 8's plausible-path regressions came from repairing findings the reviews had not required. The rule already has an exit the session did not use: naming the Product Owner decision. Item 6 is a done-criterion for a completed change, not a PLAN exit. The hardening in round a3 may also reflect this pressure (inferred), although Nathan chose it.",
+   "evidence": "ecosystem-change-management.md:217-224 and :307-308; RCA RC4; reviewer-prompt-template.md:100, which already lists 'declined with reasoning' as a disposition",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add to DISP-001: 'A finding is resolved when it is fixed, declined with reasoning, or listed as an accepted risk in an approval request Nathan approves. This applies at the close of a change, not at each review round.'"
+  },
+  {
+   "rule": "session-working-rules.md: worker communication rules 1-9; it has no loop, compaction or budget rule",
+   "where": "docs/prompt_ecosystem_management/session-working-rules.md:73-104",
+   "authored_by": "PE35 (e14ed79, 2026-09-21), with later edits in 3e943ad, 5b565bb and 77d98dd (Modification session close-out)",
+   "how_it_contributed": "The file has no rule that bounds a loop, re-prices an estimate, or keeps compaction summaries faithful. The rules it does have were broken without any mechanical trigger. Rule 6 says corrections come once, first: the gate change at 00:32 was never headlined. Rule 9 says length is a defect: 14 reports ran 974-2,656 characters. The glow-po-reporting skill ('one to three lines', 'Corrections come first') was broken in the same way.",
+   "evidence": "RCA RC5 and RC1; the installed glow-po-reporting SKILL.md:53 and :85-89",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add three rules: (a) the non-convergence and budget trigger (stopping rules 2 and 3); (b) a compaction summary quotes the session's commitment and Nathan's reply verbatim, and labels every exit rule with who set it; (c) a status update inside a loop carries the trend and an option to stop."
+  },
+  {
+   "rule": "reviewer-prompt-template.md: skill-review only; binary verdict; §6 'what to attack, weakest first'; committed before spawn (D24)",
+   "where": "docs/prompt_ecosystem_management/reviewer-prompt-template.md:18-19, :54-58 and :93-102",
+   "authored_by": "PE35 (e14ed79); D24 edits by the Modification session (d848942)",
+   "how_it_contributed": "No canonical PLAN-review brief exists. The session wrote its own PLAN review prompts and never committed them. They said 'Try hard to find real defects', defined REQUIRED with no test of likelihood, re-used the reviewer prompt as the verifier with no refute-by-default, and widened the attack each round: failure and resume terms went from 0 to 59, and from round 5 the prompts quoted earlier yields. The template's 'attack the weakest first' was followed and is sound. The missing rubric, cap and exit rule are the defect, not the template.",
+   "evidence": "RCA RC3; process-review.json synthesis.key_numbers[20] ('Try hard' in every PLAN script and absent from the ANALYZE scripts)",
+   "recovery_class": "KEEP_PATCH",
+   "smallest_patch": "Add a PLAN-review variant. REQUIRED covers only: a defect on the normal path; a silent wrong edit; a silent breach of a Product Owner ruling; or a plausible path with a silent or destructive outcome. A loud stop that returns to Nathan is listed, not required. Verifiers refute by default. The variant carries the cap and exit rule, and is committed before the reviewers are spawned."
+  },
+  {
+   "rule": "Session-set PLAN exit rule: 'I'll bring you the plan once that review is clean' (zero REQUIRED findings), repeated from 00:32 to 07:46",
+   "where": "Session transcript at 00:32:28, 02:03:08 and 07:46:10 (RCA §2); compaction summaries from 00:56 on; not in any committed governing document",
+   "authored_by": "The closeout-residuals Modification session (session_01T8Rdzm...)",
+   "how_it_contributed": "This was the primary driver (RC1). All 23 lens verdicts were NEEDS_REPAIR, so zero was the only way out. It tightened what Nathan had approved at 00:13 ('continue when the review is done', given against one review, then repair, then approval).",
+   "evidence": "RCA §2 and RC1; process-review.json analyses[1].tables[3]",
+   "recovery_class": "SELECTIVE_REVERT",
+   "smallest_patch": "Drop the rule. Keep the plan content: §3 has been stable since repair round 6, and pass 4 onward passed 51 of 51 bodies. Replace the rule with the cap: fix the four round-8 defects, run one diff-only check under the new rubric, and present the plan with every open finding listed."
+  },
+  {
+   "rule": "execution-and-delegation-model.md §1 ('Opus, for every parallel agent'; depth follows the coordinating session's configuration) and §0A ('One gate')",
+   "where": "docs/prompt_ecosystem_management/execution-and-delegation-model.md:132-150 and :22-66",
+   "authored_by": "PE31-era sessions (a46cef5); the D23 scope line by the Modification session (d848942)",
+   "how_it_contributed": "§1 carried the session's highest setting to all 87 PLAN subagents, with no per-agent way to lower it. That multiplied cost but did not set the loop (inferred). §0A's 'one gate' principle, that re-checking the same concerns with different eyes causes inconsistency, is the opposite of what the PLAN rounds did. The rule was not followed rather than defective.",
+   "evidence": "execution-and-delegation-model.md:145-150 and :54-60; RCA §3 (87 subagents)",
+   "recovery_class": "KEEP",
+   "smallest_patch": "None"
+  },
+  {
+   "rule": "AGENTS.md 'Codex reasoning and execution posture': use the highest reasoning effort for every complex task",
+   "where": "AGENTS.md:3-7",
+   "authored_by": "f4180b6 (2026-08-02, PR #384; addressed to Codex)",
+   "how_it_contributed": "No evidence shows the session applied this rule to its own configuration or to Ultracode. It is the only committed text that points toward a maximal setting.",
+   "evidence": "AGENTS.md:3-7; no citation of it in the RCA or process-review.json",
+   "recovery_class": "UNKNOWN",
+   "smallest_patch": "None now. Stage 5 could state that routine GCFPE maintenance uses a standard configuration unless an escalation trigger fires."
+  },
+  {
+   "rule": "D23: 'where a plan proves incomplete, the part returns to PLAN' (the route that produced AF Amendment 1)",
+   "where": "MODIFICATION-20260923-alpha-feedback-open-entries.md:707-709, citing D23 (gcfpe.decision-record.md:1231 and after)",
+   "authored_by": "Modification session (d848942)",
+   "how_it_contributed": "It sent the non-executable AF plan back to Nathan after one preflight and one critique round. That is a bounded return with 8 rulings, and it worked. It shows that a plan defect found early can go to Nathan without a loop.",
+   "evidence": "AF record :703-760 and :1053-1060",
+   "recovery_class": "KEEP",
+   "smallest_patch": "None"
+  }
+ ],
+ "review_loops": [
+  {
+   "loop": "AF Modification EXECUTE preflight and critique (wf_c18f4ad8-bae, wf_d3847211-6a7), 2026-09-23",
+   "rounds": "2: four surface readers (121 findings), then three critics of the Amendment 1 draft (77 findings, 5 of them blockers). 198 findings in all, each given a disposition in spec v1 §1.",
+   "material_findings": "The plan as approved would have failed. In simulation it produced 18 validator error codes and failed 48 of the 172 fixture cases. There was no generator for the contract's 'regenerate, never hand-edit' step. The R1 re-pin was impossible in place (155 digest formulas tried). No order of body edits and installs kept the ecosystem green. Two more skills restated reversed rules. The governance-audit CLI hashes bodies. D23-E had no guard. Whole-line replacements would have deleted kept rules. Source: AF record :745-760.",
+   "cosmetic_findings": "Some reader rows were WOULD_PASS or UNCERTAIN. Examples are fv-main:6, :7, :19 and :28 (preflight-2026-09-23.md:177-707). The coverage critic mapped 90 of the 121 findings as correctly placed and 31 not.",
+   "continued_after_clean": "No. After two rounds the plan went back to Nathan as Amendment 1 with 8 rulings, and he approved it.",
+   "value_vs_cost": "High. It stopped a live EXECUTE over 55 bodies and 6 skills from failing midway. The cost was 2 workflows plus a 412 KB execution spec, which grew to 490 KB in v2, and +1 interaction cost. This was the day's best-value review, and it worked by simulating the plan, not by deliberating about it. It also shows the AF PLAN had been approved without any executability check."
+  },
+  {
+   "loop": "AF Modification §10 skill review under D24, rounds a1 to a5, 08:50Z to 12:08Z",
+   "rounds": "5 rounds, each with 2 fresh reviewers over all 6 packages. a1: REPAIR/REPAIR. a2: REPAIR/REPAIR. a3: FIT/FIT, then 'hardening a3' by Nathan's choice ('we may as well do it now', REVIEWER-PROMPT-a5.md:123). a4: FIT/REPAIR. a5: FIT/FIT.",
+   "material_findings": "a1 F1: a check the spec settled was missing from validate_flowmaster.py. a2 R2-1: the brief falsely claimed the a1 repair had reached the relay and tw lists. a2 R2-2: a re-stamped GCF-17 'session' value could allow a subagent PR-35 with every suite still green, a guard gap on a direct ruling from Nathan. a4 SFR-A4-2 F1 (required): the a3 hardening's comment stripping weakened the dispatch guard, a regression the hardening itself created. These are guard-strength defects, not defects in live behaviour.",
+   "cosmetic_findings": "a3 residuals A3-1 to A3-3: nested code fences, counts rather than positions, a missing void clause in the contract. a4 residuals A4-1 to A4-3: indented code, unterminated comments, <xmp>. a5 residuals: <script>, <style>, CDATA and similar. All concern hiding by deliberate obfuscation, with no credible execution path (inferred).",
+   "continued_after_clean": "Yes, once. Both a3 reviewers confirmed. The session had recorded the non-blocking findings as optional hardening for later (AF record :1112). Nathan chose to fold them in, which voided the confirmation and cost a4 (including a required regression) and a5. After a5 the non-blocking findings were left for Nathan.",
+   "value_vs_cost": "a1 to a3 justified: they closed guard gaps on Nathan's rulings and caught a false claim in a brief, in about 1 h 40 m. Hardening a3 plus a4 and a5 cost about 1 h 40 m and 4 reviewer runs over 6 packages. The net gain was obfuscation-robustness, and the regression it introduced had to be fixed. Value was low. Each round was bounded because Nathan approved each repair set."
+  },
+  {
+   "loop": "AF close-out verification (E6 step 4 readback), shown for contrast: a single check, not a loop",
+   "rounds": "1 ('55 of 55 prompts, 0 failures on 1,484 checks')",
+   "material_findings": "None. It tested only that the new wording was present, and missed about 50 prompts that still contradicted it (RCA §1 and RC7).",
+   "cosmetic_findings": "n/a",
+   "continued_after_clean": "n/a. It stopped at a false clean.",
+   "value_vs_cost": "Cheap but insufficient. This under-review of content led directly to the widened follow-up Modification. It shows the day's review effort was misallocated: too little breadth on content at close-out, too much depth on machinery in the next PLAN."
+  },
+  {
+   "loop": "Closeout-residuals ANALYZE: review rounds (wf_1ac3cdc2-156, wf_4bf0baec-6cc, then a verifier check), 19:06 to 20:09",
+   "rounds": "3: 11 required findings, then 14 required findings ('all against the repair'), then a verifier check (4 unresolved, 5 new). 5 workflows, about 4.8M tokens. ANALYZE took 3 h 20 m.",
+   "material_findings": "Round 1: class errors, missing Class A gates, the order, cut-over and freeze, ruling 4 re-asked, ITEMs 20, 21 and 38 dispositioned. Round 2: ITEM-37 re-asked rather than decided (a boundary of Nathan's rulings), the regeneration order, package spans, PART-15 ordered after PART-06. Round 3: pins added (validation-profile.json:27-28, flowmaster-validate :1816), ITEM-13 names 6902924a..., PART-01 spans 4 packages. Source: closeout record :684-731.",
+   "cosmetic_findings": "Round 3: PART-18's name made neutral, the split-saving claim corrected, the Drive mention recorded as a dated snapshot, option costs added.",
+   "continued_after_clean": "No. It stopped after round 3 without re-reviewing the last fixes. Nathan was present, rulings were pending, and the verifiers were refute-by-default. Round 2's 'all against the repair' was already the same regression signal PLAN later showed.",
+   "value_vs_cost": "Round 1 was justified and round 2 partly. Round 3 was marginal but cheap. It converged under the same Ultracode mode, which isolates review design and Nathan's presence as the difference from PLAN."
+  },
+  {
+   "loop": "Closeout-residuals ANALYZE body sweep: 5 sweepers and 6 adversarial verifiers over all 55 live bodies (wf_575cf35d-078, wf_b6c1b6fb-c8b)",
+   "rounds": "1 sweep plus 1 refute-by-default re-check. It judged 335 of 335 findings: 158 REAL, 177 NOT_REAL, and 26 further REAL.",
+   "material_findings": "19 READ_ONLY_SELF_DESCRIPTION: for example, CL-40 is told it is read-only but must commit and push CYCLE_GAP_SCAN, so an agent may refuse a required write. 28 PR40_ENTRY_PRE_D23E: PR-40 entry is described only by assertion, without MERGE_OBSERVED. 9 CANDIDATE_AUTHORING_LEFTOVER: live bindings are called placeholder tokens. 5 OTHER_CONTRADICTION: routing in QA-110 and QA-80. The re-check also refuted the premises of ITEMs 20, 21 and 38, which narrowed scope. Source: ANALYZE-body-evidence.md:5-25 and closeout record :415-430.",
+   "cosmetic_findings": "123 HANDOFF_RESTATES_CONTENT findings are mostly handoff verbosity against D23-B, with a lower execution impact (inferred). There were 0 REAL in UNDEFINED_REFERENCE or LINK_OR_MENTION_BAN.",
+   "continued_after_clean": "No. It was a single pass.",
+   "value_vs_cost": "High. It exposed the unverified AF completion claim, found by breadth over the corpus with refute-by-default judging. It also supplied the widened 40-item scope that RCA RC7 prices as a cost."
+  },
+  {
+   "loop": "Closeout-residuals PLAN: review rounds R1 to R8 with 7 repairs, 21:10 to 08:29",
+   "rounds": "8 review rounds and 7 repair rounds. Distinct required defects: 18, 8, 9, 11, 10, 10, 7, 4. Defects about the content of the 40 items: 16, 2, 0, 2, 0, 0, 0, 0. Defects in repair-added text: 0 (R2), then 7, 9, 9, 9, 7, 4. 23.2M tokens, 87 subagents, 11 h 24 m.",
+   "material_findings": "R1 and R2: 26 distinct defects, mostly substance, such as undrafted texts, a regex that did not compile, and guards that missed or fired falsely. Six defects had been in the first plan all along: R3-01 (the CL-40 readback could never pass), R3-07 (session continuity), R4-06 (code inside bold on the AF list, a certain X5.6 failure after all bodies land), R4-07 (asynchronous writes never polled), R5-07 (the D24 brief left to EXECUTE) and R6-09 (no F1-F10 readback tool). Real silent-outcome defects that sat only in repair-added machinery: R5-03, R6-02 and R6-08. Round 8 found 4 defects, 2 of them plausible-path regressions (R8-01 and R8-02).",
+   "cosmetic_findings": "13 to 28 non-blocking reports per round (13, 28, 18, 21, 27, 22, 26, 27). All were repaired anyway, and two of those repairs created round 8's regressions. 25-33% of required reports were duplicates across lenses.",
+   "continued_after_clean": "It never reached clean. It continued through a plateau of 8 to 11 distinct defects. From R5 on, success-path defects were 1, 1, 0, 0, and §3 was unchanged from repair round 6. Nathan stopped it.",
+   "value_vs_cost": "R1 to R4 were justified. R5 and R6 were partly justified: two tools, and protection against lost context through idempotence. R7 and R8 had negative value, finding only defects in the repairs' own machinery and adding regressions. The spec grew from 190 to 425 KB (machinery about ×6, content +2.7%), against an approved estimate of 1-2M tokens and about 1 h."
+  }
+ ],
+ "model_configuration": "Findings. (measured) marks what the evidence shows; (inferred) marks my reading.\n\n(1) Did the deep configuration find operationally significant defects that a standard configuration would likely have missed? Mostly no (inferred). The significant finds of the day were deterministic executability defects found by running or simulating things:\n- The AF preflight simulated the plan and found 48 of 172 fixture cases failing and 18 error codes (measured, AF record :745-747).\n- R3-01 was a code-order bug: land.py's check returned before fill(). Any rehearsal of the CL-40 readback exposes it. The pass-4 land.py rehearsal did exactly that once someone thought to run it (measured, record :754-755).\n- R4-06 was missed by the full, deep rounds 2 and 3. It was found in round 4 by a reviewer who fetched the live AF list, a read-only dry run of a control-page readback (measured, process-review critiques[1].corrections[9]). Pass 6 later ran such helpers on the live pages (record :773-774).\n- R5-07 (the D24 brief left unwritten) and R6-09 (no readback tool) are 'the verification names no committed tool' defects. A mechanical check that every step's inputs and commands exist finds them without depth (inferred).\n- So a cheap dry run of every normal-path gate on the landed text, plus that existence check, would likely have found R3-01, R4-06, R5-07 and R6-09 by about round 2 (inferred; the RCA's change 1 cost column agrees).\n- The deep rounds did find real, subtle silent-outcome defects (R5-03, R6-02, R6-08). All of them were in machinery the deep loop itself had added (measured, defects-by-round.csv originB 'ii').\n- The one breadth win is the ANALYZE body sweep: 184 REAL findings across 55 bodies, which the AF close-out had missed. It came from fan-out and refute-by-default judging, not from depth. A standard configuration with an explicit old-text search (RCA change 11) would likely have found most of it (inferred).\n\n(2) Did it mainly widen the review surface? Yes (measured):\n- 3 lenses plus 3 verifiers per round, 14 workflows and 87 subagents.\n- Every round re-read up to 425 KB, and 25-33% of reports were duplicates.\n- Failure and resume terms in the lens prompts went from 0 to 59.\n- execution-and-delegation-model.md §1 carries the session's setting to every subagent, so cost scaled with the fan-out.\n\n(3) Did it encourage broad rewrites? It contributed (inferred causal link, measured growth):\n- The spec went from 190,729 to 425,130 B, and the machinery sections about ×6, while §3 grew 2.7%.\n- Decisions went from 56 to 119, plan Python from 2,408 to 6,415 lines, and registry assertions from 1,484 to 2,024.\n- The mode's 'token cost is not a constraint' removed the budget signal: the 1-2M estimate was passed by 22:43 and never re-priced.\n- It was not the cause of the loop. Under the same mode, ANALYZE (entered 17:57:41, exited 20:33:16) converged in 3 rounds. The difference was review design ('Try hard' in PLAN prompts only, no refute-by-default in PLAN, a self-set zero exit) and Nathan's absence.\n- The mode's own patterns (dedupe against a fixed target, refute-by-default majority) were not followed (process-review critiques[0].corrections[13]).\n- Limit: the evidence cannot separate the effect of the reasoning-effort level from that of the Ultracode multi-agent mode. Who re-enabled it at 21:07:41 is not verified, though the evidence points to Nathan's side.\n\n(4) Should it be the default for routine maintenance? No. Use a standard configuration, with a mandatory mechanical dry run of normal-path gates and a single consolidated gate, as in ecosystem-change-management.md §7 and execution-and-delegation-model §0A. Escalate only on the triggers in escalation_triggers, and drop back to standard once the dry run passes on the normal path. Here that point was pass 4 at 02:06Z, with 51 of 51 bodies passing.",
+ "escalation_triggers": "Escalate to a deep, multi-agent review only on evidence, and scope it to the triggering surface. Triggers:\n- (a) A completion claim has been refuted, or a check was shown to test only the new wording. Example: 18:37, where the D23 'complete' claim failed. Response: a corpus-wide breadth sweep with refute-by-default verifiers, as in the ANALYZE body sweep, once.\n- (b) A cheap dry run or preflight returns WOULD_FAIL on the normal path. Example: the AF preflight's 48 of 172 fixture failures. Response: a deeper check of that plan's executability, then a return to Nathan.\n- (c) The change can silently breach a Product Owner ruling (D22, D24, no subagent for PR-35) or silently mis-edit a live body or control page. Response: deep review of that path only.\n- (d) The change creates or re-pins an oracle, a validator or a guard whose failure is silent. Examples: the R1 successor, FMV guards.\n- (e) The blast radius is Tier 1 or above across many release members, for example more than about 10 live bodies or more than one skill package (inferred threshold).\n\nDo not escalate because a review round found more defects in machinery a repair just added. That is the non-convergence signal, and the right response is to return to Nathan, not to review more deeply. De-escalate once the normal-path dry run passes and the distinct confirmed required defects stop halving.",
+ "stopping_rule_candidates": "RULE 1: review cap with a dry-run floor. Where: modification-template.md as a new rule 8, and the PLAN-review brief.\n- The rule: before the first full review, run a mechanical dry run of every normal-path gate and readback on the landed text (read-only against live pages), and check that every step's verification names a committed command. Then allow at most two full reviews (the first, and one after its repair), then one check scoped to the repair diff.\n- Then the plan goes to Nathan with every open finding listed by path, likelihood and consequence, whatever the count. A round in which both reviewers confirm, or which has zero REQUIRED findings, ends reviewing. Its non-blocking findings go to the Backlog or are listed as accepted risks, and repairing them is opt-in and priced.\n- Evidence it would have stopped well: pass 4 (02:06Z) and the live-page helpers were available, and they cover R3-01, R4-06, R5-07 and R6-09 (inferred). The plan would have reached Nathan after R2, its repair and a diff check, around 01:45-02:15Z. By 08:25 it would have been waiting with its risks listed, instead of absent.\n- In the AF skill review it stops at a3 (FIT/FIT), avoiding a4 and a5 and the regression the hardening introduced (SFR-A4-2 F1).\n- In closeout ANALYZE it matches what happened: stop at round 3.\n- Risk: defects in unchanged text that the dry run does not exercise can ship unlisted (R4-07 async polling, R3-07 continuity, R5-03). The first plan's single-sentence failure design would still need fixing within the two rounds.\n\nRULE 2: non-convergence or regression trigger. Where: session-working-rules.md, and a PLAN-review brief field.\n- The rule: after each round, count distinct confirmed REQUIRED defects in one unit. If the count does not at least halve from the previous round, or if more than half sit in text the last repair added, stop and send a DECISION NEEDED. It carries the trend, the open findings with path and likelihood, and three options: approve with listed risks, one more diff check, or simplify.\n- Evidence: PLAN R2 had 8, R3 had 9 (7 in repair-added text), so it fires at about 01:47Z. ANALYZE round 2 had 14, all against the repair, so it fires at about 20:00 while Nathan was present; he was then asked rulings anyway, so the cost is small. In the AF skill review, a1 had 1 required defect and a2 had 2, so it fires after a2, and Nathan was already approving each repair set.\n- Risk: small counts are noisy, so it can fire early on a converging loop (1 to 2). Each firing costs Nathan one message, and it depends on counting honestly: the RCA found mixed report and defect units in the session's own series.\n\nRULE 3: exit-rule provenance and budget re-price. Where: session-working-rules.md and glow-po-reporting.\n- The rule: the session may not tighten an exit rule Nathan approved without asking him. Any stopping rule it states is labelled with who set it and when, and a compaction summary quotes the commitment and Nathan's reply verbatim. When elapsed time or tokens pass twice the estimate Nathan approved, the session stops and re-prices with a DECISION NEEDED before its next round.\n- Evidence: the approved estimate was 1-2M tokens and about 1 h. Drafting alone passed 4M tokens by 22:43, so the rule fires before R2. The 00:32 gate change ('once that review is clean') was a tightening of the 23:58 commitment Nathan had answered at 00:13, and it would have required asking him. In the AF run, interaction cost went from 11 predicted to 29 actual, so a round-trip budget would have fired at the a3 hardening decision, pricing it at two or more rounds before Nathan chose.\n- Risk: estimates are rough, so this can interrupt a healthy run, and the cost is one message. Enforcement depends on the session, because nothing in the repository can see a transcript. The only guard is the report itself.",
+ "notes": "Confirmations and corrections to the RCA:\n(1) Confirmed: no committed governing text requires a PLAN review, lenses, verifiers or a clean round (template, D20-D24, session-working-rules, and the reviewer template, which covers skills only). DISP-001 does give an exit the session did not use: 'name the specific PO decision'. DoD item 6 applies to a finished change, not to a PLAN exit.\n(2) Correction and extension to RC7: the PLAN and EXECUTE modes were never piloted. The stage 4 pilot (AF-005) reached ANALYZE only and is ABANDONED (MODIFICATION-20260922-af005...md:4). The AF Modification was already the full-size first run, and its PLAN was approved but not executable: the preflight showed 48 of 172 fixture cases failing. The closeout PLAN's over-review followed an under-reviewed AF PLAN and an AF close-out check that tested only the new wording (inferred link).\n(3) Confirmed with detail: the 'hardening round a3' was Nathan's choice (REVIEWER-PROMPT-a5.md:123; AF record :1112 and :1179). The session had recorded the findings as optional for later. It produced SFR-A4-2's required regression, the same fix-a-non-required-finding-and-regress pattern as PLAN round 8.\n(4) The repair-regression pattern also appeared in ANALYZE: round 2 had 14 required findings, all against the repair (closeout record :313). It did not loop because Nathan was present and the verifiers were refute-by-default.\n(5) Rule 3's Backlog sentence (template:43-44) was added by the Modification session in c2fbf3c. It gives an out-of-scope destination only; no in-scope accepted-risk disposition exists.\n(6) D22 and D24 were authored by the Modification session (d848942) from Nathan's rulings. D20, D21, template v2.0 and the validator were authored by the PE36 main session (71511b9, cacd5a1, a63bf80, session_01Aniz3...). DISP-001 and the DoD were authored in the PE31 era (a46cef5). reviewer-prompt-template and session-working-rules base: e14ed79 (PE35).\nNot verified: the per-round token cost of the a1 to a5 skill reviews (not recorded in the repo); who re-enabled Ultracode at 21:07:41. Scratch file: /tmp/claude-0/recovery-scratch/govrules/pr.txt. Nothing in the repository, Notion or the skills was written."
+}

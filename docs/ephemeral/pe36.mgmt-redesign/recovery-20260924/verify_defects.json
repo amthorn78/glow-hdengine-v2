@@ -1,0 +1,131 @@
+{
+ "checks": [
+  {
+   "claim": "ITEM-31: PR-40's MATERIAL SCOPE sentence 'An ordinary in-scope defect remains with the existing PR owner' survives beside C-REPLAN; origin AF_PARTIAL_APPLICATION; significance MATERIAL; vs_before WORSE; FIX_NOW",
+   "verdict": "CORRECTED",
+   "evidence": "Origin confirmed. git diff d848942~1 d848942 -- docs/graph/parts/prompts/PR-40.json: reject_existing_pr_owner/PR-30 became reject_replan/PR-20. At HEAD PR-40 has no edge to PR-30 (its 6 edges go to ACTUAL_OWNER_TERMINAL_RETURN, NATHAN_TERMINAL_RETURN, ORIGINAL_NATIVE_STAGE, PR-10, PR-20, RS-10). The sentence survives: ANALYZE-body-evidence.md:178, in section 'MATERIAL SCOPE ... -> RS-10, RS-20, RS-30'. C-REPLAN text: spec v2 :713-717. Significance is not demonstrated as MATERIAL. The sentence sits in the material-scope section, where it separates ordinary defects from rescope. The dedicated routing section 'PRECISE IN-SCOPE DEFECT -> re-plan' names PR-20, and the graph has only that edge. PR-40 also forbids implement and repair (ANALYZE-body-evidence.md:174, :186). The worker's own mechanism rates PR-20 the likelier route. Nathan creates every session, so the worst case needs him to paste a PR-30 handoff. That worst case is the pre-09-23 route, now unlawful under D23-F.",
+   "correction": "significance CREDIBLE_RISK. vs_before: the likely route is now the correct D23-F route, and the worst case equals the pre-09-23 behaviour (WORSE only for consistency). FIX_NOW is still reasonable as a single-sentence PR-40 edit, because PR05 will reach PR-40 and the fix is inside approved closeout scope."
+  },
+  {
+   "claim": "ITEM-37: C-LAT 'Decide it during work' (step 2 'decide it, implement it, test it') placed in 8 bodies that implement nothing; AF_INTRODUCED; MATERIAL; WORSE; FIX_NOW for all 8",
+   "verdict": "CORRECTED",
+   "evidence": "Origin confirmed: evidence/e3/body_rules.py:102 LAT10 = {PR-10, PR-20, PR-30, PR-35, PR-40, RS-10, RS-20, DOC-10, DOC-20, IA-30}. C-LAT text: spec v2 :571-584. Census A9: 10 carriers, 8 of them ITEM-37 bodies. Ruling Q2(a): MODIFICATION-20260923-closeout-residuals.md:358-360. Nathan called the words meaningless ('those words don't seem to mean anything', :346-352). The mechanism 'crosses its execution boundary into landed code' is not demonstrated. PR-40 twice forbids implementing: Execute step 8 'Do not edit repository or PF content, merge, implement, repair' (ANALYZE-body-evidence.md:174) and 'It does not implement, repair, merge' (:186). C-REPLAN routes the same defect to REJECT. The likely effect is confusion or a candidate record, not a code change. The worker itself rates the other 7 bodies as low harm.",
+   "correction": "significance CREDIBLE_RISK for PR-40 only (a three-way contradiction on one defect in the same section as ITEM-31). LOW_IMPACT for PR-10, PR-20, RS-10, RS-20, DOC-10, DOC-20 and IA-30. FIX_NOW is justified for PR-40, together with ITEM-31, since the ruling already exists. The other 7 can wait (DEFER) or ride in the same edit, with the matching registry C-LAT pattern changes."
+  },
+  {
+   "claim": "ITEM-26b: receiving bodies (PR-35, PR-40, RS-40, RS-20) require branch/head/commits/tests/reviews that C-HANDOFF senders no longer carry; CREDIBLE_RISK; WORSE; FIX_NOW",
+   "verdict": "CORRECTED",
+   "evidence": "The receiver lines exist: ANALYZE-body-evidence.md:170 (PR-35 requires tests, reviews/checks and unresolved items; branch/head were already dropped by spec v2 :538 step 13), :175 (PR-40 commit identity), :219 (RS-40 branch, head, commits). The premise that senders 'carry none' is contradicted by the same bodies' unfixed sender-side lists. PR-30 Execute step 6 still says 'Carry the exact dedicated session, open PR, ... completed work, local tests ... unresolved items' (:162). PR-30 also says 'Each handoff carries the complete native input package' (:346). RS-20 is a sender and says 'Carry ... branch, open PR/head' onward (:216). The worker's own ITEM-26a says senders will likely restate content. So receivers' required inputs are mostly satisfied today. The break needs 26a fixed first, or a strict sender reading C-HANDOFF's 'carries no branch and no commit'. Even then the result is a fail-safe INCOMPLETE/PENDING stop, and the PR reference allows recovery. The RS-20 row is sender-side, not receiver-side.",
+   "correction": "significance LOW_IMPACT now; it becomes CREDIBLE_RISK only if the ITEM-26a sender lists are removed first. vs_before SAME in likely behaviour. Recommendation: land together with or before ITEM-26a (the worker's ordering is safe), not as an independent FIX_NOW. Drop RS-20 from the receiver set, and drop 'branch/head' for PR-35."
+  },
+  {
+   "claim": "ITEM-30: PR-35's closed five-result list / 'sixth top-level result' bar and RS-40's closed list omit MERGE_OBSERVED; RS-40 MERGE_PENDING fallback lacks predicate; CREDIBLE_RISK; FIX_NOW",
+   "verdict": "CORRECTED",
+   "evidence": "Origin confirmed. git diff d848942~1 d848942 PR-35.json adds MERGE_OBSERVED to PR-35_RESULT and result_states (5 to 6) and adds a PR-35->PR-40 merge_observed edge. RS-40 at HEAD has a merge_observed edge to PR-40. The stale lists: ANALYZE-body-evidence.md:169, :218. Significance is overstated. The worker's own mechanism says 'Neither outcome is harmful', and vs_before is SAME. The double-entry window is already closed by text the same bodies carry. C-DISPATCH (placed in PR-35 and RS-40, spec v2 :654-662) limits the conditional PR-40 block to 'only where no MERGE_OBSERVED result was returned for this merge'. The D23-E successor adds 'PR-40 is entered once per merge ... the other is void' (decision record :1410-1418; also installed at glow-hde-pr-development SKILL.md:111 and change-flow :331). PR-40's own entry sentence (W-4, spec v2 :824-828) carries the same predicate.",
+   "correction": "significance LOW_IMPACT; recommendation DEFER, or bundle with the ITEM-29 PART-14 edit. Not FIX_NOW."
+  },
+  {
+   "claim": "ITEM-39: change-flow SKILL.md:335 (and flowmaster-validate :174, audit interoperability-contracts.md:96, behavioral-fixtures.md:59) state ALPHA_STOPPED / PR04 next / must not execute PR-10; PRE_EXISTING; CREDIBLE_RISK; FIX_NOW",
+   "verdict": "CONFIRMED",
+   "evidence": "The installed change-flow SKILL.md:335 reads 'the sole operative state is ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR ... next_intended_unit: HDE-EPIC040-PR04 ... must not execute PR-10 ... or resume Alpha'. flowmaster-validate :174, interoperability-contracts.md:96 and behavioral-fixtures.md:59 match. The text dates from 09-15 (GCFPE-Repair-Candidate-Reconciliation-and-Validation-v1.0-20260915.md). PR04 was merged and accepted (#467 cd6f9e6, #469 161c55c). The closeout Modification itself names this line as why PR05 planning waits (MODIFICATION-20260923-closeout-residuals.md:643-645). ANALYZE-skill-evidence.md:71 lists the validator markers. The effect is fail-safe (stop or ask), but it sits on the path of the next Alpha action, so FIX_NOW is defensible. Caveat: the line did not stop PR04 on 09-21/22. Whether a PR-10 session loads change-flow at all is unverified."
+  },
+  {
+   "claim": "ITEM-08: Flowmaster core in change-flow (:72, :122) and relay (:112) pins prompts by complete content and keeps content hashes, against D22; PRE_EXISTING; CREDIBLE_RISK; DEFER",
+   "verdict": "CONFIRMED",
+   "evidence": "change-flow SKILL.md:72 reads 'Pin mutable stage prompts at first use by exact identity and complete content ... pinned copy is unavailable, stop under prompt drift'. :122 and relay :112 read 'pinned prompt identities and content hashes'. D22's prohibited list includes 'body hashes or byte comparison' (decision record :1190-1193). Core unchanged by the AF (ANALYZE-skill-evidence.md:60). The effect is a fail-safe stop on RESUME only, and nothing shows a change-flow run in flight. CREDIBLE_RISK with DEFER is consistent. A rating of LOW_IMPACT would also be defensible."
+  },
+  {
+   "claim": "ITEM-04: flowmaster-validate guidance (:212, :382, :398, :402), profile staging_rule and help presume a local corpus; AF_PARTIAL_APPLICATION; CREDIBLE_RISK",
+   "verdict": "CORRECTED",
+   "evidence": "The lines exist, e.g. :212 'pass its exact versioned contract and the complete candidate snapshot root' and :402 'against the supplied complete corpus'. D22 prohibits 'any procedure that requires a local corpus' (decision record :1190-1193), but it permits 'A scratch file feeding --bodies-stdin ... under the same five conditions' (:1201-1203). The D22 status says the AF's only change was the reason text (:1223-1229), so AF_PARTIAL holds. The worker states that the validation result is unaffected. No gate, routing or result consequence is shown; the harm is a policy breach during validation.",
+   "correction": "significance LOW_IMPACT; DEFER stands."
+  },
+  {
+   "claim": "ITEM-05: governance audit hashes prompt bodies and, against an older snapshot, reports SRC-003 for every body E6 edited; PRE_EXISTING; CREDIBLE_RISK",
+   "verdict": "CORRECTED",
+   "evidence": "The hashing is real: audit_workspace_governance.py:445-480 sets record['sha256'] and structural_sha256 for every source. The SRC-003 mechanism is wrong. At :572-573 SRC-003 fires only when 'Current local snapshot bytes no longer match the pinned hash', i.e. when the snapshot is internally inconsistent. It does not fire because live Notion bodies changed after an older snapshot. So there are no mass SRC-003 findings from E6. What remains is a D22 breach (a body snapshot and hash) inside audits, with no flow effect, as the worker concedes.",
+   "correction": "mechanism: body snapshotting and hashing breaches D22; SRC-003 fires only on intra-snapshot tampering. significance LOW_IMPACT; DEFER."
+  },
+  {
+   "claim": "ITEM-06: relay binds sources 'by exact identity and content hash' (:378) and keeps an 'optional digest' (:263); PRE_EXISTING; CREDIBLE_RISK",
+   "verdict": "CORRECTED",
+   "evidence": "The text is confirmed. Relay :378: 'Pin the manifest, exchange instructions, response contracts, source bindings, and asset identities at first use by exact identity and content hash.' :263: 'retain its observed version, identity, provider revision and optional digest only in runtime provenance'. Unlike ITEM-08, no stop or routing mechanism is shown; the harm is a stored hash, a D22 records breach. The worker also infers that GCFPE sessions are seeded by pasted handoffs rather than relay manifests (ITEM-14).",
+   "correction": "significance LOW_IMPACT; DEFER."
+  },
+  {
+   "claim": "MB-001: DOC-20 routes to PR-40 'after Nathan asserts the manual merge', a possible second PR-40 entry; AF_PARTIAL_APPLICATION; CREDIBLE_RISK",
+   "verdict": "CORRECTED",
+   "evidence": "Edge confirmed: at HEAD DOC-20 -> PR-40 'landed_lineage_review', with no state (not INCOMPLETE/PENDING/BLOCKED as the surface says). git diff --stat d848942~1 d848942 shows no change to DOC-20.json. The ANALYZE re-check judged the line SCOPED_CORRECTLY: 'A1-5 (PO-approved) keeps DOC-20 to PR-40 unchanged ... PR-40 entry wording enforces the fallback' (ANALYZE-body-evidence.md:277). PR-40's entry sentence (W-4, spec v2 :824-828) admits the assertion only where no MERGE_OBSERVED was returned for this merge. So the claim that the 'other is void' rule does not cover this route ignores PR-40's own gate. Nathan also creates each PR-40 session. No duplicate-review mechanism is demonstrated. The origin is arguably PRE_EXISTING (edge older than the AF; A1-5 deliberately kept it).",
+   "correction": "significance LOW_IMPACT; origin PRE_EXISTING (the AF kept it by decision A1-5); DEFER, folded into ITEM-29."
+  },
+  {
+   "claim": "MGMT10-DESIGN: proposed MGMT-10 body design contradictions (no pending-approval result code etc.); PRE_EXISTING; CREDIBLE_RISK; 'maintenance sessions run in this body's three-mode form'",
+   "verdict": "CORRECTED",
+   "evidence": "The contradictions are recorded in ANALYZE-anchor-census.md 'The proposed MGMT-10 body'. The closeout Modification states 'Which MGMT-10 body governs this run. The live 091426.1 body ... PART-11 ... edits the proposed body, which does not govern this run' (MODIFICATION-20260923-closeout-residuals.md, Contradictions and risks). RCA RC1 attributes the PLAN loop to a session-set exit rule and did not read the body (RCA :101-118, :355). The body is unpromoted and not a release member. No execution consequence is demonstrated, and the worker marks the link to the loop UNKNOWN.",
+   "correction": "significance LOW_IMPACT (pre-promotion design debt, recorded for D20 stage 5); DEFER. The statement that sessions run in this body's form conflicts with the record, which names the live body as governing."
+  },
+  {
+   "claim": "TW-01: tw-flowmaster keeps the core content pin, optional digest (:306) and model-advice lines; PRE_EXISTING; CREDIBLE_RISK",
+   "verdict": "CONFIRMED",
+   "evidence": "tw-flowmaster SKILL.md:51 has the core pin, :101 has 'content hashes', and :278 says 'Pin each exact manifest reference, resolved page identity, title, complete content, class, and content hash'. :306 has the optional-digest sentence and :313-317 the advice lines. Nathan ruled TW out of scope (MODIFICATION-20260923-closeout-residuals.md 'Not included'). The mechanism parallels ITEM-08 (fail-safe), and :278 is stronger than the worker states: it pins complete content. The rating is not independently assessed, so it would be consistent with ITEM-08 at best."
+  },
+  {
+   "claim": "Sample ITEM-29 (LOW): 21 bodies describe PR-40 entry by assertion alone (A7)",
+   "verdict": "CONFIRMED",
+   "evidence": "Census A7 lists 21 carriers. The one receiver, PR-40, carries W-4's predicate. PR-10's PR_INSTRUCTION 'may encode the retired trigger' (ANALYZE-body-evidence.md:141), but PR-40 gates entry. No routing consequence beyond MB-001, which is itself LOW."
+  },
+  {
+   "claim": "Sample ITEM-34 (LOW): QA-110 ACCEPT 'including a completed failing run' vs rule 4 to ESC-10; PRE_EXISTING from c683255",
+   "verdict": "CONFIRMED",
+   "evidence": "git log -S finds c683255 (2026-09-17). QA-110.json is unchanged by d848942. At HEAD the QA-110 accept branch goes to QA-120, and QA-120's 'fail' branch goes to ESC-10. Both paths end at ESC-10, so no wrong routing."
+  },
+  {
+   "claim": "Sample ITEM-35 (LOW): QA-80 'terminally' vs graph branch to QA-70; PRE_EXISTING",
+   "verdict": "CONFIRMED",
+   "evidence": "At HEAD QA-80.json has wrong_route_terminal (NATHAN_TERMINAL_RETURN, 'complete lawful bounded-delta review intake is absent') and existing_delta_review to QA-70. The file is unchanged by d848942. Following 'terminally' costs a Nathan turn and is fail-safe."
+  },
+  {
+   "claim": "Sample ITEM-11 (LOW): validate_gcfpe_current.py:605 NameError, only on the legacy path",
+   "verdict": "CONFIRMED",
+   "evidence": "validate_gcfpe_current.py:604-605 uses 'paths[prompt_id]' (undefined in scope). At :622-625 the 4.0 schema dispatches to validate_gcfpe_20260914 before reaching it. validate_flowmaster.py:1406 calls it with no bodies. The failure is loud, never a false pass."
+  },
+  {
+   "claim": "Sample ITEM-12 (NO_RUNTIME_EFFECT): edge_indices mismatch in CF-C-10, ESC-40, QA-70, PR-35, RS-40; 3 pre-existing, 2 AF-added",
+   "verdict": "CONFIRMED",
+   "evidence": "Measured edges/indices at d848942~1: CF-C-10 5/4, ESC-40 5/3, QA-70 4/5, PR-35 4/4, RS-40 5/5. At HEAD: PR-35 5/4, RS-40 6/5. The installed graph_parts.py assemble() appends unindexed edges and derives state_routes by branch; routing is unaffected. Omission: global.json also has 13 _other_edge_indices for 3 _other_edges (closeout-residuals/plan/skills/run_gate.py:77)."
+  },
+  {
+   "claim": "Sample ITEM-36 (NO_RUNTIME_EFFECT): release-line checks see first 8 non-blank lines only; {0,7} introduced in d848942",
+   "verdict": "CONFIRMED",
+   "evidence": "git log -S'{0,7}' on the registry gives d848942 only; the count at d848942~1 is 0. flowmaster-validate validate_gcfpe_20260914.py:1145-1149 uses nonblank[:8]. Census A8 finds 0 live label lines. The promotion-time miss is marked (inferred)."
+  },
+  {
+   "claim": "Sample ITEM-22 (NO_RUNTIME_EFFECT): registry parent IDs stale; only reader is governance audit NAM-002",
+   "verdict": "CONFIRMED",
+   "evidence": "git log -S'expected_parent_id' gives 3c0b1fa (2026-09-18). A grep of the installed skills finds only amthor-workspace-governance-audit (schema reference, run_fixture_suite.py, audit_workspace_governance.py). Repository .py hits are only closeout plan evidence scripts. No flow consumer."
+  },
+  {
+   "claim": "Sample ITEM-17-32-A6A10 (LOW): read-only self-descriptions beside commits",
+   "verdict": "CONFIRMED",
+   "evidence": "Census A6 lists 13 carriers. PR-40 carries 'Do not edit repository' (ANALYZE-body-evidence.md:174) yet PR04's PR-40 committed its ACCEPT review (#469, 161c55c). So in practice sessions still commit; no demonstrated skip."
+  },
+  {
+   "claim": "Sample ITEM-32-A5 (LOW): storage sentence in PR-35/RS-40/MGMT-10; PR04 PR-35 still pushed",
+   "verdict": "CONFIRMED",
+   "evidence": "Census A5 says REAL only in GCFPE-MGMT-10, PR-35 and RS-40. The sentence predates the AF (docs/ephemeral/gcfpe.batch-1.copy-repair-ledger.md:83). PR04 code was merged (#467 cd6f9e6) with the sentence present."
+  },
+  {
+   "claim": "Sample MB-002 (LOW): PR-20's description of PR-40 says REJECT returns to PR owner",
+   "verdict": "CONFIRMED",
+   "evidence": "PR-20 carries C-PR20-ENTRY 'Re-plan entry ... accepts a PR_WORK_UNIT_LINEAGE_REVIEW whose result is REJECT (reject_replan)' (spec v2 :738-742). PR-40's routing is in its own body and the graph. Descriptive only."
+  },
+  {
+   "claim": "Counts: 48 rows; origin PRE_EXISTING 21, AF_PARTIAL 17, AF_INTRODUCED 7, RECORD_ONLY 3; significance final MATERIAL 2, CREDIBLE_RISK 10, LOW_IMPACT 23, NO_RUNTIME_EFFECT 13; WORSE 3, BETTER 2, SAME 43; FIX_NOW 5, DEFER 40, NONE 3",
+   "verdict": "CORRECTED",
+   "evidence": "Recounted row by row. 48 rows. The origin tallies are right. vs_before and recommendation tallies are right. The 'final' significance tally is wrong: LOW_IMPACT rows are ITEM-29, 26a, 27, 40, 01, 02, 03, 09, 10, 11, 14, 15b, 23, 24, 25, 17-32-A6A10, 32-A5, 18-33, 19, 21, 34, 35, MB-002 and 38, which is 24. NO_RUNTIME_EFFECT rows are ITEM-07, 12, 13, 15a, 16, 28, 36, 39b, 22, MB-003, 20 and MB-004, which is 12. The worker's working tally (24/12) was right, and its 'final' (23/13) is not.",
+   "correction": "As written: MATERIAL 2, CREDIBLE_RISK 10, LOW_IMPACT 24, NO_RUNTIME_EFFECT 12. With this verifier's corrections: MATERIAL 0, CREDIBLE_RISK 5 (ITEM-31, ITEM-37 for PR-40, ITEM-39, ITEM-08, TW-01), LOW_IMPACT 31, NO_RUNTIME_EFFECT 12. FIX_NOW 3 (ITEM-31, ITEM-37 in PR-40, ITEM-39). ITEM-26b is to be sequenced with or before ITEM-26a, and ITEM-30 is deferred into PART-14."
+  }
+ ],
+ "missed": "None with a demonstrated execution consequence. Two points to note, neither a new defect. (1) Ordering constraint: ITEM-26a (sender lists) must not be fixed before ITEM-26b (receiver required inputs). Today the unfixed sender lists (PR-30 step 6, ANALYZE-body-evidence.md:162; RS-20 :216) are what satisfy the receivers. (2) The MGMT10-DESIGN framing conflicts with the closeout record, which says the live 091426.1 MGMT-10 body governed the run and the proposed body did not (MODIFICATION-20260923-closeout-residuals.md, 'Contradictions and risks').",
+ "summary": "Origins hold up for every row I checked. Significance is overstated on most of the upper rows. No row is MATERIAL on the evidence.\n\n- **ITEM-31 and ITEM-37:** real contradictions in PR-40. PR-40 routes REJECT to PR-20 in its body and graph (the only edge), and twice forbids implementing. Both drop to CREDIBLE_RISK, and C-LAT drops to LOW_IMPACT in the other 7 bodies. Fixing PR-40 now is still justified by Nathan's Q2(a) ruling, and PR05 will reach PR-40.\n- **ITEM-26b:** mechanism undercut. The same sender bodies still carry the content the receivers require (PR-30 step 6, RS-20 required inputs). Now LOW_IMPACT; it must land with or before ITEM-26a.\n- **ITEM-30:** the worker itself says no outcome is harmful. The predicate and the once-per-merge sentence are already in C-DISPATCH and in PR-40's entry sentence. Now LOW_IMPACT, deferred.\n- **ITEM-05:** the SRC-003 mechanism is wrong. SRC-003 fires only when a snapshot is internally inconsistent, not when live bodies change.\n- **ITEM-04, ITEM-06, MB-001, MGMT10-DESIGN:** downgraded to LOW_IMPACT. No gate or routing consequence is shown. MB-001 was judged SCOPED_CORRECTLY in ANALYZE, and PR-40's own entry sentence gates it.\n- **ITEM-39, ITEM-08, TW-01:** confirmed. ITEM-39 stays FIX_NOW; its stop is fail-safe but on the path of the next Alpha action.\n- **Sampled rows:** 10 LOW_IMPACT or NO_RUNTIME_EFFECT rows (ITEM-29, 34, 35, 11, 12, 36, 22, 17-32-A6A10, 32-A5, MB-002) are confirmed, and none is material.\n- **Counts:** the origin, vs_before and recommendation tallies are right. The worker's 'final' significance tally is wrong: it should be LOW_IMPACT 24 and NO_RUNTIME_EFFECT 12, not 23 and 13."
+}
