@@ -288,7 +288,29 @@ def _forbid_live_capture(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(proof.HdApiClient, "_default_request", lambda *a, **k: pytest.fail("vendor transport attempted"))
 
 
+def _refuse_admission(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The repository root is admitted; the non-admitted branch is reached through the seam."""
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
+
+
+def test_check_current_passes_on_the_admitted_root(capsys: pytest.CaptureFixture[str]) -> None:
+    """On the admitted repository root the fixture proof validates live with no residue."""
+    assert release_sanity.release_not_admitted_observed() is False
+    state_before = _repo_state()
+    assert proof.main(["--check-current"]) == 0
+    assert _repo_state() == state_before
+    assert capsys.readouterr().out == json.dumps(
+        {"status": "OK", "path": proof.OPEN_ABBA_REL, "top_level_pass": True, "result": "pass"}, sort_keys=True
+    ) + "\n"
+    assert json.loads((proof.ROOT / proof.OPEN_ABBA_REL).read_bytes())["top_level_pass"] is True
+
+
 def test_not_admitted_fixture_proof_shape_without_live_capture(monkeypatch: pytest.MonkeyPatch) -> None:
+    _refuse_admission(monkeypatch)
     _forbid_live_capture(monkeypatch)
     assert release_sanity.release_not_admitted_observed() is True
     payload = proof.build_fixture_proof()
@@ -305,6 +327,7 @@ def test_not_admitted_fixture_proof_shape_without_live_capture(monkeypatch: pyte
 
 
 def test_check_current_ends_not_admitted_with_distinct_code_and_frozen_primary_check(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    _refuse_admission(monkeypatch)
     _forbid_live_capture(monkeypatch)
     monkeypatch.setattr(proof, "_write_primary", lambda *a, **k: pytest.fail("primary written"))
     state_before = _repo_state()
@@ -321,6 +344,7 @@ def test_check_current_ends_not_admitted_with_distinct_code_and_frozen_primary_c
 
 
 def test_fixture_generation_and_check_refuse_without_writing_when_not_admitted(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    _refuse_admission(monkeypatch)
     _forbid_live_capture(monkeypatch)
     monkeypatch.setattr(proof, "_write_primary", lambda *a, **k: pytest.fail("primary written"))
     for argv in ([], ["--check"]):

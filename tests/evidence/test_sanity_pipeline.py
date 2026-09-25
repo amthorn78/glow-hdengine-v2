@@ -243,7 +243,16 @@ def test_probe_classifies_exactly_the_incomplete_roster_refusal(monkeypatch):
     from engine.compat import compute
     from engine.config.registry_loader import SchemaValidationError
 
-    # Real admission owner: the active release is not admitted.
+    # Real admission owner: the repository root is the admitted complete release.
+    admitted = run_sanity_pipeline.probe_release_admission()
+    assert admitted is not None and len(admitted.source_identities) == 44
+    assert run_sanity_pipeline.release_not_admitted_observed() is False
+
+    # The non-admitted state stays reachable through the seam and is classified exactly.
+    def incomplete():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", incomplete)
     with pytest.raises(run_sanity_pipeline.ReleaseNotAdmitted) as excinfo:
         run_sanity_pipeline.probe_release_admission()
     assert excinfo.value.code == "INCOMPLETE_RELEASE_ROSTER"
@@ -442,14 +451,21 @@ def test_isolated_closure_refuses_with_the_distinct_code_before_any_producer(mon
     monkeypatch.setenv("HDE_ISOLATED_RELEASE_BUILD", "1")
     with pytest.raises(SystemExit, match="ISOLATED_RELEASE_BUILD_MODE_REQUIRED"):
         closure.main([])
-    # Real admission owner: INCOMPLETE_RELEASE_ROSTER → explicit line, distinct code, no producer.
+    # Real admission owner: the repository root is admitted, so the closure would run.
+    assert closure.release_not_admitted_observed() is False
+    # Not admitted (patched owner): INCOMPLETE_RELEASE_ROSTER → explicit line, distinct code, no producer.
+    from engine.config.registry_loader import SchemaValidationError
+
+    def incomplete():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr("engine.config.registry_loader.load_active_mechanics_bundle", incomplete)
     assert closure.release_not_admitted_observed() is True
     assert closure.main(["--in-place-isolated"]) == DISTINCT
     assert closure.main(["--in-place-isolated", "--check"]) == DISTINCT
     assert capsys.readouterr().out == "IDENTITY_CLOSURE:RELEASE_NOT_ADMITTED\n" * 2
-    # Any other refusal is not classified as non-admitted.
-    from engine.config.registry_loader import SchemaValidationError
 
+    # Any other refusal is not classified as non-admitted.
     def other_refusal():
         raise SchemaValidationError("SCHEMA_INVALID", "unrelated")
 

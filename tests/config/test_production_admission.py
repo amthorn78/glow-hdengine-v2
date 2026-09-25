@@ -17,6 +17,8 @@ import pytest
 
 from engine.config import registry_loader
 from engine.core import core as pure_core
+from engine.runtime.identity import identity_meta
+from engine.serializer import canon
 from engine.magic10 import calculators, composite, signals
 from engine.config.registry_loader import (
     ADMITTED_RELEASE_BUILT_AT_UTC,
@@ -335,14 +337,61 @@ def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(relea
         assert identity.size == len(raw)
 
 
-def test_actual_partial_repository_cannot_return_an_active_handle(monkeypatch, release_root: Path) -> None:
+# The fifteen members of the pre-PR06 release manifest (version 1.0.0).
+_PRE_PR06_MEMBERS = frozenset({
+    "adapter/http_reader.py",
+    "catalog/channels_v1.json",
+    "catalog/gates_v1.json",
+    "catalog/magic10.json",
+    "catalog/magic10_caps.json",
+    "catalog/magic10_seeds.json",
+    "catalog/narratives/keys.json",
+    "catalog/narratives/manifest.json",
+    "catalog/narratives/palettes.json",
+    "catalog/narratives/suppression_map.json",
+    "catalog/narratives/templates.json",
+    "engine/presenter/emitter.py",
+    "engine/serializer/canon.py",
+    "math/thresholds.json",
+    "migrations/005_identity.sql",
+})
+
+
+def test_actual_repository_root_admits(monkeypatch, release_root: Path) -> None:
+    """The real repository root admits through the parameterless owner.
+
+    The owner derives its root from execution provenance: a working directory
+    and HDE_CONFIG_ROOT that point at a fixture select nothing.
+    """
     monkeypatch.chdir(release_root)
     monkeypatch.setenv("HDE_CONFIG_ROOT", str(release_root))
     monkeypatch.setenv("HDE_RELEASE_ID", _manifest(release_root)["files"][0]["sha256"])
     assert tuple(inspect.signature(load_active_mechanics_bundle).parameters) == ()
-    with pytest.raises(RegistryConfigError) as caught:
-        load_active_mechanics_bundle()
-    assert caught.value.code == "INCOMPLETE_RELEASE_ROSTER"
+    bundle = load_active_mechanics_bundle()
+    root = Path(__file__).resolve().parents[2]
+    raw = (root / "catalog/manifest.json").read_bytes()
+    assert raw == canon.sercanon(json.loads(raw), sort_keys=True)
+    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION == "1.1.0"
+    assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
+    assert len(bundle.source_identities) == 44
+    assert tuple(identity.path for identity in bundle.source_identities) == ADMITTED_RELEASE_ROSTER
+    for identity in bundle.source_identities:
+        body = (root / identity.path).read_bytes()
+        assert identity.sha256 == hashlib.sha256(body).hexdigest()
+        assert identity.size == len(body)
+    assert bundle.release_id == hashlib.sha256(raw).hexdigest()
+    assert bundle.release_id == identity_meta()["release_id"]
+
+
+def test_baseline_partial_manifest_still_refuses(release_root: Path) -> None:
+    """The pre-PR06 fifteen-member manifest is still refused as an incomplete roster."""
+    manifest = _manifest(release_root)
+    manifest["files"] = [row for row in manifest["files"] if row["path"] in _PRE_PR06_MEMBERS]
+    manifest["version"] = "1.0.0"
+    manifest["built_at_utc"] = "2025-12-26T00:00:00Z"
+    assert len(manifest["files"]) == 15
+    write_canonical(release_root / "catalog/manifest.json", manifest)
+    _expect_code(release_root, "INCOMPLETE_RELEASE_ROSTER")
 
 
 def test_candidate_apis_do_not_return_release_bearing_handles() -> None:

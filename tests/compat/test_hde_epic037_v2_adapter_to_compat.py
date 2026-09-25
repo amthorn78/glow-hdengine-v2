@@ -1,15 +1,20 @@
 """EPIC037 v2 adapter-to-compat generator against the corrected evaluation seams.
 
 Positive matrix: the synthetic complete release is injected through the
-evaluation seam.  Check mode without an admitted release validates the frozen
-capture-time artifacts with their nonclaims and never regenerates them (PF10 §2.15).
+evaluation seam.  Check mode without an admitted release (reached through the
+seam now that the repository root admits) validates the frozen capture-time
+artifacts with their nonclaims and never regenerates them (PF10 §2.15); on the
+admitted root the owner's live comparison reports those PR-04 records stale and
+writes nothing.
 """
 import json
 
 import pytest
 
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
+from engine.compat import compute
 from engine.compat.compute import orient
+from engine.config.registry_loader import SchemaValidationError
 from tests.support.pr04_fixtures import CLOSED_RAILS, build_bundle, build_pack, inject_seams
 from tools.evidence import generate_hde_epic037_v2_to_compat as generator
 
@@ -78,9 +83,19 @@ def test_v2_to_compat_public_reader_boundary_fixture(admitted) -> None:
     assert json.loads(json.dumps(boundary, sort_keys=True))["forbidden_public_term_hits"] == []
 
 
+def _refuse_admission(monkeypatch) -> None:
+    """The repository root is admitted; the non-admitted branch is reached through the seam."""
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
+
+
 def test_check_mode_without_admission_validates_frozen_records_and_write_mode_refuses(monkeypatch, capsys) -> None:
     for key, value in CLOSED_RAILS.items():
         monkeypatch.setenv(key, value)
+    _refuse_admission(monkeypatch)
     monkeypatch.setattr(generator, "build_outputs", lambda *a, **k: pytest.fail("live regeneration attempted"))
     monkeypatch.setattr(generator, "write_outputs", lambda *a, **k: pytest.fail("write attempted"))
 
@@ -91,3 +106,19 @@ def test_check_mode_without_admission_validates_frozen_records_and_write_mode_re
 
     with pytest.raises(SystemExit, match=generator.REQUIRES_ADMITTED_RELEASE):
         generator.main([])
+
+
+def test_check_mode_on_the_admitted_root_reports_the_frozen_records_stale_without_writing(monkeypatch) -> None:
+    """On the admitted repository root the owner compares a live evaluation with the tracked
+    PR-04 records.  Those capture-time records predate admission, so check mode reports them
+    stale and writes nothing; regenerating them is the EPIC037 evidence owner's decision."""
+    for key, value in CLOSED_RAILS.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    tracked = [generator.PROOF, generator.TWO_RUN, generator.PAIR_ORDER, generator.BOUNDARY]
+    tracked += [path.with_name(path.name + ".path_proof.txt") for path in list(tracked)]
+    before = {path: path.read_bytes() for path in tracked if path.exists()}
+    with pytest.raises(SystemExit) as raised:
+        generator.main(["--check"])
+    assert str(raised.value).startswith("STALE_HDE_EPIC037_PR04_V2_TO_COMPAT:")
+    assert {path: path.read_bytes() for path in before} == before

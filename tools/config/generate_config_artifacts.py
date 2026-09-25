@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.config.registry_loader import _capture_registry_config, _capture_mechanics_config  # noqa: E402
+from engine.config.registry_loader import (  # noqa: E402
+    RegistryConfigError, _capture_registry_config, _capture_mechanics_config, load_active_mechanics_bundle,
+)
 from engine.serializer import canon  # noqa: E402
 from tools.config.artifacts import (  # noqa: E402
     BAND_EDGES_PATH, GOLDENS_DEFAULT_PATH, MAGIC10_CONFIG_PATH, GoldenComparisonRefusal,
@@ -60,11 +62,48 @@ def _check_expected(base: Path, expected: Mapping[Path, bytes]) -> dict[Path, ob
     return before
 
 
+def _admitted_bundle_or_refuse(token: str):
+    """Admit the installed release through its unchanged owner, or refuse with ``token``."""
+    try:
+        return load_active_mechanics_bundle()
+    except RegistryConfigError as exc:
+        raise RuntimeError(f"{token}:{exc.code}") from exc
+
+
+def _require_same_capture(capture, bundle) -> None:
+    """The local capture must carry exactly the admitted release's source identities.
+
+    Every captured source that is a roster member must have the admitted
+    member identity, the captured manifest must be the admitted manifest and
+    the captured mechanics configuration must be the admitted ``config_sha256``.
+    """
+    identities = {identity.path: identity for identity in bundle.source_identities}
+    mismatched = False
+    for name, source in capture.sources.items():
+        if name == "catalog/manifest.json":
+            mismatched |= source.sha256 != bundle.manifest_sha256
+        elif name in identities:
+            identity = identities[name]
+            mismatched |= (source.sha256, source.size_bytes) != (identity.sha256, identity.size)
+        if name == "catalog/magic10_mechanics_v1.json":
+            mismatched |= source.sha256 != bundle.config_sha256
+    if mismatched:
+        raise RuntimeError("CONFIG_PUBLICATION_CAPTURE_MISMATCH")
+
+
 def _verify_checked_outputs(base: Path, before: Mapping[Path, object], capture) -> None:
     capture.verify_unchanged()
     _verify_report_source(capture)
     if _destination_state(base, before) != dict(before):
         raise RuntimeError("CONFIG_CHECK_DESTINATION_CHANGED")
+    if base == ROOT:
+        # On the real root a checked family must be the admitted release's own
+        # capture; a root the owner does not admit keeps the local check semantics.
+        try:
+            bundle = load_active_mechanics_bundle()
+        except RegistryConfigError:
+            return
+        _require_same_capture(capture, bundle)
 
 
 def check_config_artifacts(root: Path | None = None, *, allow_aliases: bool = False,
@@ -150,8 +189,12 @@ def publish_config_family(root: Path | None = None) -> None:
     if os.environ.get("HDE_ISOLATED_RELEASE_BUILD"):
         raise RuntimeError("CONFIG_PUBLICATION_ISOLATED_RELEASE_MODE_FORBIDDEN")
 
+    # HDE-EPIC040-PR06: the config family is published only from a root the
+    # unchanged admission owner admits, and only from that release's capture.
+    bundle = _admitted_bundle_or_refuse("CONFIG_PUBLICATION_RELEASE_NOT_ADMITTED")
     initial = _capture_mechanics_config(base)
     initial.verify_unchanged()
+    _require_same_capture(initial, bundle)
     manifest_source = initial.sources["catalog/manifest.json"]
     manifest = manifest_source.data
     immutable_paths = {base / name for name in initial.sources if name != "catalog/manifest.json"}

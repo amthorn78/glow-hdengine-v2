@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from engine.config import registry_loader as _admission
 from engine.serializer import canon
 
 _VERSION = re.compile(
@@ -57,15 +58,51 @@ def _validate_inputs(version: str, built_at_utc: str) -> None:
         raise ValueError("release_built_at_invalid") from exc
 
 
+def _path_unsafe(name: str, manifest_rel: str) -> bool:
+    """Lexical member-path rule, shared by existing rows and roster-derived rows."""
+    rel = Path(name)
+    return (
+        not name
+        or rel.is_absolute()
+        or "\\" in name
+        or ".." in rel.parts
+        or rel.as_posix() != name
+        or name == manifest_rel
+    )
+
+
+def _validate_roster(roster: Sequence[str], manifest_rel: str) -> tuple[str, ...]:
+    """Accept only a non-empty, duplicate-free, ASCII-sorted roster of safe paths."""
+    members = tuple(roster)
+    if (
+        not members
+        or any(not isinstance(name, str) or not name.isascii() for name in members)
+        or len(set(members)) != len(members)
+        or list(members) != sorted(members)
+        or any(_path_unsafe(name, manifest_rel) for name in members)
+    ):
+        raise ValueError("release_manifest_roster_invalid")
+    return members
+
+
 def cut_manifest(
     manifest_path: Path,
     *,
     version: str,
     built_at_utc: str,
     check: bool = False,
+    roster: Sequence[str] | None = None,
     _publish: Callable[[Path, bytes], None] | None = None,
 ) -> int:
     """Render or verify one canonical manifest without derived evidence writes.
+
+    Without ``roster`` every existing row is refreshed from disk.  With a
+    roster the membership is constructed as exactly that roster: every roster
+    path receives one row (an existing row refreshed, an absent row added) and
+    an existing row outside the roster is refused as a non-input extra.  In
+    both modes each member's owning format is validated with the admission
+    owner's member rule before its hash and size are taken over the exact
+    bytes on disk; the cutter never normalizes or rewrites a member.
 
     A coordinating owner may supply a private final-byte publisher to include
     this cut in its existing transaction. The cutter still validates every
@@ -89,7 +126,7 @@ def cut_manifest(
         raise ValueError("release_manifest_files_invalid")
     repo_root = manifest_path.parent.parent.resolve()
     manifest_rel = manifest_path.resolve().relative_to(repo_root).as_posix()
-    seen: set[str] = set()
+    existing: dict[str, dict] = {}
     for entry in entries:
         if (
             not isinstance(entry, dict)
@@ -98,17 +135,23 @@ def cut_manifest(
         ):
             raise ValueError("release_manifest_entry_invalid")
         name = entry["path"]
-        rel = Path(name)
-        if (
-            rel.is_absolute()
-            or ".." in rel.parts
-            or rel.as_posix() != name
-            or name in seen
-            or name == manifest_rel
-        ):
+        if _path_unsafe(name, manifest_rel) or name in existing:
             raise ValueError("release_manifest_entry_path_unsafe")
-        seen.add(name)
-        source = repo_root / rel
+        existing[name] = entry
+    if roster is not None:
+        members = _validate_roster(roster, manifest_rel)
+        member_set = set(members)
+        for name in existing:
+            if name not in member_set:
+                raise ValueError(f"release_manifest_extra_member:{name}")
+        entries = [
+            existing.get(name, {"path": name, "sha256": "", "size": 0})
+            for name in members
+        ]
+        payload["files"] = entries
+    for entry in entries:
+        name = entry["path"]
+        source = repo_root / Path(name)
         try:
             source.resolve().relative_to(repo_root)
         except ValueError as exc:
@@ -118,6 +161,12 @@ def cut_manifest(
         if not source.is_file():
             raise ValueError("release_manifest_source_missing")
         body = source.read_bytes()
+        try:
+            _admission._parse_release_member_bytes(body, name)
+        except _admission.RegistryConfigError as exc:
+            raise ValueError(
+                f"release_manifest_member_format_invalid:{name}:{exc.code}"
+            ) from exc
         entry["sha256"] = hashlib.sha256(body).hexdigest()
         entry["size"] = len(body)
     entries.sort(key=lambda entry: entry["path"])
@@ -137,13 +186,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--version", required=True)
     parser.add_argument("--built-at-utc", required=True)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--roster-from-admission",
+        action="store_true",
+        help="construct the membership as exactly the admission owner's ADMITTED_RELEASE_ROSTER",
+    )
     args = parser.parse_args(argv)
+    roster = _admission.ADMITTED_RELEASE_ROSTER if args.roster_from_admission else None
     try:
         return cut_manifest(
             args.manifest,
             version=args.version,
             built_at_utc=args.built_at_utc,
             check=args.check,
+            roster=roster,
         )
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         print(f"RELEASE_MANIFEST_CUT_FAILED:{exc}", file=sys.stderr)

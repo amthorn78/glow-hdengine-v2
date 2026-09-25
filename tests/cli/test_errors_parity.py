@@ -89,6 +89,15 @@ def test_token_map_snapshot_matches_canonical():
         assert record["code"] in ERROR_TOKEN_MAP
 
 
+def test_token_map_bytes_are_canonical():
+    """The token map is a release member: its owner writes exact canonical bytes."""
+    from engine.serializer import canon
+
+    raw = Path("errors/token_map/token_map.json").read_bytes()
+    assert raw == canon.sercanon(render_token_map(), sort_keys=True)
+    assert raw.endswith(b"\n") and not raw.endswith(b"\n\n")
+
+
 # Every code the registry loader raises, split by what PF05 §5.2.3 says each one
 # is. Both classes carry 503, so a misclassification is a wrong governed token
 # rather than a wrong status -- which is exactly why a test has to pin it.

@@ -202,6 +202,69 @@ def test_config_publication_refuses_another_root(writer_root) -> None:
     assert _file_state(writer_root) == before
 
 
+# --- HDE-EPIC040-PR06: publication is gated on real admission and the same capture -------
+
+def _repo_status() -> str:
+    import subprocess
+    return subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"],
+                          cwd=config_tools.ROOT, capture_output=True, text=True, check=True).stdout
+
+
+def test_publish_family_refuses_without_admission(writer_root, monkeypatch) -> None:
+    from engine.config.registry_loader import SchemaValidationError
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.delenv("HDE_ISOLATED_RELEASE_BUILD", raising=False)
+    monkeypatch.setattr(config_tools, "load_active_mechanics_bundle", refuse)
+    before = _repo_status()
+    with pytest.raises(RuntimeError, match="^CONFIG_PUBLICATION_RELEASE_NOT_ADMITTED:INCOMPLETE_RELEASE_ROSTER$"):
+        config_tools.publish_config_family(config_tools.ROOT)
+    assert _repo_status() == before
+    # --check on the real root keeps its local semantics while the owner does not admit.
+    config_tools.check_config_artifacts(config_tools.ROOT)
+
+
+def test_publish_family_refuses_capture_mismatch(writer_root, monkeypatch) -> None:
+    import dataclasses
+    from engine.config.registry_loader import load_active_mechanics_bundle
+
+    admitted = load_active_mechanics_bundle()
+    monkeypatch.delenv("HDE_ISOLATED_RELEASE_BUILD", raising=False)
+    monkeypatch.setattr(config_tools, "load_active_mechanics_bundle",
+                        lambda: dataclasses.replace(admitted, config_sha256="0" * 64))
+    before = _repo_status()
+    with pytest.raises(RuntimeError, match="^CONFIG_PUBLICATION_CAPTURE_MISMATCH$"):
+        config_tools.publish_config_family(config_tools.ROOT)
+    assert _repo_status() == before
+    # --check produces the three primaries from the registry capture, which reads no
+    # mechanics configuration, so only the captured member identities bind it.
+    config_tools.check_config_artifacts(config_tools.ROOT)
+    altered = dataclasses.replace(admitted, source_identities=tuple(
+        dataclasses.replace(identity, sha256="0" * 64) if identity.path == "catalog/gates_v1.json" else identity
+        for identity in admitted.source_identities))
+    monkeypatch.setattr(config_tools, "load_active_mechanics_bundle", lambda: altered)
+    with pytest.raises(RuntimeError, match="^CONFIG_PUBLICATION_CAPTURE_MISMATCH$"):
+        config_tools.publish_config_family(config_tools.ROOT)
+    with pytest.raises(RuntimeError, match="^CONFIG_PUBLICATION_CAPTURE_MISMATCH$"):
+        config_tools.check_config_artifacts(config_tools.ROOT)
+    assert _repo_status() == before
+
+
+def test_real_root_check_requires_the_admitted_capture() -> None:
+    """On the admitted real root --check asserts the same-capture equality and passes."""
+    config_tools.check_config_artifacts(config_tools.ROOT)
+
+
+def test_generate_and_check_keep_working_on_partial_roots(writer_root) -> None:
+    """Local generation and --check on a partial root never consult admission."""
+    config_tools.generate_config_artifacts(writer_root)
+    config_tools.check_config_artifacts(writer_root)
+    for name in config_tools._CONFIG_PATHS:
+        assert (writer_root / name).is_file()
+
+
 def test_config_output_symlink_ancestor_refuses(writer_root, tmp_path_factory) -> None:
     outside = tmp_path_factory.mktemp("outside-config")
     (writer_root / "artifacts").symlink_to(outside, target_is_directory=True)
@@ -405,7 +468,7 @@ from engine.narratives import loader as narrative_loader
 from engine.narratives import router as narrative_router
 from engine.narratives import state as narrative_state
 from engine.serializer.canon import sercanon
-from tests.config.helpers import synthetic_complete_release_root
+from tests.config.helpers import synthetic_complete_release_root, write_synthetic_release_manifest
 from tools.evidence import update_evidence_index as updater
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -843,8 +906,103 @@ def test_admission_refusals_are_never_equality(tmp_path) -> None:
     member.write_bytes(member.read_bytes() + b"# changed after the manifest was cut\n")
     assert _refusal(tampered, GOLDENS) == "CANDIDATE_ADMISSION_REFUSED:MANIFEST_MEMBER_HASH_MISMATCH"
 
-    # The repository root on main is the F01 interval's truthful result, not a golden mismatch.
-    assert _refusal(ROOT, GOLDENS) == "CANDIDATE_ADMISSION_REFUSED:INCOMPLETE_RELEASE_ROSTER"
+
+# --- HDE-EPIC040-PR06: the actual complete admitted candidate ---------------------------
+
+def test_compare_goldens_admits_the_real_root(tmp_path, capfdbinary) -> None:
+    """The repository root is the admitted 44-member release: all eight goldens match."""
+    from engine.runtime.identity import identity_meta
+
+    before_status = _git_status()
+    result = artifact_tools.compare_goldens(ROOT, GOLDENS)
+    assert result.ok is True and result.mismatches == ()
+    assert [row.case_id for row in result.cases] == list(artifact_tools.GOLDEN_CASE_IDS)
+    assert [row.outcome for row in result.cases] == ["match"] * 8
+    assert result.candidate_release_id == identity_meta()["release_id"]
+    report_path = tmp_path / "golden_report.json"
+    code, out, err = _run_cli(["--compare-goldens", str(ROOT), "--report", str(report_path)], capfdbinary)
+    assert (code, err) == (0, b"")
+    assert out == report_path.read_bytes() == artifact_tools.render_golden_report(result)
+    assert json.loads(out)["ok"] is True
+    # The report went outside the tree and nothing inside it changed.
+    assert _git_status() == before_status
+
+
+# --- HDE-EPIC040-PR06 (O-17 / CR-06): executed roster members are bound to the candidate --
+
+def test_executed_member_module_map_is_derived_from_the_roster() -> None:
+    from engine.config.registry_loader import ADMITTED_RELEASE_ROSTER
+
+    mapping = artifact_tools.GOLDEN_EXECUTED_MEMBER_MODULES
+    assert tuple(mapping) == tuple(path for path in ADMITTED_RELEASE_ROSTER if path.endswith(".py"))
+    assert mapping["engine/compat/compute.py"] == "engine.compat.compute"
+    assert mapping["presenter/reader_v1/emitter.py"] == "presenter.reader_v1.emitter"
+    assert mapping["tools/bodygraph/check_magic10_gate_readiness.py"] == "tools.bodygraph.check_magic10_gate_readiness"
+    assert "migrations/005_identity.sql" not in mapping
+    assert all(name == path[:-3].replace("/", ".") for path, name in mapping.items())
+
+
+@pytest.mark.parametrize("path", ["engine/compat/compute.py", "engine/bodygraph/gates.py", "engine/narratives/router.py"])
+def test_executed_member_source_mismatch_refuses(tmp_path, capfdbinary, path) -> None:
+    """A manifest-consistent candidate whose executed member differs from the executing
+    installation's source is a refusal (exit 5), never a match and never a mismatch row."""
+    module_name = artifact_tools.GOLDEN_EXECUTED_MEMBER_MODULES[path]
+    assert module_name in sys.modules
+    altered = synthetic_complete_release_root(tmp_path / "altered")
+    member = altered / path
+    member.write_bytes(member.read_bytes() + b"# altered application member\n")
+    write_synthetic_release_manifest(altered)
+    # Admission alone still succeeds: the member is outside the covered mechanics set.
+    assert _load_active_mechanics_bundle_from_root(altered).release_id
+    assert _refusal(altered, GOLDENS) == f"CANDIDATE_EXECUTING_SOURCE_MISMATCH:{path}"
+    code, out, err = _run_cli(["--compare-goldens", str(altered)], capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"",
+                                f"CANDIDATE_EXECUTING_SOURCE_MISMATCH:{path}\n".encode())
+
+
+@pytest.mark.parametrize("kind", ["deleted", "missing", "symlink", "not_source"])
+def test_executed_member_without_readable_source_refuses(bundle_root, tmp_path, monkeypatch, kind) -> None:
+    module = sys.modules["engine.compat.compute"]
+    if kind == "deleted":
+        monkeypatch.delattr(module, "__file__")
+    elif kind == "missing":
+        monkeypatch.setattr(module, "__file__", str(tmp_path / "gone.py"))
+    elif kind == "symlink":
+        link = tmp_path / "compute.py"
+        link.symlink_to(Path(module.__file__))
+        monkeypatch.setattr(module, "__file__", str(link))
+    else:
+        compiled = tmp_path / "compute.pyc"
+        compiled.write_bytes(b"\x00")
+        monkeypatch.setattr(module, "__file__", str(compiled))
+    assert _refusal(bundle_root, GOLDENS) == "CANDIDATE_EXECUTING_SOURCE_UNAVAILABLE:engine/compat/compute.py"
+
+
+def test_unloaded_members_are_not_bound(tmp_path, monkeypatch) -> None:
+    name = "tools.bodygraph.check_magic10_gate_readiness"
+    monkeypatch.delitem(sys.modules, name, raising=False)
+    altered = synthetic_complete_release_root(tmp_path / "altered")
+    member = altered / "tools/bodygraph/check_magic10_gate_readiness.py"
+    member.write_bytes(member.read_bytes() + b"# altered but never executed by the goldens\n")
+    write_synthetic_release_manifest(altered)
+    assert artifact_tools.compare_goldens(altered, GOLDENS).ok is True
+    assert name not in sys.modules
+
+
+def test_executed_member_binding_is_read_only(bundle_root) -> None:
+    artifact_tools.compare_goldens(bundle_root, GOLDENS)  # warm every lazy runner import
+    before_modules, before_root = dict(sys.modules), _snapshot(bundle_root)
+    assert artifact_tools.compare_goldens(bundle_root, GOLDENS).ok is True
+    assert dict(sys.modules) == before_modules
+    assert _snapshot(bundle_root) == before_root
+    candidate = str(bundle_root)
+    assert not any(str(getattr(module, "__file__", "") or "").startswith(candidate)
+                   for module in list(sys.modules.values()))
+    tree = ast.parse((ROOT / "tools/config/artifacts.py").read_text(encoding="utf-8"))
+    binding = _module_functions(tree)["_golden_bind_executed_members"]
+    assert not (_referenced_names(binding) & {"import_module", "reload", "exec", "compile", "__import__",
+                                              "spec_from_file_location", "exec_module", "write_bytes"})
+    assert not any(isinstance(node, (ast.Import, ast.ImportFrom)) for node in ast.walk(binding))
 
 
 def test_candidate_root_must_be_a_real_directory(bundle_root, tmp_path) -> None:
@@ -1403,7 +1561,10 @@ def test_cli_report_path_that_cannot_be_inspected_refuses(bundle_root, tmp_path,
 
 
 def test_cli_refusals_and_usage(bundle_root, tmp_path, capfdbinary, monkeypatch) -> None:
-    code, out, err = _run_cli(["--compare-goldens", str(ROOT)], capfdbinary)
+    incomplete = synthetic_complete_release_root(tmp_path / "incomplete")
+    manifest = json.loads((incomplete / "catalog/manifest.json").read_bytes())
+    write_canonical(incomplete / "catalog/manifest.json", {**manifest, "files": manifest["files"][:-1]})
+    code, out, err = _run_cli(["--compare-goldens", str(incomplete)], capfdbinary)
     assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"CANDIDATE_ADMISSION_REFUSED:INCOMPLETE_RELEASE_ROSTER\n")
     code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(tmp_path / "absent.json")], capfdbinary)
     assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"GOLDENS_INVALID\n")

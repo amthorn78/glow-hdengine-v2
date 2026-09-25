@@ -33,6 +33,7 @@ from engine.cli.main import _candidate_from_payload
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import band_for
 from engine.config.registry_loader import (
+    ADMITTED_RELEASE_ROSTER,
     _LocalCapture,
     _capture_registry_config,
     _validate_local_schema,
@@ -65,14 +66,49 @@ GATE_CAPTURED_AT_UTC = "2025-12-26T00:00:00Z"
 
 # These governed CLI captures retain their capture-time identity.  Current
 # release-bound identity is produced externally; historical source-tree evidence
-# remains immutable.
-_CAPTURE_SERVICE_IDENTITY = json.loads(
-    (ROOT / "artifacts" / "identity" / "service_identity.json").read_bytes()
+# remains immutable.  PF10 §2.21 (HDE-EPIC040-PR06-F01): the expected
+# capture-time identity is read from the frozen captures themselves, only after
+# each capture's frozen digest is verified, never from a file that an owner or
+# the isolated attestation closure regenerates.  Only captures that carry a
+# frozen digest in _FROZEN_GENERATED_SHA256 can be sources; artifacts/cli/summary.json
+# carries an identity too and must agree, but it is a consumer of this value.
+_CAPTURE_IDENTITY_SOURCES = (
+    ("artifacts/cli/showcompat/args.json", ("identity", "meta")),
+    ("artifacts/cli/showcompat/stdout.json", ("compat", "meta")),
+    ("artifacts/cli/ab.json", ("conjunction", "compat", "meta")),
+    ("artifacts/cli/ba.json", ("conjunction", "compat", "meta")),
 )
-_CAPTURE_IDENTITY_META = {
-    field: _CAPTURE_SERVICE_IDENTITY[field]
-    for field in ("engine_tag", "invocation_tag", "release_id")
-}
+_CAPTURE_IDENTITY_FIELDS = ("engine_tag", "invocation_tag", "release_id")
+
+
+def _capture_identity_meta() -> dict[str, str]:
+    """Return the one capture-time identity the frozen captures agree on.
+
+    Evaluated at validation time, never at import.  Each source is read only
+    after its bytes verify against its frozen digest; the sources must agree.
+    """
+    metas: list[dict[str, str]] = []
+    for rel_path, key_path in _CAPTURE_IDENTITY_SOURCES:
+        expected = _FROZEN_GENERATED_SHA256.get(rel_path)
+        try:
+            obj = json.loads((ROOT / rel_path).read_bytes())
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"frozen_capture_identity_source_unverified:{rel_path}") from exc
+        if expected is None or hashlib.sha256(sercanon(obj, sort_keys=True)).hexdigest() != expected:
+            raise ValueError(f"frozen_capture_identity_source_unverified:{rel_path}")
+        value: object = obj
+        for key in key_path:
+            if not isinstance(value, dict) or key not in value:
+                raise ValueError(f"frozen_capture_identity_shape_invalid:{rel_path}")
+            value = value[key]
+        meta = _require_exact_keys(value, set(_CAPTURE_IDENTITY_FIELDS), f"frozen_capture_identity:{rel_path}")
+        _require_string(meta["engine_tag"], "frozen_capture_identity.engine_tag")
+        _require_string(meta["invocation_tag"], "frozen_capture_identity.invocation_tag")
+        _require_hex64(meta["release_id"], "frozen_capture_identity.release_id")
+        metas.append({field: meta[field] for field in _CAPTURE_IDENTITY_FIELDS})
+    if any(candidate != metas[0] for candidate in metas[1:]):
+        raise ValueError("frozen_capture_identity_disagreement")
+    return metas[0]
 
 
 @dataclass(frozen=True)
@@ -270,23 +306,9 @@ _EXPECTED_SCHEMA_SHA256 = {
     "schemas/channels_v1.schema.json": "33cd685e671b1ee44b93ce3b8ac5119a8d63ae18394f6b899e51f1e172107979",
     "schemas/gates_v1.schema.json": "b3308ca513a1f3e4490ce6c526124675fad1fdcdb5c6abce7257af99d76ed13a",
 }
-_EXPECTED_RELEASE_MANIFEST_PATHS = (
-    "adapter/http_reader.py",
-    "catalog/channels_v1.json",
-    "catalog/gates_v1.json",
-    "catalog/magic10.json",
-    "catalog/magic10_caps.json",
-    "catalog/magic10_seeds.json",
-    "catalog/narratives/keys.json",
-    "catalog/narratives/manifest.json",
-    "catalog/narratives/palettes.json",
-    "catalog/narratives/suppression_map.json",
-    "catalog/narratives/templates.json",
-    "engine/presenter/emitter.py",
-    "engine/serializer/canon.py",
-    "math/thresholds.json",
-    "migrations/005_identity.sql",
-)
+# HDE-EPIC040-PR06: the release manifest validator binds the admission owner's
+# complete roster; the 26-target inventory and the six set rules are separate.
+_EXPECTED_RELEASE_MANIFEST_PATHS = tuple(ADMITTED_RELEASE_ROSTER)
 _READER_COUNTERPARTS = {
     "artifacts/cli/out.json": "artifacts/cli/out_ba.json",
     "artifacts/cli/out_ba.json": "artifacts/cli/out.json",
@@ -362,7 +384,7 @@ def _validate_runtime_identity(value: object) -> dict[str, object]:
     _require_string(meta["engine_tag"], "runtime_identity.engine_tag")
     _require_string(meta["invocation_tag"], "runtime_identity.invocation_tag")
     _require_hex64(meta["release_id"], "runtime_identity.release_id")
-    if meta != _CAPTURE_IDENTITY_META:
+    if meta != _capture_identity_meta():
         raise ValueError("runtime_identity_source_mismatch")
     return meta
 

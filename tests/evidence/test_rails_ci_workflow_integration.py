@@ -1953,17 +1953,21 @@ def test_feature_producers_do_not_reference_path_proof_writer() -> None:
 
 
 def test_open_rails_producer_check_mode_has_no_repo_residue(capsys: pytest.CaptureFixture[str]) -> None:
-    """Under the real admission owner (INCOMPLETE_RELEASE_ROSTER) the check ends
-    RELEASE_NOT_ADMITTED with the distinct code, its explicit line and no residue."""
+    """Under the real admission owner the repository root is admitted: the check
+    validates the fixture proof live, prints its status line and leaves no residue
+    (the loader finds the tracked narrative mount and writes nothing)."""
 
     from tools.evidence import generate_open_rails_abba_proof as open_proof
 
-    assert release_sanity.release_not_admitted_observed() is True
+    assert release_sanity.release_not_admitted_observed() is False
     state_before = _repo_state()
-    assert open_proof.main(["--check-current"]) == release_sanity.RELEASE_NOT_ADMITTED_EXIT_CODE
+    assert open_proof.main(["--check-current"]) == 0
     state_after = _repo_state()
     assert state_before == state_after
-    assert capsys.readouterr().out == "OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED\n"
+    assert capsys.readouterr().out == (
+        '{"path": "audit/gates/determinism/open_rails_abba.json", "result": "pass", '
+        '"status": "OK", "top_level_pass": true}\n'
+    )
 
 
 @pytest.mark.parametrize('source,expected', [

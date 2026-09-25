@@ -30,6 +30,7 @@ from engine.core.core import _chart_fingerprint
 from engine.narratives import state as narrative_state
 from engine.narratives.constants import MISSING_NARRATIVE_KEY
 from engine.narratives.loader import load_pack
+from engine.runtime.identity import identity_meta
 from engine.serializer.canon import sercanon
 from presenter.reader_v1.emitter import emit_reader_v1
 from tests.config.helpers import synthetic_complete_release_root
@@ -351,8 +352,23 @@ def test_identity_independent_pair_key_and_cache_value_binds_fingerprints():
 
 # --- admission and structural validation ------------------------------------------------
 
-def test_real_bundle_provider_refusal_propagates_without_fallback(monkeypatch):
+def test_real_bundle_provider_admits_the_repository_root(monkeypatch):
+    """The unchanged admission owner admits the real root (PF10 §2.15 interval ended); the core is reached once."""
     monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    core = _Spy(compute.compute_core)
+    monkeypatch.setattr(compute, "compute_core", core)
+    result = evaluate_pair(_party(UUID_1, [1]), _party(UUID_2, [1]))
+    assert result["release_id"] == identity_meta()["release_id"]
+    assert core.calls == 1
+
+
+def test_refusing_bundle_provider_propagates_without_fallback(monkeypatch):
+    """The non-admitted branch is reached through the seam; the refusal propagates and nothing falls back."""
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
     core = _Spy(compute.compute_core, fail=True)
     monkeypatch.setattr(compute, "compute_core", core)
     with pytest.raises(SchemaValidationError) as raised:

@@ -164,7 +164,31 @@ def _forbid_live_capture(monkeypatch):
     monkeypatch.setattr(g, "canonical_gate_result", lambda *a, **k: pytest.fail("canonical gate spawned"))
 
 
+def _refuse_admission(monkeypatch):
+    """The repository root is admitted; the non-admitted branch is reached through the seam."""
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
+
+
+def test_build_and_check_succeed_on_the_admitted_root(monkeypatch, tmp_path):
+    """On the admitted repository root the live build reproduces the tracked outputs byte for byte."""
+    for name, value in {"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0"}.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setattr(g, "ensure_determinism_env", lambda *a, **k: None)
+    tracked = {name: Path(getattr(g, name)) for name in ("AB", "BA", "SUM", "ABB", "TWO", "ID")}
+    paths = _redirect_outputs(monkeypatch, tmp_path)
+    assert release_sanity.release_not_admitted_observed() is False
+    g.main([])
+    for name, path in paths.items():
+        assert path.read_bytes() == tracked[name].read_bytes(), name
+    g.main(["--check"])
+
+
 def test_build_raises_typed_release_not_admitted_before_any_live_capture(monkeypatch):
+    _refuse_admission(monkeypatch)
     _forbid_live_capture(monkeypatch)
     with pytest.raises(release_sanity.ReleaseNotAdmitted) as excinfo:
         g.build()
@@ -172,6 +196,7 @@ def test_build_raises_typed_release_not_admitted_before_any_live_capture(monkeyp
 
 
 def test_main_check_prints_explicit_line_exits_distinct_code_and_writes_nothing(monkeypatch, tmp_path, capsys):
+    _refuse_admission(monkeypatch)
     _forbid_live_capture(monkeypatch)
     paths = _redirect_outputs(monkeypatch, tmp_path)
     monkeypatch.setattr(g, "ensure_determinism_env", lambda *a, **k: None)
@@ -183,6 +208,7 @@ def test_main_check_prints_explicit_line_exits_distinct_code_and_writes_nothing(
 
 
 def test_main_write_mode_writes_none_of_its_outputs_when_not_admitted(monkeypatch, tmp_path, capsys):
+    _refuse_admission(monkeypatch)
     _forbid_live_capture(monkeypatch)
     paths = _redirect_outputs(monkeypatch, tmp_path)
     monkeypatch.setattr(g, "ensure_determinism_env", lambda *a, **k: None)

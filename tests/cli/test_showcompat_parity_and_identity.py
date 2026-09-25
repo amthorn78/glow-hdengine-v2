@@ -203,7 +203,10 @@ def test_preimage_artifact_matches_log():
     assert log_parts.get("match") == str(digest == envelope["idempotence_hash"]).lower()
 
 def test_governed_showcompat_capture_uses_immutable_identity(monkeypatch):
-    """The EPIC022 D2 captures are frozen; generation refuses truthfully while not admitted."""
+    """The EPIC022 D2 captures are frozen.  On the admitted repository root the
+    generator's own CLI run refuses the frozen birth-only inputs (PR04 O-20) and
+    writes nothing; while not admitted it refuses before spawning the CLI."""
+    from engine.config.registry_loader import SchemaValidationError
 
     paths = [
         Path("artifacts/cli/showcompat/stdout.json"),
@@ -215,6 +218,18 @@ def test_governed_showcompat_capture_uses_immutable_identity(monkeypatch):
     monkeypatch.setenv("ENGINE_TAG", "poison-engine-tag")
     monkeypatch.setenv("RELEASE_ID", "f" * 64)
     monkeypatch.setenv("PRODUCT_INVOCATION_TAG", "POISON-INVOCATION")
+    with pytest.raises(SystemExit) as excinfo:
+        capture_generator._capture_outputs()
+    assert str(excinfo.value).startswith("showcompat failed (rc=1)")
+    assert "ERR_M10_LEGACY_INPUT_UNSUPPORTED" in str(excinfo.value)
+    with pytest.raises(SystemExit, match="ERR_M10_LEGACY_INPUT_UNSUPPORTED"):
+        capture_generator.main([])
+    assert {path: path.read_bytes() for path in paths} == before
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(capture_generator, "load_active_mechanics_bundle", refuse)
     monkeypatch.setattr(capture_generator.subprocess, "run", lambda *a, **k: pytest.fail("CLI subprocess spawned"))
     with pytest.raises(SystemExit) as excinfo:
         capture_generator._capture_outputs()

@@ -1,8 +1,9 @@
 """CLI conformance artifacts: frozen capture-time records under PF10 §2.15.
 
 Generation needs an admitted release (and a stored BodyGraph source for the
-birth-only conjunction pairs), so the generator refuses truthfully with
-``REQUIRES_ADMITTED_RELEASE`` and ``--check`` validates the frozen bytes by digest.
+birth-only conjunction pairs).  The repository root now admits, so the
+non-admitted refusal (``REQUIRES_ADMITTED_RELEASE``) is reached through the
+owner import; ``--check`` validates the frozen bytes by digest either way.
 The frozen captures keep their coherent immutable identity.
 """
 from __future__ import annotations
@@ -15,6 +16,8 @@ from pathlib import Path
 
 import pytest
 
+from engine.config.registry_loader import SchemaValidationError
+from engine.runtime.identity import identity_meta
 from tools.cli import generate_cli_conformance_artifacts as generator
 
 ARTIFACTS = (
@@ -41,8 +44,24 @@ RETIRED_IDENTITY_ENV = {
 }
 
 
+def _refuse_admission(monkeypatch):
+    """The repository root is admitted; the non-admitted branch is reached through the owner import."""
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(generator, "load_active_mechanics_bundle", refuse)
+
+
+def test_admission_owner_admits_the_repository_root_and_frozen_check_passes():
+    assert generator._require_admitted_release() is None
+    assert generator.load_active_mechanics_bundle().release_id == identity_meta()["release_id"]
+    assert generator.main(["--check"]) == 0
+
+
 def test_cli_conformance_generation_refuses_without_admission_and_frozen_captures_are_current(monkeypatch):
     before = {path: path.read_bytes() for path in ARTIFACTS}
+    _refuse_admission(monkeypatch)
     monkeypatch.setattr(generator.subprocess, "run", lambda *a, **k: pytest.fail("CLI subprocess spawned"))
 
     with pytest.raises(SystemExit) as excinfo:

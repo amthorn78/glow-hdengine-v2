@@ -7,6 +7,10 @@ import sysconfig
 import pytest
 
 from engine.cli.main import cli
+from engine.compat import compute
+from engine.config.registry_loader import SchemaValidationError
+from engine.runtime.identity import identity_meta
+from engine.serializer.canon import sercanon
 from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, build_bundle, build_pack, complete_chart, inject_seams
 
 pytestmark = pytest.mark.epic006
@@ -84,13 +88,29 @@ def test_engine_error_writes_stderr_only():
     assert result.stderr == "PROVIDER_REFUSED\n"
 
 
-def test_admission_refusal_is_a_single_stderr_token(tmp_path: pathlib.Path):
-    # No admitted release exists in the repository; the subprocess cannot receive
-    # the fixture bundle, so the truthful outcome is the admission refusal.
+def test_admission_refusal_is_a_single_stderr_token(monkeypatch, capsys, tmp_path: pathlib.Path):
+    # The repository root is the admitted complete release, so the subprocess
+    # evaluates the pair through the real admission owner and prints exactly one
+    # canonical result document.  The admission refusal remains a single stderr
+    # token; it is asserted through the evaluation provider seam because the
+    # public owner derives its root from execution provenance, never from the
+    # working directory or an environment variable.
     payload = {"left": complete_chart(UUID_A, GATES_A), "right": complete_chart(UUID_B, GATES_B)}
     pair = tmp_path / "pair.json"
     pair.write_text(json.dumps(payload), encoding="utf-8")
     result = subprocess.run(["hdctl", "showcompat", "--pair-file", str(pair)], capture_output=True, text=True, env=_cli_env())
-    assert result.returncode == 1
-    assert result.stdout == ""
-    assert result.stderr == "INCOMPLETE_RELEASE_ROSTER\n"
+    assert result.returncode == 0
+    assert result.stderr == ""
+    document = json.loads(result.stdout)
+    assert result.stdout.encode("utf-8") == sercanon(document, sort_keys=True)
+    assert set(document) == {"categories", "config_id", "pair_key", "release_id", "schema", "signals"}
+    assert document["release_id"] == identity_meta()["release_id"]
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
+    assert cli(["showcompat", "--pair-file", str(pair)]) == 1
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == "INCOMPLETE_RELEASE_ROSTER\n"
