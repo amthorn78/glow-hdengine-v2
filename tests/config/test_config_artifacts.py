@@ -1243,6 +1243,35 @@ def test_cli_refusals_and_usage(bundle_root, tmp_path, capfdbinary, monkeypatch)
     assert code == config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE and out == b"" and err.startswith(b"RAILS_CLOSED_REQUIRED:")
 
 
+# An empty path argument (for example an unset variable expanded by automation) is refused:
+# it never becomes the current directory, the default goldens or "no report".  The
+# current directory here is itself a valid candidate, so an empty root cannot pass by it.
+@pytest.mark.parametrize("argument, token", [
+    ("--compare-goldens", "CANDIDATE_ROOT_INVALID"),
+    ("--goldens", "GOLDENS_INVALID"),
+    ("--report", "REPORT_PATH_INVALID"),
+], ids=["candidate_root", "goldens", "report"])
+def test_cli_empty_path_arguments_refuse(bundle_root, capfdbinary, monkeypatch, argument, token) -> None:
+    monkeypatch.chdir(bundle_root)
+    before = _snapshot(bundle_root)
+    argv = ["--compare-goldens", ""] if argument == "--compare-goldens" else ["--compare-goldens", str(bundle_root), argument, ""]
+    assert _run_cli(argv, capfdbinary) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", f"{token}\n".encode())
+    assert _snapshot(bundle_root) == before
+
+
+# Outside --compare-goldens, --goldens and --report are usage errors even when empty; an
+# empty value never falls through to the default writer mode.
+@pytest.mark.parametrize("argument", ["--goldens", "--report"])
+def test_golden_arguments_without_compare_goldens_are_usage_errors_even_when_empty(monkeypatch, capfdbinary, argument) -> None:
+    for writer in ("generate_config_artifacts", "check_config_artifacts", "publish_config_family"):
+        monkeypatch.setattr(config_tools, writer, lambda *args, _writer=writer, **kwargs: pytest.fail(f"{_writer} reached"))
+    for value in ("", "value.json"):
+        with pytest.raises(SystemExit) as raised:
+            config_tools.main([argument, value])
+        assert raised.value.code == 2
+        capfdbinary.readouterr()
+
+
 def test_refusal_and_mismatch_exit_codes_never_collide_with_release_not_admitted() -> None:
     assert config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE == 1
     assert config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE == 5

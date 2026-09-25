@@ -299,14 +299,22 @@ def _write_golden_report(destination: Path, payload: bytes) -> None:
         raise
 
 
-def _compare_goldens_main(candidate_root: Path, goldens: Path, report: Path | None) -> int:
+def _compare_goldens_main(candidate_root: str, goldens: str | None, report: str | None) -> int:
     try:
         try:
             require_closed_rails()
         except SystemExit as exc:
             raise GoldenComparisonRefusal(str(exc.code)) from None
-        destination = _golden_report_destination(report, candidate_root, goldens) if report is not None else None
-        result = compare_goldens(candidate_root, goldens)
+        # An empty path argument (an unset variable expanded by automation) is refused;
+        # it never becomes the current directory, the default goldens or "no report".
+        for value, code in ((report, "REPORT_PATH_INVALID"), (goldens, "GOLDENS_INVALID"),
+                            (candidate_root, "CANDIDATE_ROOT_INVALID")):
+            if value == "":
+                raise GoldenComparisonRefusal(code)
+        root = Path(candidate_root)
+        goldens_path = GOLDENS_DEFAULT_PATH if goldens is None else Path(goldens)
+        destination = _golden_report_destination(Path(report), root, goldens_path) if report is not None else None
+        result = compare_goldens(root, goldens_path)
         payload = render_golden_report(result)
         if destination is not None:
             try:
@@ -339,12 +347,8 @@ def _main(argv: list[str] | None = None) -> int:
     if args.compare_goldens is not None:
         if args.allow_aliases:
             parser.error("--compare-goldens requires the canonical goldens without aliases")
-        return _compare_goldens_main(
-            Path(args.compare_goldens),
-            Path(args.goldens) if args.goldens else GOLDENS_DEFAULT_PATH,
-            Path(args.report) if args.report else None,
-        )
-    if args.goldens or args.report:
+        return _compare_goldens_main(args.compare_goldens, args.goldens, args.report)
+    if args.goldens is not None or args.report is not None:
         parser.error("--goldens and --report apply only to --compare-goldens")
     if args.publish_family:
         if args.allow_aliases:

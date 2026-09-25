@@ -200,6 +200,8 @@ def test_empty_selection_refuses_before_any_query(monkeypatch, capfdbinary, tmp_
     ["--user-id", "person-x"],
     ["--user-id", UUID_A, "--user-id", UUID_A],
     ["--user-id", "00000000000000000000000000000001"],
+    ["--user-id", ""],
+    ["--selection-file", ""],
 ])
 def test_invalid_selection_refuses_before_any_query(monkeypatch, capfdbinary, argv) -> None:
     fake = _good_db(UUID_A)
