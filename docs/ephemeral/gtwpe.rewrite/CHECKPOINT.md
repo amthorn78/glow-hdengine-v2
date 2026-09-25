@@ -6,7 +6,7 @@ facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, from main @ f141e5d
 pull_request: "#495, https://github.com/amthorn78/glow-hdengine-v2/pull/495 (draft)"
 phase: P0 Preflight
-updated: 2026-09-25T08:00Z
+updated: 2026-09-25T07:55Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -23,7 +23,9 @@ stopped and does not start P1 until the relay says so.**
 | Base | `main` @ `f141e5d` (#493 merged) |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, opened 2026-09-25 at about 07:58Z. Notion, Drive, skills, canon, registry, graph: **none** |
+| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z. Notion, Drive, skills, canon, registry, graph: **none** |
+| Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
+| `main` since the branch point | Now `0c610d6` (#494, one HDE-EPIC040-PR05 file in `docs/ephemeral/`). No GTWPE source changed, and the PR stays mergeable |
 | Open errors | P0-1 to P0-5 (§6), all `LISTED`, all `OPEN`. PE37 numbers them in `ERRORS.md` |
 | Next action | Stop. Await PE37's V0 check and the relay's instruction to start P1 |
 
@@ -73,7 +75,7 @@ Every repository file was read at `f141e5d`.
 ### PE Metaprompt findings that bear on later phases
 
 - **Unchanged since its test.** Its last-edited value is still 2026-09-23T17:17:22.217Z.
-- **Its §14 workarounds held at P0.** Its body was never hashed, the transient file was deleted
+- **The plan's §14 workarounds held at P0.** Its body was never hashed, the transient file was deleted
   (§5), no procedure was sought in Drive or `docs/ephemeral`, and its GCFPE overlay, PR-lane and
   Alpha text were not applied.
 - **Four test defects have no §14 workaround.** They are carried to P1 (§7): `D5` (two handoff
