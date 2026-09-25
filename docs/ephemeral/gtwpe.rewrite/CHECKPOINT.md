@@ -4,9 +4,9 @@ plan: docs/ephemeral/gtwpe.rewrite/GTWPE-IMPLEMENTATION-PLAN-v1.0.md (GTWPE-IMPL
 worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created 2026-09-25T07:39:13Z, origin web_claude_ai)
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, from main @ f141e5d
-pull_request: opened at this checkpoint; its number is recorded in §1 by the checkpoint's second commit
+pull_request: "#495, https://github.com/amthorn78/glow-hdengine-v2/pull/495 (draft)"
 phase: P0 Preflight
-updated: 2026-09-25T07:55Z
+updated: 2026-09-25T08:00Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -23,7 +23,7 @@ stopped and does not start P1 until the relay says so.**
 | Base | `main` @ `f141e5d` (#493 merged) |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | Git: this branch, pushed. GitHub: one draft PR from this branch. Notion, Drive, skills, canon, registry, graph: **none** |
+| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, opened 2026-09-25 at about 07:58Z. Notion, Drive, skills, canon, registry, graph: **none** |
 | Open errors | P0-1 to P0-5 (§6), all `LISTED`, all `OPEN`. PE37 numbers them in `ERRORS.md` |
 | Next action | Stop. Await PE37's V0 check and the relay's instruction to start P1 |
 
