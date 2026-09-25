@@ -389,6 +389,7 @@ import ast
 import copy
 import errno
 import hashlib
+import inspect
 import os
 import subprocess
 
@@ -842,6 +843,80 @@ def test_self_pair_that_reaches_core_cache_or_router_is_a_mismatch(bundle_root, 
     assert result.ok is False
     assert [(row.case_id, row.path, row.expected, row.actual) for row in result.mismatches] == [
         ("M10-G007", path, False, True) for path in paths]
+
+
+# Codex CR-17: the router stub keeps the canonical router's contract, and every
+# evaluation routes exactly its result rows in both normalized directions.  Each variant
+# regresses ``compute._route`` as a broken evaluate_pair would call its router: the
+# first five are what route_keys refuses, the last two misroute with valid values.
+_ROUTE_REGRESSIONS = {
+    "reverse_perspective_typo": (lambda c, b, p: (c, b, "typo" if p == "b_to_a" else p, {}), "execution"),
+    "reverse_perspective_shared": (lambda c, b, p: (c, b, "shared" if p == "b_to_a" else p, {}), "execution"),
+    "band_not_a_narrative_band": (lambda c, b, p: (c, b.lower(), p, {}), "execution"),
+    "category_not_the_candidates": (lambda c, b, p: (c + "_x", b, p, {}), "execution"),
+    "unexpected_keyword": (lambda c, b, p: (c, b, p, {"unexpected": True}), "execution"),
+    "another_valid_category": (lambda c, b, p: ("heat", b, p, {}), "router_calls"),
+    "another_valid_band": (lambda c, b, p: (c, "Glow", p, {}), "router_calls"),
+}
+
+
+def _regressed_route(transform):
+    def route(router, category, band, perspective):
+        category, band, perspective, keywords = transform(category, band, perspective)
+        return router(category, band, perspective, **keywords)
+    return route
+
+
+def _required_routing(case_id: str) -> list[list[str]]:
+    case = next(row for row in _document()["cases"] if row["case_id"] == case_id)
+    rows = case["expected"]["intrinsic"]["categories"] if case_id == "M10-G005" else case["expected"]["categories"]
+    return sorted(([row["category_id"], row["band"], perspective] for row in rows for perspective in ("a_to_b", "b_to_a")),
+                  key=repr)
+
+
+@pytest.mark.parametrize("variant", list(_ROUTE_REGRESSIONS))
+def test_a_misrouting_evaluate_pair_is_never_a_match(bundle_root, monkeypatch, variant) -> None:
+    transform, path = _ROUTE_REGRESSIONS[variant]
+    monkeypatch.setattr(compute, "_route", _regressed_route(transform))
+    result = artifact_tools.compare_goldens(bundle_root, GOLDENS)
+    assert result.ok is False
+    assert [(row.case_id, row.path) for row in result.mismatches] == [("M10-G005", path), ("M10-G008", path)]
+    for row in result.mismatches:
+        if path == "execution":
+            assert row.actual.startswith("TypeError: " if variant == "unexpected_keyword"
+                                         else "CompatBoundaryError: ERR_MISSING_NARRATIVE_KEY:narrative_key:")
+        else:
+            observed = {(category, band, perspective) for category, band, perspective in
+                        (transform(c, b, p)[:3] for c, b, p in map(tuple, _required_routing(row.case_id)))}
+            assert row.expected == _required_routing(row.case_id)
+            assert row.actual == sorted(map(list, observed), key=repr)
+
+
+def test_the_router_stub_answers_as_the_canonical_router_does(bundle) -> None:
+    constants = _document()["constants"]
+    stub, missing = constants["router_stub"], narrative_router.MISSING_NARRATIVE_KEY
+    calls: list = []
+    router = artifact_tools._golden_router(constants, bundle, calls)
+    assert list(inspect.signature(router).parameters) == list(inspect.signature(narrative_router.route_keys).parameters)
+    assert router("harmony", "Cool", "a_to_b") == {"personal_key": stub["personal_lo_to_hi"], "shared_key": stub["shared"]}
+    assert router("harmony", "Glow", "b_to_a", viewer_top=None, flags=()) == {
+        "personal_key": stub["personal_hi_to_lo"], "shared_key": stub["shared"]}
+    assert router("balance", "Open", "shared") == {"personal_key": missing, "shared_key": stub["shared"]}
+    for arguments in (("harmony", "Cool", "typo"), ("harmony", "cool", "a_to_b"), ("harmony_x", "Warm", "b_to_a")):
+        assert router(*arguments) == {"personal_key": missing, "shared_key": missing}
+    with pytest.raises(TypeError):
+        router("harmony", "Cool", "a_to_b", unexpected=True)
+    assert calls == [("harmony", "Cool", "a_to_b"), ("harmony", "Glow", "b_to_a"), ("balance", "Open", "shared"),
+                     ("harmony", "Cool", "typo"), ("harmony", "cool", "a_to_b"), ("harmony_x", "Warm", "b_to_a")]
+
+
+def test_repeated_identical_routing_is_not_a_mismatch(bundle_root, monkeypatch) -> None:
+    def route_twice(router, category, band, perspective):
+        router(category, band, perspective)
+        return router(category, band, perspective)
+
+    monkeypatch.setattr(compute, "_route", route_twice)
+    assert artifact_tools.compare_goldens(bundle_root, GOLDENS).ok is True
 
 
 def test_transcription_digests_pin_the_committed_cases() -> None:

@@ -614,14 +614,46 @@ def _golden_party(constants: Mapping[str, Any], spec: Mapping[str, Any], path: s
     return evaluation_party(ResolvedCompatChart(spec["person_uid"], chart, "resolved", None, None, None, None))
 
 
-def _golden_router(constants: Mapping[str, Any]) -> Callable[..., Mapping[str, str]]:
-    stub = constants["router_stub"]
+def _golden_router(constants: Mapping[str, Any], bundle,
+                   calls: list[tuple[object, object, object]]) -> Callable[..., Mapping[str, str]]:
+    """The PF01 §9.5 router stub, held to the canonical router's contract.
 
-    def router(category: str, band: str, perspective: str, **_ignored):
-        personal = stub["personal_lo_to_hi"] if perspective == "a_to_b" else stub["personal_hi_to_lo"]
-        return {"personal_key": personal, "shared_key": stub["shared"]}
+    It has ``route_keys``'s signature and answers the missing key wherever that
+    router does: a category outside the candidate's, a band outside the narrative
+    bands, a perspective outside the narrative perspectives, and the personal key
+    of the ``shared`` perspective.  Every call is recorded for the routing check.
+    """
+    from engine.narratives.constants import BANDS, MISSING_NARRATIVE_KEY, PERSPECTIVES
+
+    stub = constants["router_stub"]
+    categories = frozenset(bundle.registry.magic10_order)
+    personal = {"a_to_b": stub["personal_lo_to_hi"], "b_to_a": stub["personal_hi_to_lo"]}
+
+    def router(category: str, band: str, perspective: str, *, viewer_top: str | None = None,
+               flags: Sequence[str] | None = None) -> dict[str, str]:
+        calls.append((category, band, perspective))
+        if category not in categories or band not in BANDS or perspective not in PERSPECTIVES:
+            return {"personal_key": MISSING_NARRATIVE_KEY, "shared_key": MISSING_NARRATIVE_KEY}
+        return {"personal_key": personal.get(perspective, MISSING_NARRATIVE_KEY), "shared_key": stub["shared"]}
 
     return router
+
+
+def _golden_check_routing(calls: list[tuple[object, object, object]], result: Mapping[str, Any]) -> None:
+    """Hold one evaluation's routing to the tuples its own result requires.
+
+    ``evaluate_pair`` routes each category row once lo→hi (``a_to_b``) and once
+    hi→lo (``b_to_a``).  The stub's constant keys cannot show a call that named
+    another category, band or perspective, so the recorded calls must equal, as a
+    set, the row tuples in both directions.
+    """
+    required = {(row["category_id"], row["band"], perspective)
+                for row in result["categories"] for perspective in ("a_to_b", "b_to_a")}
+    observed = set(calls)
+    calls.clear()
+    if observed != required:
+        raise _GoldenCaseMismatch("router_calls", sorted(map(list, required), key=repr),
+                                  sorted(map(list, observed), key=repr))
 
 
 def _golden_reader(result: Mapping[str, Any], meta: Mapping[str, str], release_id: str):
@@ -651,7 +683,8 @@ def _golden_intrinsic(result: Mapping[str, Any]) -> dict[str, Any]:
 def _golden_run_identity_independence(case, constants, bundle) -> dict[str, Any]:
     from engine.compat.compute import evaluate_pair
 
-    router = _golden_router(constants)
+    routed: list[tuple[object, object, object]] = []
+    router = _golden_router(constants, bundle, routed)
     pairs = case["inputs"]["pairs"]
     for index, pair in enumerate(pairs):
         _golden_closed(pair, _GOLDEN_PAIR_KEYS, f"inputs.pairs[{index}]")
@@ -665,6 +698,7 @@ def _golden_run_identity_independence(case, constants, bundle) -> dict[str, Any]
         party_a = _golden_party(constants, pair["a"], f"inputs.pairs[{index}].a")
         party_b = _golden_party(constants, pair["b"], f"inputs.pairs[{index}].b")
         results.append(evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router))
+        _golden_check_routing(routed, results[-1])
     intrinsic = [_golden_intrinsic(result) for result in results]
     return {
         "pair_key_equal_across_pairs": len({row["pair_key"] for row in intrinsic}) == 1,
@@ -707,7 +741,7 @@ def _golden_run_self_pair(case, constants, bundle) -> dict[str, Any]:
     from engine.compat.error_tokens import CompatBoundaryError
 
     inputs = case["inputs"]
-    router = _golden_router(constants)
+    router = _golden_router(constants, bundle, [])
     party_a = _golden_party(constants, inputs["a"], "inputs.a")
     party_b = _golden_party(constants, inputs["b"], "inputs.b")
     # PF01 §9.5: a valid self-pair calls neither Engine Core, the intrinsic cache nor
@@ -759,12 +793,16 @@ def _golden_run_equal_mask_pair(case, constants, bundle) -> dict[str, Any]:
     from engine.compat.compute import evaluate_pair, intrinsic_pair_key, is_ineligible_carrier, orient
 
     inputs = case["inputs"]
-    router = _golden_router(constants)
+    routed: list[tuple[object, object, object]] = []
+    router = _golden_router(constants, bundle, routed)
     party_a = _golden_party(constants, inputs["a"], "inputs.a")
     party_b = _golden_party(constants, inputs["b"], "inputs.b")
     result = evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router)
+    _golden_check_routing(routed, result)
     result_two = evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router)
+    _golden_check_routing(routed, result_two)
     result_ba = evaluate_pair(party_b, party_a, bundle_provider=lambda: bundle, router=router)
+    _golden_check_routing(routed, result_ba)
     if is_ineligible_carrier(result):
         raise _GoldenCaseMismatch("expected.eligible", True, False)
     lo, hi = orient(party_a, party_b)
