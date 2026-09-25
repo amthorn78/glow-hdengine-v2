@@ -249,9 +249,30 @@ _GOLDEN_ADVERSE_KEYS = frozenset({"adverse_id", "field", "party", "value"})
 # ``constants`` and every case field other than ``inputs`` and ``expected``) are
 # never compared, and most are never consumed, so they are pinned to the committed
 # PF01 §9.5 transcription: a collection carrying any other identity or annotation
-# is refused instead of being reported as matching.  ``inputs`` stay free, so an
-# altered input still yields its mismatches; ``expected`` is what is compared.
+# is refused instead of being reported as matching.
 GOLDEN_ANNOTATION_SHA256 = "c9ce74c3d055826235d16b26de4dbac31644d1a995c73c6844447c9b6e846a8a"
+# Each case's ``inputs`` and ``expected`` are bound to the same transcription.  A
+# collection that differs from it still runs, so an altered value yields its own
+# mismatches, and the difference itself is that case's ``transcription.inputs`` or
+# ``transcription.expected`` mismatch: a consistently altered case is never a match.
+GOLDEN_TRANSCRIPTION_SHA256 = {
+    "M10-G001": ("86c92a954997d681b0c9e1bdac58920efface6b96bffd5ef8ea455baaaababdc",
+                 "0c685b5d91a9a6334eff8a343343d2944cda625d2457df50b1d1a56b4c615a27"),
+    "M10-G002": ("b25eca653b91d94019c920c5a96723326e42700de81bee7e0b39bcd00f5db515",
+                 "e350d282448ff20e0a4b8399c5dcffc9a405c46ef64bb947a27948688fa7e78e"),
+    "M10-G003": ("2aee12e52bafb3812fcf7e902d0e4d60d291b528413e41eb3b095ae6b6a642c4",
+                 "78477e4aaff2f4f2fb75bcb087d695dadbf8460bc64224d3df18c74fa1ea110c"),
+    "M10-G004": ("e40f96dba1ac08cddfea718e1c1c3c1df18affb708cdbbc0830ea463e4995afb",
+                 "c79d4b6471efeff56e4742a1262c3ab46303472bd85bd54d661a6e1b1f3b522c"),
+    "M10-G005": ("f2ecd41cbcc4a77092a8b256b794076545743932291a7b5bc7c8a383ee95e37b",
+                 "a71ab811d480966132f6b1fdd6aa407ca1f1dd293a5ed1fbaff20067c3128e1c"),
+    "M10-G006": ("5b36e617c6f38b308eaf2a7bc7f9953814eef2be299a9e4a6c327dd2d7ed4961",
+                 "9037a73693417a4467b619bf0ce3189c61dd5369373fb12d842c316ace21b38c"),
+    "M10-G007": ("c504556c01d92f8e6332a37c3d5576dde53cdd88a613dc1a069d85109a067ffc",
+                 "6280843e3bd15cdb4a6ca9791c6db47e864209cb7194a5016e071a0113c5c339"),
+    "M10-G008": ("fa8abcd6e256ed02cf642c18b92dd89ef74ea2ed81cf189e0316db9cfae1460d",
+                 "30962a613380f7f380ebd12868f25d4e2076f5864c7e177e2c93802e8a86a9eb"),
+}
 
 
 class GoldenComparisonRefusal(RuntimeError):
@@ -340,6 +361,16 @@ def _golden_annotation_digest(document: Mapping[str, Any]) -> str:
     projection["cases"] = [{key: value for key, value in case.items() if key not in ("inputs", "expected")}
                            for case in document["cases"]]
     return hashlib.sha256(canon.sercanon(projection, sort_keys=True)).hexdigest()
+
+
+def _golden_transcription_mismatches(case: Mapping[str, Any]) -> list[Mismatch]:
+    pinned = GOLDEN_TRANSCRIPTION_SHA256[case["case_id"]]
+    found = []
+    for part, digest in zip(("inputs", "expected"), pinned):
+        actual = hashlib.sha256(canon.sercanon(case[part], sort_keys=True)).hexdigest()
+        if actual != digest:
+            found.append(Mismatch(case["case_id"], f"transcription.{part}", digest, actual))
+    return found
 
 
 def _golden_validate_document(document: Mapping[str, Any]) -> None:
@@ -759,6 +790,12 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
     through the admission owner, runs each case through the canonical
     entrypoint for its kind, and reports every mismatch.  It never writes,
     activates, generates or repairs anything, and a refusal is never equality.
+
+    The entrypoints are those of the executing installation.  Admission proves
+    executable equivalence with the candidate's bytes only for the admission
+    owner's covered mechanics modules, so a candidate root other than the
+    executing installation is a fixture candidate whose success is test-only,
+    never release admission.
     """
     require_closed_rails()
     document, goldens_sha256 = _golden_load_document(goldens_path)
@@ -780,6 +817,7 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
             # example a CompatBoundaryError from a non-canonical identity) is that
             # case's mismatch; it never aborts the comparison of the other cases.
             case_mismatches = [Mismatch(case_id, "execution", "completed", f"{type(exc).__name__}: {exc}")]
+        case_mismatches += _golden_transcription_mismatches(case)
         mismatches.extend(case_mismatches)
         outcomes.append(CaseOutcome(case_id, case["case_type"], case["kind"],
                                     "match" if not case_mismatches else "mismatch", expected, observed))

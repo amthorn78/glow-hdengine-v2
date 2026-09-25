@@ -535,16 +535,21 @@ def _alter(document: dict, case_id: str, mutate) -> None:
 
 
 ALTERATIONS = {
-    "g004_signal_q": ("M10-G004", lambda case: case["expected"]["signals"][1].__setitem__("q", 64), {"expected.signals[1].q"}),
+    "g004_signal_q": ("M10-G004", lambda case: case["expected"]["signals"][1].__setitem__("q", 64),
+                      {"expected.signals[1].q", "transcription.expected"}),
     "g002_category_order": ("M10-G002", lambda case: case["expected"]["categories"].__setitem__(slice(0, 2), case["expected"]["categories"][0:2][::-1]),
                             {"expected.categories[0].category_id", "expected.categories[0].score", "expected.categories[0].band",
-                             "expected.categories[1].category_id", "expected.categories[1].score", "expected.categories[1].band"}),
+                             "expected.categories[1].category_id", "expected.categories[1].score", "expected.categories[1].band",
+                             "transcription.expected"}),
     "g008_reader_hash_byte": ("M10-G008", lambda case: case["expected"]["reader"].__setitem__("idempotence_hash", "0" + G008_READER_HASH[1:]),
-                              {"expected.reader.idempotence_hash"}),
+                              {"expected.reader.idempotence_hash", "transcription.expected"}),
     "g008_identity_flip": ("M10-G008", lambda case: case["inputs"]["b"].__setitem__("person_uid", "00000000-0000-0000-0000-000000000000"),
-                           {"expected.members[1].person_uid", "expected.orientation.hi", "expected.orientation.lo"}),
-    "g007_reader_hash": ("M10-G007", lambda case: case["expected"]["reader"].__setitem__("idempotence_hash", "f" * 64), {"expected.reader.idempotence_hash"}),
-    "g006_score": ("M10-G006", lambda case: case["expected"]["results"][0].__setitem__("band", "Open"), {"expected.results[0].band"}),
+                           {"expected.members[1].person_uid", "expected.orientation.hi", "expected.orientation.lo",
+                            "transcription.inputs"}),
+    "g007_reader_hash": ("M10-G007", lambda case: case["expected"]["reader"].__setitem__("idempotence_hash", "f" * 64),
+                         {"expected.reader.idempotence_hash", "transcription.expected"}),
+    "g006_score": ("M10-G006", lambda case: case["expected"]["results"][0].__setitem__("band", "Open"),
+                   {"expected.results[0].band", "transcription.expected"}),
 }
 
 
@@ -582,7 +587,8 @@ def test_added_or_missing_expected_keys_are_mismatches(bundle_root, tmp_path) ->
     del case["expected"]["categories"]
     result = artifact_tools.compare_goldens(bundle_root, _write_document(tmp_path / "keys.json", document))
     assert {(row.path, row.expected, row.actual if row.path.endswith("extra") else "<observed>") for row in result.mismatches} == {
-        ("expected.extra", 1, "<absent>"), ("expected.categories", "<absent>", "<observed>")}
+        ("expected.extra", 1, "<absent>"), ("expected.categories", "<absent>", "<observed>"),
+        ("transcription.expected", artifact_tools.GOLDEN_TRANSCRIPTION_SHA256["M10-G001"][1], "<observed>")}
 
 
 UNRUNNABLE = {
@@ -601,11 +607,12 @@ def test_a_case_that_cannot_execute_is_its_own_mismatch_never_a_crash(bundle_roo
     goldens = _write_document(tmp_path / f"{name}.json", document)
     result = artifact_tools.compare_goldens(bundle_root, goldens)
     assert result.ok is False
-    assert [(row.case_id, row.path, row.expected) for row in result.mismatches] == [(case_id, "execution", "completed")]
+    assert [(row.case_id, row.path, row.expected) for row in result.mismatches] == [
+        (case_id, "execution", "completed"), (case_id, "transcription.inputs", artifact_tools.GOLDEN_TRANSCRIPTION_SHA256[case_id][0])]
     assert result.mismatches[0].actual.startswith(actual_prefix)
     assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == [case_id]
     code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
-    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"", b"GOLDEN_COMPARISON_MISMATCH:1\n")
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"", b"GOLDEN_COMPARISON_MISMATCH:2\n")
 
 
 def _setter(*path, value):
@@ -640,7 +647,7 @@ def test_unconsumed_or_unknown_input_fields_are_mismatches(bundle_root, tmp_path
     _alter(document, case_id, mutate)
     result = artifact_tools.compare_goldens(bundle_root, _write_document(tmp_path / f"{name}.json", document))
     assert result.ok is False
-    assert [(row.case_id, row.path) for row in result.mismatches] == [(case_id, path)]
+    assert [(row.case_id, row.path) for row in result.mismatches] == [(case_id, path), (case_id, "transcription.inputs")]
     assert all(row.outcome == "match" for row in result.cases if row.case_id != case_id)
 
 
@@ -796,6 +803,48 @@ def test_annotation_digest_pins_the_committed_transcription() -> None:
         altered = _document()
         _alter(altered, *ALTERATIONS[name][:2])
         assert artifact_tools._golden_annotation_digest(altered) == artifact_tools.GOLDEN_ANNOTATION_SHA256
+
+
+def test_transcription_digests_pin_the_committed_cases() -> None:
+    pins = artifact_tools.GOLDEN_TRANSCRIPTION_SHA256
+    assert tuple(pins) == artifact_tools.GOLDEN_CASE_IDS
+    for case in _document()["cases"]:
+        assert pins[case["case_id"]] == tuple(hashlib.sha256(sercanon(case[part], sort_keys=True)).hexdigest()
+                                              for part in ("inputs", "expected"))
+        assert artifact_tools._golden_transcription_mismatches(case) == []
+
+
+def _swap_g004_members(case) -> None:
+    inputs = case["inputs"]
+    inputs["member_a_gates"], inputs["member_b_gates"] = inputs["member_b_gates"], inputs["member_a_gates"]
+
+
+def _g006_first_pair_to_50(case) -> None:
+    case["inputs"]["pairs"][0] = [50, 50]
+    case["expected"]["results"][0] = {"band": "Open", "q": [50, 50], "score": 25}
+
+
+# A case altered so that the candidate still reproduces its expected values is
+# never certified: the difference from the committed transcription is the mismatch.
+CONSISTENT_ALTERATIONS = {
+    "g006_inputs_and_expected": ("M10-G006", _g006_first_pair_to_50, ["transcription.expected", "transcription.inputs"]),
+    "g004_members_swapped": ("M10-G004", _swap_g004_members, ["transcription.inputs"]),
+}
+
+
+@pytest.mark.parametrize("name", sorted(CONSISTENT_ALTERATIONS))
+def test_a_consistently_altered_case_is_never_a_match(bundle_root, tmp_path, capfdbinary, name) -> None:
+    case_id, mutate, paths = CONSISTENT_ALTERATIONS[name]
+    document = _document()
+    _alter(document, case_id, mutate)
+    goldens = _write_document(tmp_path / f"{name}.json", document)
+    result = artifact_tools.compare_goldens(bundle_root, goldens)
+    assert result.ok is False
+    assert [(row.case_id, row.path) for row in result.mismatches] == [(case_id, path) for path in paths]
+    assert [row.case_id for row in result.cases if row.outcome == "mismatch"] == [case_id]
+    code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"",
+                                f"GOLDEN_COMPARISON_MISMATCH:{len(paths)}\n".encode("ascii"))
 
 
 def _metadata(mutate):
@@ -987,10 +1036,11 @@ def test_cli_mismatch_is_a_single_token_and_the_report_holds_every_mismatch(bund
     report_path.parent.mkdir()
     code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens), "--report", str(report_path)], capfdbinary)
     assert (code, out) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"")
-    assert err == b"GOLDEN_COMPARISON_MISMATCH:2\n"
+    assert err == b"GOLDEN_COMPARISON_MISMATCH:4\n"
     report = json.loads(report_path.read_bytes())
     assert report["ok"] is False and {(row["case_id"], row["path"]) for row in report["mismatches"]} == {
-        ("M10-G004", "expected.signals[1].q"), ("M10-G007", "expected.reader.idempotence_hash")}
+        ("M10-G004", "expected.signals[1].q"), ("M10-G004", "transcription.expected"),
+        ("M10-G007", "expected.reader.idempotence_hash"), ("M10-G007", "transcription.expected")}
     assert report_path.read_bytes() == artifact_tools.render_golden_report(artifact_tools.compare_goldens(bundle_root, goldens))
 
 
