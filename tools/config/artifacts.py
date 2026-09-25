@@ -269,7 +269,7 @@ GOLDEN_TRANSCRIPTION_SHA256 = {
     "M10-G006": ("5b36e617c6f38b308eaf2a7bc7f9953814eef2be299a9e4a6c327dd2d7ed4961",
                  "9037a73693417a4467b619bf0ce3189c61dd5369373fb12d842c316ace21b38c"),
     "M10-G007": ("c504556c01d92f8e6332a37c3d5576dde53cdd88a613dc1a069d85109a067ffc",
-                 "6280843e3bd15cdb4a6ca9791c6db47e864209cb7194a5016e071a0113c5c339"),
+                 "3a93fad18cbb819b851c47ba63085df19d46cea3e32c34b94cbfaf17879f08b4"),
     "M10-G008": ("fa8abcd6e256ed02cf642c18b92dd89ef74ea2ed81cf189e0316db9cfae1460d",
                  "30962a613380f7f380ebd12868f25d4e2076f5864c7e177e2c93802e8a86a9eb"),
 }
@@ -674,6 +674,34 @@ def _golden_run_identity_independence(case, constants, bundle) -> dict[str, Any]
     }
 
 
+class _GoldenCacheSpy:
+    """An intrinsic cache that holds nothing and records every access."""
+
+    def __init__(self, calls: list[str]) -> None:
+        self._calls = calls
+
+    def get(self, key: str) -> None:
+        self._calls.append("cache")
+        return None
+
+    def put(self, key: str, value: object) -> None:
+        self._calls.append("cache")
+
+
+def _golden_recording_seams(bundle, router, calls: list[str]) -> dict[str, Any]:
+    """evaluate_pair's three seams, each recording every call in ``calls``."""
+
+    def provider():
+        calls.append("bundle_provider")
+        return bundle
+
+    def tracked_router(*args, **kwargs):
+        calls.append("router")
+        return router(*args, **kwargs)
+
+    return {"bundle_provider": provider, "cache": _GoldenCacheSpy(calls), "router": tracked_router}
+
+
 def _golden_run_self_pair(case, constants, bundle) -> dict[str, Any]:
     from engine.compat.compute import evaluate_pair
     from engine.compat.error_tokens import CompatBoundaryError
@@ -682,8 +710,13 @@ def _golden_run_self_pair(case, constants, bundle) -> dict[str, Any]:
     router = _golden_router(constants)
     party_a = _golden_party(constants, inputs["a"], "inputs.a")
     party_b = _golden_party(constants, inputs["b"], "inputs.b")
-    result = evaluate_pair(party_a, party_b, bundle_provider=lambda: bundle, router=router)
-    reversed_result = evaluate_pair(party_b, party_a, bundle_provider=lambda: bundle, router=router)
+    # PF01 §9.5: a valid self-pair calls neither Engine Core, the intrinsic cache nor
+    # the narrative router.  evaluate_pair reaches Engine Core only with the admitted
+    # bundle, so the bundle provider stands for it; all three seams record any call.
+    calls: list[str] = []
+    seams = _golden_recording_seams(bundle, router, calls)
+    result = evaluate_pair(party_a, party_b, **seams)
+    reversed_result = evaluate_pair(party_b, party_a, **seams)
     body, envelope = _golden_reader(result, inputs["meta"], inputs["release_id"])
     body_two, _ = _golden_reader(result, inputs["meta"], inputs["release_id"])
     body_ba, _ = _golden_reader(reversed_result, inputs["meta"], inputs["release_id"])
@@ -695,15 +728,24 @@ def _golden_run_self_pair(case, constants, bundle) -> dict[str, Any]:
         mutated_b = _golden_party(constants, inputs["b"], "inputs.b", override if variant["party"] == "b" else None)
         token = reason = None
         returned = False
+        adverse_result: object = None
+        adverse_calls: list[str] = []
         try:
-            evaluate_pair(mutated_a, mutated_b, bundle_provider=lambda: bundle, router=router)
+            adverse_result = evaluate_pair(mutated_a, mutated_b, **_golden_recording_seams(bundle, router, adverse_calls))
             returned = True
         except CompatBoundaryError as exc:
             token, reason = exc.token, exc.reason
-        adverse.append({"adverse_id": variant["adverse_id"], "token": token, "reason": reason, "result_returned": returned})
+        # PF01 §9.5: the inconsistent self-pair creates no pair_key.  A pair key needs the
+        # admitted bundle and keys the intrinsic cache, so reaching either seam, or
+        # returning a result that carries one, is a created pair key.
+        pair_key_created = ("bundle_provider" in adverse_calls or "cache" in adverse_calls
+                            or (isinstance(adverse_result, Mapping) and "pair_key" in adverse_result))
+        adverse.append({"adverse_id": variant["adverse_id"], "token": token, "reason": reason,
+                        "pair_key_created": pair_key_created, "result_returned": returned})
     return {
         "eligible": bool(result.get("eligible")) if "eligible" in result else True,
         "evaluate_pair_result": json.loads(canon.sercanon(result).decode("utf-8")),
+        "core_cache_router_called": bool(calls),
         "pair_key_present": "pair_key" in result,
         "reader": {"eligible": envelope["eligible"], "categories": envelope["categories"],
                    "idempotence_hash": envelope["idempotence_hash"]},
@@ -772,6 +814,25 @@ def _golden_runner(case: Mapping[str, Any]):
     return _GOLDEN_RUNNERS[(kind, case["case_id"] if kind == "evaluate_pair" else None)]
 
 
+def _golden_reportable(value: object) -> object:
+    """A mismatch value as the canonical report can carry it.
+
+    Canonical JSON (PF12 §4.1) carries integers, strings, booleans, null, and arrays and
+    string-keyed objects of them.  Anything else an entrypoint returns (a float, a
+    non-finite number, bytes, an arbitrary object) is reported as a deterministic
+    description instead, so the report stays canonical and rendering it never fails.
+    """
+    if value is None or type(value) in (bool, int, str):
+        return value
+    if type(value) is list:
+        return [_golden_reportable(item) for item in value]
+    if type(value) is dict and all(type(key) is str for key in value):
+        return {key: _golden_reportable(item) for key, item in value.items()}
+    if type(value) is float:
+        return f"<float {value!r}>"
+    return f"<{type(value).__name__}>"
+
+
 def _golden_diff(case_id: str, expected: object, observed: object) -> list[Mismatch]:
     found: list[Mismatch] = []
 
@@ -834,6 +895,8 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
             # case's mismatch; it never aborts the comparison of the other cases.
             case_mismatches = [Mismatch(case_id, "execution", "completed", f"{type(exc).__name__}: {exc}")]
         case_mismatches += _golden_transcription_mismatches(case)
+        case_mismatches = [Mismatch(row.case_id, row.path, _golden_reportable(row.expected), _golden_reportable(row.actual))
+                           for row in case_mismatches]
         mismatches.extend(case_mismatches)
         outcomes.append(CaseOutcome(case_id, case["case_type"], case["kind"],
                                     "match" if not case_mismatches else "mismatch", expected, observed))

@@ -496,6 +496,8 @@ def test_fixture_bytes_are_canonical_and_agree_with_pf01() -> None:
     g007 = _case(document, "M10-G007")
     assert g007["expected"]["reader"]["idempotence_hash"] == G007_READER_HASH
     assert g007["expected"]["evaluate_pair_result"] == {"categories": [], "eligible": False}
+    assert g007["expected"]["core_cache_router_called"] is False  # PF01 §9.5: none of them is called
+    assert [row["pair_key_created"] for row in g007["expected"]["adverse"]] == [False]  # PF01 §9.5: creates no pair_key
     g008 = _case(document, "M10-G008")
     assert g008["expected"]["pair_key_under_release"] == {"config_id": "m10-channel-state-v1.0.0", "release_id": "a" * 64, "pair_key": G008_PAIR_KEY}
     assert {row["chart_fingerprint"] for row in g008["expected"]["members"]} == {G008_FINGERPRINT}
@@ -519,6 +521,8 @@ def test_positive_comparison_matches_all_eight_cases(bundle_root, bundle) -> Non
     assert [row["state"] for row in observed["M10-G004"]["channel_states"]].count("none") == 30
     assert observed["M10-G007"]["evaluate_pair_result"] == {"categories": [], "eligible": False}
     assert observed["M10-G007"]["adverse"][0]["token"] == "ERR_READER_INVALID_CHART"
+    assert observed["M10-G007"]["core_cache_router_called"] is False
+    assert observed["M10-G007"]["adverse"][0]["pair_key_created"] is False
     assert observed["M10-G008"]["pair_key_under_release"]["pair_key"] == G008_PAIR_KEY
     assert observed["M10-G008"]["reader"]["idempotence_hash"] == G008_READER_HASH
     assert observed["M10-G005"]["pair_key_equal_across_pairs"] is True
@@ -805,6 +809,41 @@ def test_annotation_digest_pins_the_committed_transcription() -> None:
         assert artifact_tools._golden_annotation_digest(altered) == artifact_tools.GOLDEN_ANNOTATION_SHA256
 
 
+# PF01 §9.5 G007: a valid self-pair calls neither Engine Core, the intrinsic cache nor
+# the narrative router, and the inconsistent self-pair creates no pair_key.  An
+# implementation that reaches those seams is a mismatch; "every" is a wrapper that leaks
+# for both same-UUID pairs.
+@pytest.mark.parametrize("pair, seam, paths", [
+    ("valid", "bundle_provider", ["expected.core_cache_router_called"]),
+    ("valid", "cache", ["expected.core_cache_router_called"]),
+    ("valid", "router", ["expected.core_cache_router_called"]),
+    ("inconsistent", "bundle_provider", ["expected.adverse[0].pair_key_created"]),
+    ("inconsistent", "cache", ["expected.adverse[0].pair_key_created"]),
+    ("every", "bundle_provider", ["expected.adverse[0].pair_key_created", "expected.core_cache_router_called"]),
+], ids=["valid-bundle_provider", "valid-cache", "valid-router", "inconsistent-bundle_provider", "inconsistent-cache",
+        "every-bundle_provider"])
+def test_self_pair_that_reaches_core_cache_or_router_is_a_mismatch(bundle_root, monkeypatch, pair, seam, paths) -> None:
+    real = compute.evaluate_pair
+
+    def leaky(a, b, *, bundle_provider=None, cache=None, router=None):
+        if a.canonical_person_id == b.canonical_person_id:
+            kind = "valid" if a.projection == b.projection else "inconsistent"
+            if pair in (kind, "every"):
+                if seam == "bundle_provider":
+                    bundle_provider()
+                elif seam == "cache":
+                    cache.get("m10:self-pair")
+                else:
+                    router("harmony", "Cool", "a_to_b")
+        return real(a, b, bundle_provider=bundle_provider, cache=cache, router=router)
+
+    monkeypatch.setattr(compute, "evaluate_pair", leaky)
+    result = artifact_tools.compare_goldens(bundle_root, GOLDENS)
+    assert result.ok is False
+    assert [(row.case_id, row.path, row.expected, row.actual) for row in result.mismatches] == [
+        ("M10-G007", path, False, True) for path in paths]
+
+
 def test_transcription_digests_pin_the_committed_cases() -> None:
     pins = artifact_tools.GOLDEN_TRANSCRIPTION_SHA256
     assert tuple(pins) == artifact_tools.GOLDEN_CASE_IDS
@@ -904,6 +943,42 @@ def test_non_integer_numbers_refuse(bundle_root, tmp_path, capfdbinary, value) -
     assert _refusal(bundle_root, goldens) == "GOLDENS_INVALID"
     result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
     assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"GOLDENS_INVALID\n")
+
+
+class _Opaque:
+    pass
+
+
+def _strict_number(token: str) -> object:
+    raise ValueError(f"non-integer JSON number: {token}")
+
+
+# The same holds for what an entrypoint returns: a float, a non-finite number, bytes or
+# an arbitrary object is that case's mismatch with a described value, the report stays
+# canonical JSON, and the CLI keeps its exit contract instead of crashing.
+@pytest.mark.parametrize("value, described", [(24.5, "<float 24.5>"), (float("nan"), "<float nan>"), (b"24", "<bytes>"),
+                                              (_Opaque(), "<_Opaque>")], ids=["float", "nan", "bytes", "object"])
+def test_non_canonical_observed_values_are_described_never_a_crash(bundle_root, tmp_path, capfdbinary, monkeypatch,
+                                                                     value, described) -> None:
+    real = artifact_tools._GOLDEN_RUNNERS[("reducer", None)]
+
+    def regressed(case, constants, bundle):
+        observed = real(case, constants, bundle)
+        observed["results"][0]["score"] = value
+        return observed
+
+    monkeypatch.setitem(artifact_tools._GOLDEN_RUNNERS, ("reducer", None), regressed)
+    result = artifact_tools.compare_goldens(bundle_root, GOLDENS)
+    assert [(row.case_id, row.path, row.expected, row.actual) for row in result.mismatches] == [
+        ("M10-G006", "expected.results[0].score", 24, described)]
+    report_path = tmp_path / "report.json"
+    code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--report", str(report_path)], capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE, b"", b"GOLDEN_COMPARISON_MISMATCH:1\n")
+    raw = report_path.read_bytes()
+    report = json.loads(raw, parse_constant=_strict_number, parse_float=_strict_number)
+    assert sercanon(report, sort_keys=True) == raw
+    assert report["mismatches"] == [{"case_id": "M10-G006", "path": "expected.results[0].score", "expected": 24,
+                                     "actual": described}]
 
 
 def test_every_registry_admission_error_is_a_refusal(bundle_root, tmp_path, capfdbinary, monkeypatch) -> None:
@@ -1083,6 +1158,20 @@ def test_reports_carry_no_host_path(bundle_root, tmp_path, capfdbinary) -> None:
         assert str(host_path).encode("utf-8") not in raw
     assert artifact_tools._golden_display(ROOT) == "."
     assert artifact_tools._golden_display(ROOT / "catalog") == "catalog"
+
+
+@pytest.mark.parametrize("spelling", ["same_path", "through_symlinked_directory"])
+def test_cli_report_path_equal_to_the_goldens_refuses(bundle_root, tmp_path, capfdbinary, spelling) -> None:
+    goldens = tmp_path / "custom.json"
+    goldens.write_bytes(GOLDENS.read_bytes())
+    report_path = goldens
+    if spelling == "through_symlinked_directory":
+        (tmp_path / "alias").symlink_to(tmp_path, target_is_directory=True)
+        report_path = tmp_path / "alias" / "custom.json"
+    code, out, err = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens), "--report", str(report_path)],
+                              capfdbinary)
+    assert (code, out, err) == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"REPORT_PATH_INVALID\n")
+    assert goldens.read_bytes() == GOLDENS.read_bytes()
 
 
 @pytest.mark.parametrize("target", ["candidate", "repository"])

@@ -270,14 +270,16 @@ GOLDEN_COMPARISON_MISMATCH_EXIT_CODE = 1
 GOLDEN_COMPARISON_REFUSAL_EXIT_CODE = 5
 
 
-def _golden_report_destination(report_path: Path, candidate_root: Path) -> Path:
-    """Refuse a report path inside the candidate root or the repository, or unsafe on disk."""
+def _golden_report_destination(report_path: Path, candidate_root: Path, goldens_path: Path) -> Path:
+    """Refuse a report path that is the goldens file, lies inside the candidate root or the
+    repository, or is unsafe on disk."""
     try:
         parent = Path(os.path.realpath(Path(os.path.abspath(report_path)).parent))
         destination = parent / Path(report_path).name
         forbidden = (Path(os.path.realpath(candidate_root)), Path(os.path.realpath(ROOT)))
         if (not destination.name or destination.name in {".", ".."} or not parent.is_dir()
                 or destination.is_symlink() or (destination.exists() and not destination.is_file())
+                or destination == Path(os.path.realpath(goldens_path))
                 or any(destination == root or destination.is_relative_to(root) for root in forbidden)):
             raise GoldenComparisonRefusal("REPORT_PATH_INVALID")
     except OSError:
@@ -303,7 +305,7 @@ def _compare_goldens_main(candidate_root: Path, goldens: Path, report: Path | No
             require_closed_rails()
         except SystemExit as exc:
             raise GoldenComparisonRefusal(str(exc.code)) from None
-        destination = _golden_report_destination(report, candidate_root) if report is not None else None
+        destination = _golden_report_destination(report, candidate_root, goldens) if report is not None else None
         result = compare_goldens(candidate_root, goldens)
         payload = render_golden_report(result)
         if destination is not None:
@@ -332,7 +334,7 @@ def _main(argv: list[str] | None = None) -> int:
     modes.add_argument("--publish-family", action="store_true", help="Publish the scoped config, catalog logs, bundles and required evidence companions from this checkout")
     modes.add_argument("--compare-goldens", metavar="CANDIDATE_ROOT", help="Read-only: admit the explicit candidate root and compare the PF01 §9.5 golden collection through the canonical entrypoints; exit 0 on match, 1 on mismatch, 5 on refusal")
     parser.add_argument("--goldens", metavar="PATH", help="Golden collection for --compare-goldens (default: tests/fixtures/magic10/v1/goldens.json)")
-    parser.add_argument("--report", metavar="PATH", help="With --compare-goldens: write the complete canonical report to this path outside the candidate root and the repository")
+    parser.add_argument("--report", metavar="PATH", help="With --compare-goldens: write the complete canonical report to this path outside the candidate root and the repository, never over the goldens file")
     args = parser.parse_args(argv)
     if args.compare_goldens is not None:
         if args.allow_aliases:
