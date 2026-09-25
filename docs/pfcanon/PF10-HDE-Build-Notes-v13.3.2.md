@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.3.1**  
+**Version: v13.3.2**  
 Effective Date: Sep 25, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -202,7 +202,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.17 HDE-EPIC040-PR04-F05 — Reader response vs published schema: Product Owner deferral decision v1.0  
 * 2.18 HDE-EPIC040-PR04-F07 — Dev conjunction evidence capture unrunnable: Product Owner deferral decision v1.0  
 * 2.19 HDE-EPIC040-PR04-LINEAGE-001 — Bounded Application, Identity, and Consumer Integration  
-* 2.20 HDE-EPIC040-PR05 — PR Work-Unit Lineage Review v1.0
+* 2.20 HDE-EPIC040-PR05 — PR Work-Unit Lineage Review v1.0  
+* 2.21 HDE-EPIC040-PR06-F01 — Frozen-capture identity source for the canonical JSON gate
 
 # **2\) Numbered Addenda**
 
@@ -2235,5 +2236,38 @@ GCFPE\_PROMPT\_USES: GCFPE-USE-HDE-EPIC040-PR-40-20260925-PR05-01. Prompt: PR-40
 ### 9\. Native return
 
 HDE-EPIC040-PR05 is ACCEPTED\_FINAL. It is never rerun, reopened or given a duplicate receipt. The return goes to the same retained whole-change IA for Plan progression. The next planned unit is PR06, complete release admission and evidence convergence; its PR-10 instruction stage may begin. PR06 inherits O-17 / CR-06 and runs the comparator against the actual candidate. This acceptance authorizes no Proceed, merge, QA, Ops, release admission or closure.
+
+## 2.21 HDE-EPIC040-PR06-F01 — Frozen-capture identity source for the canonical JSON gate
+
+Decision. The whole-change IA approved this bounded implementation rescope on 2026-09-25, by Product Owner direction, as alternative A. The decision record is docs/ephemeral/HDE-EPIC040-PR06-F01-rescope-review-v1.0.md.  
+Base. Plan v2.1 §6.6 and PR06 instruction v1.0 §§4–6. Neither is rewritten.  
+Delta. HDE-EPIC040-PR06's loci are extended by exactly two items:
+
+* tools/evidence/run\_canonical\_json\_gate.py;  
+* that file's existing test home.
+
+\_CAPTURE\_IDENTITY\_META is derived from the frozen captures' own recorded capture-time identity, read only after each capture's frozen digest is verified. It is no longer read from artifacts/identity/service\_identity.json, which the isolated attestation closure regenerates to the current release.  
+Effects. Once the complete release is admitted, the closure can run and the attestation can pass. service\_identity.json and the identity family stay certified against the current release by their own owners.  
+Exclusions. This addendum changes none of the following:
+
+* the success schema hde.release\_attestation.v1 or its wire value PR06R\_B\_FINAL\_PASS;  
+* the frozen captures, their generators or their digests;  
+* the identity family or the closure;  
+* the 26 gate targets or the six set rules;  
+* any Index/Mirror row except by a legitimate owner run.
+
+It does not re-identify the captures. That is alternative B, a Product Owner capture-contract decision, and remains available to PR07 or the Product Owner.  
+Binding conditions. See review §4:
+
+* the identity source must be digest-verified;  
+* capture identities must agree with each other;  
+* the existing checks are not weakened;  
+* tests prove the pass case and every refusal case;  
+* the attestation must describe its contents honestly.
+
+Conflicts. None. CANON\_CONFLICT\_REGISTER entries C040-01 to C040-06 are unchanged.  
+Unresolved. PF10 numbering and publication are for Nathan.  
+Return phase. PR-20 in the dedicated PR06 session. There is no open PR, and RS-40 does not apply.  
+Normalized approved-delta digest: not computed. No governed normalization procedure exists, and none is invented here.
 
 \<eof\>  
