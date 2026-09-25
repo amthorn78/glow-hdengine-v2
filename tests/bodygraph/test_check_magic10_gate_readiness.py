@@ -18,6 +18,7 @@ from ci.checks import classify_ci_changes as classifier
 from engine.bodygraph import mapped_cache
 from engine.bodygraph import resolver
 from engine.bodygraph import vendor_client
+from engine.compat.error_tokens import CompatBoundaryError
 from engine.config.registry_loader import _load_active_mechanics_bundle_from_root, _parse_release_member_bytes
 from engine.db import DBAccess
 from engine.db.errors import PrimaryUnavailable, SqlExecError
@@ -142,6 +143,9 @@ def test_good_rows_are_ready_with_identity_safe_aggregate_report(monkeypatch, ca
         ("payload_not_object", lambda: _row(UUID_B, payload="[]"), "payload_invalid", "DB_PAYLOAD_INVALID"),
         ("payload_missing_keys", lambda: _row(UUID_B, payload=json.dumps({"bodygraph": complete_chart(UUID_B, GATES_A)["bodygraph"]})), "payload_invalid", None),
         ("person_uid_mismatch", lambda: _row(UUID_B, {**complete_chart(UUID_B, GATES_A), "person_uid": UUID_C}), "payload_invalid", None),
+        ("payload_names_another_uuid", lambda: _row(UUID_B, complete_chart(UUID_C, GATES_A)), "payload_invalid", "IDENTITY_CONFLICT"),
+        ("payload_names_another_label", lambda: _row(UUID_B, complete_chart("person-" + UUID_C, GATES_A)), "payload_invalid", "IDENTITY_CONFLICT"),
+        ("payload_names_a_non_uuid", lambda: _row(UUID_B, complete_chart("someone-else", GATES_A)), "payload_invalid", "IDENTITY_CONFLICT"),
         ("duplicate_rows", lambda: _row(UUID_B) + _row(UUID_B), "duplicate", "DB_ROW_CONTRACT_VIOLATED"),
     ],
 )
@@ -174,6 +178,31 @@ def test_missing_row_is_not_ready_and_mixed_diagnostics_are_sorted(monkeypatch, 
     assert report["counts"] == {"ready": 1, "missing": 1, "duplicate": 0, "row_invalid": 0, "payload_invalid": 0, "gates_invalid": 1}
     assert report["diagnostics"] == [{"code": "GATE_VALUE_INVALID", "count": 1}]
     assert [params for _sql, params in fake.queries] == [(UUID_A,), (UUID_B,), (UUID_C,)]
+
+
+@pytest.mark.parametrize(("label", "ready"), [
+    (UUID_B, True),
+    ("person-" + UUID_B, True),
+    (UUID_B.upper(), True),
+    (UUID_C, False),
+    ("person-" + UUID_C, False),
+    ("someone-else", False),
+], ids=["same_uuid", "person_label_same", "other_spelling_same", "other_uuid", "person_label_other", "non_uuid_label"])
+def test_a_row_is_ready_exactly_when_the_reader_resolves_it(label, ready) -> None:
+    # The route's own resolution call over the same current row (adapter/http_reader.py).
+    fake = RowVariantDB(rows={UUID_B: _row(UUID_B, complete_chart(label, GATES_A))})
+    report = readiness.observe(fake, (UUID_B,))
+    rows = {UUID_B: mapped_cache.read_current_mapped_bodygraph(fake, UUID_B)}
+    if ready:
+        resolved = resolver.resolve_compat_chart({"user_id": UUID_B}, source_policy="local", env=None, local_lookup=rows.get)
+        assert resolved.canonical_person_id == UUID_B
+        assert (report.readiness, report.counts["ready"], report.diagnostics) == ("READY", 1, ())
+    else:
+        with pytest.raises(CompatBoundaryError) as refused:
+            resolver.resolve_compat_chart({"user_id": UUID_B}, source_policy="local", env=None, local_lookup=rows.get)
+        assert (refused.value.reason, refused.value.detail) == ("identity_conflict", "IDENTITY_CONFLICT")
+        assert (report.readiness, report.counts["ready"], report.counts["payload_invalid"]) == ("NOT_READY", 0, 1)
+        assert report.diagnostics == (("IDENTITY_CONFLICT", 1),)
 
 
 def test_duplicate_row_message_is_pinned_against_mapped_cache() -> None:

@@ -3,8 +3,9 @@
 
 Enumerates only an explicitly selected set of canonical user identities through
 the existing ``DBAccess`` abstraction and the PR04 current-row read path, applies
-the shared Gate predicate through the existing BodyGraph projection, and reports
-bounded, aggregate, identity-safe diagnostics.  It issues no ``UPDATE``,
+the shared Gate predicate through the existing BodyGraph projection, binds each
+row's payload identity to the selected identity as the production Reader does,
+and reports bounded, aggregate, identity-safe diagnostics.  It issues no ``UPDATE``,
 ``INSERT`` or ``DELETE``, performs no acquisition, auto-repair, backfill or
 vendor call, and never represents an unavailable dataset as ready.
 
@@ -33,7 +34,7 @@ if str(ROOT) not in sys.path:
 
 from engine.bodygraph.mapped_cache import MappedCacheError, read_current_mapped_bodygraph  # noqa: E402
 from engine.bodygraph.projection import (  # noqa: E402
-    BodyGraphProjectionError, is_gate_ingress_code, strict_canonical_uuid,
+    BodyGraphProjectionError, bind_projection_identity, is_gate_ingress_code, strict_canonical_uuid,
 )
 from engine.db import DBAccess  # noqa: E402
 from engine.db.errors import AdapterError  # noqa: E402
@@ -126,6 +127,11 @@ def observe(db: DBAccess, selection: Sequence[str]) -> ReadinessReport:
     for user_id in selection:
         try:
             row = read_current_mapped_bodygraph(db, user_id)
+            if row is not None:
+                # The row key already equals ``user_id``; its payload identity is bound to it
+                # as the production Reader binds it, so a row the Reader refuses with
+                # ``IDENTITY_CONFLICT`` is never counted ready.
+                bind_projection_identity(row.payload, user_id)
         except MappedCacheError as exc:
             if exc.code == "DB_QUERY_FAILED":
                 raise ReadinessRefusal(READINESS_UNAVAILABLE) from exc
