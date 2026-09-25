@@ -894,6 +894,18 @@ def test_deeply_nested_goldens_refuse(bundle_root, tmp_path) -> None:
     assert _refusal(bundle_root, path) == "GOLDENS_INVALID"
 
 
+# Canonical JSON carries integers only, so a non-finite or fractional number is
+# refused before it could reach a report (bare NaN is not JSON at all).
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), 25.5], ids=["nan", "inf", "neg_inf", "fraction"])
+def test_non_integer_numbers_refuse(bundle_root, tmp_path, capfdbinary, value) -> None:
+    document = _document()
+    _case(document, "M10-G006")["expected"]["results"][0]["score"] = value
+    goldens = _write_document(tmp_path / "number.json", document)
+    assert _refusal(bundle_root, goldens) == "GOLDENS_INVALID"
+    result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
+    assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"GOLDENS_INVALID\n")
+
+
 def test_every_registry_admission_error_is_a_refusal(bundle_root, tmp_path, capfdbinary, monkeypatch) -> None:
     duplicated = synthetic_complete_release_root(tmp_path / "duplicated")
     manifest = json.loads((duplicated / "catalog/manifest.json").read_bytes())
@@ -1052,9 +1064,25 @@ def test_cli_match_report_file_and_determinism(bundle_root, tmp_path, capfdbinar
     assert second == 0 and out_two == out
     other_root = synthetic_complete_release_root(tmp_path / "other")
     third, out_three, _ = _run_cli(["--compare-goldens", str(other_root)], capfdbinary)
-    first_report, third_report = json.loads(out), json.loads(out_three)
-    assert third == 0 and first_report.pop("candidate_root") != third_report.pop("candidate_root")
-    assert first_report == third_report
+    assert third == 0 and out_three == out  # the report names no host path, so the location drops out
+
+
+def test_reports_carry_no_host_path(bundle_root, tmp_path, capfdbinary) -> None:
+    report = json.loads(artifact_tools.render_golden_report(artifact_tools.compare_goldens(bundle_root, GOLDENS)))
+    assert (report["candidate_root"], report["goldens_path"]) == ("<external>", "tests/fixtures/magic10/v1/goldens.json")
+    document = _document()
+    _alter(document, *ALTERATIONS["g004_signal_q"][:2])
+    goldens = _write_document(tmp_path / "mismatch.json", document)
+    report_path = tmp_path / "out.json"
+    code, _, _ = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens), "--report", str(report_path)],
+                          capfdbinary)
+    raw = report_path.read_bytes()
+    assert code == config_tools.GOLDEN_COMPARISON_MISMATCH_EXIT_CODE
+    assert (json.loads(raw)["candidate_root"], json.loads(raw)["goldens_path"]) == ("<external>", "<external>")
+    for host_path in (bundle_root, tmp_path, ROOT):
+        assert str(host_path).encode("utf-8") not in raw
+    assert artifact_tools._golden_display(ROOT) == "."
+    assert artifact_tools._golden_display(ROOT / "catalog") == "catalog"
 
 
 @pytest.mark.parametrize("target", ["candidate", "repository"])

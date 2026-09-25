@@ -311,8 +311,8 @@ class CaseOutcome:
 
 @dataclass(frozen=True)
 class GoldenComparison:
-    candidate_root: str
-    goldens_path: str
+    candidate_root: str  # display only: ".", repository-relative or "<external>"
+    goldens_path: str  # display only, as candidate_root
     goldens_sha256: str
     candidate_release_id: str
     config_id: str
@@ -333,8 +333,23 @@ def _golden_pairs_hook(pairs):
     return dict(pairs)
 
 
+def _golden_refuse_non_integer(token: str) -> object:
+    # Canonical JSON (PF12 §4.1) carries integers only: NaN, ±Infinity and every
+    # fraction or exponent are refused before they could reach a report.
+    raise ValueError(f"non-integer JSON number: {token}")
+
+
 def _golden_is_str(value: object) -> bool:
     return type(value) is str and bool(value)
+
+
+def _golden_display(path: Path) -> str:
+    """A report never carries a host path: the repository root is ".", a path
+    inside it is repository-relative, and any other path is "<external>"."""
+    resolved, root = Path(os.path.realpath(path)), Path(os.path.realpath(ROOT))
+    if resolved == root:
+        return "."
+    return resolved.relative_to(root).as_posix() if resolved.is_relative_to(root) else "<external>"
 
 
 def _golden_load_document(goldens_path: Path) -> tuple[Mapping[str, Any], str]:
@@ -346,7 +361,8 @@ def _golden_load_document(goldens_path: Path) -> tuple[Mapping[str, Any], str]:
     except OSError:
         raise _golden_refuse("GOLDENS_INVALID") from None
     try:
-        document = json.loads(raw.decode("utf-8"), object_pairs_hook=_golden_pairs_hook)
+        document = json.loads(raw.decode("utf-8"), object_pairs_hook=_golden_pairs_hook,
+                              parse_constant=_golden_refuse_non_integer, parse_float=_golden_refuse_non_integer)
         canonical = isinstance(document, dict) and canon.sercanon(document, sort_keys=True) == raw
     except (UnicodeDecodeError, ValueError, RecursionError):
         raise _golden_refuse("GOLDENS_INVALID") from None
@@ -823,7 +839,7 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
                                     "match" if not case_mismatches else "mismatch", expected, observed))
     ordered = tuple(sorted(mismatches, key=lambda row: (row.case_id, row.path)))
     return GoldenComparison(
-        candidate_root=str(root), goldens_path=str(Path(os.path.abspath(goldens_path))),
+        candidate_root=_golden_display(root), goldens_path=_golden_display(Path(goldens_path)),
         goldens_sha256=goldens_sha256, candidate_release_id=bundle.release_id,
         config_id=bundle.mechanics["config_id"], cases=tuple(outcomes), mismatches=ordered, ok=not ordered,
     )
