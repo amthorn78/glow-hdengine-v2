@@ -38,7 +38,7 @@ FORBIDDEN_STRINGS = (UUID_A, UUID_B, UUID_C, "birthDateUtc", "\"gates\":", "body
                      "DATABASE_URL", "postgres://", "[10", "\"10\"", "person_uid", "example.invalid")
 ALLOWED_IMPORT_ROOTS = {"__future__", "argparse", "hashlib", "sys", "collections", "dataclasses", "pathlib", "typing",
                         "engine.bodygraph.mapped_cache", "engine.bodygraph.projection", "engine.db",
-                        "engine.db.errors", "engine.serializer.canon"}
+                        "engine.db.errors", "engine.runtime.determinism_env", "engine.serializer.canon"}
 FORBIDDEN_IMPORTS = ("engine.bodygraph.resolver", "engine.bodygraph.vendor_client", "engine.bodygraph.ingest",
                      "psycopg", "persist_mapped_bodygraph", "requests", "urllib", "subprocess", "json")
 
@@ -240,6 +240,30 @@ def test_unreadable_selection_file_refuses_before_any_database_access(monkeypatc
 
 
 # --- unavailable or denied datasets never become ready ----------------------------------
+
+# Closed rails (AGENTS.md): outside them the tool refuses before reading the selection or
+# constructing a database provider, and names only the unmet pins' required values.
+@pytest.mark.parametrize("change, unmet", [
+    ({"SAFE_MODE": "0"}, [("SAFE_MODE", "1")]),
+    ({"ALLOW_NETWORK": "1"}, [("ALLOW_NETWORK", "0")]),
+    ({"TZ": None}, [("TZ", "UTC")]),
+    ({"LC_ALL": "en_US.UTF-8", "LANG": None}, [("LANG", "C"), ("LC_ALL", "C")]),
+], ids=["safe_mode_open", "network_allowed", "tz_unset", "locale_unpinned"])
+def test_open_or_unpinned_rails_refuse_before_any_database_access(monkeypatch, capfdbinary, tmp_path, change, unmet) -> None:
+    for key, value in change.items():
+        if value is None:
+            monkeypatch.delenv(key, raising=False)
+        else:
+            monkeypatch.setenv(key, value)
+    monkeypatch.setenv("DATABASE_URL", "postgres://example.invalid/db")
+    monkeypatch.setattr(readiness.DBAccess, "for_current_env", classmethod(lambda cls, *a, **k: pytest.fail("database reached")))
+    expected = (readiness.REFUSAL_EXIT_CODE, b"", f"RAILS_CLOSED_REQUIRED:{unmet}\n".encode())
+    code, out, err = _run(["--user-id", UUID_A], capfdbinary)
+    assert (code, out, err) == expected
+    _assert_no_leak(out, err)
+    assert _run([], capfdbinary) == expected
+    assert _run(["--selection-file", str(tmp_path / "missing.txt")], capfdbinary) == expected
+
 
 def test_missing_database_url_is_unavailable_without_a_connection(monkeypatch, capfdbinary) -> None:
     monkeypatch.setattr("engine.db.adapter.PsycopgProvider", lambda *a, **k: pytest.fail("provider constructed"))

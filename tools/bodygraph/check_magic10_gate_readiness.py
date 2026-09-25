@@ -8,10 +8,14 @@ bounded, aggregate, identity-safe diagnostics.  It issues no ``UPDATE``,
 ``INSERT`` or ``DELETE``, performs no acquisition, auto-repair, backfill or
 vendor call, and never represents an unavailable dataset as ready.
 
+It runs only under the closed determinism rails; otherwise it refuses before
+reading the selection or constructing a database provider.
+
 Exit codes: ``0`` — a report was emitted (``READY`` or ``NOT_READY``); ``5`` —
-refusal with one stderr token (``READINESS_EMPTY_SELECTION``,
-``READINESS_SELECTION_INVALID`` or ``READINESS_UNAVAILABLE``); argparse usage
-errors keep the parser's exit.  The tool never exits ``3``.
+refusal with one stderr token (``RAILS_CLOSED_REQUIRED:<pins>``,
+``READINESS_EMPTY_SELECTION``, ``READINESS_SELECTION_INVALID`` or
+``READINESS_UNAVAILABLE``); argparse usage errors keep the parser's exit.  The
+tool never exits ``3``.
 """
 from __future__ import annotations
 
@@ -33,6 +37,7 @@ from engine.bodygraph.projection import (  # noqa: E402
 )
 from engine.db import DBAccess  # noqa: E402
 from engine.db.errors import AdapterError  # noqa: E402
+from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, expected_env  # noqa: E402
 from engine.serializer.canon import sercanon  # noqa: E402
 
 REPORT_SCHEMA = "magic10_gate_readiness.v1"
@@ -73,6 +78,18 @@ class ReadinessReport:
             "counts": {key: self.counts[key] for key in COUNT_KEYS},
             "diagnostics": [{"code": code, "count": count} for code, count in self.diagnostics],
         }
+
+
+def require_closed_rails() -> None:
+    """Refuse unless every determinism pin is closed (AGENTS.md closed rails).
+
+    The token names each unmet pin with its required value, never the value found
+    in the environment, as the comparator's ``RAILS_CLOSED_REQUIRED`` token does.
+    """
+    current = expected_env()
+    unmet = {key: value for key, value in DETERMINISM_ENV_PINS.items() if current.get(key) != value}
+    if unmet:
+        raise ReadinessRefusal(f"RAILS_CLOSED_REQUIRED:{sorted(unmet.items())}")
 
 
 def parse_selection(user_ids: Sequence[str], selection_file: Path | None) -> tuple[str, ...]:
@@ -151,6 +168,7 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parse_args(argv)
     try:
+        require_closed_rails()
         selection = parse_selection(args.user_id, args.selection_file)
         try:
             db = DBAccess.for_current_env()
