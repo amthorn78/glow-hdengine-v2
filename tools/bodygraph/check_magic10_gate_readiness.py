@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+"""Read-only current-row Magic-10 Gate-readiness check (HDE-EPIC040-PR05).
+
+Enumerates only an explicitly selected set of canonical user identities through
+the existing ``DBAccess`` abstraction and the PR04 current-row read path, applies
+the shared Gate predicate through the existing BodyGraph projection, binds each
+row's payload identity to the selected identity as the production Reader does,
+and reports bounded, aggregate, identity-safe diagnostics.  It issues no ``UPDATE``,
+``INSERT`` or ``DELETE``, performs no acquisition, auto-repair, backfill or
+vendor call, and never represents an unavailable dataset as ready.
+
+It runs only under the closed determinism rails; otherwise it refuses before
+reading the selection or constructing a database provider.  A selection file
+must be a regular, non-symlinked file of at most ``SELECTION_FILE_MAX_BYTES``.
+
+Exit codes: ``0`` — a report was emitted (``READY`` or ``NOT_READY``); ``5`` —
+refusal with one stderr token (``RAILS_CLOSED_REQUIRED:<pins>``,
+``READINESS_EMPTY_SELECTION``, ``READINESS_SELECTION_INVALID`` or
+``READINESS_UNAVAILABLE``); argparse usage errors keep the parser's exit.  The
+tool never exits ``3``.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import os
+import stat
+import sys
+from collections import Counter
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Mapping, Sequence
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from engine.bodygraph.mapped_cache import MappedCacheError, read_current_mapped_bodygraph  # noqa: E402
+from engine.bodygraph.projection import (  # noqa: E402
+    BodyGraphProjectionError, bind_projection_identity, is_gate_ingress_code, strict_canonical_uuid,
+)
+from engine.db import DBAccess  # noqa: E402
+from engine.db.errors import AdapterError  # noqa: E402
+from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, expected_env  # noqa: E402
+from engine.serializer.canon import sercanon  # noqa: E402
+
+REPORT_SCHEMA = "magic10_gate_readiness.v1"
+REFUSAL_EXIT_CODE = 5
+READINESS_EMPTY_SELECTION = "READINESS_EMPTY_SELECTION"
+READINESS_SELECTION_INVALID = "READINESS_SELECTION_INVALID"
+READINESS_UNAVAILABLE = "READINESS_UNAVAILABLE"
+COUNT_KEYS = ("ready", "missing", "duplicate", "row_invalid", "payload_invalid", "gates_invalid")
+# About 28,000 canonical UUID lines: generous for an explicit selection, and bounded.
+SELECTION_FILE_MAX_BYTES = 1_048_576
+# ``read_current_mapped_bodygraph`` folds a multi-row current view into its
+# row-contract refusal; the owning test pins this exact message so drift is caught.
+DUPLICATE_ROW_MESSAGE = "current view returned more than one row"
+
+
+class ReadinessRefusal(RuntimeError):
+    """Value-free refusal: no report is emitted and nothing is ready."""
+
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+@dataclass(frozen=True)
+class ReadinessReport:
+    readiness: str
+    provider: str
+    requested: int
+    selection_sha256: str
+    counts: Mapping[str, int]
+    diagnostics: tuple[tuple[str, int], ...]
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "schema": REPORT_SCHEMA,
+            "readiness": self.readiness,
+            "provider": self.provider,
+            "read_only": True,
+            "selection": {"requested": self.requested, "sha256": self.selection_sha256},
+            "counts": {key: self.counts[key] for key in COUNT_KEYS},
+            "diagnostics": [{"code": code, "count": count} for code, count in self.diagnostics],
+        }
+
+
+def require_closed_rails() -> None:
+    """Refuse unless every determinism pin is closed (AGENTS.md closed rails).
+
+    The token names each unmet pin with its required value, never the value found
+    in the environment, as the comparator's ``RAILS_CLOSED_REQUIRED`` token does.
+    """
+    current = expected_env()
+    unmet = {key: value for key, value in DETERMINISM_ENV_PINS.items() if current.get(key) != value}
+    if unmet:
+        raise ReadinessRefusal(f"RAILS_CLOSED_REQUIRED:{sorted(unmet.items())}")
+
+
+def read_selection_file(path: Path) -> str:
+    """Return the text of a regular, non-symlinked selection file within the size bound.
+
+    The file is opened without following a final symlink and without blocking, and
+    its type is checked on the opened descriptor, so a FIFO, device, directory or
+    symlink is refused before anything is read, and at most one byte past the bound
+    is ever read.  A missing, unreadable, oversized or non-UTF-8 file is refused
+    too, value-free and before any database access.  The descriptor is closed on
+    every path.
+    """
+    try:
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except OSError:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            raw = handle.read(SELECTION_FILE_MAX_BYTES + 1)
+    except OSError:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+    finally:
+        os.close(descriptor)
+    if len(raw) > SELECTION_FILE_MAX_BYTES:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+    try:
+        return raw.decode("utf-8")
+    except UnicodeError:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+
+
+def parse_selection(user_ids: Sequence[str], selection_file: Path | None) -> tuple[str, ...]:
+    """Return the sorted, duplicate-free canonical selection or refuse."""
+    raw = [value for value in user_ids]
+    if selection_file is not None:
+        text = read_selection_file(selection_file)
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped and not stripped.startswith("#"):
+                raw.append(stripped)
+    if not raw:
+        raise ReadinessRefusal(READINESS_EMPTY_SELECTION)
+    if any(strict_canonical_uuid(value) is None for value in raw):
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+    if len(set(raw)) != len(raw):
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+    return tuple(sorted(raw))
+
+
+def selection_digest(selection: Sequence[str]) -> str:
+    return hashlib.sha256(sercanon(list(selection), sort_keys=True)).hexdigest()
+
+
+def observe(db: DBAccess, selection: Sequence[str]) -> ReadinessReport:
+    """Read each selected current row once; abort as unavailable on any DB failure."""
+    counts = {key: 0 for key in COUNT_KEYS}
+    diagnostics: Counter[str] = Counter()
+    for user_id in selection:
+        try:
+            row = read_current_mapped_bodygraph(db, user_id)
+            if row is not None:
+                # The row key already equals ``user_id``; its payload identity is bound to it
+                # as the production Reader binds it, so a row the Reader refuses with
+                # ``IDENTITY_CONFLICT`` is never counted ready.
+                bind_projection_identity(row.payload, user_id)
+        except MappedCacheError as exc:
+            if exc.code == "DB_QUERY_FAILED":
+                raise ReadinessRefusal(READINESS_UNAVAILABLE) from exc
+            if exc.code == "DB_ROW_CONTRACT_VIOLATED" and str(exc) == DUPLICATE_ROW_MESSAGE:
+                counts["duplicate"] += 1
+            elif exc.code == "DB_ROW_CONTRACT_VIOLATED":
+                counts["row_invalid"] += 1
+            else:
+                counts["payload_invalid"] += 1
+            diagnostics[exc.code] += 1
+        except BodyGraphProjectionError as exc:
+            counts["gates_invalid" if is_gate_ingress_code(exc.code) else "payload_invalid"] += 1
+            diagnostics[exc.code] += 1
+        except RecursionError:
+            # A stored payload nested past the recursion limit cannot be decoded or
+            # validated: the row is invalid, with the read path's own code for an
+            # undecodable payload, and the rest of the selection is still observed.
+            counts["payload_invalid"] += 1
+            diagnostics["DB_PAYLOAD_INVALID"] += 1
+        except AdapterError as exc:
+            raise ReadinessRefusal(READINESS_UNAVAILABLE) from exc
+        else:
+            counts["missing" if row is None else "ready"] += 1
+    readiness = "READY" if counts["ready"] == len(selection) else "NOT_READY"
+    return ReadinessReport(
+        readiness=readiness,
+        provider=str(getattr(db, "provider_name", "unknown")),
+        requested=len(selection),
+        selection_sha256=selection_digest(selection),
+        counts=counts,
+        diagnostics=tuple(sorted(diagnostics.items())),
+    )
+
+
+def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Read-only current-row Magic-10 Gate-readiness check over an explicit selection",
+    )
+    parser.add_argument("--user-id", action="append", default=[], metavar="UUID",
+                        help="Canonical lowercase hyphenated UUID to check; repeatable")
+    parser.add_argument("--selection-file", type=Path, metavar="PATH",
+                        help="File with one canonical UUID per line; blank lines and '#' comments ignored")
+    return parser.parse_args(argv)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = _parse_args(argv)
+    try:
+        require_closed_rails()
+        selection = parse_selection(args.user_id, args.selection_file)
+        try:
+            db = DBAccess.for_current_env()
+        except AdapterError as exc:
+            raise ReadinessRefusal(READINESS_UNAVAILABLE) from exc
+        report = observe(db, selection)
+    except ReadinessRefusal as exc:
+        sys.stderr.write(f"{exc.code}\n")
+        return REFUSAL_EXIT_CODE
+    sys.stdout.buffer.write(sercanon(report.to_payload(), sort_keys=True))
+    sys.stdout.flush()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

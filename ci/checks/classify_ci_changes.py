@@ -682,6 +682,17 @@ _CONFIG_WRITER_TEST_OWNERS = {
         "tests/config/test_typed_bundles.py",
     ),
 }
+# HDE-EPIC040-PR05: repository-owned BodyGraph tools (the PF12 "Gate
+# persistence and resolution" class) resolve to exact behavioral owners or
+# fail closed; the readiness tool reads through DBAccess and is a promoted
+# release input.
+_BODYGRAPH_TOOL_PREFIX = "tools/bodygraph/"
+_BODYGRAPH_TOOL_LANES = frozenset({"db", "product", "release"})
+_BODYGRAPH_TOOL_TEST_OWNERS = {
+    "tools/bodygraph/check_magic10_gate_readiness.py": (
+        "tests/bodygraph/test_check_magic10_gate_readiness.py",
+    ),
+}
 # Governed chart fixtures consumed by the dev GET /reader route and its tests.
 _FIXTURE_LANE_PREFIXES = (
     ("fixtures/charts/", {"product", "compat", "release"}),
@@ -731,6 +742,11 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/config/test_registry_report_indexing.py",
         "tests/config/test_config_artifacts.py",
         "tests/config/test_typed_bundles.py",
+    ),
+    # HDE-EPIC040-PR05: the PF01 §9.5 golden collection is consumed only by
+    # the comparator tests in the config-tooling owner module.
+    "tests/fixtures/magic10/v1/goldens.json": (
+        "tests/config/test_config_artifacts.py",
     ),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
@@ -896,6 +912,8 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _QA_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _CONFIG_WRITER_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _BODYGRAPH_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)
@@ -1121,6 +1139,28 @@ def _config_writer_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
         return ()
     return _validated_owner_targets(
         repo_root, path, targets, error_code="CI_CONFIG_WRITER_OWNER_INVALID"
+    )
+
+
+def _bodygraph_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve exact behavioral owners for repository BodyGraph tools.
+
+    An unregistered source tool under the prefix (any ``_UNKNOWN_SOURCE_SUFFIXES``
+    suffix) fails classification instead of receiving a green conclusion from an
+    unrelated lane: the prefix's lane mapping would otherwise bypass the
+    unknown-source failure.
+    """
+    rel = PurePosixPath(path)
+    if not path.startswith(_BODYGRAPH_TOOL_PREFIX) or rel.suffix.lower() not in _UNKNOWN_SOURCE_SUFFIXES:
+        return ()
+    targets = _BODYGRAPH_TOOL_TEST_OWNERS.get(path)
+    if targets is None:
+        raise ValueError(f"CI_BODYGRAPH_TOOL_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_BODYGRAPH_TOOL_OWNER_TEST_INVALID",
     )
 
 
@@ -1454,6 +1494,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
             )
         )
         targets.update(_qa_tool_owner_targets(repo_root, path))
+        targets.update(_bodygraph_tool_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
             and _lanes_for_path(path) is None
@@ -1535,6 +1576,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith("tools/qa/") or path.startswith("tests/qa/"):
         return {"evidence", "qa"}
+
+    if path.startswith(_BODYGRAPH_TOOL_PREFIX):
+        return set(_BODYGRAPH_TOOL_LANES)
 
     if path.startswith("tests/evidence/"):
         lanes = {"evidence"}
