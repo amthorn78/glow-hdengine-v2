@@ -1145,11 +1145,13 @@ def _config_writer_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
 def _bodygraph_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     """Resolve exact behavioral owners for repository BodyGraph tools.
 
-    An unregistered Python tool under the prefix fails classification instead
-    of receiving a green conclusion from an unrelated lane.
+    An unregistered source tool under the prefix (any ``_UNKNOWN_SOURCE_SUFFIXES``
+    suffix) fails classification instead of receiving a green conclusion from an
+    unrelated lane: the prefix's lane mapping would otherwise bypass the
+    unknown-source failure.
     """
     rel = PurePosixPath(path)
-    if not path.startswith(_BODYGRAPH_TOOL_PREFIX) or rel.suffix.lower() != ".py":
+    if not path.startswith(_BODYGRAPH_TOOL_PREFIX) or rel.suffix.lower() not in _UNKNOWN_SOURCE_SUFFIXES:
         return ()
     targets = _BODYGRAPH_TOOL_TEST_OWNERS.get(path)
     if targets is None:

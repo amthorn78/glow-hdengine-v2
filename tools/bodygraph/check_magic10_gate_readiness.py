@@ -105,19 +105,22 @@ def read_selection_file(path: Path) -> str:
     its type is checked on the opened descriptor, so a FIFO, device, directory or
     symlink is refused before anything is read, and at most one byte past the bound
     is ever read.  A missing, unreadable, oversized or non-UTF-8 file is refused
-    too, value-free and before any database access.
+    too, value-free and before any database access.  The descriptor is closed on
+    every path.
     """
     try:
         descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     except OSError:
         raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
     try:
-        with os.fdopen(descriptor, "rb") as handle:
-            if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
-                raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
             raw = handle.read(SELECTION_FILE_MAX_BYTES + 1)
     except OSError:
         raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+    finally:
+        os.close(descriptor)
     if len(raw) > SELECTION_FILE_MAX_BYTES:
         raise ReadinessRefusal(READINESS_SELECTION_INVALID)
     try:

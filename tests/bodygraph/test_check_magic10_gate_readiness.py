@@ -319,7 +319,13 @@ def _deadline(seconds):
         signal.signal(signal.SIGALRM, previous)
 
 
-@pytest.mark.parametrize("kind", ["fifo", "device", "symlink", "oversized"])
+def _open_descriptors() -> set[str]:
+    return set(os.listdir("/proc/self/fd"))
+
+
+# Every refusal also closes the descriptor it opened: a directory is opened like the
+# others and refused on the opened descriptor.
+@pytest.mark.parametrize("kind", ["fifo", "device", "directory", "symlink", "oversized"])
 def test_special_symlinked_or_oversized_selection_files_refuse_before_any_read(monkeypatch, capfdbinary, tmp_path, kind) -> None:
     monkeypatch.setattr(readiness.DBAccess, "for_current_env", classmethod(lambda cls, *a, **k: pytest.fail("database reached")))
     regular = tmp_path / "selection.txt"
@@ -329,15 +335,19 @@ def test_special_symlinked_or_oversized_selection_files_refuse_before_any_read(m
         os.mkfifo(path)  # no writer: a blocking open or read would never return
     elif kind == "device":
         path = Path(os.devnull)  # a character device, which reads as empty
+    elif kind == "directory":
+        path = tmp_path
     elif kind == "symlink":
         path = tmp_path / "selection.link"
         path.symlink_to(regular)
     else:
         path = tmp_path / "selection.big"
         path.write_bytes(f"{UUID_A}\n#".encode("ascii") + b"x" * readiness.SELECTION_FILE_MAX_BYTES)
+    before = _open_descriptors()
     with _deadline(2):
         result = _run(["--selection-file", str(path)], capfdbinary)
     assert result == (readiness.REFUSAL_EXIT_CODE, b"", b"READINESS_SELECTION_INVALID\n")
+    assert _open_descriptors() == before
 
 
 def test_selection_file_at_the_size_bound_is_read(monkeypatch, capfdbinary, tmp_path) -> None:
@@ -485,3 +495,14 @@ def test_classifier_owns_the_readiness_tool_and_fails_closed_for_siblings() -> N
     with pytest.raises(ValueError, match="CI_BODYGRAPH_TOOL_OWNER_TEST_MISSING:tools/bodygraph/other.py"):
         classifier.changed_test_targets(ROOT, ["tools/bodygraph/other.py"])
     assert classifier._bodygraph_tool_owner_targets(ROOT, "tools/bodygraph/README.md") == ()
+
+
+# CR-18: every unregistered source suffix under the prefix fails closed, not only ``.py``;
+# the prefix's lane mapping would otherwise give a shell or SQL tool no changed tests.
+@pytest.mark.parametrize("suffix", [".py", ".sh", ".sql"], ids=["py", "sh", "sql"])
+def test_every_unregistered_bodygraph_source_fails_closed(suffix) -> None:
+    assert suffix in classifier._UNKNOWN_SOURCE_SUFFIXES
+    path = f"tools/bodygraph/other{suffix}"
+    assert classifier._lanes_for_path(path) == {"db", "product", "release"}
+    with pytest.raises(ValueError, match=f"CI_BODYGRAPH_TOOL_OWNER_TEST_MISSING:{path}$"):
+        classifier.changed_test_targets(ROOT, [path])

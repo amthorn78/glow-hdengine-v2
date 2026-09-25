@@ -196,6 +196,10 @@ def write_band_edges(root: Path | None = None) -> Path:
 GOLDENS_SCHEMA = "magic10_goldens.v1"
 GOLDEN_COMPARISON_SCHEMA = "magic10_golden_comparison.v1"
 GOLDENS_DEFAULT_PATH = ROOT / "tests/fixtures/magic10/v1/goldens.json"
+# The committed collection is 26,030 bytes and a document must carry its fixed
+# membership and pinned annotations, so 1 MiB leaves ample room while an oversized
+# input is refused after reading at most one byte past the bound.
+GOLDENS_MAX_BYTES = 1_048_576
 # PF01 §9.5 ownership of each golden: kernel fixtures run through PR03's
 # canonical kernel functions, application fixtures through ``evaluate_pair``.
 GOLDEN_CASE_TABLE = (
@@ -352,14 +356,34 @@ def _golden_display(path: Path) -> str:
     return resolved.relative_to(root).as_posix() if resolved.is_relative_to(root) else "<external>"
 
 
-def _golden_load_document(goldens_path: Path) -> tuple[Mapping[str, Any], str]:
-    path = Path(os.path.abspath(goldens_path))
+def _golden_read_bounded(path: Path) -> bytes:
+    """Return the bytes of a regular, non-symlinked goldens file within the bound.
+
+    The file is opened without following a final symlink and without blocking,
+    and its type is checked on the opened descriptor, so a FIFO, device, directory
+    or symlink is refused before anything is read, and at most one byte past
+    ``GOLDENS_MAX_BYTES`` is ever read. The descriptor is closed on every path.
+    """
     try:
-        if path.is_symlink() or not path.is_file():
-            raise _golden_refuse("GOLDENS_INVALID")
-        raw = path.read_bytes()
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     except OSError:
         raise _golden_refuse("GOLDENS_INVALID") from None
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise _golden_refuse("GOLDENS_INVALID")
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            raw = handle.read(GOLDENS_MAX_BYTES + 1)
+    except OSError:
+        raise _golden_refuse("GOLDENS_INVALID") from None
+    finally:
+        os.close(descriptor)
+    if len(raw) > GOLDENS_MAX_BYTES:
+        raise _golden_refuse("GOLDENS_INVALID")
+    return raw
+
+
+def _golden_load_document(goldens_path: Path) -> tuple[Mapping[str, Any], str]:
+    raw = _golden_read_bounded(Path(os.path.abspath(goldens_path)))
     try:
         document = json.loads(raw.decode("utf-8"), object_pairs_hook=_golden_pairs_hook,
                               parse_constant=_golden_refuse_non_integer, parse_float=_golden_refuse_non_integer)

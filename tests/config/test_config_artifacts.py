@@ -386,12 +386,17 @@ def test_manifest_cut_callback_recovers_actual_publication_failure(writer_root, 
 # ---------------------------------------------------------------------------
 
 import ast
+import contextlib
 import copy
 import errno
 import hashlib
 import inspect
 import os
+import resource
+import signal
+import stat
 import subprocess
+import sys
 
 from ci.checks import classify_ci_changes as classifier
 from engine.compat import compute
@@ -750,6 +755,82 @@ def test_symlinked_or_missing_goldens_refuse(bundle_root, tmp_path) -> None:
     assert _refusal(bundle_root, tmp_path / "absent.json") == "GOLDENS_INVALID"
 
 
+# The goldens are read through a bound (CR-19): the committed collection fits well
+# inside it, and a document one byte longer than the bound allows is refused.
+def test_the_goldens_size_bound_is_pinned_and_holds_the_committed_collection(bundle_root, monkeypatch) -> None:
+    assert artifact_tools.GOLDENS_MAX_BYTES == 1_048_576
+    size = GOLDENS.stat().st_size
+    assert size < artifact_tools.GOLDENS_MAX_BYTES
+    monkeypatch.setattr(artifact_tools, "GOLDENS_MAX_BYTES", size)
+    assert artifact_tools.compare_goldens(bundle_root, GOLDENS).ok is True
+    monkeypatch.setattr(artifact_tools, "GOLDENS_MAX_BYTES", size - 1)
+    assert _refusal(bundle_root, GOLDENS) == "GOLDENS_INVALID"
+
+
+# A sparse 8 GiB file under a 2 GiB address-space limit: reading it whole cannot
+# succeed, so only a bounded read reaches the refusal, and it does so before admission.
+def test_an_oversized_goldens_file_is_refused_without_reading_it_whole(bundle_root, tmp_path) -> None:
+    big = tmp_path / "big.json"
+    with big.open("wb") as handle:
+        handle.truncate(8 * 1024 ** 3)
+
+    def cap_address_space() -> None:
+        _soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+        limit = 2 * 1024 ** 3 if hard == resource.RLIM_INFINITY else min(2 * 1024 ** 3, hard)
+        resource.setrlimit(resource.RLIMIT_AS, (limit, hard))
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "tools/config/generate_config_artifacts.py"),
+         "--compare-goldens", str(bundle_root), "--goldens", str(big)],
+        cwd=tmp_path, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}, capture_output=True,
+        timeout=120, preexec_fn=cap_address_space)
+    assert (result.returncode, result.stdout, result.stderr) == (
+        config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", b"GOLDENS_INVALID\n")
+
+
+class _Blocked(Exception):
+    """Raised by the test deadline; deliberately not an ``OSError``, so no handler absorbs it."""
+
+
+@contextlib.contextmanager
+def _deadline(seconds):
+    def expire(signum, frame):
+        raise _Blocked("reading the goldens blocked")
+
+    previous = signal.signal(signal.SIGALRM, expire)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
+
+
+def _open_descriptors() -> set[str]:
+    return set(os.listdir("/proc/self/fd"))
+
+
+# A FIFO, device or directory is refused on the opened descriptor before any read, an
+# oversized file after at most one byte past the bound, and every refusal closes the
+# descriptor it opened.
+@pytest.mark.parametrize("kind", ["fifo", "device", "directory", "oversized"])
+def test_special_or_oversized_goldens_refuse_and_close_their_descriptor(bundle_root, tmp_path, kind) -> None:
+    if kind == "fifo":
+        path = tmp_path / "goldens.fifo"
+        os.mkfifo(path)  # no writer: a blocking open or read would never return
+    elif kind == "device":
+        path = Path(os.devnull)  # a character device, which reads as empty
+    elif kind == "directory":
+        path = tmp_path
+    else:
+        path = tmp_path / "goldens.big"
+        path.write_bytes(b" " * (artifact_tools.GOLDENS_MAX_BYTES + 1))
+    before = _open_descriptors()
+    with _deadline(2):
+        assert _refusal(bundle_root, path) == "GOLDENS_INVALID"
+    assert _open_descriptors() == before
+
+
 def test_admission_refusals_are_never_equality(tmp_path) -> None:
     incomplete = synthetic_complete_release_root(tmp_path / "incomplete")
     manifest = json.loads((incomplete / "catalog/manifest.json").read_bytes())
@@ -788,15 +869,36 @@ def _deny(monkeypatch, method: str, denied: Path) -> None:
     monkeypatch.setattr(Path, method, guarded)
 
 
+def _deny_open(monkeypatch, denied: Path) -> None:
+    """Make ``os.open`` raise EACCES for exactly one path (root can open anything)."""
+    original = os.open
+
+    def guarded(path, flags, *args, **kwargs):
+        if kwargs.get("dir_fd") is None and os.path.realpath(path) == os.path.realpath(denied):
+            raise PermissionError(errno.EACCES, "Permission denied", str(path))
+        return original(path, flags, *args, **kwargs)
+
+    monkeypatch.setattr(os, "open", guarded)
+
+
+# The goldens reader opens the path itself and reads the opened descriptor, so its two
+# failures are injected there: a denied open, and a regular file whose read fails
+# (``/proc/self/mem`` is a regular, zero-length file whose offset 0 is unmapped: EIO).
 @pytest.mark.parametrize(("target", "method", "code"), [
-    ("goldens", "read_bytes", "GOLDENS_INVALID"),
-    ("goldens", "is_symlink", "GOLDENS_INVALID"),
+    ("goldens", "open", "GOLDENS_INVALID"),
+    ("goldens", "read", "GOLDENS_INVALID"),
     ("candidate", "is_symlink", "CANDIDATE_ROOT_INVALID"),
 ])
 def test_inputs_that_cannot_be_inspected_or_read_refuse(bundle_root, tmp_path, capfdbinary, monkeypatch, target, method, code) -> None:
     goldens = tmp_path / "goldens.json"
     goldens.write_bytes(GOLDENS.read_bytes())
-    _deny(monkeypatch, method, goldens if target == "goldens" else bundle_root)
+    if method == "open":
+        _deny_open(monkeypatch, goldens)
+    elif method == "read":
+        goldens = Path("/proc/self/mem")
+        assert stat.S_ISREG(goldens.stat().st_mode)
+    else:
+        _deny(monkeypatch, method, bundle_root)
     assert _refusal(bundle_root, goldens) == code
     result = _run_cli(["--compare-goldens", str(bundle_root), "--goldens", str(goldens)], capfdbinary)
     assert result == (config_tools.GOLDEN_COMPARISON_REFUSAL_EXIT_CODE, b"", f"{code}\n".encode("ascii"))
