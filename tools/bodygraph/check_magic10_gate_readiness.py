@@ -10,7 +10,8 @@ and reports bounded, aggregate, identity-safe diagnostics.  It issues no ``UPDAT
 vendor call, and never represents an unavailable dataset as ready.
 
 It runs only under the closed determinism rails; otherwise it refuses before
-reading the selection or constructing a database provider.
+reading the selection or constructing a database provider.  A selection file
+must be a regular, non-symlinked file of at most ``SELECTION_FILE_MAX_BYTES``.
 
 Exit codes: ``0`` — a report was emitted (``READY`` or ``NOT_READY``); ``5`` —
 refusal with one stderr token (``RAILS_CLOSED_REQUIRED:<pins>``,
@@ -22,6 +23,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
+import stat
 import sys
 from collections import Counter
 from dataclasses import dataclass
@@ -47,6 +50,8 @@ READINESS_EMPTY_SELECTION = "READINESS_EMPTY_SELECTION"
 READINESS_SELECTION_INVALID = "READINESS_SELECTION_INVALID"
 READINESS_UNAVAILABLE = "READINESS_UNAVAILABLE"
 COUNT_KEYS = ("ready", "missing", "duplicate", "row_invalid", "payload_invalid", "gates_invalid")
+# About 28,000 canonical UUID lines: generous for an explicit selection, and bounded.
+SELECTION_FILE_MAX_BYTES = 1_048_576
 # ``read_current_mapped_bodygraph`` folds a multi-row current view into its
 # row-contract refusal; the owning test pins this exact message so drift is caught.
 DUPLICATE_ROW_MESSAGE = "current view returned more than one row"
@@ -93,16 +98,39 @@ def require_closed_rails() -> None:
         raise ReadinessRefusal(f"RAILS_CLOSED_REQUIRED:{sorted(unmet.items())}")
 
 
+def read_selection_file(path: Path) -> str:
+    """Return the text of a regular, non-symlinked selection file within the size bound.
+
+    The file is opened without following a final symlink and without blocking, and
+    its type is checked on the opened descriptor, so a FIFO, device, directory or
+    symlink is refused before anything is read, and at most one byte past the bound
+    is ever read.  A missing, unreadable, oversized or non-UTF-8 file is refused
+    too, value-free and before any database access.
+    """
+    try:
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except OSError:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+    try:
+        with os.fdopen(descriptor, "rb") as handle:
+            if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+                raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+            raw = handle.read(SELECTION_FILE_MAX_BYTES + 1)
+    except OSError:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+    if len(raw) > SELECTION_FILE_MAX_BYTES:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID)
+    try:
+        return raw.decode("utf-8")
+    except UnicodeError:
+        raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+
+
 def parse_selection(user_ids: Sequence[str], selection_file: Path | None) -> tuple[str, ...]:
     """Return the sorted, duplicate-free canonical selection or refuse."""
     raw = [value for value in user_ids]
     if selection_file is not None:
-        try:
-            text = selection_file.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
-            # A missing, unreadable or non-UTF-8 file is an invalid selection,
-            # refused value-free before any database access.
-            raise ReadinessRefusal(READINESS_SELECTION_INVALID) from None
+        text = read_selection_file(selection_file)
         for line in text.splitlines():
             stripped = line.strip()
             if stripped and not stripped.startswith("#"):
@@ -145,6 +173,12 @@ def observe(db: DBAccess, selection: Sequence[str]) -> ReadinessReport:
         except BodyGraphProjectionError as exc:
             counts["gates_invalid" if is_gate_ingress_code(exc.code) else "payload_invalid"] += 1
             diagnostics[exc.code] += 1
+        except RecursionError:
+            # A stored payload nested past the recursion limit cannot be decoded or
+            # validated: the row is invalid, with the read path's own code for an
+            # undecodable payload, and the rest of the selection is still observed.
+            counts["payload_invalid"] += 1
+            diagnostics["DB_PAYLOAD_INVALID"] += 1
         except AdapterError as exc:
             raise ReadinessRefusal(READINESS_UNAVAILABLE) from exc
         else:

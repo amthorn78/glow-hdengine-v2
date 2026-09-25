@@ -6,10 +6,13 @@ vendor or network is reached, and nothing is written.
 from __future__ import annotations
 
 import ast
+import contextlib
 import errno
 import hashlib
 import importlib
 import json
+import os
+import signal
 from pathlib import Path
 
 import pytest
@@ -37,7 +40,7 @@ GATES_A = ["10", "20", "34"]
 REPORT_KEYS = {"schema", "readiness", "provider", "read_only", "selection", "counts", "diagnostics"}
 FORBIDDEN_STRINGS = (UUID_A, UUID_B, UUID_C, "birthDateUtc", "\"gates\":", "bodygraph", "Emotional", "2000-01-01",
                      "DATABASE_URL", "postgres://", "[10", "\"10\"", "person_uid", "example.invalid")
-ALLOWED_IMPORT_ROOTS = {"__future__", "argparse", "hashlib", "sys", "collections", "dataclasses", "pathlib", "typing",
+ALLOWED_IMPORT_ROOTS = {"__future__", "argparse", "hashlib", "os", "stat", "sys", "collections", "dataclasses", "pathlib", "typing",
                         "engine.bodygraph.mapped_cache", "engine.bodygraph.projection", "engine.db",
                         "engine.db.errors", "engine.runtime.determinism_env", "engine.serializer.canon"}
 FORBIDDEN_IMPORTS = ("engine.bodygraph.resolver", "engine.bodygraph.vendor_client", "engine.bodygraph.ingest",
@@ -205,6 +208,34 @@ def test_a_row_is_ready_exactly_when_the_reader_resolves_it(label, ready) -> Non
         assert report.diagnostics == (("IDENTITY_CONFLICT", 1),)
 
 
+def _deep_list(depth):
+    value = []
+    for _ in range(depth):
+        value = [value]
+    return value
+
+
+@pytest.mark.parametrize("form", ["decoded", "text"])
+def test_a_payload_nested_past_the_recursion_limit_is_payload_invalid(monkeypatch, capfdbinary, form) -> None:
+    chart = complete_chart(UUID_A, GATES_A)
+    if form == "decoded":
+        chart["bodygraph"]["authority"] = _deep_list(5000)
+        payload = chart
+    else:
+        chart["bodygraph"]["authority"] = "__deep__"
+        payload = json.dumps(chart, sort_keys=True).replace('"__deep__"', "[" * 5000 + "]" * 5000)
+    fake = RowVariantDB({UUID_B: complete_chart(UUID_B, GATES_A)}, rows={UUID_A: [(UUID_A, "hdapi", 2, "a" * 64, payload)]})
+    _use(monkeypatch, fake)
+    code, out, err = _run(["--user-id", UUID_B, "--user-id", UUID_A], capfdbinary)
+    assert (code, err) == (0, b"")
+    report = json.loads(out)
+    assert report["readiness"] == "NOT_READY"
+    assert report["counts"] == {"ready": 1, "missing": 0, "duplicate": 0, "row_invalid": 0, "payload_invalid": 1, "gates_invalid": 0}
+    assert report["diagnostics"] == [{"code": "DB_PAYLOAD_INVALID", "count": 1}]
+    assert [params for _sql, params in fake.queries] == [(UUID_A,), (UUID_B,)]  # the row after it is still read
+    _assert_no_leak(out, err)
+
+
 def test_duplicate_row_message_is_pinned_against_mapped_cache() -> None:
     fake = RowVariantDB(rows={UUID_A: _row(UUID_A) + _row(UUID_A)})
     with pytest.raises(mapped_cache.MappedCacheError) as raised:
@@ -257,17 +288,69 @@ def test_unreadable_selection_file_refuses_before_any_database_access(monkeypatc
     not_utf8.write_bytes(b"\xff" + UUID_A.encode("ascii") + b"\n")
     denied = tmp_path / "denied.txt"
     denied.write_text(f"{UUID_A}\n", encoding="utf-8")
-    real_read_text = Path.read_text
+    real_open = os.open
 
-    def read_text(self, *args, **kwargs):
-        if self == denied:  # root can read anything, so the permission failure is injected
-            raise PermissionError(errno.EACCES, "Permission denied", str(self))
-        return real_read_text(self, *args, **kwargs)
+    def guarded_open(path, flags, *args, **kwargs):
+        if Path(path) == denied:  # root can read anything, so the permission failure is injected
+            raise PermissionError(errno.EACCES, "Permission denied", str(path))
+        return real_open(path, flags, *args, **kwargs)
 
-    monkeypatch.setattr(Path, "read_text", read_text)
+    monkeypatch.setattr(readiness.os, "open", guarded_open)
     for path in (tmp_path / "absent.txt", tmp_path, not_utf8, denied):
         code, out, err = _run(["--selection-file", str(path)], capfdbinary)
         assert (code, out, err) == (readiness.REFUSAL_EXIT_CODE, b"", b"READINESS_SELECTION_INVALID\n"), path
+
+
+class _Blocked(Exception):
+    """Raised by the test deadline; deliberately not an ``OSError``, so no handler absorbs it."""
+
+
+@contextlib.contextmanager
+def _deadline(seconds):
+    def expire(signum, frame):
+        raise _Blocked("reading the selection file blocked")
+
+    previous = signal.signal(signal.SIGALRM, expire)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
+
+
+@pytest.mark.parametrize("kind", ["fifo", "device", "symlink", "oversized"])
+def test_special_symlinked_or_oversized_selection_files_refuse_before_any_read(monkeypatch, capfdbinary, tmp_path, kind) -> None:
+    monkeypatch.setattr(readiness.DBAccess, "for_current_env", classmethod(lambda cls, *a, **k: pytest.fail("database reached")))
+    regular = tmp_path / "selection.txt"
+    regular.write_text(f"{UUID_A}\n", encoding="utf-8")
+    if kind == "fifo":
+        path = tmp_path / "selection.fifo"
+        os.mkfifo(path)  # no writer: a blocking open or read would never return
+    elif kind == "device":
+        path = Path(os.devnull)  # a character device, which reads as empty
+    elif kind == "symlink":
+        path = tmp_path / "selection.link"
+        path.symlink_to(regular)
+    else:
+        path = tmp_path / "selection.big"
+        path.write_bytes(f"{UUID_A}\n#".encode("ascii") + b"x" * readiness.SELECTION_FILE_MAX_BYTES)
+    with _deadline(2):
+        result = _run(["--selection-file", str(path)], capfdbinary)
+    assert result == (readiness.REFUSAL_EXIT_CODE, b"", b"READINESS_SELECTION_INVALID\n")
+
+
+def test_selection_file_at_the_size_bound_is_read(monkeypatch, capfdbinary, tmp_path) -> None:
+    assert readiness.SELECTION_FILE_MAX_BYTES == 1_048_576
+    fake = _good_db(UUID_A)
+    _use(monkeypatch, fake)
+    head = f"{UUID_A}\n#".encode("ascii")
+    path = tmp_path / "selection.txt"
+    path.write_bytes(head + b"x" * (readiness.SELECTION_FILE_MAX_BYTES - len(head) - 1) + b"\n")
+    assert path.stat().st_size == readiness.SELECTION_FILE_MAX_BYTES
+    code, out, err = _run(["--selection-file", str(path)], capfdbinary)
+    assert (code, err) == (0, b"") and json.loads(out)["counts"]["ready"] == 1
+    assert [params for _sql, params in fake.queries] == [(UUID_A,)]
 
 
 # --- unavailable or denied datasets never become ready ----------------------------------
