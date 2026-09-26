@@ -4,11 +4,13 @@ import copy
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 import jsonschema
 
 from engine.config.registry_loader import (
+    ADMITTED_RELEASE_ROSTER,
     FROZEN_MAGIC10_INPUTS,
     SchemaValidationError,
     _normalize_channel_id,
@@ -23,6 +25,57 @@ def _refresh_reader_idempotence_hash(payload):
     payload["idempotence_hash"] = hashlib.sha256(
         run_canonical_json_gate.sercanon(preimage, sort_keys=True)
     ).hexdigest()
+
+
+_ROSTER_DIRECTORIES = ("adapter", "catalog", "engine", "math", "migrations", "schemas")
+# The five gate targets that carry a capture-time identity: the four frozen
+# sources of _CAPTURE_IDENTITY_SOURCES and the consumer artifacts/cli/summary.json.
+_IDENTITY_TARGETS = (
+    "artifacts/cli/showcompat/args.json",
+    "artifacts/cli/showcompat/stdout.json",
+    "artifacts/cli/ab.json",
+    "artifacts/cli/ba.json",
+    "artifacts/cli/summary.json",
+)
+_FROZEN_CAPTURE_IDENTITY = {
+    "engine_tag": "hdengine@prod",
+    "invocation_tag": "INV-f2ac55d77ce9aacc",
+    "release_id": "12523fec11d4f0ff375bbc7e0d88352a6f3beb07f3a74cecfae901307bbb6e5c",
+}
+
+
+def _gate_root(tmp_path, *, copy_artifacts=False):
+    """A temporary root holding every release roster member and the gate's inputs."""
+    source_root = run_canonical_json_gate.ROOT
+    if copy_artifacts:
+        shutil.copytree(source_root / "artifacts", tmp_path / "artifacts")
+    else:
+        (tmp_path / "artifacts").symlink_to(source_root / "artifacts", target_is_directory=True)
+    (tmp_path / "audit").symlink_to(source_root / "audit", target_is_directory=True)
+    for name in _ROSTER_DIRECTORIES:
+        shutil.copytree(source_root / name, tmp_path / name)
+    for rel_path in ADMITTED_RELEASE_ROSTER:
+        member = tmp_path / rel_path
+        if not member.exists():
+            member.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_root / rel_path, member)
+    return tmp_path
+
+
+def _point_gate_at(monkeypatch, root):
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", root)
+    monkeypatch.setattr(run_canonical_json_gate, "CANON_DIR", root / "audit" / "gates" / "canonical_json")
+    monkeypatch.setattr(
+        run_canonical_json_gate, "JSON_GATE_DIR", root / "audit" / "gates" / "json_gate" / "canonical"
+    )
+
+
+def _target(rel_path):
+    return next(target for target in run_canonical_json_gate.TARGETS if target.rel_path == rel_path)
+
+
+def _write_capture(root, rel_path, payload):
+    (root / rel_path).write_bytes(run_canonical_json_gate.sercanon(payload, sort_keys=True))
 
 
 def test_stale_outputs_detects_missing_and_drift(tmp_path):
@@ -70,11 +123,7 @@ def test_gate_capture_timestamp_is_independent_of_intentional_release_cut(
 def test_full_gate_outputs_remain_current_after_metadata_only_release_cut(
     tmp_path, monkeypatch
 ):
-    source_root = run_canonical_json_gate.ROOT
-    for name in ("artifacts", "audit"):
-        (tmp_path / name).symlink_to(source_root / name, target_is_directory=True)
-    for name in ("adapter", "catalog", "engine", "math", "migrations", "schemas"):
-        shutil.copytree(source_root / name, tmp_path / name)
+    _gate_root(tmp_path)
 
     manifest_path = tmp_path / "catalog" / "manifest.json"
     manifest = json.loads(manifest_path.read_bytes())
@@ -980,7 +1029,7 @@ def test_generated_compat_rejects_valid_token_with_wrong_score_band():
     "rel_path",
     ("artifacts/cli/showcompat/stdout.json", "artifacts/cli/ab.json"),
 )
-def test_generated_compat_identity_binds_immutable_runtime_source(rel_path):
+def test_generated_compat_identity_binds_frozen_capture_identity(rel_path):
     target = next(
         target
         for target in run_canonical_json_gate.TARGETS
@@ -1000,57 +1049,44 @@ def test_generated_compat_identity_binds_immutable_runtime_source(rel_path):
 
 
 def test_conjunction_capture_rejects_coherent_forged_uids(tmp_path, monkeypatch):
-    artifact_dir = tmp_path / "artifacts" / "cli"
-    artifact_dir.mkdir(parents=True)
-    payloads = {}
+    """A presented payload with forged uids refuses on the uid while the four
+    on-disk identity sources stay intact and digest-verified."""
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    _point_gate_at(monkeypatch, root)
     for name in ("ab", "ba"):
-        payload = json.loads(
-            (run_canonical_json_gate.ROOT / f"artifacts/cli/{name}.json").read_bytes()
-        )
+        rel_path = f"artifacts/cli/{name}.json"
+        payload = json.loads((root / rel_path).read_bytes())
         payload["conjunction"]["left"]["person_uid"] = "forged-left"
-        payloads[name] = payload
-        (artifact_dir / f"{name}.json").write_bytes(
-            run_canonical_json_gate.sercanon(payload, sort_keys=True)
-        )
-
-    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
-    for name in ("ab", "ba"):
-        target = next(
-            target
-            for target in run_canonical_json_gate.TARGETS
-            if target.rel_path == f"artifacts/cli/{name}.json"
-        )
         with pytest.raises(ValueError, match="person_uid_source_mismatch"):
-            run_canonical_json_gate._validate_target(target, payloads[name])
+            run_canonical_json_gate._validate_target(_target(rel_path), payload)
 
 
 def test_conjunction_capture_rejects_coherent_same_band_score_forgery(
     tmp_path, monkeypatch
 ):
-    source_root = run_canonical_json_gate.ROOT
-    artifact_dir = tmp_path / "artifacts" / "cli"
-    artifact_dir.mkdir(parents=True)
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    _point_gate_at(monkeypatch, root)
     payloads = {}
     for name in ("ab", "ba"):
-        payload = json.loads(
-            (source_root / f"artifacts/cli/{name}.json").read_bytes()
-        )
+        payload = json.loads((root / f"artifacts/cli/{name}.json").read_bytes())
         payload["conjunction"]["compat"]["categories"][0]["score"] = 46
         payloads[name] = payload
-        (artifact_dir / f"{name}.json").write_bytes(
-            run_canonical_json_gate.sercanon(payload, sort_keys=True)
-        )
-
-    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    # A presented-payload forgery against intact on-disk captures reaches the
+    # existing order's counterpart comparison.
     for name in ("ab", "ba"):
-        target = next(
-            target
-            for target in run_canonical_json_gate.TARGETS
-            if target.rel_path == f"artifacts/cli/{name}.json"
-        )
-        # Frozen capture-time record: a coherent same-band score forgery breaks the frozen digest.
-        with pytest.raises(ValueError, match="frozen_generated_capture_mismatch"):
+        with pytest.raises(ValueError, match="conjunction_counterpart_mismatch"):
+            run_canonical_json_gate._validate_target(_target(f"artifacts/cli/{name}.json"), payloads[name])
+    # A coherent on-disk forgery of both captures refuses earlier: the identity
+    # source's frozen digest is verified before any identity or uid comparison,
+    # and the target's own frozen-digest check still refuses the forged bytes.
+    for name in ("ab", "ba"):
+        _write_capture(root, f"artifacts/cli/{name}.json", payloads[name])
+    for name in ("ab", "ba"):
+        target = _target(f"artifacts/cli/{name}.json")
+        with pytest.raises(ValueError, match="frozen_capture_identity_source_unverified:artifacts/cli/ab.json"):
             run_canonical_json_gate._validate_target(target, payloads[name])
+        with pytest.raises(ValueError, match="frozen_generated_capture_mismatch"):
+            run_canonical_json_gate._validate_frozen_generated_capture(target, payloads[name])
 
 
 def test_showcompat_capture_rejects_coherent_same_band_score_forgery():
@@ -1424,3 +1460,151 @@ def test_duplicate_channel_gate_endpoints_fail_schema_and_loader():
     with pytest.raises(SchemaValidationError, match="two distinct gates") as exc_info:
         _normalize_channel_id("01-01", [1, 1])
     assert exc_info.value.code == "DUPLICATE_CHANNEL_GATE"
+
+
+# --- HDE-EPIC040-PR06: the release manifest validator binds the admitted roster ---------
+
+def test_manifest_validator_binds_the_admitted_roster():
+    gate = run_canonical_json_gate
+    assert gate._EXPECTED_RELEASE_MANIFEST_PATHS == ADMITTED_RELEASE_ROSTER
+    assert len(gate._EXPECTED_RELEASE_MANIFEST_PATHS) == 44
+    assert len(gate.EXPECTED_TARGET_PATHS) == 26
+    assert len(gate.EXPECTED_SET_RULES) == 6
+    target = _target("catalog/manifest.json")
+    payload = json.loads((gate.ROOT / "catalog/manifest.json").read_bytes())
+    assert tuple(entry["path"] for entry in payload["files"]) == ADMITTED_RELEASE_ROSTER
+    gate._validate_target(target, payload)
+
+    short = copy.deepcopy(payload)
+    short["files"] = short["files"][:-1]
+    with pytest.raises(ValueError, match="release_manifest_input_roster_invalid"):
+        gate._validate_target(target, short)
+
+    extra_path = "tools/errors/generate_error_artifacts.py"
+    extra_bytes = (gate.ROOT / extra_path).read_bytes()
+    long = copy.deepcopy(payload)
+    long["files"].append(
+        {"path": extra_path, "sha256": hashlib.sha256(extra_bytes).hexdigest(), "size": len(extra_bytes)}
+    )
+    long["files"].sort(key=lambda entry: entry["path"])
+    with pytest.raises(ValueError, match="release_manifest_input_roster_invalid"):
+        gate._validate_target(target, long)
+
+
+# --- HDE-EPIC040-PR06-F01 (PF10 §2.21): frozen-capture identity source -------------------
+
+def test_frozen_capture_identity_passes_when_service_identity_is_regenerated(tmp_path, monkeypatch):
+    """The isolated closure regenerates service_identity.json to the current release;
+    the frozen captures keep validating against their own capture-time identity."""
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    identity_path = root / "artifacts" / "identity" / "service_identity.json"
+    regenerated = json.loads(identity_path.read_bytes())
+    regenerated["release_id"] = "e" * 64
+    identity_path.write_bytes(run_canonical_json_gate.sercanon(regenerated, sort_keys=True))
+    _point_gate_at(monkeypatch, root)
+    assert run_canonical_json_gate._capture_identity_meta() == _FROZEN_CAPTURE_IDENTITY
+    for rel_path in _IDENTITY_TARGETS:
+        run_canonical_json_gate._validate_target(
+            _target(rel_path), json.loads((root / rel_path).read_bytes())
+        )
+    assert run_canonical_json_gate._run_gate(run_canonical_json_gate.TARGETS, check_only=True) == 0
+
+
+def test_frozen_capture_identity_refuses_tampered_capture(tmp_path, monkeypatch):
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    rel_path = "artifacts/cli/showcompat/args.json"
+    payload = json.loads((root / rel_path).read_bytes())
+    payload["identity"]["meta"]["release_id"] = "f" * 64
+    _write_capture(root, rel_path, payload)
+    _point_gate_at(monkeypatch, root)
+    with pytest.raises(ValueError, match=f"^frozen_capture_identity_source_unverified:{rel_path}$"):
+        run_canonical_json_gate._capture_identity_meta()
+    # The digest is verified before the identity is read, so the tampered source
+    # refuses from every identity-carrying target, including the untouched ones.
+    for target_path in _IDENTITY_TARGETS:
+        with pytest.raises(ValueError, match=f"frozen_capture_identity_source_unverified:{rel_path}"):
+            run_canonical_json_gate._validate_target(
+                _target(target_path), json.loads((root / target_path).read_bytes())
+            )
+    with pytest.raises(ValueError, match="frozen_generated_capture_mismatch"):
+        run_canonical_json_gate._validate_frozen_generated_capture(_target(rel_path), payload)
+
+
+def test_frozen_capture_identity_refuses_disagreement(tmp_path, monkeypatch):
+    """A coherent forgery of one capture family cannot pass by re-freezing it alone."""
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    digests = dict(run_canonical_json_gate._FROZEN_GENERATED_SHA256)
+    for name in ("ab", "ba"):
+        rel_path = f"artifacts/cli/{name}.json"
+        payload = json.loads((root / rel_path).read_bytes())
+        payload["conjunction"]["compat"]["meta"]["release_id"] = "d" * 64
+        _write_capture(root, rel_path, payload)
+        digests[rel_path] = hashlib.sha256(
+            run_canonical_json_gate.sercanon(payload, sort_keys=True)
+        ).hexdigest()
+    # Make the consumer consistent with the re-frozen pair too, so its own
+    # pair-digest checks pass and the identity comparison is reached.
+    summary = json.loads((root / "artifacts/cli/summary.json").read_bytes())
+    summary["ab_sha256"] = hashlib.sha256((root / "artifacts/cli/ab.json").read_bytes()).hexdigest()
+    summary["ba_sha256"] = hashlib.sha256((root / "artifacts/cli/ba.json").read_bytes()).hexdigest()
+    summary["two_run_sha256"] = summary["ab_sha256"]
+    _write_capture(root, "artifacts/cli/summary.json", summary)
+    monkeypatch.setattr(run_canonical_json_gate, "_FROZEN_GENERATED_SHA256", digests)
+    _point_gate_at(monkeypatch, root)
+    with pytest.raises(ValueError, match="^frozen_capture_identity_disagreement$"):
+        run_canonical_json_gate._capture_identity_meta()
+    for target_path in _IDENTITY_TARGETS:
+        with pytest.raises(ValueError, match="frozen_capture_identity_disagreement"):
+            run_canonical_json_gate._validate_target(
+                _target(target_path), json.loads((root / target_path).read_bytes())
+            )
+
+
+def test_frozen_capture_identity_refuses_consumer_disagreement(tmp_path, monkeypatch):
+    """artifacts/cli/summary.json carries an identity but is a consumer: it is
+    compared against the agreed source identity, never trusted as a source."""
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    rel_path = "artifacts/cli/summary.json"
+    payload = json.loads((root / rel_path).read_bytes())
+    payload["identity"]["meta"]["release_id"] = "c" * 64
+    _write_capture(root, rel_path, payload)
+    _point_gate_at(monkeypatch, root)
+    assert rel_path not in run_canonical_json_gate._FROZEN_GENERATED_SHA256
+    assert rel_path not in dict(run_canonical_json_gate._CAPTURE_IDENTITY_SOURCES)
+    assert run_canonical_json_gate._capture_identity_meta() == _FROZEN_CAPTURE_IDENTITY
+    with pytest.raises(ValueError, match="^runtime_identity_source_mismatch$"):
+        run_canonical_json_gate._validate_target(_target(rel_path), payload)
+
+
+def test_frozen_capture_identity_refuses_unverified_digest(monkeypatch):
+    digests = {
+        key: value
+        for key, value in run_canonical_json_gate._FROZEN_GENERATED_SHA256.items()
+        if key != "artifacts/cli/ab.json"
+    }
+    monkeypatch.setattr(run_canonical_json_gate, "_FROZEN_GENERATED_SHA256", digests)
+    with pytest.raises(ValueError, match="^frozen_capture_identity_source_unverified:artifacts/cli/ab.json$"):
+        run_canonical_json_gate._capture_identity_meta()
+    rel_path = "artifacts/cli/showcompat/args.json"
+    with pytest.raises(ValueError, match="frozen_capture_identity_source_unverified:artifacts/cli/ab.json"):
+        run_canonical_json_gate._validate_target(
+            _target(rel_path), json.loads((run_canonical_json_gate.ROOT / rel_path).read_bytes())
+        )
+
+
+def test_gate_never_reads_service_identity_for_capture_identity(tmp_path, monkeypatch):
+    root = _gate_root(tmp_path, copy_artifacts=True)
+    (root / "artifacts" / "identity" / "service_identity.json").unlink()
+    _point_gate_at(monkeypatch, root)
+    assert run_canonical_json_gate._capture_identity_meta() == _FROZEN_CAPTURE_IDENTITY
+    for rel_path in _IDENTITY_TARGETS:
+        run_canonical_json_gate._validate_target(
+            _target(rel_path), json.loads((root / rel_path).read_bytes())
+        )
+    source = Path(run_canonical_json_gate.__file__).read_text(encoding="utf-8")
+    assert "service_identity" not in source
+    assert "_CAPTURE_IDENTITY_META" not in source
+    # Every identity source carries a frozen digest; the identity is never read at import.
+    for rel_path, _key_path in run_canonical_json_gate._CAPTURE_IDENTITY_SOURCES:
+        assert rel_path in run_canonical_json_gate._FROZEN_GENERATED_SHA256
+    assert not hasattr(run_canonical_json_gate, "_CAPTURE_IDENTITY_META")

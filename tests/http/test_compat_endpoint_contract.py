@@ -193,7 +193,22 @@ def test_compat_post_self_pair_returns_carrier_and_admission_refusal_is_503(monk
     resp = _post(client, {"a": complete_chart(UUID_A, GATES_A), "b": complete_chart(UUID_A, GATES_A), "viewer_prefs": _prefs()})
     assert resp.status_code == 200
     assert json.loads(resp.data) == {"categories": [], "eligible": False}
+    # The real admission owner admits the repository root: a real pair evaluates.
+    from engine.config.registry_loader import SchemaValidationError
+    from engine.runtime.identity import identity_meta
+
     monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    resp = _post(client, _payload())
+    assert resp.status_code == 200, resp.data
+    evaluated = json.loads(resp.data.decode("utf-8"))
+    assert evaluated["schema"] == "magic10_compat_result.v1"
+    assert evaluated["release_id"] == identity_meta()["release_id"]
+    assert resp.headers.get("Cache-Control") == "no-store"
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
     resp = _post(client, _payload())
     assert resp.status_code == 503
     assert json.loads(resp.data)["code"] == "ERR_M10_MANIFEST_MISMATCH"

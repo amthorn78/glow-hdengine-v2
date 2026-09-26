@@ -257,6 +257,21 @@ _NARRATIVE_TEST_OWNERS = (
     "tests/unit/test_narratives_loader.py",
     "tests/cli/test_aux_preview.py",
 )
+# HDE-EPIC040-PR06: promoted release members outside the product prefixes and
+# the loader-produced narrative pack mount (engine/narratives/loader.py writes
+# narratives/<pack_sha>/ on first use; the tracked mount keeps every live
+# evaluation residue-free).  The token map is a member of the admitted release
+# roster written by its owner in canonical bytes.
+_PROMOTED_MEMBER_PATH_LANES = {
+    "errors/token_map/token_map.json": frozenset({"compat", "product", "release"}),
+    "tools/errors/generate_error_artifacts.py": frozenset({"compat", "release"}),
+}
+_PROMOTED_MEMBER_OWNER_PATHS = {
+    "errors/token_map/token_map.json": ("tests/cli/test_errors_parity.py",),
+    "tools/errors/generate_error_artifacts.py": ("tests/cli/test_errors_parity.py",),
+}
+_NARRATIVE_MOUNT_PREFIX = "narratives/"
+_NARRATIVE_MOUNT_LANES = frozenset({"compat", "product"})
 _HTTP_READER_MODULE = "adapter.http_reader"
 _HTTP_READER_TEST_IMPORT_MODULE = "ci.checks.import_http_reader_for_tests"
 _HTTP_READER_TEST_IMPORT_SEAM = (
@@ -373,6 +388,18 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/runtime/test_identity.py",
         "tests/evidence/test_release_manifest_content_binding.py",
     ),
+    # HDE-EPIC040-PR06: roster members finalized to canonical bytes and the reader
+    # schema's digest sidecar (consumer tests plus real-root admission).
+    "adapter/schemas/error_v1.schema.json": (
+        "tests/adapter/test_jsonschema.py",
+        "tests/config/test_production_admission.py",
+    ),
+    "schemas/reader.v1.schema.json": (
+        "tests/reader_v1/test_schema.py",
+        "tests/reader_v1/test_goldens.py",
+        "tests/config/test_production_admission.py",
+    ),
+    "schemas/reader.v1.schema.json.sha256": ("tests/reader_v1/test_schema.py",),
     "schemas/epic_close_candidate_source.v1.json": (
         "tests/qa/test_generate_epic_close_pack.py",
     ),
@@ -1164,6 +1191,21 @@ def _bodygraph_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]
     )
 
 
+def _promoted_member_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Owners for promoted release members and the tracked narrative pack mount."""
+    targets = _PROMOTED_MEMBER_OWNER_PATHS.get(path)
+    if targets is None and path.startswith(_NARRATIVE_MOUNT_PREFIX):
+        targets = _NARRATIVE_TEST_OWNERS
+    if targets is None:
+        return ()
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_PROMOTED_MEMBER_OWNER_TEST_INVALID",
+    )
+
+
 def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     targets = _TEST_SUPPORT_OWNER_PATHS.get(path)
     if targets is None:
@@ -1495,6 +1537,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         )
         targets.update(_qa_tool_owner_targets(repo_root, path))
         targets.update(_bodygraph_tool_owner_targets(repo_root, path))
+        targets.update(_promoted_member_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
             and _lanes_for_path(path) is None
@@ -1652,6 +1695,12 @@ def _lanes_for_path(path: str) -> set[str] | None:
         if any(marker in path for marker in _RAILS_MARKERS):
             lanes.add("rails")
         return lanes
+
+    promoted_lanes = _PROMOTED_MEMBER_PATH_LANES.get(path)
+    if promoted_lanes is not None:
+        return set(promoted_lanes)
+    if path.startswith(_NARRATIVE_MOUNT_PREFIX):
+        return set(_NARRATIVE_MOUNT_LANES)
 
     return None
 

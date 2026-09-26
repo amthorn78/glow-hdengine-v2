@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import stat
+import sys
 from contextlib import nullcontext
 from dataclasses import dataclass
 import os
@@ -10,7 +11,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from engine.config.registry_loader import (
-    RegistryConfig, RegistryConfigError, _capture_registry_config,
+    ADMITTED_RELEASE_ROSTER, RegistryConfig, RegistryConfigError, _capture_registry_config,
     _load_active_mechanics_bundle_from_root, _validate_thresholds,
 )
 from engine.serializer import canon
@@ -480,6 +481,49 @@ def _golden_admit(candidate_root: Path):
     return root, bundle
 
 
+# HDE-EPIC040-PR06 (O-17 / CR-06): every executable roster member, keyed by
+# the module name the executing installation imports it as.  Derived from the
+# admission roster at import time so it cannot drift from it.
+GOLDEN_EXECUTED_MEMBER_MODULES: Mapping[str, str] = {
+    path: path[: -len(".py")].replace("/", ".")
+    for path in ADMITTED_RELEASE_ROSTER
+    if path.endswith(".py")
+}
+
+
+def _golden_bind_executed_members(bundle) -> None:
+    """Refuse when an executing roster module's source differs from the candidate.
+
+    Admission binds executing code to the candidate's bytes only for its
+    covered mechanics modules; the golden runners also execute other roster
+    members from the executing installation.  For every such member that is
+    already imported, the installation's source file must be a readable
+    regular ``.py`` file and its bytes must equal the candidate's
+    manifest-bound identity for that path.  Read-only by construction:
+    nothing is imported, reloaded, compiled or compared as code objects, and
+    a module that is not loaded is not executed by the goldens and is not
+    bound.  Executable equivalence for these members remains unproven.
+    """
+    identities = {identity.path: identity for identity in bundle.source_identities}
+    for path, module_name in GOLDEN_EXECUTED_MEMBER_MODULES.items():
+        module = sys.modules.get(module_name)
+        if module is None:
+            continue
+        origin = getattr(module, "__file__", None)
+        try:
+            if (not isinstance(origin, str) or not origin.endswith(".py") or not os.path.isabs(origin)
+                    or os.path.islink(origin) or not os.path.isfile(origin)):
+                raise _golden_refuse(f"CANDIDATE_EXECUTING_SOURCE_UNAVAILABLE:{path}")
+            with open(origin, "rb") as handle:
+                executing = handle.read()
+        except OSError:
+            raise _golden_refuse(f"CANDIDATE_EXECUTING_SOURCE_UNAVAILABLE:{path}") from None
+        identity = identities.get(path)
+        if (identity is None or len(executing) != identity.size
+                or hashlib.sha256(executing).hexdigest() != identity.sha256):
+            raise _golden_refuse(f"CANDIDATE_EXECUTING_SOURCE_MISMATCH:{path}")
+
+
 def _golden_signal_order(bundle) -> tuple[str, ...]:
     registry = bundle.registry
     return tuple(signal for category in registry.magic10_order
@@ -939,6 +983,7 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
     require_closed_rails()
     document, goldens_sha256 = _golden_load_document(goldens_path)
     root, bundle = _golden_admit(candidate_root)
+    _golden_bind_executed_members(bundle)
     constants = document["constants"]
     outcomes: list[CaseOutcome] = []
     mismatches: list[Mismatch] = []
@@ -962,6 +1007,8 @@ def compare_goldens(candidate_root: Path, goldens_path: Path = GOLDENS_DEFAULT_P
         mismatches.extend(case_mismatches)
         outcomes.append(CaseOutcome(case_id, case["case_type"], case["kind"],
                                     "match" if not case_mismatches else "mismatch", expected, observed))
+    # The runners import lazily: bind every member they loaded before a verdict.
+    _golden_bind_executed_members(bundle)
     ordered = tuple(sorted(mismatches, key=lambda row: (row.case_id, row.path)))
     return GoldenComparison(
         candidate_root=_golden_display(root), goldens_path=_golden_display(Path(goldens_path)),

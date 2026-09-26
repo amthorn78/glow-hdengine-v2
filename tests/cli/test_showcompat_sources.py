@@ -278,7 +278,13 @@ def test_showcompat_conjunction_db_source_miss_is_missing_chart_not_refusal(monk
 
 
 def test_showcompat_refuses_without_an_admitted_release(monkeypatch, capsys, tmp_path, spies):
-    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    from engine.config.registry_loader import SchemaValidationError
+    from engine.runtime.identity import identity_meta
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
     pair = tmp_path / "pair.json"
     pair.write_text(json.dumps({"left": complete_chart(UUID_A, GATES_A), "right": complete_chart(UUID_B, GATES_B)}), encoding="utf-8")
     exit_code = cli(["showcompat", "--pair-file", str(pair)])
@@ -286,6 +292,13 @@ def test_showcompat_refuses_without_an_admitted_release(monkeypatch, capsys, tmp
     assert exit_code == 1
     assert captured.out == ""
     assert captured.err == "INCOMPLETE_RELEASE_ROSTER\n"
+    # The real admission owner admits the repository root: the same pair evaluates.
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    assert cli(["showcompat", "--pair-file", str(pair)]) == 0
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert captured.out.endswith("\n")
+    assert json.loads(captured.out)["release_id"] == identity_meta()["release_id"]
 
 
 def test_legacy_helpers_are_gone_from_the_cli():

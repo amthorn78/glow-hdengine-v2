@@ -6,6 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from engine.compat import compute
+from engine.config.registry_loader import SchemaValidationError
+from engine.runtime.identity import identity_meta
 from tests.support.pr04_fixtures import build_bundle, build_pack, inject_seams
 
 
@@ -137,5 +140,17 @@ def test_pr05_generation_refuses_truthfully_without_an_admitted_release(monkeypa
     mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
     monkeypatch.setattr(mod, "ensure_determinism_env", lambda: None)
     monkeypatch.setattr(mod, "_write_bytes", lambda *a, **k: pytest.fail("write attempted"))
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    # The repository root is admitted (PF10 §2.15 interval ended); the refusal branch is reached through the seam.
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
     with pytest.raises(SystemExit, match=mod.REQUIRES_ADMITTED_RELEASE):
         mod.generate()
+
+
+def test_pr05_admission_probe_admits_the_repository_root(monkeypatch):
+    mod = importlib.import_module("tools.evidence.generate_epic030_pr05_category_framework_evidence")
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    assert mod.probe_release_admission().release_id == identity_meta()["release_id"]

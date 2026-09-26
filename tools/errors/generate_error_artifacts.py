@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 from adapter import wsgi as adapter_wsgi
 from engine.compat.error_tokens import ERROR_TOKEN_MAP
 from engine.runtime.determinism_env import ensure_determinism_env
+from engine.serializer import canon
 
 ERROR_SCHEMA_PATH = ROOT / "adapter/schemas/error_v1.schema.json"
 
@@ -248,6 +249,17 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def _write_canonical_json(path: Path, payload: object) -> None:
+    """Write a promoted release member in its exact canonical byte form.
+
+    ``errors/token_map/token_map.json`` is a member of the admitted release
+    roster, whose member-format rule requires canonical JSON bytes; the parity
+    captures keep their indented writer.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(canon.sercanon(payload, sort_keys=True))
+
+
 def _write_cli_text(path: Path, payload: Mapping[str, object]) -> None:
     lines = [
         f"returncode: {payload['returncode']}",
@@ -293,7 +305,7 @@ def write_parity_artifacts() -> None:
         _write_cli_text(parity_dir / f"errors_reader_cli.{scenario.name}.cli.txt", cli_result)
 
     generate_schema_logs(http_results)
-    _write_json(ROOT / "errors/token_map/token_map.json", render_token_map())
+    _write_canonical_json(ROOT / "errors/token_map/token_map.json", render_token_map())
 
     scenario_list = ", ".join(s.name for s in SCENARIOS)
     readme = (

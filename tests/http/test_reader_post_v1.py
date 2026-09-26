@@ -9,6 +9,7 @@ import pytest
 
 from adapter import http_reader
 from engine.compat import compute
+from engine.config.registry_loader import SchemaValidationError
 from engine.db.errors import PrimaryUnavailable, SqlExecError
 from engine.runtime.identity import identity_meta
 from engine.serializer.canon import sercanon
@@ -196,8 +197,23 @@ def test_stored_row_defects_refuse_without_partial_score(db, monkeypatch, mutate
 
 
 def test_admission_refusal_is_503_schema_mismatch(db, monkeypatch):
-    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    # The repository root is admitted (PF10 §2.15 interval ended); the refusal branch is reached through the seam.
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
     _assert_error(_post(_client(), {"a_id": UUID_A, "b_id": UUID_B}), "ERR_M10_MANIFEST_MISMATCH", 503)
+
+
+def test_real_admission_owner_serves_the_admitted_release(db, monkeypatch):
+    """With the unchanged admission owner (no injected bundle) the real root admits and the
+    Reader answers 200 with the admitted release identity."""
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", compute.load_active_mechanics_bundle)
+    resp = _post(_client(), {"a_id": UUID_A, "b_id": UUID_B})
+    assert resp.status_code == 200, resp.data
+    body = json.loads(resp.data.decode("utf-8"))
+    assert list(body) == SIX_KEYS
+    assert body["release_id"] == identity_meta()["release_id"]
 
 
 # --- success ------------------------------------------------------------------------------

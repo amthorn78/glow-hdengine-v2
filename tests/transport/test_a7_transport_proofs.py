@@ -135,7 +135,30 @@ def _forbid_live_requests(monkeypatch):
     monkeypatch.setattr(g, "create_app", lambda *a, **k: pytest.fail("Flask app created before admission"))
 
 
+def _refuse_admission(monkeypatch):
+    """The repository root is admitted; the non-admitted branch is reached through the seam."""
+
+    def refuse():
+        raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "patched provider")
+
+    monkeypatch.setattr(compute, "_BUNDLE_PROVIDER", refuse)
+
+
+def test_build_and_check_succeed_on_the_admitted_root(monkeypatch):
+    """On the admitted repository root the live build reproduces the tracked A7 family byte for byte."""
+    for name, value in {"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0"}.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setattr(g, "ensure_determinism_env", lambda *a, **k: None)
+    assert release_sanity.release_not_admitted_observed() is False
+    state_before = _repo_state()
+    outs = g.build()
+    assert outs and all(path.read_bytes() == body for path, body in outs.items())
+    g.main(["--check"])
+    assert _repo_state() == state_before
+
+
 def test_build_raises_typed_release_not_admitted_without_any_request(monkeypatch):
+    _refuse_admission(monkeypatch)
     _forbid_live_requests(monkeypatch)
     with pytest.raises(release_sanity.ReleaseNotAdmitted) as excinfo:
         g.build()
@@ -144,6 +167,7 @@ def test_build_raises_typed_release_not_admitted_without_any_request(monkeypatch
 
 
 def test_main_check_prints_explicit_line_exits_distinct_code_and_writes_nothing(monkeypatch, capsys):
+    _refuse_admission(monkeypatch)
     _forbid_live_requests(monkeypatch)
     monkeypatch.setattr(g, "ensure_determinism_env", lambda *a, **k: None)
     state_before = _repo_state()
@@ -155,6 +179,7 @@ def test_main_check_prints_explicit_line_exits_distinct_code_and_writes_nothing(
 
 
 def test_main_write_mode_refuses_when_not_admitted(monkeypatch, capsys):
+    _refuse_admission(monkeypatch)
     _forbid_live_requests(monkeypatch)
     monkeypatch.setattr(g, "ensure_determinism_env", lambda *a, **k: None)
     monkeypatch.setenv("HDE_WRITE_A7_PROOFS", "1")

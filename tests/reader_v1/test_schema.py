@@ -1,7 +1,8 @@
-import json, pathlib, pytest
+import hashlib, json, pathlib, pytest
 import jsonschema
 
 SCHEMA_PATH = pathlib.Path("schemas/reader.v1.schema.json")
+SIDECAR_PATH = pathlib.Path("schemas/reader.v1.schema.json.sha256")
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 def _validate(doc):
@@ -73,3 +74,13 @@ def test_additional_properties_closed_everywhere():
     # Nested meta extra → reject
     with pytest.raises(jsonschema.ValidationError):
         _validate({**base, "meta":{"engine_tag":"Isis5","invocation_tag":"INV-1","x":1}})
+
+
+def test_digest_sidecar_binds_the_schema_bytes():
+    # sha256sum format: "<hex64>  schemas/reader.v1.schema.json\n", one line, LF-terminated.
+    sidecar = SIDECAR_PATH.read_text(encoding="utf-8")
+    assert sidecar.endswith("\n") and sidecar.count("\n") == 1
+    digest, separator, name = sidecar[:-1].partition("  ")
+    assert separator == "  "
+    assert name == SCHEMA_PATH.as_posix()
+    assert digest == hashlib.sha256(SCHEMA_PATH.read_bytes()).hexdigest()

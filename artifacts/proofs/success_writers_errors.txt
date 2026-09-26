@@ -1,5 +1,6 @@
 POST /reader
-status=405
+status=422
+code=ERR_READER_INVALID_INPUT
 cache_control=no-store
 etag_absent=true
 conditional_not_304=true

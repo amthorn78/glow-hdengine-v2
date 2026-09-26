@@ -1,5 +1,5 @@
 path: artifacts/audit/ENDPOINTS_CATALOG.json.sha256
 size_bytes: 105
-sha256: 4427068c29804327920ccfae78fbbb15b17f7763e02b00ef3d53956f6db43e8f
-mtime_utc: 2026-07-23T05:13:59Z
-produced_at_utc: 2026-07-23T05:27:31Z
+sha256: 2db7c6f4fbad2684a5da87763e39a32453c5ed5b423670c3971adce238e42a13
+mtime_utc: 2026-09-25T18:21:27Z
+produced_at_utc: 2026-09-25T18:21:27Z
