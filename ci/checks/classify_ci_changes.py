@@ -294,6 +294,7 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/http/test_endpoint_catalog.py",
     "tests/http/test_reader_a7_transport.py",
     "tests/http/test_reader_post_v1.py",
+    "tests/http/test_reader_post_v2.py",
     "tests/runtime/test_emit_public_legacy_helper.py",
     "tests/runtime/test_identity.py",
     "tests/transport/test_aux_narrative.py",
@@ -400,6 +401,26 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_production_admission.py",
     ),
     "schemas/reader.v1.schema.json.sha256": ("tests/reader_v1/test_schema.py",),
+    # HDE-EPIC040-PR06a: Reader v2 schema (45th release member), the goldens writer,
+    # the release-pack companions and the app factories that mount the production Reader.
+    "schemas/reader.v2.schema.json": (
+        "tests/reader_v1/test_schema.py",
+        "tests/reader_v1/test_goldens.py",
+        "tests/config/test_production_admission.py",
+    ),
+    "schemas/reader.v2.schema.json.sha256": ("tests/reader_v1/test_schema.py",),
+    "scripts/make_reader_v1_goldens.py": ("tests/reader_v1/test_goldens.py",),
+    "scripts/make_release_pack.sh": ("tests/reader_v1/test_release_pack.py",),
+    "adapter/factory.py": (
+        "tests/http/test_reader_post_v1.py",
+        "tests/http/test_reader_post_v2.py",
+        "tests/http/test_endpoint_catalog.py",
+    ),
+    "adapter/wsgi.py": (
+        "tests/http/test_reader_post_v1.py",
+        "tests/http/test_reader_post_v2.py",
+        "tests/http/test_endpoint_catalog.py",
+    ),
     "schemas/epic_close_candidate_source.v1.json": (
         "tests/qa/test_generate_epic_close_pack.py",
     ),
@@ -437,6 +458,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "engine/runtime/public.py": (
         "tests/runtime/test_identity.py",
         "tests/http/test_reader_post_v1.py",
+        "tests/http/test_reader_post_v2.py",
     ),
     "engine/emit_public.py": ("tests/runtime/test_emit_public_legacy_helper.py",),
     "engine/config/__init__.py": (
@@ -460,6 +482,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "presenter/reader_v1/emitter.py": (
         "tests/reader_v1/test_goldens.py",
         "tests/reader_v1/test_schema.py",
+        "tests/reader_v1/test_emitter.py",
         "tests/runtime/test_identity.py",
     ),
     "engine/compat/error_tokens.py": (
@@ -533,6 +556,9 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     ),
     "tools/evidence/generate_bodygraph_policy_proofs.py": (
         "tests/evidence/test_bodygraph_policy_proofs.py",
+    ),
+    "tools/evidence/generate_conjunction_writer_evidence.py": (
+        "tests/evidence/test_dev_conjunction_identity.py",
     ),
     "tools/evidence/generate_a7_transport_proofs.py": (
         "tests/transport/test_a7_transport_proofs.py",
@@ -723,6 +749,7 @@ _BODYGRAPH_TOOL_TEST_OWNERS = {
 # Governed chart fixtures consumed by the dev GET /reader route and its tests.
 _FIXTURE_LANE_PREFIXES = (
     ("fixtures/charts/", {"product", "compat", "release"}),
+    ("goldens/reader/", {"product", "compat", "release"}),
 )
 _FIXTURE_TEST_OWNER_PREFIXES = (
     (
@@ -730,6 +757,13 @@ _FIXTURE_TEST_OWNER_PREFIXES = (
         (
             "tests/http/test_reader_a7_transport.py",
             "tests/http/test_reader_post_v1.py",
+        ),
+    ),
+    (
+        "goldens/reader/",
+        (
+            "tests/reader_v1/test_goldens.py",
+            "tests/reader_v1/test_release_pack.py",
         ),
     ),
 )

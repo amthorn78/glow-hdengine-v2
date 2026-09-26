@@ -63,7 +63,7 @@ def _assert_production_row(cat):
     assert row["internal"] is False
     assert row["a7_eligible"] is False
     assert row["env_gate"] == "not_applicable_public"
-    assert row["blueprint_module"] == "adapter.http_reader"
+    assert row["blueprint_module"] == create_app.__module__
     assert "v=2" in row["description"] and "v=1" in row["description"]
     assert cat["success_endpoints"] == [{"method": "GET", "path": "/reader"}]
     target = validate_catalog(cat)

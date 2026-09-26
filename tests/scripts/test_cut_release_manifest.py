@@ -19,7 +19,7 @@ from scripts import cut_release_manifest as cutter
 from tests.config.helpers import synthetic_complete_release_root, write_canonical
 
 # The fifteen members of the pre-PR06 release manifest (version 1.0.0), used
-# as the existing-row baseline that a roster cut must complete to 44 members.
+# as the existing-row baseline that a roster cut must complete to 45 members.
 _PRE_PR06_MEMBERS = (
     "adapter/http_reader.py",
     "catalog/channels_v1.json",
@@ -369,7 +369,7 @@ def test_roster_cut_constructs_exactly_the_admitted_roster(complete_root: Path) 
     assert payload["root"] == "catalog/"
     assert payload["version"] == ADMITTED_RELEASE_VERSION
     assert payload["built_at_utc"] == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(payload["files"]) == 44
+    assert len(payload["files"]) == 45
     assert tuple(row["path"] for row in payload["files"]) == ADMITTED_RELEASE_ROSTER
     assert "catalog/manifest.json" not in {row["path"] for row in payload["files"]}
     for row in payload["files"]:

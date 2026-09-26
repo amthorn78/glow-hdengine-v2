@@ -910,7 +910,7 @@ def test_admission_refusals_are_never_equality(tmp_path) -> None:
 # --- HDE-EPIC040-PR06: the actual complete admitted candidate ---------------------------
 
 def test_compare_goldens_admits_the_real_root(tmp_path, capfdbinary) -> None:
-    """The repository root is the admitted 44-member release: all eight goldens match."""
+    """The repository root is the admitted 45-member release: all eight goldens match."""
     from engine.runtime.identity import identity_meta
 
     before_status = _git_status()

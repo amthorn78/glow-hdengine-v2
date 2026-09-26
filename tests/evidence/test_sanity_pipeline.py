@@ -245,7 +245,7 @@ def test_probe_classifies_exactly_the_incomplete_roster_refusal(monkeypatch):
 
     # Real admission owner: the repository root is the admitted complete release.
     admitted = run_sanity_pipeline.probe_release_admission()
-    assert admitted is not None and len(admitted.source_identities) == 44
+    assert admitted is not None and len(admitted.source_identities) == 45
     assert run_sanity_pipeline.release_not_admitted_observed() is False
 
     # The non-admitted state stays reachable through the seam and is classified exactly.
