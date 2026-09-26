@@ -395,7 +395,7 @@ _LOCAL_SCHEMAS = frozenset({
 
 # HDE-EPIC040's adopted complete mechanics release.  The active loader accepts
 # this exact sorted union only; catalog/manifest.json itself is never a member.
-ADMITTED_RELEASE_VERSION = "1.2.0"
+ADMITTED_RELEASE_VERSION = "1.3.0"
 ADMITTED_RELEASE_BUILT_AT_UTC = "2026-08-24T18:04:49Z"
 ADMITTED_RELEASE_ROSTER = tuple(sorted({
     "adapter/http_reader.py",

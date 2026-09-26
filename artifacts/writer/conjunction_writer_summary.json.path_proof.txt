@@ -1,5 +1,5 @@
 path: artifacts/writer/conjunction_writer_summary.json
 size_bytes: 936
-sha256: 7873d888497292eec980324ee7e67ef5b08604225452a91f24d8ec41f7788d5e
+sha256: 158e321a33bf69f612baa9e11dd4cde5bf306ec27be6464d07b232dbc7cf6a37
 mtime_utc: 2026-06-26T08:32:24Z
 produced_at_utc: 2026-07-05T15:38:47Z

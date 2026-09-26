@@ -62,10 +62,9 @@ assert b1 == b2, "AB/BA bytes must match"
 (OUT / "g02_ab_ba_parity_A.jsonl.sha256").write_text(_sha256((OUT/"g02_ab_ba_parity_A.jsonl").read_bytes())+"\n", encoding="utf-8")
 (OUT / "g02_ab_ba_parity_B.jsonl.sha256").write_text(_sha256((OUT/"g02_ab_ba_parity_B.jsonl").read_bytes())+"\n", encoding="utf-8")
 
-# g06: error envelope (public error; not produced by emitter)
-err = { "ok": False, "code": "InvalidInput", "error": "bad gates" }
-b = (json.dumps(err, ensure_ascii=False, separators=(",",":"), sort_keys=True) + "\n").encode("utf-8")
-_write(OUT / "g06_error_invalid_input.json", b)
+# g06: the real governed Reader v1 error envelope bytes for an invalid request (PF05 §5.2;
+# PF10 §2.24, C040-08): the same bytes POST /api/reader?v=1 emits for ERR_READER_INVALID_INPUT.
+_write(OUT / "g06_error_invalid_input.json", emit_public(error_envelope("ERR_READER_INVALID_INPUT")))
 
 print("GOLDENS_WRITTEN", OUT)
 

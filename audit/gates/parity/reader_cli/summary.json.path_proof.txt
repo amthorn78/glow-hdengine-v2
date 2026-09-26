@@ -1,5 +1,5 @@
 path: audit/gates/parity/reader_cli/summary.json
 size_bytes: 1622
-sha256: cc6c10623eba11ac8e2502ba36aec75ee854243e0f37833e084b42ca213943cf
+sha256: 423bf11597569c504defa5293c96480485376a75b3080c9944b3177df1d342c2
 mtime_utc: 2026-07-13T01:49:32Z
 produced_at_utc: 2026-07-12T00:52:16Z
