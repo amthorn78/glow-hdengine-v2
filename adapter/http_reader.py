@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask, current_app, g
 from threading import Lock
+from werkzeug.exceptions import MethodNotAllowed
 from engine.presenter.emitter import emit_public
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes, identity_admin, identity_meta
@@ -560,6 +561,24 @@ def get_reader_api_bp(emit_fn=None):
     def reader_method_not_allowed():
         return _reader_method_not_allowed("POST")
 
+    def _refuse_unrouted_methods(state):
+        """A method no rule names (``TRACE``, ``CONNECT``, any extension method)
+        fails routing with ``MethodNotAllowed`` before a view or blueprint error
+        handler is chosen, so the rule above never sees it and each app factory
+        would answer with its own 405.  Refuse it on the app, for exactly this
+        blueprint's mounted route, with the same governed 405: every non-POST
+        method on the production Reader is refused alike (PF05 §5.2)."""
+
+        route = f"{(state.url_prefix or '').rstrip('/')}/reader"
+
+        def _governed_405_for_unrouted_methods():
+            if isinstance(request.routing_exception, MethodNotAllowed) and request.path == route:
+                return _reader_method_not_allowed("POST")
+            return None
+
+        state.app.before_request(_governed_405_for_unrouted_methods)
+
+    bp.record(_refuse_unrouted_methods)
     return bp
 
 

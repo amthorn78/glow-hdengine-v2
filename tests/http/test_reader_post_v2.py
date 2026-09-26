@@ -8,6 +8,7 @@ from pathlib import Path
 
 import jsonschema
 import pytest
+from flask import Flask
 
 from adapter import factory, http_reader, wsgi
 from engine.bodygraph.resolver import resolve_compat_chart
@@ -239,6 +240,38 @@ def test_non_post_methods_on_the_production_route_are_the_governed_405(db, metho
     if method != "HEAD":
         assert json.loads(resp.data) == {"schema": "v1", "ok": False, "code": "ERR_NOT_FOUND", "error": "not found"}
         assert resp.data.endswith(b"\n")
+    assert db.queries == []
+
+
+@pytest.mark.parametrize("create_app", [factory.create_app, http_reader.create_app, wsgi.create_app], ids=["factory", "http_reader", "wsgi"])
+@pytest.mark.parametrize("method", ["GET", "HEAD", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE", "CONNECT", "PROPFIND", "QUERY"])
+def test_every_non_post_method_is_the_same_governed_405_on_every_app_factory(db, create_app, method):
+    # TRACE, CONNECT and extension methods match no rule, so routing refuses them before
+    # any view runs; they still get the route's governed 405, not the factory's own.
+    resp = _client(create_app).open("/api/reader?v=2", method=method)
+    assert resp.status_code == 405
+    assert resp.headers.get("Allow") == "POST"
+    assert resp.headers.get("Cache-Control") == "no-store"
+    assert resp.headers.get("Content-Type") == "application/json; charset=utf-8"
+    assert "ETag" not in resp.headers and "Content-Encoding" not in resp.headers
+    if method != "HEAD":
+        body = json.loads(resp.data)
+        assert body == {"schema": "v1", "ok": False, "code": "ERR_NOT_FOUND", "error": "not found"}
+        assert sercanon(body) == resp.data
+    assert db.queries == []
+
+
+def test_the_unrouted_method_refusal_is_bound_to_the_mounted_route(db):
+    app = Flask(__name__)
+    app.register_blueprint(http_reader.get_reader_api_bp(), url_prefix="/elsewhere")
+    client = app.test_client()
+    moved = client.open("/elsewhere/reader", method="TRACE")
+    assert moved.status_code == 405 and moved.headers.get("Allow") == "POST"
+    assert json.loads(moved.data)["code"] == "ERR_NOT_FOUND"
+    assert client.open("/api/reader", method="TRACE").status_code == 404
+    # Other routes keep their own 405: the dev GET /reader is not the production Reader.
+    dev = _client().open("/reader?v=1", method="TRACE")
+    assert dev.status_code == 405 and dev.headers.get("Allow") != "POST"
     assert db.queries == []
 
 
