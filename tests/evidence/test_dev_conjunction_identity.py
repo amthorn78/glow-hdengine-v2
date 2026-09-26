@@ -75,7 +75,8 @@ def test_dev_conjunction_identity_evidence_is_current_and_nonwriting():
     log = Path("artifacts/writer/conjunction_write_readback.log").read_text(encoding="utf-8")
     assert log.startswith("schema=conjunction_write_readback.log.v2\nrails=closed\n")
     assert f"release_id={identity_meta()['release_id']}\n" in log
-    assert "dev_identity" not in log
+    assert not any(line.startswith(("writer_dev_identity=", "reader_dev_identity=")) for line in log.splitlines())
+    assert "no_dev_identity_stamp=true\n" in log
 
 
 def test_check_mode_neutralizes_database_url_and_preserves_artifacts(monkeypatch):

@@ -812,7 +812,8 @@ def test_result_schema_references_must_resolve_without_constructing_a_result(
 ) -> None:
     path = release_root / "schemas/reader.v1.schema.json"
     schema = json.loads(path.read_bytes())
-    schema["properties"]["categories"]["items"]["$ref"] = reference
+    # F05 (PF10 §2.23): the success branch is the closed object $defs.success.
+    schema["$defs"]["success"]["properties"]["categories"]["items"]["$ref"] = reference
     write_canonical(path, schema)
     write_synthetic_release_manifest(release_root)
     _expect_code(release_root, code)

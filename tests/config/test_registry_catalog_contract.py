@@ -319,7 +319,7 @@ def test_source_capture_detects_later_change_and_base_needs_no_mechanics_release
     root = catalog_root(tmp_path)
     (root / 'catalog/magic10_mechanics_v1.json').unlink()
     capture = _capture_registry_config(root)
-    assert capture.config.manifest.version == '1.1.0'
+    assert capture.config.manifest.version == '1.2.0'
     assert not any('mechanics' in name for name in capture.sources)
     path = root / 'catalog/magic10_seeds.json'
     data = json.loads(path.read_bytes())
