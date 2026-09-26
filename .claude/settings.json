@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /root/.claude/uploads/*)",
+      "Edit(docs/pfcanon/**)",
+      "Bash(git checkout *)",
+      "Bash(git fetch *)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "mcp__github__create_pull_request"
+    ]
+  }
+}
