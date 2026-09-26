@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.3.5**  
+**Version: v13.3.6**  
 Effective Date: Sep 26, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -206,7 +206,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.21 HDE-EPIC040-PR06-F01 — Frozen-capture identity source for the canonical JSON gate  
 * 2.22 HDE-EPIC040-PR06 — PR Work-Unit Lineage Review v1.0  
 * 2.23 HDE-EPIC040-PR07-F01 — Add PR06a for Reader v2 Full Magic-10 Exposure and the Deferred Reader Contract Work  
-* 2.24 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)
+* 2.24 HDE-EPIC040-PR06a — PR Work-Unit Lineage Review v1.0  
+* 2.25 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)
 
 # **2\) Numbered Addenda**
 
@@ -2483,17 +2484,98 @@ CANON\_CONFLICT\_REGISTER entries C040-01 through C040-06 are carried unchanged,
 
 HDE-EPIC040-PR07-F01 is approved as a bounded rescope that adds HDE-EPIC040-PR06a. The next native stage is the PR06a work-unit instruction by the retained whole-change Implementation Architect. PR06a implementation awaits the Product Owner's separate exact PR-30 invocation against a PR06a detailed plan in AWAITING\_PO\_PROCEED. That plan does not yet exist, and this overlay does not supply the Proceed.
 
-# 2.24 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)
+## 2.24 HDE-EPIC040-PR06a — PR Work-Unit Lineage Review v1.0
 
-## Status and authority
+### 1\. Decision
+
+decision: ACCEPT. HDE-EPIC040-PR06a is accepted as delivered and is now ACCEPTED\_FINAL. It delivered Reader v2 full Magic-10 on POST /api/reader, Reader v1 F05 conformance, the F03 production route, the F07 dev conjunction capture, and the 45-member release 1.2.0.  
+Four limitations qualify the acceptance, and none of them is waived:
+
+* CR-02 / C040-08: real Reader v1 error bytes fail the published v1 schema. This predates PR06a and was outside its authority. I decide it separately in docs/ephemeral/HDE-EPIC040-PR06b-rescope-decision-v1.0.md, which adds PR06b.  
+* CR-03 / O-P06a-22: two factories answer unknown paths with Flask's HTML 404\. This predates PR06a; it goes to the HTTP transport / PF05 owner and is non-gating.  
+* The Security Review does not cover the IF-08 delta. Codex's Security Review ran on 402db72 with no finding. Only a Code Review covered head 1b4a510, which contains the IF-08 corrective delta (a 405 guard).  
+* CR-01 / O-12 (from PR06): a packaged wheel install does not admit the release. This stays open with the packaging owner / Product Owner.
+
+This decision grants none of the following: a QA verdict, acceptance, OPS01 attestation, activation, deployment, PF09 movement, a PF10 edit, or closure.  
+Entry route. The review entered on MERGE\_OBSERVED. I verified the merge independently (§2). Result v1.1's MERGE\_PENDING stays as pre-merge history.
+
+### 2\. Merge and attribution — verified
+
+| Fact | Value |
+| :---- | :---- |
+| PR | [\#508](https://github.com/amthorn78/glow-hdengine-v2/pull/508), the only PR in this unit. Merged by amthorn78 at 2026-09-26T12:20:15Z |
+| Landed commit | d79cfc1c398eb83934aa30653c7779a7bf9f3e69, a squash commit whose sole parent is cf9198d (\#506) |
+| Reviewed head | 1b4a510517de5676530dc49727992164d5e3e9dc, whose base was 547dc5b |
+| Tree comparison | git diff 1b4a510 d79cfc1 shows exactly one file: docs/ephemeral/HDE-EPIC040-PR06a-pr-instruction-v1.0.md, which is \#506's content and landed on main independently. The landed tree is therefore the reviewed head plus \#506, so attribution is by tree |
+| Scope | 135 files, \+2,592 / −465 |
+| Later divergence | None. main \= d79cfc1 |
+| CI on the reviewed head | test passed: run 36222478818, job 108350204251, 06:01–06:16Z (read through the API) |
+
+### 3\. Behaviour executed at the landed tree
+
+Everything below ran under closed rails, and the working tree was clean afterward.
+
+* catalog/manifest.json has 45 members, version 1.2.0, and built\_at\_utc 2026-08-24T18:04:49Z. Its bytes are canonical. release\_id is 9f962ce338c448c7a2312f05695d5fdab12b01fbc1a67d490465d9fc87edab3f. release\_id\_recompute.py \--check-manifest-only exits 0\.  
+* load\_active\_mechanics\_bundle() returns AdmittedMechanicsBundle.  
+* generate\_config\_artifacts.py \--compare-goldens . reports ok: true with no mismatches.  
+* run\_canonical\_json\_gate.py \--check-only and update\_evidence\_index.py \--check both exit 0\.  
+* The mounted Reader routes are:  
+  * POST /api/reader;  
+  * the governed 405 for GET, PUT, PATCH and DELETE on /api/reader;  
+  * dev GET /reader;  
+  * POST /reader, which is a 405 stub.  
+* Version selection: a missing v, v=3 and v=1\&v=2 each return 400 ERR\_READER\_INVALID\_VERSION.  
+* Goldens:  
+  * goldens/reader/v2/ holds ineligible, AB/BA, ten-in-order and invalid-version cases.  
+  * goldens/reader/v1/ now uses harmony identities (g03–g05, g07). The \*\_leader files are gone.  
+* Focused suites: the Reader v1/v2 POST tests, tests/reader\_v1, the endpoint catalog, dev conjunction identity and production admission gave 351 passed, 1 failed. The failure is tests/reader\_v1/test\_cli\_proof.py, and it fails identically at the pre-merge base cf9198d. It is pre-existing: plan D-18 and O-P06a-03 record it, and scripts/hd\_cli.py is a legacy stub that still emits open\_leader. It is not attributable to PR06a.  
+* C040-08 reproduced. POST /api/reader?v=1 with body {} returns 422 {"code":"ERR\_READER\_INVALID\_INPUT","error":…,"ok":false,"schema":"v1"}. Those bytes fail schemas/reader.v1.schema.json. The same bytes validate against schemas/reader.v2.schema.json.
+
+### 4\. Conformance to the approved scope and overlay (PF10 §2.23)
+
+* Deliveries 1–5 are present.  
+  * Change to engine/config/registry\_loader.py is limited to the roster (+schemas/reader.v2.schema.json), the invariant (45) and the version (1.2.0). The admission logic is unchanged.  
+  * The manifest was cut by the cutter.  
+  * Evidence was regenerated by its owners.  
+* Paths outside the listed loci:  
+  * tools/evidence/generate\_a7\_transport\_proofs.py and generate\_open\_rails\_abba\_proof.py, plus the tests/config/\*, tests/scripts/\* and tests/transport/\* rewrites, are coherence dependents of the re-cut and the route, as with PR06 under plan v2.1 §6.2.  
+  * scripts/make\_reader\_v1\_goldens.py and scripts/make\_release\_pack.sh are the goldens' owning writers.  
+* I find no unauthorised widening.  
+* Nothing changed in Magic-10 math, the attestation schema, PR06R\_B\_FINAL\_PASS, or docs/pfcanon/.  
+* Reader v1 is not retired. v=1 is live on /api/reader, as §2.23 requires. Only the \*\_leader category identities were retired.
+
+### 5\. Findings and carried items
+
+* C040-08 (CR-02, O-P06a-24): decided alternative A in the PR06b rescope decision.  
+* O-P06a-22 (CR-03): HTTP transport / PF05 owner. Non-gating.  
+* O-P06a-23 (IF-09): the engine-core evidence currency test does not check release\_id. This is carried to the evidence owner, and PR06b's re-cut must run the engine-core owner.  
+* O-P06a-03: scripts/hd\_cli.py / test\_cli\_proof.py baseline failure. Its owner is PR07 / the IA backlog. Non-gating.  
+* N-01 (Nathan, non-gating): stale PF10 v13.3 through v13.3.3 files are still beside v13.3.4.
+
+### 6\. Register and provenance
+
+* CANON\_CONFLICT\_REGISTER:  
+  * C040-01 through C040-06 are unchanged.  
+  * C040-07 was delivered by PR06a; its drainage is pending with its maintainers.  
+  * C040-08 is decided in the PR06b decision.  
+* Prompt use: GCFPE-USE-HDE-EPIC040-PR-40-20260926-PR06a-01, PR-40 — Review PR Work-Unit Lineage — 091426.1, on GCFPE-20260914.1 / 091426.1 / 55\. Repository persistence is PENDING / NON\_GATING.  
+* PF10 read: v13.3.4 (0029e282…).
+
+### 7\. Native return
+
+HDE-EPIC040-PR06a is ACCEPTED\_FINAL. The dependency order becomes … → PR06a → PR06b → PR07 → OPS01. The next stage is PR-10 for PR06b.
+
+## 2.25 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)
+
+### Status and authority
 
 This addendum is approved by the whole-change IA, by Product Owner direction, on 2026-09-26. The decision record is docs/ephemeral/HDE-EPIC040-PR06b-rescope-decision-v1.0.md. The bases are not rewritten.
 
-## Objective
+### Objective
 
 Make the published Reader v1 schema accept the Reader v1 error envelope the routes actually emit, per PF05 §5.2. Then bind the result with one release re-cut.
 
-## Required delivery
+### Required delivery
 
 1. Schema. In schemas/reader.v1.schema.json, the error branch admits schema (const "v1", required, as the routes emit it) and restricts code/error to the governed token/message pairs, as schemas/reader.v2.schema.json's error branch does. Optional integer retry\_after\_ms ≥ 0 is kept only if a governed emitter produces it. The success branch is unchanged, and so is additionalProperties: false. The .sha256 companion is regenerated.  
 2. Goldens. The synthetic goldens/reader/v1/g06\_error\_invalid\_input.json (currently {"code":"InvalidInput",…} with no schema) is regenerated through scripts/make\_reader\_v1\_goldens.py as a real governed v1 error envelope. Its companion and the release-pack outputs are regenerated through scripts/make\_release\_pack.sh.  
@@ -2504,7 +2586,7 @@ Make the published Reader v1 schema accept the Reader v1 error envelope the rout
    * Config artifacts, the registry report, bundles and evidence (including the engine-core owner, per O-P06a-23) converge through their owning writers in PR06's generation order.  
    * The strict attestation builds and verifies in the ordinary-CI release lane.
 
-## Owned loci
+### Owned loci
 
 * schemas/reader.v1.schema.json (+ .sha256)  
 * goldens/reader/v1/g06\_error\_invalid\_input.json (+ .sha256), through its writer  
@@ -2516,7 +2598,7 @@ Make the published Reader v1 schema accept the Reader v1 error envelope the rout
 
 A file that items 1–3 genuinely require but that falls outside these loci is a finding for the rescope route.
 
-## Positive and adverse proof
+### Positive and adverse proof
 
 * Every governed Reader v1 error response from POST /api/reader?v=1 and dev GET /reader validates against the corrected v1 schema. Test this for every token in ERROR\_TOKEN\_MAP that the v1 routes can emit.  
 * The following are refused:  
@@ -2527,7 +2609,7 @@ A file that items 1–3 genuinely require but that falls outside these loci is a
 * Every existing v1 success golden still validates. Reader v1 and v2 response bytes are unchanged, and so are the dev GET /reader bytes.  
 * Admission returns ADMITTED on the re-cut 1.3.0 release. The strict attestation passes on the exact candidate head.
 
-## Exclusions
+### Exclusions
 
 This addendum does not authorise any of the following:
 
@@ -2540,17 +2622,17 @@ This addendum does not authorise any of the following:
 
 CR-03 and O-12 stay with their owners.
 
-## Completion
+### Completion
 
 Real code review, security review and ordinary CI pass on the exact candidate head, under PR-30 and PR-35. PR06b claims no QA verdict, acceptance, PF09 movement or closure.
 
-## Work-unit effects
+### Work-unit effects
 
 * The order becomes PR01 → … → PR06 → PR06a → PR06b → PR07 → OPS01.  
 * PR07 documents the v1 schema as PR06b delivers it.  
 * OPS01 requires all nine PR units and verifies the 1.3.0 release.
 
-## Canon conflict
+### Canon conflict
 
 C040-08 is decided A. PF01 §2.3 and PF04 §8.1.2 drainage belongs to their maintainers and is pending and non-gating. C040-01 through C040-07 are unchanged.
 
