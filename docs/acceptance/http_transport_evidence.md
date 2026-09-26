@@ -17,6 +17,8 @@ All predicates below remain required within this document's stated scope. The re
 - `HTTP_POST_METHOD_POSTURE_OK` — Reader POST ⇒ 405 typed JSON (`no-store`, no ETag); Compat POST ⇒ 200 non-conditional.
 - `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `invalid_json`, `no-store`, no ETag (GET remains probe-only; POST is the compat compute surface).
 
+Current routes (HDE-EPIC040): the 200, 304 and HEAD predicates above apply to the dev Reader `GET /reader`, the route the A7 transport proofs select from `docs/ENDPOINTS_CATALOG.json`. `HTTP_POST_METHOD_POSTURE_OK` keeps its original meaning, which now holds for the unprefixed `POST /reader`: it returns the governed 405 (`ERR_NOT_FOUND`, `Allow: GET, HEAD`, `no-store`, no ETag). The production Reader is `POST /api/reader?v=1` or `?v=2`: a success is 200, non-conditional and carries no ETag; its errors are `no-store` without ETag; every other method on `/api/reader` returns 405 with `Allow: POST`. See `docs/contracts/reader_v2_public_bytes.md`.
+
 ## Evidence shape
 Header proofs are plain-text captures: a status line plus ordered header lines, LF-terminated.
 Reader bytes are LF-terminated; Reader↔CLI parity is defined via the CLI `--dump-reader` sidecar (not showcompat stdout).

@@ -12,6 +12,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
   - `hdctl showcompat --conjunction --user-a <user_a> --user-b <user_b> [--source db|vendor|auto]`
   - `hdctl showcompat --conjunction` (reads one conjunction pair payload from stdin)
 - `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
+  - `<compat.json>` is a `magic10_compat_result.v1` document such as `hdctl showcompat` stdout; `--category` is a Magic-10 category id present in it.
 - `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--upsert] [--dry-run] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
   - Closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) refuse vendor resolution before route-policy classification, client construction, request construction, fetch, ingest, DB, DNS, socket, or HTTP.
   - Under explicitly open rails, configured v2 bases use the governed, version-neutral `charts` route plus the deterministic v2 ChartResult adapter. `--dry-run` maps without constructing a database target. A non-dry-run configured-v2 write requires explicit `--upsert`, a non-production-like requested and process environment, and an available sanctioned `DBAccess.for_current_env()` target. The resolver persists only the projected mapped-cache payload to `hde.body_graphs`, then verifies canonical read-back and idempotence.
@@ -21,12 +22,26 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
 
 `showcompat --conjunction` emits canonical JSON to stdout. Side effects depend on input mode and rails: payload-based invocation (`--pair-file`, `--a-file` + `--b-file`, or stdin with `left`/`right`) is computation-only, while unresolved `--user-a/--user-b` inputs can trigger bodygraph resolution and vendor ingest under open rails (for example with `--source vendor`), which may persist resolved records. Required conjunction inputs must be present for both parties, either through `--user-a/--user-b` or through payload input. Single-party file input (only `--a-file` or only `--b-file`), mixed file modes, or unresolved auto source paths fail with CLI usage errors; `--dump-reader`/`--dump-admin-dir` are not supported with `--conjunction`.
 
-Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout is the canonical emitter output for compat or conjunction payloads and may include numeric scores/weights as captured in governed evidence. Reader v1 bytes are emitted via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and align with the Reader harness. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
+Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout (non-conjunction) is the canonical `magic10_compat_result.v1` document (`schemas/magic10_compat_result_v1.schema.json`); it carries numeric scores and signals and is not a public Reader body. Conjunction mode emits the conjunction contract. Reader v1 bytes are emitted only via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and match dev `GET /reader` bytes for the same charts. Known gap: the one-line `hdctl --help` summary for `showcompat` still reads "Emit canonical Reader v1 bytes from vendor JSON"; the stdout contract above is current. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
 
 ## Guards
 - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
 - Emitter symbol proof: `python tools/cli/emitter_symbol_proof.py` → `artifacts/cli/guards/emitter_symbol_proof.txt`
 Both guards fail fast if determinism rails are not pinned and protect the allow-listed presenter/emitter.
+
+## Magic-10 comparison, readiness and admission (HDE-EPIC040)
+
+Both tools are read-only and refuse outside the closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`).
+
+- Golden comparison: `python tools/config/generate_config_artifacts.py --compare-goldens <candidate-root> [--goldens <path>] [--report <path>]`
+  - Admits the explicit candidate root through the admission owner and runs the Magic-10 golden collection (default `tests/fixtures/magic10/v1/goldens.json`, cases `M10-G001` to `M10-G008`) through the canonical kernel and application entrypoints.
+  - Exit codes: 0 when every case matches, 1 on any mismatch, 5 on refusal. The report (`magic10_golden_comparison.v1`) lists every mismatch; `--report` writes it to a path outside the candidate root and the repository, never over the goldens file.
+  - It never writes, activates or regenerates configuration, manifest or fixtures.
+- Gate readiness: `python tools/bodygraph/check_magic10_gate_readiness.py --user-id <uuid> [--user-id <uuid>]` or `--selection-file <path>` (one canonical UUID per line; blank lines and `#` comments ignored; a regular, non-symlinked file of at most 1,048,576 bytes).
+  - Reads each selected current row once through `DBAccess` and reports aggregate, identity-safe counts as `magic10_gate_readiness.v1`, with `readiness` `READY` or `NOT_READY`.
+  - Exit codes: 0 when a report is emitted; 5 on refusal, with one stderr token: `RAILS_CLOSED_REQUIRED:<pins>`, `READINESS_EMPTY_SELECTION`, `READINESS_SELECTION_INVALID` or `READINESS_UNAVAILABLE`. An unavailable database is never reported as ready.
+  - It issues no `UPDATE`, `INSERT` or `DELETE` and performs no acquisition, repair, backfill or vendor call. It reads through the database configured by `DATABASE_URL`; never print or commit that value.
+- Active admission: `engine.config.registry_loader.load_active_mechanics_bundle()` returns the admitted bundle only for the complete release and takes no root or override argument. See `README.md`, "Release identity".
 
 
 ## HumanDesignAPI v2 BodyGraph-detail resolver evidence posture (HDE-EPIC037)

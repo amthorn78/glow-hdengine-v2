@@ -128,11 +128,12 @@ source .venv/bin/activate  # Linux/macOS
 - Defines middleware and post-request hooks
 - ETag header management for internal endpoints
 
-**Code Structure**:
+**Code Structure** (abridged; see `adapter/factory.py`):
 ```python
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(bp, url_prefix="")  # Register routes
+    app.register_blueprint(api_bp, url_prefix="/api")  # production Reader: POST /api/reader
     
     @app.after_request
     def _strip_etag_on_internal(resp):
@@ -188,7 +189,7 @@ bash run_flask_dev.sh [PORT]
 - `/internal/dev/sampler`: Development sampler endpoint (if `DEV_SAMPLER_URL` env var is set)
 - Other custom endpoints
 
-**Integration**: Blueprint is mounted at root path (`url_prefix=""`)
+**Integration**: the dev/internal blueprint is mounted at the root path (`url_prefix=""`); since HDE-EPIC040 the production Reader blueprint (`api_bp`) is mounted under `/api`, serving `POST /api/reader?v=1` and `?v=2`.
 
 ---
 

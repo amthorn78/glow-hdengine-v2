@@ -13,7 +13,7 @@
   - `tools/cli/emitter_symbol_proof.py` (proves governed CLI handlers call the allow-listed presenter/emitter).
 
 ## Surfaces and harnesses
-- Public surfaces: Reader v1 endpoints and `hdctl showcompat` share the presenter/emitter and remain the only public APIs.
+- Public surfaces: the Reader endpoints (Reader v1, and since HDE-EPIC040 Reader v2, on `POST /api/reader`; the dev `GET /reader` is Reader v1) and `hdctl showcompat` share the presenter/emitter and remain the only public APIs. See `docs/contracts/reader_v1_public_bytes.md` and `docs/contracts/reader_v2_public_bytes.md`.
 - Dev/admin sampler surfaces: `hdctl dev:sampler` (APP_ENV=dev) and `/internal/dev/sampler` (APP_ENV=dev via `scripts/dev_start_reader.sh`) mirror public bytes for QA only.
 - QA harnesses: closed-rails healthcheck and Live QA (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`) plus open-rails vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`, controlled vendor identity). Outputs are governed evidence under `audit/qa/hde-epic019/`; EPIC020 evidence families live under `errors/` and `parity/` (error envelopes), `artifacts/presenter/` (presenter identity proofs), and `artifacts/ops/internal_version/` + `artifacts/math/` (internal identity).
 

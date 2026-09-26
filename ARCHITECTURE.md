@@ -8,7 +8,7 @@
   - Validation: `engine/validation/viewer_prefs.py`
   - Emission: `engine/presenter/emitter.py::emit_compact_json(payload)`
   - Serialization: `engine/serializer/canon.py::dumps(obj)->bytes` (UTF-8, sort_keys, compact, one trailing LF)
-  - Errors: `engine/errors/envelope.py` (`{ok,false,code,error}`)
+  - Errors: `engine/compat/errors.py::error_envelope` builds the governed `error_v1` envelope with keys `schema` (`"v1"`), `ok` (`false`), `code` and `error`, adding `details` only when a caller passes one (the Reader routes never do); the Reader error branches are `$defs.error` of `schemas/reader.v1.schema.json` and `schemas/reader.v2.schema.json`.
   - HTTP handlers: `engine/http/*` (e.g., `compat_handler.py`)
 - **adapter/** — dev runner & route registration (the only app home)
   - Registers blueprints/routes and imports handlers from `engine/http/*`
