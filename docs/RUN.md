@@ -2,14 +2,14 @@
 
 ## Rails
 - Pin determinism env: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` (or call `engine.runtime.determinism_env.ensure_determinism_env`).
-- Disable auto-reload when capturing evidence. Reader harness binds to http://127.0.0.1:5000 when run locally (dev helper can override port via `PORT`).
+- Disable auto-reload when capturing evidence. The dev Reader helper `scripts/dev_start_reader.sh` runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`).
 
 ## Quick checks
 - Env pins: `python scripts/ensure_env.py` → expect `[ENV] OK` with rails above; CI mirrors this via `ci/checks/check_env_pins.sh`.
 - Serializer parity: `pytest -q tests/test_sercanon.py` (runs under pinned locale/timezone).
-- Registry report spot-check: `python tools/generate_registry_report.py --check` to validate catalog inputs and serializer wiring.
+- Registry and configuration spot-check: `python tools/config/generate_config_artifacts.py --check` validates the committed registry report, `artifacts/thresholds/magic10_config.json` and `artifacts/thresholds/band_edges.json` without writing. `python tools/generate_registry_report.py` has no check mode; it writes the registry report.
 - Release input gate (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only`. It validates canonical `catalog/manifest.json` and its declared file hashes without writing.
-- Intentional release cut: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. This updates only the manifest; commit that input once.
+- Intentional release cut: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. This updates only the manifest; commit that input once. A new release version also changes `ADMITTED_RELEASE_VERSION` (and, where they change, `ADMITTED_RELEASE_BUILT_AT_UTC` and `ADMITTED_RELEASE_ROSTER`) in `engine/config/registry_loader.py` before the cut, because admission compares the manifest with those constants and that file is itself a release member.
 - Exact-head attestation: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. The tool uses an isolated tracked-file copy, validates exact source and the final fifteen-stage generic release-sanity posture, and emits `attestation.json`, its checksum, a names-only transcript, and generated evidence outside the Repo.
 
 
@@ -17,6 +17,12 @@
 - The current release-sanity gate is `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py`; it is an exact fifteen-stage fail-closed chain and logs to `audit/gates/sanity_pipeline/sanity_pipeline.log`. It exercises current mapped-cache behavior in memory and leaves frozen architecture and historical OPS evidence untouched. Do not run it for a docs-only PR unless specifically scoped.
 - Direct DB posture is direct-only through `DATABASE_URL`; retired bridge keys `DB_ALLOW_BRIDGE_IN_PROD`, `DB_BRIDGE_URL`, and `DB_FORCE_BRIDGE` are presence-sensitive refusal keys before provider construction or I/O.
 - Configured-v2 mapped-cache non-dry-run use requires explicit `--upsert`, open rails, a non-production-like environment, and a sanctioned `DBAccess.for_current_env()` target; it persists only the projected mapped-cache payload and refuses production-like writes.
+
+## Reader (HDE-EPIC040)
+- Start locally from the repository root: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh`.
+- Dev Reader v1: `curl -s 'http://127.0.0.1:8000/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=UTC&b_tz=UTC'`. The bytes equal the `--dump-reader` sidecar of `hdctl showcompat --a-file fixtures/charts/alice.json --b-file fixtures/charts/bob.json --dump-reader <out.json>` for the same charts.
+- Production Reader: `POST /api/reader?v=1` or `POST /api/reader?v=2` with the body `{"a_id":"<uuid>","b_id":"<uuid>"}`. It resolves both identities through a read-only current-row lookup, so it needs a configured database; without one it returns 503 `ERR_M10_RESOLVER_UNAVAILABLE`. Contracts: `docs/contracts/reader_v1_public_bytes.md` and `docs/contracts/reader_v2_public_bytes.md`.
+- Golden comparison, Gate readiness and admission: `docs/CLI_commands.md`, "Magic-10 comparison, readiness and admission (HDE-EPIC040)".
 
 ## Evidence and guard workflow
 ```bash

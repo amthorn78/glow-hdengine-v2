@@ -1,5 +1,17 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC040: Separation Pass 3 final repository documentation (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented the delivered HDE-EPIC040 contract: the four-argument `compute_core(member_a, member_b, mechanics_bundle, release_id)` core reached through `evaluate_pair`; the strict `magic10_mechanics_config.v1`, `magic10_result.v1` and `magic10_compat_result.v1` schemas; canonical writers and sources; and the complete-versus-candidate boundary of the admitted `1.3.0` release with 45 members.
+- Added `docs/contracts/reader_v2_public_bytes.md` for Reader v2 (`POST /api/reader?v=2`: the ten Magic-10 bands in canonical order, `[]` when ineligible, bands-only and numeric-free) and documented the production route `POST /api/reader` with its `v=1`/`v=2` selection.
+- Documented the read-only golden comparator (`generate_config_artifacts.py --compare-goldens`) and Gate-readiness tool (`check_magic10_gate_readiness.py`) with their non-mutation and closed-rails constraints, and routed readers to the decided C040-06 Channel taxonomy record, including why Integration uses the broad `individual` grouping.
+
+### Changed / Fixed
+- Corrected the Reader v1 contract page: a schema-valid example from the goldens, the conformed error branch (`schema`, `ok`, `code`, `error`; governed pairs only; C040-08) and the retired `*_leader` identities recorded as history.
+- Corrected live-path descriptions: `docs/server/reader_v1.md` no longer documents `GET /api/reader` (the production Reader is `POST /api/reader`; dev `GET /reader` is Reader v1); the transport-evidence pages scope the Reader 405 predicate to the unprefixed `POST /reader`; the README `aux-preview` example reads a `showcompat` stdout pair file; the release-cut guidance names the admission constants a new release must change; and configuration pages name the current Magic-10 sources.
+- Recorded Canon status: C040-06, C040-07 and C040-08 are decided and delivered, and their drainage into permanent PF canon is pending with its maintainers as of HDE-EPIC040-PR07. No QA verdict, acceptance, OPS01 attestation, deployment, activation, PF09 movement or epic closure is claimed.
+
 Unreleased — HDE-EPIC039: Calcination Pass 6 documentation alignment (README/CHANGELOG/AGENTS/docs/)
 
 ### Added

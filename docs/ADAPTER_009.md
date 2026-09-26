@@ -173,9 +173,11 @@ All predicates below remain required within this document's stated scope. The re
 - `HTTP_POST_METHOD_POSTURE_OK` — Reader POST ⇒ 405 typed JSON (`no-store`, no ETag); Compat POST ⇒ 200 non-conditional.
 - `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `{"error":"body_not_allowed"}`, `no-store`, no ETag.
 
+Current routes (HDE-EPIC040): the 200, 304 and HEAD predicates above apply to the dev Reader `GET /reader`, the route the A7 transport proofs select from `docs/ENDPOINTS_CATALOG.json`. `HTTP_POST_METHOD_POSTURE_OK` keeps its original meaning, which now holds for the unprefixed `POST /reader`: it returns the governed 405 (`ERR_NOT_FOUND`, `Allow: GET, HEAD`, `no-store`, no ETag). The production Reader is `POST /api/reader?v=1` or `?v=2`: a success is 200, non-conditional and carries no ETag; its errors are `no-store` without ETag; every other method on `/api/reader` returns 405 with `Allow: POST`. See `docs/contracts/reader_v2_public_bytes.md`.
+
 ## Evidence shape
 Header goldens are canonical JSON: **lowercased keys**, sorted, compact, **exactly one trailing LF**.
-Bytes are LF-terminated; CLI output equals the Reader identity bytes (parity).
+Bytes are LF-terminated; Reader↔CLI parity is defined via the CLI `--dump-reader` sidecar (not `showcompat` stdout), as in `docs/acceptance/http_transport_evidence.md`.
 
 <!-- EPIC-004 PATCH: _arch naming compatibility note -->
 ### Snapshot directory naming (compatibility)

@@ -6,6 +6,18 @@ This document is deprecated. The **only** HTTP home for Reader is:
 See:
 - `docs/RUN.md` for the canonical start command
 - `docs/acceptance/http_transport_evidence.md` for transport acceptance
+- `docs/contracts/reader_v1_public_bytes.md` and `docs/contracts/reader_v2_public_bytes.md` for the current public bodies
+
+## Current state (HDE-EPIC040)
+
+Everything below this section is retained history. Where it disagrees with this section, this section describes the current repository implementation.
+
+- Production Reader: `POST /api/reader?v=1` (Reader v1) and `POST /api/reader?v=2` (Reader v2). The production blueprint (`get_reader_api_bp` in `adapter/http_reader.py`) is mounted under `/api` by every app factory: `adapter/factory.py`, `adapter/wsgi.py` and `adapter/http_reader.py::create_app`. Version selection, request body, lookup, transport and error rules are shared by both versions; see `docs/contracts/reader_v2_public_bytes.md`.
+- Every method other than `POST` on `/api/reader` returns the governed 405 (`ERR_NOT_FOUND`, `Allow: POST`, `no-store`).
+- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. When `APP_ENV` is set to a value other than `dev`, it returns 403 `ERR_READER_FORBIDDEN`; an unset `APP_ENV` is treated as `dev`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
+- `POST /reader` (unprefixed) is not the production Reader: it returns the governed 405 with `Allow: GET, HEAD`.
+- Local start: `scripts/dev_start_reader.sh` runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`). Run it from the repository root. The legacy notice below names `dev/reader_harness/app.py`; as of HDE-EPIC040-PR07 that file raises `AttributeError` at import, so it is not a start path.
+- Known limitation: a path that no route serves receives the framework's HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`; `adapter/wsgi.py` answers with the JSON `ERR_NOT_FOUND` envelope.
 
 ---
 
@@ -39,14 +51,14 @@ Contract ownership. The public body shape (keys, enums, serializer rules, idempo
 
 GET /health → returns 200 and body ok\n. 
 
-GET /api/reader?v=1&a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA> → returns LF-terminated public bytes identical to CLI for the same inputs. 
+GET /reader?v=1&a=<chart path>&b=<chart path>&a_tz=<IANA>&b_tz=<IANA> → dev Reader v1 (`APP_ENV=dev`); returns LF-terminated public bytes identical to the CLI `--dump-reader` sidecar for the same charts. The production Reader is `POST /api/reader?v=1|2` (see "Current state (HDE-EPIC040)" above); `GET /api/reader` returns 405.
 
 
 Parameter policy
 
 v=1 only (version is explicit to allow future bodies without changing this harness path). 
 
-a, b are relative paths resolved under fixtures/charts/. Absolute paths are rejected. 
+a, b are chart paths resolved against the server's working directory; each must resolve inside fixtures/charts/ (for example fixtures/charts/alice.json), so run the server from the repository root.
 
 a_tz, b_tz are required if the respective chart files do not include a time zone (IANA names). 
 
