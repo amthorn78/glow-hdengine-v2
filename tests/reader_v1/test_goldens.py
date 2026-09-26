@@ -75,8 +75,10 @@ def test_v1_goldens_are_the_harmony_covenant():
         assert doc["categories"] == [{"band": band, "id": "harmony"}]
     ineligible = json.loads((G / "g01_minimal_ineligible.json").read_bytes())
     assert ineligible["reader_version"] == "v1" and ineligible["eligible"] is False and ineligible["categories"] == []
+    # PF10 §2.24: the error golden is the real governed Reader v1 error envelope bytes.
+    assert (G / "g06_error_invalid_input.json").read_bytes() == emit_public(error_envelope("ERR_READER_INVALID_INPUT"))
     error = json.loads((G / "g06_error_invalid_input.json").read_bytes())
-    assert error == {"code": "InvalidInput", "error": "bad gates", "ok": False}
+    assert error == {"code": "ERR_READER_INVALID_INPUT", "error": "invalid Reader request", "ok": False, "schema": "v1"}
 
 
 def test_ab_ba_jsonl_identity_and_hashes():

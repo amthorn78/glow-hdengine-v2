@@ -54,7 +54,7 @@ PRODUCED_AT = "2026-07-14T00:00:00Z"
 # Frozen capture-time primary (HDE-EPIC038 PR-03).  This producer never rewrites
 # it while the active release is not admitted; ``--check-current`` validates it
 # by this recorded hash instead.
-FROZEN_OPEN_ABBA_SHA256 = "29223e6f8a30ed80f857a5ded666e13eab8b54440c14d068ac8c40330a1fdbda"
+FROZEN_OPEN_ABBA_SHA256 = "c78740b3f9d45472e67c3bdeef4ade9e4a9c74fc3e6b11bc2f29d1a90a323348"
 NOT_ADMITTED_LINE = "OPEN_RAILS_ABBA_CHECK:RELEASE_NOT_ADMITTED"
 OUTCOME_EVALUATED = "EVALUATED"
 OUTCOME_RELEASE_NOT_ADMITTED = "RELEASE_NOT_ADMITTED"

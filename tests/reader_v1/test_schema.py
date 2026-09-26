@@ -13,6 +13,14 @@ SCHEMA_V2_PATH = pathlib.Path("schemas/reader.v2.schema.json")
 SIDECAR_V2_PATH = pathlib.Path("schemas/reader.v2.schema.json.sha256")
 SCHEMA_V2 = json.loads(SCHEMA_V2_PATH.read_text(encoding="utf-8"))
 BANDS = ["Cool", "Open", "Warm", "Glow"]
+V1_DEV_ROUTE_ERROR_PAIRS = [
+    # dev GET /reader only (PF05 §5.2.4.1.4 tokens the production POST route never emits)
+    ("ERR_READER_FORBIDDEN", "reader endpoint disabled"),
+    ("ERR_READER_MISSING_PARAM", "missing required reader parameters"),
+    ("ERR_READER_INVALID_PATH", "invalid chart path"),
+    ("ERR_READER_MISSING_TZ_A", "missing tz for party A"),
+    ("ERR_READER_MISSING_TZ_B", "missing tz for party B"),
+]
 V2_ERROR_PAIRS = [
     ("ERR_READER_INVALID_VERSION", "unsupported reader version"),
     ("ERR_READER_INVALID_INPUT", "invalid Reader request"),
@@ -27,6 +35,9 @@ V2_ERROR_PAIRS = [
     ("ERR_M10_STALE_RESULT", "Magic10 cached result is stale"),
     ("ERR_NOT_FOUND", "not found"),
 ]
+# PF10 §2.24 (C040-08, alternative A): the v1 error branch admits every governed pair either
+# Reader v1 route can emit -- the production route's twelve (shared with v2) plus the dev route's five.
+V1_ERROR_PAIRS = V2_ERROR_PAIRS + V1_DEV_ROUTE_ERROR_PAIRS
 
 
 def _validate(doc):
@@ -72,6 +83,10 @@ def _error_v2(code="ERR_READER_INVALID_VERSION", message="unsupported reader ver
     return {"schema": "v1", "ok": False, "code": code, "error": message}
 
 
+def _error_v1(code="ERR_READER_INVALID_INPUT", message="invalid Reader request"):
+    return {"schema": "v1", "ok": False, "code": code, "error": message}
+
+
 # --- Reader v1 --------------------------------------------------------------------------------------
 
 def test_success_minimal_shape_valid():
@@ -83,15 +98,44 @@ def test_success_harmony_item_valid_for_every_band(band):
     _validate(_success_v1(categories=[{"id": "harmony", "band": band}]))
 
 
-def test_error_shape_valid_with_retry_after_optional():
-    err = {
-        "ok": False,
-        "code": "InvalidInput",
-        "error": "bad gates",
-        "retry_after_ms": 250
-    }
-    _validate(err)
-    _validate({"ok": False, "code": "InvalidInput", "error": "bad gates"})
+@pytest.mark.parametrize(("code", "message"), V1_ERROR_PAIRS)
+def test_v1_error_pairs_valid_and_bound_to_the_token_map(code, message):
+    _validate(_error_v1(code, message))
+    assert ERROR_TOKEN_MAP[code]["message"] == message
+
+
+def test_v1_error_branch_is_exactly_the_reader_route_pairs():
+    pairs = [(o["properties"]["code"]["const"], o["properties"]["error"]["const"]) for o in SCHEMA["$defs"]["error"]["oneOf"]]
+    assert pairs == V1_ERROR_PAIRS and len(pairs) == 17
+    assert SCHEMA["$defs"]["error"]["required"] == ["schema", "ok", "code", "error"]
+    assert SCHEMA["$defs"]["error"]["additionalProperties"] is False
+    assert set(SCHEMA["$defs"]["error"]["properties"]) == {"schema", "ok", "code", "error"}
+    assert SCHEMA["$defs"]["error"]["properties"]["schema"] == {"const": "v1"}
+    # the production route's pairs are the v2 branch's pairs
+    v2_pairs = [(o["properties"]["code"]["const"], o["properties"]["error"]["const"]) for o in SCHEMA_V2["$defs"]["error"]["oneOf"]]
+    assert pairs[: len(v2_pairs)] == v2_pairs
+
+
+@pytest.mark.parametrize(
+    "doc",
+    [
+        {k: v for k, v in _error_v1().items() if k != "schema"},
+        {**_error_v1(), "schema": "v2"},
+        {**_error_v1(), "schema": "V1"},
+        _error_v1("ERR_WRITER_INVALID_INPUT", "schema validation failed"),
+        _error_v1("ERR_M10_GATES_INVALID", "Gate data is invalid"),
+        _error_v1("ERR_READER_INVALID_INPUT", "not found"),
+        {"ok": False, "code": "InvalidInput", "error": "bad gates"},
+        {**_error_v1(), "retry_after_ms": 250},
+        {**_error_v1(), "details": {}},
+        {**_error_v1(), "ok": True},
+        {k: v for k, v in _error_v1().items() if k != "error"},
+    ],
+    ids=["no_schema", "wrong_schema_const", "schema_case", "ungoverned_writer_code", "internal_only_code", "wrong_message", "synthetic_legacy_golden", "retry_after_ms", "details", "ok_true", "missing_error"],
+)
+def test_v1_error_adverse_cases_invalid(doc):
+    with pytest.raises(jsonschema.ValidationError):
+        _validate(doc)
 
 
 @pytest.mark.parametrize(
@@ -135,7 +179,7 @@ def test_additional_properties_closed_everywhere():
         _validate({**base, "meta": {"engine_tag": "Isis5", "invocation_tag": "INV-1", "x": 1}})
     # Error extra → reject
     with pytest.raises(jsonschema.ValidationError):
-        _validate({"ok": False, "code": "InvalidInput", "error": "bad gates", "details": {}})
+        _validate({**_error_v1(), "details": {}})
 
 
 def test_v1_schema_identity_and_canonical_bytes():

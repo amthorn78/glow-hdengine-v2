@@ -7,9 +7,12 @@ import io
 import json
 from pathlib import Path
 
+import jsonschema
 import pytest
 
 from adapter import http_reader
+from engine.compat.errors import error_envelope
+from engine.presenter.emitter import emit_public
 from engine.compat import compute
 from engine.config.registry_loader import SchemaValidationError
 from engine.db.errors import PrimaryUnavailable, SqlExecError
@@ -30,6 +33,20 @@ from tests.support.pr04_fixtures import (
 )
 
 SIX_KEYS = ["categories", "eligible", "idempotence_hash", "meta", "reader_version", "release_id"]
+SCHEMA_V1 = json.loads(Path("schemas/reader.v1.schema.json").read_text(encoding="utf-8"))
+# Every governed Reader v1 error token either v1 route can emit (PF10 §2.24 proof; PF05 §5.2.3 / §5.2.4.1.4).
+V1_ERROR_TOKENS = {
+    "ERR_READER_INVALID_VERSION": 400, "ERR_READER_INVALID_INPUT": 422, "ERR_READER_INVALID_CHART": 422,
+    "ERR_M10_PERSON_UNRESOLVED": 404, "ERR_M10_RESOLVER_UNAVAILABLE": 503, "ERR_M10_BODYGRAPH_INCOMPLETE": 503,
+    "ERR_M10_LEGACY_INPUT_UNSUPPORTED": 422, "ERR_M10_CONFIG_MISMATCH": 503, "ERR_M10_MANIFEST_MISMATCH": 503,
+    "ERR_M10_RESULT_SCHEMA_MISMATCH": 503, "ERR_M10_STALE_RESULT": 503, "ERR_NOT_FOUND": 405,
+    "ERR_READER_FORBIDDEN": 403, "ERR_READER_MISSING_PARAM": 400, "ERR_READER_INVALID_PATH": 400,
+    "ERR_READER_MISSING_TZ_A": 400, "ERR_READER_MISSING_TZ_B": 400,
+}
+
+
+def _validates_v1(raw: bytes) -> None:
+    jsonschema.Draft202012Validator(SCHEMA_V1).validate(json.loads(raw.decode("utf-8")))
 FORBIDDEN = ("score", "signals", "pair_key", "gates", "shared_key", "personal", "config_id", "keys", "q\"", UUID_A, UUID_B, "bodygraph")
 
 
@@ -75,6 +92,7 @@ def _assert_error(resp, token, status, db=None):
     body = json.loads(resp.data.decode("utf-8"))
     assert body == {"schema": "v1", "ok": False, "code": token, "error": body["error"]}
     assert set(body) == {"schema", "ok", "code", "error"}
+    _validates_v1(resp.data)
     assert resp.headers.get("Cache-Control") == "no-store"
     assert "ETag" not in resp.headers
     assert resp.data.endswith(b"\n")
@@ -101,7 +119,21 @@ def test_unprefixed_post_reader_is_the_governed_405(db):
     assert resp.headers.get("Cache-Control") == "no-store"
     assert "ETag" not in resp.headers
     assert json.loads(resp.data) == {"schema": "v1", "ok": False, "code": "ERR_NOT_FOUND", "error": "not found"}
+    _validates_v1(resp.data)
     assert db.queries == []
+
+
+@pytest.mark.parametrize(("token", "status"), sorted(V1_ERROR_TOKENS.items()))
+def test_every_governed_reader_v1_error_token_validates_against_the_v1_schema(token, status):
+    """PF10 §2.24: the corrected v1 schema admits exactly the envelope ``_error`` emits for every
+    token the v1 routes can emit, and those bytes are the canonical ``error_envelope`` bytes."""
+    with http_reader.create_app().test_request_context("/api/reader?v=1"):
+        resp, code = http_reader._error(token, status)
+    assert code == status
+    assert resp.data == emit_public(error_envelope(token))
+    assert set(json.loads(resp.data)) == {"schema", "ok", "code", "error"}
+    _validates_v1(resp.data)
+    assert resp.headers.get("Cache-Control") == "no-store" and "ETag" not in resp.headers
 
 
 @pytest.mark.parametrize(
@@ -304,7 +336,9 @@ def test_production_app_env_serves_post_and_forbids_dev_get(db, monkeypatch):
     monkeypatch.setenv("APP_ENV", "production")
     client = _client()
     assert _post(client, {"a_id": UUID_A, "b_id": UUID_B}).status_code == 200
-    assert client.get("/reader?v=1&a=x&b=y").status_code == 403
+    forbidden = client.get("/reader?v=1&a=x&b=y")
+    assert forbidden.status_code == 403 and json.loads(forbidden.data)["code"] == "ERR_READER_FORBIDDEN"
+    _validates_v1(forbidden.data)
 
 
 # --- dev GET fixture route regression ---------------------------------------------------------
@@ -335,6 +369,13 @@ def test_dev_get_route_resolves_complete_fixtures_and_keeps_tz_and_conditional_c
     missing_tz = client.get("/reader", query_string={key: value for key, value in _fixture_params().items() if key != "a_tz"})
     assert missing_tz.status_code == 400
     assert json.loads(missing_tz.data)["code"] == "ERR_READER_MISSING_TZ_A"
+    _validates_v1(missing_tz.data)
+    missing_param = client.get("/reader", query_string={"v": "1"})
+    assert missing_param.status_code == 400 and json.loads(missing_param.data)["code"] == "ERR_READER_MISSING_PARAM"
+    _validates_v1(missing_param.data)
+    bad_path = client.get("/reader", query_string=_fixture_params(a="/definitely/missing.json"))
+    assert bad_path.status_code == 400 and json.loads(bad_path.data)["code"] == "ERR_READER_INVALID_PATH"
+    _validates_v1(bad_path.data)
 
 
 def test_dev_get_route_refuses_legacy_or_incomplete_fixtures(tmp_path, monkeypatch):
@@ -349,8 +390,10 @@ def test_dev_get_route_refuses_legacy_or_incomplete_fixtures(tmp_path, monkeypat
     client = _client()
     resp = client.get("/reader", query_string={"v": "1", "a": str(legacy), "b": str(good), "a_tz": "UTC", "b_tz": "UTC"})
     assert resp.status_code == 422 and json.loads(resp.data)["code"] == "ERR_M10_LEGACY_INPUT_UNSUPPORTED"
+    _validates_v1(resp.data)
     resp = client.get("/reader", query_string={"v": "1", "a": str(incomplete), "b": str(good), "a_tz": "UTC", "b_tz": "UTC"})
     assert resp.status_code == 503 and json.loads(resp.data)["code"] == "ERR_M10_BODYGRAPH_INCOMPLETE"
+    _validates_v1(resp.data)
     assert "ETag" not in resp.headers and resp.headers.get("Cache-Control") == "no-store"
 
 

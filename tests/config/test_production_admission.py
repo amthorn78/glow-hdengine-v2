@@ -372,7 +372,7 @@ def test_actual_repository_root_admits(monkeypatch, release_root: Path) -> None:
     root = Path(__file__).resolve().parents[2]
     raw = (root / "catalog/manifest.json").read_bytes()
     assert raw == canon.sercanon(json.loads(raw), sort_keys=True)
-    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION == "1.2.0"
+    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION == "1.3.0"
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
     assert len(bundle.source_identities) == 45
     assert tuple(identity.path for identity in bundle.source_identities) == ADMITTED_RELEASE_ROSTER
