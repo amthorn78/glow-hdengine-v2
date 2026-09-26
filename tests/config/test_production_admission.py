@@ -226,7 +226,7 @@ def test_mechanics_fresh_startup_and_optimization_semantics(
     script += "from engine.config import registry_loader as loader\n"
     script += _MECHANICS_ADMIT_SCRIPT + "print(json.dumps(result))\n"
     assert _isolated_mechanics_script(release_root, script, optimization=optimization) == {
-        "state": "admitted", "members": 44,
+        "state": "admitted", "members": 45,
     }
 
 
@@ -255,7 +255,7 @@ def test_mechanics_timestamp_valid_stale_bytecode_refuses_and_fresh_source_admit
     }
     cached.unlink()
     assert _isolated_mechanics_script(release_root, script) == {
-        "state": "admitted", "members": 44, "behavior": "B",
+        "state": "admitted", "members": 45, "behavior": "B",
     }
 
 
@@ -321,8 +321,9 @@ def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(relea
     assert isinstance(bundle, AdmittedMechanicsBundle)
     assert bundle.manifest.version == ADMITTED_RELEASE_VERSION
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(ADMITTED_RELEASE_ROSTER) == 44
+    assert len(ADMITTED_RELEASE_ROSTER) == 45
     assert "schemas/gates_v1.schema.json" in ADMITTED_RELEASE_ROSTER
+    assert "schemas/reader.v2.schema.json" in ADMITTED_RELEASE_ROSTER
     assert "engine/stable/sercanon.py" in ADMITTED_RELEASE_ROSTER
     assert "engine/categories/registry.py" in ADMITTED_RELEASE_ROSTER
     assert tuple(row.path for row in bundle.manifest.files) == ADMITTED_RELEASE_ROSTER
@@ -371,9 +372,9 @@ def test_actual_repository_root_admits(monkeypatch, release_root: Path) -> None:
     root = Path(__file__).resolve().parents[2]
     raw = (root / "catalog/manifest.json").read_bytes()
     assert raw == canon.sercanon(json.loads(raw), sort_keys=True)
-    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION == "1.1.0"
+    assert bundle.manifest.version == ADMITTED_RELEASE_VERSION == "1.2.0"
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
-    assert len(bundle.source_identities) == 44
+    assert len(bundle.source_identities) == 45
     assert tuple(identity.path for identity in bundle.source_identities) == ADMITTED_RELEASE_ROSTER
     for identity in bundle.source_identities:
         body = (root / identity.path).read_bytes()
@@ -604,14 +605,14 @@ def test_manifest_requires_exact_roster_version_and_timestamp(release_root: Path
     _expect_code(release_root, "RELEASE_TIMESTAMP_MISMATCH")
 
 
-def test_gate_schema_is_required_and_an_unlisted_43_member_release_is_incomplete(
+def test_gate_schema_is_required_and_an_unlisted_44_member_release_is_incomplete(
     release_root: Path,
 ) -> None:
     manifest = _manifest(release_root)
     manifest["files"] = [
         row for row in manifest["files"] if row["path"] != "schemas/gates_v1.schema.json"
     ]
-    assert len(manifest["files"]) == 43
+    assert len(manifest["files"]) == 44
     _write_manifest(release_root, manifest)
     _expect_code(release_root, "INCOMPLETE_RELEASE_ROSTER")
 
@@ -811,7 +812,8 @@ def test_result_schema_references_must_resolve_without_constructing_a_result(
 ) -> None:
     path = release_root / "schemas/reader.v1.schema.json"
     schema = json.loads(path.read_bytes())
-    schema["properties"]["categories"]["items"]["$ref"] = reference
+    # F05 (PF10 §2.23): the success branch is the closed object $defs.success.
+    schema["$defs"]["success"]["properties"]["categories"]["items"]["$ref"] = reference
     write_canonical(path, schema)
     write_synthetic_release_manifest(release_root)
     _expect_code(release_root, code)

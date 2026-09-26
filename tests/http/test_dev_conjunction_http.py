@@ -2,11 +2,12 @@ import json
 
 import pytest
 
+from adapter import http_reader
 from adapter.http_reader import create_app
 from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.vendor_client import VendorRequest, VendorResult
 from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
-from tests.support.pr04_fixtures import GATES_A, GATES_B, build_bundle, build_pack, inject_seams
+from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, FakeCurrentViewDB, RowStore, build_bundle, build_pack, complete_chart, current_row, inject_seams
 
 VENDOR_CHART = json.loads(open("tests/fixtures/bodygraph/source_invariance/vendor_chart_result.v1.json", encoding="utf-8").read())["payload"]
 QUERY = {
@@ -184,3 +185,91 @@ def test_dev_writer_conjunction_retired_db_config_uses_typed_error(monkeypatch):
         "type": "dev.writer.conjunction.error.v1",
     }
     assert provider_calls == []
+
+
+# --- F07 (PF10 §2.23): the app-config lookup seam ------------------------------------------------
+
+def _seam_rows() -> RowStore:
+    left, right = resolve_db_user_id("left"), resolve_db_user_id("right")
+    return RowStore({left: current_row(left, complete_chart(left, GATES_A)), right: current_row(right, complete_chart(right, GATES_B))})
+
+
+def _seam_client(monkeypatch, app_env: str, rows: RowStore):
+    monkeypatch.setenv("APP_ENV", app_env)
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor client constructed with the seam installed"))
+    app = create_app()
+    app.config.update(TESTING=True)
+    assert "DEV_CONJUNCTION_LOCAL_LOOKUP" not in app.config
+    app.config["DEV_CONJUNCTION_LOCAL_LOOKUP"] = rows
+    return app.test_client()
+
+
+def test_seam_is_absent_from_every_app_factory_default_config():
+    from adapter import factory, wsgi
+
+    for create in (create_app, factory.create_app, wsgi.create_app):
+        assert "DEV_CONJUNCTION_LOCAL_LOOKUP" not in create().config
+
+
+@pytest.mark.parametrize("app_env", ["dev", "test", "local"])
+def test_dev_routes_serve_the_seam_under_closed_rails_with_the_admitted_identity(monkeypatch, bundle, app_env):
+    rows = _seam_rows()
+    client = _seam_client(monkeypatch, app_env, rows)
+    expected = {resolve_db_user_id("left"), resolve_db_user_id("right")}
+    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction", "/dev/writer/conjunction"):
+        resp = client.get(route, query_string={"a_user_id": "left", "b_user_id": "right"})
+        assert resp.status_code == 200, resp.data
+        assert resp.headers["Cache-Control"] == "no-store" and "ETag" not in resp.headers
+        payload = json.loads(resp.data)
+        conjunction_payload = payload.get("result", payload)
+        assert {conjunction_payload["conjunction"]["left"]["person_uid"], conjunction_payload["conjunction"]["right"]["person_uid"]} == expected
+        compat = conjunction_payload["conjunction"]["compat"]
+        assert compat["schema"] == "magic10_compat_result.v1"
+        assert compat["release_id"] == bundle.release_id
+        assert "meta" not in compat
+    assert set(rows.lookups) == expected
+
+
+def test_dev_writer_is_idempotent_through_the_seam(monkeypatch):
+    client = _seam_client(monkeypatch, "dev", _seam_rows())
+    one = client.get("/dev/writer/conjunction", query_string={"a_user_id": "left", "b_user_id": "right"})
+    two = client.get("/dev/writer/conjunction", query_string={"a_user_id": "left", "b_user_id": "right"})
+    assert one.status_code == 200 and one.data == two.data
+    payload = json.loads(one.data)
+    assert payload["type"] == "dev.writer.conjunction.success.v1"
+    assert payload["result"]["conjunction"]["compat"]["release_id"] != "dev"
+
+
+def test_seam_miss_still_refuses_under_closed_rails(monkeypatch):
+    rows = RowStore({})
+    client = _seam_client(monkeypatch, "dev", rows)
+    resp = client.get("/dev/reader/conjunction", query_string={"a_user_id": "left", "b_user_id": "right"})
+    assert resp.status_code == 503
+    payload = json.loads(resp.data)
+    assert payload["code"] == "ERR_WRITER_RAILS_CLOSED" and payload["details"]["provider_code"] == "PROVIDER_REFUSED"
+    assert rows.lookups == [resolve_db_user_id("left")]
+
+
+def test_production_reader_never_consults_the_seam(monkeypatch):
+    rows = RowStore({UUID_A: current_row(UUID_A, complete_chart(UUID_A, GATES_A)), UUID_B: current_row(UUID_B, complete_chart(UUID_B, GATES_B))})
+    client = _seam_client(monkeypatch, "dev", rows)
+    empty_db = FakeCurrentViewDB({})
+    monkeypatch.setattr(http_reader.DBAccess, "for_current_env", classmethod(lambda cls, *a, **k: empty_db))
+    for version in ("1", "2"):
+        resp = client.post(f"/api/reader?v={version}", data=json.dumps({"a_id": UUID_A, "b_id": UUID_B}), headers={"Content-Type": "application/json; charset=utf-8"})
+        assert resp.status_code == 404, resp.data
+        assert json.loads(resp.data)["code"] == "ERR_M10_PERSON_UNRESOLVED"
+    assert rows.lookups == []
+    assert [params for _sql, params in empty_db.queries] == [(UUID_A,), (UUID_A,)]
+
+
+def test_seam_is_unreachable_in_prod(monkeypatch):
+    rows = _seam_rows()
+    client = _seam_client(monkeypatch, "prod", rows)
+    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction", "/dev/writer/conjunction"):
+        resp = client.get(route, query_string={"a_user_id": "left", "b_user_id": "right"})
+        assert resp.status_code == 403
+        assert json.loads(resp.data)["code"] == "ERR_WRITER_FORBIDDEN"
+    assert rows.lookups == []

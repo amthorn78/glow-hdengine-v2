@@ -100,7 +100,7 @@ def test_public_fresh_execution_admits_all_four_modules_under_matching_semantics
     _importable(release_root)
     result = _child(release_root, _IMPORT + "print(json.dumps(admit()))\n", optimization=optimization)
     assert result["state"] == "admitted"
-    assert result["members"] == 44
+    assert result["members"] == 45
     assert result["release_id"] == hashlib.sha256((release_root / "catalog/manifest.json").read_bytes()).hexdigest()
     for path, _ in COVERED:
         assert result["sources"][path] == hashlib.sha256((release_root / path).read_bytes()).hexdigest()
@@ -158,7 +158,7 @@ print(json.dumps(result))
     cached.unlink()
     fresh = _child(release_root, script)
     assert fresh["state"] == "admitted"
-    assert fresh["members"] == 44
+    assert fresh["members"] == 45
     assert fresh["behavior"] == "B"
     assert fresh["sources"][path] == hashlib.sha256(raw_b).hexdigest()
 
@@ -258,12 +258,12 @@ def test_real_public_import_through_deployment_symlink_refuses(
     assert _child(alias, script + "print(json.dumps(admit()))\n") == {"state": "refused", "code": "UNSAFE_SOURCE_PATH"}
 
 
-@pytest.mark.parametrize("count", [42, 43, 45])
-def test_only_the_exact_44_member_roster_admits(release_root: Path, count: int) -> None:
+@pytest.mark.parametrize("count", [43, 44, 46])
+def test_only_the_exact_45_member_roster_admits(release_root: Path, count: int) -> None:
     path = release_root / "catalog/manifest.json"
     manifest = json.loads(path.read_bytes())
-    if count < 44:
-        omitted = HELPERS[:44 - count]
+    if count < 45:
+        omitted = HELPERS[:45 - count]
         manifest["files"] = [row for row in manifest["files"] if row["path"] not in omitted]
         expected = "INCOMPLETE_RELEASE_ROSTER"
     else:

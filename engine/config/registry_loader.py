@@ -395,7 +395,7 @@ _LOCAL_SCHEMAS = frozenset({
 
 # HDE-EPIC040's adopted complete mechanics release.  The active loader accepts
 # this exact sorted union only; catalog/manifest.json itself is never a member.
-ADMITTED_RELEASE_VERSION = "1.1.0"
+ADMITTED_RELEASE_VERSION = "1.2.0"
 ADMITTED_RELEASE_BUILT_AT_UTC = "2026-08-24T18:04:49Z"
 ADMITTED_RELEASE_ROSTER = tuple(sorted({
     "adapter/http_reader.py",
@@ -439,12 +439,13 @@ ADMITTED_RELEASE_ROSTER = tuple(sorted({
     "schemas/magic10_mechanics_v1.schema.json",
     "schemas/magic10_result_v1.schema.json",
     "schemas/reader.v1.schema.json",
+    "schemas/reader.v2.schema.json",
     "tools/bodygraph/check_magic10_gate_readiness.py",
     "engine/serializer/canon.py",
     "engine/stable/sercanon.py",
 }))
 
-if len(ADMITTED_RELEASE_ROSTER) != 44:  # pragma: no cover - import-time invariant
+if len(ADMITTED_RELEASE_ROSTER) != 45:  # pragma: no cover - import-time invariant
     raise RuntimeError("ADMITTED_RELEASE_ROSTER_INVALID")
 
 @dataclass(frozen=True)

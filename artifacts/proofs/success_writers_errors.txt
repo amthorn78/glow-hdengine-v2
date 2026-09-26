@@ -1,4 +1,4 @@
-POST /reader
+POST /api/reader
 status=422
 code=ERR_READER_INVALID_INPUT
 cache_control=no-store

@@ -9,9 +9,10 @@ RID="$ART/release_id.txt"
 if [[ -z "${FILES:-}" ]]; then
   FILES=$'schemas/reader.v1.schema.json
 goldens/reader/v1/g01_minimal_ineligible.json
-goldens/reader/v1/g03_open_leader.json
-goldens/reader/v1/g04_warm_leader.json
-goldens/reader/v1/g05_cool_leader.json
+goldens/reader/v1/g03_harmony_open.json
+goldens/reader/v1/g04_harmony_warm.json
+goldens/reader/v1/g05_harmony_cool.json
+goldens/reader/v1/g07_harmony_glow.json
 goldens/reader/v1/g06_error_invalid_input.json
 goldens/reader/v1/g02_ab_ba_parity_A.jsonl
 goldens/reader/v1/g02_ab_ba_parity_B.jsonl'

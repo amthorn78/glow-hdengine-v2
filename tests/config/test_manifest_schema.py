@@ -138,8 +138,8 @@ def test_manifest_entry_keys_are_closed(tmp_path: Path) -> None:
 def test_generic_manifest_shape_does_not_claim_full_release_admission() -> None:
     root = Path(__file__).resolve().parents[2]
     manifest = load_manifest(root)
-    assert manifest.version == "1.1.0"
-    assert len(manifest.files) == 44
+    assert manifest.version == "1.2.0"
+    assert len(manifest.files) == 45
     assert all(row.path != "catalog/manifest.json" for row in manifest.files)
     # The generic loader returns the manifest shape only; admission authority
     # stays with load_active_mechanics_bundle.

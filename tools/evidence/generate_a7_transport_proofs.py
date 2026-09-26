@@ -9,7 +9,9 @@ and exits with the distinct code, and write mode refuses.  The committed A7
 artifacts stay frozen capture-time records with a nonclaim until their owner can
 truthfully regenerate them.  The POST requirement is the PF05 §5.3 non-conditional
 POST fact: query-only input is 422 ``ERR_READER_INVALID_INPUT``, ``no-store``,
-no ETag, ``If-None-Match`` ignored.
+no ETag, ``If-None-Match`` ignored -- captured on the production route
+``POST /api/reader`` (PF05 §5.4 prefix mechanism; HDE-EPIC040-PR06a), which the
+catalog carries as its one ``public_reader`` row (A7-ineligible: a POST).
 """
 from __future__ import annotations
 import argparse, copy, hashlib, json, os, re, sys
@@ -23,6 +25,7 @@ from adapter.http_reader import create_app
 from tools.evidence.run_sanity_pipeline import RELEASE_NOT_ADMITTED_EXIT_CODE, ReleaseNotAdmitted, probe_release_admission
 NOT_ADMITTED_LINE='A7_TRANSPORT_CHECK:RELEASE_NOT_ADMITTED'
 POST_ERROR_CODE='ERR_READER_INVALID_INPUT'
+PRODUCTION_READER_PATH='/api/reader'
 TS=json.loads((ROOT/'catalog/manifest.json').read_text()).get('built_at_utc','2026-01-01T00:00:00Z')
 DOC=ROOT/'docs/ENDPOINTS_CATALOG.json'; DOCSHA=ROOT/'docs/ENDPOINTS_CATALOG.json.sha256'; AUD=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json'; AUDSHA=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json.sha256'; SNAP=ROOT/'artifacts/reader/endpoints_snapshot.json'
 PROOFS=[ROOT/'artifacts/proofs/endpoints_env_gate_proof.log',ROOT/'artifacts/proofs/success_get.txt',ROOT/'artifacts/proofs/success_head.txt',ROOT/'artifacts/proofs/success_304.txt',ROOT/'artifacts/proofs/success_writers_errors.txt',ROOT/'artifacts/proofs/success_encoding_invariance.txt',ROOT/'artifacts/proofs/reader_success_get_head_304.json']
@@ -33,6 +36,7 @@ def cjson(o): return json.dumps(o,separators=(',',':'),sort_keys=True).encode()+
 def catalog_obj():
  eps=[
  {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat pair endpoint (internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'POST','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
+ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'public_reader','description':'Production Reader (POST; v=1 Reader v1, v=2 Reader v2)','env_gate':'not_applicable_public','internal':False,'method':'POST','path':'/api/reader','rails_profile':'public-read-only; closed rails; current-row DB resolution; no vendor call; POST non-conditional no-ETag'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Conjunction reader preview route (dev-only)','env_gate':'APP_ENV in {dev,test,local}','internal':True,'method':'GET','path':'/dev/reader/conjunction','rails_profile':'dev-harness closed-by-default SAFE rails'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Conjunction writer preview route (dev-only)','env_gate':'APP_ENV in {dev,test,local}','internal':True,'method':'GET','path':'/dev/writer/conjunction','rails_profile':'dev-harness closed-by-default SAFE rails','route_id':'dev.writer.conjunction.v1'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Conjunction sampler preview route (dev-only)','env_gate':'APP_ENV in {dev,test,local}','internal':True,'method':'GET','path':'/dev/sampler/conjunction','rails_profile':'dev-harness closed-by-default SAFE rails'},
@@ -63,6 +67,8 @@ def validate_catalog(cat):
  sampler=[e for e in cat['endpoints'] if e['path']=='/internal/dev/sampler']
  if len(sampler)!=1 or sampler[0]['method']!='POST' or sampler[0]['classification']!='dev_harness' or sampler[0]['internal'] is not True or sampler[0]['a7_eligible'] is not False or sampler[0]['env_gate']!='APP_ENV in {dev,test,local}': raise ValueError('internal dev sampler catalog invalid')
  if any(e['path']=='/internal/dev/sampler' and e['method']=='GET' for e in cat['endpoints']): raise ValueError('GET internal dev sampler must not be cataloged')
+ production=[e for e in cat['endpoints'] if e['path']==PRODUCTION_READER_PATH]
+ if len(production)!=1 or production[0]['method']!='POST' or production[0]['classification']!='public_reader' or production[0]['internal'] is not False or production[0]['a7_eligible'] is not False: raise ValueError('production reader catalog invalid')
  des=cat['success_endpoints']
  if len(des)!=1: raise ValueError('exactly one success designation required')
  d=des[0]
@@ -88,7 +94,7 @@ def capture(client_factory=create_app):
   require(get.status_code==200,'get status'); require(body.endswith(b'\n') and body,'get canonical body'); require(hb.get('content-type')=='application/json; charset=utf-8','ct'); require(hb.get('cache-control')=='private, max-age=0, must-revalidate','cache'); require('Authorization' in hb.get('vary','') and 'Accept-Encoding' in hb.get('vary',''),'vary'); require(hb.get('etag')==et,'etag'); require(hb.get('content-length')==str(len(body)),'cl')
   head=c.head(target['path'],query_string=q(),headers={'Accept-Encoding':'identity'}); hh=headers(head); require(head.status_code==200 and head.data==b'','head'); require(hh.get('etag')==et and hh.get('content-length')==str(len(body)) and hh.get('content-type')==hb.get('content-type') and hh.get('cache-control')==hb.get('cache-control') and hh.get('vary')==hb.get('vary'),'head parity')
   r304=c.get(target['path'],query_string=q(),headers={'If-None-Match':et}); h304=headers(r304); require(r304.status_code==304 and r304.data==b'','304'); require(h304.get('etag')==et and h304.get('cache-control')==hb.get('cache-control') and h304.get('vary')==hb.get('vary') and 'content-type' not in h304 and 'content-length' not in h304,'304 headers')
-  post=c.post(target['path'],query_string=q(),headers={'If-None-Match':et}); hp=headers(post); post_body=json.loads(post.data) if post.data else None
+  post=c.post(PRODUCTION_READER_PATH,query_string=q(),headers={'If-None-Match':et}); hp=headers(post); post_body=json.loads(post.data) if post.data else None
   require(post.status_code==422 and hp.get('cache-control')=='no-store' and 'etag' not in hp and post.data.endswith(b'\n') and isinstance(post_body,dict) and canon.sercanon(post_body)==post.data and post_body.get('code')==POST_ERROR_CODE and post_body.get('ok') is False,'writer')
   enc=[]
   for ae in ['identity','gzip','br']:
@@ -135,7 +141,7 @@ def build():
  enc=comp['tested_encodings']
  enc_equal=all(e['etag']==comp['etag'] and e['head_identity_length']==comp['get_200']['content_length'] for e in enc)
  enc_text="ENCODING_INVARIANCE\n"+"\n".join(f"{e['accept_encoding']}_etag={e['etag']}\n{e['accept_encoding']}_head_identity_length={e['head_identity_length']}" for e in enc)+f"\netag_equal=true\nhead_identity_length_equal={str(enc_equal).lower()}\npass={str(enc_equal).lower()}\n"
- outs={DOC:catb,DOCSHA:(f"{sha(catb)}  docs/ENDPOINTS_CATALOG.json\n").encode(),AUD:catb,AUDSHA:(f"{sha(catb)}  artifacts/audit/ENDPOINTS_CATALOG.json\n").encode(),SNAP:snap,PROOFS[0]:b'APP_ENV=prod\n/reader_success_unreachable=true\ncache_control=no-store\netag_absent=true\n',PROOFS[1]:(f"status=200\nbody_sha256={comp['get_200']['body_sha256']}\netag={comp['etag']}\ncontent-type={comp['get_200']['content_type']}\ncache-control={comp['get_200']['cache_control']}\nvary={comp['get_200']['vary']}\ncontent-length={comp['get_200']['content_length']}\n").encode(),PROOFS[2]:(f"status=200\nbody_empty=true\ncontent_length={comp['head_200']['content_length']}\netag={comp['etag']}\ncontent-type={comp['head_200']['content_type']}\ncache-control={comp['head_200']['cache_control']}\nvary={comp['head_200']['vary']}\ncontent-length={comp['head_200']['content_length']}\n").encode(),PROOFS[3]:(f"status=304\nbody_empty=true\ncontent_type_absent=true\ncontent_length_absent=true\netag={comp['etag']}\ncache-control={comp['after_304']['cache_control']}\nvary={comp['after_304']['vary']}\n").encode(),PROOFS[4]:(f'POST /reader\nstatus=422\ncode={POST_ERROR_CODE}\ncache_control=no-store\netag_absent=true\nconditional_not_304=true\ncanonical_body=true\n').encode(),PROOFS[5]:enc_text.encode(),PROOFS[6]:cjson(comp)}
+ outs={DOC:catb,DOCSHA:(f"{sha(catb)}  docs/ENDPOINTS_CATALOG.json\n").encode(),AUD:catb,AUDSHA:(f"{sha(catb)}  artifacts/audit/ENDPOINTS_CATALOG.json\n").encode(),SNAP:snap,PROOFS[0]:b'APP_ENV=prod\n/reader_success_unreachable=true\ncache_control=no-store\netag_absent=true\n',PROOFS[1]:(f"status=200\nbody_sha256={comp['get_200']['body_sha256']}\netag={comp['etag']}\ncontent-type={comp['get_200']['content_type']}\ncache-control={comp['get_200']['cache_control']}\nvary={comp['get_200']['vary']}\ncontent-length={comp['get_200']['content_length']}\n").encode(),PROOFS[2]:(f"status=200\nbody_empty=true\ncontent_length={comp['head_200']['content_length']}\netag={comp['etag']}\ncontent-type={comp['head_200']['content_type']}\ncache-control={comp['head_200']['cache_control']}\nvary={comp['head_200']['vary']}\ncontent-length={comp['head_200']['content_length']}\n").encode(),PROOFS[3]:(f"status=304\nbody_empty=true\ncontent_type_absent=true\ncontent_length_absent=true\netag={comp['etag']}\ncache-control={comp['after_304']['cache_control']}\nvary={comp['after_304']['vary']}\n").encode(),PROOFS[4]:(f'POST {PRODUCTION_READER_PATH}\nstatus=422\ncode={POST_ERROR_CODE}\ncache_control=no-store\netag_absent=true\nconditional_not_304=true\ncanonical_body=true\n').encode(),PROOFS[5]:enc_text.encode(),PROOFS[6]:cjson(comp)}
  return outs
 def main(argv=None):
  ap=argparse.ArgumentParser(); ap.add_argument('--check',action='store_true'); ns=ap.parse_args(argv); ensure_determinism_env()

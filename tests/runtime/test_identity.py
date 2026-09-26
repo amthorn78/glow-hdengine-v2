@@ -11,6 +11,7 @@ from engine.runtime.identity import (
     identity_admin,
     identity_meta,
 )
+from engine.categories.registry import FROZEN_MAGIC10_ORDER
 from engine.serializer import canon
 from engine.runtime.public import emit_reader_public_envelope
 from engine.cli.main import _engine_identity
@@ -30,6 +31,27 @@ def test_identity_shapes_and_reader_cli_shared_identity():
     ineligible_body, ineligible = emit_reader_public_envelope(eligible=False)
     assert ineligible["categories"] == [] and ineligible["release_id"] == admin["release_id"]
     assert ineligible_body.endswith(b"\n")
+
+
+def test_reader_v2_public_envelope_carries_the_same_runtime_identity():
+    """PF10 §2.23: Reader v2 carries identity_meta()'s identity and the ordered full Magic-10."""
+    admin = identity_admin()
+    pairs = [(category_id, "Open") for category_id in FROZEN_MAGIC10_ORDER]
+    body, payload = emit_reader_public_envelope(eligible=True, reader_version="v2", categories=pairs)
+    assert payload["reader_version"] == "v2"
+    assert payload["meta"] == {"engine_tag": admin["engine_tag"], "invocation_tag": admin["invocation_tag"]}
+    assert payload["release_id"] == admin["release_id"]
+    assert [item["id"] for item in payload["categories"]] == list(FROZEN_MAGIC10_ORDER)
+    assert len(payload["categories"]) == 10
+    assert body.endswith(b"\n")
+    ineligible_body, ineligible = emit_reader_public_envelope(eligible=False, reader_version="v2")
+    assert ineligible["reader_version"] == "v2" and ineligible["categories"] == []
+    assert ineligible["release_id"] == admin["release_id"]
+    assert ineligible_body.endswith(b"\n")
+    with pytest.raises(ValueError):
+        emit_reader_public_envelope(eligible=True, reader_version="v2")
+    with pytest.raises(ValueError):
+        emit_reader_public_envelope(eligible=True, reader_version="v3", harmony_band="Open")
 
 
 def test_release_identity_is_derived_from_the_packaged_manifest():

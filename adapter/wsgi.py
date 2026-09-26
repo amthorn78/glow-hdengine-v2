@@ -2,7 +2,7 @@ import os
 from flask import Flask, Blueprint, jsonify, request, make_response, Response
 from engine.presenter.emitter import emit_public
 from engine.stable.sercanon import serialize
-from adapter.http_reader import bp as reader_bp
+from adapter.http_reader import api_bp as reader_api_bp, bp as reader_bp
 from engine.http.compat_handler import compat_blueprint
 from adapter.logging_filter import install as install_logging_filter
 from adapter.env_guard import validate_or_fail
@@ -21,6 +21,7 @@ def create_app():
 
     # Register reader + compat blueprints
     app.register_blueprint(reader_bp)
+    app.register_blueprint(reader_api_bp, url_prefix="/api")  # production Reader: POST /api/reader (PF05 §5.4)
     app.register_blueprint(compat_blueprint)
 
     def _apply_common_headers(resp: Response) -> Response:
