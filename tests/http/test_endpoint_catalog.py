@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from adapter.http_reader import create_app
-from tools.evidence.generate_a7_transport_proofs import validate_catalog
+from tools.evidence.generate_a7_transport_proofs import catalog_obj, validate_catalog
 
 def _catalog():
     return json.loads(Path("docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8"))
@@ -48,3 +48,44 @@ def test_internal_dev_sampler_cataloged_as_internal_non_a7_dev_harness(monkeypat
     app = create_app()
     app.config.update(TESTING=True)
     assert app.test_client().get("/internal/dev/sampler").status_code == 405
+
+
+def _production_rows(cat):
+    return [e for e in cat["endpoints"] if e["path"] == "/api/reader"]
+
+
+def _assert_production_row(cat):
+    rows = _production_rows(cat)
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["method"] == "POST"
+    assert row["classification"] == "public_reader"
+    assert row["internal"] is False
+    assert row["a7_eligible"] is False
+    assert row["env_gate"] == "not_applicable_public"
+    assert row["blueprint_module"] == "adapter.http_reader"
+    assert "v=2" in row["description"] and "v=1" in row["description"]
+    assert cat["success_endpoints"] == [{"method": "GET", "path": "/reader"}]
+    target = validate_catalog(cat)
+    assert target["method"] == "GET" and target["path"] == "/reader"
+
+
+def test_authored_catalog_carries_the_production_reader_row():
+    _assert_production_row(catalog_obj())
+
+
+def test_tracked_catalog_carries_the_production_reader_row():
+    cat = _catalog()
+    _assert_production_row(cat)
+    mirror = json.loads(Path("artifacts/audit/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8"))
+    assert mirror == cat
+
+
+def test_production_reader_route_refuses_get_with_the_governed_405(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "dev")
+    app = create_app()
+    app.config.update(TESTING=True)
+    resp = app.test_client().get("/api/reader?v=2")
+    assert resp.status_code == 405
+    assert resp.headers.get("Allow") == "POST"
+    assert json.loads(resp.data)["code"] == "ERR_NOT_FOUND"

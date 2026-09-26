@@ -54,6 +54,15 @@ def test_valid_unique_reader_designation():
     assert target['internal'] is True
     sampler=[e for e in cat()['endpoints'] if e['path']=='/internal/dev/sampler']
     assert len(sampler)==1 and sampler[0]['method']=='POST' and sampler[0]['a7_eligible'] is False
+    production=[e for e in cat()['endpoints'] if e['path']==g.PRODUCTION_READER_PATH]
+    assert len(production)==1 and production[0]['method']=='POST' and production[0]['classification']=='public_reader'
+    assert production[0]['internal'] is False and production[0]['a7_eligible'] is False and production[0]['env_gate']=='not_applicable_public'
+def test_production_row_missing_or_duplicated_rejected():
+    invalid(lambda c: c['endpoints'].remove(next(e for e in c['endpoints'] if e['path']==g.PRODUCTION_READER_PATH)))
+    invalid(lambda c: c['endpoints'].append(dict(next(e for e in c['endpoints'] if e['path']==g.PRODUCTION_READER_PATH), method='PUT')))
+    invalid(lambda c: next(e for e in c['endpoints'] if e['path']==g.PRODUCTION_READER_PATH).__setitem__('internal', True))
+    invalid(lambda c: next(e for e in c['endpoints'] if e['path']==g.PRODUCTION_READER_PATH).__setitem__('a7_eligible', True))
+    invalid(lambda c: c.__setitem__('success_endpoints',[{'method':'POST','path':g.PRODUCTION_READER_PATH}]))
 def test_no_designation(): invalid(lambda c: c.__setitem__('success_endpoints', []))
 def test_duplicate_designation(): invalid(lambda c: c.__setitem__('success_endpoints', [{'method':'GET','path':'/reader'},{'method':'GET','path':'/reader'}]))
 def test_ambiguous_designation(): invalid(lambda c: c['endpoints'].append(dict(c['endpoints'][-2])))
@@ -93,16 +102,20 @@ def test_capture_get_head_304_writer_encoding_env_and_restore(admitted):
 def test_post_reader_is_the_pf05_non_conditional_422_fact(admitted):
     proof = g.build()[g.PROOFS[4]].decode()
     assert proof == (
-        'POST /reader\nstatus=422\ncode=ERR_READER_INVALID_INPUT\ncache_control=no-store\n'
+        'POST /api/reader\nstatus=422\ncode=ERR_READER_INVALID_INPUT\ncache_control=no-store\n'
         'etag_absent=true\nconditional_not_304=true\ncanonical_body=true\n'
     )
     # A 405 (or any other status) for the query-only POST is a failed capture, never accepted.
     app = g.create_app(); app.config.update(TESTING=True)
     with app.test_client() as client:
-        resp = client.post('/reader', query_string=g.q(), headers={'If-None-Match': '"deadbeef"'})
+        resp = client.post(g.PRODUCTION_READER_PATH, query_string=g.q(), headers={'If-None-Match': '"deadbeef"'})
+        unprefixed = client.post('/reader', query_string=g.q(), headers={'If-None-Match': '"deadbeef"'})
     assert resp.status_code == 422
     assert resp.headers.get('Cache-Control') == 'no-store' and 'ETag' not in resp.headers
     assert json.loads(resp.data) == {"schema": "v1", "ok": False, "code": "ERR_READER_INVALID_INPUT", "error": json.loads(resp.data)["error"]}
+    # PF05 §5.4: the unprefixed POST /reader is not the capture target; it is the governed 405.
+    assert unprefixed.status_code == 405 and json.loads(unprefixed.data)["code"] == "ERR_NOT_FOUND"
+    assert unprefixed.headers.get('Allow') == 'GET, HEAD'
 
 def test_composite_unknown_key_rejected(admitted):
     comp=json.loads(g.build()[g.PROOFS[6]]); comp['unknown']=True
