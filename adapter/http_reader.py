@@ -3,7 +3,7 @@ import hashlib, json, os
 from collections import ChainMap
 from datetime import datetime, timezone
 from pathlib import Path
-from flask import Blueprint, Response, request, Flask, g
+from flask import Blueprint, Response, request, Flask, current_app, g
 from threading import Lock
 from engine.presenter.emitter import emit_public
 from engine.serializer import canon
@@ -17,7 +17,6 @@ from engine.compat.compute import (
     conjunction_public_resolved,
     evaluate_pair,
     evaluation_party,
-    harmony_band,
     is_ineligible_carrier,
 )
 from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError, admission_token_for
@@ -362,6 +361,59 @@ class _ReaderFailure(Exception):
         self.status = status
 
 
+def _error(token: str, code: int = 400):
+    """Governed Reader error: canonical ``error_v1`` bytes, ``no-store``, no ETag."""
+    envelope = error_envelope(token)
+    body_bytes = emit_public(envelope)
+    resp = Response(body_bytes, status=code, mimetype='application/json; charset=utf-8')
+    resp.headers['Cache-Control'] = 'no-store'
+    resp.headers.pop('ETag', None)
+    return resp, code
+
+
+_READER_VERSIONS = {"1": "v1", "2": "v2"}
+
+
+def _select_reader_version(allowed: tuple[str, ...]) -> str:
+    """PF05 §5.1.0 strict version selection.
+
+    Exactly one ``v`` query value, and that value in ``allowed``, selects the
+    Reader contract (``"1"`` → ``"v1"``, ``"2"`` → ``"v2"``, PF10 §2.23).
+    Anything else -- absent, empty, repeated, unsupported or malformed -- is
+    ``ERR_READER_INVALID_VERSION`` before any body read or lookup.
+    """
+
+    values = request.args.getlist("v")
+    if len(values) != 1 or values[0] not in allowed or values[0] not in _READER_VERSIONS:
+        raise _ReaderFailure("ERR_READER_INVALID_VERSION", 400)
+    return _READER_VERSIONS[values[0]]
+
+
+def _reader_method_not_allowed(allow: str) -> Response:
+    """Governed 405 (PF05 §5.4): canonical ``ERR_NOT_FOUND`` envelope, ``no-store``,
+    ``Allow`` naming the served methods, no ETag, no ``Content-Encoding``."""
+
+    body = emit_public(error_envelope("ERR_NOT_FOUND"))
+    resp = Response(body, status=405, mimetype="application/json; charset=utf-8")
+    resp.headers["Content-Type"] = "application/json; charset=utf-8"
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Allow"] = allow
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    resp.headers["Content-Length"] = str(len(body))
+    return resp
+
+
+def _dev_conjunction_local_lookup():
+    """F07 (PF10 §2.23): the dev conjunction routes may read an in-process
+    current-row lookup from app config.  The key is absent from every app
+    factory's default config, so nothing is fabricated by default; it is read
+    only behind ``_dev_admin_gate`` and never by the production Reader."""
+
+    lookup = current_app.config.get("DEV_CONJUNCTION_LOCAL_LOOKUP")
+    return lookup if callable(lookup) else None
+
+
 def _admission_failure(exc: RegistryConfigError) -> _ReaderFailure:
     token = admission_token_for(getattr(exc, "code", None))
     return _ReaderFailure(token, MAGIC10_HTTP_STATUS[token])
@@ -387,13 +439,24 @@ def _reader_failure(exc: BaseException) -> _ReaderFailure:
     raise exc
 
 
-def _evaluate_reader_pair(left_resolved, right_resolved) -> tuple[bool, str | None, str | None]:
-    """Eligibility before core, cache and router; returns ``(eligible, band, release_id)``."""
+def _evaluate_reader_pair(
+    left_resolved, right_resolved
+) -> tuple[bool, tuple[tuple[str, str], ...] | None, str | None]:
+    """Eligibility before core, cache and router; returns ``(eligible, bands, release_id)``.
+
+    ``bands`` is the ordered tuple of ``(category_id, band)`` rows of the
+    validated complete result (``validate_compat_result`` checked the row order
+    against the registry), or ``None`` when the pair is ineligible.  The first
+    row is ``harmony`` by that order; anything else is a result-schema refusal.
+    """
 
     result = evaluate_pair(evaluation_party(left_resolved), evaluation_party(right_resolved))
     if is_ineligible_carrier(result):
         return False, None, None
-    return True, harmony_band(result), str(result["release_id"])
+    bands = tuple((str(row["category_id"]), str(row["band"])) for row in result["categories"])
+    if not bands or bands[0][0] != "harmony":
+        raise CompatBoundaryError("result_schema", detail="harmony")
+    return True, bands, str(result["release_id"])
 
 
 def _parse_reader_post_body() -> tuple[str, str]:
@@ -442,9 +505,70 @@ def _reader_current_rows(ids: tuple[str, ...]) -> dict[str, object]:
         rows[canonical_id] = row
     return rows
 
+def _production_reader_response(emit_fn):
+    """PF05 §5.1.0 production Reader: strict version selection, read-only
+    current-row resolution, eligibility, then the single emitter -- Reader v1
+    (``harmony`` only) or Reader v2 (the ordered full Magic-10, PF10 §2.23).
+    POST is non-conditional (§5.3): no ETag, ``If-*`` ignored, errors ``no-store``."""
+
+    try:
+        version = _select_reader_version(("1", "2"))
+        a_id, b_id = _parse_reader_post_body()
+        rows = _reader_current_rows((a_id, b_id))
+        left_resolved = resolve_compat_chart({"user_id": a_id}, source_policy="local", env=None, local_lookup=rows.get)
+        right_resolved = resolve_compat_chart({"user_id": b_id}, source_policy="local", env=None, local_lookup=rows.get)
+        eligible, bands, result_release_id = _evaluate_reader_pair(left_resolved, right_resolved)
+    except (_ReaderFailure, CompatBoundaryError, BodyGraphProjectionError, RegistryConfigError, MappedCacheError, AdapterError) as exc:
+        failure = _reader_failure(exc)
+        return _error(failure.token, failure.status)
+    meta = identity_meta()
+    body = emit_fn(
+        None,
+        None,
+        engine_tag=meta["engine_tag"],
+        invocation_tag=meta["invocation_tag"],
+        release_id=result_release_id or meta["release_id"],
+        eligible=eligible,
+        harmony_band=bands[0][1] if eligible else None,
+        reader_version=version,
+        categories=bands if version == "v2" else None,
+    )
+    resp = Response(body, status=200)
+    _set_reader_200_headers(resp)
+    resp.headers.pop("ETag", None)
+    resp.headers["Content-Length"] = str(len(body))
+    return resp, 200
+
+
+def get_reader_api_bp(emit_fn=None):
+    """
+    Factory: the production Reader blueprint, mounted under ``/api`` by every app
+    factory (PF05 §5.4).  It serves ``POST /reader`` (``v=1`` Reader v1, ``v=2``
+    Reader v2) and refuses every other method with the governed 405.
+    emit_fn(a, b, *, engine_tag, invocation_tag, release_id, eligible, harmony_band,
+            reader_version, categories) -> bytes
+    """
+    if emit_fn is None:
+        emit_fn = emit_reader_public_bytes
+    bp = Blueprint("reader_api", __name__)
+
+    @bp.route("/reader", methods=["POST"], provide_automatic_options=False)
+    def reader_post():
+        return _production_reader_response(emit_fn)
+
+    @bp.route("/reader", methods=["GET", "HEAD", "OPTIONS", "PUT", "PATCH", "DELETE"], provide_automatic_options=False)
+    def reader_method_not_allowed():
+        return _reader_method_not_allowed("POST")
+
+    return bp
+
+
 def get_reader_bp(emit_fn=None):
     """
-    Factory: returns a Blueprint exposing /reader (to be mounted under /api).
+    Factory: returns the dev/internal Blueprint exposing the dev ``GET /reader``
+    fixture route, ``/aux/narrative``, the ops probes and the dev conjunction
+    routes (mounted at the root).  The production ``POST /reader`` lives on
+    ``get_reader_api_bp`` under ``/api``.
     emit_fn(a, b, *, engine_tag, invocation_tag, release_id, eligible, harmony_band) -> bytes
     """
     if emit_fn is None:
@@ -453,8 +577,10 @@ def get_reader_bp(emit_fn=None):
 
     @bp.get("/reader")
     def reader_v1():
-        if request.args.get("v") != "1":
-            return _error("ERR_READER_INVALID_VERSION")
+        try:
+            _select_reader_version(("1",))
+        except _ReaderFailure as exc:
+            return _error(exc.token, exc.status)
         if os.environ.get("APP_ENV", "dev") != "dev":
             return _error("ERR_READER_FORBIDDEN", 403)
 
@@ -482,7 +608,7 @@ def get_reader_bp(emit_fn=None):
         try:
             left_resolved = resolve_compat_chart(a, source_policy="local", env=None)
             right_resolved = resolve_compat_chart(b, source_policy="local", env=None)
-            eligible, band, result_release_id = _evaluate_reader_pair(left_resolved, right_resolved)
+            eligible, bands, result_release_id = _evaluate_reader_pair(left_resolved, right_resolved)
         except (CompatBoundaryError, BodyGraphProjectionError, RegistryConfigError) as exc:
             failure = _reader_failure(exc)
             return _error(failure.token, failure.status)
@@ -493,7 +619,7 @@ def get_reader_bp(emit_fn=None):
             invocation_tag=meta["invocation_tag"],
             release_id=result_release_id or meta["release_id"],
             eligible=eligible,
-            harmony_band=band,
+            harmony_band=bands[0][1] if eligible else None,
         )
         etag = "\"" + _sha256_hex(body) + "\""
         tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
@@ -572,38 +698,13 @@ def get_reader_bp(emit_fn=None):
 
         return resp
 
-    @bp.post("/reader")
-    def reader_v1_post():
-        """PF05 §5.1.0 production Reader: read-only current-row resolution, then
-        eligibility, then the single emitter.  POST is non-conditional (§5.3):
-        no ETag, ``If-*`` ignored, errors ``no-store``."""
+    @bp.route("/reader", methods=["POST"], provide_automatic_options=False)
+    def reader_post_not_allowed():
+        """PF05 §5.4 / PF10 §2.16 §4: the production Reader is served only under
+        the ``/api`` prefix (``get_reader_api_bp``).  The unprefixed ``POST /reader``
+        is a governed 405 so no production handler is reachable outside it."""
 
-        if request.args.get("v") != "1":
-            return _error("ERR_READER_INVALID_VERSION")
-        try:
-            a_id, b_id = _parse_reader_post_body()
-            rows = _reader_current_rows((a_id, b_id))
-            left_resolved = resolve_compat_chart({"user_id": a_id}, source_policy="local", env=None, local_lookup=rows.get)
-            right_resolved = resolve_compat_chart({"user_id": b_id}, source_policy="local", env=None, local_lookup=rows.get)
-            eligible, band, result_release_id = _evaluate_reader_pair(left_resolved, right_resolved)
-        except (_ReaderFailure, CompatBoundaryError, BodyGraphProjectionError, RegistryConfigError, MappedCacheError, AdapterError) as exc:
-            failure = _reader_failure(exc)
-            return _error(failure.token, failure.status)
-        meta = identity_meta()
-        body = emit_fn(
-            None,
-            None,
-            engine_tag=meta["engine_tag"],
-            invocation_tag=meta["invocation_tag"],
-            release_id=result_release_id or meta["release_id"],
-            eligible=eligible,
-            harmony_band=band,
-        )
-        resp = Response(body, status=200)
-        _set_reader_200_headers(resp)
-        resp.headers.pop("ETag", None)
-        resp.headers["Content-Length"] = str(len(body))
-        return resp, 200
+        return _reader_method_not_allowed("GET, HEAD")
 
     def _rails_state() -> str:
         safe_mode = os.getenv("SAFE_MODE", "1")
@@ -815,7 +916,7 @@ def get_reader_bp(emit_fn=None):
                 viewer_top=CATEGORIES_ORDER_V1[0],
                 viewer_weights=_default_viewer_weights(),
                 env=rails_env,
-                local_lookup=None,
+                local_lookup=_dev_conjunction_local_lookup(),
             )
         except CompatBoundaryError as exc:
             return _writer_error(
@@ -948,17 +1049,10 @@ def get_reader_bp(emit_fn=None):
             return gate
         return _emit_dev_writer_conjunction_response()
 
-    def _error(token: str, code: int = 400):
-        envelope = error_envelope(token)
-        body_bytes = emit_public(envelope)
-        resp = Response(body_bytes, status=code, mimetype='application/json; charset=utf-8')
-        resp.headers['Cache-Control'] = 'no-store'
-        resp.headers.pop('ETag', None)
-        return resp, code
-
     return bp
 
 bp = get_reader_bp()
+api_bp = get_reader_api_bp()
 
 # === EPIC-005 /internal/version (Blueprint: bp) ===
 # /internal/version stays DB-decoupled and obtains immutable identity from the runtime authority.
@@ -1055,6 +1149,8 @@ def create_app():
     except Exception as _e:
         # if bp is not defined yet, raise a clear error for operator
         raise RuntimeError("Blueprint 'bp' not found in adapter/http_reader.py") from _e
+    # production Reader blueprint under the /api prefix (PF05 §5.4)
+    app.register_blueprint(api_bp, url_prefix="/api")
 
     # compat blueprint (shared with wsgi) -- scoped to compat routes only
     app.register_blueprint(compat_blueprint)

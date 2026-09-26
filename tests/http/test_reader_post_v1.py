@@ -1,6 +1,8 @@
-"""PF05 §5.1.0 / §5.3 production Reader POST and the dev GET fixture route (HDE-EPIC040-PR04)."""
+"""PF05 §5.1.0 / §5.3 production Reader POST (mounted under ``/api``, PF05 §5.4; HDE-EPIC040-PR06a)
+and the dev GET fixture route (HDE-EPIC040-PR04)."""
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -65,7 +67,7 @@ def _client():
 
 def _post(client, body=None, *, raw: bytes | None = None, query="v=1", headers=None):
     data = raw if raw is not None else (json.dumps(body, sort_keys=True).encode("utf-8") if body is not None else None)
-    return client.post(f"/reader?{query}" if query else "/reader", data=data, headers=headers or {"Content-Type": "application/json; charset=utf-8"})
+    return client.post(f"/api/reader?{query}" if query else "/api/reader", data=data, headers=headers or {"Content-Type": "application/json; charset=utf-8"})
 
 
 def _assert_error(resp, token, status, db=None):
@@ -84,6 +86,22 @@ def _assert_error(resp, token, status, db=None):
 
 def test_missing_version_is_the_existing_version_error(db):
     _assert_error(_post(_client(), {"a_id": UUID_A, "b_id": UUID_B}, query=""), "ERR_READER_INVALID_VERSION", 400, db)
+
+
+@pytest.mark.parametrize("query", ["v=1&v=1", "v=1&v=2", "v=", "v=01"])
+def test_duplicated_or_malformed_version_is_refused_before_any_lookup(db, query):
+    _assert_error(_post(_client(), {"a_id": UUID_A, "b_id": UUID_B}, query=query), "ERR_READER_INVALID_VERSION", 400, db)
+
+
+def test_unprefixed_post_reader_is_the_governed_405(db):
+    """PF05 §5.4 / PF10 §2.16 §4: no production handler is served outside the ``/api`` prefix."""
+    resp = _client().post("/reader?v=1", data=json.dumps({"a_id": UUID_A, "b_id": UUID_B}), headers={"Content-Type": "application/json; charset=utf-8"})
+    assert resp.status_code == 405
+    assert resp.headers.get("Allow") == "GET, HEAD"
+    assert resp.headers.get("Cache-Control") == "no-store"
+    assert "ETag" not in resp.headers
+    assert json.loads(resp.data) == {"schema": "v1", "ok": False, "code": "ERR_NOT_FOUND", "error": "not found"}
+    assert db.queries == []
 
 
 @pytest.mark.parametrize(
@@ -126,7 +144,7 @@ def test_body_without_content_length_is_bounded_before_buffering(db):
     )
     stream = io.BytesIO(oversized)
     resp = _client().post(
-        "/reader?v=1",
+        "/api/reader?v=1",
         headers={"Content-Type": "application/json; charset=utf-8"},
         environ_overrides={"wsgi.input": stream, "wsgi.input_terminated": True, "CONTENT_LENGTH": ""},
     )
@@ -214,6 +232,7 @@ def test_real_admission_owner_serves_the_admitted_release(db, monkeypatch):
     body = json.loads(resp.data.decode("utf-8"))
     assert list(body) == SIX_KEYS
     assert body["release_id"] == identity_meta()["release_id"]
+    assert body["release_id"] == hashlib.sha256(Path("catalog/manifest.json").read_bytes()).hexdigest()
 
 
 # --- success ------------------------------------------------------------------------------
@@ -250,7 +269,7 @@ def test_post_is_non_conditional(db):
 
     etag = '"' + hashlib.sha256(first.data).hexdigest() + '"'
     conditional = client.post(
-        "/reader?v=1",
+        "/api/reader?v=1",
         data=json.dumps({"a_id": UUID_A, "b_id": UUID_B}),
         headers={"Content-Type": "application/json; charset=utf-8", "If-None-Match": etag},
     )
@@ -333,3 +352,38 @@ def test_dev_get_route_refuses_legacy_or_incomplete_fixtures(tmp_path, monkeypat
     resp = client.get("/reader", query_string={"v": "1", "a": str(incomplete), "b": str(good), "a_tz": "UTC", "b_tz": "UTC"})
     assert resp.status_code == 503 and json.loads(resp.data)["code"] == "ERR_M10_BODYGRAPH_INCOMPLETE"
     assert "ETag" not in resp.headers and resp.headers.get("Cache-Control") == "no-store"
+
+
+# --- dev GET bytes unchanged (PR06a: Reader v1 bytes are byte-for-byte pre-change) -------------------
+
+# Recorded at the planning baseline (main 547dc5b, before any PR06a change): the dev GET /reader
+# bytes for fixtures/charts/{alice,bob}.json through the pre-change emitter under the fixed
+# synthetic identity (Isis5 / INV-000000 / release_id "a"*64).
+PRE_CHANGE_DEV_GET_BYTES = (
+    b'{"categories":[{"band":"Cool","id":"harmony"}],"eligible":true,'
+    b'"idempotence_hash":"400041025cdb2c8e4b14bb428abc2a43eb182b6126b9d69b6f614f6257731145",'
+    b'"meta":{"engine_tag":"Isis5","invocation_tag":"INV-000000"},"reader_version":"v1",'
+    b'"release_id":"' + b"a" * 64 + b'"}\n'
+)
+
+
+def test_dev_get_bytes_for_the_fixture_pair_are_unchanged():
+    from flask import Flask
+    from engine.runtime.public import emit_reader_public_bytes
+
+    seen = {}
+
+    def fixed_identity(a, b, *, engine_tag, invocation_tag, release_id, eligible, harmony_band):
+        seen.update({"eligible": eligible, "harmony_band": harmony_band})
+        return emit_reader_public_bytes(a, b, engine_tag="Isis5", invocation_tag="INV-000000", release_id="a" * 64, eligible=eligible, harmony_band=harmony_band)
+
+    app = Flask(__name__)
+    app.register_blueprint(http_reader.get_reader_bp(emit_fn=fixed_identity))
+    client = app.test_client()
+    params = _fixture_params()
+    resp = client.get("/reader", query_string=params, headers={"Accept-Encoding": "identity"})
+    assert resp.status_code == 200, resp.data
+    assert resp.data == PRE_CHANGE_DEV_GET_BYTES
+    assert seen == {"eligible": True, "harmony_band": "Cool"}
+    swapped = client.get("/reader", query_string=_fixture_params(a=params["b"], b=params["a"]), headers={"Accept-Encoding": "identity"})
+    assert swapped.data == PRE_CHANGE_DEV_GET_BYTES

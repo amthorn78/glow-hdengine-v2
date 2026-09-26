@@ -116,11 +116,21 @@ def test_reader_a7_transport_invariants(monkeypatch):
     assert cond_resp.headers.get("ETag") == etag
     assert cond_resp.headers.get("Vary") == get_resp_identity.headers.get("Vary")
 
-    # PF05 §5.3: POST is non-conditional; query-only input is not a Reader request.
+    # PF05 §5.4: the production Reader is served only under /api; the unprefixed
+    # POST /reader is the governed 405 (no ETag, no-store).
     post_resp = client.post("/reader", query_string=params)
-    assert post_resp.status_code == 422
-    assert post_resp.get_json()["code"] == "ERR_READER_INVALID_INPUT"
+    assert post_resp.status_code == 405
+    assert post_resp.get_json()["code"] == "ERR_NOT_FOUND"
+    assert post_resp.headers.get("Allow") == "GET, HEAD"
     assert "ETag" not in post_resp.headers
     assert post_resp.headers.get("Cache-Control") == "no-store"
-    conditional_post = client.post("/reader", query_string=params, headers={"If-None-Match": etag})
+
+    # PF05 §5.3: POST is non-conditional; query-only input is not a Reader request.
+    api_post = client.post("/api/reader", query_string=params)
+    assert api_post.status_code == 422
+    assert api_post.get_json()["code"] == "ERR_READER_INVALID_INPUT"
+    assert "ETag" not in api_post.headers
+    assert api_post.headers.get("Cache-Control") == "no-store"
+    conditional_post = client.post("/api/reader", query_string=params, headers={"If-None-Match": etag})
     assert conditional_post.status_code == 422
+    assert conditional_post.data == api_post.data

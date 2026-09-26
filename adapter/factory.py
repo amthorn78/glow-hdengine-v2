@@ -1,5 +1,5 @@
 from flask import Flask, request as _req
-from adapter.http_reader import bp  # existing blueprint with /internal/version
+from adapter.http_reader import api_bp, bp  # dev/internal blueprint and the production Reader blueprint
 from engine.http.compat_handler import (
     compat_blueprint,
     compat_error_response,
@@ -9,6 +9,7 @@ from engine.http.compat_handler import (
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(bp, url_prefix="")  # mount at /
+    app.register_blueprint(api_bp, url_prefix="/api")  # production Reader: POST /api/reader (PF05 §5.4)
     app.register_blueprint(compat_blueprint)
     @app.after_request
     def _strip_etag_on_internal(resp):
