@@ -76,7 +76,39 @@ def scan_names(text: str, stems: list[str], single: list[str]) -> list[str]:
     return violations
 
 
+def _wrapped_pairs(text: str) -> list[tuple[int, str, int]]:
+    """Adjacent prose lines joined as Markdown renders them: (line number, joined text, boundary)."""
+    lines = [raw.replace("*", "").replace("`", "") for raw in text.splitlines()]
+    pairs: list[tuple[int, str, int]] = []
+    for index in range(len(lines) - 1):
+        first, second = lines[index].rstrip(), lines[index + 1].strip()
+        if not first.strip() or not second or second.startswith(("#", "-", "|", ">")) or re.match(r"\d+[.)]\s", second):
+            continue
+        pairs.append((index + 1, f"{first} {second}", len(first)))
+    return pairs
+
+
 def scan(text: str, titles: list[str]) -> list[str]:
+    violations = _scan_lines(text, titles)
+    # A citation split across a soft line break is still one citation.
+    patterns = [
+        ("pf_document_named", _PF_NUMBER),
+        ("pf10_locator", _PF10_LOCATOR),
+        ("pf10_version", _PF10_VERSION),
+        ("pf10_heading", _PF10_HEADING),
+        ("addendum_number", _ADDENDUM_NUMBER),
+    ] + [("pf_title", re.compile(re.escape(title).replace(r"\ ", r"\s+"), re.IGNORECASE)) for title in titles]
+    for number, joined, boundary in _wrapped_pairs(text):
+        for label, pattern in patterns:
+            for match in pattern.finditer(joined):
+                if match.start() < boundary < match.end():
+                    if label == "pf_document_named" and match.group(1) == "10":
+                        continue
+                    violations.append(f"AGENTS.md:{number}:{label}:{' '.join(match.group(0).split())}")
+    return violations
+
+
+def _scan_lines(text: str, titles: list[str]) -> list[str]:
     violations: list[str] = []
     for number, raw_line in enumerate(text.splitlines(), 1):
         # Emphasis and code markers must not hide a citation.

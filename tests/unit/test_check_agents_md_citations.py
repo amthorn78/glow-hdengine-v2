@@ -91,3 +91,19 @@ def test_single_word_and_exact_file_names(tmp_path: Path) -> None:
     assert any(":pf_filename:" in r for r in check.scan_names("see PF-Invocation.md\n", stems, single))
     assert any(":pf_title:" in r for r in check.scan_names("per the Invocation document\n", stems, single))
     assert check.scan_names("each prompt invocation is recorded\n", stems, single) == []
+
+
+@pytest.mark.parametrize(
+    ("text", "kind"),
+    [
+        ("PF10 governs as described in\n§2.29 of that document.\n", "pf10_locator"),
+        ("Apply HDE Build Notes\nv13.4.2 here.\n", "pf10_version"),
+        ("Read HDE\nGovernance first.\n", "pf_title"),
+    ],
+)
+def test_wrapped_citations_are_rejected(text: str, kind: str) -> None:
+    assert any(f":{kind}:" in row for row in check.scan(text, TITLES))
+
+
+def test_list_items_are_not_joined() -> None:
+    assert check.scan("PF10 governs.\n- 2 items follow\n", TITLES) == []

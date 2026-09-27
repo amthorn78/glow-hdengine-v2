@@ -23,8 +23,12 @@ _LABEL = re.compile(r"^\s*(#{1,6}\s*|\*\*|[-*]\s*)?canon relied on\s*(\*\*)?\s*(
 _HEADING = re.compile(r"^\s*#{1,6}\s")
 
 
+_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
 def has_block(text: str) -> bool:
-    lines = text.splitlines()
+    # HTML comments (template placeholders) are not attribution.
+    lines = _COMMENT.sub("", text).splitlines()
     for index, line in enumerate(lines):
         if not _LABEL.match(line):
             continue
