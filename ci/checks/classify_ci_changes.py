@@ -187,6 +187,7 @@ _ARCHITECTURE_ANALYSIS_PATHS = {
     "tools/evidence/generate_architecture_snapshot.py",
 }
 _WORKFLOW_CONTROL_PATH_LANES = {
+    "ci/checks/check_agents_md_citations.py": {"product"},
     "ci/checks/check_env_pins.sh": set(LANES),
     "ci/checks/check_cli_help.sh": {"compat"},
     "ci/checks/run_rails_job_definitions.py": {"rails", "release"},

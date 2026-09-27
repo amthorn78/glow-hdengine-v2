@@ -314,6 +314,7 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
         (["tests/transport/headers/aux_text_200.snap.path_proof.txt"], {"evidence"}, "selected_lanes"),
         (["tests/README.md"], set(), "documentation_only"),
         ([".claude/settings.json"], set(), "documentation_only"),
+        (["ci/checks/check_agents_md_citations.py"], {"product"}, "selected_lanes"),
         ([".github/workflows/ci.yml"], set(classifier.LANES), "selected_lanes"),
         ([".github/workflows/epic-closeout-validation.yml"], set(classifier.LANES), "selected_lanes"),
         (["ci/checks/classify_ci_changes.py"], set(classifier.LANES), "selected_lanes"),

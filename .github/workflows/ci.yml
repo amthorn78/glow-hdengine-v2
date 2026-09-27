@@ -57,6 +57,10 @@ jobs:
             --github-output "$GITHUB_OUTPUT" \
             --changed-tests-output "$RUNNER_TEMP/ci-changed-test-targets.txt"
 
+      - name: Check AGENTS.md cites no project documents
+        shell: bash
+        run: python3 ci/checks/check_agents_md_citations.py
+
       - name: Set up Python 3.12
         id: python_setup
         if: ${{ steps.classify.outputs.needs_python == 'true' }}
