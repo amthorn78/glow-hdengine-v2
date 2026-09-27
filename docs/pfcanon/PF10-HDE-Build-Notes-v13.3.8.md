@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.3.7**  
-Effective Date: Sep 26, 2026  
+**Version: v13.3.8**  
+Effective Date: Sep 27, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -207,7 +207,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.22 HDE-EPIC040-PR06 — PR Work-Unit Lineage Review v1.0  
 * 2.23 HDE-EPIC040-PR07-F01 — Add PR06a for Reader v2 Full Magic-10 Exposure and the Deferred Reader Contract Work  
 * 2.24 HDE-EPIC040-PR06a — PR Work-Unit Lineage Review v1.0  
-* 2.25 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)
+* 2.25 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)  
+* 2.26 HDE-EPIC040-PR06b — PR Work-Unit Lineage Review v1.0
 
 # **2\) Numbered Addenda**
 
@@ -2715,5 +2716,52 @@ Focused suites
 ### 7\. Native return
 
 HDE-EPIC040-PR06b is ACCEPTED\_FINAL. The next unit is PR07, the documentation-only DOC-10, and its PR-10 stage may begin. PR07 documents Reader v2, /api/reader and the v1 schema as PR06a and PR06b delivered them. After PR07 comes OPS01, which verifies the 1.3.0 release (52be4558…).
+
+## 2.27 HDE-EPIC040-OPS01 — OPS\_EXECUTION\_RESULT v1.4
+
+### Outcome
+
+OPS\_EXECUTION\_RESULT: PASS  
+The v1.3 task's supplemental adverse-check script exited 0 and printed:  
+RESULT: PASS (A-5, A-6, A-7 refused as required)  
+The task's post-check reported post\_check=OK. The disposable fixture bundle built and verified successfully (build\_exit=0, verify\_exit=0).
+
+### Authorization record
+
+The P-0 record was written to /tmp/ops01\_p0.txt and included verbatim in the script log:  
+PO delegation reference: In this session, the PO instructed, "we need to run the ops task referenced here: docs/ephemeral/HDE-EPIC040-OPS01-ops-task-v1.3.md" and confirmed "proceed" after being asked to authorize this execution. This directs the automated session to execute HDE-EPIC040-OPS01, task v1.3, for adverse checks A-5, A-6, and A-7, against clean main, within this task record only, with no merge.
+
+### Candidate and preflight
+
+* Candidate HEAD: 6e4b3a109c0fe270cbbf51c033e63aa460792002 (main, OPS\_TASK v1.3, PR \#526).  
+* The local main was fast-forwarded from 5cf3189226fec6522cd842ecab23722d4941c843; the candidate tree was clean before dispatch and the script's post-check passed.  
+* Runtime: Python 3.11.16; dependencies and editable repository package installed from requirements.txt, requirements-dev.txt, and \-e ..  
+* P-3 import probe, run from /tmp: import engine, jsonschema; print('env\_ready') printed env\_ready.  
+* Script SHA-256: 8a6e0af8fee7d6f3d34916fef6efd7458cdb11020151a2ff4a875813fe7d361c, matching the v1.3 task record.  
+* Key probe: HD\_API\_KEY=UNSET, HD\_API\_BASE\_URL=UNSET, HDAPI\_BASE\_URL=UNSET, GEO\_API\_KEY=UNSET, DATABASE\_URL=UNSET.
+
+### Adverse checks
+
+* A-5 tampered attestation.json: exit 1; refusal RELEASE\_ATTESTATION\_FAILED:attestation\_contract\_invalid; REFUSED\_AS\_REQUIRED.  
+* A-6 tampered evidence file ./artifacts/audit/ENDPOINTS\_CATALOG.json: exit 1; refusal RELEASE\_ATTESTATION\_FAILED:attestation\_file\_binding\_invalid; REFUSED\_AS\_REQUIRED.  
+* A-7 committed change to release member schemas/reader.v2.schema.json: exit 1; refusal RELEASE\_ATTESTATION\_FAILED:isolated\_stage\_failed; REFUSED\_AS\_REQUIRED. This is not source\_tree\_not\_clean and satisfies the task's stated A-7 refusal criterion.
+
+### Evidence storage
+
+The run was stored on branch ops/hde-epic040-ops01-supplemental-v1.3:
+
+* audit/ops/hde-epic040/ops01/ops01\_execution\_log.attempt5.md — exact script log, copied byte-for-byte from the temporary work directory's ops01\_execution\_log.attempt4.md.  
+* audit/ops/hde-epic040/ops01/SHA256SUMS — checksum ledger for the attestation files, build log, and attempt 1, 2, 4, and 5 logs.  
+* docs/ephemeral/HDE-EPIC040-OPS01-ops-execution-result-v1.4.md — this record.
+
+The prior accepted attestation and attempts 1, 2, and 4 were retained unchanged. Attempt 3 remains NOT\_PRODUCED and was not reconstructed.
+
+### Non-claims
+
+This result is bounded to OPS01 supplemental adverse checks. It is not a QA PASS, Live QA completion, final acceptance, acceptance-token satisfaction, PF09 status change, deployment, release activation, epic completion, or closeout. No network, vendor, or database call was made. No merge was performed or authorized.
+
+### Provenance
+
+GCFPE-USE-HDE-EPIC040-OPS-20-20260927-OPS01-01: OPS-20 — Execute Bounded Ops Task, executed under the P-0 record above. The evidence branch is to be published in one PR and must not be merged.
 
 \<eof\>  
