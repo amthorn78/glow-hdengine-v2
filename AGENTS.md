@@ -17,7 +17,7 @@
 - Without that explicit direction: do not edit an existing PF canon document; do not silently correct, modernize, reconcile or rewrite canon; do not patch conflicts in an earlier PF document; do not alter canon because implementation or review shows a rule is outdated or inconsistent.
 - When canon appears to conflict, determine the rule that governs the work, including whether PF10 already establishes a controlling override. Do not resolve the conflict by modifying canon. If canon itself needs a change, report or propose it.
 - When the prompt explicitly directs a canonical change, make only that change. A new override, amendment, clarification, exception or supersession of earlier canon is normally made as a new PF10 addendum. When adding, replacing, renaming or removing a directed PF file, preserve all unrelated content and report the resulting commit.
-- PF documents never cite PF10 by section, addendum number, heading, paragraph or version; PF10 is designed to keep growing, so such references become brittle.
+- PF documents other than PF10 never cite PF10 by section, addendum number, heading, paragraph or version; PF10 is designed to keep growing, so such references become brittle. PF10 addenda may cite other PF10 addenda.
 
 ## Codex reasoning and execution posture
 - For every complex task, use the most capable reasoning model available and the highest reasoning-effort setting available (for example, `model_reasoning_effort: high`). Never reduce reasoning effort for a complex task to optimize latency or cost.
