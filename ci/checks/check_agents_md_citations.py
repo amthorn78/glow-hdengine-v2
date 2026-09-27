@@ -21,6 +21,7 @@ _PF10_LOCATOR = re.compile(
     r"\bPF10(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,40}?(?:§\s*\d|\baddend(?:um|a)\s+\d|\bsection\s+\d))",
     re.IGNORECASE,
 )
+_PF10_VERSION = re.compile(r"\bPF10\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s`)*]+\.md")
 _TITLE_FROM_FILE = re.compile(r"^PF[\d.]+[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
@@ -52,6 +53,9 @@ def scan(text: str, titles: list[str]) -> list[str]:
                 violations.append(f"AGENTS.md:{number}:pf_document_named:{match.group(0)}")
         for match in _PF10_LOCATOR.finditer(line):
             violations.append(f"AGENTS.md:{number}:pf10_locator:{match.group(0).strip()}")
+        if not _PF10_LOCATOR.search(line):
+            for match in _PF10_VERSION.finditer(line):
+                violations.append(f"AGENTS.md:{number}:pf10_version:{match.group(0).strip()}")
         for match in _ADDENDUM_NUMBER.finditer(line):
             violations.append(f"AGENTS.md:{number}:addendum_number:{match.group(0)}")
         for match in _PFCANON_FILE.finditer(line):

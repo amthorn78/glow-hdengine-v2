@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """PostToolUse hook: review artifacts must carry a non-empty "Canon relied on" block.
 
-Fires after Write/Edit/MultiEdit. For a file under docs/ephemeral/ whose name marks
-it as a review or approval, it checks for a heading or label "Canon relied on"
+Fires after Write/Edit/MultiEdit. For a file under docs/ephemeral/ that is a review, approval, readiness,
+disposition, decision, verdict, acceptance, triage or audit artifact (by name or
+front-matter artifact_type), it checks for a heading or label "Canon relied on"
 followed by at least one non-empty line before the next heading. A missing or
 empty block returns decision "block", which feeds the reason back to the agent.
 It checks presence only: it cannot verify that the listed sections were read.
@@ -16,7 +17,8 @@ import re
 import sys
 from pathlib import Path
 
-_REVIEW_NAME = re.compile(r"(review|approv)", re.IGNORECASE)
+_REVIEW_NAME = re.compile(r"(review|approv|readiness|disposition|decision|verdict|acceptance|triage|audit)", re.IGNORECASE)
+_REVIEW_TYPE = re.compile(r"^artifact_type:\s*\S*(REVIEW|APPROV|READINESS|DISPOSITION|DECISION|VERDICT|ACCEPTANCE|TRIAGE|AUDIT)", re.IGNORECASE | re.MULTILINE)
 _LABEL = re.compile(r"^\s*(#{1,6}\s*|\*\*|[-*]\s*)?canon relied on\b", re.IGNORECASE)
 _HEADING = re.compile(r"^\s*#{1,6}\s")
 
@@ -45,11 +47,11 @@ def main() -> int:
     path = str((payload.get("tool_input") or {}).get("file_path") or "")
     if "docs/ephemeral/" not in path or not path.endswith(".md"):
         return 0
-    if not _REVIEW_NAME.search(Path(path).name):
-        return 0
     try:
         text = Path(path).read_text(encoding="utf-8")
     except OSError:
+        return 0
+    if not (_REVIEW_NAME.search(Path(path).name) or _REVIEW_TYPE.search(text[:4000])):
         return 0
     if has_block(text):
         return 0
