@@ -120,3 +120,8 @@ def test_reverse_order_locators_are_rejected(line: str) -> None:
 @pytest.mark.parametrize("text", ["Read HDE-Governance first.\n", "See Glow-QA-Guide.\n", "Read HDE-\nGovernance first.\n"])
 def test_hyphenated_titles_are_rejected(text: str) -> None:
     assert any(":pf_title:" in row for row in check.scan(text, TITLES))
+
+
+@pytest.mark.parametrize("line", ["Read PF-04 first.", "See PF 19.", "PF-10 section 2.29 applies."])
+def test_separated_pf_identifiers_are_rejected(line: str) -> None:
+    assert check.scan(line + "\n", TITLES) != []

@@ -16,17 +16,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-_PF_NUMBER = re.compile(r"\bPF(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
+_PF_NUMBER = re.compile(r"\bPF[ -]?(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
 _PF10_LOCATOR = re.compile(
-    r"\b(?:PF10|HDE[ -]Build[ -]Notes)(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,40}?(?:§\s*\d|¶\s*\d|\baddend(?:um|a)\s+\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d))",
+    r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,40}?(?:§\s*\d|¶\s*\d|\baddend(?:um|a)\s+\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d))",
     re.IGNORECASE,
 )
-_PF10_VERSION = re.compile(r"\b(?:PF10|HDE[ -]Build[ -]Notes)\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
+_PF10_VERSION = re.compile(r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
 # PF10 followed by a dash and a title other than its own ("HDE Build Notes") cites a heading.
-_PF10_HEADING = re.compile(r"\b(?:PF10|HDE[ -]Build[ -]Notes)\s*[—–:-]\s*(?!HDE[ -]Build[ -]Notes\b|PF10\b)[A-Za-z\"\'`*]")
-# The reverse order: "section 2.29 of PF10".
+_PF10_HEADING = re.compile(r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\s*[—–:-]\s*(?!HDE[ -]Build[ -]Notes\b|PF[ -]?10\b)[A-Za-z\"\'`*]")
+# The reverse order: "section 2.29 of PF10" (also "PF-10", "PF 10").
 _PF10_REVERSE = re.compile(
-    r"(?:[§¶]\s*|\baddend(?:um|a)\s+|\b(?:sub)?sections?\s+|\bparagraphs?\s+)\d+(?:\.\d+)*[^\n.;]{0,40}?\b(?:of|in|from)\s+(?:the\s+)?(?:PF10|HDE[ -]Build[ -]Notes)\b",
+    r"(?:[§¶]\s*|\baddend(?:um|a)\s+|\b(?:sub)?sections?\s+|\bparagraphs?\s+)\d+(?:\.\d+)*[^\n.;]{0,40}?\b(?:of|in|from)\s+(?:the\s+)?(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\b",
     re.IGNORECASE,
 )
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
