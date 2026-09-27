@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.4**  
+**Version: v13.4.1**  
 Effective Date: Sep 27, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -211,7 +211,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.26 HDE-EPIC040-PR06b — PR Work-Unit Lineage Review v1.0  
 * 2.27 HDE-EPIC040-OPS01 — OPS\_EXECUTION\_RESULT v1.4  
 * 2.28 HDE-EPIC040 — Change Audit Triage v1.0 (QA-10)  
-* 2.29 PF10-CANON-001 — Repository PF-Canon Authority, Change-Process Document Storage and Canon Consultation
+* 2.29 PF10-CANON-001 — Repository PF-Canon Authority, Change-Process Document Storage and Canon Consultation  
+* 2.30 PF10-CITE-001 — PF Documents Do Not Cite HDE Build Notes by Internal Locator
 
 # **2\) Numbered Addenda**
 
@@ -2943,5 +2944,60 @@ Within those scopes it supersedes these passages. Outside them, the documents st
 * `docs/prompt_ecosystem_management/authoritative-surfaces.md`, rule of precedence and "Not authoritative"  
 * `docs/ephemeral/HDE-EPIC040-QA70-planning-failure-rca-v1.1.md`  
 * `AGENTS.md`, "Canon-first rule"
+
+## 2.30 PF10-CITE-001 — PF Documents Do Not Cite HDE Build Notes by Internal Locator
+
+Timestamp: 092726 17:16 (UTC)  
+Details: Establishes that PF documents other than HDE Build Notes do not cite it by addendum number, section, heading, paragraph or version, and names the permanent passages that currently do as drain targets.
+
+### Source and authority
+
+This addendum records the Product Owner's governance rules of 2026-09-27 for PF-Canon references:
+
+* No PF document cites HDE Build Notes by addendum number, section number, heading, paragraph, version or any other internal locator.
+* HDE Build Notes addenda may cite other HDE Build Notes addenda. That is the only exception.
+* HDE Build Notes grows by addenda, so a locator in another document is brittle: addendum numbers and titles change between HDE Build Notes versions.
+
+### Rule
+
+A PF document other than HDE Build Notes acknowledges HDE Build Notes authority only through the canon's governance relationship. HDE Build Notes is the canonical override and amendment mechanism, and an applicable addendum governs conflicting earlier canon for its scope. Such a document names HDE Build Notes, at most, by title.
+
+An agent that meets an addendum-number citation in another PF document does not resolve it by number. It searches the current HDE Build Notes for the addenda whose scope covers the topic, as the front matter's operational rule requires. Many existing citations name addenda of earlier HDE Build Notes versions. In the current version those numbers identify different addenda, so they give no reliable pointer.
+
+### Drain targets
+
+Each passage below cites HDE Build Notes by addendum number or section. When the document is next revised, the citation is removed. Where the governance relationship needs acknowledging, the reference is by title only. The substantive rule each passage states is not changed by this addendum.
+
+| Document | Sections carrying locator citations |
+| :---- | :---- |
+| **HDE Governance** | §0.2 |
+| **HDE Build Checklist — Calcination** | §0.5; Task HDE-CALC003; Subtasks HDE-CALC003.11, HDE-CALC003.14, HDE-CALC003.15 and HDE-CALC003.17 |
+| **HDE Build Checklist — Separation** | Task HDE-SEPA006 |
+| **HDE Build Checklist — Conjunction** | Phase IV introduction; Subtask HDE-CONJ005.2; Task HDE-CONJ008; Subtasks HDE-CONJ008.1, HDE-CONJ009.1 and HDE-CONJ009.2 |
+| **HDE Build Checklist — Coagulation** | Subtasks HDE-COAG001.3, HDE-COAG001.9 and HDE-COAG007.2; Task HDE-COAG006 |
+| **HDE Mechanics Guide** | §0.2; §1.1; §1.3; §1.6.3; §35; "EPIC029 bounded conjunction closure artifact" |
+
+The storage and canon-source content of **HDE Build Checklist — Calcination** §0.5 and **HDE Mechanics Guide** §0.2 and §35 is already superseded by addendum 2.29. The citations in those passages are drain targets under this addendum.
+
+### Historical records
+
+Historical records keep their original wording and provenance, including their addendum-number citations. These are not drain targets:
+
+* **HDE Phased Epics**, a historical reference document;
+* the dated snapshots in **Reality Audits**;
+* the closed-change and learnings records in **Glow QA Guide** §13.12 and §13.19.
+
+Their citations describe the HDE Build Notes version current when they were written, not the current one.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no text in any document listed above.
+* It does not alter the meaning of any cited addendum or of the passages that cite them.
+* It creates no requirement to revise a document before its next ordinary revision.
+* It establishes no QA verdict, acceptance, build-checklist status movement or closure.
+
+### Evidence anchors
+
+* Line-level locator search across `docs/pfcanon/` excluding HDE Build Notes, 2026-09-27 (repository state `4eb293c`)
 
 \<eof\>  
