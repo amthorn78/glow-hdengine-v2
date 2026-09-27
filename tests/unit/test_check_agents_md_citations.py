@@ -125,3 +125,8 @@ def test_hyphenated_titles_are_rejected(text: str) -> None:
 @pytest.mark.parametrize("line", ["Read PF-04 first.", "See PF 19.", "PF-10 section 2.29 applies."])
 def test_separated_pf_identifiers_are_rejected(line: str) -> None:
     assert check.scan(line + "\n", TITLES) != []
+
+
+def test_three_line_paragraph_citation_is_rejected() -> None:
+    text = "PF10 governs as described\nin the canonical document\n§2.29 today.\n"
+    assert any(":pf10_locator:" in row for row in check.scan(text, TITLES))

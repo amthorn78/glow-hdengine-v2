@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 _PF_NUMBER = re.compile(r"\bPF[ -]?(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
 _PF10_LOCATOR = re.compile(
-    r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,40}?(?:§\s*\d|¶\s*\d|\baddend(?:um|a)\s+\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d))",
+    r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,80}?(?:§\s*\d|¶\s*\d|\baddend(?:um|a)\s+\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d))",
     re.IGNORECASE,
 )
 _PF10_VERSION = re.compile(r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
@@ -81,16 +81,26 @@ def scan_names(text: str, stems: list[str], single: list[str]) -> list[str]:
     return violations
 
 
-def _wrapped_pairs(text: str) -> list[tuple[int, str, int]]:
-    """Adjacent prose lines joined as Markdown renders them: (line number, joined text, boundary)."""
+def _paragraphs(text: str) -> list[tuple[str, list[tuple[int, int]]]]:
+    """Prose paragraphs joined as Markdown renders them, with (start offset, line number) per line."""
     lines = [raw.replace("*", "").replace("`", "") for raw in text.splitlines()]
-    pairs: list[tuple[int, str, int]] = []
-    for index in range(len(lines) - 1):
-        first, second = lines[index].rstrip(), lines[index + 1].strip()
-        if not first.strip() or not second or second.startswith(("#", "-", "|", ">")) or re.match(r"\d+[.)]\s", second):
+    blocks: list[tuple[str, list[tuple[int, int]]]] = []
+    joined, starts = "", []
+    for number, line in enumerate(lines, 1):
+        stripped = line.strip()
+        new_block = not stripped or stripped.startswith(("#", "-", "|", ">")) or re.match(r"\d+[.)]\s", stripped)
+        if new_block and starts:
+            blocks.append((joined, starts))
+            joined, starts = "", []
+        if not stripped:
             continue
-        pairs.append((index + 1, f"{first} {second}", len(first)))
-    return pairs
+        if starts:
+            joined += " "
+        starts.append((len(joined), number))
+        joined += stripped
+    if starts:
+        blocks.append((joined, starts))
+    return blocks
 
 
 def scan(text: str, titles: list[str]) -> list[str]:
@@ -104,13 +114,18 @@ def scan(text: str, titles: list[str]) -> list[str]:
         ("pf10_locator", _PF10_REVERSE),
         ("addendum_number", _ADDENDUM_NUMBER),
     ] + [("pf_title", re.compile(re.escape(title).replace(r"\ ", r"[\s_-]+"), re.IGNORECASE)) for title in titles]
-    for number, joined, boundary in _wrapped_pairs(text):
+    for joined, starts in _paragraphs(text):
+        if len(starts) < 2:
+            continue
         for label, pattern in patterns:
             for match in pattern.finditer(joined):
-                if match.start() < boundary < match.end():
-                    if label == "pf_document_named" and match.group(1) == "10":
-                        continue
-                    violations.append(f"AGENTS.md:{number}:{label}:{' '.join(match.group(0).split())}")
+                first = max(i for i, (offset, _) in enumerate(starts) if offset <= match.start())
+                last = max(i for i, (offset, _) in enumerate(starts) if offset < match.end())
+                if first == last:
+                    continue  # within one line: the line scan already reports it
+                if label == "pf_document_named" and match.group(1) == "10":
+                    continue
+                violations.append(f"AGENTS.md:{starts[first][1]}:{label}:{' '.join(match.group(0).split())}")
     return violations
 
 

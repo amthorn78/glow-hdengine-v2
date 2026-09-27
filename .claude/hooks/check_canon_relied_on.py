@@ -96,6 +96,9 @@ def _shell_check(root: Path) -> None:
             candidates[rel] = hashlib.sha256((root / rel).read_bytes()).hexdigest()
         except OSError:
             continue
+    # Committed files that failed earlier stay pending until they pass.
+    for rel in state.get("pending", []) if isinstance(state.get("pending"), list) else []:
+        candidates.setdefault(rel, None)
     old_head = state.get("head")
     if old_head and head and old_head != head:
         try:
@@ -107,16 +110,19 @@ def _shell_check(root: Path) -> None:
                 candidates.setdefault(rel, None)
     recorded: dict[str, str] = {}
     failing: list[str] = []
+    pending: list[str] = []
     for rel, digest in candidates.items():
         if digest is not None and seen.get(rel) == digest:
             recorded[rel] = digest
             continue
         if _fails(str(root / rel)):
             failing.append(str(root / rel))
+            if digest is None:
+                pending.append(rel)
         elif digest is not None:
             recorded[rel] = digest
     try:
-        state_file.write_text(json.dumps({"head": head, "files": recorded}, sort_keys=True), encoding="utf-8")
+        state_file.write_text(json.dumps({"head": head, "files": recorded, "pending": pending}, sort_keys=True), encoding="utf-8")
     except OSError:
         pass
     _report(failing)
