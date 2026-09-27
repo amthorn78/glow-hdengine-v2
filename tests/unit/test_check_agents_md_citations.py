@@ -15,37 +15,34 @@ _SPEC.loader.exec_module(check)
 TITLES = ["HDE Governance", "Glow QA Guide", "Plan Templates"]
 
 
-@pytest.mark.parametrize(
-    "line, kind",
-    [
-        ("apply PF04 rules", "pf_document_named"),
-        ("see PF09.5 status", "pf_document_named"),
-        ("PF10 — HDE Build Notes §2.8 applies", "pf10_locator"),
-        ("PF10 v13.4 is current", "pf10_locator"),
-        ("addendum PF10-CANON-001 governs", "pf10_locator"),
-        ("under PF10 addendum 2.29", "pf10_locator"),
-        ("addendum 2.14 says", "addendum_number"),
-        ("PF10 — HDE Build Notes v13.4 applies", "pf10_"),
-        ("PF10 version 13.4 is current", "pf10_version"),
-        ("see PF10 (v13.4)", "pf10_version"),
-        ("PF10 paragraph 3 says", "pf10_locator"),
-        ("HDE Build Notes §2.29 governs", "pf10_locator"),
-        ("HDE Build Notes addendum 2.29 governs", "pf10_locator"),
-        ("HDE Build Notes v13.4 is current", "pf10_"),
-        ("PF10 subsection 2.29.1 applies", "pf10_locator"),
-        ("PF10 — Repository canon authority and canon consultation", "pf10_heading"),
-        ("HDE Build Notes — Repository canon authority", "pf10_heading"),
-        ("PF10: repository canon authority", "pf10_heading"),
-        ("**PF10** — Repository canon authority", "pf10_heading"),
-        ("`PF10` §2.29 applies", "pf10_locator"),
-        ("read docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.5.md", "pf_filename"),
-        ("the Glow QA Guide requires it", "pf_title"),
-        ("per hde governance", "pf_title"),
-    ],
-)
-def test_citations_are_rejected(line: str, kind: str) -> None:
-    violations = check.scan(line + "\n", TITLES)
-    assert any(f":{kind}" in row for row in violations), violations
+# Every prohibited form found so far, one per row. Each must fail the check;
+# the category reported is not asserted, only that the text is rejected.
+REJECTED = [
+    # PF documents other than PF10, by number
+    "apply PF04 rules", "see PF09.5 status", "Read PF-04 first.", "See PF 19.",
+    # PF10 with a locator, either order, any separator or emphasis
+    "PF10 — HDE Build Notes §2.8 applies", "PF10 v13.4 is current", "PF10 version 13.4 is current",
+    "see PF10 (v13.4)", "PF10 paragraph 3 says", "PF10 subsection 2.29.1 applies",
+    "addendum PF10-CANON-001 governs", "under PF10 addendum 2.29", "`PF10` §2.29 applies",
+    "HDE Build Notes §2.29 governs", "HDE Build Notes addendum 2.29 governs", "HDE Build Notes v13.4 is current",
+    "HDE-Build-Notes §2.29 governs", "PF-10 section 2.29 applies.",
+    "See section 2.29 of PF10.", "per § 2.30 in the HDE Build Notes", "paragraph 3 of PF10 applies",
+    # PF10 by heading
+    "PF10 — Repository canon authority and canon consultation", "HDE Build Notes — Repository canon authority",
+    "PF10: repository canon authority", "**PF10** — Repository canon authority",
+    # addendum numbers, filenames and titles
+    "addendum 2.14 says", "read docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.5.md",
+    "the Glow QA Guide requires it", "per hde governance", "Read HDE-Governance first.", "See Glow-QA-Guide.",
+    # soft-wrapped across lines
+    "PF10 governs as described in\n§2.29 of that document.", "Apply HDE Build Notes\nv13.4.2 here.",
+    "Read HDE\nGovernance first.", "Read HDE-\nGovernance first.",
+    "PF10 governs as described\nin the canonical document\n§2.29 today.",
+]
+
+
+@pytest.mark.parametrize("text", REJECTED)
+def test_prohibited_forms_are_rejected(text: str) -> None:
+    assert check.scan(text + "\n", TITLES) != []
 
 
 @pytest.mark.parametrize(
@@ -93,40 +90,9 @@ def test_single_word_and_exact_file_names(tmp_path: Path) -> None:
     assert check.scan_names("each prompt invocation is recorded\n", stems, single) == []
 
 
-@pytest.mark.parametrize(
-    ("text", "kind"),
-    [
-        ("PF10 governs as described in\n§2.29 of that document.\n", "pf10_locator"),
-        ("Apply HDE Build Notes\nv13.4.2 here.\n", "pf10_version"),
-        ("Read HDE\nGovernance first.\n", "pf_title"),
-    ],
-)
-def test_wrapped_citations_are_rejected(text: str, kind: str) -> None:
-    assert any(f":{kind}:" in row for row in check.scan(text, TITLES))
-
-
 def test_list_items_are_not_joined() -> None:
     assert check.scan("PF10 governs.\n- 2 items follow\n", TITLES) == []
 
 
-@pytest.mark.parametrize(
-    "line",
-    ["See section 2.29 of PF10.", "per § 2.30 in the HDE Build Notes", "paragraph 3 of PF10 applies"],
-)
-def test_reverse_order_locators_are_rejected(line: str) -> None:
-    assert any(":pf10_locator:" in row for row in check.scan(line + "\n", TITLES))
-
-
-@pytest.mark.parametrize("text", ["Read HDE-Governance first.\n", "See Glow-QA-Guide.\n", "Read HDE-\nGovernance first.\n"])
-def test_hyphenated_titles_are_rejected(text: str) -> None:
-    assert any(":pf_title:" in row for row in check.scan(text, TITLES))
-
-
-@pytest.mark.parametrize("line", ["Read PF-04 first.", "See PF 19.", "PF-10 section 2.29 applies."])
-def test_separated_pf_identifiers_are_rejected(line: str) -> None:
-    assert check.scan(line + "\n", TITLES) != []
-
-
-def test_three_line_paragraph_citation_is_rejected() -> None:
-    text = "PF10 governs as described\nin the canonical document\n§2.29 today.\n"
-    assert any(":pf10_locator:" in row for row in check.scan(text, TITLES))
+def test_separate_sentences_are_not_joined() -> None:
+    assert check.scan("PF10 governs where it speaks. Section 3 of the plan lists the steps.\n", TITLES) == []

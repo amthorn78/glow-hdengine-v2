@@ -3,9 +3,26 @@
 
 Product Owner rule (2026-09-27): AGENTS.md states governing rules directly. It
 names no PF document except PF10, and names PF10 only by title: never by
-version, addendum number, section, heading or filename. PF document titles are
-derived from the files in docs/pfcanon/, so the check follows canon as it
-changes. Standard library only; reads AGENTS.md and the docs/pfcanon listing.
+version, addendum number, section, heading or filename.
+
+Contract. The text is first rendered the way a reader sees it: Markdown emphasis
+and code markers are removed, soft-wrapped lines are joined into paragraphs, and
+paragraphs are split into sentences. Then, anywhere in AGENTS.md:
+
+* a PF document number other than 10 ("PF04", "PF-19", "PF 09.5") fails;
+* an addendum number ("addendum 2.29") fails;
+* a docs/pfcanon file name, or the exact name of a PF file, fails;
+* a PF title derived from the docs/pfcanon file names fails, with spaces,
+  hyphens and underscores treated alike;
+* a sentence that names PF10 (or "HDE Build Notes") and also carries a locator
+  fails, whatever the order: a section, paragraph or pilcrow mark, a
+  "section/subsection/paragraph N", a version ("v13.4", "version 13"), or a
+  hyphenated identifier ("PF10-CANON-001");
+* PF10 followed by a dash or colon and a title other than its own fails.
+
+Known limits: this is a lexical check. It cannot catch a citation phrased with
+no locator token (for example "the twenty-ninth addendum"), and it judges only
+AGENTS.md. Standard library only; reads AGENTS.md and the docs/pfcanon listing.
 """
 
 from __future__ import annotations
@@ -16,146 +33,106 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-_PF_NUMBER = re.compile(r"\bPF[ -]?(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
-_PF10_LOCATOR = re.compile(
-    r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,80}?(?:§\s*\d|¶\s*\d|\baddend(?:um|a)\s+\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d))",
+_PF10_NAME = r"(?:PF10|HDE Build Notes)"
+_PF_NUMBER = re.compile(r"\bPF(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
+_LOCATOR = re.compile(
+    r"[§¶]\s*\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d|\bv\d+(?:\.\d+)+|\bversion\s+\d|\bPF10-[A-Za-z]",
     re.IGNORECASE,
 )
-_PF10_VERSION = re.compile(r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
-# PF10 followed by a dash and a title other than its own ("HDE Build Notes") cites a heading.
-_PF10_HEADING = re.compile(r"\b(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\s*[—–:-]\s*(?!HDE[ -]Build[ -]Notes\b|PF[ -]?10\b)[A-Za-z\"\'`*]")
-# The reverse order: "section 2.29 of PF10" (also "PF-10", "PF 10").
-_PF10_REVERSE = re.compile(
-    r"(?:[§¶]\s*|\baddend(?:um|a)\s+|\b(?:sub)?sections?\s+|\bparagraphs?\s+)\d+(?:\.\d+)*[^\n.;]{0,40}?\b(?:of|in|from)\s+(?:the\s+)?(?:PF[ -]?10|HDE[ -]Build[ -]Notes)\b",
-    re.IGNORECASE,
-)
+_NAME = re.compile(rf"\b{_PF10_NAME}\b", re.IGNORECASE)
+_HEADING = re.compile(rf"\b{_PF10_NAME}\s*[—–:-]\s*(?!{_PF10_NAME}\b)[A-Za-z\"']", re.IGNORECASE)
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
-_PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s`)*]+\.md")
+_PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s)]+\.md")
+_SENTENCE_END = re.compile(r"(?<=[.!?;])\s+(?=[A-Z(\"'])")
+_BLOCK_START = re.compile(r"^(?:#|[-+*]\s|\||>|\d+[.)]\s)")
 _TITLE_FROM_FILE = re.compile(r"^PF[\d.]*[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
 
 
+def _title_words(stem: str) -> list[str]:
+    match = _TITLE_FROM_FILE.match(stem)
+    return (match.group(1) if match else stem).replace("-", " ").split()
+
+
 def pf_titles(pfcanon: Path) -> list[str]:
-    """Distinctive titles of PF documents other than PF10."""
-    titles: set[str] = set()
-    for path in sorted(pfcanon.glob("*.md")):
-        stem = path.stem
-        if stem.startswith("PF10"):
-            continue
-        match = _TITLE_FROM_FILE.match(stem)
-        raw = (match.group(1) if match else stem).strip(" -")
-        if not raw:
-            continue
-        spaced = re.sub(r"\s+", " ", raw.replace("-", " ")).strip()
-        # Only multi-word titles are distinctive enough to match in prose.
-        if len(spaced.split()) >= 2:
-            titles.add(spaced)
-    return sorted(titles)
+    """Multi-word titles of PF documents other than PF10."""
+    titles = {" ".join(_title_words(p.stem)) for p in pfcanon.glob("*.md") if not p.stem.startswith("PF10")}
+    return sorted(t for t in titles if len(t.split()) >= 2)
 
 
 def pf_names(pfcanon: Path) -> tuple[list[str], list[str]]:
     """Exact PF file names (without .md) and single-word PF titles."""
-    stems: list[str] = []
-    single: list[str] = []
-    for path in sorted(pfcanon.glob("*.md")):
-        if path.stem.startswith("PF10"):
-            continue
-        stems.append(path.stem)
-        match = _TITLE_FROM_FILE.match(path.stem)
-        raw = (match.group(1) if match else path.stem).strip(" -")
-        words = raw.replace("-", " ").split()
-        if len(words) == 1:
-            single.append(words[0])
+    stems = sorted(p.stem for p in pfcanon.glob("*.md") if not p.stem.startswith("PF10"))
+    single = [words[0] for words in map(_title_words, stems) if len(words) == 1]
     return stems, single
+
+
+def _normalize(text: str) -> str:
+    text = re.sub(r"[*`_]", "", text)
+    text = re.sub(r"\bPF[\s-]?(\d)", r"PF\1", text)
+    return re.sub(r"\bHDE[\s-]+Build[\s-]+Notes\b", "HDE Build Notes", text, flags=re.IGNORECASE)
+
+
+def _units(text: str) -> list[tuple[int, str]]:
+    """Rendered sentences with the source line each starts on."""
+    units: list[tuple[int, str]] = []
+    paragraph: list[tuple[int, str]] = []
+
+    def flush() -> None:
+        if not paragraph:
+            return
+        joined, starts = "", []
+        for number, line in paragraph:
+            starts.append((len(joined), number))
+            joined += line + " "
+        position = 0
+        for sentence in _SENTENCE_END.split(joined):
+            offset = joined.index(sentence, position)
+            position = offset + len(sentence)
+            line = max(n for start, n in starts if start <= offset)
+            units.append((line, sentence.strip()))
+        paragraph.clear()
+
+    for number, raw in enumerate(text.splitlines(), 1):
+        line = _normalize(raw).strip()
+        if not line or _BLOCK_START.match(line):
+            flush()
+        if line:
+            paragraph.append((number, line))
+    flush()
+    return units
+
+
+def scan(text: str, titles: list[str]) -> list[str]:
+    violations: list[str] = []
+    title_patterns = [(t, re.compile(r"\b" + r"[\s_-]+".join(map(re.escape, t.split())) + r"\b", re.IGNORECASE)) for t in titles]
+    for number, sentence in _units(text):
+        where = f"AGENTS.md:{number}"
+        for match in _PF_NUMBER.finditer(sentence):
+            if match.group(1) != "10":
+                violations.append(f"{where}:pf_document_named:{match.group(0)}")
+        for match in _ADDENDUM_NUMBER.finditer(sentence):
+            violations.append(f"{where}:addendum_number:{match.group(0)}")
+        if _NAME.search(sentence) and (locator := _LOCATOR.search(sentence)):
+            violations.append(f"{where}:pf10_locator:{locator.group(0)}")
+        for match in _HEADING.finditer(sentence):
+            violations.append(f"{where}:pf10_heading:{match.group(0)}")
+        for match in _PFCANON_FILE.finditer(sentence):
+            violations.append(f"{where}:pf_filename:{match.group(0)}")
+        for title, pattern in title_patterns:
+            if pattern.search(sentence):
+                violations.append(f"{where}:pf_title:{title}")
+    return violations
 
 
 def scan_names(text: str, stems: list[str], single: list[str]) -> list[str]:
     violations: list[str] = []
-    for number, line in enumerate(text.splitlines(), 1):
-        lowered = line.lower()
+    for number, sentence in _units(text):
         for stem in stems:
-            if stem.lower() in lowered:
+            if stem.lower() in sentence.lower():
                 violations.append(f"AGENTS.md:{number}:pf_filename:{stem}")
         for word in single:
-            if re.search(rf"\bthe\s+{re.escape(word)}\s+(?:document|doc|file|guide)\b", line, re.IGNORECASE):
+            if re.search(rf"\bthe\s+{re.escape(word)}\s+(?:document|doc|file|guide)\b", sentence, re.IGNORECASE):
                 violations.append(f"AGENTS.md:{number}:pf_title:{word}")
-    return violations
-
-
-def _paragraphs(text: str) -> list[tuple[str, list[tuple[int, int]]]]:
-    """Prose paragraphs joined as Markdown renders them, with (start offset, line number) per line."""
-    lines = [raw.replace("*", "").replace("`", "") for raw in text.splitlines()]
-    blocks: list[tuple[str, list[tuple[int, int]]]] = []
-    joined, starts = "", []
-    for number, line in enumerate(lines, 1):
-        stripped = line.strip()
-        new_block = not stripped or stripped.startswith(("#", "-", "|", ">")) or re.match(r"\d+[.)]\s", stripped)
-        if new_block and starts:
-            blocks.append((joined, starts))
-            joined, starts = "", []
-        if not stripped:
-            continue
-        if starts:
-            joined += " "
-        starts.append((len(joined), number))
-        joined += stripped
-    if starts:
-        blocks.append((joined, starts))
-    return blocks
-
-
-def scan(text: str, titles: list[str]) -> list[str]:
-    violations = _scan_lines(text, titles)
-    # A citation split across a soft line break is still one citation.
-    patterns = [
-        ("pf_document_named", _PF_NUMBER),
-        ("pf10_locator", _PF10_LOCATOR),
-        ("pf10_version", _PF10_VERSION),
-        ("pf10_heading", _PF10_HEADING),
-        ("pf10_locator", _PF10_REVERSE),
-        ("addendum_number", _ADDENDUM_NUMBER),
-    ] + [("pf_title", re.compile(re.escape(title).replace(r"\ ", r"[\s_-]+"), re.IGNORECASE)) for title in titles]
-    for joined, starts in _paragraphs(text):
-        if len(starts) < 2:
-            continue
-        for label, pattern in patterns:
-            for match in pattern.finditer(joined):
-                first = max(i for i, (offset, _) in enumerate(starts) if offset <= match.start())
-                last = max(i for i, (offset, _) in enumerate(starts) if offset < match.end())
-                if first == last:
-                    continue  # within one line: the line scan already reports it
-                if label == "pf_document_named" and match.group(1) == "10":
-                    continue
-                violations.append(f"AGENTS.md:{starts[first][1]}:{label}:{' '.join(match.group(0).split())}")
-    return violations
-
-
-def _scan_lines(text: str, titles: list[str]) -> list[str]:
-    violations: list[str] = []
-    for number, raw_line in enumerate(text.splitlines(), 1):
-        # Emphasis and code markers must not hide a citation.
-        line = raw_line.replace("*", "").replace("`", "")
-        for match in _PF_NUMBER.finditer(line):
-            if match.group(1) != "10":
-                violations.append(f"AGENTS.md:{number}:pf_document_named:{match.group(0)}")
-        for match in _PF10_LOCATOR.finditer(line):
-            violations.append(f"AGENTS.md:{number}:pf10_locator:{match.group(0).strip()}")
-        if not _PF10_LOCATOR.search(line):
-            for match in _PF10_VERSION.finditer(line):
-                violations.append(f"AGENTS.md:{number}:pf10_version:{match.group(0).strip()}")
-        if not _ADDENDUM_NUMBER.search(line):
-            for match in _PF10_REVERSE.finditer(line):
-                violations.append(f"AGENTS.md:{number}:pf10_locator:{match.group(0).strip()}")
-        for match in _PF10_HEADING.finditer(line):
-            violations.append(f"AGENTS.md:{number}:pf10_heading:{match.group(0).strip()}")
-        for match in _ADDENDUM_NUMBER.finditer(line):
-            violations.append(f"AGENTS.md:{number}:addendum_number:{match.group(0)}")
-        for match in _PFCANON_FILE.finditer(line):
-            violations.append(f"AGENTS.md:{number}:pf_filename:{match.group(0)}")
-        # Hyphens and spaces are equivalent separators in PF titles ("HDE-Governance").
-        lowered = re.sub(r"[\s_-]+", " ", line.lower())
-        for title in titles:
-            if title.lower() in lowered:
-                violations.append(f"AGENTS.md:{number}:pf_title:{title}")
     return violations
 
 

@@ -1,13 +1,30 @@
 #!/usr/bin/env python3
-"""PostToolUse hook: review artifacts must carry a non-empty "Canon relied on" block.
+"""PostToolUse hook: decision artifacts must carry a non-empty "Canon relied on" block.
 
-Fires after Write/Edit/MultiEdit, and after Bash for docs/ephemeral files the command changed or committed. For a file under docs/ephemeral/ that is a review, approval, readiness,
-disposition, decision, verdict, acceptance, triage or audit artifact (by name or
-front-matter artifact_type), it checks for a heading or label "Canon relied on"
-followed by at least one non-empty line before the next heading. A missing or
-empty block returns decision "block", which feeds the reason back to the agent.
-It checks presence only: it cannot verify that the listed sections were read.
-Standard library only. It never writes to the repository; it keeps a small hash record inside .git/.
+Contract. A decision artifact is a Markdown file under docs/ephemeral/ whose file
+name, or front-matter artifact_type, names a review, approval, readiness,
+disposition, decision, verdict, acceptance, triage or audit. It passes when it
+has a "Canon relied on" heading or label followed, before the next heading, by
+at least one line of real content. HTML comments, empty fences and lines made
+only of Markdown markers are not content. A failing artifact produces a
+"block" decision that returns the reason to the agent.
+
+When it runs:
+* after Write, Edit or MultiEdit: on the file written;
+* after Bash: on every docs/ephemeral Markdown file that is uncommitted and
+  changed since the hook last looked, or changed by commits made since then.
+  Failing files stay pending and are reported after each later Bash call until
+  they pass. State is kept in .git/, never in the working tree.
+
+Known limits, by design:
+* It is advisory. It runs after the write, so it cannot prevent one, and an
+  agent can ignore it. It is not a merge gate.
+* It runs only in Claude Code sessions that carry this settings file.
+* It checks that the block exists, not that the sections listed were read.
+* A file changed by something other than this session's tool calls is judged
+  at the next Bash call, not when it changes.
+Binding enforcement belongs in the prompts that produce these artifacts.
+Standard library and git only.
 """
 
 from __future__ import annotations
