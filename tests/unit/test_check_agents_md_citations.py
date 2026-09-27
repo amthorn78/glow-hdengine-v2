@@ -107,3 +107,11 @@ def test_wrapped_citations_are_rejected(text: str, kind: str) -> None:
 
 def test_list_items_are_not_joined() -> None:
     assert check.scan("PF10 governs.\n- 2 items follow\n", TITLES) == []
+
+
+@pytest.mark.parametrize(
+    "line",
+    ["See section 2.29 of PF10.", "per § 2.30 in the HDE Build Notes", "paragraph 3 of PF10 applies"],
+)
+def test_reverse_order_locators_are_rejected(line: str) -> None:
+    assert any(":pf10_locator:" in row for row in check.scan(line + "\n", TITLES))

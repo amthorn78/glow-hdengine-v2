@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PostToolUse hook: review artifacts must carry a non-empty "Canon relied on" block.
 
-Fires after Write/Edit/MultiEdit. For a file under docs/ephemeral/ that is a review, approval, readiness,
+Fires after Write/Edit/MultiEdit, and after Bash for the docs/ephemeral files a command names. For a file under docs/ephemeral/ that is a review, approval, readiness,
 disposition, decision, verdict, acceptance, triage or audit artifact (by name or
 front-matter artifact_type), it checks for a heading or label "Canon relied on"
 followed by at least one non-empty line before the next heading. A missing or
@@ -20,6 +20,7 @@ from pathlib import Path
 _REVIEW_NAME = re.compile(r"(review|approv|readiness|disposition|decision|verdict|acceptance|triage|audit)", re.IGNORECASE)
 _REVIEW_TYPE = re.compile(r"^artifact_type:\s*\S*(REVIEW|APPROV|READINESS|DISPOSITION|DECISION|VERDICT|ACCEPTANCE|TRIAGE|AUDIT)", re.IGNORECASE | re.MULTILINE)
 _LABEL = re.compile(r"^\s*(#{1,6}\s*|\*\*|[-*]\s*)?canon relied on\s*(\*\*)?\s*(:|$)", re.IGNORECASE)
+_BASH_PATH = re.compile(r"[^\s'\"<>|;&]*docs/ephemeral/[^\s'\"<>|;&]+\.md")
 _HEADING = re.compile(r"^\s*#{1,6}\s")
 
 
@@ -38,7 +39,7 @@ def has_block(text: str) -> bool:
         for follow in lines[index + 1 :]:
             if _HEADING.match(follow):
                 break
-            if follow.strip(" -*|\t"):
+            if follow.strip(" -*|\t`~>_"):
                 return True
     return False
 
@@ -48,17 +49,30 @@ def main() -> int:
         payload = json.load(sys.stdin)
     except (json.JSONDecodeError, ValueError):
         return 0
-    path = str((payload.get("tool_input") or {}).get("file_path") or "")
+    tool_input = payload.get("tool_input") or {}
+    if payload.get("tool_name") == "Bash":
+        # Shell writes: check every docs/ephemeral Markdown file the command names.
+        paths = _BASH_PATH.findall(str(tool_input.get("command") or ""))
+    else:
+        paths = [str(tool_input.get("file_path") or "")]
+    for path in dict.fromkeys(paths):
+        if _check(path):
+            return 0
+    return 0
+
+
+def _check(path: str) -> bool:
+    """Print a block decision for one file; return True when it did."""
     if "docs/ephemeral/" not in path or not path.endswith(".md"):
-        return 0
+        return False
     try:
         text = Path(path).read_text(encoding="utf-8")
     except OSError:
-        return 0
+        return False
     if not (_REVIEW_NAME.search(Path(path).name) or _REVIEW_TYPE.search(text[:4000])):
-        return 0
+        return False
     if has_block(text):
-        return 0
+        return False
     print(json.dumps({
         "decision": "block",
         "reason": (
@@ -68,7 +82,7 @@ def main() -> int:
             "Search canon first if you have not."
         ),
     }))
-    return 0
+    return True
 
 
 if __name__ == "__main__":

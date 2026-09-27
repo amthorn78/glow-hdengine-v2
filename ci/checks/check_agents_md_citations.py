@@ -24,6 +24,11 @@ _PF10_LOCATOR = re.compile(
 _PF10_VERSION = re.compile(r"\b(?:PF10|HDE[ -]Build[ -]Notes)\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
 # PF10 followed by a dash and a title other than its own ("HDE Build Notes") cites a heading.
 _PF10_HEADING = re.compile(r"\b(?:PF10|HDE[ -]Build[ -]Notes)\s*[—–:-]\s*(?!HDE[ -]Build[ -]Notes\b|PF10\b)[A-Za-z\"\'`*]")
+# The reverse order: "section 2.29 of PF10".
+_PF10_REVERSE = re.compile(
+    r"(?:[§¶]\s*|\baddend(?:um|a)\s+|\b(?:sub)?sections?\s+|\bparagraphs?\s+)\d+(?:\.\d+)*[^\n.;]{0,40}?\b(?:of|in|from)\s+(?:the\s+)?(?:PF10|HDE[ -]Build[ -]Notes)\b",
+    re.IGNORECASE,
+)
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s`)*]+\.md")
 _TITLE_FROM_FILE = re.compile(r"^PF[\d.]*[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
@@ -96,6 +101,7 @@ def scan(text: str, titles: list[str]) -> list[str]:
         ("pf10_locator", _PF10_LOCATOR),
         ("pf10_version", _PF10_VERSION),
         ("pf10_heading", _PF10_HEADING),
+        ("pf10_locator", _PF10_REVERSE),
         ("addendum_number", _ADDENDUM_NUMBER),
     ] + [("pf_title", re.compile(re.escape(title).replace(r"\ ", r"\s+"), re.IGNORECASE)) for title in titles]
     for number, joined, boundary in _wrapped_pairs(text):
@@ -121,6 +127,9 @@ def _scan_lines(text: str, titles: list[str]) -> list[str]:
         if not _PF10_LOCATOR.search(line):
             for match in _PF10_VERSION.finditer(line):
                 violations.append(f"AGENTS.md:{number}:pf10_version:{match.group(0).strip()}")
+        if not _ADDENDUM_NUMBER.search(line):
+            for match in _PF10_REVERSE.finditer(line):
+                violations.append(f"AGENTS.md:{number}:pf10_locator:{match.group(0).strip()}")
         for match in _PF10_HEADING.finditer(line):
             violations.append(f"AGENTS.md:{number}:pf10_heading:{match.group(0).strip()}")
         for match in _ADDENDUM_NUMBER.finditer(line):
