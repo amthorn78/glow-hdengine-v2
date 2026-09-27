@@ -23,7 +23,7 @@ _PF10_LOCATOR = re.compile(
 )
 _PF10_VERSION = re.compile(r"\b(?:PF10|HDE[ -]Build[ -]Notes)\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
 # PF10 followed by a dash and a title other than its own ("HDE Build Notes") cites a heading.
-_PF10_HEADING = re.compile(r"\bPF10\s*[—–-]\s*(?!HDE[ -]Build[ -]Notes\b)[A-Z\"\'`*]")
+_PF10_HEADING = re.compile(r"\b(?:PF10|HDE[ -]Build[ -]Notes)\s*[—–:-]\s*(?!HDE[ -]Build[ -]Notes\b|PF10\b)[A-Za-z\"\'`*]")
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s`)*]+\.md")
 _TITLE_FROM_FILE = re.compile(r"^PF[\d.]*[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")

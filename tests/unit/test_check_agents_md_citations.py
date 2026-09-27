@@ -34,6 +34,8 @@ TITLES = ["HDE Governance", "Glow QA Guide", "Plan Templates"]
         ("HDE Build Notes v13.4 is current", "pf10_"),
         ("PF10 subsection 2.29.1 applies", "pf10_locator"),
         ("PF10 — Repository canon authority and canon consultation", "pf10_heading"),
+        ("HDE Build Notes — Repository canon authority", "pf10_heading"),
+        ("PF10: repository canon authority", "pf10_heading"),
         ("read docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.5.md", "pf_filename"),
         ("the Glow QA Guide requires it", "pf_title"),
         ("per hde governance", "pf_title"),
