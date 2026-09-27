@@ -62,11 +62,12 @@ def test_titles_derive_from_pfcanon_filenames(tmp_path: Path) -> None:
         "PF19-Canon-Glow-QA-Guide-v3.0.5.md",
         "PF10-HDE-Build-Notes-v13.4.1.md",
         "PF08-Reference-Human Design System.md",
+        "PF-Reference-Glow Story.md",
     ):
         (tmp_path / name).write_text("x\n", encoding="utf-8")
     titles = check.pf_titles(tmp_path)
     assert "HDE Governance" in titles and "Glow QA Guide" in titles
-    assert "Human Design System" in titles
+    assert "Human Design System" in titles and "Glow Story" in titles
     assert not any("Build Notes" in title for title in titles)
 
 

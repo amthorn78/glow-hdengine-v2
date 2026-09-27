@@ -26,7 +26,7 @@ _PF10_VERSION = re.compile(r"\bPF10\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion
 _PF10_HEADING = re.compile(r"\bPF10\s*[—–-]\s*(?!HDE[ -]Build[ -]Notes\b)[A-Z\"\'`*]")
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s`)*]+\.md")
-_TITLE_FROM_FILE = re.compile(r"^PF[\d.]+[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
+_TITLE_FROM_FILE = re.compile(r"^PF[\d.]*[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
 
 
 def pf_titles(pfcanon: Path) -> list[str]:
