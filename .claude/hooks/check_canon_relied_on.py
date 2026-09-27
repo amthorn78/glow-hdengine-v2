@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PostToolUse hook: review artifacts must carry a non-empty "Canon relied on" block.
 
-Fires after Write/Edit/MultiEdit, and after Bash for the docs/ephemeral files a command names. For a file under docs/ephemeral/ that is a review, approval, readiness,
+Fires after Write/Edit/MultiEdit, and after Bash for the docs/ephemeral files a command names and just modified. For a file under docs/ephemeral/ that is a review, approval, readiness,
 disposition, decision, verdict, acceptance, triage or audit artifact (by name or
 front-matter artifact_type), it checks for a heading or label "Canon relied on"
 followed by at least one non-empty line before the next heading. A missing or
@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import time
 from pathlib import Path
 
 _REVIEW_NAME = re.compile(r"(review|approv|readiness|disposition|decision|verdict|acceptance|triage|audit)", re.IGNORECASE)
@@ -52,7 +53,12 @@ def main() -> int:
     tool_input = payload.get("tool_input") or {}
     if payload.get("tool_name") == "Bash":
         # Shell writes: check every docs/ephemeral Markdown file the command names.
-        paths = _BASH_PATH.findall(str(tool_input.get("command") or ""))
+        # Only files the command just changed: a read-only command must not re-judge old records.
+        cutoff = time.time() - 30
+        paths = [
+            p for p in _BASH_PATH.findall(str(tool_input.get("command") or ""))
+            if Path(p).is_file() and Path(p).stat().st_mtime >= cutoff
+        ]
     else:
         paths = [str(tool_input.get("file_path") or "")]
     for path in dict.fromkeys(paths):

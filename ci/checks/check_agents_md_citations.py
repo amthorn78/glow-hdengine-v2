@@ -103,7 +103,7 @@ def scan(text: str, titles: list[str]) -> list[str]:
         ("pf10_heading", _PF10_HEADING),
         ("pf10_locator", _PF10_REVERSE),
         ("addendum_number", _ADDENDUM_NUMBER),
-    ] + [("pf_title", re.compile(re.escape(title).replace(r"\ ", r"\s+"), re.IGNORECASE)) for title in titles]
+    ] + [("pf_title", re.compile(re.escape(title).replace(r"\ ", r"[\s_-]+"), re.IGNORECASE)) for title in titles]
     for number, joined, boundary in _wrapped_pairs(text):
         for label, pattern in patterns:
             for match in pattern.finditer(joined):
@@ -136,7 +136,8 @@ def _scan_lines(text: str, titles: list[str]) -> list[str]:
             violations.append(f"AGENTS.md:{number}:addendum_number:{match.group(0)}")
         for match in _PFCANON_FILE.finditer(line):
             violations.append(f"AGENTS.md:{number}:pf_filename:{match.group(0)}")
-        lowered = line.lower()
+        # Hyphens and spaces are equivalent separators in PF titles ("HDE-Governance").
+        lowered = re.sub(r"[\s_-]+", " ", line.lower())
         for title in titles:
             if title.lower() in lowered:
                 violations.append(f"AGENTS.md:{number}:pf_title:{title}")

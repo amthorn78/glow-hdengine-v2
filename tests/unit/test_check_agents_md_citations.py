@@ -115,3 +115,8 @@ def test_list_items_are_not_joined() -> None:
 )
 def test_reverse_order_locators_are_rejected(line: str) -> None:
     assert any(":pf10_locator:" in row for row in check.scan(line + "\n", TITLES))
+
+
+@pytest.mark.parametrize("text", ["Read HDE-Governance first.\n", "See Glow-QA-Guide.\n", "Read HDE-\nGovernance first.\n"])
+def test_hyphenated_titles_are_rejected(text: str) -> None:
+    assert any(":pf_title:" in row for row in check.scan(text, TITLES))
