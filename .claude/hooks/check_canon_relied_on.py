@@ -5,11 +5,12 @@ Contract. A decision artifact is a Markdown file under docs/ephemeral/ whose fil
 name, or front-matter artifact_type, names a review, approval, readiness,
 disposition, decision, verdict, acceptance, triage or audit. It passes when it
 has a "Canon relied on" heading or label followed, before the next heading, by
-at least one line of real content. HTML comments, empty fences and lines made
-only of Markdown markers are not content. A failing artifact produces a
+content: a line with at least one letter or digit, outside HTML comments.
+Lines made only of Markdown markers (fences, rules, underlines) are not content. A failing artifact produces a
 "block" decision that returns the reason to the agent.
 
 When it runs:
+* at session start: records HEAD as the baseline for the first shell command;
 * after Write, Edit or MultiEdit: on the file written;
 * after Bash: on every docs/ephemeral Markdown file that is uncommitted and
   changed since the hook last looked, or changed by commits made since then.
@@ -52,15 +53,20 @@ def has_block(text: str) -> bool:
     for index, line in enumerate(lines):
         if not _LABEL.match(line):
             continue
-        after = line.split(":", 1)[1].strip(" *") if ":" in line else ""
-        if after:
+        after = line.split(":", 1)[1] if ":" in line else ""
+        if _is_content(after):
             return True
         for follow in lines[index + 1 :]:
             if _HEADING.match(follow):
                 break
-            if follow.strip(" -*|\t`~>_"):
+            if _is_content(follow):
                 return True
     return False
+
+
+def _is_content(line: str) -> bool:
+    # Content has at least one letter or digit; lines made only of Markdown markers do not count.
+    return bool(re.search(r"[^\W_]", line))
 
 
 def main() -> int:
@@ -69,7 +75,9 @@ def main() -> int:
     except (json.JSONDecodeError, ValueError):
         return 0
     tool_input = payload.get("tool_input") or {}
-    if payload.get("tool_name") == "Bash":
+    if payload.get("hook_event_name") == "SessionStart":
+        _baseline(Path(os.environ.get("CLAUDE_PROJECT_DIR") or "."))
+    elif payload.get("tool_name") == "Bash":
         _shell_check(Path(os.environ.get("CLAUDE_PROJECT_DIR") or "."))
     else:
         failing = [p for p in [str(tool_input.get("file_path") or "")] if _fails(p)]
@@ -83,6 +91,29 @@ def _git(root: Path, *args: str) -> str:
     ).stdout.decode("utf-8", "replace")
 
 
+def _state_file(root: Path) -> Path:
+    path = Path(_git(root, "rev-parse", "--git-path", "canon_relied_on_hook.json").strip())
+    return path if path.is_absolute() else root / path
+
+
+def _baseline(root: Path) -> None:
+    """At session start, record HEAD so the first shell command has a "before" state."""
+    try:
+        head = _git(root, "rev-parse", "--verify", "-q", "HEAD").strip()
+        state_file = _state_file(root)
+    except (OSError, subprocess.SubprocessError):
+        return
+    try:
+        state = json.loads(state_file.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        state = {}
+    state["head"] = head
+    try:
+        state_file.write_text(json.dumps(state, sort_keys=True), encoding="utf-8")
+    except OSError:
+        pass
+
+
 def _shell_check(root: Path) -> None:
     """Judge docs/ephemeral Markdown files a shell command changed or committed.
 
@@ -94,11 +125,9 @@ def _shell_check(root: Path) -> None:
     try:
         status = _git(root, "status", "--porcelain", "-z", "--untracked-files=all", "--", "docs/ephemeral")
         head = _git(root, "rev-parse", "--verify", "-q", "HEAD").strip()
-        state_file = Path(_git(root, "rev-parse", "--git-path", "canon_relied_on_hook.json").strip())
+        state_file = _state_file(root)
     except (OSError, subprocess.SubprocessError):
         return
-    if not state_file.is_absolute():
-        state_file = root / state_file
     try:
         state = json.loads(state_file.read_text(encoding="utf-8"))
     except (OSError, ValueError):
