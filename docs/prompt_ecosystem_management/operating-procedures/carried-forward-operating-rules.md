@@ -41,7 +41,7 @@ About 70% was superseded or specific to an old release. That includes the retire
 
 For a Human Design mechanics question, read PF08 and PF11 in `docs/pfcanon/` first. If they are inconclusive, retrieve the actual admitted original reference passages the claim needs. An index is not doctrinal evidence. If bounded external inquiry is needed, use only jovianarchive.com. An inaccessible original is an access limitation, not evidence that the doctrine is absent. If the question is still unresolved, give the Product Owner the exact question, the alternatives, the evidence inspected and the practical consequences.
 
-*Source:* Protocol L41 and Guidelines L55; both reviewers classified it live. *Open point:* the archived text keeps the original references in a Drive "HD Refs" directory, and under D7 those have no repository home yet (see Pending, P1).
+*Source:* Protocol L41 and Guidelines L55; both reviewers classified it live. *Scope (Product Owner ruling, 2026-09-27):* the "HD Refs" originals remain authoritative in some contexts, but no development work needs them, so no repository home is created. The step "retrieve the original passages" applies outside development work only.
 
 ### R2. Engineering research order
 
@@ -71,10 +71,19 @@ A prompt the Product Owner has rejected is not eligible for launch, reuse, repai
 
 | # | Candidate | Why it is not adopted |
 | :---- | :---- | :---- |
-| P1 | Repository home for Human Design reference originals (the "HD Refs" directory) | D7 removes Drive as an authority and no repository location exists |
 | P2 | Review standard: judge the artifact as a competent reader would act on it; no approval on an unsupported decisive claim | One reviewer found it uncovered; the other thought it may live in the CF-E-30, CF-C-30 and IA-30 prompt bodies |
 | P3 | ADR disposition triad: APPROVED / APPROVED_AS_CHANGED / REJECTED; being included in a Plan is not approval | The vocabulary is in live use and D9 protects it, but it may already be in the prompt bodies |
 | P4 | PR-10 semantic-readiness checks before INSTRUCTION_READY; session-reinitialization rules; IA-30 correction intake; CL-40 scan detail; ordered-PR merge dependency | Can only be settled by reading the Notion prompt bodies and graph parts |
-| P5 | Model and surface advice (human model headers) | The graph `handoff_contract` forbids model routes, while HDE Governance §9.1.6 on `main` still keeps a monthly header review. Needs a ruling |
 | P6 | Who writes to the Notion Prompt and Session Control Error Log | No destination rule names it (`notion-write-boundary.md`) |
 | P7 | Technical Writing (TW) flow rules | TW is outside the current ecosystem scope (D23 successor) |
+
+## Product Owner rulings, 2026-09-27
+
+These settle former pending items. They change no PF canon: the passages that disagree stay as written until the Product Owner directs a change to them.
+
+| Former item | Ruling | Effect |
+| :---- | :---- | :---- |
+| P1, home for the "HD Refs" originals | They remain authoritative in some contexts, but nothing development-related needs them | No repository home is created; R1 is scoped accordingly |
+| P5, monthly model-advice review of prompt headers | It does not survive | The graph `handoff_contract` governs; the review in HDE Governance §9.1.6 is not performed. That passage is a candidate drain target |
+| Who assigns PF10 addendum numbers | Not agent-managed | Agents do not assign addendum numbers, consistent with the graph `pf10_addendum_contract`. The contrary text in PF10 addendum 2.8 is a candidate for a later addendum |
+| Whether addendum 2.28 needs a D4 update | Not a matter for agents to govern | No action |
