@@ -152,7 +152,7 @@ def _shell_check(root: Path) -> None:
     old_head = state.get("head")
     if old_head and head and old_head != head:
         try:
-            committed = _git(root, "diff", "--name-only", "-z", "--diff-filter=AM", old_head, head, "--", "docs/ephemeral")
+            committed = _git(root, "diff", "--name-only", "-z", "--diff-filter=AMR", old_head, head, "--", "docs/ephemeral")
         except (OSError, subprocess.SubprocessError):
             committed = ""
         for rel in committed.split("\0"):
