@@ -84,6 +84,6 @@ These settle former pending items. They change no PF canon: the passages that di
 | Former item | Ruling | Effect |
 | :---- | :---- | :---- |
 | P1, home for the "HD Refs" originals | They remain authoritative in some contexts, but nothing development-related needs them | No repository home is created; R1 is scoped accordingly |
-| P5, monthly model-advice review of prompt headers | It does not survive | The graph `handoff_contract` governs; the review in HDE Governance §9.1.6 is not performed. That passage is a candidate drain target |
-| Who assigns PF10 addendum numbers | Not agent-managed | Agents do not assign addendum numbers, consistent with the graph `pf10_addendum_contract`. The contrary text in PF10 addendum 2.8 is a candidate for a later addendum |
+| P5, monthly model-advice review of prompt headers | It does not survive; no header review is needed | The graph `handoff_contract` governs; the review in HDE Governance §9.1.6 is not performed. That passage is a candidate drain target |
+| Who assigns PF10 addendum numbers | An agent that authors a PF10 addendum during a prompt-governed cycle assigns its number | PF10 addendum 2.8 stands. The graph `pf10_addendum_contract` rule that producers never assign numbers conflicts with it, and that contract is the candidate for correction |
 | Whether addendum 2.28 needs a D4 update | Not a matter for agents to govern | No action |
