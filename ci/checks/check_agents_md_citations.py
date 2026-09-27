@@ -47,6 +47,35 @@ def pf_titles(pfcanon: Path) -> list[str]:
     return sorted(titles)
 
 
+def pf_names(pfcanon: Path) -> tuple[list[str], list[str]]:
+    """Exact PF file names (without .md) and single-word PF titles."""
+    stems: list[str] = []
+    single: list[str] = []
+    for path in sorted(pfcanon.glob("*.md")):
+        if path.stem.startswith("PF10"):
+            continue
+        stems.append(path.stem)
+        match = _TITLE_FROM_FILE.match(path.stem)
+        raw = (match.group(1) if match else path.stem).strip(" -")
+        words = raw.replace("-", " ").split()
+        if len(words) == 1:
+            single.append(words[0])
+    return stems, single
+
+
+def scan_names(text: str, stems: list[str], single: list[str]) -> list[str]:
+    violations: list[str] = []
+    for number, line in enumerate(text.splitlines(), 1):
+        lowered = line.lower()
+        for stem in stems:
+            if stem.lower() in lowered:
+                violations.append(f"AGENTS.md:{number}:pf_filename:{stem}")
+        for word in single:
+            if re.search(rf"\bthe\s+{re.escape(word)}\s+(?:document|doc|file|guide)\b", line, re.IGNORECASE):
+                violations.append(f"AGENTS.md:{number}:pf_title:{word}")
+    return violations
+
+
 def scan(text: str, titles: list[str]) -> list[str]:
     violations: list[str] = []
     for number, line in enumerate(text.splitlines(), 1):
@@ -76,7 +105,9 @@ def main(root: Path = ROOT) -> int:
     if not agents.is_file():
         print("AGENTS_MD_CITATIONS_MISSING_FILE", file=sys.stderr)
         return 2
-    violations = scan(agents.read_text(encoding="utf-8"), pf_titles(root / "docs" / "pfcanon"))
+    text = agents.read_text(encoding="utf-8")
+    pfcanon = root / "docs" / "pfcanon"
+    violations = scan(text, pf_titles(pfcanon)) + scan_names(text, *pf_names(pfcanon))
     if violations:
         for row in violations:
             print(row, file=sys.stderr)

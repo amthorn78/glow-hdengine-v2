@@ -79,3 +79,13 @@ def test_titles_derive_from_pfcanon_filenames(tmp_path: Path) -> None:
 
 def test_repository_agents_md_passes() -> None:
     assert check.main(ROOT) == 0
+
+
+def test_single_word_and_exact_file_names(tmp_path: Path) -> None:
+    (tmp_path / "PF-Invocation.md").write_text("x\n", encoding="utf-8")
+    (tmp_path / "PF10-HDE-Build-Notes-v13.4.1.md").write_text("x\n", encoding="utf-8")
+    stems, single = check.pf_names(tmp_path)
+    assert stems == ["PF-Invocation"] and single == ["Invocation"]
+    assert any(":pf_filename:" in r for r in check.scan_names("see PF-Invocation.md\n", stems, single))
+    assert any(":pf_title:" in r for r in check.scan_names("per the Invocation document\n", stems, single))
+    assert check.scan_names("each prompt invocation is recorded\n", stems, single) == []
