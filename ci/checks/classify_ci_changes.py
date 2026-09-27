@@ -116,6 +116,8 @@ _DOCUMENTATION_PREFIXES = (
 )
 _DOCUMENT_SUFFIXES = {".adoc", ".md", ".rst"}
 _DOCUMENT_PATHS = {
+    # Claude Code agent configuration (per-turn canon reminder hook); not runtime.
+    ".claude/settings.json",
     "LICENSE",
     "AcceptanceMap.md",
     "AGENTS.md",
