@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PostToolUse hook: review artifacts must carry a non-empty "Canon relied on" block.
 
-Fires after Write/Edit/MultiEdit, and after Bash for the uncommitted docs/ephemeral files whose content changed since the hook last looked. For a file under docs/ephemeral/ that is a review, approval, readiness,
+Fires after Write/Edit/MultiEdit, and after Bash for docs/ephemeral files the command changed or committed. For a file under docs/ephemeral/ that is a review, approval, readiness,
 disposition, decision, verdict, acceptance, triage or audit artifact (by name or
 front-matter artifact_type), it checks for a heading or label "Canon relied on"
 followed by at least one non-empty line before the next heading. A missing or
@@ -53,59 +53,77 @@ def main() -> int:
         return 0
     tool_input = payload.get("tool_input") or {}
     if payload.get("tool_name") == "Bash":
-        # Shell writes: compare the working tree's changed docs/ephemeral Markdown files
-        # with the state last seen, so only files whose content this command changed are judged.
-        paths = _changed_by_shell()
+        _shell_check(Path(os.environ.get("CLAUDE_PROJECT_DIR") or "."))
     else:
-        paths = [str(tool_input.get("file_path") or "")]
-    for path in dict.fromkeys(paths):
-        if _check(path):
-            return 0
+        failing = [p for p in [str(tool_input.get("file_path") or "")] if _fails(p)]
+        _report(failing)
     return 0
 
 
-def _changed_by_shell() -> list[str]:
-    root = Path(os.environ.get("CLAUDE_PROJECT_DIR") or ".")
+def _git(root: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(root), *args], capture_output=True, check=True, timeout=5
+    ).stdout.decode("utf-8", "replace")
+
+
+def _shell_check(root: Path) -> None:
+    """Judge docs/ephemeral Markdown files a shell command changed or committed.
+
+    State kept under .git/ records HEAD and the hash of each uncommitted file already
+    judged. A file is judged when its content differs from that record, or when it was
+    changed by commits made since the recorded HEAD. Only files that pass are recorded,
+    so a failing file is judged again after the next shell command.
+    """
     try:
-        out = subprocess.run(
-            ["git", "-C", str(root), "status", "--porcelain", "-z", "--untracked-files=all", "--", "docs/ephemeral"],
-            capture_output=True, check=True, timeout=5,
-        ).stdout.decode("utf-8", "replace")
-        state_file = Path(subprocess.run(
-            ["git", "-C", str(root), "rev-parse", "--git-path", "canon_relied_on_hook.json"],
-            capture_output=True, check=True, timeout=5,
-        ).stdout.decode().strip())
+        status = _git(root, "status", "--porcelain", "-z", "--untracked-files=all", "--", "docs/ephemeral")
+        head = _git(root, "rev-parse", "--verify", "-q", "HEAD").strip()
+        state_file = Path(_git(root, "rev-parse", "--git-path", "canon_relied_on_hook.json").strip())
     except (OSError, subprocess.SubprocessError):
-        return []
+        return
     if not state_file.is_absolute():
         state_file = root / state_file
     try:
-        seen = json.loads(state_file.read_text(encoding="utf-8"))
+        state = json.loads(state_file.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        seen = {}
-    current: dict[str, str] = {}
-    changed: list[str] = []
-    for entry in out.split("\0"):
+        state = {}
+    seen = state.get("files", {}) if isinstance(state.get("files"), dict) else {}
+    candidates: dict[str, str | None] = {}
+    for entry in status.split("\0"):
         rel = entry[3:]
-        if len(entry) < 4 or entry[:2].strip() == "D" or not rel.endswith(".md"):
+        if len(entry) < 4 or "D" in entry[:2] or not rel.endswith(".md"):
             continue
-        path = root / rel
         try:
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            candidates[rel] = hashlib.sha256((root / rel).read_bytes()).hexdigest()
         except OSError:
             continue
-        current[rel] = digest
-        if seen.get(rel) != digest:
-            changed.append(str(path))
+    old_head = state.get("head")
+    if old_head and head and old_head != head:
+        try:
+            committed = _git(root, "diff", "--name-only", "-z", "--diff-filter=AM", old_head, head, "--", "docs/ephemeral")
+        except (OSError, subprocess.SubprocessError):
+            committed = ""
+        for rel in committed.split("\0"):
+            if rel.endswith(".md"):
+                candidates.setdefault(rel, None)
+    recorded: dict[str, str] = {}
+    failing: list[str] = []
+    for rel, digest in candidates.items():
+        if digest is not None and seen.get(rel) == digest:
+            recorded[rel] = digest
+            continue
+        if _fails(str(root / rel)):
+            failing.append(str(root / rel))
+        elif digest is not None:
+            recorded[rel] = digest
     try:
-        state_file.write_text(json.dumps(current, sort_keys=True), encoding="utf-8")
+        state_file.write_text(json.dumps({"head": head, "files": recorded}, sort_keys=True), encoding="utf-8")
     except OSError:
         pass
-    return changed
+    _report(failing)
 
 
-def _check(path: str) -> bool:
-    """Print a block decision for one file; return True when it did."""
+def _fails(path: str) -> bool:
+    """True for a decision artifact under docs/ephemeral/ without a non-empty block."""
     if "docs/ephemeral/" not in path or not path.endswith(".md"):
         return False
     try:
@@ -114,18 +132,22 @@ def _check(path: str) -> bool:
         return False
     if not (_REVIEW_NAME.search(Path(path).name) or _REVIEW_TYPE.search(text[:4000])):
         return False
-    if has_block(text):
-        return False
+    return not has_block(text)
+
+
+def _report(failing: list[str]) -> None:
+    if not failing:
+        return
+    names = ", ".join(Path(p).name for p in failing)
     print(json.dumps({
         "decision": "block",
         "reason": (
-            f"{Path(path).name} is a review or approval artifact with no non-empty "
+            f"{names}: review or approval artifact with no non-empty "
             "'Canon relied on' block. Add one listing the PF titles and sections, and the "
             "in-flight documents, actually read for this review (AGENTS.md canon-first rule). "
             "Search canon first if you have not."
         ),
     }))
-    return True
 
 
 if __name__ == "__main__":
