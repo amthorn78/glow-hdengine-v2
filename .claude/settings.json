@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '%s\\n' '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"Canon-first reminder (AGENTS.md): before planning, authoring, reviewing, deciding or asking the Product Owner anything, search PF canon as it stands on main (when this branch edits docs/pfcanon/, use git grep origin/main -- docs/pfcanon/ and treat the branch edits as an unmerged proposal) and this change'\"'\"'s docs/ephemeral/ documents for this task'\"'\"'s terms, surfaces, environments and headings. Read every governing section found in full, apply it, and cite the PF titles and sections relied on (inside a PF document other than PF10, name PF10 by title only). PF10 overrides earlier canon where it speaks. Do not modify PF canon unless this prompt explicitly directs it.\"}}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_canon_relied_on.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_canon_relied_on.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -26,6 +26,7 @@ LANES = ("product", "compat", "db", "rails", "evidence", "qa", "release")
 SHA_RE = re.compile(r"[0-9a-fA-F]{40,64}\Z")
 
 _FULL_VALIDATION_PREFIXES = (
+    ".claude/",  # agent hooks execute shell commands every session turn
     ".github/",
 )
 _FULL_VALIDATION_PATHS = {
@@ -185,6 +186,7 @@ _ARCHITECTURE_ANALYSIS_PATHS = {
     "tools/evidence/generate_architecture_snapshot.py",
 }
 _WORKFLOW_CONTROL_PATH_LANES = {
+    "ci/checks/check_agents_md_citations.py": {"product"},
     "ci/checks/check_env_pins.sh": set(LANES),
     "ci/checks/check_cli_help.sh": {"compat"},
     "ci/checks/run_rails_job_definitions.py": {"rails", "release"},
@@ -841,6 +843,7 @@ _FIXED_LANE_TEST_PROVIDERS = {
         "tests/unit/test_check_direct_db_contract.py",
     )},
     "tests/evidence/test_architecture_snapshot.py": "product",
+    "tests/unit/test_check_agents_md_citations.py": "product",
     "tests/mech/test_order_properties.py": "product",
     "tests/evidence/test_rails_ci_workflow_integration.py": "rails",
     **{path: "evidence" for path in (

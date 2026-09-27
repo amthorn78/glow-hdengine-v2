@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.3.9**  
+**Version: v13.4.2**  
 Effective Date: Sep 27, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -210,7 +210,10 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.25 HDE-EPIC040-PR06b — Reader v1 error-envelope schema conformance (C040-08)  
 * 2.26 HDE-EPIC040-PR06b — PR Work-Unit Lineage Review v1.0  
 * 2.27 HDE-EPIC040-OPS01 — OPS\_EXECUTION\_RESULT v1.4  
-* 2.28 HDE-EPIC040 — Change Audit Triage v1.0 (QA-10)
+* 2.28 HDE-EPIC040 — Change Audit Triage v1.0 (QA-10)  
+* 2.29 PF10-CANON-001 — Repository PF-Canon Authority, Change-Process Document Storage and Canon Consultation  
+* 2.30 PF10-CITE-001 — PF Documents Do Not Cite HDE Build Notes by Internal Locator
+* 2.31 PF10-HDR-001 — Retirement of the Human Operator Header Model-Advice Review
 
 # **2\) Numbered Addenda**
 
@@ -2831,4 +2834,203 @@ Every observation in the Reality Audit §12 (RA-01 to RA-18) and every historica
 * PF10\_ADDENDUM\_OUTPUT: NOT\_PRODUCED\_BY\_QA-10.  
 * CANON\_CONFLICT\_REGISTER: C040-01 to C040-08 carried unchanged (status in the readiness record §5).
 
-\<eof\>  
+## 2.29 PF10-CANON-001 — Repository PF-Canon Authority, Change-Process Document Storage and Canon Consultation
+
+Timestamp: 092726 16:57 (UTC)  
+Details: Records Product Owner decision D7 in canon for where PF-Canon is resolved and where change-process documents are stored, and requires every agent task to begin from the canon that governs it.
+
+### Source and authority
+
+This addendum records two Product Owner decisions:
+
+* Decision D7, ruled 2026-09-18 in `docs/prompt_ecosystem_management/gcfpe.decision-record.md`. The repository is the persistent storage and versioning authority. Notion is the operational and indexing layer. Google Drive is not a storage authority: not a default, not a fallback and not a place canon is resolved from.  
+* The Product Owner's direction of 2026-09-27, following the HDE-EPIC040 QA-70 planning failure. Every agent task begins by searching PF-Canon for the material relevant to it. A change's in-flight documents are canon for that change. Specifications are permanent governed records; Plans are working direction.
+
+### PF-Canon location and authority
+
+PF-Canon is held in `docs/pfcanon/` on `main`. Each document there keeps the standing it declares, such as canon, build notes or reference. That directory is the canon authority for all work, including planning, governance authoring, review, QA readiness, task preparation, and QA and operations execution. The current version of a PF document is its version in `docs/pfcanon/` on `main`. A superseded version leaves that directory, and the repository history retains it.
+
+A native Google Doc, a Markdown export, a Google Drive folder or a Notion page confers no PF authority. PF-named files elsewhere in the repository, such as those under `audit/docdeltas/`, are not controlled canon.
+
+Adopting a PF version is not content approval, implementation, QA acceptance or closure. Resolving canon from `docs/pfcanon/` grants no tool, credential, network, rails, mutation or privileged-action permission. `docs/pfcanon/` stays read-only for agents except under the Product Owner's exact authority for an identified document and action.
+
+### Change-process document storage
+
+Change-process documents are stored in `docs/ephemeral/` and referenced by repository path. A document whose class is uncertain is stored there too. This covers the following:
+
+* intake and kickoff records;  
+* Specifications and Plans;  
+* audits, triage and readiness records;  
+* Guides, instructions and tasks;  
+* reviews, reports, RCAs and remediation work products;  
+* handoffs, redlines and Product Owner dispositions.
+
+These documents belong to the `REPOSITORY_CONTROLLED` class of **HDE Governance** §9.1.3. Persistent prompt-ecosystem management records are held in `docs/prompt_ecosystem_management/`. Repository-controlled code, tests, configuration and governed evidence keep their established paths and writers.
+
+ChatGPT Library and Google Drive are neither destinations nor authorities for change-process documents. Google Drive holds a file only where the Product Owner directs that specific file there, and such a file is not an authority. Existing documents in ChatGPT Library or Google Drive keep their provenance as historical records.
+
+### Canon consultation for every task
+
+Agent work is grounded in canon the agent has read.
+
+At the start of every task, and whenever its subject changes, the agent searches all of `docs/pfcanon/` for material relevant to the task. It also searches the in-flight documents of the change the task serves. The search covers the task's terms, the surfaces and environments it touches, and section headings. The agent reads each governing section it finds in full and applies it. It searches rather than loading all of canon into context.
+
+The search comes before any planning, authoring, reviewing or deciding, and before any question to the Product Owner. A review checks the work against the canon the reviewer has read, not only against code.
+
+The agent does not ask the Product Owner a question that canon answers. It asks only in two cases, and names the sections it searched:
+
+* canon is silent;  
+* canon's precedence rules leave a conflict unresolved.
+
+Each artifact records the PF titles and sections it relied on. An artifact neither states nor implies conformance to canon that was not read.
+
+### In-flight change documents
+
+A change's in-flight documents are in `docs/ephemeral/`, found by the change ID in their file names. They are canon for that change during the implementation flow:
+
+* Its approved Specification is a permanent governed record. It is the sole intended-scope authority for the change (**HDE Mechanics Guide** §0.2; addendum 2.14).  
+* Its approved Plans are working direction for executing the change. They govern that execution but do not become permanent records.  
+* The decisions recorded in its reviews and in Product Owner dispositions also govern the change.
+
+The current version of each document applies; superseded and rejected versions do not. Where an in-flight document conflicts with PF-Canon, the precedence rule in **Plan Templates**, "Canon precedence for template use", applies.
+
+### Superseded permanent passages
+
+This addendum supersedes permanent PF-Canon within three scopes only:
+
+* where PF-Canon is resolved, and what confers PF authority;  
+* where change-process documents are stored;  
+* whether Google Drive or ChatGPT Library holds authority for either.
+
+Within those scopes it supersedes these passages. Outside them, the documents stand.
+
+| Document and section | Superseded scope |
+| :---- | :---- |
+| **HDE Governance** §2.0, second "Claim separation" paragraph | Repository PF documents as publication mirrors of a Drive authority and as bounded QA/Ops execution sources. The rule that repository presence confers no independent PF editing authority stands. |
+| **HDE Governance** §9.1.2, third and fourth paragraphs | The Drive collection as the persistent PFCanon authority. Native Google Docs, Markdown peers, mirror synchronization, drift and archive mechanics as determinants of PF authority. Drive sources for planning and governance authoring, and the limit of repository PF documents to QA/Ops execution. |
+| **HDE Governance** §9.1.3 | The `EPHEMERAL_LIBRARY` and `DURABLE_DRIVE` classes. Every rule that places change-process documents, or the durable retention of scratch work, in ChatGPT Library, including Library as the default when classification is uncertain. Classification before the first write, `REPOSITORY_CONTROLLED`, `CONTROL_NOTION`, scratch as transient space and the prohibition on Drive persistence stand. |
+| **HDE Governance** §9.1.4, first paragraph | The exception permitting repository PF copies when Drive is unavailable, and its limit on planning. Its source-recording requirement stands. So does its non-grant of tools, credentials, mutation, network, rails and privileged-action permission. |
+| **HDE Governance** §9.1.6 | Ongoing operating procedures as controlled Drive Markdown authorities. |
+| **Glow QA Guide** §0.2 | ChatGPT Library for authored QA work products. |
+| **Glow QA Guide** §0.4.3 | ChatGPT Library for change-process artifacts. The rest of that paragraph stands. |
+| **Glow QA Guide** §3.4.3, "QA evidence and work-product path grammar (normative)", row "Authored Live QA plan or runbook" | ChatGPT Library as the location. |
+| **Glow QA Guide** §3.6 | ChatGPT Library for authored audits and Plans. |
+| **Glow QA Guide** §10.8, "Canonical authority and bounded execution sources" | Google Drive as the canonical source for readiness, QA planning, Plan review and task preparation. Repository PF documents as publication/execution copies. The bounded execution exception and its limit on planning. The rule that repository copies confer no PF editing authority stands, as does the requirement to record the PF sources actually used. |
+| **HDE Mechanics Guide** §0.2, "Current source and work-product posture" | Planning canon in the Google Drive PFCanon collection. Repository PF documents as mirrors. The Drive-unavailable execution fallback. `EPHEMERAL_LIBRARY` storage for change-process documents. The sentences on HDE Build Notes addendum scope, and the rest of that subsection, stand. |
+| **HDE Mechanics Guide** §35 and §37.2 | `EPHEMERAL_LIBRARY` for newly produced off-repository documents. |
+| **HDE Build Checklist — Calcination** §0.5, fourth and fifth paragraphs | Google Drive PFCanon as the authority for build-checklist planning and documentation. The execution-source exception. ChatGPT Library for change-process work products. Both paragraphs cite HDE Build Notes addenda on execution sources and ephemeral artifact storage from an earlier HDE Build Notes version, and this addendum governs both topics. The recording of actual sources, the absence of PF editing authority and the remaining sentences stand. |
+| Addendum 2.1, "Canonical-source boundaries" and "Maintenance rule" | The Google Drive PFCanon directory as the home of canonical PF documents and as the place the pointer pages resolve. Canonical PF documents are in `docs/pfcanon/`, and the pointer pages resolve the current document there by PF identity and versionless title. The rest of addendum 2.1 stands. |
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no text in the permanent documents listed above.  
+* It does not move, copy or re-home existing artifacts in ChatGPT Library, Google Drive or Notion, and it does not alter any historical record or its provenance.  
+* It does not change any of the following:  
+  * governed evidence homes or their writers;  
+  * the Evidence Index or Mirror;  
+  * path proofs;  
+  * release or attestation contracts.  
+* GCFPE prompt bodies remain single-homed in Notion.  
+* It grants no tool, credential, network, rails, mutation or privileged-action permission. PF mutation stays under the Product Owner's exact authority.  
+* It establishes no QA verdict, acceptance, OPS result, HDE Build Checklist status movement or closure for any change.
+
+### Unresolved work
+
+* **HDE Governance** §9.1.6 places ongoing operating procedures in Drive, and those procedures have no repository home. Under this addendum Drive holds no authority for them. Their placement is undecided.  
+* The same applies to the dated selection guidance that **HDE Governance** §9.1.3 locates in Glow / Ops, to the extent Drive holds it.
+
+### Evidence anchors
+
+* `docs/prompt_ecosystem_management/gcfpe.decision-record.md`, D7 and "Applied under D7"  
+* `docs/prompt_ecosystem_management/authoritative-surfaces.md`, rule of precedence and "Not authoritative"  
+* `docs/ephemeral/HDE-EPIC040-QA70-planning-failure-rca-v1.1.md`  
+* `AGENTS.md`, "Canon-first rule"
+
+## 2.30 PF10-CITE-001 — PF Documents Do Not Cite HDE Build Notes by Internal Locator
+
+Timestamp: 092726 17:16 (UTC)  
+Details: Establishes that PF documents other than HDE Build Notes do not cite it by addendum number, section, heading, paragraph or version, and names the permanent passages that currently do as drain targets.
+
+### Source and authority
+
+This addendum records the Product Owner's governance rules of 2026-09-27 for PF-Canon references:
+
+* No PF document cites HDE Build Notes by addendum number, section number, heading, paragraph, version or any other internal locator.
+* HDE Build Notes addenda may cite other HDE Build Notes addenda. That is the only exception.
+* HDE Build Notes grows by addenda, so a locator in another document is brittle: addendum numbers and titles change between HDE Build Notes versions.
+
+### Rule
+
+A PF document other than HDE Build Notes acknowledges HDE Build Notes authority only through the canon's governance relationship. HDE Build Notes is the canonical override and amendment mechanism, and an applicable addendum governs conflicting earlier canon for its scope. Such a document names HDE Build Notes, at most, by title.
+
+An agent that meets an addendum-number citation in another PF document does not resolve it by number. It searches the current HDE Build Notes for the addenda whose scope covers the topic, as the front matter's operational rule requires. Many existing citations name addenda of earlier HDE Build Notes versions. In the current version those numbers identify different addenda, so they give no reliable pointer.
+
+### Drain targets
+
+Each passage below cites HDE Build Notes by addendum number or section. When the document is next revised, the citation is removed. Where the governance relationship needs acknowledging, the reference is by title only. The substantive rule each passage states is not changed by this addendum.
+
+| Document | Sections carrying locator citations |
+| :---- | :---- |
+| **HDE Governance** | §0.2 |
+| **HDE Build Checklist — Calcination** | §0.5; Task HDE-CALC003; Subtasks HDE-CALC003.11, HDE-CALC003.14, HDE-CALC003.15 and HDE-CALC003.17 |
+| **HDE Build Checklist — Separation** | Task HDE-SEPA006 |
+| **HDE Build Checklist — Conjunction** | Phase IV introduction; Subtask HDE-CONJ005.2; Task HDE-CONJ008; Subtasks HDE-CONJ008.1, HDE-CONJ009.1 and HDE-CONJ009.2 |
+| **HDE Build Checklist — Coagulation** | Subtasks HDE-COAG001.3, HDE-COAG001.9 and HDE-COAG007.2; Task HDE-COAG006 |
+| **HDE Mechanics Guide** | §0.2; §1.1; §1.3; §1.6.3; §35; "EPIC029 bounded conjunction closure artifact" |
+
+The storage and canon-source content of **HDE Build Checklist — Calcination** §0.5 and **HDE Mechanics Guide** §0.2 and §35 is already superseded by addendum 2.29. The citations in those passages are drain targets under this addendum.
+
+### Historical records
+
+Historical records keep their original wording and provenance, including their addendum-number citations. These are not drain targets:
+
+* **HDE Phased Epics**, a historical reference document;
+* the dated snapshots in **Reality Audits**;
+* the closed-change and learnings records in **Glow QA Guide** §13.12 and §13.19.
+
+Their citations describe the HDE Build Notes version current when they were written, not the current one.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no text in any document listed above.
+* It does not alter the meaning of any cited addendum or of the passages that cite them.
+* It creates no requirement to revise a document before its next ordinary revision.
+* It establishes no QA verdict, acceptance, build-checklist status movement or closure.
+
+### Evidence anchors
+
+* Line-level locator search across `docs/pfcanon/` excluding HDE Build Notes, 2026-09-27 (repository state `4eb293c`)
+
+## 2.31 PF10-HDR-001 — Retirement of the Human Operator Header Model-Advice Review
+
+Timestamp: 092726 19:05 (UTC)  
+Details: Retires the monthly review of surface, model and effort guidance in human operator headers, and names the permanent passage that prescribes it as a drain target.
+
+### Source and authority
+
+This addendum records the Product Owner's ruling of 2026-09-27: no header review is needed. The monthly review of human operator header model advice is not performed.
+
+### Rule
+
+No agent or role maintains, reviews or refreshes the surface, model or effort guidance in human operator headers on a monthly or release-driven schedule. Nothing in the canon makes that review a prerequisite for prompt selection, publication, maintenance or use.
+
+### Superseded permanent passage and drain target
+
+| Document and section | Superseded scope |
+| :---- | :---- |
+| **HDE Governance** §9.1.6, the paragraph beginning "Keep each applicable human operator header's surface/model/effort guidance current" | The first five sentences: the monthly and release-driven review of header surface, model and effort guidance, the no-duplicate-schedule rule, the preservation of predecessor advice, the separate assessment of an expanded next task, and the limits on fixed model and effort selection. The paragraph's remaining sentences, on separating known text defects, candidate corrections, published selection and observed runtime correction, preserving the failing case, and the limits of static checks, stand. |
+
+When HDE Governance is next revised, the superseded sentences are removed. The remaining sentences stay.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no text in HDE Governance or any other permanent document.
+* It changes no prompt body, prompt header, contract, register, map, graph part or other prompt ecosystem artifact.
+* The permission, elsewhere in §9.1.6, for a prompt to carry its own version and a human model header is unchanged.
+* It establishes no QA verdict, acceptance, build-checklist status movement or closure.
+
+### Evidence anchors
+
+* Product Owner ruling, 2026-09-27, recorded in `docs/prompt_ecosystem_management/operating-procedures/carried-forward-operating-rules.md`, "Product Owner rulings, 2026-09-27"
+
+\<eof\>
