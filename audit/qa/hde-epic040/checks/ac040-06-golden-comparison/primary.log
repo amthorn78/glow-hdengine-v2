@@ -1,0 +1,10 @@
+T06 ac040-06-golden-comparison
+=== compare-goldens ===
+{"candidate_release_id":"52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96","candidate_root":".","cases":[{"case_id":"M10-G001","case_type":"kernel","kind":"signal_vector","outcome":"match"},{"case_id":"M10-G002","case_type":"kernel","kind":"signal_vector","outcome":"match"},{"case_id":"M10-G003","case_type":"kernel","kind":"signal_operation","outcome":"match"},{"case_id":"M10-G004","case_type":"kernel","kind":"core","outcome":"match"},{"case_id":"M10-G005","case_type":"application","kind":"evaluate_pair","outcome":"match"},{"case_id":"M10-G006","case_type":"kernel","kind":"reducer","outcome":"match"},{"case_id":"M10-G007","case_type":"application","kind":"evaluate_pair","outcome":"match"},{"case_id":"M10-G008","case_type":"application","kind":"evaluate_pair","outcome":"match"}],"config_id":"m10-channel-state-v1.0.0","goldens_path":"tests/fixtures/magic10/v1/goldens.json","goldens_sha256":"9f99c6aa633cf4713c3de9d37a1d70157fe632e08740ec1c505ecc202486ace5","mismatches":[],"ok":true,"schema":"magic10_golden_comparison.v1"}
+RC=0
+=== pytest group C ===
+........................................................................ [ 47%]
+........................................................................ [ 94%]
+.........                                                                [100%]
+153 passed in 23.03s
+RC=0

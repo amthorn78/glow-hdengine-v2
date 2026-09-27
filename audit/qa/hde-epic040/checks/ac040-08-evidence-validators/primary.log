@@ -1,0 +1,184 @@
+++ __vsc_preexec_only ''
+++ '[' 1 = 0 ']'
++ echo 'T03 ac040-08-evidence-validators'
+T03 ac040-08-evidence-validators
+++ __vsc_preexec_only 'T03 ac040-08-evidence-validators'
+++ '[' 1 = 0 ']'
++ echo '=== python --version ==='
+=== python --version ===
+++ __vsc_preexec_only '=== python --version ==='
+++ '[' 1 = 0 ']'
++ python --version
+Python 3.12.14
+++ __vsc_preexec_only --version
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== python import harness ==='
+=== python import harness ===
+++ __vsc_preexec_only '=== python import harness ==='
+++ '[' 1 = 0 ']'
++ python -c 'import tools.qa.qa_harness, engine'
+++ __vsc_preexec_only 'import tools.qa.qa_harness, engine'
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== update_evidence_index --check ==='
+=== update_evidence_index --check ===
+++ __vsc_preexec_only '=== update_evidence_index --check ==='
+++ '[' 1 = 0 ']'
++ python tools/evidence/update_evidence_index.py --check
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+++ __vsc_preexec_only --check
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== orientation_demo --check ==='
+=== orientation_demo --check ===
+++ __vsc_preexec_only '=== orientation_demo --check ==='
+++ '[' 1 = 0 ']'
++ python tools/evidence/orientation_demo.py --check
+++ __vsc_preexec_only --check
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== validate_evidence_paths ==='
+=== validate_evidence_paths ===
+++ __vsc_preexec_only '=== validate_evidence_paths ==='
+++ '[' 1 = 0 ']'
++ python tools/evidence/validate_evidence_paths.py
+++ __vsc_preexec_only tools/evidence/validate_evidence_paths.py
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== check_mirror_schema ==='
+=== check_mirror_schema ===
+++ __vsc_preexec_only '=== check_mirror_schema ==='
+++ '[' 1 = 0 ']'
++ ./ci/checks/check_mirror_schema.sh
+++ __vsc_preexec_only ./ci/checks/check_mirror_schema.sh
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== check_evidence_index_hash ==='
+=== check_evidence_index_hash ===
+++ __vsc_preexec_only '=== check_evidence_index_hash ==='
+++ '[' 1 = 0 ']'
++ ci/checks/check_evidence_index_hash.sh
+++ __vsc_preexec_only ci/checks/check_evidence_index_hash.sh
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== run_canonical_json_gate --check-only ==='
+=== run_canonical_json_gate --check-only ===
+++ __vsc_preexec_only '=== run_canonical_json_gate --check-only ==='
+++ '[' 1 = 0 ']'
++ python tools/evidence/run_canonical_json_gate.py --check-only
+++ __vsc_preexec_only --check-only
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== check_lf_endings ==='
+=== check_lf_endings ===
+++ __vsc_preexec_only '=== check_lf_endings ==='
+++ '[' 1 = 0 ']'
++ python tools/evidence/check_lf_endings.py
+++ __vsc_preexec_only tools/evidence/check_lf_endings.py
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== check_env_pins ==='
+=== check_env_pins ===
+++ __vsc_preexec_only '=== check_env_pins ==='
+++ '[' 1 = 0 ']'
++ ci/checks/check_env_pins.sh
+[env-pins] OK: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+++ __vsc_preexec_only ci/checks/check_env_pins.sh
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== generate_config_artifacts --check ==='
+=== generate_config_artifacts --check ===
+++ __vsc_preexec_only '=== generate_config_artifacts --check ==='
+++ '[' 1 = 0 ']'
++ python tools/config/generate_config_artifacts.py --check
+++ __vsc_preexec_only --check
+++ '[' 1 = 0 ']'
++ echo RC=0
+RC=0
+++ __vsc_preexec_only RC=0
+++ '[' 1 = 0 ']'
++ echo '=== pytest group G ==='
+=== pytest group G ===
+++ __vsc_preexec_only '=== pytest group G ==='
+++ '[' 1 = 0 ']'
++ python -m pytest -q -p no:cacheprovider -rs tests/evidence/test_canonical_json_gate_check_outputs.py tests/evidence/test_cli_conformance_artifacts.py tests/evidence/test_determinism_gate_proofs.py tests/evidence/test_dev_conjunction_identity.py tests/evidence/test_engine_core_evidence.py tests/evidence/test_epic030_pr05_category_framework_evidence.py tests/evidence/test_evidence_index_missing_state.py tests/evidence/test_evidence_tool_ownership.py tests/evidence/test_open_rails_abba_proof.py tests/evidence/test_rails_ci_workflow_integration.py tests/evidence/test_sanity_pipeline.py tests/qa/test_qa_tool_ownership.py
+........................................................................ [ 12%]
+.....................................................................F
+=================================== FAILURES ===================================
+__________ test_updater_recovers_complete_missing_state_in_one_write ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-vscode/pytest-3/test_updater_recovers_complete0')
+
+    def test_updater_recovers_complete_missing_state_in_one_write(tmp_path: Path) -> None:
+        repo = tmp_path / "repo"
+        shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    
+        missing_families = (
+            ("docs/evidence/INDEX.sha256",),
+            ("docs/evidence/INDEX.sha256.path_proof.txt",),
+            (
+                "artifacts/evidence_index.jsonl",
+                "artifacts/evidence_index.jsonl.path_proof.txt",
+                "artifacts/evidence_index.jsonl.sha256",
+                "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+            ),
+            (
+                "audit/gates/topology/orientation_demo.txt",
+                "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+            ),
+        )
+        for family in missing_families:
+            original_modes = {
+                relative: stat.S_IMODE((repo / relative).stat().st_mode)
+                for relative in family
+            }
+            for relative in family:
+                (repo / relative).unlink()
+            _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+            assert all((repo / relative).is_file() for relative in family)
+>           assert {
+                relative: stat.S_IMODE((repo / relative).stat().st_mode)
+                for relative in family
+            } == original_modes
+E           AssertionError: assert {'docs/eviden....sha256': 420} == {'docs/eviden....sha256': 438}
+E             
+E             Differing items:
+E             {'docs/evidence/INDEX.sha256': 420} != {'docs/evidence/INDEX.sha256': 438}
+E             Use -v to get more diff
+
+tests/evidence/test_evidence_index_missing_state.py:249: AssertionError
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/tmp/hde-python-3.12/python/lib/python3.12/selectors.py:415: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+1 failed, 141 passed in 45.24s

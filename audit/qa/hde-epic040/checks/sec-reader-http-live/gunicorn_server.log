@@ -1,0 +1,9 @@
+[2026-09-27 13:03:33 +0000] [47199] [INFO] Starting gunicorn 21.2.0
+[2026-09-27 13:03:33 +0000] [47199] [INFO] Listening at: http://0.0.0.0:8000 (47199)
+[2026-09-27 13:03:33 +0000] [47199] [INFO] Using worker: gthread
+[2026-09-27 13:03:33 +0000] [47210] [INFO] Booting worker with pid: 47210
+[2026-09-27 13:03:33 +0000] [47211] [INFO] Booting worker with pid: 47211
+[2026-09-27 13:03:34 +0000] [47199] [INFO] Handling signal: term
+[2026-09-27 13:03:34 +0000] [47210] [INFO] Worker exiting (pid: 47210)
+[2026-09-27 13:03:35 +0000] [47211] [INFO] Worker exiting (pid: 47211)
+[2026-09-27 13:03:35 +0000] [47199] [INFO] Shutting down: Master

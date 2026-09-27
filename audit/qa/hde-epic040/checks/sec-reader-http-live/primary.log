@@ -1,0 +1,7 @@
+T10 sec-reader-http-live
+[1] 47199
+curl: (7) Failed to connect to 127.0.0.1 port 8000 after 0 ms: Could not connect to server
+probe_version_1 http_code=000
+probe_version_2 http_code=200
+T10 smoke end
+RC=0

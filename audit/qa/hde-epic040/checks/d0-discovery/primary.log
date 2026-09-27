@@ -1,0 +1,291 @@
+# T01 d0-discovery
+CMD1 rc=0
+
+
+CMD2 rc=0
+DATABASE_URL=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+PORT=UNSET
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+
+
+CMD3 rc=0
+b2147503f52bba40da09fdfd4c382fc435b19a3c
+
+
+CMD4 rc=0
+
+
+CMD5 rc=0
+/tmp/hde-epic040-qa/venv/bin/python3.12
+
+
+CMD6 rc=0
+
+
+CMD7 rc=0
+Python 3.12.14
+
+
+CMD8 rc=0
+Obtaining file:///workspaces/glow-hdengine-v2
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Collecting psycopg<3.3,>=3.1 (from psycopg[binary]<3.3,>=3.1->-r requirements.txt (line 1))
+  Using cached psycopg-3.2.13-py3-none-any.whl.metadata (4.5 kB)
+Collecting Flask<3.0,>=2.3 (from -r requirements.txt (line 2))
+  Using cached flask-2.3.3-py3-none-any.whl.metadata (3.6 kB)
+Collecting gunicorn<22,>=21 (from -r requirements.txt (line 3))
+  Using cached gunicorn-21.2.0-py3-none-any.whl.metadata (4.1 kB)
+Collecting jsonschema==4.23.0 (from -r requirements.txt (line 4))
+  Using cached jsonschema-4.23.0-py3-none-any.whl.metadata (7.9 kB)
+Collecting pytest<9.0,>=7.4 (from -r requirements-dev.txt (line 5))
+  Using cached pytest-8.4.2-py3-none-any.whl.metadata (7.7 kB)
+Collecting pytest-cov<5.0,>=4.1 (from -r requirements-dev.txt (line 6))
+  Using cached pytest_cov-4.1.0-py3-none-any.whl.metadata (26 kB)
+Collecting pytest-mock<4.0,>=3.12 (from -r requirements-dev.txt (line 7))
+  Using cached pytest_mock-3.15.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting attrs>=22.2.0 (from jsonschema==4.23.0->-r requirements.txt (line 4))
+  Using cached attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema==4.23.0->-r requirements.txt (line 4))
+  Using cached jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema==4.23.0->-r requirements.txt (line 4))
+  Using cached referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.7.1 (from jsonschema==4.23.0->-r requirements.txt (line 4))
+  Using cached rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting typing-extensions>=4.6 (from psycopg<3.3,>=3.1->psycopg[binary]<3.3,>=3.1->-r requirements.txt (line 1))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting Werkzeug>=2.3.7 (from Flask<3.0,>=2.3->-r requirements.txt (line 2))
+  Using cached werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+Collecting Jinja2>=3.1.2 (from Flask<3.0,>=2.3->-r requirements.txt (line 2))
+  Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting itsdangerous>=2.1.2 (from Flask<3.0,>=2.3->-r requirements.txt (line 2))
+  Using cached itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting click>=8.1.3 (from Flask<3.0,>=2.3->-r requirements.txt (line 2))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting blinker>=1.6.2 (from Flask<3.0,>=2.3->-r requirements.txt (line 2))
+  Using cached blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting packaging (from gunicorn<22,>=21->-r requirements.txt (line 3))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting iniconfig>=1 (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5))
+  Using cached iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting pluggy<2,>=1.5 (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5))
+  Using cached pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting pygments>=2.7.2 (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5))
+  Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting coverage>=5.2.1 (from coverage[toml]>=5.2.1->pytest-cov<5.0,>=4.1->-r requirements-dev.txt (line 6))
+  Using cached coverage-7.16.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.2 kB)
+Collecting psycopg-binary==3.2.13 (from psycopg[binary]<3.3,>=3.1->-r requirements.txt (line 1))
+  Using cached psycopg_binary-3.2.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.9 kB)
+Collecting MarkupSafe>=2.0 (from Jinja2>=3.1.2->Flask<3.0,>=2.3->-r requirements.txt (line 2))
+  Using cached markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Using cached jsonschema-4.23.0-py3-none-any.whl (88 kB)
+Using cached psycopg-3.2.13-py3-none-any.whl (206 kB)
+Using cached flask-2.3.3-py3-none-any.whl (96 kB)
+Using cached gunicorn-21.2.0-py3-none-any.whl (80 kB)
+Using cached pytest-8.4.2-py3-none-any.whl (365 kB)
+Using cached pytest_cov-4.1.0-py3-none-any.whl (21 kB)
+Using cached pytest_mock-3.15.1-py3-none-any.whl (10 kB)
+Using cached psycopg_binary-3.2.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.4 MB)
+Using cached attrs-26.1.0-py3-none-any.whl (67 kB)
+Using cached blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Using cached click-8.5.0-py3-none-any.whl (125 kB)
+Using cached coverage-7.16.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (258 kB)
+Using cached iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Using cached itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+Using cached jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Using cached pluggy-1.6.0-py3-none-any.whl (20 kB)
+Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+Using cached referencing-0.37.0-py3-none-any.whl (26 kB)
+Using cached rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (366 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached werkzeug-3.1.8-py3-none-any.whl (226 kB)
+Using cached markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Building wheels for collected packages: glow-hdengine
+  Building editable for glow-hdengine (pyproject.toml): started
+  Building editable for glow-hdengine (pyproject.toml): finished with status 'done'
+  Created wheel for glow-hdengine: filename=glow_hdengine-0.0.0-0.editable-py3-none-any.whl size=20123 sha256=afc31bea734b73a326cefd03c9201b5f4e71ea32e5ee5c7b77aa6428332ee00c
+  Stored in directory: /tmp/pip-ephem-wheel-cache-ssydypzp/wheels/af/ad/34/8f65df646a36c4492f6f2c9bf8ec3cf26398a037da28e1f5b4
+Successfully built glow-hdengine
+Installing collected packages: typing-extensions, rpds-py, pygments, psycopg-binary, pluggy, packaging, MarkupSafe, itsdangerous, iniconfig, glow-hdengine, coverage, click, blinker, attrs, Werkzeug, referencing, pytest, psycopg, Jinja2, gunicorn, pytest-mock, pytest-cov, jsonschema-specifications, Flask, jsonschema
+Successfully installed Flask-2.3.3 Jinja2-3.1.6 MarkupSafe-3.0.3 Werkzeug-3.1.8 attrs-26.1.0 blinker-1.9.0 click-8.5.0 coverage-7.16.2 glow-hdengine-0.0.0 gunicorn-21.2.0 iniconfig-2.3.0 itsdangerous-2.2.0 jsonschema-4.23.0 jsonschema-specifications-2025.9.1 packaging-26.3 pluggy-1.6.0 psycopg-3.2.13 psycopg-binary-3.2.13 pygments-2.21.0 pytest-8.4.2 pytest-cov-4.1.0 pytest-mock-3.15.1 referencing-0.37.0 rpds-py-2026.6.3 typing-extensions-4.16.0
+
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+
+CMD9 rc=0
+pytest 8.4.2
+
+
+CMD10 rc=0
+/tmp/hde-epic040-qa/venv/bin/python
+/tmp/hde-epic040-qa/venv/bin/python3
+/tmp/hde-epic040-qa/venv/bin/hdctl
+
+
+CMD11 rc=0
+harness_ready
+
+
+CMD12 rc=0
+usage: hdctl [-h] [--version]
+             {showcompat,aux-preview,bg:resolve,dev:sampler} ...
+
+Glow HD Engine compatibility CLI
+
+positional arguments:
+  {showcompat,aux-preview,bg:resolve,dev:sampler}
+    showcompat          Emit canonical Reader v1 bytes from vendor JSON (stdin
+                        or files)
+    aux-preview         Preview Aux narrative text for a public tuple
+    bg:resolve          Resolve BodyGraphs from db/vendor sources (Phase S8a
+                        stub)
+    dev:sampler         DEV/ADMIN ONLY: deterministic sampler harness
+                        (seedable)
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program version and exit
+
+
+CMD13 rc=0
+usage: hdctl showcompat [-h] [--pair-file PAIR_FILE] [--a-file A_FILE]
+                        [--b-file B_FILE] [--a A_FILE] [--b B_FILE]
+                        [--dump-reader DUMP_READER]
+                        [--dump-admin-dir DUMP_ADMIN_DIR]
+                        [--source {db,vendor,auto}] [--conjunction]
+                        [--viewer-prefs-file VIEWER_PREFS_FILE]
+                        [--user-a USER_A] [--user-b USER_B]
+                        [--birthdate-a BIRTHDATE_A]
+                        [--birthtime-a BIRTHTIME_A] [--location-a LOCATION_A]
+                        [--birthdate-b BIRTHDATE_B]
+                        [--birthtime-b BIRTHTIME_B] [--location-b LOCATION_B]
+
+options:
+  -h, --help            show this help message and exit
+  --pair-file PAIR_FILE
+                        Path to JSON with left/right payloads
+  --a-file A_FILE       Path to JSON file containing the left payload
+  --b-file B_FILE       Path to JSON file containing the right payload
+  --a A_FILE            Alias for --a-file
+  --b B_FILE            Alias for --b-file
+  --dump-reader DUMP_READER
+                        Optional path to write public Reader JSON (canonical
+                        bytes)
+  --dump-admin-dir DUMP_ADMIN_DIR
+                        Directory for admin proofs (writes 0600 JSON + .sha256
+                        sidecars)
+  --source {db,vendor,auto}
+                        Explicit BodyGraph source (db, vendor, or auto)
+  --conjunction         Emit conjunction contract JSON (requires
+                        --user-a/--user-b or conjunction pair input; uses SAFE
+                        rails resolver gating)
+  --viewer-prefs-file VIEWER_PREFS_FILE
+                        Path to JSON viewer prefs (top_category + weights)
+  --user-a USER_A       DB user identifier for party A
+  --user-b USER_B       DB user identifier for party B
+  --birthdate-a BIRTHDATE_A
+                        Birthdate for party A (YYYY-MM-DD)
+  --birthtime-a BIRTHTIME_A
+                        Birth time for party A (HH:MM)
+  --location-a LOCATION_A
+                        Location for party A
+  --birthdate-b BIRTHDATE_B
+                        Birthdate for party B (YYYY-MM-DD)
+  --birthtime-b BIRTHTIME_B
+                        Birth time for party B (HH:MM)
+  --location-b LOCATION_B
+                        Location for party B
+
+
+CMD14 rc=0
+usage: generate_config_artifacts.py [-h] [--allow-aliases]
+                                    [--check | --publish-family | --compare-goldens CANDIDATE_ROOT]
+                                    [--goldens PATH] [--report PATH]
+
+Generate governed config artifacts under closed rails
+
+options:
+  -h, --help            show this help message and exit
+  --allow-aliases       Enable explicit input-only alias allow-list mode
+  --check               Validate committed three-primary bytes without writing
+  --publish-family      Publish the scoped config, catalog logs, bundles and
+                        required evidence companions from this checkout
+  --compare-goldens CANDIDATE_ROOT
+                        Read-only: admit the explicit candidate root and
+                        compare the PF01 §9.5 golden collection through the
+                        canonical entrypoints; exit 0 on match, 1 on mismatch,
+                        5 on refusal
+  --goldens PATH        Golden collection for --compare-goldens (default:
+                        tests/fixtures/magic10/v1/goldens.json)
+  --report PATH         With --compare-goldens: write the complete canonical
+                        report to this path outside the candidate root and the
+                        repository, never over the goldens file
+
+
+CMD15 rc=0
+usage: check_magic10_gate_readiness.py [-h] [--user-id UUID]
+                                       [--selection-file PATH]
+
+Read-only current-row Magic-10 Gate-readiness check over an explicit selection
+
+options:
+  -h, --help            show this help message and exit
+  --user-id UUID        Canonical lowercase hyphenated UUID to check;
+                        repeatable
+  --selection-file PATH
+                        File with one canonical UUID per line; blank lines and
+                        '#' comments ignored
+
+
+CMD16 rc=0
+usage: release_id_recompute.py [-h] [--manifest MANIFEST] [--check]
+                               [--check-manifest-only]
+
+Recompute and validate release_id from the canonical manifest
+
+options:
+  -h, --help            show this help message and exit
+  --manifest MANIFEST   Path to the source-of-truth manifest
+  --check               Fail non-zero on derived-output mismatches without
+                        writing
+  --check-manifest-only
+                        Read-only validation of the canonical manifest and its
+                        declared inputs
+
+
+CMD17 rc=0
+AdmittedMechanicsBundle 1.3.0 2026-08-24T18:04:49Z 45 52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96 m10-channel-state-v1.0.0
+
+
+CMD18 rc=0
+52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96  catalog/manifest.json
+
+
+CMD19 rc=0
+
+
+CMD20 rc=1
+
+

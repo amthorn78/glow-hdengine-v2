@@ -1,0 +1,10 @@
+T08 ac040-04-09-compat-cli-offline
+........................................................................ [ 49%]
+..........................................................sss........... [ 98%]
+..                                                                       [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:108: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:128: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:150: showcompat vendor calls require open rails
+143 passed, 3 skipped in 8.86s
+RC=0

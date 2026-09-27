@@ -1,0 +1,18 @@
+T07 ac040-07-gate-ingress-offline
+=== gate-readiness open rail check ===
+RAILS_CLOSED_REQUIRED:[('SAFE_MODE', '1')]
+RC=5
+=== gate-readiness closed rail check ===
+READINESS_UNAVAILABLE
+RC=5
+=== pytest group D ===
+........................................................................ [ 37%]
+........................................................................ [ 75%]
+...............................................                          [100%]
+191 passed in 0.63s
+RC=0
+
+=== T07 rerun 2026-09-27 SAFE_MODE=0 ALLOW_NETWORK=0 PYTHON=Python 3.13.5 ===
+RAILS_CLOSED_REQUIRED:[('SAFE_MODE', '1')]
+gate_readiness_rc=5
+exit
