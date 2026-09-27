@@ -16,7 +16,7 @@ Each file starts with a SUPERSEDED banner. Below the banner's separator line is 
 | `prompt-selection-and-session-delegation-protocol-v1.14.0.md` | `Prompt-Selection-and-Session-Delegation-Protocol-v1.14.0.md` | `10EKsqzg27jtXiKDzmKaZtZvgl_LgNgjP` | 1.14.0 (2026-09-09) | 103,122 | `559d989a5c709ae2…` |
 | `general-prompt-flow-and-creation-guidelines-v1.12.1.md` | `NON-CANONICAL-General-Prompt-Flow-and-Creation-Guidelines-v1.12.1.md` | `1lFtlm1kVcrgDyxZV7E7KYuOwKiZ1rWR-` | 1.12.1 (2026-09-09) | 135,590 | `dee7b76e2179a40c…` |
 
-Both predate the current release, decision D7 (repository storage authority) and the drainage removal (D6, D8). Rules from them that are still valid and not stated elsewhere are carried into a current procedure in the parent directory. That procedure, PF-Canon and the decision record govern; these files never do.
+Both predate the current release, decision D7 (repository storage authority) and the drainage removal (D6, D8). Rules from them that are still valid and not stated elsewhere are carried into `../carried-forward-operating-rules.md`. That procedure, PF-Canon and the decision record govern; these files never do.
 
 Not imported (still in Drive `Glow / Ops`):
 * the Drive Markdown-first storage workflow, which D7 made obsolete;
