@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.4.1**  
+**Version: v13.4.2**  
 Effective Date: Sep 27, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -213,6 +213,7 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.28 HDE-EPIC040 — Change Audit Triage v1.0 (QA-10)  
 * 2.29 PF10-CANON-001 — Repository PF-Canon Authority, Change-Process Document Storage and Canon Consultation  
 * 2.30 PF10-CITE-001 — PF Documents Do Not Cite HDE Build Notes by Internal Locator
+* 2.31 PF10-HDR-001 — Retirement of the Human Operator Header Model-Advice Review
 
 # **2\) Numbered Addenda**
 
@@ -3000,4 +3001,36 @@ Their citations describe the HDE Build Notes version current when they were writ
 
 * Line-level locator search across `docs/pfcanon/` excluding HDE Build Notes, 2026-09-27 (repository state `4eb293c`)
 
-\<eof\>  
+## 2.31 PF10-HDR-001 — Retirement of the Human Operator Header Model-Advice Review
+
+Timestamp: 092726 19:05 (UTC)  
+Details: Retires the monthly review of surface, model and effort guidance in human operator headers, and names the permanent passage that prescribes it as a drain target.
+
+### Source and authority
+
+This addendum records the Product Owner's ruling of 2026-09-27: no header review is needed. The monthly review of human operator header model advice is not performed.
+
+### Rule
+
+No agent or role maintains, reviews or refreshes the surface, model or effort guidance in human operator headers on a monthly or release-driven schedule. Nothing in the canon makes that review a prerequisite for prompt selection, publication, maintenance or use.
+
+### Superseded permanent passage and drain target
+
+| Document and section | Superseded scope |
+| :---- | :---- |
+| **HDE Governance** §9.1.6, the paragraph beginning "Keep each applicable human operator header's surface/model/effort guidance current" | The first five sentences: the monthly and release-driven review of header surface, model and effort guidance, the no-duplicate-schedule rule, the preservation of predecessor advice, the separate assessment of an expanded next task, and the limits on fixed model and effort selection. The paragraph's remaining sentences, on separating known text defects, candidate corrections, published selection and observed runtime correction, preserving the failing case, and the limits of static checks, stand. |
+
+When HDE Governance is next revised, the superseded sentences are removed. The remaining sentences stay.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no text in HDE Governance or any other permanent document.
+* It changes no prompt body, prompt header, contract, register, map, graph part or other prompt ecosystem artifact.
+* The permission, elsewhere in §9.1.6, for a prompt to carry its own version and a human model header is unchanged.
+* It establishes no QA verdict, acceptance, build-checklist status movement or closure.
+
+### Evidence anchors
+
+* Product Owner ruling, 2026-09-27, recorded in `docs/prompt_ecosystem_management/operating-procedures/carried-forward-operating-rules.md`, "Product Owner rulings, 2026-09-27"
+
+\<eof\>
