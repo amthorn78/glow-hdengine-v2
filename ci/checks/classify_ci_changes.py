@@ -26,6 +26,7 @@ LANES = ("product", "compat", "db", "rails", "evidence", "qa", "release")
 SHA_RE = re.compile(r"[0-9a-fA-F]{40,64}\Z")
 
 _FULL_VALIDATION_PREFIXES = (
+    ".claude/",  # agent hooks execute shell commands every session turn
     ".github/",
 )
 _FULL_VALIDATION_PATHS = {
@@ -116,8 +117,6 @@ _DOCUMENTATION_PREFIXES = (
 )
 _DOCUMENT_SUFFIXES = {".adoc", ".md", ".rst"}
 _DOCUMENT_PATHS = {
-    # Claude Code agent configuration (per-turn canon reminder hook); not runtime.
-    ".claude/settings.json",
     "LICENSE",
     "AcceptanceMap.md",
     "AGENTS.md",
