@@ -69,7 +69,8 @@ def pf_names(pfcanon: Path) -> tuple[list[str], list[str]]:
 
 
 def _normalize(text: str) -> str:
-    text = re.sub(r"[*`_]", "", text)
+    text = re.sub(r"[*`]", "", text)
+    text = text.replace("_", " ")  # underscores separate words, as in "HDE_Governance"
     text = re.sub(r"\bPF[\s-]?(\d)", r"PF\1", text)
     return re.sub(r"\bHDE[\s-]+Build[\s-]+Notes\b", "HDE Build Notes", text, flags=re.IGNORECASE)
 

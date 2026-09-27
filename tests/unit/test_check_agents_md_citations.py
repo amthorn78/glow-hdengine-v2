@@ -41,6 +41,7 @@ REJECTED = [
     "> PF10 governs as described in\n> §2.29 of that document.",
     "PF10's 2.29 addendum governs", "the 2.29 addendum in PF10 applies",
     "PF10 governs; Section 2.29 applies",
+    "See Glow_QA_Guide.", "Read HDE_Governance first.",
 ]
 
 
