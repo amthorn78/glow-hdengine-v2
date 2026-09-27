@@ -6,8 +6,9 @@ names no PF document except PF10, and names PF10 only by title: never by
 version, addendum number, section, heading or filename.
 
 Contract. The text is first rendered the way a reader sees it: Markdown emphasis
-and code markers are removed, soft-wrapped lines are joined into paragraphs, and
-paragraphs are split into sentences. Then, anywhere in AGENTS.md:
+and code markers are removed, lines are joined into paragraphs following
+CommonMark (headings and table rows stand alone; list items and quotes continue
+onto unindented lines), and paragraphs are split into sentences. Then, anywhere in AGENTS.md:
 
 * a PF document number other than 10 ("PF04", "PF-19", "PF 09.5") fails;
 * an addendum number ("addendum 2.29") fails;
@@ -44,6 +45,7 @@ _HEADING = re.compile(rf"\b{_PF10_NAME}\s*[—–:-]\s*(?!{_PF10_NAME}\b)[A-Za-z
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s)]+\.md")
 _SENTENCE_END = re.compile(r"(?<=[.!?;])\s+(?=[A-Z(\"'])")
+_SINGLE_LINE_BLOCK = re.compile(r"^(?:#|\|)")
 _BLOCK_START = re.compile(r"^(?:#|[-+*]\s|\||>|\d+[.)]\s)")
 _TITLE_FROM_FILE = re.compile(r"^PF[\d.]*[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
 
@@ -98,6 +100,8 @@ def _units(text: str) -> list[tuple[int, str]]:
             flush()
         if line:
             paragraph.append((number, line))
+        if _SINGLE_LINE_BLOCK.match(line):
+            flush()  # headings and table rows never continue onto the next line
     flush()
     return units
 

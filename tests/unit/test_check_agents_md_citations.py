@@ -96,3 +96,11 @@ def test_list_items_are_not_joined() -> None:
 
 def test_separate_sentences_are_not_joined() -> None:
     assert check.scan("PF10 governs where it speaks. Section 3 of the plan lists the steps.\n", TITLES) == []
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["# PF10 governs\nSection 3 of the plan lists the steps.\n", "| PF10 | x |\nSection 3 of the plan lists the steps.\n"],
+)
+def test_headings_and_table_rows_stand_alone(text: str) -> None:
+    assert check.scan(text, TITLES) == []

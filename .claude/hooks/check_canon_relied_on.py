@@ -4,7 +4,7 @@
 Contract. A decision artifact is a Markdown file under docs/ephemeral/ whose file
 name, or front-matter artifact_type, names a review, approval, readiness,
 disposition, decision, verdict, acceptance, triage or audit. It passes when it
-has a "Canon relied on" heading or label followed, before the next heading, by
+has a "Canon relied on" heading or label followed, before the next ATX or Setext heading, by
 content: a line with at least one letter or digit, outside HTML comments.
 Lines made only of Markdown markers (fences, rules, underlines) are not content. A failing artifact produces a
 "block" decision that returns the reason to the agent.
@@ -41,6 +41,7 @@ from pathlib import Path
 _REVIEW_NAME = re.compile(r"(review|approv|readiness|disposition|decision|verdict|acceptance|triage|audit)", re.IGNORECASE)
 _REVIEW_TYPE = re.compile(r"^artifact_type:\s*\S*(REVIEW|APPROV|READINESS|DISPOSITION|DECISION|VERDICT|ACCEPTANCE|TRIAGE|AUDIT)", re.IGNORECASE | re.MULTILINE)
 _LABEL = re.compile(r"^\s*(#{1,6}\s*|\*\*|[-*]\s*)?canon relied on\s*(\*\*)?\s*(:|$)", re.IGNORECASE)
+_SETEXT = re.compile(r"^\s{0,3}(?:=+|-+)\s*$")
 _HEADING = re.compile(r"^\s*#{1,6}\s")
 
 
@@ -56,8 +57,11 @@ def has_block(text: str) -> bool:
         after = line.split(":", 1)[1] if ":" in line else ""
         if _is_content(after):
             return True
-        for follow in lines[index + 1 :]:
-            if _HEADING.match(follow):
+        rest = lines[index + 1 :]
+        for position, follow in enumerate(rest):
+            following = rest[position + 1] if position + 1 < len(rest) else ""
+            # ATX heading, or Setext heading (text underlined by === or ---).
+            if _HEADING.match(follow) or (follow.strip() and _SETEXT.match(following)):
                 break
             if _is_content(follow):
                 return True
