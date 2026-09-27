@@ -37,6 +37,9 @@ REJECTED = [
     "PF10 governs as described in\n§2.29 of that document.", "Apply HDE Build Notes\nv13.4.2 here.",
     "Read HDE\nGovernance first.", "Read HDE-\nGovernance first.",
     "PF10 governs as described\nin the canonical document\n§2.29 today.",
+    # blockquotes wrap too; addendum numbers either way round
+    "> PF10 governs as described in\n> §2.29 of that document.",
+    "PF10's 2.29 addendum governs", "the 2.29 addendum in PF10 applies",
 ]
 
 
@@ -104,3 +107,7 @@ def test_separate_sentences_are_not_joined() -> None:
 )
 def test_headings_and_table_rows_stand_alone(text: str) -> None:
     assert check.scan(text, TITLES) == []
+
+
+def test_separate_quotes_are_not_joined() -> None:
+    assert check.scan("> PF10 governs.\n\n> Section 3 of the plan lists the steps.\n", TITLES) == []

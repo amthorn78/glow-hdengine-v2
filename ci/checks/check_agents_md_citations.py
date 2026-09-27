@@ -7,11 +7,11 @@ version, addendum number, section, heading or filename.
 
 Contract. The text is first rendered the way a reader sees it: Markdown emphasis
 and code markers are removed, lines are joined into paragraphs following
-CommonMark (headings and table rows stand alone; list items and quotes continue
-onto unindented lines), and paragraphs are split into sentences. Then, anywhere in AGENTS.md:
+CommonMark (headings and table rows stand alone; list items continue onto unindented
+lines; consecutive quote lines form one paragraph), and paragraphs are split into sentences. Then, anywhere in AGENTS.md:
 
 * a PF document number other than 10 ("PF04", "PF-19", "PF 09.5") fails;
-* an addendum number ("addendum 2.29") fails;
+* an addendum number, in either order ("addendum 2.29", "the 2.29 addendum"), fails;
 * a docs/pfcanon file name, or the exact name of a PF file, fails;
 * a PF title derived from the docs/pfcanon file names fails, with spaces,
   hyphens and underscores treated alike;
@@ -42,7 +42,7 @@ _LOCATOR = re.compile(
 )
 _NAME = re.compile(rf"\b{_PF10_NAME}\b", re.IGNORECASE)
 _HEADING = re.compile(rf"\b{_PF10_NAME}\s*[—–:-]\s*(?!{_PF10_NAME}\b)[A-Za-z\"']", re.IGNORECASE)
-_ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
+_ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+|\b\d+\.\d+\s+addend(?:um|a)\b", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s)]+\.md")
 _SENTENCE_END = re.compile(r"(?<=[.!?;])\s+(?=[A-Z(\"'])")
 _SINGLE_LINE_BLOCK = re.compile(r"^(?:#|\|)")
@@ -78,6 +78,7 @@ def _units(text: str) -> list[tuple[int, str]]:
     """Rendered sentences with the source line each starts on."""
     units: list[tuple[int, str]] = []
     paragraph: list[tuple[int, str]] = []
+    in_quote = False
 
     def flush() -> None:
         if not paragraph:
@@ -96,8 +97,13 @@ def _units(text: str) -> list[tuple[int, str]]:
 
     for number, raw in enumerate(text.splitlines(), 1):
         line = _normalize(raw).strip()
-        if not line or _BLOCK_START.match(line):
+        quoted = line.startswith(">")
+        # A quote line continues the quote paragraph above it; other block starts begin a new one.
+        continues_quote = quoted and paragraph and in_quote
+        line = line.lstrip("> ").strip() if quoted else line
+        if not line or (_BLOCK_START.match(line) or quoted) and not continues_quote:
             flush()
+        in_quote = quoted or (in_quote and bool(line))
         if line:
             paragraph.append((number, line))
         if _SINGLE_LINE_BLOCK.match(line):
