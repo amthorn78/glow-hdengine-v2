@@ -78,7 +78,9 @@ def scan_names(text: str, stems: list[str], single: list[str]) -> list[str]:
 
 def scan(text: str, titles: list[str]) -> list[str]:
     violations: list[str] = []
-    for number, line in enumerate(text.splitlines(), 1):
+    for number, raw_line in enumerate(text.splitlines(), 1):
+        # Emphasis and code markers must not hide a citation.
+        line = raw_line.replace("*", "").replace("`", "")
         for match in _PF_NUMBER.finditer(line):
             if match.group(1) != "10":
                 violations.append(f"AGENTS.md:{number}:pf_document_named:{match.group(0)}")
