@@ -126,7 +126,8 @@ jobs:
           python -m pytest -q \
             tests/order \
             tests/mech/test_order_properties.py \
-            tests/evidence/test_architecture_snapshot.py
+            tests/evidence/test_architecture_snapshot.py \
+            tests/unit/test_check_agents_md_citations.py
 
       - name: Run CLI and compatibility lane
         id: compat_lane

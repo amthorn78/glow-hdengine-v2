@@ -28,6 +28,9 @@ TITLES = ["HDE Governance", "Glow QA Guide", "Plan Templates"]
         ("PF10 — HDE Build Notes v13.4 applies", "pf10_version"),
         ("PF10 version 13.4 is current", "pf10_version"),
         ("see PF10 (v13.4)", "pf10_version"),
+        ("PF10 paragraph 3 says", "pf10_locator"),
+        ("PF10 subsection 2.29.1 applies", "pf10_locator"),
+        ("PF10 — Repository canon authority and canon consultation", "pf10_heading"),
         ("read docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.5.md", "pf_filename"),
         ("the Glow QA Guide requires it", "pf_title"),
         ("per hde governance", "pf_title"),
@@ -42,6 +45,7 @@ def test_citations_are_rejected(line: str, kind: str) -> None:
     "line",
     [
         "PF10 is the canonical override and amendment mechanism.",
+        "PF10 — HDE Build Notes is the override mechanism.",
         "Where PF10 establishes a later rule, the applicable PF10 rule governs.",
         "search `docs/pfcanon/*.md docs/ephemeral/<CHANGE-ID>-*.md`",
         "Resolve all canon from `docs/pfcanon/` on `main`.",

@@ -18,10 +18,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 _PF_NUMBER = re.compile(r"\bPF(\d{1,2}(?:\.\d+)?)(?![\d.]*\d)")
 _PF10_LOCATOR = re.compile(
-    r"\bPF10(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,40}?(?:§\s*\d|\baddend(?:um|a)\s+\d|\bsection\s+\d))",
+    r"\bPF10(?:-[A-Za-z]|\s*v\d|[^\n.;]{0,40}?(?:§\s*\d|¶\s*\d|\baddend(?:um|a)\s+\d|\b(?:sub)?sections?\s+\d|\bparagraphs?\s+\d))",
     re.IGNORECASE,
 )
 _PF10_VERSION = re.compile(r"\bPF10\b[^\n.;]{0,60}?(?:\bv\d+(?:\.\d+)+|\bversion\s+\d)", re.IGNORECASE)
+# PF10 followed by a dash and a title other than its own ("HDE Build Notes") cites a heading.
+_PF10_HEADING = re.compile(r"\bPF10\s*[—–-]\s*(?!HDE[ -]Build[ -]Notes\b)[A-Z\"\'`*]")
 _ADDENDUM_NUMBER = re.compile(r"\baddend(?:um|a)\s+\d+\.\d+", re.IGNORECASE)
 _PFCANON_FILE = re.compile(r"docs/pfcanon/[^\s`)*]+\.md")
 _TITLE_FROM_FILE = re.compile(r"^PF[\d.]+[- ]*(?:(?:Canon|Reference)-)?(.*?)(?:[- ]v\d[\w.]*)?$")
@@ -56,6 +58,8 @@ def scan(text: str, titles: list[str]) -> list[str]:
         if not _PF10_LOCATOR.search(line):
             for match in _PF10_VERSION.finditer(line):
                 violations.append(f"AGENTS.md:{number}:pf10_version:{match.group(0).strip()}")
+        for match in _PF10_HEADING.finditer(line):
+            violations.append(f"AGENTS.md:{number}:pf10_heading:{match.group(0).strip()}")
         for match in _ADDENDUM_NUMBER.finditer(line):
             violations.append(f"AGENTS.md:{number}:addendum_number:{match.group(0)}")
         for match in _PFCANON_FILE.finditer(line):

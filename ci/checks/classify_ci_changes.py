@@ -843,6 +843,7 @@ _FIXED_LANE_TEST_PROVIDERS = {
         "tests/unit/test_check_direct_db_contract.py",
     )},
     "tests/evidence/test_architecture_snapshot.py": "product",
+    "tests/unit/test_check_agents_md_citations.py": "product",
     "tests/mech/test_order_properties.py": "product",
     "tests/evidence/test_rails_ci_workflow_integration.py": "rails",
     **{path: "evidence" for path in (
