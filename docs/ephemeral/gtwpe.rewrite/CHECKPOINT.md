@@ -6,7 +6,7 @@ facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
 phase: P1 Design, at its checkpoint; stopped before G1 (P0 accepted: V0 PASSED)
-updated: 2026-09-28T01:55Z
+updated: 2026-09-28T14:46Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -14,7 +14,8 @@ status: RECORD. Merging preserves the record and approves nothing (D21-C)
 
 **P1 is at its checkpoint and W1 has stopped before G1.** P0 was accepted by PE37 (V0 PASSED,
 relayed 2026-09-28). §2 to §7 are the P0 record as it was accepted, with P1's disclosures added to
-§5. §8 holds Nathan's rulings, and §9 carries P1.
+§5. §8 holds Nathan's rulings, and §9 carries P1. §9.7 carries W1's proposal on Nathan's direction
+after the P1 report: the change prompt first.
 
 ## 1. State (plan §9)
 
@@ -27,8 +28,8 @@ relayed 2026-09-28). §2 to §7 are the P0 record as it was accepted, with P1's 
 | External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1: pushes to this branch only.** P1 opened no PR and wrote nothing to Notion, Drive, skills, canon, the registry or the graph. It only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
-| Open errors | `ERRORS.md`: E-004, E-006, E-007 `OPEN` (all `LISTED`); the design resolves them (design §9), pending G1. E-001, E-002, E-003, E-005 `FIXED`; E-008 `DECLINED`. New from P1, for PE37 to enter: P1-1 to P1-7 (design §15) and P1-8 (§9.6). The diff check leaves **RQ-1 to RQ-3 open**, for Nathan (§9.4) |
-| Next action | **None until the relay returns.** Nathan: G1 on the design package, the decisions in design §14, the choice on RQ-1 to RQ-3, and his G0 words (§9.1). Then P2, if G1 approves |
+| Open errors | `ERRORS.md`: E-004, E-006, E-007 `OPEN` (all `LISTED`); the design resolves them (design §9), pending G1. E-001, E-002, E-003, E-005 `FIXED`; E-008 `DECLINED`. New from P1, for PE37 to enter: P1-1 to P1-7 (design §15), P1-8 (§9.6), and P1-9 to P1-11 (§9.7). The diff check leaves **RQ-1 to RQ-3 open**, for Nathan (§9.4) |
+| Next action | **None until the relay returns.** Nathan's direction after the P1 report (§8) puts the change prompt, GTWPE-MGMT-10, first; W1's proposal is §9.7. Nathan: his disposition of RQ-1 to RQ-3, and his G0 words (§9.1). PE37: the plan revision that the direction needs. Then W1 revises the design to match, for G1 |
 
 ## 2. Authority used
 
@@ -249,6 +250,7 @@ Every row was found by W1, is `LISTED` and is `OPEN`. None blocks P0 or P1.
 | 2026-09-28 | "No, pF10 will NEVER be a merge target, EVER>" | Given directly to W1 during P1, when W1 said Path B could also carry PF10 as a target: the named `PF10_BUILD_NOTES_ADDENDUM` files have not yet been inserted into PF10. **PF10 is a source only.** No GTWPE run lists, drafts, applies or opens a PR against a `docs/pfcanon/PF10-*` file. That covers inserting a named addendum, adding a new addendum, and removing drained addenda (PF10 §7). The design applies this at S2 (excluded from targets) and guards it mechanically: `gtwpe_redline.py` refuses a PF10 path in `validate` and `apply`, S8 checks the canon PR's changed paths, a selftest case must fail on a PF10 target, and the P5 `glow-write-boundary` exception names PF10 as excluded |
 | 2026-09-28 | "with the exception of PF03 only files with "canon" in their title are valid merge targets" | Sent to W1 mid-turn during P1, straight after the PF10 ruling. **A valid merge target is `docs/pfcanon/PF03-*`, or a PF file with "canon" in its title.** 23 of the 34 files in `docs/pfcanon/` on `main` qualify: PF01, PF02, PF03, PF04, PF05, PF06, PF07, PF09.1 to PF09.7, PF12, PF14, PF16, PF17, PF19, PF23, PF27, PF29 and PF30.1. The filename and the in-document title (PF16's is its H1, "PF16‑Canon — HD Engine Epics Map") agree for every file. The other 11 are never targets: `PF-Invocation.md`, `PF-Reference-Glow Story.md`, PF08, PF10, PF11, PF13, PF15, PF18, PF20, PF21 and PF31. This settles Q1 (no PF20) by ruling rather than by default. It supersedes TW-TRIAGE-10's "A title containing Canon is not an eligibility rule". The design applies it at S2 and guards it the same way as the PF10 ruling |
 | 2026-09-28 | "PF20 and PF30 are special targets with dedicated prompts" | Sent to W1 during P1, after the eligibility ruling. **PF20 and PF30.x are valid merge targets, reached only through their own dedicated prompts.** This supersedes the preceding row's listing of PF20 among files that are never targets, and its "settles Q1 (no PF20)" (`AUTH-001`: that row is left as written). It also changes plan §2.5 and Q1. TW-RECORD-10 becomes **GTWPE-RECORD-10** (PF20, Epic history) and TW-RECORD-20 becomes **GTWPE-RECORD-20** (PF30.x, CRD history), each a dedicated GTWPE member sharing the S4–S9 machinery. GTWPE-RUN-10 never drafts PF20 or PF30.x, even though PF30.1's title contains "Canon". The eligibility guard binds each target to the one prompt allowed to write it |
+| 2026-09-28 | "keep in mind, there are multiple repairs that will be needed before this is production ready, so we should make sure the change prompt is solid then we can run through repairs" | Given directly to W1 after the P1 report. W1 reads "the change prompt" as GTWPE-MGMT-10, the GTWPE's own change prompt (design §4.4 and §11). W1 reads the direction as: RQ-1 to RQ-3 get no separate repair round now (§9.4's option B is not taken), and GTWPE-MGMT-10 is made solid and proven before any repair runs through it. The reading stands until Nathan corrects it. It reorders plan §5; PE37 revises the plan and Nathan approves it, so W1 acts on none of it before the relay returns. W1's proposal is §9.7 |
 
 ## 9. P1 Design
 
@@ -273,7 +275,7 @@ All on `docs/20260925-gtwpe-w1`, each pushed and read back byte for byte from `o
 | `design/DRY-RUN-P1.md` | The `D26-A` dry run | `e70b8ed` |
 | `design/REVIEW-BRIEF-P1-DIFFCHECK.md` | The filled second template, committed before spawning | `ec82849` |
 | `design/REVIEW-P1-DIFFCHECK-R1.md` | The reviewer's record, captured by script | `c7ceb41` |
-| `CHECKPOINT.md` | This file; §8 carries Nathan's three rulings of 2026-09-28 | `5e5e1c0`, `70df576`, `54562b8`, and this update |
+| `CHECKPOINT.md` | This file; §8 carries Nathan's rulings and direction of 2026-09-28 | `5e5e1c0`, `70df576`, `54562b8`, `9cdd040`, and this update |
 
 ### 9.3 Nathan's rulings during P1
 
@@ -353,3 +355,63 @@ phase end either way.
    `VALIDATION`, `LISTED`, found by W1's own post-check. RQ-1 to RQ-3 are also for the ledger, as
    PE37 classes them.
 4. **Stopped before G1.** W1 writes no page, tool, prompt, skill or canon file until G1 is approved.
+
+### 9.7 The change prompt first: Nathan's direction after the P1 report
+
+**It needs a plan revision.** Under W1's reading of Nathan's direction (§8), GTWPE-MGMT-10 is made
+solid and proven before any repair runs through it. Plan §5 publishes it at P3, beside GTWPE-RUN-10,
+and no trial in plan §11 or design §13.1 exercises it. As planned, its first use would be the first
+live repair. D20 says "The pilot is not optional", and `pe36-to-pe37.md` lists "Skipped the small
+pilot" among PE36's process faults. PE37 revises the plan and Nathan approves it, so this section
+is a proposal for the relay. W1 acts on none of it before the relay returns.
+
+**Why GTWPE-MGMT-10 is the prompt meant.** HDE Governance §9.1.6 defines the change process: "Maintain
+one discoverable adjacent GCFPE-MGMT-10 process for intake, investigation, impact assessment,
+repair, quality control, publication/readback, documentation and the exact next/resume route." It
+also says "this management scope does not extend automatically to another ecosystem". The GTWPE's
+own instance of that process is GTWPE-MGMT-10 (plan §2.5; design §11).
+
+**What "solid" needs.** Five items. Items 1, 2 and 4 are new, from reading the controls
+GTWPE-MGMT-10 reuses and its source. Item 3 is the diff check's, and item 5 is D20's.
+
+| # | Item | Evidence | Ledger |
+|---|---|---|---|
+| 1 | Its records pass the validator | Design D-8 reuses `modification_validate.py`, whose `targets` accepts only `prompt`, `skill`, `rule`, `graph`, `registry` and `notion_control` (line 81). GTWPE-MGMT-10's scope includes tools, a lock and a selftest (design §11), and none of these classes names them. A record has no class for a tool: `tool` fails validation, loudly, and any other class mislabels it. The validator is a GCFPE control, so a change to it routes as D-9 does | P1-9, `PLAN_DEFECT`, `LISTED` |
+| 2 | Design §16 is corrected | §16 records the risk that the validator "may reject a GTWPE record's `closure`". No check in the validator reads `closure`: the file's one mention of the word is selftest text (line 575), and it reads the template only to compare section text. That risk is unfounded, and item 1 is the real one. The design stays as pinned for G1 | P1-10, `PLAN_DEFECT`, `LISTED` |
+| 3 | Its contract agrees with itself | The diff check's listed #10: §4.4's *Writes* contradicts §4's shared *Boundaries*, "certain as written" | listed #10 |
+| 4 | Its source stays in step | Design §11 derives it from the GCFPE-MGMT-10 proposed body. A Notion search at 2026-09-28T14:42Z (titles only; no body fetched, so no `D22` transient) finds that page still titled "PROPOSED BODY (D20 redesign)", last edited 2026-09-24T11:00Z, and no later versioned GCFPE-MGMT-10 page. `pe36-to-pe37.md` records it as `APPROVED_FOR_TESTING` and not promoted, and lists its promotion as open item 3. It ran `ANALYZE` for `MODIFICATION-20260923-alpha-feedback-open-entries`, and resumed `MODIFICATION-20260923-closeout-residuals`, which is now `COMPLETE`. That record counts four returns in the resumed run, each "a return that the plan had no step for". Design §11's triggers name the decision record but not the source page. A fix made to the source body without a decision entry would therefore trigger no GTWPE-MGMT-10 review, and would not reach the GTWPE copy. That is the PE test's `D8` failure, for a different source | P1-11, `PLAN_DEFECT`, `LISTED` |
+| 5 | A pilot | `ANALYZE`, `PLAN` and `EXECUTE` on one small real change, before any repair runs through it | — |
+
+P1-9 to P1-11 were found by W1, and are for PE37 to enter in `ERRORS.md`.
+
+**W1's recommendation.**
+
+1. **GTWPE-MGMT-10 first.** Settle items 1 to 4 in the design. Publish GTWPE-MGMT-10 with the parent
+   page, under G2. Then pilot it. A candidate pilot is `gtwpe_read.py` with `readers.lock` (E-004),
+   carrying the reader half of RQ-2's fix. It is small, stays in the repository, is proved by
+   selftest cases, and exercises item 1's tool target.
+2. **Then the build, as planned.** P2 to P4 build the other members with RQ-1's and RQ-3's fixes
+   built in (§9.4's option A), each covered by a selftest case that fails without it. No known
+   required defect is built in and then repaired.
+3. **Every repair after the pilot runs through GTWPE-MGMT-10:** trial mismatches (V4), the 13 listed
+   findings that Nathan opts in, and whatever production readiness needs before G5.
+4. **Whether GCFPE's promotion comes first** is for PE37 to settle: its succession record carries
+   the promotion as open item 3. Either way, item 4 adds the source page to GTWPE-MGMT-10's triggers.
+
+**What this needs.**
+
+- **From Nathan:** his disposition of RQ-1 to RQ-3. Plan §7 lets no phase close with a `REQUIRED`
+  error open, so P1 closes on his word. Under his direction that disposition is `ACCEPTED_RISK`
+  (`DISP-001`), with each finding carried into the build as above. RQ-3's option (i) still needs
+  his word, because it narrows plan §2.3 (§9.4). His G0 words are also still missing (§9.1).
+- **From PE37:** the plan revision (the phase order, the pilot, its price under `D26-D`, and the
+  review budget for the design's revision); ledger entries P1-9 to P1-11; and the route for item 1's
+  change to the validator.
+- **Then W1** revises the design to match the revised plan, and G1 pins that version.
+
+**Canon relied on:** PF04 — HDE Governance §9.1.6; `AGENTS.md`, the canon-first rule. In-flight and
+governing documents: plan v1.1 §2.5, §5, §7 and §11; design §4, §4.4, §11, §13.1, §14 D-8 and §16;
+`design/REVIEW-P1-DIFFCHECK-R1.md`; `pe-succession/pe36-to-pe37.md`; `gcfpe.decision-record.md` D20
+and D26; `modification_validate.py`, lines 1 to 40, 81, 95 to 140, 401 to 405 and 575;
+`MODIFICATION-20260923-closeout-residuals.md`, its *Interaction cost, actual against predicted*;
+`MODIFICATION-20260923-alpha-feedback-open-entries.md`, line 344.
