@@ -8,6 +8,7 @@ author: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 canon_read_at: "main @ 8eb4ce0; docs/pfcanon/ and AGENTS.md are byte-identical at 53449c9"
 result: AWAITING_APPROVAL
+revised: 2026-09-28 — repair of the dry run's required findings DR-1 to DR-8 (design/DRY-RUN-P1.md)
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -68,7 +69,7 @@ title (PF03 §9; HDE Governance §0.2).
 | PF03 — Technical Writing Best Practices | complete | §1 writing only; §3 complete reads, no ellipsis; §6 source precedence; §7 document control and finding accounting; §8 and §15.2 the redline format; §11 state language; §12 when to ask |
 | PF06 — Change Process Guide | complete | §0.1A process ownership; §0.2 canon edits are separate documentation work, the PO squash-merges; §0.6.10 one-pass redline bundles; §1.0.3, §1.0.6, §1.1.2, §3.5.1, §6.3 PF30 and PF20 records; §1.1.11 `ASK OK?`; §3.5.2.8 post-QA drainage ordering |
 | PF10 — HDE Build Notes | complete | §1 to §9 precedence, §7 drained guidance; 2.8 PF10-FORM-001; 2.14 Specification format authority; 2.29 PF10-CANON-001; 2.30 PF10-CITE-001; 2.31 PF10-HDR-001 |
-| PF27 — Plan Templates | complete | §1 review rules (materiality, rendered escapes, redline bundles, review stability); §2 the Epic record and archive-on-close; §2A the CRD profile and compact PF30 contract |
+| PF27 — Plan Templates | complete | *Review guardrails* (materiality, rendered escapes, redline bundles, review stability); §2 the Epic record and archive-on-close; §2A the CRD profile and compact PF30 contract |
 | PF30.1 — HDE CRD Records | complete | §2 ownership; §3.1 CRD IDs; §3.2 record lifecycle; §3.3 vocabularies; §4 record contract; §6 volumes; §7 template |
 | HDE Governance (PF04) | §0, §9.1 to §9.6, found by the canon-first search | §9.1.1 historical homes; §9.1.2 conflicts; §9.1.3 advice; §9.1.6 prompt ecosystems; §9.3.1 change log |
 | HDE Phased Epics (PF20) | front matter, §0, Phase Exit Criteria, §1, and the §2 heading index, found by the canon-first search | its reference-ledger posture, drain posture and Build Notes posture; its record order |
@@ -84,6 +85,33 @@ and the `D23-G` successors), `session-working-rules.md`, `execution-and-delegati
 **Notion, read-only under `D22`.** The eight selected TW bodies, the proposed GCFPE-MGMT-10 body
 (`3e34590a05eb811b93d2da9b4ef8106d`) and, at P0, the PE Metaprompt 091426.1. Page IDs, edit times
 and the rules kept are in `design/P1-SOURCE-NOTES.md`. No body is copied into this record.
+
+### 1.1 The PF03, PF06 and PF10 check for new prompts
+
+The PE Metaprompt requires a complete PF03, PF06 and PF10 check before a new Glow prompt is made.
+All three were read in full (P1 source notes). The four GTWPE prompts must meet each rule below, and
+this design meets it where stated.
+
+| Rule | Source | Where the design meets it |
+|---|---|---|
+| Read every relied-on source completely; an unknown stays unknown | PF03 §3 | Drafters read the complete target (§7.3); `UNKNOWN` and `BLOCKED` are returns, never guesses |
+| No ASCII three-period or Unicode ellipsis in a PF document | PF03 §3 | V8 |
+| Source precedence: the operator, the complete target, the owning canon, then PF10 where an addendum speaks | PF03 §6 | The brief frame's settled rules (§7.2 item 4) |
+| Document control changes only on explicit authority; every finding of an audit source is accounted for | PF03 §7, §15.1 | G3 approves each exact value (§8.4); B-DRAFT's change ledger accounts for every finding |
+| The redline format and its placement rules | PF03 §8, §15.2 | §8.1; V1 to V7 |
+| "applied", "committed" and "merged" only on direct evidence | PF03 §11 | The run report says "applied" after S6's diff check and "merged" only after S9 |
+| Ask only when the answer changes the result | PF03 §12 | Subagents never ask; the manager asks at G3 or on a named blocker |
+| A canon edit is separate documentation work; the PO squash-merges | PF06 §0.2 | A GTWPE run is separate canon maintenance, never part of an implementation PR; Nathan merges |
+| One-pass redline bundles, original anchor space, no overlap | PF06 §0.6.10 | V4 to V7; a failing bundle returns to its drafter once |
+| `ASK OK?` on approval-submitted artifacts | PF06 §1.1.11 | The G3 package and this design |
+| Drainage only after the epic's QA is complete | PF06 §3.5.2.8 | §10.5; §14 D-3 |
+| PF30 and PF20 records | PF06 §1.0.3, §1.0.6, §1.1.2, §3.5.1, §6.3 | The dedicated record prompts (§4.2, §4.3), within HDE Governance §9.1.1 (§10.3) |
+| Precedence, the latest base version, addenda scoped individually | PF10 §1 to §9 | B-CLASSIFY-PF10 reads one logical base version through EOF; a later addendum governs only where scopes overlap |
+| Agent-authored addendum form | PF10 2.8 | Not applicable: PF10 is never a GTWPE target |
+| Specification format authority and terms | PF10 2.14 | PF27 through GTWPE-RUN-10, PF30 through GTWPE-RECORD-20; new text says "Specification" |
+| Canon is `docs/pfcanon/` on `main`; a superseded version leaves it; agents write only under exact PO authority | PF10 2.29 | S6 replaces the versioned file; G3 is the exact authority |
+| No PF10 locator in another PF | PF10 2.30 | V9 |
+| No header model-advice review | PF10 2.31 | No model or effort content anywhere (`D7`, §9.4) |
 
 ## 2. Membership
 
@@ -193,7 +221,7 @@ Every GTWPE prompt shares these terms:
 |---|---|
 | Purpose | Turn one Path A or Path B input (plan §2.1, §2.2) into approved, applied and merged changes to the general targets |
 | Owner | Nathan invokes it and holds G3 and G4. The managing session runs it |
-| Inputs | `START` with **(a)** a document: a repository path, an upload, pasted text, a Notion page ID, or a Drive file Nathan names specifically (§9.4 `D10`); and/or **(b)** a specification: the repository path of an approved Epic or CRD Specification under `docs/ephemeral/`, with any `PF10_BUILD_NOTES_ADDENDUM` files it names. Optional: a slug, a source selection (sections or addenda), `PF10 SCOPE = ALL`. Or `RESUME <run-id>`. Or Nathan's G3 reply in the same session |
+| Inputs | `START` with any of: **(a)** a document: a repository path, an upload, pasted text, a Notion page ID, or a Drive file Nathan names specifically (§9.4 `D10`); **(b)** a specification: the repository path of an approved Epic or CRD Specification under `docs/ephemeral/`; **(c)** `PF10`: the applicable PF10 file set (§9.5 Q2), whole or narrowed to named addenda. Optional: a slug, and a selection within (a). Or `RESUME <run-id>`. Or Nathan's G3 reply in the same session. §4.1.1 maps plan §2.2's rows to these inputs |
 | Outputs | The run records (§5.2); the G3 package; one canon PR; the run report |
 | Writes | The records branch and the run directory; the canon branch, holding only files Nathan approved at G3. After P5, `glow-write-boundary`'s exception permits the canon write; before P5 it is refused (E-002) |
 | Reads | The inputs; `docs/pfcanon/` on `main`; the procedure; Notion and Drive only for a named input |
@@ -203,6 +231,20 @@ Every GTWPE prompt shares these terms:
 | Results | `AWAITING_APPROVAL` (the G3 package; `DECISION NEEDED`) · `CANON_PR_OPEN` (`IN FLIGHT`) · `RUN_COMPLETE` · `NO_CHANGE_COMPLETE` (every target `NO_CHANGE` and none unsure) · `RUN_BLOCKED: <code>` (`DECISION NEEDED`) · `CLOSED_NOT_APPROVED` · `CLOSED_NOT_ADOPTED` |
 | Completion | `RUN_COMPLETE` when S9 finds every approved file on `main` equal to the S6 output. A due PF20 or PF30 record is named in the run report as information, never handed off |
 | Resume | Only at the checkpoints in §5.3 (`D26-C`) |
+
+#### 4.1.1 Plan §2.2's rows as invocations
+
+| Plan §2.2 row | Inputs given | Targets | PF27; the PF20 or PF30 record |
+|---|---|---|---|
+| A document only | (a) | The eligible PFs the document bears on | Not touched. A missing specification never blocks Path A |
+| A specification and PF10 | (b) and (c) | The PFs the PF10 set's addenda address | PF27 evaluated: `CHANGE` or `NO_CHANGE: <reason>`. The due record is named for GTWPE-RECORD-10 or GTWPE-RECORD-20 |
+| A specification, a document, and PF10 | (a), (b) and (c) | The union of both rows | As the row above |
+| A specification without PF10 | (b) | The specification's own targets | As above. PF10 is treated as absent, not as an error |
+| PF10 only | (c) | The PFs its addenda address | Not touched |
+| Nothing usable | None resolves | None | `RUN_BLOCKED: INPUT_MISSING`, listing the accepted inputs |
+
+A document with PF10 and no specification, (a) and (c), takes the union of their targets and touches
+neither PF27 nor a record.
 
 ### 4.2 GTWPE-RECORD-10 — Record an Epic in HDE Phased Epics
 
@@ -215,6 +257,7 @@ Every GTWPE prompt shares these terms:
 | Destination | The single PF20 file on `main`. A new record goes after the last record as `### 2.<next> <Epic ID> …`, without the outer bold of the older headings (PF03 §8). Because PF20 has no end marker, the edit is a `REPLACE` of its last unique line that reproduces it (PF03 §8 widening) |
 | Nonduplication | Search PF20 for the Epic ID first. PF20 already holds two records for HDE-EPIC038 (§2.23 and §2.24); the prompt reports such duplicates and never adds a third |
 | Outputs, writes, results | As §4.1, for PF20 only |
+| Dependencies, exclusions, completion | As §4.1, except that it writes only PF20, never another file, and is invoked by Nathan alone, never by another prompt. `RUN_COMPLETE` when S9 finds the new PF20 file on `main` equal to S6's output |
 | Cost | PF20 is 952,515 B, about 318,000 tokens; its drafter reads all of it (§7.6) |
 
 ### 4.3 GTWPE-RECORD-20 — Record a CRD in HDE CRD Records
@@ -227,12 +270,22 @@ Every GTWPE prompt shares these terms:
 | Rules | The CRD ID is the PO's to allocate and must already exist (PF30.1 §3.1); a missing ID is `RUN_BLOCKED: CRD_ID_MISSING`. One primary record per CRD, updated in place in its originating volume; the material-change history is append-only (§3.2, §4.2). Exact controlled vocabularies (§3.3). No inferred implementation, QA, acceptance, drainage or closure (§3.2, §5). Specification approval is a planned baseline only. "Specification approval" replaces "CRD Plan approval" in new text (PF10 2.14). New text names HDE Build Notes by title only (PF10 2.30), even where the §7 template asks for "exact references" |
 | Destination | A new registration goes to the one `Active` volume, currently PF30.1 (§6); an update goes to the record's originating volume. The prompt never opens, closes or rolls over a volume |
 | Outputs, writes, results | As §4.1, for PF30.x only. `RUN_BLOCKED: CRD_ID_MISSING` and `RUN_BLOCKED: APPROVAL_EVIDENCE_MISSING` are added |
+| Dependencies, exclusions, completion | As §4.1, except that it writes only PF30.x, never another file, and is invoked by Nathan alone, never by another prompt. `RUN_COMPLETE` when S9 finds the PF30.x file on `main` equal to S6's output |
 
 ### 4.4 GTWPE-MGMT-10 — Manage the GTWPE
 
-The contract is in §11. In brief: three modes, `ANALYZE`, `PLAN` and `EXECUTE`, over one spine;
-Modification records in format 2.1; `D26`'s bounded reviews; Notion writes only to the GTWPE parent
-page and its catalog, under the destination rule G2 establishes; no canon writes.
+| Field | Contract |
+|---|---|
+| Purpose | Manage one GTWPE Modification, everything Nathan hands in together, from request to applied and verified result, through `ANALYZE`, `PLAN` and `EXECUTE` (§11) |
+| Owner | Nathan requests the change and approves each mode. The managing session runs it |
+| Inputs | `MODE` and the subject: the request for `ANALYZE`, or the Modification ID for `PLAN` and `EXECUTE` |
+| Outputs | The Modification record and its evidence; successor prompt pages; the catalog update; a `D24` skill package when a skill is in scope |
+| Writes | `docs/ephemeral/modifications/` and its evidence; `docs/prompt_ecosystem_management/gtwpe/`; the Notion GTWPE parent page and its catalog, under the destination rule G2 establishes. Never `docs/pfcanon/` |
+| Approval effects | `analyze_approved_by` and `plan_approved_by` are written only on Nathan's approval, quoting his words; a merge approves nothing (D21-C). Merges and installs are his |
+| Dependencies | The selected PE Metaprompt, with the kickoff's workarounds until its repair; `modification-template.md`, `modification_validate.py`, `reviewer-prompt-template.md`, `ecosystem-change-management.md`, `execution-and-delegation-model.md`, `gcfpe.decision-record.md` |
+| Exclusions | PF canon; the GCFPE's register, catalog and PE Metaprompt; TW-ALPHA's pages before G5; running a GTWPE run |
+| Results | `PRODUCT_OWNER_ACTION_PENDING`, `ECOSYSTEM_CHANGE_COMPLETE`, `IMPLEMENTATION_BLOCKED`, `PROMOTION_CHECKPOINT_REQUIRED`. It hands off to no prompt |
+| Completion | `ECOSYSTEM_CHANGE_COMPLETE` once `EXECUTE` has verified what landed after Nathan's merges and installs |
 
 ## 5. A run, stage by stage
 
@@ -244,15 +297,15 @@ use their own drafting brief.
 | Stage | What the manager does | Output | Check that can fail | On failure |
 |---|---|---|---|---|
 | S0 Intake | Determine the path (plan §2.2), the run ID, the branches; snapshot `origin/main` | `RUN.md` at `INTAKE` | Every input resolves to a readable identity | `RUN_BLOCKED: INPUT_MISSING` naming it, with the accepted inputs |
-| S1 Normalize | Read each input into a source record with `gtwpe_read.py`, or the Notion or Drive connector for a named page or file | `source/NN-<name>.md` and its `.json` | Each record carries origin, type, reader and version, byte count and sha256 (not for a prompt body, `D22`), and complete coverage | `RUN_BLOCKED: UNSUPPORTED_INPUT <type>`; never a guessed conversion |
-| S2 Targets (RUN-10) | Precompute candidates mechanically, then classify them (§7.3). Evaluate PF27 when a specification exists; name a due PF20 or PF30 record | `targets.md` | Every target cites the source passage that requires it, and passes the eligibility guard (§8.7) | An unsure target is named for G3, never dropped or added silently |
+| S1 Normalize | Record each input. A repository input (the specification, PF10, an addendum file, a repository document) is recorded by path, blob SHA and unit index, with no copy of its bytes. An input from outside the repository (an upload, pasted text, a Notion page, a Drive file) is read into the record with `gtwpe_read.py`, or with the Notion or Drive connector. A Notion page that is a prompt body is recorded by identity only (page ID, title, `page_last_edited_at`), never its body (`D22`; plan §2.3); its drafter reads it live | `source/NN-<name>.json`, plus `source/NN-<name>.md` for an input from outside the repository | Each record carries origin, type, reader and version, byte count, sha256 (none for a prompt body), and a unit index covering the whole input or the stated selection | `RUN_BLOCKED: UNSUPPORTED_INPUT <type>`; never a guessed conversion. With §14 D-6's reader agents, which have no Notion tool, a prompt-body input is `UNSUPPORTED_INPUT notion-prompt-body` |
+| S2 Targets (RUN-10) | Build the candidates: every eligible PF the source names by number or title (an exact search of the records), and every eligible PF whose purpose-and-scope sections the manager finds the source bears on, each with its reason (plan §2.2). For (c), add the PFs that B-CLASSIFY-PF10 maps from the PF10 set. Then classify each candidate (§7.3). Evaluate PF27 when a specification exists; name a due PF20 or PF30 record | `targets.md` | `gtwpe_redline.py targets-check`: every target cites a source unit that exists in a record, and passes the eligibility guard for this prompt (§8.7) | An unsure target is named for G3, never dropped or added silently |
 | R2 Destination (RECORD-10, RECORD-20) | Resolve the volume, the insertion point and nonduplication by exact search | `targets.md` | The ID exists, is unique in the family, and the destination is unambiguous | `RUN_BLOCKED` naming the missing fact |
 | S3 Draft | Spawn one drafting subagent per target (§7); capture each return programmatically (§7.4) | `drafts/<key>.return.md` and `.redlines.md` | The return parses and ends `END OF REDLINES`, or is exactly `no redlines`, or is `BLOCKED` with its reasons | A malformed return is re-dispatched once, then logged |
 | S4 Validate | `gtwpe_redline.py validate` | `validate/<key>.json` | Exit 0 (§8.2) | The whole batch goes back to its drafter once with the diagnostic; a second failure is a `REQUIRED` error for Nathan (plan §8) |
-| S5 / G3 | Assemble the G3 package; stop and return `AWAITING_APPROVAL` | `G3-PACKAGE.md` | Nathan's reply is recorded verbatim; it names the run and each file, or the package version whose file list is fixed | Declined: `CLOSED_NOT_APPROVED`. Changed by him: a new package version, S4 again, G3 again |
+| S5 / G3 | Assemble the G3 package; stop and return `AWAITING_APPROVAL` | `G3-PACKAGE.md` | Nathan's reply is recorded verbatim, and `gtwpe_redline.py approval-check` confirms it names the run and each file, or the package version whose file list is fixed | Declined: `CLOSED_NOT_APPROVED`. Changed by him: a new package version, S4 again, G3 again |
 | S6 Apply | Fetch `main`; check each base blob is unchanged (§9.1); create the canon branch; `git mv` to the new filename; `gtwpe_redline.py apply`; commit locally | `apply/<key>.json`, `apply/<key>.diff` | The script's diff check: the output equals the one-pass simulation byte for byte, and every changed byte belongs to an approved operation | Stop, keep no file, log `REQUIRED` |
-| S7 Verify | Spawn a fresh verifier that sees the approved package, the base and the local commit, never S6's report (§7.3) | `verify/<key>.md` | Zero differences | Stop; PE37 compares centrally (plan §8) |
-| S8 Publish / G4 | Re-check the base blobs; push the canon branch; open the PR | The PR, and `RUN.md` at `CANON_PR_OPEN` | The PR's changed paths are exactly the approved files, and its diff equals S6's | CI red or a conflict: diagnose; fix only within the approved edits, or back to G3 |
+| S7 Verify | Spawn a fresh verifier that sees the approved package, the base and the local commit, never S6's report (§7.3) | `verify/<key>.md` | `gtwpe_redline.py verify-check`: the verifier reports every approved operation present exactly and no unexplained hunk, and its hunks match `apply/<key>.json`. The comparison runs centrally, never in the verifier | Stop; PE37 compares centrally (plan §8) |
+| S8 Publish / G4 | Re-check the base blobs; push the canon branch; open the PR | The PR, and `RUN.md` at `CANON_PR_OPEN` | `gtwpe_redline.py pr-check`: `git diff --name-status origin/main...<canon branch>` lists exactly the approved files, and the branch's diff equals S6's | CI red or a conflict: diagnose; fix only within the approved edits, or back to G3 |
 | S9 Close | Entered only at `RESUME`, from `main` | `REPORT.md`, `RUN.md` at `COMPLETE` | Each approved file on `origin/main` has the S6 output's blob; each old versioned filename is gone | `RUN_BLOCKED: MAIN_DIFFERS` with the difference |
 
 ### 5.2 Records, identities and branches
@@ -294,7 +347,7 @@ that cannot parse its input stops with the stage's blocked code and never repair
 | # | Producer → consumer | Artifact and format | Required fields and provenance | Consumer's check | Invalid input → return to |
 |---|---|---|---|---|---|
 | H1 | Nathan → S0 | The invocation | Path A, Path B or both; each input's identity | Each input resolves | Nathan, `INPUT_MISSING` |
-| H2 | S1 → S2 | Source record `.md` plus `.json` | origin, type, reader and version, bytes, sha256 (not for a prompt body), selection, units with stable anchors | Units cover the whole source or the stated selection | S1, once; then Nathan |
+| H2 | S1 → S2 | Source record `.json`, plus a `.md` copy only for an input from outside the repository | origin (a repository path and blob SHA, or the outside identity), type, reader and version, bytes, sha256 (none for a prompt body), selection, units with stable anchors | Units cover the whole source or the stated selection | S1, once; then Nathan |
 | H3 | S2 → S3 | Drafting brief (§7.2) | run ID, target path and base blob, eligibility class, the source units mapped to it with locations, the brief variant, a capture nonce | The target is eligible for this prompt; the units exist | Manager (a brief is never sent invalid) |
 | H4 | Drafter → manager | Return: JSON envelope plus PF03 §15.2 redline blocks, between nonce markers (§7.4) | outcome, coverage rows, coupled edits, document-control proposal, blocked items, `wrote_anything: no` | Parses; set equality with the assigned units; every quoted anchor matches the base bytes | The drafter, once; then logged |
 | H5 | S4 → S5 | `validate/<key>.json` and `G3-PACKAGE.md` | per-operation spans, counts, conflicts, simulation result; the package version | Exit 0, or the batch is rejected whole | S3 |
@@ -337,7 +390,7 @@ Every brief is filled from a template in `gtwpe-run-procedure.md`. It carries, i
 3. **Scope:** the exact target path and base blob, the source units by path and anchor, and the counts
    the manager precomputed, so coverage is arithmetic (`execution-and-delegation-model.md` §2).
 4. **The settled rules**, as citations, never paraphrases: PF03 §3, §7, §8 and §15.2; PF06 §0.6.10;
-   PF27 §1 on rendered escapes; the variant's own rules (§7.3). "Apply them; do not revisit them. If a
+   PF27 *Review guardrails* on rendered escapes; the variant's own rules (§7.3). "Apply them; do not revisit them. If a
    rule looks wrong, say so and stop."
 5. **The escape hatch:** "Report any in-scope line your instructions do not cover"
    (`ecosystem-change-management.md` §2 Step 2).
@@ -428,7 +481,7 @@ redline blocks, each labelled `CONTENT`, `COUPLED` (§8.5) or `NEXT_REVISION` (�
 `END OF REDLINES`. `G3-PACKAGE.md` lists every target with its outcome, its redlines, its
 document-control changes (old and new values), its source citations, the S4 result, each unsure target
 with its question, each `NO_CHANGE` and `BLOCKED` result, and a ready-to-send approval sentence naming
-every file. It carries `ASK OK?` (PF06 §1.1.11; PF27 §1).
+every file. It carries `ASK OK?` (PF06 §1.1.11; PF27 *Review guardrails*).
 
 ### 8.2 `gtwpe_redline.py validate`: what exit 0 means
 
@@ -485,9 +538,9 @@ A drafter finds and proposes, as labelled blocks in the same package:
 
 ### 8.6 Raw bytes
 
-Anchors and quotes are judged against raw bytes (PF03 §8; PF27 §1). PF files carry escapes from the
+Anchors and quotes are judged against raw bytes (PF03 §8; PF27 *Review guardrails*). PF files carry escapes from the
 Google Docs export, such as `\[`, `\_` and `\<eof\>`, and an anchor reproduces them exactly. No
-redline removes a display-layer escape on its own (PF27 §1). An addition at the end of a file with no
+redline removes a display-layer escape on its own (PF27 *Review guardrails*). An addition at the end of a file with no
 end marker, such as PF20, is a `REPLACE` of the last unique line that reproduces it.
 
 ### 8.7 Merge targets: Nathan's rulings, and the guard
@@ -653,7 +706,7 @@ with the *ANALYZE and PLAN review brief*; resume only at checkpoints, with merge
 | Scope | GCFPE members, graph parts, the registry | The four GTWPE prompts, `gtwpe-run-procedure.md`, the tools, the lock, the selftest, the GTWPE parent page and catalog, and the GTWPE wording of `glow-write-boundary`'s exception |
 | Dependency closure | `closure.py` over graph parts | The GTWPE has no graph parts. Its closure is §6's producer-consumer table, updated in the Modification record |
 | Member comparison | — | For any member change, every other member gets an affected or unaffected disposition with a reason (HDE Governance §9.1.6) |
-| Triggers | A request | A request; a run defect (H11); a change to the PE Metaprompt (`D8`); a change to a cited rule: PF03 §8, §15.2; PF06 §0.6.10; PF10 2.8, 2.14, 2.29, 2.30; PF27 §1; PF30.1 §3 to §7; HDE Governance §9.1.1, §9.3.1; `AGENTS.md`; `glow-write-boundary`; the decision record |
+| Triggers | A request | A request; a run defect (H11); a change to the PE Metaprompt (`D8`); a change to a cited rule: PF03 §8, §15.2; PF06 §0.6.10; PF10 2.8, 2.14, 2.29, 2.30; PF27 *Review guardrails*; PF30.1 §3 to §7; HDE Governance §9.1.1, §9.3.1; `AGENTS.md`; `glow-write-boundary`; the decision record |
 | Records | `docs/ephemeral/modifications/`, format 2.1 | The same directory, slug prefix `gtwpe-`; P2 checks that `modification_validate.py` accepts a record whose `closure` is not `closure.py` output (§16) |
 | Notion writes | GCFPE maintenance surfaces | The GTWPE parent page and its catalog only, under the destination rule G2 establishes (`notion-write-boundary.md`). A finding outside the frozen scope goes back to Nathan in the record. There is no GTWPE backlog page unless he makes one |
 | May not change | — | PF canon; the GCFPE register, catalog or PE Metaprompt (HDE Governance §9.1.6: its scope "does not extend automatically to another ecosystem"); TW-ALPHA pages before G5 |
@@ -668,7 +721,7 @@ GTWPE. Its general rules do (decision record, successor of 2026-09-23).
 
 | Phase | Deliverable | Validation | Gate |
 |---|---|---|---|
-| **P2 Tools** | In `docs/prompt_ecosystem_management/gtwpe/`: `gtwpe_redline.py` with subcommands `validate`, `apply`, `capture`, `postcheck`, `detect-merge`; `gtwpe_read.py`; `readers.lock`; `gtwpe-run-procedure.md` (S4 to S9, the brief frame and templates, the post-check); `selftest.py` with at least 30 cases (§13.2); `guard_proof.py` | V2: selftest 100%; every check shown to fail when disabled | — |
+| **P2 Tools** | In `docs/prompt_ecosystem_management/gtwpe/`: `gtwpe_redline.py` with subcommands `targets-check`, `validate`, `approval-check`, `apply`, `capture`, `verify-check`, `pr-check`, `postcheck`, `detect-merge`; `gtwpe_read.py`; `readers.lock`; `gtwpe-run-procedure.md` (S4 to S9, the brief frame and templates, the post-check); `selftest.py` with at least 30 cases (§13.2); `guard_proof.py` | V2: selftest 100%; every check shown to fail when disabled | — |
 | **P3 Publish** | The Notion writes in §12.2, each read back | V3: title, parent, identity lines and complete body verified; no page outside the list | **G2** before the first write |
 | **P4 Trials** | T1 to T5 on scratch copies (§13.1) | V4: each expected result matched; each mismatch in `ERRORS.md` | — |
 | **P5 Adoption** | (1) The `D24` skill package: `glow-write-boundary`'s GTWPE exception, `tw-flowmaster` retired, `flowmaster-validate` updated. Two reviewer subagents, Nathan's install, then the post-install digest comparison. (2) Only then T6, live through S5 to S9. (3) Superseded banners on TW-ALPHA's pages and a decision-record entry | V5: T6's files on `main` equal the approved edits; the skills installed and read back | **G3 and G4** in T6; **G5** |
@@ -704,7 +757,7 @@ A TW session already in flight finishes under TW-ALPHA. The GTWPE starts no run 
 
 | Phase | Plan | This design's estimate |
 |---|---|---|
-| P2 | about 2 h, 1M tokens | about 3 h, 1M context tokens. Five subcommands, two tools and the procedure exceed the plan's scope |
+| P2 | about 2 h, 1M tokens | about 3 h, 1M context tokens. Nine subcommands, two tools and the procedure exceed the plan's scope |
 | P3 | about 1 h, 0.5M | about 1.5 h, 0.6M. Four prompts, not two |
 | P4 | about 3 h, 2M | about 4 h. The trials' subagents total about 2.5M in context at completion, or about 20M cumulative (§7.6), plus W1's own session. T2b reads PF20 in full |
 | P5 | about 2 h, 1M | about 2 h, 1M, plus Nathan's installs; T6's cost follows §7.6 |
@@ -741,7 +794,8 @@ heading path matching zero times; non-adjacent `INSERT` boundaries; an overlap; 
 gap; a simulation that misplaces text; an ellipsis; a whole-block fence; an outer-bold heading; a PF10
 locator in PF04; a version-pinned citation; a metadata-only package; a changed base; CRLF; each of the
 four eligibility refusals; a filename and title mismatch; a capture with no match and one with two; a
-post-check with a new file under `/tmp`. **Guard proof:** each check disabled in a scratch copy fails
+post-check with a new file under `/tmp`. One positive and one negative case each for `targets-check`,
+`approval-check`, `verify-check` and `pr-check`. **Guard proof:** each check disabled in a scratch copy fails
 its own cases.
 
 ## 14. Decisions for G1
