@@ -9,6 +9,7 @@ author: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 canon_read_at: "main @ 0db3f0e; docs/pfcanon/, AGENTS.md and docs/prompt_ecosystem_management/ are byte-identical to 8eb4ce0, where P1 read them"
 result: AWAITING_APPROVAL
+revised: 2026-09-28 — repair of the dry run's required findings DRr-1 to DRr-6 (design/DRY-RUN-P1r.md)
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -78,6 +79,7 @@ under Nathan's delegation of 2026-09-28 (§10.7).
 | RQ-3: a Notion page that is a prompt body is not an accepted input | §4.1; §5.1 S1; §9.2; §13.1; §13.3 | E-022: PE37's decision under Nathan's delegation |
 | The post-check watches the harness's `tool-results/` and `subagents/` directories | §7.5 | E-016 |
 | The token measure is uncached input plus cache writes plus output | §7.6; §12.5 | Plan v1.2 §16.3, which settles v1.0's D-11 |
+| The P1r dry run's six repairs, DRr-1 to DRr-6, and decisions D-14 and D-15 | §4.1; §5.1; §11.4; §11.5; §11.7; §12.2; §13.2; §13.3; §14 | `design/DRY-RUN-P1r.md` |
 
 ## 1. Sources relied on
 
@@ -270,7 +272,7 @@ Every GTWPE prompt shares these terms:
 |---|---|
 | Purpose | Turn one Path A or Path B input (plan §2.1, §2.2) into approved, applied and merged changes to the general targets |
 | Owner | Nathan invokes it and holds G3 and G4. The managing session runs it |
-| Inputs | `START` with any of: **(a)** a document: a repository path, an upload, pasted text, a Notion page that is not a prompt body (§5.1 S1), or a Drive file Nathan names specifically (§9.4 `D10`); **(b)** a specification: the repository path of an approved Epic or CRD Specification under `docs/ephemeral/`; **(c)** `PF10`: the applicable PF10 file set (§9.5 Q2), whole or narrowed to named addenda. Optional: a slug, and a selection within (a). Or `RESUME <run-id>`. Or Nathan's G3 reply in the same session. §4.1.1 maps plan §2.2's rows to these inputs |
+| Inputs | `START` with any of: **(a)** a document: a repository path, an upload, pasted text, a Notion page that is not a prompt body, named by its title and page ID (§5.1 S1), or a Drive file Nathan names specifically (§9.4 `D10`); **(b)** a specification: the repository path of an approved Epic or CRD Specification under `docs/ephemeral/`; **(c)** `PF10`: the applicable PF10 file set (§9.5 Q2), whole or narrowed to named addenda. Optional: a slug, and a selection within (a). Or `RESUME <run-id>`. Or Nathan's G3 reply in the same session. §4.1.1 maps plan §2.2's rows to these inputs |
 | Outputs | The run records (§5.2); the G3 package; one canon PR; the run report |
 | Writes | The records branch and the run directory; the canon branch, holding only files Nathan approved at G3. After P6's install, `glow-write-boundary`'s exception permits the canon write; before it, the write is refused (E-002) |
 | Reads | The inputs; `docs/pfcanon/` on `main`; the procedure; Notion and Drive only for a named input |
@@ -354,7 +356,7 @@ use their own drafting brief.
 | Stage | What the manager does | Output | Check that can fail | On failure |
 |---|---|---|---|---|
 | S0 Intake | Determine the path (plan §2.2), the run ID, the branches; snapshot `origin/main` | `RUN.md` at `INTAKE` | Every input resolves to a readable identity | `RUN_BLOCKED: INPUT_MISSING` naming it, with the accepted inputs |
-| S1 Normalize | Record every input with `gtwpe_read.py` (E-021). A repository input (the specification, PF10, an addendum file, a repository document) gets only a `.json` pointer record: path, blob SHA and a unit index computed from the blob, with no copy of its bytes. A file from outside the repository (an upload, or a Drive file Nathan named, once downloaded) is converted by the pinned reader for its type (§9.2) into a `.md` that the `.json` indexes. Pasted text is saved as given, and a Notion page is read with the connector, each into a `.md` that `gtwpe_read.py` indexes. **A Notion page that is a prompt body is refused before it is fetched:** its title carries a prompt identity (`<ID> — <title> — <MMDDYY.N>`) or its path lies under `AI Prompts`, both read from a search result, which returns no body (PE37 under Nathan's delegation, 2026-09-28; E-022) | `source/NN-<name>.json`, plus `source/NN-<name>.md` for an input from outside the repository | `gtwpe_read.py` exits 0: each record carries origin, type, reader and version, byte count, sha256, and a unit index covering the whole input or the stated selection | `RUN_BLOCKED: UNSUPPORTED_INPUT <type>`, including `notion-prompt-body`; never a guessed conversion |
+| S1 Normalize | Record every input with `gtwpe_read.py` (E-021). A repository input (the specification, PF10, an addendum file, a repository document) gets only a `.json` pointer record: path, blob SHA and a unit index computed from the blob, with no copy of its bytes. A file from outside the repository (an upload, or a Drive file Nathan named, once downloaded) is converted by the pinned reader for its type (§9.2) into a `.md` that the `.json` indexes. Pasted text is saved as given, and a Notion page is read with the connector, each into a `.md` that `gtwpe_read.py` indexes. **A Notion page that is a prompt body is refused before it is fetched** (PE37 under Nathan's delegation, 2026-09-28; E-022). Nathan names a Notion page input by its title and page ID, because a search by page ID alone does not return the page. S1 searches Notion for the title with highlights off, which returns no body, and takes the result whose ID matches. The page is refused when that result's title carries a prompt identity (`<ID> — <title> — <MMDDYY.N>`) or its path lies under `AI Prompts` | `source/NN-<name>.json`, plus `source/NN-<name>.md` for an input from outside the repository | `gtwpe_read.py` exits 0: each record carries origin, type, reader and version, byte count, sha256, and a unit index covering the whole input or the stated selection | `RUN_BLOCKED: UNSUPPORTED_INPUT <type>`, including `notion-prompt-body`, and `notion-page-unidentified` when no search result matches the ID; never a guessed conversion |
 | S2 Targets (RUN-10) | Build the candidates: every eligible PF the source names by number or title, found by an exact search of each recorded source at its blob or in its `.md` (E-021), and every eligible PF whose purpose-and-scope sections the manager finds the source bears on, each with its reason (plan §2.2). For (c), add the PFs that B-CLASSIFY-PF10 maps from the PF10 set. **PF27 is a candidate only when (b) is given, and then only for a template PF27 owns that the specification changes** (E-020). Then classify each candidate (§7.3). With (b), evaluate PF27 and name a due PF20 or PF30 record | `targets.md` | `gtwpe_redline.py targets-check`: every target cites a source unit that exists in a record, passes the eligibility guard for this prompt (§8.7), and is not PF27 in a run without (b) | An unsure target is named for G3, never dropped or added silently |
 | R2 Destination (RECORD-10, RECORD-20) | Resolve the volume, the insertion point and nonduplication by exact search | `targets.md` | The ID exists, is unique in the family, and the destination is unambiguous | `RUN_BLOCKED` naming the missing fact |
 | S3 Draft | Spawn one drafting subagent per target (§7); capture each return programmatically (§7.4) | `drafts/<key>.return.md` and `.redlines.md` | The return parses and ends `END OF REDLINES`, or is exactly `no redlines`, or is `BLOCKED` with its reasons | A malformed return is re-dispatched once, then logged |
@@ -822,23 +824,24 @@ mode writes only its own section of the record, its frontmatter fields and its e
 | # | Step | Check |
 |---|---|---|
 | A0 | **Drift check.** Compare the PE Metaprompt page and the GCFPE-MGMT-10 source page with the catalog's pins, at the minute resolution of a Notion search that returns titles and edit times and fetches no body. Run `git log <the catalog's last-close commit>..origin/main` over the watched paths (§11.7) | Each change found is recorded in §A as a trigger finding, with the `D26-E` search it calls for. The run continues; adopting a change is Nathan's choice |
-| A1 | Create the record from the template on its branch, at `ANALYZING`; copy the request verbatim; number the items | The record exists on its branch. The validator runs at A7, since it requires `targets`, `gate_tier` and `readiness` once a record is past `INTAKE` |
-| A2 | Group the items into parts, and give each part its class (A to E), targets, closure and tier (§11.3). For a member change, give every other member an affected or unaffected disposition with a reason (HDE Governance §9.1.6) | — |
+| A1 | Create the record from the template on its branch, at `ANALYZING`; copy the request verbatim; number the items | `git cat-file -e <branch>:<record path>` succeeds. The validator runs at A7, since it requires `targets`, `gate_tier` and `readiness` once a record is past `INTAKE` |
+| A2 | Group the items into parts, and give each part its class (A to E), targets, closure and tier (§11.3). For a member change, give every other member an affected or unaffected disposition with a reason (HDE Governance §9.1.6) | Checked at A7: the validator requires each part's class, and `targets` and `gate_tier` from their vocabularies |
 | A3 | Measure the scope by broad match minus permitted exceptions, and state the method with the number (`SCOPE-001`). For a rule change, run the `D26-E` search for surviving old text | The search command and its count are in §A |
-| A4 | Record contradictions, risks and open questions, and set `readiness`, which is advice and never a refusal | — |
+| A4 | Record contradictions, risks and open questions, and set `readiness`, which is advice and never a refusal | Checked at A7: `readiness` from its vocabulary |
 | A5 | Set `interaction_cost_predicted`, with its breakdown, and the `estimate` for `PLAN` and `EXECUTE` | The validator requires `estimate` from `ANALYZED` |
 | A6 | Reviews under `D26-A`: a dry run of §A first; then at most two full reviews and one diff check, each briefed by the second template of `reviewer-prompt-template.md`, committed before its reviewers are spawned. Every round goes in `reviews` | The validator's cap and dry-run checks |
 | A7 | Set the status to `ANALYZED`, commit and push; return `PRODUCT_OWNER_ACTION_PENDING`, asking for `ANALYZE` approval | `modification_validate.py` exits 0; the record on the branch equals the local file |
 
-On Nathan's approval, his words go into `analyze_approved_by` with the date, and the scope freezes
-(template rule 3).
+On Nathan's approval, his words go into `analyze_approved_by` with the date,
+`item_count_at_approval` is set to the number of items, and the scope freezes (template rule 3). The
+validator requires that count from `PLANNING` on.
 
 **`PLAN`**, given the Modification ID. The validator refuses it while `analyze_approved_by` is empty:
 
 | # | Step | Check |
 |---|---|---|
-| PL1 | Set the status to `PLANNING`. Write §P: ordered steps by part, each with its target, exact edit, authority, verification and rollback. A prompt edit is given as its shortest unique anchor and its new text, never a longer passage of the body (§11.6). A tool or rule change names its selftest cases, including one that fails without each new check (`CHK-001`), and its guard proof | — |
-| PL2 | List the open findings accepted as risks, the Product Owner actions with how each is verified, and what is out of scope | — |
+| PL1 | Set the status to `PLANNING`. Write §P: ordered steps by part, each with its target, exact edit, authority, verification and rollback. A prompt edit is given as its shortest unique anchor and its new text, never a longer passage of the body (§11.6). A tool or rule change names its selftest cases, including one that fails without each new check (`CHK-001`), and its guard proof | Checked at PL4: the validator requires §P and the recorded `ANALYZE` approval |
+| PL2 | List the open findings accepted as risks, the Product Owner actions with how each is verified, and what is out of scope | Checked at PL4, with §P |
 | PL3 | Reviews under `D26-A`: a dry run of §P, then at most two full reviews and one diff check, as in A6 | The validator's cap and dry-run checks |
 | PL4 | Set the status to `PLANNED`, commit and push; return `PRODUCT_OWNER_ACTION_PENDING`, asking for `PLAN` approval | `modification_validate.py` exits 0; the record on the branch equals the local file |
 
@@ -851,17 +854,23 @@ On Nathan's approval, his words go into `plan_approved_by` with the date.
 | X1 | Set the status to `EXECUTING`. Apply §P's steps in order, each target by its route (§11.5). Give each step and item a disposition with evidence in §E | Each step's own verification |
 | X2 | Push the branch and open its pull request; return `PRODUCT_OWNER_ACTION_PENDING` for Nathan's merge, and for his install where the skill exception changed | `modification_validate.py` exits 0 at `EXECUTING` |
 | X3 | Resume after the merge, from `main`. Detect the merge by files on `main`, never by commit subjects (`D26-C`). Re-run each gate from `main`; for the skill, compare the installed digest | `git rev-parse origin/main:<path>` equals the branch's blob for every changed file |
-| X4 | Update the catalog block to the new versions, but only if the approved plan names that selection; otherwise return `PROMOTION_CHECKPOINT_REQUIRED` | The catalog block, read back |
-| X5 | Record `interaction_cost_actual` against the prediction, with the reason for any difference; set the status to `COMPLETE`; commit and push the record; set the catalog block's last-close commit to `origin/main` once the record has merged | `modification_validate.py` exits 0 at `COMPLETE`; the catalog block, read back |
+| X4 | Update the catalog block. Its last-close commit becomes X3's merge commit. Where the Modification changed a prompt page, that row moves to the new version if the approved plan names the selection; if it does not, the row stays, and the mode ends with `PROMOTION_CHECKPOINT_REQUIRED` after X5 | The catalog block, read back |
+| X5 | Record `interaction_cost_actual` against the prediction, with the reason for any difference, and the actual author, checker and acceptor of each part (HDE Governance §9.1.6). Set the status to `COMPLETE`. Restart the branch from `origin/main`, commit the record and push it. Nathan merges it when he chooses, and nothing waits on that merge (D21-C) | `modification_validate.py` exits 0 at `COMPLETE`; the record on the branch equals the local file |
 
 A failure after the first external write takes `D26-B`'s path and nothing more: a failure record, a
 read-only sweep of what landed, the freeze kept, and a return to Nathan.
+
+**Capturing a reviewer's record.** Reviewers write nothing, so a record reaches the repository by
+capture (§7.4), never by retyping (`EVID-001`). Until P4 builds `gtwpe_redline.py capture`, the
+capture is the method P1 used (§17): a JSON parse of the reviewer's own transcript for its final
+handback message, written to the record file unedited, with its byte count and sha256 recorded and
+the transcript named in the record's *Harness files* section.
 
 ### 11.5 How each kind of target changes
 
 | Target | Route | Verification | Rollback |
 |---|---|---|---|
-| A prompt page | A new versioned sibling under the GTWPE parent page. Search for the exact new title first; duplicate the current version's page in Notion; apply the approved edits to the duplicate; set its identity lines to the new version. The current page is never edited, renamed, moved or deleted (TW-MGMT-10's rule, §2.1) | Read the new page back: its identity lines, and for each approved edit its new text present and its replaced anchor absent (§11.6) | Before X4, Nathan archives the unselected page; after X4, the catalog selects the prior version again. Neither needs a copy of a body |
+| A prompt page | A new versioned sibling under the GTWPE parent page. Search for the exact new title first; duplicate the current version's page in Notion; apply the approved edits to the duplicate; set its identity lines to the new version. The current page is never edited, renamed, moved or deleted (TW-MGMT-10's rule, §2.1) | Read the new page back whole, into the session's context (§11.6): its identity lines; for each approved edit, its new text present and its replaced anchor absent; its section headings the same as the current version's, except as the plan changes them; and, after X4, the catalog's link to it. HDE Governance §9.1.6 asks to "read back complete changed published bodies and required links" | Before X4, Nathan archives the unselected page; after X4, the catalog selects the prior version again. Neither needs a copy of a body |
 | A tool, lock, selftest or procedure file | A commit on the Modification's branch, merged by Nathan | The selftest at 100%; a guard proof in which each new check, disabled in a scratch copy, fails its own cases; for a rule change, the `D26-E` search; after the merge, X3 | Before the merge, the pull request is closed unmerged; after it, a new Modification reverses the change |
 | The catalog block | An update to the parent page | Read back: its rows equal the plan's | The prior rows, which the plan records, restored the same way |
 | The skill exception | A `D24` package: two reviewer subagents on the first template; Nathan installs | The post-install digest comparison | Nathan reinstalls the prior digest |
@@ -883,11 +892,12 @@ read-only sweep of what landed, the freeze kept, and a return to Nathan.
 
 ### 11.7 The catalog block and the watched sources
 
-The catalog block on the GTWPE parent page holds one row per member: its ID, title, current version
-and page ID, and from G5 whether it is selected. It also holds the lineage pins: the GCFPE-MGMT-10
+The catalog block on the GTWPE parent page holds one row per prompt member: its ID, title, current
+version and page ID, and from G5 whether it is selected. The tools and the procedure have no row:
+they are identified by their paths on `main`, at the last-close commit. It also holds the lineage pins: the GCFPE-MGMT-10
 source page's ID and pinned edit time, the PE Metaprompt's page ID and edit time, and the commit at
 which the last GTWPE Modification closed; P2(b) sets that commit to `origin/main` as it writes the
-block. P2(b) writes the block first. After that, only `EXECUTE` changes it (X4 and X5).
+block. P2(b) writes the block first. After that, only `EXECUTE` changes it (X4).
 
 The watched paths for A0 are the repository sources the GTWPE cites that can change under it:
 
@@ -949,7 +959,7 @@ something not yet landed is fixed in place by the phase building it (plan §8).
 
 ### 12.2 The Notion writes
 
-**For G2 at P2(b)**, in this order, each read back completely before the next: (1) create *GTWPE —
+**For G2 at P2(b)**, in this order, each read back before the next: (1) create *GTWPE —
 Glow Technical Writing Prompt Ecosystem* under `AI Prompts / HDE TW`
 (`3c74590a05eb8176baf8cb59f1631f3c`), with a catalog block that lists no member yet; (2) create
 GTWPE-MGMT-10 under it; (3) update the catalog block with GTWPE-MGMT-10's version and page ID and the
@@ -958,7 +968,10 @@ under the parent, then update the catalog block.
 
 Each G2 request lists every write with its title, parent and identity lines, and gives each body in
 the request itself for review. Bodies are authored in the session. Any scratch draft is deleted
-after publication and disclosed (`D22`); no body enters the repository (plan §4). **The destination
+after publication and disclosed (`D22`); no body enters the repository (plan §4). **The readback** fetches each page whole into the session's context, with no
+file kept (`D22`). It checks the exact title and the parent; for a prompt page, its two identity
+lines and every section heading of the approved body, in order; and for the catalog block, that its
+rows equal the approved rows. A difference stops the phase (`D26-B`). **The destination
 rule G2 establishes** (§14 D-10): GTWPE-MGMT-10 may create child pages of the GTWPE parent page and
 update the parent's catalog block, and may write nothing else in Notion.
 
@@ -1023,7 +1036,7 @@ verified landing, with its record valid at every mode, before any repair depends
 | The record | `MODIFICATION-<yyyymmdd>-gtwpe-reader-pilot`, `targets: [tool]`, one part of class B (applying this approved design), tier 1 (a new tool that produces H2) |
 | Who runs it | W1, as a GTWPE-MGMT-10 session: at the start of each mode it reads the published body live, and it follows the body. Where the body is silent, ambiguous or wrong, W1 records a pilot finding before it acts, and never fills the gap from this design unrecorded |
 | Reviews | `ANALYZE`: a dry run. `PLAN`: a dry run, then one full review by two reviewers on the second template, their records captured by script. Every round goes in the ledger |
-| The cold run | After §A is recorded, one fresh subagent is given only the published body's page ID and the pilot's request. It fetches the body and returns the §A it would write, and writes nothing (§11.6 names it). W1 compares that return with the recorded §A, and each material difference is a pilot finding against the body |
+| The cold run | After §A is recorded, one fresh subagent, briefed with §7.2's write-nothing clause, is given only the published body's page ID and the pilot's request. It fetches the body and returns the §A it would write, and writes nothing (§11.6 names it). W1 compares that return with the recorded §A, and each material difference is a pilot finding against the body |
 | The reader's selftest | One positive case for each type in plan §2.3 other than a Notion page: Markdown, text, `.docx`, `.pdf`, HTML, `.xlsx` and `.csv`; a repository input recorded as a pointer, whose unit index covers the whole blob; a stated selection. Negative cases, each with its code: a hash mismatch in the lock, an unreachable index, a scanned PDF with no text, an unknown type, and a unit index that misses a unit. The guard proof: each check, disabled in a scratch copy, fails its own cases |
 | V3 | `modification_validate.py` exits 0 at `ANALYZED`, `PLANNED`, `EXECUTING` and `COMPLETE`; every step and item has a disposition; the reader's files on `main` equal the branch's (X3); the selftest passes from `main`; interaction cost, actual against predicted; the pilot findings listed |
 | After it | Each pilot finding against GTWPE-MGMT-10 becomes an item of a GTWPE-MGMT-10 Modification: its first real repair. A finding against this design goes to Nathan in the pilot's record |
@@ -1046,7 +1059,7 @@ its own cases.
 **The carried fixes, each with a case that fails without it:** `targets-check` refuses PF27 in a run
 without (b) (E-020); S2's exact search finds a PF named only inside a repository input's blob (E-021);
 a Notion page that is a prompt body is refused before any fetch, once by its title and once by its
-path (E-022). **The post-check:** a new file in `subagents/` other than the spawned agent's own, and a
+path, and a page whose title search finds no matching ID is `notion-page-unidentified` (E-022). **The post-check:** a new file in `subagents/` other than the spawned agent's own, and a
 new `tool-results/` file the harness did not save for it (E-016).
 
 ## 14. Decisions for G1
@@ -1067,6 +1080,8 @@ Each has a default. G1's approval takes the default unless Nathan's words say ot
 | D-10 | The destination rule for GTWPE-MGMT-10's Notion writes: it may create child pages of the GTWPE parent page and update the parent's catalog block, and nothing else | **Establish it at G2** | Notion writes need an explicit rule |
 | D-11 | Which token measure the estimates use | **Settled** by PE37 in plan v1.2 §16.3: uncached input plus cache writes plus output. Not for G1 | — |
 | D-12 | A prompt change lands as a new versioned sibling page, selected through the catalog, rather than as an edit in place (§11.5) | **Adopt.** It keeps TW-MGMT-10's rule, and it makes a rollback a re-selection that needs no copy of a body | It differs from the GCFPE's in-place edits |
+| D-14 | The pilot's branch. GTWPE-MGMT-10 opens `docs/<yyyymmdd>-modification-gtwpe-<slug>` for each Modification (§11.3), while the kickoff tells W1 to "Work on one branch, docs/20260925-gtwpe-w1" | **The pilot uses its own branch**, as the prompt specifies, so it tests the path Nathan will use. W1's records stay on `docs/20260925-gtwpe-w1` | The kickoff is his |
+| D-15 | Does the *Glow HDE Living Prompt Flow Map* record GTWPE prompts? HDE Governance §9.1.6 introduces the map within its GCFPE governance text, and does not say | **No.** The GTWPE catalog is its navigation, and D-10's destination rule does not reach the map | Canon is silent, so the answer is his |
 | D-13 | Who runs the pilot: W1, as a GTWPE-MGMT-10 session checked by the cold run (§13.2), or a fresh session Nathan starts with the published body | **W1, with the cold run.** A fresh session is the truer test, and costs Nathan one action | It needs his action if he chooses the fresh session |
 
 ## 15. Errors for the ledger
@@ -1100,7 +1115,7 @@ selftest case that fails without it (§13.2, §13.3).
 | A GCFPE session scanning `docs/ephemeral/modifications/` meets GTWPE records typed `GCFPE_MODIFICATION_RECORD` | normal, for the GCFPE | low | A GCFPE tool could count a GTWPE record as its own | The `ecosystem` key marks it; a GCFPE change is outside GTWPE-MGMT-10 |
 | A GTWPE-MGMT-10 worker's harness file that holds a prompt body is read once more, to capture that worker's return (§11.6) | normal, when a plan names such a worker | low | Read strictly, `D22` counts the capture as a second read | It is the check in hand, and it is disclosed, as GCFPE's follow-up did. The pilot names only the cold run |
 | The P1 diff check's other listed findings: #1 to #4, #6 to #9, #11 and #12, and #10's half on §4.2 and §4.3. #5 falls away with RQ-3's option (i), and #13 was fixed when P1's ledger was written (`c7ceb41`) | as recorded | as recorded | as recorded | Not repaired unless Nathan opts in (`D26-A` rule 4); `design/REVIEW-P1-DIFFCHECK-R1.md` |
-| A new versioned prompt page is checked edit by edit, not as a whole (§11.5) | normal, for a prompt change | low | A change Notion's duplication made elsewhere in the page would go unseen | `D22` forbids comparing the body's bytes; the duplicate is Notion's own copy, and the pilot changes no prompt page |
+| A new versioned prompt page is read back whole, but no bytes are compared (§11.5) | normal, for a prompt change | low | A change Notion's duplication made inside an unedited paragraph could pass | `D22` forbids comparing the body's bytes; the duplicate is Notion's own copy; the pilot changes no prompt page |
 
 ## 17. Reviews ledger
 
@@ -1121,6 +1136,11 @@ reviews:
     date: 2026-09-28
     required_open: 3
     outcome: "P1, v1.0: RQ-1 to RQ-3 (two R1, one R3) and 13 listed, in design/REVIEW-P1-DIFFCHECK-R1.md; returned to Nathan, then accepted as risks under his delegation and fixed in the build (E-020 to E-022)"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-28
+    required_open: 6
+    outcome: "P1r, v1.1 at d087e4d: DRr-1 to DRr-6 (all R1) and 3 listed, in design/DRY-RUN-P1r.md; all 6 repaired in the commit after 4e3a3db, which also adds D-14 and D-15"
 ```
 
 ## 18. What this package does not claim
