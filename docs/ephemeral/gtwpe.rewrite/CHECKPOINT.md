@@ -1,35 +1,35 @@
 ---
 artifact_type: GTWPE_CHECKPOINT
-plan: docs/ephemeral/gtwpe.rewrite/GTWPE-IMPLEMENTATION-PLAN-v1.1.md (GTWPE-IMPL-PLAN v1.1, on main since #541); P0 ran under v1.0
+plan: docs/ephemeral/gtwpe.rewrite/GTWPE-IMPLEMENTATION-PLAN-v1.2.md (GTWPE-IMPL-PLAN v1.2, approved at G0 on 2026-09-28; read from PE37's branch docs/20260928-pe37-gtwpe-facilitation at 0ecb6a1, not yet on main); P1 ran under v1.1 and P0 under v1.0
 worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created 2026-09-25T07:39:13Z, origin web_claude_ai)
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P1 Design, at its checkpoint; stopped before G1 (P0 accepted: V0 PASSED)
+phase: P1r Design revision, in progress since 2026-09-28T20:19Z (P0 accepted: V0 PASSED; P1 stopped before G1 and is superseded by P1r)
 updated: 2026-09-28T14:46Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**P1 is at its checkpoint and W1 has stopped before G1.** P0 was accepted by PE37 (V0 PASSED,
-relayed 2026-09-28). §2 to §7 are the P0 record as it was accepted, with P1's disclosures added to
-§5. §8 holds Nathan's rulings, and §9 carries P1. §9.7 carries W1's proposal on Nathan's direction
-after the P1 report: the change prompt first.
+**P1r is in progress under plan v1.2.** P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
+§2 to §7 are the P0 record as it was accepted, with later disclosures added to §5. §8 holds Nathan's
+rulings, §9 carries P1, and §9.7 carries W1's proposal on Nathan's direction after the P1 report:
+the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r.
 
 ## 1. State (plan §9)
 
 | Item | Value |
 |---|---|
-| Last completed step | P1 Design: `design/GTWPE-DESIGN-v1.0.md` (`AWAITING_APPROVAL`), its dry run, one diff check, and the reviews ledger (§9.2 to §9.4). P0 Preflight was accepted earlier (V0 PASSED) |
+| Last completed step | P1 Design (§9): `design/GTWPE-DESIGN-v1.0.md`, its dry run, one diff check and the reviews ledger. Then W1's proposal on Nathan's direction (§9.7, `4a02d4a`), which plan v1.2 adopted. P0 Preflight was accepted earlier (V0 PASSED) |
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
 | External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1: pushes to this branch only.** P1 opened no PR and wrote nothing to Notion, Drive, skills, canon, the registry or the graph. It only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
-| Open errors | `ERRORS.md`: E-004, E-006, E-007 `OPEN` (all `LISTED`); the design resolves them (design §9), pending G1. E-001, E-002, E-003, E-005 `FIXED`; E-008 `DECLINED`. New from P1, for PE37 to enter: P1-1 to P1-7 (design §15), P1-8 (§9.6), and P1-9 to P1-11 (§9.7). The diff check leaves **RQ-1 to RQ-3 open**, for Nathan (§9.4) |
-| Next action | **None until the relay returns.** Nathan's direction after the P1 report (§8) puts the change prompt, GTWPE-MGMT-10, first; W1's proposal is §9.7. Nathan: his disposition of RQ-1 to RQ-3, and his G0 words (§9.1). PE37: the plan revision that the direction needs. Then W1 revises the design to match, for G1 |
+| Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023, including W1's P1-1 to P1-11. Open: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. E-020 to E-022 are RQ-1 to RQ-3, `REQUIRED`, accepted as risks under Nathan's direction of 2026-09-28 and fixed in the build (§10.1) |
+| Next action | **P1r (§10):** revise the design so GTWPE-MGMT-10 comes first (plan v1.2 §16.1 and §16.2), run one dry run and one fresh full review, then checkpoint, push and stop for G1 on `design/GTWPE-DESIGN-v1.1.md` |
 
 ## 2. Authority used
 
@@ -251,6 +251,7 @@ Every row was found by W1, is `LISTED` and is `OPEN`. None blocks P0 or P1.
 | 2026-09-28 | "with the exception of PF03 only files with "canon" in their title are valid merge targets" | Sent to W1 mid-turn during P1, straight after the PF10 ruling. **A valid merge target is `docs/pfcanon/PF03-*`, or a PF file with "canon" in its title.** 23 of the 34 files in `docs/pfcanon/` on `main` qualify: PF01, PF02, PF03, PF04, PF05, PF06, PF07, PF09.1 to PF09.7, PF12, PF14, PF16, PF17, PF19, PF23, PF27, PF29 and PF30.1. The filename and the in-document title (PF16's is its H1, "PF16‑Canon — HD Engine Epics Map") agree for every file. The other 11 are never targets: `PF-Invocation.md`, `PF-Reference-Glow Story.md`, PF08, PF10, PF11, PF13, PF15, PF18, PF20, PF21 and PF31. This settles Q1 (no PF20) by ruling rather than by default. It supersedes TW-TRIAGE-10's "A title containing Canon is not an eligibility rule". The design applies it at S2 and guards it the same way as the PF10 ruling |
 | 2026-09-28 | "PF20 and PF30 are special targets with dedicated prompts" | Sent to W1 during P1, after the eligibility ruling. **PF20 and PF30.x are valid merge targets, reached only through their own dedicated prompts.** This supersedes the preceding row's listing of PF20 among files that are never targets, and its "settles Q1 (no PF20)" (`AUTH-001`: that row is left as written). It also changes plan §2.5 and Q1. TW-RECORD-10 becomes **GTWPE-RECORD-10** (PF20, Epic history) and TW-RECORD-20 becomes **GTWPE-RECORD-20** (PF30.x, CRD history), each a dedicated GTWPE member sharing the S4–S9 machinery. GTWPE-RUN-10 never drafts PF20 or PF30.x, even though PF30.1's title contains "Canon". The eligibility guard binds each target to the one prompt allowed to write it |
 | 2026-09-28 | "keep in mind, there are multiple repairs that will be needed before this is production ready, so we should make sure the change prompt is solid then we can run through repairs" | Given directly to W1 after the P1 report. W1 reads "the change prompt" as GTWPE-MGMT-10, the GTWPE's own change prompt (design §4.4 and §11). W1 reads the direction as: RQ-1 to RQ-3 get no separate repair round now (§9.4's option B is not taken), and GTWPE-MGMT-10 is made solid and proven before any repair runs through it. The reading stands until Nathan corrects it. It reorders plan §5; PE37 revises the plan and Nathan approves it, so W1 acts on none of it before the relay returns. W1's proposal is §9.7 |
+| 2026-09-28 | "Make sure that the tw mgmt prompt works so I can repair the rest of the prompts, because I am sure none of this works right. that is what I want. All these code words and references mean nothing to me. I need the problem solved" | Relayed verbatim by PE37 with the P1r instruction (§10.1). PE37 takes it as Nathan's G0 approval of plan v1.2 and as his delegation of the open choices to PE37 (plan v1.2 §16.4). "The tw mgmt prompt" is GTWPE-MGMT-10. **From here, W1's reports to Nathan are plain language:** at most five sentences, saying what is done, whether the change prompt is closer to working, what happens next and whether he has to do anything. Every detail goes in this file |
 
 ## 9. P1 Design
 
@@ -415,3 +416,17 @@ governing documents: plan v1.1 §2.5, §5, §7 and §11; design §4, §4.4, §11
 and D26; `modification_validate.py`, lines 1 to 40, 81, 95 to 140, 401 to 405 and 575;
 `MODIFICATION-20260923-closeout-residuals.md`, its *Interaction cost, actual against predicted*;
 `MODIFICATION-20260923-alpha-feedback-open-entries.md`, line 344.
+
+## 10. P1r Design revision
+
+### 10.1 Relay of 2026-09-28, second (PE37, through Nathan)
+
+| Item | As relayed | Recorded |
+|---|---|---|
+| G0 | Nathan's words, as in §8, then: "This is his approval (G0) of plan v1.2." | Plan v1.2's `status` reads "APPROVED — G0 by Nathan, 2026-09-28 (§16.4)". This fills the gap §9.1 left, where the first relay's quotation slot was empty (E-023) |
+| Delegation | "He delegated the open choices to PE37, which decided: RQ-1 to RQ-3 are accepted as risks and fixed in the build, and a Notion prompt body is not an accepted input." | E-020 to E-022 in `ERRORS.md` at `0ecb6a1` record RQ-1 to RQ-3 as accepted under Nathan's direction. RQ-3 takes option (i) of §9.4: a Notion page that is a prompt body is `UNSUPPORTED_INPUT` in every configuration. W1 records PE37's decisions and does not reopen them |
+| Plan | "Your plan is GTWPE-IMPLEMENTATION-PLAN-v1.2.md, §16, on branch docs/20260928-pe37-gtwpe-facilitation. Read it there." | Read completely from `origin/docs/20260928-pe37-gtwpe-facilitation` at `0ecb6a1`: 25,670 B, 372 lines, sha256 `f32dd2ef04544f74a477e78d5b1057dc5d93761dc82f87fbb22a98ac95bfce8b`. §16 governs where it differs from §5, §6, §11 and §12. `ERRORS.md` was read completely from the same commit: 6,162 B, 36 lines |
+| P1r scope | "1. Revise the design so GTWPE-MGMT-10 comes first, as §16.1 and §16.2 describe. 2. Run one dry run, then one fresh full review. 3. Checkpoint, push, and stop." | Output `design/GTWPE-DESIGN-v1.1.md`; check V1r; gate G1 on v1.1 (plan v1.2 §16.1). Estimate: about 2 h and 2M tokens, measured as uncached input plus cache writes plus output (§16.3) |
+| Report | "When you stop, your report to Nathan is at most five plain sentences: what is done; whether the change prompt is closer to working; what happens next; whether he has to do anything. Put every detail in the checkpoint, not in the report." | Applies to every report from P1r on |
+
+P1r began at 2026-09-28T20:19:08Z, at branch head `4a02d4a`.
