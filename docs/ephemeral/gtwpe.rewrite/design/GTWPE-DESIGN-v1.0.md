@@ -849,8 +849,25 @@ reviewed as a plan. The plan fixes the budget at one dry run and at most one dif
 the relay).
 
 ```yaml
-reviews: []
+reviews:
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-28
+    required_open: 8
+    outcome: "DR-1 to DR-8 (seven R1, one R3) and 4 listed, in design/DRY-RUN-P1.md; all 8 repaired in 42badb7"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-28
+    required_open: 3
+    outcome: "RQ-1 to RQ-3 (two R1, one R3) and 13 listed, in design/REVIEW-P1-DIFFCHECK-R1.md. 8 to 3 halves, but all three sit in text the repair added (D26-A rule 5), and P1's cap is spent: returned to Nathan, DECISION NEEDED, not repaired"
 ```
+
+The diff check was one fresh `general-purpose` reviewer, GTWPE-P1-DC-R1, briefed only by the
+committed `design/REVIEW-BRIEF-P1-DIFFCHECK.md` (commit `ec82849`). Its record was captured by script
+from its own transcript, as its `SubagentHandback` message: 19,754 bytes, sha256 `a5835377…`. It was
+written to the record file unedited, with a final newline added. The post-check (§7.5) found no write
+attributable to the reviewer. The one exception is the harness's automatic save of one oversized tool
+result, which the reviewer disclosed; it holds a copy of `P1-SOURCE-NOTES.md`.
 
 ## 18. What this package does not claim
 
