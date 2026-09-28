@@ -1,0 +1,122 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"step-0b-doc-delta-capture","check_name":"Step-0B doc-delta capture","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-s","audit/qa/hde-epic040/checks/d0-discovery/primary.log"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-e","audit/docdeltas/hde-epic040_doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-e","audit/qa/hde-epic040/00_meta/doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import re; from pathlib import Path; plan=Path('docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md').read_text(encoding='utf-8').splitlines(); rows=[l.rstrip() + ' Drives decision: No |' for l in plan if re.match(r'\\| DD-[0-9]{2} \\|', l)]; blk=[l for l in Path('audit/qa/hde-epic040/checks/d0-discovery/primary.log').read_text(encoding='utf-8').splitlines() if l.startswith('BLOCKER:')]; t='# HDE-EPIC040 doc deltas (Step-0B)\\n\\nSource: QA Plan v1.2, docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md, section 9.1. Written by check step-0b-doc-delta-capture (QA-90 collection v1.1, task T02).\\n\\n## BLOCKERS\\n\\n' + ('\\n'.join(blk) if blk else 'none') + '\\n\\n## CAVEATS\\n\\n| ID | Class | Delta | Drain target (title) | Owner | Decision |\\n| --- | --- | --- | --- | --- | --- |\\n' + '\\n'.join(rows) + '\\n'; [(Path(p).parent.mkdir(parents=True, exist_ok=True), Path(p).write_bytes(t.encode('utf-8'))) for p in ('audit/docdeltas/hde-epic040_doc_deltas.md', 'audit/qa/hde-epic040/00_meta/doc_deltas.md')]"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-s","audit/docdeltas/hde-epic040_doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-s","audit/qa/hde-epic040/00_meta/doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"]],"command_provenance":"QA Plan v1.2 CHECK 2 step-0b-doc-delta-capture (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.1 task T02 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.1.md); attempt 1; executed by amthorn78 (authorized QA Codespace operator session; GitHub Copilot execution agent); normalizations: N-01, N-02, N-03, N-04, N-17","evidence_artifacts":["audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF27-Canon-Plan-Templates","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-28T01:29:06Z"}
+=== CONTEXT ===
+EXECUTOR: amthorn78 (authorized QA Codespace operator session; GitHub Copilot execution agent)
+VENUE: GitHub Codespace for amthorn78/glow-hdengine-v2
+CHECKOUT: /workspaces/hde-epic040-qa
+TESTED_SOURCE_SHA (from T01 command 3):
+0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d
+DEPENDENCY_PRIMARY_LOG_PRESENT (command 1): yes; status handled per the T02 gate requirement.
+PYTHON_VERSION (command 2):
+Python 3.12.14
+PYTHON_EXECUTABLE (command 3):
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+CLOSED_RAILS (command 4):
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+
+=== COMMANDS ===
+command 01: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -s audit/qa/hde-epic040/checks/d0-discovery/primary.log
+exit_code: 0
+command 02: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+exit_code: 0
+command 03: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+exit_code: 0
+command 04: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+exit_code: 0
+command 05: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -e audit/docdeltas/hde-epic040_doc_deltas.md
+exit_code: 1
+command 06: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -e audit/qa/hde-epic040/00_meta/doc_deltas.md
+exit_code: 1
+command 07: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import re; from pathlib import Path; plan=Path('docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md').read_text(encoding='utf-8').splitlines(); rows=[l.rstrip() + ' Drives decision: No |' for l in plan if re.match(r'\| DD-[0-9]{2} \|', l)]; blk=[l for l in Path('audit/qa/hde-epic040/checks/d0-discovery/primary.log').read_text(encoding='utf-8').splitlines() if l.startswith('BLOCKER:')]; t='# HDE-EPIC040 doc deltas (Step-0B)\n\nSource: QA Plan v1.2, docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md, section 9.1. Written by check step-0b-doc-delta-capture (QA-90 collection v1.1, task T02).\n\n## BLOCKERS\n\n' + ('\n'.join(blk) if blk else 'none') + '\n\n## CAVEATS\n\n| ID | Class | Delta | Drain target (title) | Owner | Decision |\n| --- | --- | --- | --- | --- | --- |\n' + '\n'.join(rows) + '\n'; [(Path(p).parent.mkdir(parents=True, exist_ok=True), Path(p).write_bytes(t.encode('utf-8'))) for p in ('audit/docdeltas/hde-epic040_doc_deltas.md', 'audit/qa/hde-epic040/00_meta/doc_deltas.md')]"
+exit_code: 0
+command 08: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -s audit/docdeltas/hde-epic040_doc_deltas.md
+exit_code: 0
+command 09: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -s audit/qa/hde-epic040/00_meta/doc_deltas.md
+exit_code: 0
+command 10: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum audit/docdeltas/hde-epic040_doc_deltas.md audit/qa/hde-epic040/00_meta/doc_deltas.md
+exit_code: 0
+command 11: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp audit/docdeltas/hde-epic040_doc_deltas.md audit/qa/hde-epic040/00_meta/doc_deltas.md
+exit_code: 0
+
+=== OUTPUT ===
+
+--- command 01 stdout ---
+--- command 1 stderr ---
+
+--- command 02 stdout ---
+Python 3.12.14
+--- command 2 stderr ---
+
+--- command 03 stdout ---
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+--- command 3 stderr ---
+
+--- command 04 stdout ---
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+--- command 4 stderr ---
+
+--- command 05 stdout ---
+--- command 5 stderr ---
+
+--- command 06 stdout ---
+--- command 6 stderr ---
+
+--- command 07 stdout ---
+--- command 7 stderr ---
+
+--- command 08 stdout ---
+--- command 8 stderr ---
+
+--- command 09 stdout ---
+--- command 9 stderr ---
+
+--- command 10 stdout ---
+c79379566ea01cd6acff71f6cba3e3caa9edb5bc7748f42e8e3b3f7944e3a2c2  audit/docdeltas/hde-epic040_doc_deltas.md
+c79379566ea01cd6acff71f6cba3e3caa9edb5bc7748f42e8e3b3f7944e3a2c2  audit/qa/hde-epic040/00_meta/doc_deltas.md
+--- command 10 stderr ---
+
+--- command 11 stdout ---
+--- command 11 stderr ---
+
+=== PREDICATES ===
+
+E-01 PASS: both planned doc-delta surfaces were absent before the writer (commands 5 and 6 exited 1).
+
+E-02 PASS: approved writer command 7 exited 0; both output files are non-empty (commands 8 and 9 exited 0); final decisive cmp (command 11) exited 0.
+
+K predicates: pending QA-110 content review of both surfaces.
+
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+
+
+
+=== LIMITS ===
+
+Class 1 pre-flight/internal Step-0B doc-delta capture. This is a draft evidence capture and establishes no QA verdict, acceptance, closure, deployment, PF status change, or doc-delta approval.

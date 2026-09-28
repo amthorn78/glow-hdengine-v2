@@ -1,0 +1,81 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac040-04-05-admission-identity","check_name":"Admission, pure core and release identity","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","scripts/release_id_recompute.py","--check-manifest-only"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","catalog/manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","cd audit/ops/hde-epic040/ops01 && sha256sum -c SHA256SUMS"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","PYTHONDONTWRITEBYTECODE=1","python","-m","pytest","-q","-p","no:cacheprovider","-rs","tests/config/test_production_admission.py","tests/config/test_execution_coherence.py","tests/core/test_engine_core_purity.py","tests/core/test_engine_core_determinism.py","tests/core/test_engine_core_abba.py","tests/m10/test_m10_symmetry_identity.py","tests/runtime/test_identity.py","tests/scripts/test_cut_release_manifest.py","tests/reader_v1/test_release_pack.py"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","jq \"{manifest_sha256, release_id, source_commit, validation_result, release_admission}\" audit/ops/hde-epic040/ops01/attestation.json && sha256sum audit/ops/hde-epic040/ops01/attestation.json"]],"command_provenance":"QA Plan v1.2 CHECK 5 ac040-04-05-admission-identity (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.1 task T05 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.1.md); attempt 1; executed by amthorn78 (authorized QA Codespace operator session; GitHub Copilot execution agent); normalizations: N-01, N-02, N-03, N-04, N-06","evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF09.3-Canon-HDE-Build-Checklist-Separation"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-28T01:41:09Z"}
+=== CONTEXT ===
+EXECUTOR: amthorn78 (authorized QA Codespace operator session; GitHub Copilot execution agent)
+VENUE: GitHub Codespace for amthorn78/glow-hdengine-v2
+CHECKOUT: /workspaces/hde-epic040-qa
+TESTED_SOURCE_SHA (T01 command 3):
+0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d
+DEPENDENCY: d0-discovery status PASS.
+R1/R2/R3 (commands 2-4):
+Python 3.12.14
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+
+MANIFEST-ONLY VALIDATION (command 5): exit 0
+MANIFEST DIGEST:
+52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96  catalog/manifest.json
+OPS01 SHA256SUMS CHECK:
+attestation.json: OK
+attestation.json.sha256: OK
+build.log: OK
+ops01_execution_log.attempt1.md: OK
+ops01_execution_log.attempt2.md: OK
+ops01_execution_log.attempt4.md: OK
+ops01_execution_log.attempt5.md: OK
+ATTESTATION FIELDS AND HASH:
+{
+  "manifest_sha256": "52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96",
+  "release_id": "52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96",
+  "source_commit": "6f53d828a30101bb7cd6638f3695eb82c2b10979",
+  "validation_result": "PASS",
+  "release_admission": "PR06R_B_FINAL_PASS"
+}
+9ffd1929875cd8d7485d13b5bd15a9452e32f2b9e08c033a517df58213986dff  audit/ops/hde-epic040/ops01/attestation.json
+
+=== COMMANDS ===
+     1	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+     2	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+     3	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+     4	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+     5	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only
+     6	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum catalog/manifest.json
+     7	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'cd audit/ops/hde-epic040/ops01 && sha256sum -c SHA256SUMS'
+     8	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider -rs tests/config/test_production_admission.py tests/config/test_execution_coherence.py tests/core/test_engine_core_purity.py tests/core/test_engine_core_determinism.py tests/core/test_engine_core_abba.py tests/m10/test_m10_symmetry_identity.py tests/runtime/test_identity.py tests/scripts/test_cut_release_manifest.py tests/reader_v1/test_release_pack.py
+     9	env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'jq "{manifest_sha256, release_id, source_commit, validation_result, release_admission}" audit/ops/hde-epic040/ops01/attestation.json && sha256sum audit/ops/hde-epic040/ops01/attestation.json'
+
+=== GROUP B OUTPUT ===
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 58%]
+........................................................................ [ 77%]
+........................................................................ [ 97%]
+...........                                                              [100%]
+371 passed in 35.21s
+
+=== PREDICATES ===
+
+E predicates PASS: release manifest check exited 0; OPS01 checksum command reports all seven entries OK; Group B exited 0 with 371 passed.
+
+K evidence recorded for QA-110: attestation manifest_sha256 and release_id both equal 52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96; validation_result PASS; release_admission PR06R_B_FINAL_PASS; source_commit 6f53d828a30101bb7cd6638f3695eb82c2b10979. Attestation SHA-256 9ffd1929875cd8d7485d13b5bd15a9452e32f2b9e08c033a517df58213986dff.
+
+Step-log status attests the execution layer only; Kronos evaluates the recorded [K] predicates at QA-110.
+
+
+
+=== LIMITS ===
+
+Class 2 local/offline admission, pure core, and identity coverage. OPS01 attestation is read-only corroboration; this task makes no new OPS, database, vendor, release activation, acceptance, deployment, PF09, or Epic-closure claim.
