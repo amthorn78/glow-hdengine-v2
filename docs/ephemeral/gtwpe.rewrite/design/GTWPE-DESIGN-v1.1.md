@@ -1141,7 +1141,20 @@ reviews:
     date: 2026-09-28
     required_open: 6
     outcome: "P1r, v1.1 at d087e4d: DRr-1 to DRr-6 (all R1) and 3 listed, in design/DRY-RUN-P1r.md; all 6 repaired in the commit after 4e3a3db, which also adds D-14 and D-15"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-09-28
+    required_open: 5
+    outcome: "P1r, v1.1 at a33647c, two reviewers: GTWPE-P1R-R1-A (2 required, 31 listed) and GTWPE-P1R-R1-B (4 required, 24 listed), in design/REVIEW-P1r-R1-A.md and -B.md; 5 distinct, since A's RF-2 and B's RB-4 are one. 6 to 5 does not halve (D26-A rule 5), and P1r's budget of one dry run and one full review is spent: returned to Nathan through PE37, DECISION NEEDED, not repaired"
 ```
+
+The full review was two fresh `general-purpose` reviewers, GTWPE-P1R-R1-A and GTWPE-P1R-R1-B, each
+briefed only by `design/REVIEW-BRIEF-P1r-FULL.md` (commit `f94448b`). Each brief as sent equals the
+committed brief: sha256 `cf1490fd…` and `21a9053e…`, 9,102 bytes each. Each record was captured by
+script from the reviewer's own transcript, as its handback message: 24,894 and 21,565 bytes, sha256
+`34f84b88…` and `c62a9656…`, written unedited with a final newline added. The post-check found no
+write attributable to either reviewer; reviewer A disclosed one harness save of an oversized
+`grep` output (`CHECKPOINT.md` §10.5).
 
 ## 18. What this package does not claim
 

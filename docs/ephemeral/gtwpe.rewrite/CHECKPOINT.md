@@ -5,14 +5,14 @@ worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P1r Design revision, in progress since 2026-09-28T20:19Z (P0 accepted: V0 PASSED; P1 stopped before G1 and is superseded by P1r)
-updated: 2026-09-28T14:46Z
+phase: P1r Design revision, at its checkpoint; stopped before G1 (P0 accepted: V0 PASSED; P1 superseded by P1r)
+updated: 2026-09-28T21:37Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**P1r is in progress under plan v1.2.** P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
+**P1r is at its checkpoint and W1 has stopped before G1.** P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
 §2 to §7 are the P0 record as it was accepted, with later disclosures added to §5. §8 holds Nathan's
 rulings, §9 carries P1, and §9.7 carries W1's proposal on Nathan's direction after the P1 report:
 the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r.
@@ -21,15 +21,15 @@ the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r.
 
 | Item | Value |
 |---|---|
-| Last completed step | P1 Design (§9): `design/GTWPE-DESIGN-v1.0.md`, its dry run, one diff check and the reviews ledger. Then W1's proposal on Nathan's direction (§9.7, `4a02d4a`), which plan v1.2 adopted. P0 Preflight was accepted earlier (V0 PASSED) |
+| Last completed step | **P1r** (§10): `design/GTWPE-DESIGN-v1.1.md` (`AWAITING_APPROVAL`), its dry run and repair, one full review by two reviewers, and the reviews ledger. Before it, P1 (§9) and W1's proposal (§9.7), which plan v1.2 adopted. P0 was accepted (V0 PASSED) |
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1: pushes to this branch only.** P1 opened no PR and wrote nothing to Notion, Drive, skills, canon, the registry or the graph. It only read Notion, GitHub and the session list |
+| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1 and P1r: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
-| Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023, including W1's P1-1 to P1-11. Open: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. E-020 to E-022 are RQ-1 to RQ-3, `REQUIRED`, accepted as risks under Nathan's direction of 2026-09-28 and fixed in the build (§10.1) |
-| Next action | **P1r (§10):** revise the design so GTWPE-MGMT-10 comes first (plan v1.2 §16.1 and §16.2), run one dry run and one fresh full review, then checkpoint, push and stop for G1 on `design/GTWPE-DESIGN-v1.1.md` |
+| Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023. Open there: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **New from P1r, for PE37 to enter:** P1r-1 to P1r-4 (design §15), P1r-5 (§10.4), and the full review's five open required findings (§10.4) |
+| Next action | **None until the relay returns.** The full review left five required findings open, and their count did not halve, so P1r stops here (§10.4). PE37: the next step, a repair round or G1 with the five as accepted risks (§10.8). Nathan: nothing yet |
 
 ## 2. Authority used
 
@@ -204,6 +204,15 @@ No other prompt body was fetched. The probe subagent fetched only the HDE TW hub
 | 2 | none from W1's fetches | The eight TW bodies and the proposed GCFPE-MGMT-10 body, fetched with `notion-fetch` | Every result came back inline, so the harness saved no file. W1 hashed, compared and copied none of them (`design/P1-SOURCE-NOTES.md` keeps only rules and short phrases) |
 | 3 | The harness's transcripts: the session's own and each subagent's, under `/root/.claude/projects/-home-user-glow-hdengine-v2/` | Everything each tool call returned, including those bodies and, at P0, the PE Metaprompt | Harness-managed, outside the repository and any shared store. W1 read them only by script, to sum token usage and to capture the diff-check record, and never hashed, compared or copied a body. Left to harness teardown (`D22` condition 4). **P0's disclosure missed them** (design §15, P1-6) |
 | 4 | `…/tool-results/byenbb7m4.txt`, 34,822 B, the harness's save of an oversized output of the diff-check reviewer | A copy of `design/P1-SOURCE-NOTES.md`, a repository record with no prompt body | Disclosed by the reviewer; outside `D22`; left to teardown |
+
+**Added in P1r.**
+
+| # | File | Held | Handling |
+|---|---|---|---|
+| 5 | none from W1's reads | W1 fetched no prompt body in P1r. It fetched HDE TW, a navigation page, inline, and ran Notion searches with highlights off | No file was made |
+| 6 | `…/subagents/agent-aeacb5b36771180e7.jsonl` and `agent-acd923444ec434e8a.jsonl`, the two reviewers' transcripts | What they read: repository files only; both report no Notion call | W1 read each by script only, to check the brief as sent, capture the handback and sum usage. Left to teardown |
+| 7 | `…/tool-results/bgdfkbfjj.txt`, the harness's save of reviewer A's oversized `grep` output | Its preview showed a fragment of candidate-era prompt-body text that a committed historical repository record already holds (`pe36-to-pe37.md`, open item 6) | Disclosed by the reviewer, who did not open it. W1 has not opened it. Left to teardown |
+| 8 | This session's own transcript | P0's and P1's fetches, including the TW bodies, the source body and the PE Metaprompt | Read again by script in P1r only to sum usage, as in P1 (row 3). Both reviewers list this as a strain on `D22` condition 4 (A's L2, B's L1) |
 
 ## 6. Errors found at P0, for `ERRORS.md`
 
@@ -430,3 +439,120 @@ and D26; `modification_validate.py`, lines 1 to 40, 81, 95 to 140, 401 to 405 an
 | Report | "When you stop, your report to Nathan is at most five plain sentences: what is done; whether the change prompt is closer to working; what happens next; whether he has to do anything. Put every detail in the checkpoint, not in the report." | Applies to every report from P1r on |
 
 P1r began at 2026-09-28T20:19:08Z, at branch head `4a02d4a`.
+
+### 10.2 P1r outputs
+
+All on `docs/20260925-gtwpe-w1`, each pushed and read back from `origin`.
+
+| File | What it is | Commits |
+|---|---|---|
+| `design/GTWPE-DESIGN-v1.1.md` | The design, change prompt first, `AWAITING_APPROVAL` for G1 | authored `d087e4d`; repair `a33647c`, the commit reviewed; ledger in this update |
+| `design/DRY-RUN-P1r.md` | The `D26-A` dry run | `4e3a3db` |
+| `design/REVIEW-BRIEF-P1r-FULL.md` | The filled second template, committed before spawning | `f94448b` |
+| `design/REVIEW-P1r-R1-A.md` | Reviewer A's record, captured by script | `9d5a392` |
+| `design/REVIEW-P1r-R1-B.md` | Reviewer B's record, captured by script | this update |
+| `CHECKPOINT.md` | This file | `07fe65d`, and this update |
+
+### 10.3 What v1.1 changes
+
+GTWPE-MGMT-10 is built first (P2(b)) and proven by a pilot that builds the input reader (P3). The
+run prompts and tools follow (P4), then the trials (P5) and adoption (P6). §11 specifies the change
+prompt in full: its record, its three modes step by step, how each kind of target changes, how it
+reads prompt bodies, and its drift check. v1.1 applies E-016 to E-022, D-11 is settled, and D-12 to
+D-15 are new. Design §0.1 lists every change.
+
+### 10.4 Reviews and the round's result
+
+| mode | kind | date | required_open | outcome |
+|---|---|---|---|---|
+| PLAN | DRY_RUN | 2026-09-28 | 6 | DRr-1 to DRr-6, all R1, and 3 listed; all 6 repaired in `a33647c` |
+| PLAN | FULL | 2026-09-28 | 5 | Reviewer A: 2 required, 31 listed. Reviewer B: 4 required, 24 listed. 5 distinct. Not repaired |
+
+**The five open required findings,** fully in the two records:
+
+- **RF-1 (R4, reviewer A).** The drift check watches the two pinned Notion pages. The PE
+  Metaprompt's and GCFPE-MGMT-10's next versions arrive as new pages, so it would never see them.
+  Reviewer B lists the same as L17.
+- **RF-2, also RB-4 (R1, both reviewers).** The drift check runs once, at the start. Commits that
+  land on the watched paths while a Modification is open are never examined, and neither is the gap
+  between the design's canon read and P2(b)'s first pin. Partly in DRr-4's repair.
+- **RB-1 (R1, reviewer B).** A new prompt version made by duplicating a page keeps the old
+  version's title. No step retitles it, and the readback checks neither title nor parent. Reviewer
+  A lists the same as L11. Partly in DRr-6's repair.
+- **RB-2 (R1, reviewer B).** A repair that changes only prompt pages cannot be selected until
+  Nathan merges a pull request holding only the record. That contradicts his ruling that pull
+  requests "cannot gate" (§8). Reviewer A lists the same as L27.
+- **RB-3 (R3, reviewer B).** From P4, `capture` scans every subagent transcript. It would re-read,
+  unreported, any transcript that holds a prompt body, against `D22`. Partly in DRr-3's repair.
+
+**Trend.** 6 to 5 does not halve (`D26-A` rule 5), and three of the five sit partly in text the last
+repair added. Plan v1.2 §16.1 gives P1r one dry run and one full review, so P1r stops here with the
+findings open. Both reviewers reproduced the pilot record's validation at all four statuses once
+`tool` exists (claim C2).
+
+**Listed findings worth the relay's attention**, among A's 31 and B's 24:
+
+- **The pilot never changes a prompt page** (A's L25, B's L21). The route Nathan most needs,
+  repairing a prompt, is first used on a real repair. RB-1 and RB-2 sit on that route.
+- **D-14 names the kickoff's one-branch rule, but not `glow-write-boundary`'s** "One branch per
+  session, one PR per branch" (A's L24, B's L22).
+- **The token measure re-reads transcripts that hold prompt bodies** (A's L2, B's L1; §5 row 8).
+
+**P1r-5, from W1's check of both reviewers' L15.** Both reviewers doubted that a Notion search
+returns a page's path. The live searches in this phase did return one for every result, for example
+"AI Prompts / HDE TW", so S1's path test can run. The same results show a prompt body the rule
+misses. The GCFPE-MGMT-10 proposed body sits under "Glow Operations Hub / GCFPE MGMT Change-Process
+Redesign — Tracking", and its title ends "PROPOSED BODY (D20 redesign)", not a version, so neither
+test refuses it. By the rubric that is R3, with low likelihood. W1 records it for PE37 and does not
+repair it.
+
+### 10.5 Post-check around the reviewers
+
+- **Unchanged:** local branches and stash; the top-level names in `/tmp` and the scratchpad; the
+  five most recently updated PRs, with #545 (PE37's, open) still updated at 20:15:18Z; the session
+  list, whose newest session is still 16:16Z; no GTWPE page in Notion.
+- **Changed, all by W1:** the working tree gained only the capture file `REVIEW-P1r-R1-B.md`. HEAD
+  and the remote head moved only by W1's commit and push of reviewer A's record (`9d5a392`).
+- **Changed, as expected:** `subagents/` gained the two reviewers' transcripts and metadata files.
+  `tool-results/` gained `bgdfkbfjj.txt`, reviewer A's disclosed save (§5 row 7).
+- **The reviewers' own accounts:** every git command read-only, no fetch, and no Notion call.
+
+### 10.6 Cost on the record (`D26-D`, plan v1.2 §16.3's measure)
+
+**Time.** 20:19Z to about 21:40Z: about 1.35 h, against about 2 h.
+
+**Tokens**, summed by script from the transcripts' per-call usage. The measure is uncached input
+plus cache writes plus output.
+
+| Transcript | Calls | Uncached | Cache writes | Output | Measure | Cache reads, excluded |
+|---|---|---|---|---|---|---|
+| This session, P1r | 72 | 146 | 366,637 | 199,006 | 565,789 | 34,948,065 |
+| Reviewer A | 61 | 122 | 537,511 | 1,328 | 538,961 | 17,243,792 |
+| Reviewer B | 76 | 152 | 576,155 | 1,482 | 577,789 | 20,598,583 |
+
+The total is about **1.68M against about 2M**, under the estimate. The harness reports the reviewers
+at 540,086 and 578,683 tokens of context, over 66 and 77 tool uses, in 35.7 and 46.3 minutes. Their
+transcripts' output figures undercount, as in P1.
+
+### 10.7 Canon relied on in P1r
+
+PF04 — HDE Governance §9.1.6, read in full on `main` at `0db3f0e`; the canon-first search found no
+other governing section for this subject. `AGENTS.md`, the canon-first rule. The PF sections P1
+read (§9.2 above; design §1) still hold: `docs/pfcanon/`, `AGENTS.md` and
+`docs/prompt_ecosystem_management/` are byte-identical from `8eb4ce0` to `0db3f0e`.
+
+### 10.8 For the relay
+
+1. **The next step is PE37's to decide.** Five required findings are open, and the count did not
+   halve. `D26-A` rule 2 allows one more round: a repair, then a second full review or a check of the
+   repair's diff. The other path is G1 with the five as accepted risks. W1 recommends the repair
+   round. All five are small text changes, and four of them sit on the prompt-repair route Nathan
+   asked to have working.
+2. **W1 recommends that the pilot also change one prompt page,** for example a small wording fix
+   to GTWPE-MGMT-10 itself. Then the route Nathan needs is tested before a real repair depends on
+   it. That changes plan v1.2 §16.1's P3, so it is PE37's call.
+3. **For `ERRORS.md`:** P1r-1 to P1r-4 (design §15); P1r-5 (§10.4); and the five open required
+   findings.
+4. **G1 is not asked for yet.** When it is, it covers decisions D-1 to D-15. D-11 is settled; D-12
+   to D-15 are new; and D-14 should also name `glow-write-boundary`'s branch rule.
+5. **Stopped before G1.** W1 writes no page, tool, prompt, skill or canon file until G1 is approved.
