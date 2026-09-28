@@ -3,10 +3,10 @@ artifact_type: GTWPE_CHECKPOINT
 plan: docs/ephemeral/gtwpe.rewrite/GTWPE-IMPLEMENTATION-PLAN-v1.0.md (GTWPE-IMPL-PLAN v1.0)
 worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created 2026-09-25T07:39:13Z, origin web_claude_ai)
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
-branch: docs/20260925-gtwpe-w1, from main @ f141e5d
-pull_request: "#495, https://github.com/amthorn78/glow-hdengine-v2/pull/495 (draft)"
+branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
+pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
 phase: P0 Preflight
-updated: 2026-09-25T07:55Z
+updated: 2026-09-28T00:12Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -27,7 +27,7 @@ stopped and does not start P1 until the relay says so.**
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since the branch point | Now `0c610d6` (#494, one HDE-EPIC040-PR05 file in `docs/ephemeral/`). No GTWPE source changed, and the PR stays mergeable |
 | Open errors | P0-1 to P0-5 (§6), all `LISTED`, all `OPEN`. PE37 numbers them in `ERRORS.md` |
-| Next action | Stop. Await PE37's V0 check and the relay's instruction to start P1 |
+| Next action | Stop. Await PE37's V0 check and the relay's instruction to start P1. No step waits on a PR merge (§8) |
 
 ## 2. Authority used
 
@@ -230,3 +230,10 @@ Every row was found by W1, is `LISTED` and is `OPEN`. None blocks P0 or P1.
 6. **Nine PFs are 300 KB or more:** PF04, PF05, PF06, PF11, PF12, PF14, PF19, PF20 and PF27. At
    about 4 bytes a token, six are larger than one 128,000-token response (PF04, PF11, PF12, PF14,
    PF19 and PF20), which agrees with the analysis. T4 names PF04, PF12, PF14 or PF19.
+
+## 8. Rulings since the P0 report
+
+| Date | Nathan's words | Effect on W1 |
+|---|---|---|
+| 2026-09-25 | "I will have to merge this branch pending future work, it does not constitute approval." | #495 merged at 2026-09-25T08:05:40Z. The merge preserves the P0 record and approves nothing (D21-C) |
+| 2026-09-28 | "We can't use PRs to manage work in this stream. There is too much parallel work. We can use them, but they cannot gate." | A PR is a storage vehicle only. W1 commits and pushes each checkpoint on `docs/20260925-gtwpe-w1`, and PE37 reads the pushed branch. No phase, check or relay waits on a PR being opened, reviewed or merged. After any merge the branch restarts from `main` under the same name. This supersedes the kickoff's "with one PR" and closes P0-3's PR half; T6's canon adoption is taken up at G1 |
