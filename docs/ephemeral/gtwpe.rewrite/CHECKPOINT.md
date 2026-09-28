@@ -1,33 +1,33 @@
 ---
 artifact_type: GTWPE_CHECKPOINT
-plan: docs/ephemeral/gtwpe.rewrite/GTWPE-IMPLEMENTATION-PLAN-v1.0.md (GTWPE-IMPL-PLAN v1.0)
+plan: docs/ephemeral/gtwpe.rewrite/GTWPE-IMPLEMENTATION-PLAN-v1.1.md (GTWPE-IMPL-PLAN v1.1, on main since #541); P0 ran under v1.0
 worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created 2026-09-25T07:39:13Z, origin web_claude_ai)
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P0 Preflight
-updated: 2026-09-28T00:12Z
+phase: P1 Design, in progress (P0 accepted: V0 PASSED)
+updated: 2026-09-28T00:40Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**P0 is complete: every source was read completely and every probe is recorded below. W1 has
-stopped and does not start P1 until the relay says so.**
+**P1 is in progress. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28); §2 to §7 are the P0
+record as it was accepted, and §9 carries P1.**
 
 ## 1. State (plan §9)
 
 | Item | Value |
 |---|---|
-| Last completed step | P0 Preflight: sources read (§3), environment probed (§4) |
-| Base | `main` @ `f141e5d` (#493 merged) |
+| Last completed step | P0 Preflight, accepted: V0 PASSED (§9). P1 started 2026-09-28 |
+| Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
 | External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z. Notion, Drive, skills, canon, registry, graph: **none** |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
-| `main` since the branch point | Now `0c610d6` (#494, one HDE-EPIC040-PR05 file in `docs/ephemeral/`). No GTWPE source changed, and the PR stays mergeable |
-| Open errors | P0-1 to P0-5 (§6), all `LISTED`, all `OPEN`. PE37 numbers them in `ERRORS.md` |
-| Next action | Stop. Await PE37's V0 check and the relay's instruction to start P1. No step waits on a PR merge (§8) |
+| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file |
+| Open errors | `ERRORS.md`: E-004, E-006, E-007 `OPEN` (all `LISTED`); P1 resolves them in the design. E-001, E-002, E-003, E-005 `FIXED`; E-008 `DECLINED` |
+| Next action | P1: read PF03, PF06, PF10, then PF27 and PF30.1, completely; author `design/GTWPE-DESIGN-v1.0.md`; one dry run, at most one diff check; checkpoint and stop before G1 |
 
 ## 2. Authority used
 
@@ -237,3 +237,15 @@ Every row was found by W1, is `LISTED` and is `OPEN`. None blocks P0 or P1.
 |---|---|---|
 | 2026-09-25 | "I will have to merge this branch pending future work, it does not constitute approval." | #495 merged at 2026-09-25T08:05:40Z. The merge preserves the P0 record and approves nothing (D21-C) |
 | 2026-09-28 | "We can't use PRs to manage work in this stream. There is too much parallel work. We can use them, but they cannot gate." | A PR is a storage vehicle only. W1 commits and pushes each checkpoint on `docs/20260925-gtwpe-w1`, and PE37 reads the pushed branch. No phase, check or relay waits on a PR being opened, reviewed or merged. After any merge the branch restarts from `main` under the same name. This supersedes the kickoff's "with one PR" and closes P0-3's PR half; T6's canon adoption is taken up at G1 |
+
+## 9. P1 Design
+
+### 9.1 Relay of 2026-09-28 (PE37, through Nathan)
+
+| Item | As relayed | Recorded |
+|---|---|---|
+| V0 | "V0 PASSED. P0 is accepted." | P0 closed |
+| Ledger | P0-1 to P0-5 are E-001 to E-005; the subagent tool finding (§4.2) is E-006; the four PE defects without a workaround (§7.2) are E-007; the `rg` note (§4.1) is E-008, declined | `ERRORS.md` on `main`, read completely |
+| G0 | "Nathan approved G0 on 2026-09-28: \"<paste Nathan's words>\"" | **Nathan's words were not supplied**: the relay's quotation slot still held its placeholder. W1 records that PE37 relays a G0 approval dated 2026-09-28 and records no quotation. Plan v1.1's `status` says his confirmation "is recorded in §15 when given"; §15 does not yet record it |
+| Plan | v1.1 governs; §15 lists the changes from v1.0 | Read completely on `main` (21,196 B, 317 lines); PR #541 merged at 2026-09-28T00:15:59Z and its branch is deleted, so it was read from `main` |
+| P1 scope | Resolve E-003 (the canon PR's branch; S9 detects the merge without waiting), E-004 (pinned reader provisioning, or `BLOCKED` per type), E-006 (subagent brief and post-check), E-007 (D5, D7, D8, D10), Q1 to Q3 at their defaults; price S2 and S3 per subagent from the 97,191-token probe; one dry run, at most one diff check, a reviews ledger | Carried into the design |
