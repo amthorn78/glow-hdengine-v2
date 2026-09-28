@@ -5,29 +5,30 @@ worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P1 Design, in progress (P0 accepted: V0 PASSED)
-updated: 2026-09-28T00:40Z
+phase: P1 Design, at its checkpoint; stopped before G1 (P0 accepted: V0 PASSED)
+updated: 2026-09-28T01:55Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**P1 is in progress. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28); §2 to §7 are the P0
-record as it was accepted, and §9 carries P1.**
+**P1 is at its checkpoint and W1 has stopped before G1.** P0 was accepted by PE37 (V0 PASSED,
+relayed 2026-09-28). §2 to §7 are the P0 record as it was accepted, with P1's disclosures added to
+§5. §8 holds Nathan's rulings, and §9 carries P1.
 
 ## 1. State (plan §9)
 
 | Item | Value |
 |---|---|
-| Last completed step | P0 Preflight, accepted: V0 PASSED (§9). P1 started 2026-09-28 |
+| Last completed step | P1 Design: `design/GTWPE-DESIGN-v1.0.md` (`AWAITING_APPROVAL`), its dry run, one diff check, and the reviews ledger (§9.2 to §9.4). P0 Preflight was accepted earlier (V0 PASSED) |
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z. Notion, Drive, skills, canon, registry, graph: **none** |
+| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1: pushes to this branch only.** P1 opened no PR and wrote nothing to Notion, Drive, skills, canon, the registry or the graph. It only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
-| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file |
-| Open errors | `ERRORS.md`: E-004, E-006, E-007 `OPEN` (all `LISTED`); P1 resolves them in the design. E-001, E-002, E-003, E-005 `FIXED`; E-008 `DECLINED` |
-| Next action | P1: read PF03, PF06, PF10, then PF27 and PF30.1, completely; author `design/GTWPE-DESIGN-v1.0.md`; one dry run, at most one diff check; checkpoint and stop before G1 |
+| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
+| Open errors | `ERRORS.md`: E-004, E-006, E-007 `OPEN` (all `LISTED`); the design resolves them (design §9), pending G1. E-001, E-002, E-003, E-005 `FIXED`; E-008 `DECLINED`. New from P1, for PE37 to enter: P1-1 to P1-7 (design §15) and P1-8 (§9.6). The diff check leaves **RQ-1 to RQ-3 open**, for Nathan (§9.4) |
+| Next action | **None until the relay returns.** Nathan: G1 on the design package, the decisions in design §14, the choice on RQ-1 to RQ-3, and his G0 words (§9.1). Then P2, if G1 approves |
 
 ## 2. Authority used
 
@@ -195,6 +196,14 @@ records 21 (P0-5). No GTWPE page exists.
 
 No other prompt body was fetched. The probe subagent fetched only the HDE TW hub page.
 
+**Added in P1.**
+
+| # | File | Held | Handling |
+|---|---|---|---|
+| 2 | none from W1's fetches | The eight TW bodies and the proposed GCFPE-MGMT-10 body, fetched with `notion-fetch` | Every result came back inline, so the harness saved no file. W1 hashed, compared and copied none of them (`design/P1-SOURCE-NOTES.md` keeps only rules and short phrases) |
+| 3 | The harness's transcripts: the session's own and each subagent's, under `/root/.claude/projects/-home-user-glow-hdengine-v2/` | Everything each tool call returned, including those bodies and, at P0, the PE Metaprompt | Harness-managed, outside the repository and any shared store. W1 read them only by script, to sum token usage and to capture the diff-check record, and never hashed, compared or copied a body. Left to harness teardown (`D22` condition 4). **P0's disclosure missed them** (design §15, P1-6) |
+| 4 | `…/tool-results/byenbb7m4.txt`, 34,822 B, the harness's save of an oversized output of the diff-check reviewer | A copy of `design/P1-SOURCE-NOTES.md`, a repository record with no prompt body | Disclosed by the reviewer; outside `D22`; left to teardown |
+
 ## 6. Errors found at P0, for `ERRORS.md`
 
 Every row was found by W1, is `LISTED` and is `OPEN`. None blocks P0 or P1.
@@ -252,3 +261,95 @@ Every row was found by W1, is `LISTED` and is `OPEN`. None blocks P0 or P1.
 | G0 | `Nathan approved G0 on 2026-09-28: "<paste Nathan's words>"` | **Nathan's words were not supplied**: the relay's quotation slot still held its placeholder. W1 records that PE37 relays a G0 approval dated 2026-09-28 and records no quotation. Plan v1.1's `status` says his confirmation "is recorded in §15 when given"; §15 does not yet record it |
 | Plan | v1.1 governs; §15 lists the changes from v1.0 | Read completely on `main` (21,196 B, 317 lines); PR #541 merged at 2026-09-28T00:15:59Z and its branch is deleted, so it was read from `main` |
 | P1 scope | Resolve E-003 (the canon PR's branch; S9 detects the merge without waiting), E-004 (pinned reader provisioning, or `BLOCKED` per type), E-006 (subagent brief and post-check), E-007 (D5, D7, D8, D10), Q1 to Q3 at their defaults; price S2 and S3 per subagent from the 97,191-token probe; one dry run, at most one diff check, a reviews ledger | Carried into the design |
+
+### 9.2 P1 outputs
+
+All on `docs/20260925-gtwpe-w1`, each pushed and read back byte for byte from `origin`.
+
+| File | What it is | Commits |
+|---|---|---|
+| `design/GTWPE-DESIGN-v1.0.md` | The design package, `AWAITING_APPROVAL` for G1 | authored `9548251`; repair `42badb7`; ledger `c7ceb41` |
+| `design/P1-SOURCE-NOTES.md` | Working notes from the complete reads | `bad23e5`, `62b85bf`, `30ddcc5`, `741d6c9` |
+| `design/DRY-RUN-P1.md` | The `D26-A` dry run | `e70b8ed` |
+| `design/REVIEW-BRIEF-P1-DIFFCHECK.md` | The filled second template, committed before spawning | `ec82849` |
+| `design/REVIEW-P1-DIFFCHECK-R1.md` | The reviewer's record, captured by script | `c7ceb41` |
+| `CHECKPOINT.md` | This file; §8 carries Nathan's three rulings of 2026-09-28 | `5e5e1c0`, `70df576`, `54562b8`, and this update |
+
+### 9.3 Nathan's rulings during P1
+
+Three, recorded verbatim in §8 as they arrived: PF10 is never a merge target; only PF03 and files
+with "canon" in their title are valid merge targets; PF20 and PF30 are special targets with
+dedicated prompts. The design applies all three (design §8.7, §2, §4.2, §4.3, and Q1 in §9.5) and
+guards them mechanically.
+
+### 9.4 Reviews and the post-check
+
+| mode | kind | date | required_open | outcome |
+|---|---|---|---|---|
+| PLAN | DRY_RUN | 2026-09-28 | 8 | DR-1 to DR-8 (seven R1, one R3), 4 listed; all 8 repaired in `42badb7` |
+| PLAN | DIFF_CHECK | 2026-09-28 | 3 | RQ-1 to RQ-3 (two R1, one R3), 13 listed. 8 to 3 halves, but all three sit in text the repair added (`D26-A` rule 5). P1's cap (one dry run, one diff check) is spent, so they are **returned to Nathan, not repaired** |
+
+**The three open required findings,** in the reviewer's words and fully in
+`design/REVIEW-P1-DIFFCHECK-R1.md`:
+
+- **RQ-1 (R1):** "PF27 can change in a run with no specification". S2 and `targets-check` admit
+  PF27 as a general target, against Nathan's instruction of 2026-09-25 that "PF27 and PF30 are updated
+  only when a specification exists". The design also drops plan §2.2's "PF27 changes only if the
+  specification changes a template it owns".
+- **RQ-2 (R1):** the repository-input pointer records from DR-3's repair are built by no named
+  command, and S2's exact search cannot see their text.
+- **RQ-3 (R3):** DR-4's live read of a prompt-body input stays out of the record, but leaves a
+  transcript copy that `capture` reads again and no field reports. That breaches `D22`.
+
+**Nathan's choice.** **(A)** Accept RQ-1 to RQ-3 as listed risks at G1 and fix them in P2 and P3.
+**(B)** One repair round, each fix proved by a failing P2 selftest case rather than another review. A
+second diff check would need his `review_cap` override. The reviewer and W1 both recommend **B**, with
+RQ-3's option (i): a prompt-body input is `UNSUPPORTED_INPUT notion-prompt-body` in every
+configuration. Option (i) narrows plan §2.3, so it needs his word. The 13 listed findings stay listed
+unless he opts in.
+
+**Post-check around the reviewer (E-006, design §7.5).**
+
+- **Unchanged:** the git working tree, HEAD, local branches and stash; the remote heads; the five
+  most recently updated PRs; HDE TW's timestamp (2026-09-23T17:44).
+- **The session list** gained one session. It was created at 01:27Z from `web_claude_ai`, for another
+  repository and with no parent session: Nathan's parallel work, not the reviewer's.
+- **`/tmp`** gained and lost one file each in the harness's `tasks/` directory.
+- **The harness's `tool-results/` directory** gained the reviewer's oversized-output save (§5 row 4).
+  The design's post-check does not watch that directory (P1-8).
+
+The reviewer's own account: "every git command I ran was read-only".
+
+### 9.5 Cost on the record (`D26-D`)
+
+**Time.** P0 ran from 2026-09-25T07:39Z to about 08:05Z. P1 ran from the relay at 2026-09-28T00:17:11Z
+to about 01:55Z. Together that is about 2.1 hours, against the plan's "about 3 h".
+
+**Tokens**, summed by script from the transcripts' per-call `usage`:
+
+| Transcript | Calls | Uncached input | Cache writes | Cache reads | Output |
+|---|---|---|---|---|---|
+| This session, P0 and P1 | 231 | 462 | 1,775,911 | 96,106,224 | 390,451 |
+| P0 probe subagent | 4 | 8 | 96,382 | 227,864 | 511 |
+| P1 diff-check reviewer | 52 | 104 | 427,216 | 11,497,353 | — |
+
+The reviewer's context at completion was **429,362** tokens over 53 tool uses in 32 minutes, as the
+harness reports it. That is the probe's measure: 97,191 at P0. Its transcript's output figure (1,255)
+is lower than its 19,754-byte record implies, so it is not used.
+
+**Against "about 2M".** Uncached input plus cache writes plus output comes to about **2.7M**, or 1.35
+times the estimate: under twice. Counting cache reads as well it is about **110M**, far over. Which
+measure the plan means is not stated, so this is design §14 D-11, for PE37. W1 is stopped at the
+phase end either way.
+
+### 9.6 For the relay
+
+1. **G1 on `design/GTWPE-DESIGN-v1.0.md`,** with its decisions D-1 to D-11 (design §14) at the stated
+   defaults, and **the choice on RQ-1 to RQ-3** (§9.4).
+2. **Nathan's G0 words are still missing** (§9.1). W1 needs them to complete the record.
+3. **For `ERRORS.md`:** P1-1 to P1-7 (design §15) and **P1-8**: the post-check (design §7.5) does not
+   watch the harness's `tool-results/` directory, where a subagent's oversized output lands. The fix
+   is to add `…/tool-results/` and `…/subagents/` to `postcheck`'s snapshot in P2. Class
+   `VALIDATION`, `LISTED`, found by W1's own post-check. RQ-1 to RQ-3 are also for the ledger, as
+   PE37 classes them.
+4. **Stopped before G1.** W1 writes no page, tool, prompt, skill or canon file until G1 is approved.
