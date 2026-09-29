@@ -16,6 +16,13 @@ status: RECORD. Merging preserves the record and approves nothing (D21-C)
 
 Brief: 5544 bytes, sha256 `af41f422f4be041e44ac88af7af39fdec54b7eee6e6846be034c4177d5a4317a`.
 
+## Canon relied on
+
+- `AGENTS.md`: the canon-first rule; PF canon is read-only.
+- HDE Governance (PF04) §9.1.6 and HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, on `main` at `fffadb5`.
+- In flight: the record's §A and §P at `bba16f9`; `PLAN-REVIEW-A.md` and `PLAN-REVIEW-B.md`;
+  `reviewer-prompt-template.md`'s second template; `gcfpe.decision-record.md` D26 (A to C).
+
 ## The brief for GTWPE-FIRST-REPAIR-PLAN-DC
 
 ```plain text
