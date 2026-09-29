@@ -26,6 +26,11 @@ reviews:
     date: 2026-09-29
     required_open: 0
     outcome: "By this session, read-only: the validator exits 0 on a copy at ANALYZED; A0 (b) reproduces at fffadb5; the front matter and all five tables are well formed; PART-02's premises hold on main. A second reading of the scope table corrected 11 of 16 rows, one of them a required defect (ITEM-11 missed four mode checks), repaired before this row. No full review"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-29
+    required_open: 0
+    outcome: "By this session, read-only against the live pages: the validator and the GTWPE check exit 0 on a copy at PLANNED; the 43 anchors occur as expected on 092926.1, by reading, twice; C1 to C4 once each on the catalog; the tool's selftest 17/17 and guard proof 5/5; edits.json and phrases.json consistent by script. One required defect, in the tool's first draft (fenced headings), fixed before this row"
 item_count_at_approval: 17
 items:
   - id: ITEM-01
