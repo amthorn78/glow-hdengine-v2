@@ -3256,6 +3256,79 @@ EPIC039_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC040_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic040.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic040/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "epic040.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic040_doc_deltas.md",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_02_03_catalog_config.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_04_05_admission_identity.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_04_09_compat_cli_offline.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_06_golden_comparison.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_07_gate_ingress_offline.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_08_evidence_validators.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.ac040_09_reader_http_in_process.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.d0_discovery.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.open_rails_showcompat_vendor.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.qa_closeout_deliverables.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.sec_reader_http_live.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic040.checks.step_0b_doc_delta_capture.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "epic_id": "HDE-EPIC040",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -3890,6 +3963,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC038_PR06_PRIMARY_ARTIFACTS,
             *EPIC039_PR01_PRIMARY_ARTIFACTS,
             *EPIC039_QA_PRIMARY_ARTIFACTS,
+            *EPIC040_QA_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -1,0 +1,125 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac040-04-09-compat-cli-offline","check_name":"Compat and CLI, local/offline","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","PYTHONDONTWRITEBYTECODE=1","python","-m","pytest","-q","-p","no:cacheprovider","-rs","tests/compat/test_evaluate_pair_eligibility.py","tests/compat/test_conjunction_no_user_boundary.py","tests/compat/test_compat_public_ab_ba_identity.py","tests/compat/test_compat_public_lf_bom.py","tests/compat/test_abba_parity.py","tests/compat/test_hde_epic037_v2_adapter_to_compat.py","tests/cli/test_showcompat_sources.py","tests/cli/test_errors_parity.py","tests/cli/test_cli_usage_and_errors.py","tests/cli/test_cli_canonical_bytes.py","tests/cli/test_cli_file_inputs.py","tests/cli/test_showcompat_parity_and_identity.py","tests/artifacts/test_cli_text_artifacts_bom_lf.py","tests/qa/test_cli_admin_dumps.py","tests/qa/test_cli_admin_parity.py","tests/runtime/test_emit_public_legacy_helper.py","tests/epic003/test_meta_invocation_ok.py"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-F","SKIPPED","/tmp/hde-epic040-qa-v1.2/ac040-04-09-compat-cli-offline/c3.out"]],"command_provenance":"QA Plan v1.2 CHECK 8 ac040-04-09-compat-cli-offline (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.1 task T08 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.1.md); attempt 1; executed by Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner; normalizations: N-01, N-02, N-03, N-04, N-05, N-06","evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-29T01:54:22Z"}
+=== CONTEXT ===
+EXECUTOR: Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner
+VENUE: Product Owner-controlled Linux shell (host Linux 6.8.0-142-generic); not a GitHub Codespace.
+CHECKOUT: /home/nathan/hde-epic040-qa
+TESTED_SOURCE (git rev-parse HEAD as captured by T01 command 3): 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d
+INTERPRETER (readiness R1): Python 3.12.3
+SYS_EXECUTABLE (readiness R2): /tmp/hde-epic040-qa-v1.2/venv/bin/python
+CLOSED_POSTURE_AS_APPLIED (readiness R3):
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+MECHANICS: as recorded in the T01 body (inline shell function appends the literal command text to argv.txt and evaluates it with stdout, stderr and exit code captured; the command lines and the recording invocation were taken mechanically from the collection file). Command 3 was launched as a detached background process of the shell (background and disown) with the same captures, and its exit code was written by the same shell function. No script file was created.
+=== COMMANDS ===
+c1 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+c2a exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+c2b exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+c2c exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+c3 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider -rs tests/compat/test_evaluate_pair_eligibility.py tests/compat/test_conjunction_no_user_boundary.py tests/compat/test_compat_public_ab_ba_identity.py tests/compat/test_compat_public_lf_bom.py tests/compat/test_abba_parity.py tests/compat/test_hde_epic037_v2_adapter_to_compat.py tests/cli/test_showcompat_sources.py tests/cli/test_errors_parity.py tests/cli/test_cli_usage_and_errors.py tests/cli/test_cli_canonical_bytes.py tests/cli/test_cli_file_inputs.py tests/cli/test_showcompat_parity_and_identity.py tests/artifacts/test_cli_text_artifacts_bom_lf.py tests/qa/test_cli_admin_dumps.py tests/qa/test_cli_admin_parity.py tests/runtime/test_emit_public_legacy_helper.py tests/epic003/test_meta_invocation_ok.py
+c4 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -F SKIPPED /tmp/hde-epic040-qa-v1.2/ac040-04-09-compat-cli-offline/c3.out
+c5 recording: tools.qa.qa_harness.record_check invoked once after this body was composed; it is the recording mechanism and is not listed in argv.txt
+=== OUTPUT ===
+--- c1 stdout (gate.out) ---
+{
+    "ac040-02-03-catalog-config": {
+        "check_id": "ac040-02-03-catalog-config",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-05-admission-identity": {
+        "check_id": "ac040-04-05-admission-identity",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log",
+        "status": "PASS"
+    },
+    "ac040-06-golden-comparison": {
+        "check_id": "ac040-06-golden-comparison",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log",
+        "status": "PASS"
+    },
+    "ac040-07-gate-ingress-offline": {
+        "check_id": "ac040-07-gate-ingress-offline",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log",
+        "status": "PASS"
+    },
+    "ac040-08-evidence-validators": {
+        "check_id": "ac040-08-evidence-validators",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log",
+        "status": "PASS"
+    },
+    "d0-discovery": {
+        "check_id": "d0-discovery",
+        "log_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "status": "PASS"
+    },
+    "step-0b-doc-delta-capture": {
+        "check_id": "step-0b-doc-delta-capture",
+        "log_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "status": "PASS"
+    }
+}
+--- c1 stderr ---
+--- c2a stdout ---
+Python 3.12.3
+--- c2a stderr ---
+--- c2b stdout ---
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+--- c2b stderr ---
+--- c2c stdout ---
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+--- c2c stderr ---
+--- c3 stdout ---
+........................................................................ [ 48%]
+..........................................................sss........... [ 97%]
+...                                                                      [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:108: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:128: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:150: showcompat vendor calls require open rails
+144 passed, 3 skipped in 17.04s
+--- c3 stderr ---
+--- c4 stdout ---
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:108: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:128: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:150: showcompat vendor calls require open rails
+--- c4 stderr ---
+=== PREDICATES ===
+E1 PASS: dependency gate (command 1, manifest read) exited 0; d0-discovery status in gate.out is PASS
+E2 PASS: readiness R1 printed [Python 3.12.3]; R2 printed [/tmp/hde-epic040-qa-v1.2/venv/bin/python]; R3 matched the closed posture (six pin values and nine UNSET lines)
+E3 PASS: command 3 (pytest group E, 17 files) exited 0; summary line [144 passed, 3 skipped in 17.04s]; no failure or error reported
+SKIPS (command 4, grep -F SKIPPED on the captured pytest output, exit 0; each skip with its reason, Plan RL-12):
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:108: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:128: showcompat vendor calls require open rails
+SKIPPED [1] tests/cli/test_showcompat_parity_and_identity.py:150: showcompat vendor calls require open rails
+Skips contribute no proof and are not counted as passes. The three tests of tests/cli/test_showcompat_parity_and_identity.py that skip with "showcompat vendor calls require open rails" are not vendor coverage (Glow QA Guide section 2.3); vendor-backed behavior is carried by check 11 (open-rails-showcompat-vendor) alone, which is not part of this collection and is NOT RUN.
+K predicates: none for this task.
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+=== LIMITS ===
+Proof class: class 2 local/offline (no vendor), closed rails (Plan check 8; Glow QA Guide section 3.3 local/offline label). It runs the eligibility, no-user boundary, AB/BA identity, CLI source, error parity, canonical-bytes and file-input tests. It does not prove live vendor behavior.
+Nonclaims: no QA PASS for the change, acceptance, closure, PF09 status change, deployment, token, new public route or flag, or PF edit follows from this task result (Plan section 12).

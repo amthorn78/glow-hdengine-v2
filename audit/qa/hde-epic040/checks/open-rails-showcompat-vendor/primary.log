@@ -1,0 +1,488 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"open-rails-showcompat-vendor","check_name":"Bounded open-rails vendor step","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","git","rev-parse","HEAD"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","git","diff","--name-only","0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d","HEAD"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","from pathlib import Path; from tools.qa.qa_harness import HarnessConfig, CheckResult, Status, record_check; c=HarnessConfig('HDE-EPIC040', Path.cwd()); r=CheckResult(check_id='open-rails-showcompat-vendor', check_name='Bounded open-rails vendor step', status=Status.TOOLING_BLOCKED, status_reason='recording preflight only, nothing is recorded', command=(), command_provenance='Not executed', exit_code=None, output='recording preflight', evidence_artifacts=(), intended_tokens=(), pf_refs=('PF05-Canon-HDE-CLI-API-Vendor-Ref', 'PF19-Canon-Glow-QA-Guide', 'PF07-Canon-Glow-Infrastructure'), captured_env=()); print(c.qa_root)"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-E","^RECORDING_PREFLIGHT_(EXIT: 0|OUTPUT: /.*/audit/qa/hde-epic040)$","/tmp/hde-epic040-open-rails-showcompat-vendor/body.txt"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in HD_API_BASE_URL HD_API_KEY GEO_API_KEY HDAPI_BASE_URL DATABASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if [ -n \"$(printenv \"$k\")\" ]; then echo \"$k=SET\"; elif printenv \"$k\" > /dev/null; then echo \"$k=EMPTY\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-F","-e","SAFE_MODE=0","-e","ALLOW_NETWORK=1","-e","APP_ENV=dev","-e","LC_ALL=C","-e","LANG=C","-e","TZ=UTC","-e","HD_API_BASE_URL=SET","-e","HD_API_KEY=SET","-e","GEO_API_KEY=SET","-e","HDAPI_BASE_URL=UNSET","-e","DATABASE_URL=UNSET","-e","DB_BRIDGE_URL=UNSET","-e","DB_FORCE_BRIDGE=UNSET","-e","DB_ALLOW_BRIDGE_IN_PROD=UNSET","-e","ENGINE_ENV=UNSET","/tmp/hde-epic040-open-rails-showcompat-vendor/c7.out"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-F","\"status\": \"PASS\"","/tmp/hde-epic040-open-rails-showcompat-vendor/c9.out"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","catalog/manifest.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","mkdir","-p","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","{ printf \"check_id: open-rails-showcompat-vendor\\n\"; printf \"plan: docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md, CHECK 11\\n\"; printf \"task: docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.3.md, T11, attempt 1\\n\"; printf \"executor: Nathan (Product Owner), PO-only execution of the vendor commands\\n\"; printf \"authorization: Product Owner selection of QA Plan v1.2 check 11 at the QA-90 invocation of 2026-09-29, and the Product Owner running this task; PO disposition Q-2 (docs/ephemeral/HDE-EPIC040-QA10-po-disposition-v1.0.md)\\n\"; printf \"target: CLI-local vendor smoke, hdctl showcompat --source vendor, local process, APP_ENV=dev, not production\\n\"; printf \"tuple_provenance: QA Audit L-51 default, audit/ops/hde-epic030/ops-02/vendor_command.txt, equal to audit/ops/hde-epic030/ops-02/sample_birth_inputs.json; synthetic QA tuples (QA50-S01, QA-70 review v1.1)\\n\"; printf \"tuple_a: birthdate 1999-10-16, birthtime 04:37, location Santiago, Chile\\n\"; printf \"tuple_b: birthdate 1978-06-17, birthtime 02:35, location Tallinn, Estonia\\n\"; for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do printf \"%s=%s\\n\" \"$k\" \"$(printenv \"$k\")\"; done; for k in HD_API_BASE_URL HD_API_KEY GEO_API_KEY HDAPI_BASE_URL DATABASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if [ -n \"$(printenv \"$k\")\" ]; then printf \"%s=SET\\n\" \"$k\"; else printf \"%s=UNSET\\n\" \"$k\"; fi; done; printf \"time_utc: %s\\n\" \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"; printf \"exact_commands, one per line, as they are run (AB, then BA):\\n\"; printf \"%s\\n\" \"$1\" \"$2\"; printf \"No secret value is recorded in this file.\\n\"; } > audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt","sh","env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1999-10-16 --birthtime-a 04:37 --location-a \"Santiago, Chile\" --birthdate-b 1978-06-17 --birthtime-b 02:35 --location-b \"Tallinn, Estonia\" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json","env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1978-06-17 --birthtime-a 02:35 --location-a \"Tallinn, Estonia\" --birthdate-b 1999-10-16 --birthtime-b 04:37 --location-b \"Santiago, Chile\" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","hdctl","showcompat","--source","vendor","--birthdate-a","1999-10-16","--birthtime-a","04:37","--location-a","Santiago, Chile","--birthdate-b","1978-06-17","--birthtime-b","02:35","--location-b","Tallinn, Estonia","--dump-reader","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","hdctl","showcompat","--source","vendor","--birthdate-a","1978-06-17","--birthtime-a","02:35","--location-a","Tallinn, Estonia","--birthdate-b","1999-10-16","--birthtime-b","04:37","--location-b","Santiago, Chile","--dump-reader","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-F","-f","/tmp/hde-epic040-open-rails-showcompat-vendor/c14.argv","-f","/tmp/hde-epic040-open-rails-showcompat-vendor/c15.argv","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","cd audit/qa/hde-epic040/checks/open-rails-showcompat-vendor && for f in vendor_run_ab.json vendor_run_ba.json reader_v1_ab.json reader_v1_ba.json; do if [ -s \"$f\" ]; then printf \"%s %s\\n\" \"$f\" \"$(wc -c < \"$f\")\"; elif [ -e \"$f\" ]; then mv \"$f\" \"/tmp/hde-epic040-open-rails-showcompat-vendor/$f.empty\" && printf \"%s EMPTY_MOVED\\n\" \"$f\"; else printf \"%s ABSENT\\n\" \"$f\"; fi; done"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","printf \"%s\\n\" \"$HD_API_KEY\" | grep -r -c -F -f - --exclude=\"c21.*\" /tmp/hde-epic040-open-rails-showcompat-vendor audit/qa/hde-epic040/checks/open-rails-showcompat-vendor"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","printf \"%s\\n\" \"$GEO_API_KEY\" | grep -r -c -F -f - --exclude=\"c22.*\" /tmp/hde-epic040-open-rails-showcompat-vendor audit/qa/hde-epic040/checks/open-rails-showcompat-vendor"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json"],["env","-u","HDAPI_BASE_URL","-u","DATABASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=0","ALLOW_NETWORK=1","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],["unset","HD_API_KEY","GEO_API_KEY","HD_API_BASE_URL"],["sh","-c","for k in HD_API_KEY GEO_API_KEY HD_API_BASE_URL; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"]],"command_provenance":"QA Plan v1.2 CHECK 11 open-rails-showcompat-vendor (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.3 task T11 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.3.md); attempt 1; commands 4 to 28 executed by Claude Code local VS Code session f0edea78-3120-4040-92a1-020776ba5a6f, QA/infra executor delegated by the Product Owner as the Product Owner's delegated agent on the Product Owner's direction (collection section 4.1 assigns them to Nathan, Product Owner, in person; deviation recorded for QA-110); commands 1 to 3 executed and the check recorded by Claude Code local VS Code session f0edea78-3120-4040-92a1-020776ba5a6f, QA/infra executor delegated by the Product Owner; normalizations: N-02, N-03, N-05, N-06, N-20 to N-35; executor normalization E-01: command lines 13 to 28 and the writers were fed to the capture function from the collection file by line number (sed -n) instead of being retyped, with the same bytes","evidence_artifacts":["audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF19-Canon-Glow-QA-Guide","PF07-Canon-Glow-Infrastructure"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-29T05:53:32Z"}
+=== CONTEXT ===
+TASK: T11 of docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.3.md; QA Plan v1.2 CHECK 11 open-rails-showcompat-vendor (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); attempt 1
+VENDOR_COMMAND_EXECUTOR: Nathan (Product Owner), PO-only, commands 4 to 28
+RECORDER: Claude Code local VS Code session f0edea78-3120-4040-92a1-020776ba5a6f, QA/infra executor delegated by the Product Owner
+VENUE: Product Owner-controlled Linux shell, the venue of checks 1 to 10 (Run B)
+CHECKOUT: /home/nathan/hde-epic040-qa
+CHECKOUT_HEAD: 345148b7fce2482349828f897abbc0d7d12fe7fa
+RECORDING_PREFLIGHT_EXIT: 0
+RECORDING_PREFLIGHT_OUTPUT: /home/nathan/hde-epic040-qa/audit/qa/hde-epic040
+=== COMMANDS ===
+[1] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC git rev-parse HEAD
+[2] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC git diff --name-only 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d HEAD
+[3] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "from pathlib import Path; from tools.qa.qa_harness import HarnessConfig, CheckResult, Status, record_check; c=HarnessConfig('HDE-EPIC040', Path.cwd()); r=CheckResult(check_id='open-rails-showcompat-vendor', check_name='Bounded open-rails vendor step', status=Status.TOOLING_BLOCKED, status_reason='recording preflight only, nothing is recorded', command=(), command_provenance='Not executed', exit_code=None, output='recording preflight', evidence_artifacts=(), intended_tokens=(), pf_refs=('PF05-Canon-HDE-CLI-API-Vendor-Ref', 'PF19-Canon-Glow-QA-Guide', 'PF07-Canon-Glow-Infrastructure'), captured_env=()); print(c.qa_root)"
+[4] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -E '^RECORDING_PREFLIGHT_(EXIT: 0|OUTPUT: /.*/audit/qa/hde-epic040)$' /tmp/hde-epic040-open-rails-showcompat-vendor/body.txt
+[5] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+[6] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+[7] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in HD_API_BASE_URL HD_API_KEY GEO_API_KEY HDAPI_BASE_URL DATABASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if [ -n "$(printenv "$k")" ]; then echo "$k=SET"; elif printenv "$k" > /dev/null; then echo "$k=EMPTY"; else echo "$k=UNSET"; fi; done'
+[8] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -F -e SAFE_MODE=0 -e ALLOW_NETWORK=1 -e APP_ENV=dev -e LC_ALL=C -e LANG=C -e TZ=UTC -e HD_API_BASE_URL=SET -e HD_API_KEY=SET -e GEO_API_KEY=SET -e HDAPI_BASE_URL=UNSET -e DATABASE_URL=UNSET -e DB_BRIDGE_URL=UNSET -e DB_FORCE_BRIDGE=UNSET -e DB_ALLOW_BRIDGE_IN_PROD=UNSET -e ENGINE_ENV=UNSET /tmp/hde-epic040-open-rails-showcompat-vendor/c7.out
+[9] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+[10] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -F '"status": "PASS"' /tmp/hde-epic040-open-rails-showcompat-vendor/c9.out
+[11] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum catalog/manifest.json
+[12] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC mkdir -p audit/qa/hde-epic040/checks/open-rails-showcompat-vendor
+[13] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c '{ printf "check_id: open-rails-showcompat-vendor\n"; printf "plan: docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md, CHECK 11\n"; printf "task: docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.3.md, T11, attempt 1\n"; printf "executor: Nathan (Product Owner), PO-only execution of the vendor commands\n"; printf "authorization: Product Owner selection of QA Plan v1.2 check 11 at the QA-90 invocation of 2026-09-29, and the Product Owner running this task; PO disposition Q-2 (docs/ephemeral/HDE-EPIC040-QA10-po-disposition-v1.0.md)\n"; printf "target: CLI-local vendor smoke, hdctl showcompat --source vendor, local process, APP_ENV=dev, not production\n"; printf "tuple_provenance: QA Audit L-51 default, audit/ops/hde-epic030/ops-02/vendor_command.txt, equal to audit/ops/hde-epic030/ops-02/sample_birth_inputs.json; synthetic QA tuples (QA50-S01, QA-70 review v1.1)\n"; printf "tuple_a: birthdate 1999-10-16, birthtime 04:37, location Santiago, Chile\n"; printf "tuple_b: birthdate 1978-06-17, birthtime 02:35, location Tallinn, Estonia\n"; for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do printf "%s=%s\n" "$k" "$(printenv "$k")"; done; for k in HD_API_BASE_URL HD_API_KEY GEO_API_KEY HDAPI_BASE_URL DATABASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if [ -n "$(printenv "$k")" ]; then printf "%s=SET\n" "$k"; else printf "%s=UNSET\n" "$k"; fi; done; printf "time_utc: %s\n" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"; printf "exact_commands, one per line, as they are run (AB, then BA):\n"; printf "%s\n" "$1" "$2"; printf "No secret value is recorded in this file.\n"; } > audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt' sh 'env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1999-10-16 --birthtime-a 04:37 --location-a "Santiago, Chile" --birthdate-b 1978-06-17 --birthtime-b 02:35 --location-b "Tallinn, Estonia" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json' 'env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1978-06-17 --birthtime-a 02:35 --location-a "Tallinn, Estonia" --birthdate-b 1999-10-16 --birthtime-b 04:37 --location-b "Santiago, Chile" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json'
+[14] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1999-10-16 --birthtime-a 04:37 --location-a "Santiago, Chile" --birthdate-b 1978-06-17 --birthtime-b 02:35 --location-b "Tallinn, Estonia" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+[15] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1978-06-17 --birthtime-a 02:35 --location-a "Tallinn, Estonia" --birthdate-b 1999-10-16 --birthtime-b 04:37 --location-b "Santiago, Chile" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[16] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -F -f /tmp/hde-epic040-open-rails-showcompat-vendor/c14.argv -f /tmp/hde-epic040-open-rails-showcompat-vendor/c15.argv audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt
+[17] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'cd audit/qa/hde-epic040/checks/open-rails-showcompat-vendor && for f in vendor_run_ab.json vendor_run_ba.json reader_v1_ab.json reader_v1_ba.json; do if [ -s "$f" ]; then printf "%s %s\n" "$f" "$(wc -c < "$f")"; elif [ -e "$f" ]; then mv "$f" "/tmp/hde-epic040-open-rails-showcompat-vendor/$f.empty" && printf "%s EMPTY_MOVED\n" "$f"; else printf "%s ABSENT\n" "$f"; fi; done'
+[18] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json
+[19] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[20] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[21] exit=1 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'printf "%s\n" "$HD_API_KEY" | grep -r -c -F -f - --exclude="c21.*" /tmp/hde-epic040-open-rails-showcompat-vendor audit/qa/hde-epic040/checks/open-rails-showcompat-vendor'
+[22] exit=1 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'printf "%s\n" "$GEO_API_KEY" | grep -r -c -F -f - --exclude="c22.*" /tmp/hde-epic040-open-rails-showcompat-vendor audit/qa/hde-epic040/checks/open-rails-showcompat-vendor'
+[23] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json
+[24] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json
+[25] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+[26] exit=0 :: env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[27] exit=0 :: unset HD_API_KEY GEO_API_KEY HD_API_BASE_URL
+[28] exit=0 :: sh -c 'for k in HD_API_KEY GEO_API_KEY HD_API_BASE_URL; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+=== OUTPUT ===
+[1] exit=0
+[1] stdout:
+345148b7fce2482349828f897abbc0d7d12fe7fa
+[1] stderr:
+[2] exit=0
+[2] stdout:
+audit/docdeltas/hde-epic040_doc_deltas.md
+audit/qa/hde-epic040/00_meta/doc_deltas.md
+audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log
+audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log
+audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log
+audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log
+audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log
+audit/qa/hde-epic040/checks/d0-discovery/primary.log
+audit/qa/hde-epic040/checks/sec-reader-http-live/gunicorn_server.log
+audit/qa/hde-epic040/checks/sec-reader-http-live/http_probes.jsonl
+audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log
+audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log
+audit/qa/hde-epic040/qa_step_logs_manifest.json
+[2] stderr:
+[3] exit=0
+[3] stdout:
+/home/nathan/hde-epic040-qa/audit/qa/hde-epic040
+[3] stderr:
+[4] exit=0
+[4] stdout:
+2
+[4] stderr:
+[5] exit=0
+[5] stdout:
+Python 3.12.3
+[5] stderr:
+[6] exit=0
+[6] stdout:
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+[6] stderr:
+[7] exit=0
+[7] stdout:
+SAFE_MODE=0
+ALLOW_NETWORK=1
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+HD_API_BASE_URL=SET
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HDAPI_BASE_URL=UNSET
+DATABASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+[7] stderr:
+[8] exit=0
+[8] stdout:
+15
+[8] stderr:
+[9] exit=0
+[9] stdout:
+{
+    "ac040-02-03-catalog-config": {
+        "check_id": "ac040-02-03-catalog-config",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-05-admission-identity": {
+        "check_id": "ac040-04-05-admission-identity",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-09-compat-cli-offline": {
+        "check_id": "ac040-04-09-compat-cli-offline",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log",
+        "status": "PASS"
+    },
+    "ac040-06-golden-comparison": {
+        "check_id": "ac040-06-golden-comparison",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log",
+        "status": "PASS"
+    },
+    "ac040-07-gate-ingress-offline": {
+        "check_id": "ac040-07-gate-ingress-offline",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log",
+        "status": "PASS"
+    },
+    "ac040-08-evidence-validators": {
+        "check_id": "ac040-08-evidence-validators",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log",
+        "status": "PASS"
+    },
+    "ac040-09-reader-http-in-process": {
+        "check_id": "ac040-09-reader-http-in-process",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log",
+        "status": "PASS"
+    },
+    "d0-discovery": {
+        "check_id": "d0-discovery",
+        "log_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "status": "PASS"
+    },
+    "sec-reader-http-live": {
+        "check_id": "sec-reader-http-live",
+        "log_path": "audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log",
+        "status": "PASS"
+    },
+    "step-0b-doc-delta-capture": {
+        "check_id": "step-0b-doc-delta-capture",
+        "log_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "status": "PASS"
+    }
+}
+[9] stderr:
+[10] exit=0
+[10] stdout:
+10
+[10] stderr:
+[11] exit=0
+[11] stdout:
+52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96  catalog/manifest.json
+[11] stderr:
+[12] exit=0
+[12] stdout:
+[12] stderr:
+[13] exit=0
+[13] stdout:
+[13] stderr:
+[14] exit=0
+[14] stdout: written to the file the command names, or discarded
+[14] stderr:
+[15] exit=0
+[15] stdout: written to the file the command names, or discarded
+[15] stderr:
+[16] exit=0
+[16] stdout:
+2
+[16] stderr:
+[17] exit=0
+[17] stdout:
+vendor_run_ab.json 3303
+vendor_run_ba.json 3303
+reader_v1_ab.json 330
+reader_v1_ba.json 330
+[17] stderr:
+[18] exit=0
+[18] stdout:
+[18] stderr:
+[19] exit=0
+[19] stdout:
+[19] stderr:
+[20] exit=0
+[20] stdout:
+328508d8a020e84d6d74078331c7221233556ee69b389893160057073e92c4a9  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt
+e33377d7eab26ed1693b6ebbe5166b88cca5c38f300999c94a30db057c1fa564  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json
+e33377d7eab26ed1693b6ebbe5166b88cca5c38f300999c94a30db057c1fa564  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json
+103df389283c7e577ebd78d377eb49fe6b7d014b732389577ea9efbbe1de32d0  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+103df389283c7e577ebd78d377eb49fe6b7d014b732389577ea9efbbe1de32d0  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[20] stderr:
+[21] exit=1
+[21] stdout:
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/recorder_identity.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c14.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/.c13_src:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c14.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c15.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/cmds.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c14.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/body.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/.vendor_start_utc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c15.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/argv.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c15.argv:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json:0
+[21] stderr:
+[22] exit=1
+[22] stdout:
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c21.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c7.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c19.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/recorder_identity.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c21.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c14.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/.c13_src:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c21.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c12.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c14.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c15.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/cmds.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c14.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c17.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c6.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c16.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/body.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c10.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c5.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/.vendor_start_utc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c8.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c21.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c2.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c4.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c1.out:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c20.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c15.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/argv.txt:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c3.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c13.argv:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c11.rc:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c9.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c18.err:0
+/tmp/hde-epic040-open-rails-showcompat-vendor/c15.argv:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json:0
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json:0
+[22] stderr:
+[23] exit=0
+[23] stdout: written to the file the command names, or discarded
+[23] stderr:
+[24] exit=0
+[24] stdout: written to the file the command names, or discarded
+[24] stderr:
+[25] exit=0
+[25] stdout: written to the file the command names, or discarded
+[25] stderr:
+[26] exit=0
+[26] stdout: written to the file the command names, or discarded
+[26] stderr:
+[27] exit=0
+[27] stdout:
+[27] stderr:
+[28] exit=0
+[28] stdout:
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+[28] stderr:
+vendor_request.txt:
+check_id: open-rails-showcompat-vendor
+plan: docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md, CHECK 11
+task: docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.3.md, T11, attempt 1
+executor: Nathan (Product Owner), PO-only execution of the vendor commands
+authorization: Product Owner selection of QA Plan v1.2 check 11 at the QA-90 invocation of 2026-09-29, and the Product Owner running this task; PO disposition Q-2 (docs/ephemeral/HDE-EPIC040-QA10-po-disposition-v1.0.md)
+target: CLI-local vendor smoke, hdctl showcompat --source vendor, local process, APP_ENV=dev, not production
+tuple_provenance: QA Audit L-51 default, audit/ops/hde-epic030/ops-02/vendor_command.txt, equal to audit/ops/hde-epic030/ops-02/sample_birth_inputs.json; synthetic QA tuples (QA50-S01, QA-70 review v1.1)
+tuple_a: birthdate 1999-10-16, birthtime 04:37, location Santiago, Chile
+tuple_b: birthdate 1978-06-17, birthtime 02:35, location Tallinn, Estonia
+SAFE_MODE=0
+ALLOW_NETWORK=1
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+HD_API_BASE_URL=SET
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HDAPI_BASE_URL=UNSET
+DATABASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+time_utc: 2026-09-29T05:51:11Z
+exact_commands, one per line, as they are run (AB, then BA):
+env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1999-10-16 --birthtime-a 04:37 --location-a "Santiago, Chile" --birthdate-b 1978-06-17 --birthtime-b 02:35 --location-b "Tallinn, Estonia" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1978-06-17 --birthtime-a 02:35 --location-a "Tallinn, Estonia" --birthdate-b 1999-10-16 --birthtime-b 04:37 --location-b "Santiago, Chile" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+No secret value is recorded in this file.
+=== PREDICATES ===
+Observed values, from the capture files:
+command 3: exit=0 stdout=/home/nathan/hde-epic040-qa/audit/qa/hde-epic040 
+command 4: exit=0 stdout=2 
+command 5: exit=0 stdout=Python 3.12.3 
+command 6: exit=0 stdout=/tmp/hde-epic040-qa-v1.2/venv/bin/python 
+command 8: exit=0 stdout=15 
+command 10: exit=0 stdout=10 
+command 11: exit=0 stdout=52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96  catalog/manifest.json 
+command 12: exit=0 stdout=
+command 13: exit=0 stdout=
+command 14: exit=0 stdout=
+command 15: exit=0 stdout=
+command 16: exit=0 stdout=2 
+command 17: exit=0 stdout=vendor_run_ab.json 3303 vendor_run_ba.json 3303 reader_v1_ab.json 330 reader_v1_ba.json 330 
+command 18: exit=0 stdout=
+command 19: exit=0 stdout=
+command 21: exit=1 stdout=/tmp/hde-epic040-open-rails-showcompat-vendor/c13.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c13.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c13.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/recorder_identity.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c14.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/.c13_src:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c14.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c15.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/cmds.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c14.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/body.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/.vendor_start_utc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c15.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/argv.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c13.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c15.argv:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json:0 
+command 22: exit=1 stdout=/tmp/hde-epic040-open-rails-showcompat-vendor/c13.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c21.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c7.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c19.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c13.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c13.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/recorder_identity.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c21.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c14.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/.c13_src:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c21.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c12.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c14.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c15.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/cmds.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c14.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c17.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c6.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c16.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/body.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c10.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c5.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/.vendor_start_utc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c8.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c21.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c2.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c4.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c1.out:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c20.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c15.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/argv.txt:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c3.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c13.argv:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c11.rc:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c9.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c18.err:0 /tmp/hde-epic040-open-rails-showcompat-vendor/c15.argv:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json:0 audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json:0 
+command 23: exit=0 stdout=
+command 24: exit=0 stdout=
+command 25: exit=0 stdout=
+command 26: exit=0 stdout=
+command 28: exit=0 stdout=HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET 
+E1 recording and readiness preflight: PASS (command 3 exit 0, printed /home/nathan/hde-epic040-qa/audit/qa/hde-epic040; command 4 printed 2)
+E2 readiness line: PASS (command 5 printed Python 3.12.3; command 6 exit 0, printed /tmp/hde-epic040-qa-v1.2/venv/bin/python)
+E3 preflight matrix: PASS (command 8 printed 15; command 10 printed 10; commands 11, 12, 13 exit 0, 0, 0)
+E4 exact commands: PASS (command 16 printed 2)
+E5 both vendor runs: PASS (commands 14 and 15 exit 0 and 0; command 17 printed: vendor_run_ab.json 3303;vendor_run_ba.json 3303;reader_v1_ab.json 330;reader_v1_ba.json 330;)
+E6 byte identity: PASS (commands 18 and 19 exit 0 and 0)
+E7 secret scan: PASS (commands 21 and 22 exit 1 and 1; 89 and 93 path:count lines, every count 0)
+E8 parse: PASS (commands 23 to 26 exit 0, 0, 0, 0)
+R restore (does not change the status): PASS (command 28 printed: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET )
+EXECUTION DEVIATION: commands 4 to 28, D1, D2 and W2 were executed by the QA/infra executor as the Product Owner's delegated agent on the Product Owner's direction in this session ("you need to execute all the steps as my agent"; "yes agents can run live vendor calls when directed"), not by the Product Owner in person as collection section 4.1 assigns; the three vendor values came from the executor shell environment the Product Owner set, no value was printed or persisted, and the command text was taken mechanically from the collection lines. For QA-110.
+[K] K1 each stdout is canonical JSON with one final LF and no CR, exactly the keys schema (magic10_compat_result.v1), config_id (m10-channel-state-v1.0.0), release_id (equal to the command 11 digest), pair_key, signals (20) and categories (10, in the order harmony, heat, communication, alignment, comfort, consistency, expansion, creativity, drive, balance): pending QA-110
+[K] K2 each Reader dump has exactly six keys, reader_version v1, categories of one harmony item or empty, no JSON number, and one final LF: pending QA-110
+[K] K3 the exercised-versus-inferred statement below matches the captured stderr of commands 14 and 15: pending QA-110
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+=== LIMITS ===
+Proof class: vendor-backed no-user behavior (birth-only); CLI-local vendor smoke in a local process with APP_ENV=dev; not production and not a deployed service.
+Exercised: both birth tuples resolved through HumanDesignAPI, pair evaluated, canonical output and Reader v1 dump emitted.
+Inferred, not exercised, unless the captured stderr shows it: the exact vendor resource path, auth-header family and adapter status.
+Not exercised: rate-limit and Retry-After handling, typed vendor error mapping, malformed-response handling, v1 legacy guard, mapped-cache persistence, Reader v2 and any deployed service.
+Nonclaims: no QA PASS for the change, acceptance, closure, PF09 status change, deployment, token, new public route or flag, broad HumanDesignAPI v2 conformance, or PF edit follows from this result.
+DOC_DELTA: PF05-Canon-HDE-CLI-API-Vendor-Ref section 3.7 lists HDAPI_BASE_URL among the target facts of the CLI vendor smoke, while its section 1, PF07-Canon-Glow-Infrastructure section 2.7 and PF19-Canon-Glow-QA-Guide section 3.5.7 make HD_API_BASE_URL canonical and HDAPI_BASE_URL a deprecated alias; this check used HD_API_BASE_URL with HDAPI_BASE_URL unset (QA Plan v1.2 section 5.2). Owner: PF05 maintainer. Documentation drainage only; drives no decision.

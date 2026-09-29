@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/d0-discovery/primary.log
+size_bytes: 329498
+sha256: f5b0f82c7974307bc52efac98232947726f534441fe07992ce384321aa7d5c1d
+mtime_utc: 2026-09-29T01:31:42Z
+produced_at_utc: 2026-09-29T13:48:00Z

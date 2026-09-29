@@ -1,0 +1,384 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-closeout-deliverables","check_name":"Close-out deliverables and coverage","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","git","rev-parse","HEAD"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","git","diff","--name-only","0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d","HEAD"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-F","-e","\"check_id\": \"","/tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c3.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-F","-e","\"check_id\": \"d0-discovery\"","-e","\"check_id\": \"step-0b-doc-delta-capture\"","-e","\"check_id\": \"ac040-08-evidence-validators\"","-e","\"check_id\": \"ac040-02-03-catalog-config\"","-e","\"check_id\": \"ac040-04-05-admission-identity\"","-e","\"check_id\": \"ac040-06-golden-comparison\"","-e","\"check_id\": \"ac040-07-gate-ingress-offline\"","-e","\"check_id\": \"ac040-04-09-compat-cli-offline\"","-e","\"check_id\": \"ac040-09-reader-http-in-process\"","-e","\"check_id\": \"sec-reader-http-live\"","-e","\"check_id\": \"open-rails-showcompat-vendor\"","/tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c3.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-F","-e","SAFE_MODE=1","-e","ALLOW_NETWORK=0","-e","APP_ENV=dev","-e","LC_ALL=C","-e","LANG=C","-e","TZ=UTC","-e","DATABASE_URL=UNSET","-e","HD_API_KEY=UNSET","-e","GEO_API_KEY=UNSET","-e","HD_API_BASE_URL=UNSET","-e","HDAPI_BASE_URL=UNSET","-e","DB_BRIDGE_URL=UNSET","-e","DB_FORCE_BRIDGE=UNSET","-e","DB_ALLOW_BRIDGE_IN_PROD=UNSET","-e","ENGINE_ENV=UNSET","/tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c8.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","audit/qa/hde-epic040/qa_step_logs_manifest.json","audit/qa/hde-epic040/checks/d0-discovery/primary.log","audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log","audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log","audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log","audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log","audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log","audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log","audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log","audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json","audit/qa/hde-epic040/checks/sec-reader-http-live/http_probes.jsonl","audit/qa/hde-epic040/checks/sec-reader-http-live/gunicorn_server.log","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","wc","-l","/tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c10.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys; from pathlib import Path; ids = ('ac040-08-evidence-validators', 'ac040-02-03-catalog-config', 'ac040-04-05-admission-identity', 'ac040-06-golden-comparison', 'ac040-07-gate-ingress-offline', 'ac040-04-09-compat-cli-offline', 'ac040-09-reader-http-in-process', 'sec-reader-http-live', 'open-rails-showcompat-vendor'); a = Path('audit/docdeltas/hde-epic040_doc_deltas.md'); b = Path('audit/qa/hde-epic040/00_meta/doc_deltas.md'); x = a.read_bytes(); h = '## QA-DISCOVERED CAVEATS'; (not x == b.read_bytes() or not x.endswith(b'\\n') or h.encode('utf-8') in x) and sys.exit('DOC_DELTA_APPEND_REFUSED: the two surfaces differ, lack a final LF, or already hold the appended section; nothing written'); rows = [(i, l) for i in ids for l in Path('audit/qa/hde-epic040/checks/' + i + '/primary.log').read_text(encoding='utf-8').splitlines() if l.startswith('DOC_DELTA:')]; t = '\\n' + h + ' (check qa-closeout-deliverables)\\n\\nSource: every line starting DOC_DELTA: in the primary logs of QA Plan v1.2 checks 3 to 11, in Plan order. Class: CAVEAT. Drives decision: No.\\n\\n' + (''.join('- DD-%02d (source check %s): %s\\n' % (13 + n, i, l) for n, (i, l) in enumerate(rows)) if rows else 'No new deltas found during execution.\\n'); [p.write_bytes(x + t.encode('utf-8')) for p in (a, b)]; print('appended', len(rows)); [print('DD-%02d' % (13 + n), i) for n, (i, l) in enumerate(rows)]"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import datetime as d; import tools.evidence.update_evidence_index as u; ids = ('d0-discovery', 'step-0b-doc-delta-capture', 'ac040-08-evidence-validators', 'ac040-02-03-catalog-config', 'ac040-04-05-admission-identity', 'ac040-06-golden-comparison', 'ac040-07-gate-ingress-offline', 'ac040-04-09-compat-cli-offline', 'ac040-09-reader-http-in-process', 'sec-reader-http-live', 'open-rails-showcompat-vendor'); ps = ['audit/qa/hde-epic040/checks/' + i + '/primary.log' for i in ids] + ['audit/docdeltas/hde-epic040_doc_deltas.md', 'audit/qa/hde-epic040/00_meta/doc_deltas.md']; t = d.datetime.now(d.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'); [u._refresh_path_proof(u.ROOT / p, default_produced_at=t, check=False) for p in ps]; print('default_produced_at', t); [print(p + '.path_proof.txt') for p in ps]"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import datetime as d; import tools.evidence.update_evidence_index as u; ids = ('d0-discovery', 'step-0b-doc-delta-capture', 'ac040-08-evidence-validators', 'ac040-02-03-catalog-config', 'ac040-04-05-admission-identity', 'ac040-06-golden-comparison', 'ac040-07-gate-ingress-offline', 'ac040-04-09-compat-cli-offline', 'ac040-09-reader-http-in-process', 'sec-reader-http-live', 'open-rails-showcompat-vendor'); ps = ['audit/qa/hde-epic040/checks/' + i + '/primary.log' for i in ids] + ['audit/docdeltas/hde-epic040_doc_deltas.md', 'audit/qa/hde-epic040/00_meta/doc_deltas.md']; t = d.datetime.now(d.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'); [u._refresh_path_proof(u.ROOT / p, default_produced_at=t, check=True) for p in ps]; print('check mode passed', len(ps))"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cat","audit/qa/hde-epic040/checks/d0-discovery/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log.path_proof.txt","audit/docdeltas/hde-epic040_doc_deltas.md.path_proof.txt","audit/qa/hde-epic040/00_meta/doc_deltas.md.path_proof.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/update_evidence_index.py","--check"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/validate_evidence_paths.py"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","git","status","--porcelain"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","M=audit/qa/hde-epic040/qa_step_logs_manifest.json; p() { e=$(grep -o -E \"\\\"$2\\\":[{][^}]*[}]\" \"$M\"); a=$(grep -o -m 1 -E \"\\\"evidence_artifacts\\\":\\[[^]]*\\]\" \"audit/qa/hde-epic040/checks/$2/primary.log\"); case \"$e\" in *\\\"status\\\":\\\"PASS\\\"*) f=\"none at execution; the per-task result is decided by Kronos at QA-110\";; *) f=\"the blocking precondition is the status_reason in the primary-log header of this check; the follow-up is decided by Kronos at QA-110 (Plan section 7.3)\";; esac; printf \"COVERAGE %s %s | manifest entry %s | attempt lineage %s | evidence %s | follow-up %s\\n\" \"$1\" \"$2\" \"${e:-absent}\" \"$3\" \"${a:-absent}\" \"$f\"; }; R=\"Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5)\"; p 1 d0-discovery \"$R\"; p 2 step-0b-doc-delta-capture \"$R\"; p 3 ac040-08-evidence-validators \"one recorded execution (Run B at 345148b); attempt 1 unless Run A executed it, which is unknown (QA-110 review v1.0 ruling LR-01 items 2, 3 and 7)\"; p 4 ac040-02-03-catalog-config \"$R\"; p 5 ac040-04-05-admission-identity \"$R\"; p 6 ac040-06-golden-comparison \"$R\"; p 7 ac040-07-gate-ingress-offline \"$R\"; p 8 ac040-04-09-compat-cli-offline \"$R\"; p 9 ac040-09-reader-http-in-process \"$R\"; p 10 sec-reader-http-live \"$R\"; p 11 open-rails-showcompat-vendor \"attempt 1 (Run B stream at 380cf46; QA-110 review T11 v1.0)\"; printf \"COVERAGE 12 qa-closeout-deliverables | manifest entry written by the recording of this check | attempt lineage attempt 1 (task T12 of QA-90 collection v1.4) | evidence audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log with the path proofs of Plan check 12 steps 3 and 8 | follow-up per the header of this primary log\\n\"; printf \"DEFERRED QA Plan v1.2 section 2: live Gate readiness and live DB Reader success are deferred requirements, not checks; no command ran for them (Glow QA Guide section 3.3)\\n\""],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-E","^COVERAGE ([1-9]|1[0-2]) ","/tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c22.out"]],"command_provenance":"QA Plan v1.2 CHECK 12 qa-closeout-deliverables (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.4 task T12 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.4.md); attempt 1; executed and recorded by Claude Code local VS Code session 0f9a38bb-0ae2-4bf0-be59-17703912e6f7, QA/infra executor delegated by the Product Owner; normalizations: N-01, N-02, N-03, N-05, N-06, N-36 to N-45","evidence_artifacts":["audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md","audit/qa/hde-epic040/checks/d0-discovery/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log.path_proof.txt","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log.path_proof.txt","audit/docdeltas/hde-epic040_doc_deltas.md.path_proof.txt","audit/qa/hde-epic040/00_meta/doc_deltas.md.path_proof.txt"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF06-Canon-Change-Process-Guide","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-29T13:50:25Z"}
+=== CONTEXT ===
+TASK: T12 of docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.4.md; QA Plan v1.2 CHECK 12 qa-closeout-deliverables (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); attempt 1
+EXECUTOR: Claude Code local VS Code session 0f9a38bb-0ae2-4bf0-be59-17703912e6f7, QA/infra executor delegated by the Product Owner
+HOST: glow-devops-vps
+CHECKOUT: /home/nathan/hde-epic040-qa
+TESTED_SOURCE: 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d (commands 1 and 2 record the checkout HEAD and the files that differ from it)
+RAILS: CLOSED prefix on every command (collection v1.4 section 4.4)
+=== COMMANDS ===
+[1] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC git rev-parse HEAD
+[2] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC git diff --name-only 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d HEAD
+[3] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+[4] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -F -e '"check_id": "' /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c3.out
+[5] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -F -e '"check_id": "d0-discovery"' -e '"check_id": "step-0b-doc-delta-capture"' -e '"check_id": "ac040-08-evidence-validators"' -e '"check_id": "ac040-02-03-catalog-config"' -e '"check_id": "ac040-04-05-admission-identity"' -e '"check_id": "ac040-06-golden-comparison"' -e '"check_id": "ac040-07-gate-ingress-offline"' -e '"check_id": "ac040-04-09-compat-cli-offline"' -e '"check_id": "ac040-09-reader-http-in-process"' -e '"check_id": "sec-reader-http-live"' -e '"check_id": "open-rails-showcompat-vendor"' /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c3.out
+[6] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+[7] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+[8] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+[9] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -F -e SAFE_MODE=1 -e ALLOW_NETWORK=0 -e APP_ENV=dev -e LC_ALL=C -e LANG=C -e TZ=UTC -e DATABASE_URL=UNSET -e HD_API_KEY=UNSET -e GEO_API_KEY=UNSET -e HD_API_BASE_URL=UNSET -e HDAPI_BASE_URL=UNSET -e DB_BRIDGE_URL=UNSET -e DB_FORCE_BRIDGE=UNSET -e DB_ALLOW_BRIDGE_IN_PROD=UNSET -e ENGINE_ENV=UNSET /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c8.out
+[10] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum audit/qa/hde-epic040/qa_step_logs_manifest.json audit/qa/hde-epic040/checks/d0-discovery/primary.log audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log audit/docdeltas/hde-epic040_doc_deltas.md audit/qa/hde-epic040/00_meta/doc_deltas.md audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json audit/qa/hde-epic040/checks/sec-reader-http-live/http_probes.jsonl audit/qa/hde-epic040/checks/sec-reader-http-live/gunicorn_server.log audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[11] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC wc -l /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c10.out
+[12] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp audit/docdeltas/hde-epic040_doc_deltas.md audit/qa/hde-epic040/00_meta/doc_deltas.md
+[13] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys; from pathlib import Path; ids = ('ac040-08-evidence-validators', 'ac040-02-03-catalog-config', 'ac040-04-05-admission-identity', 'ac040-06-golden-comparison', 'ac040-07-gate-ingress-offline', 'ac040-04-09-compat-cli-offline', 'ac040-09-reader-http-in-process', 'sec-reader-http-live', 'open-rails-showcompat-vendor'); a = Path('audit/docdeltas/hde-epic040_doc_deltas.md'); b = Path('audit/qa/hde-epic040/00_meta/doc_deltas.md'); x = a.read_bytes(); h = '## QA-DISCOVERED CAVEATS'; (not x == b.read_bytes() or not x.endswith(b'\n') or h.encode('utf-8') in x) and sys.exit('DOC_DELTA_APPEND_REFUSED: the two surfaces differ, lack a final LF, or already hold the appended section; nothing written'); rows = [(i, l) for i in ids for l in Path('audit/qa/hde-epic040/checks/' + i + '/primary.log').read_text(encoding='utf-8').splitlines() if l.startswith('DOC_DELTA:')]; t = '\n' + h + ' (check qa-closeout-deliverables)\n\nSource: every line starting DOC_DELTA: in the primary logs of QA Plan v1.2 checks 3 to 11, in Plan order. Class: CAVEAT. Drives decision: No.\n\n' + (''.join('- DD-%02d (source check %s): %s\n' % (13 + n, i, l) for n, (i, l) in enumerate(rows)) if rows else 'No new deltas found during execution.\n'); [p.write_bytes(x + t.encode('utf-8')) for p in (a, b)]; print('appended', len(rows)); [print('DD-%02d' % (13 + n), i) for n, (i, l) in enumerate(rows)]"
+[14] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp audit/docdeltas/hde-epic040_doc_deltas.md audit/qa/hde-epic040/00_meta/doc_deltas.md
+[15] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum audit/docdeltas/hde-epic040_doc_deltas.md audit/qa/hde-epic040/00_meta/doc_deltas.md
+[16] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import datetime as d; import tools.evidence.update_evidence_index as u; ids = ('d0-discovery', 'step-0b-doc-delta-capture', 'ac040-08-evidence-validators', 'ac040-02-03-catalog-config', 'ac040-04-05-admission-identity', 'ac040-06-golden-comparison', 'ac040-07-gate-ingress-offline', 'ac040-04-09-compat-cli-offline', 'ac040-09-reader-http-in-process', 'sec-reader-http-live', 'open-rails-showcompat-vendor'); ps = ['audit/qa/hde-epic040/checks/' + i + '/primary.log' for i in ids] + ['audit/docdeltas/hde-epic040_doc_deltas.md', 'audit/qa/hde-epic040/00_meta/doc_deltas.md']; t = d.datetime.now(d.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'); [u._refresh_path_proof(u.ROOT / p, default_produced_at=t, check=False) for p in ps]; print('default_produced_at', t); [print(p + '.path_proof.txt') for p in ps]"
+[17] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import datetime as d; import tools.evidence.update_evidence_index as u; ids = ('d0-discovery', 'step-0b-doc-delta-capture', 'ac040-08-evidence-validators', 'ac040-02-03-catalog-config', 'ac040-04-05-admission-identity', 'ac040-06-golden-comparison', 'ac040-07-gate-ingress-offline', 'ac040-04-09-compat-cli-offline', 'ac040-09-reader-http-in-process', 'sec-reader-http-live', 'open-rails-showcompat-vendor'); ps = ['audit/qa/hde-epic040/checks/' + i + '/primary.log' for i in ids] + ['audit/docdeltas/hde-epic040_doc_deltas.md', 'audit/qa/hde-epic040/00_meta/doc_deltas.md']; t = d.datetime.now(d.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'); [u._refresh_path_proof(u.ROOT / p, default_produced_at=t, check=True) for p in ps]; print('check mode passed', len(ps))"
+[18] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cat audit/qa/hde-epic040/checks/d0-discovery/primary.log.path_proof.txt audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log.path_proof.txt audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log.path_proof.txt audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log.path_proof.txt audit/docdeltas/hde-epic040_doc_deltas.md.path_proof.txt audit/qa/hde-epic040/00_meta/doc_deltas.md.path_proof.txt
+[19] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check
+[20] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/validate_evidence_paths.py
+[21] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC git status --porcelain
+[22] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'M=audit/qa/hde-epic040/qa_step_logs_manifest.json; p() { e=$(grep -o -E "\"$2\":[{][^}]*[}]" "$M"); a=$(grep -o -m 1 -E "\"evidence_artifacts\":\[[^]]*\]" "audit/qa/hde-epic040/checks/$2/primary.log"); case "$e" in *\"status\":\"PASS\"*) f="none at execution; the per-task result is decided by Kronos at QA-110";; *) f="the blocking precondition is the status_reason in the primary-log header of this check; the follow-up is decided by Kronos at QA-110 (Plan section 7.3)";; esac; printf "COVERAGE %s %s | manifest entry %s | attempt lineage %s | evidence %s | follow-up %s\n" "$1" "$2" "${e:-absent}" "$3" "${a:-absent}" "$f"; }; R="Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5)"; p 1 d0-discovery "$R"; p 2 step-0b-doc-delta-capture "$R"; p 3 ac040-08-evidence-validators "one recorded execution (Run B at 345148b); attempt 1 unless Run A executed it, which is unknown (QA-110 review v1.0 ruling LR-01 items 2, 3 and 7)"; p 4 ac040-02-03-catalog-config "$R"; p 5 ac040-04-05-admission-identity "$R"; p 6 ac040-06-golden-comparison "$R"; p 7 ac040-07-gate-ingress-offline "$R"; p 8 ac040-04-09-compat-cli-offline "$R"; p 9 ac040-09-reader-http-in-process "$R"; p 10 sec-reader-http-live "$R"; p 11 open-rails-showcompat-vendor "attempt 1 (Run B stream at 380cf46; QA-110 review T11 v1.0)"; printf "COVERAGE 12 qa-closeout-deliverables | manifest entry written by the recording of this check | attempt lineage attempt 1 (task T12 of QA-90 collection v1.4) | evidence audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log with the path proofs of Plan check 12 steps 3 and 8 | follow-up per the header of this primary log\n"; printf "DEFERRED QA Plan v1.2 section 2: live Gate readiness and live DB Reader success are deferred requirements, not checks; no command ran for them (Glow QA Guide section 3.3)\n"'
+[23] exit=0 :: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -E '^COVERAGE ([1-9]|1[0-2]) ' /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c22.out
+=== OUTPUT ===
+[1] exit=0
+[1] stdout:
+380cf46fda95686ccf71f256521e63ca0eb5c9e1
+[1] stderr:
+[2] exit=0
+[2] stdout:
+audit/docdeltas/hde-epic040_doc_deltas.md
+audit/qa/hde-epic040/00_meta/doc_deltas.md
+audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log
+audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log
+audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log
+audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log
+audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log
+audit/qa/hde-epic040/checks/d0-discovery/primary.log
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json
+audit/qa/hde-epic040/checks/sec-reader-http-live/gunicorn_server.log
+audit/qa/hde-epic040/checks/sec-reader-http-live/http_probes.jsonl
+audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log
+audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log
+audit/qa/hde-epic040/qa_step_logs_manifest.json
+[2] stderr:
+[3] exit=0
+[3] stdout:
+{
+    "ac040-02-03-catalog-config": {
+        "check_id": "ac040-02-03-catalog-config",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-05-admission-identity": {
+        "check_id": "ac040-04-05-admission-identity",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-09-compat-cli-offline": {
+        "check_id": "ac040-04-09-compat-cli-offline",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log",
+        "status": "PASS"
+    },
+    "ac040-06-golden-comparison": {
+        "check_id": "ac040-06-golden-comparison",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log",
+        "status": "PASS"
+    },
+    "ac040-07-gate-ingress-offline": {
+        "check_id": "ac040-07-gate-ingress-offline",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log",
+        "status": "PASS"
+    },
+    "ac040-08-evidence-validators": {
+        "check_id": "ac040-08-evidence-validators",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log",
+        "status": "PASS"
+    },
+    "ac040-09-reader-http-in-process": {
+        "check_id": "ac040-09-reader-http-in-process",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log",
+        "status": "PASS"
+    },
+    "d0-discovery": {
+        "check_id": "d0-discovery",
+        "log_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "status": "PASS"
+    },
+    "open-rails-showcompat-vendor": {
+        "check_id": "open-rails-showcompat-vendor",
+        "log_path": "audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log",
+        "status": "PASS"
+    },
+    "sec-reader-http-live": {
+        "check_id": "sec-reader-http-live",
+        "log_path": "audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log",
+        "status": "PASS"
+    },
+    "step-0b-doc-delta-capture": {
+        "check_id": "step-0b-doc-delta-capture",
+        "log_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "status": "PASS"
+    }
+}
+[3] stderr:
+[4] exit=0
+[4] stdout:
+11
+[4] stderr:
+[5] exit=0
+[5] stdout:
+11
+[5] stderr:
+[6] exit=0
+[6] stdout:
+Python 3.12.3
+[6] stderr:
+[7] exit=0
+[7] stdout:
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+[7] stderr:
+[8] exit=0
+[8] stdout:
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+[8] stderr:
+[9] exit=0
+[9] stdout:
+15
+[9] stderr:
+[10] exit=0
+[10] stdout:
+f11fbdbc5a978772cd8ad0847a4341320939fbd17505843ef6426ed2d623bc96  audit/qa/hde-epic040/qa_step_logs_manifest.json
+f5b0f82c7974307bc52efac98232947726f534441fe07992ce384321aa7d5c1d  audit/qa/hde-epic040/checks/d0-discovery/primary.log
+a64483b5460b75fbc4ce7028f238ff9e72a3f62c617c8e3361ab3d3c163d2c4b  audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log
+170171e1bbdb61b45c5650207425eabb63fea83597a2d0088023096ef1f11aed  audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log
+6e622d117b9cbb9dc96845e61b34572c9d667bf62ed9d900a9cbebfaef65b5f6  audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log
+ffa2a4629db34c415554f32ed88365641471f2995ac440c5b688b8b7262a45cc  audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log
+0b8cda3488141932d45205c9285620ac1545b78c93a6a5a322f218890a6c2e73  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log
+fea547063e4b5f2476736e0b0e1f9f35bb6b2a1ad51cab97de4db6c4e3b2758e  audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log
+2c69c50a0520ab0f5b2a5e7d7ed94fa745ff10120bade979f127fec6a682ac87  audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log
+6e53c15e3e0b496c62457887ccc39b9629c1305dfcd830bc9b6964e315452854  audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log
+97e37e38b75d793bef7b57d47bb024070bc7366df718edb1303d0c378022d960  audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log
+1e4341e27e1ce47fe172546581ac4737e2dcb9745f82bac42f0001ac6f5f4674  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log
+c79379566ea01cd6acff71f6cba3e3caa9edb5bc7748f42e8e3b3f7944e3a2c2  audit/docdeltas/hde-epic040_doc_deltas.md
+c79379566ea01cd6acff71f6cba3e3caa9edb5bc7748f42e8e3b3f7944e3a2c2  audit/qa/hde-epic040/00_meta/doc_deltas.md
+bea29970107fe750394e0f78c1047de93ebd9193565cd82a8e6e92e7b515dca8  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json
+bea29970107fe750394e0f78c1047de93ebd9193565cd82a8e6e92e7b515dca8  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json
+b8624a02bcc1f24aa689389fc976a5e4939f34a91e080748367e1d155824322f  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+0c09bf7fdcb265acabc0e125621d69582365f5190728f4613f9375db04e3a008  audit/qa/hde-epic040/checks/sec-reader-http-live/http_probes.jsonl
+1af474e20796fd4be6fe58cf890802b8fd8897805ca07d80f12345ee0708c5db  audit/qa/hde-epic040/checks/sec-reader-http-live/gunicorn_server.log
+328508d8a020e84d6d74078331c7221233556ee69b389893160057073e92c4a9  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt
+e33377d7eab26ed1693b6ebbe5166b88cca5c38f300999c94a30db057c1fa564  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json
+e33377d7eab26ed1693b6ebbe5166b88cca5c38f300999c94a30db057c1fa564  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json
+103df389283c7e577ebd78d377eb49fe6b7d014b732389577ea9efbbe1de32d0  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+103df389283c7e577ebd78d377eb49fe6b7d014b732389577ea9efbbe1de32d0  audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+[10] stderr:
+[11] exit=0
+[11] stdout:
+25 /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c10.out
+[11] stderr:
+[12] exit=0
+[12] stdout:
+[12] stderr:
+[13] exit=0
+[13] stdout:
+appended 1
+DD-13 open-rails-showcompat-vendor
+[13] stderr:
+[14] exit=0
+[14] stdout:
+[14] stderr:
+[15] exit=0
+[15] stdout:
+f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5  audit/docdeltas/hde-epic040_doc_deltas.md
+f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5  audit/qa/hde-epic040/00_meta/doc_deltas.md
+[15] stderr:
+[16] exit=0
+[16] stdout:
+default_produced_at 2026-09-29T13:48:00Z
+audit/qa/hde-epic040/checks/d0-discovery/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log.path_proof.txt
+audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log.path_proof.txt
+audit/docdeltas/hde-epic040_doc_deltas.md.path_proof.txt
+audit/qa/hde-epic040/00_meta/doc_deltas.md.path_proof.txt
+[16] stderr:
+[17] exit=0
+[17] stdout:
+check mode passed 13
+[17] stderr:
+[18] exit=0
+[18] stdout:
+path: audit/qa/hde-epic040/checks/d0-discovery/primary.log
+size_bytes: 329498
+sha256: f5b0f82c7974307bc52efac98232947726f534441fe07992ce384321aa7d5c1d
+mtime_utc: 2026-09-29T01:31:42Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log
+size_bytes: 15951
+sha256: a64483b5460b75fbc4ce7028f238ff9e72a3f62c617c8e3361ab3d3c163d2c4b
+mtime_utc: 2026-09-29T01:33:05Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log
+size_bytes: 28542
+sha256: 170171e1bbdb61b45c5650207425eabb63fea83597a2d0088023096ef1f11aed
+mtime_utc: 2026-09-29T01:46:26Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log
+size_bytes: 12806
+sha256: 6e622d117b9cbb9dc96845e61b34572c9d667bf62ed9d900a9cbebfaef65b5f6
+mtime_utc: 2026-09-29T01:48:22Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log
+size_bytes: 14284
+sha256: ffa2a4629db34c415554f32ed88365641471f2995ac440c5b688b8b7262a45cc
+mtime_utc: 2026-09-29T01:50:07Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log
+size_bytes: 36195
+sha256: 0b8cda3488141932d45205c9285620ac1545b78c93a6a5a322f218890a6c2e73
+mtime_utc: 2026-09-29T01:52:28Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log
+size_bytes: 19946
+sha256: fea547063e4b5f2476736e0b0e1f9f35bb6b2a1ad51cab97de4db6c4e3b2758e
+mtime_utc: 2026-09-29T01:53:21Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log
+size_bytes: 14003
+sha256: 2c69c50a0520ab0f5b2a5e7d7ed94fa745ff10120bade979f127fec6a682ac87
+mtime_utc: 2026-09-29T01:54:22Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log
+size_bytes: 12737
+sha256: 6e53c15e3e0b496c62457887ccc39b9629c1305dfcd830bc9b6964e315452854
+mtime_utc: 2026-09-29T01:55:14Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log
+size_bytes: 73940
+sha256: 97e37e38b75d793bef7b57d47bb024070bc7366df718edb1303d0c378022d960
+mtime_utc: 2026-09-29T02:00:29Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log
+size_bytes: 64998
+sha256: 1e4341e27e1ce47fe172546581ac4737e2dcb9745f82bac42f0001ac6f5f4674
+mtime_utc: 2026-09-29T05:53:32Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/docdeltas/hde-epic040_doc_deltas.md
+size_bytes: 3585
+sha256: f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5
+mtime_utc: 2026-09-29T13:48:00Z
+produced_at_utc: 2026-09-29T13:48:00Z
+path: audit/qa/hde-epic040/00_meta/doc_deltas.md
+size_bytes: 3585
+sha256: f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5
+mtime_utc: 2026-09-29T13:48:00Z
+produced_at_utc: 2026-09-29T13:48:00Z
+[18] stderr:
+[19] exit=0
+[19] stdout:
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[19] stderr:
+[20] exit=0
+[20] stdout:
+[20] stderr:
+[21] exit=0
+[21] stdout:
+ M audit/docdeltas/hde-epic040_doc_deltas.md
+ M audit/qa/hde-epic040/00_meta/doc_deltas.md
+?? audit/docdeltas/hde-epic040_doc_deltas.md.path_proof.txt
+?? audit/qa/hde-epic040/00_meta/doc_deltas.md.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/d0-discovery/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log.path_proof.txt
+?? audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt
+[21] stderr:
+[22] exit=0
+[22] stdout:
+COVERAGE 1 d0-discovery | manifest entry "d0-discovery":{"check_id":"d0-discovery","log_path":"audit/qa/hde-epic040/checks/d0-discovery/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/d0-discovery/primary.log","audit/qa/hde-epic040/qa_step_logs_manifest.json"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 2 step-0b-doc-delta-capture | manifest entry "step-0b-doc-delta-capture":{"check_id":"step-0b-doc-delta-capture","log_path":"audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log","audit/docdeltas/hde-epic040_doc_deltas.md","audit/qa/hde-epic040/00_meta/doc_deltas.md"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 3 ac040-08-evidence-validators | manifest entry "ac040-08-evidence-validators":{"check_id":"ac040-08-evidence-validators","log_path":"audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log","status":"PASS"} | attempt lineage one recorded execution (Run B at 345148b); attempt 1 unless Run A executed it, which is unknown (QA-110 review v1.0 ruling LR-01 items 2, 3 and 7) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 4 ac040-02-03-catalog-config | manifest entry "ac040-02-03-catalog-config":{"check_id":"ac040-02-03-catalog-config","log_path":"audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 5 ac040-04-05-admission-identity | manifest entry "ac040-04-05-admission-identity":{"check_id":"ac040-04-05-admission-identity","log_path":"audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 6 ac040-06-golden-comparison | manifest entry "ac040-06-golden-comparison":{"check_id":"ac040-06-golden-comparison","log_path":"audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 7 ac040-07-gate-ingress-offline | manifest entry "ac040-07-gate-ingress-offline":{"check_id":"ac040-07-gate-ingress-offline","log_path":"audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 8 ac040-04-09-compat-cli-offline | manifest entry "ac040-04-09-compat-cli-offline":{"check_id":"ac040-04-09-compat-cli-offline","log_path":"audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 9 ac040-09-reader-http-in-process | manifest entry "ac040-09-reader-http-in-process":{"check_id":"ac040-09-reader-http-in-process","log_path":"audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 10 sec-reader-http-live | manifest entry "sec-reader-http-live":{"check_id":"sec-reader-http-live","log_path":"audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution at 345148b is the evidence of record and is not an authorized attempt 2 (QA-110 review v1.0 ruling LR-01 items 2 to 5) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log","audit/qa/hde-epic040/checks/sec-reader-http-live/http_probes.jsonl","audit/qa/hde-epic040/checks/sec-reader-http-live/gunicorn_server.log"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 11 open-rails-showcompat-vendor | manifest entry "open-rails-showcompat-vendor":{"check_id":"open-rails-showcompat-vendor","log_path":"audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log","status":"PASS"} | attempt lineage attempt 1 (Run B stream at 380cf46; QA-110 review T11 v1.0) | evidence "evidence_artifacts":["audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_request.txt","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/vendor_run_ba.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json","audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json"] | follow-up none at execution; the per-task result is decided by Kronos at QA-110
+COVERAGE 12 qa-closeout-deliverables | manifest entry written by the recording of this check | attempt lineage attempt 1 (task T12 of QA-90 collection v1.4) | evidence audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log with the path proofs of Plan check 12 steps 3 and 8 | follow-up per the header of this primary log
+DEFERRED QA Plan v1.2 section 2: live Gate readiness and live DB Reader success are deferred requirements, not checks; no command ran for them (Glow QA Guide section 3.3)
+[22] stderr:
+[23] exit=0
+[23] stdout:
+12
+[23] stderr:
+=== PREDICATES ===
+Observed values, from the capture files:
+command 3: exit=0 stdout={     "ac040-02-03-catalog-config": {         "check_id": "ac040-02-03-catalog-config",         "log_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",         "status": "PASS"     },     "ac040-04-05-admission-identity": {         "check_id": "ac040-04-05-admission-identit
+command 4: exit=0 stdout=11 
+command 5: exit=0 stdout=11 
+command 6: exit=0 stdout=Python 3.12.3 
+command 7: exit=0 stdout=/tmp/hde-epic040-qa-v1.2/venv/bin/python 
+command 9: exit=0 stdout=15 
+command 10: exit=0 stdout=f11fbdbc5a978772cd8ad0847a4341320939fbd17505843ef6426ed2d623bc96  audit/qa/hde-epic040/qa_step_logs_manifest.json f5b0f82c7974307bc52efac98232947726f534441fe07992ce384321aa7d5c1d  audit/qa/hde-epic040/checks/d0-discovery/primary.log a64483b5460b75fbc4ce7028f238ff9e72a3f62c617c8e3361ab3d3c163d2c4b  a
+command 11: exit=0 stdout=25 /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c10.out 
+command 12: exit=0 stdout=
+command 13: exit=0 stdout=appended 1 DD-13 open-rails-showcompat-vendor 
+command 14: exit=0 stdout=
+command 16: exit=0 stdout=default_produced_at 2026-09-29T13:48:00Z audit/qa/hde-epic040/checks/d0-discovery/primary.log.path_proof.txt audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log.path_proof.txt audit/qa/hde-epic040/check
+command 17: exit=0 stdout=check mode passed 13 
+command 19: exit=0 stdout=[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC 
+command 20: exit=0 stdout=
+command 22: exit=0 stdout=COVERAGE 1 d0-discovery | manifest entry "d0-discovery":{"check_id":"d0-discovery","log_path":"audit/qa/hde-epic040/checks/d0-discovery/primary.log","status":"PASS"} | attempt lineage Run A executed it first (branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c), which is attempt 1; the Run B execution 
+command 23: exit=0 stdout=12 
+E1 dependency gate: PASS (command 3 exit 0; commands 4 and 5 printed 11)
+E2 readiness line: PASS (command 6 printed Python 3.12.3; command 7 exit 0 printed /tmp/hde-epic040-qa-v1.2/venv/bin/python; command 9 printed 15)
+E3 step-1 digests captured: PASS (command 10 exit 0; command 11 printed 25)
+E4 doc-delta surfaces byte-identical after the append: PASS (commands 12, 13 and 14 exit 0)
+E5 path proofs pass check mode: PASS (commands 16 and 17 exit 0; command 17 printed check mode passed 13)
+E6 governed graph with the QA files present: PASS (commands 19 and 20 exit 0)
+E7 coverage accounting written: PASS (command 22 exit 0; command 23 printed 12)
+[K] K1 the manifest whose digest command 10 recorded holds exactly one entry for each of checks 1 to 11 of QA Plan v1.2 section 11, all recorded before this check: pending QA-110
+[K] K2 each log_path is the concrete primary-log path that the check block states: pending QA-110
+[K] K3 each primary log is non-empty, LF-terminated and starts with a pf27.step_log_header.v2 header whose status equals the manifest status: pending QA-110
+[K] K4 every supplementary file named in a primary log exists with the recorded SHA-256: pending QA-110
+[K] K5 the coverage accounting lists every check of QA Plan v1.2 section 11: pending QA-110
+[K] Step 8 each finalization path proof (this primary log; the manifest) has the sha256 and size_bytes of its file: pending QA-110
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+=== LIMITS ===
+Proof class: local/offline integrity of the QA run evidence under the closed posture; no vendor, database, server or network; no product-behavior claim (FAIL_BEHAVIOR not applicable).
+The path proofs bind the path, size and SHA-256 of each QA file; mtime_utc is capture-time provenance (PF12-Canon-HDE-Schemas-and-Artifacts MTIME-UTC-SEMANTICS).
+Step 4 shows that the governed evidence checks pass with the QA files present; it registers no QA file in the Human Evidence Index or the Machine Mirror, and the manifest is not claimed to be ledger-bound (PF19-Canon-Glow-QA-Guide section 4.4.3; QA Plan v1.2 section 8).
+The path proofs of this primary log and of the final manifest are written after this log is recorded (QA Plan v1.2 check 12 step 8), outside this log.
+Nonclaims: no QA PASS for the change, acceptance, closure, PF09 status change, close-pack, Index or Mirror publication, deployment, token, new public route or flag, or PF edit follows from this result.

@@ -1,0 +1,196 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac040-06-golden-comparison","check_name":"Read-only golden comparison","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","find",".","-path","./.git","-prune","-o","-path","./audit/qa/hde-epic040","-prune","-o","-name","__pycache__","-prune","-o","-name",".pytest_cache","-prune","-o","-type","f","-print0"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sort","-z","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.z"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","xargs","-0","-a","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.sorted.z","sha256sum"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","mkdir","-p","audit/qa/hde-epic040/checks/ac040-06-golden-comparison"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/config/generate_config_artifacts.py","--compare-goldens","."],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/config/generate_config_artifacts.py","--compare-goldens","."],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import json; from pathlib import Path; d=json.loads(Path('tests/fixtures/magic10/v1/goldens.json').read_bytes()); s=[x for x in d['cases'] if x['case_id'] == 'M10-G001'][0]['expected']['signals'][0]; print('M10-G001 expected.signals[0]', s['signal_id'], 'q', s['q'], 'to', 1); s['q']=1; Path('audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json').write_bytes(json.dumps(d, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8') + b'\\n')"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","tests/fixtures/magic10/v1/goldens.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/config/generate_config_artifacts.py","--compare-goldens",".","--goldens","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json","--report","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-E","GOLDEN_COMPARISON_MISMATCH:([2-9]|[1-9][0-9]+)","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/c12.err"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cp","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","find",".","-path","./.git","-prune","-o","-path","./audit/qa/hde-epic040","-prune","-o","-name","__pycache__","-prune","-o","-name",".pytest_cache","-prune","-o","-type","f","-print0"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sort","-z","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.z"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","xargs","-0","-a","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.sorted.z","sha256sum"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.txt","/tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","PYTHONDONTWRITEBYTECODE=1","python","-m","pytest","-q","-p","no:cacheprovider","-rs","tests/config/test_config_artifacts.py"]],"command_provenance":"QA Plan v1.2 CHECK 6 ac040-06-golden-comparison (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.1 task T06 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.1.md); attempt 1; executed by Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner; normalizations: N-01, N-02, N-03, N-04, N-05, N-06, N-10, N-11","evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json","audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF09.3-Canon-HDE-Build-Checklist-Separation","PF01-Canon-HDE-Math-Spec"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-29T01:52:28Z"}
+=== CONTEXT ===
+EXECUTOR: Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner
+VENUE: Product Owner-controlled Linux shell (host Linux 6.8.0-142-generic); not a GitHub Codespace.
+CHECKOUT: /home/nathan/hde-epic040-qa
+TESTED_SOURCE (git rev-parse HEAD as captured by T01 command 3): 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d
+MANIFEST_SHA256 (T01 command 25): 52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96
+INTERPRETER (readiness R1): Python 3.12.3
+SYS_EXECUTABLE (readiness R2): /tmp/hde-epic040-qa-v1.2/venv/bin/python
+CLOSED_POSTURE_AS_APPLIED (readiness R3):
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+PF_ANCHORS: PF09.3-Canon-HDE-Build-Checklist-Separation (HDE-SEPA005.4); PF01-Canon-HDE-Math-Spec section 9.5; PF10 HDE Build Notes, addendum 2.20 "HDE-EPIC040-PR05 — PR Work-Unit Lineage Review v1.0". PF10 is cited here in the body because the harness pf_refs pattern does not admit its title (Plan section 8).
+MECHANICS: as recorded in the T01 body (inline shell function appends the literal command text to argv.txt and evaluates it with stdout, stderr and exit code captured; long lines and the recording invocation were taken mechanically from the collection file; command 9 is the same command as command 8, typed with the CLOSED prefix because the collection names it only as the same command). Command 24 ran as a background job of the tool harness with the same captures. tools/config/generate_config_artifacts.py was run only with --compare-goldens (write paths never used). The QA-created input writer (command 10) is evidence-assembly scaffolding under Plan section 12; it evaluates no predicate. No script file was created.
+=== COMMANDS ===
+c1 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+c2a exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+c2b exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+c2c exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+c3 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC find . -path ./.git -prune -o -path ./audit/qa/hde-epic040 -prune -o -name __pycache__ -prune -o -name .pytest_cache -prune -o -type f -print0
+c4 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sort -z /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.z
+c5 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC xargs -0 -a /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.sorted.z sha256sum
+c6 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.txt
+c7 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC mkdir -p audit/qa/hde-epic040/checks/ac040-06-golden-comparison
+c8 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/config/generate_config_artifacts.py --compare-goldens .
+c9 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/config/generate_config_artifacts.py --compare-goldens .
+c10 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import json; from pathlib import Path; d=json.loads(Path('tests/fixtures/magic10/v1/goldens.json').read_bytes()); s=[x for x in d['cases'] if x['case_id'] == 'M10-G001'][0]['expected']['signals'][0]; print('M10-G001 expected.signals[0]', s['signal_id'], 'q', s['q'], 'to', 1); s['q']=1; Path('audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json').write_bytes(json.dumps(d, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8') + b'\n')"
+c11 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum tests/fixtures/magic10/v1/goldens.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+c12 exit=1: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/config/generate_config_artifacts.py --compare-goldens . --goldens audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json --report /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json
+c13 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -E 'GOLDEN_COMPARISON_MISMATCH:([2-9]|[1-9][0-9]+)' /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/c12.err
+c14 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cp /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+c15 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+c16 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+c17 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC find . -path ./.git -prune -o -path ./audit/qa/hde-epic040 -prune -o -name __pycache__ -prune -o -name .pytest_cache -prune -o -type f -print0
+c18 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sort -z /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.z
+c19 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC xargs -0 -a /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.sorted.z sha256sum
+c20 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.txt
+c21 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.txt /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.txt
+c22 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json
+c23 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+c24 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider -rs tests/config/test_config_artifacts.py
+c25 recording: tools.qa.qa_harness.record_check invoked once after this body was composed; it is the recording mechanism and is not listed in argv.txt
+=== OUTPUT ===
+--- c1 stdout (gate.out) ---
+{
+    "ac040-02-03-catalog-config": {
+        "check_id": "ac040-02-03-catalog-config",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-05-admission-identity": {
+        "check_id": "ac040-04-05-admission-identity",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log",
+        "status": "PASS"
+    },
+    "ac040-08-evidence-validators": {
+        "check_id": "ac040-08-evidence-validators",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log",
+        "status": "PASS"
+    },
+    "d0-discovery": {
+        "check_id": "d0-discovery",
+        "log_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "status": "PASS"
+    },
+    "step-0b-doc-delta-capture": {
+        "check_id": "step-0b-doc-delta-capture",
+        "log_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "status": "PASS"
+    }
+}
+--- c1 stderr ---
+--- c2a stdout ---
+Python 3.12.3
+--- c2a stderr ---
+--- c2b stdout ---
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+--- c2b stderr ---
+--- c2c stdout ---
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+--- c2c stderr ---
+--- c3 stdout (scratch file tree_before.z: 457102 bytes, 7299 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c3 stderr ---
+--- c4 stdout (scratch file tree_before.sorted.z: 457102 bytes, 7299 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c4 stderr ---
+--- c5 stdout (scratch file tree_before.txt: 938836 bytes, 7299 lines; not embedded, bound by the digest of command 6) ---
+--- c5 stderr ---
+--- c6 stdout ---
+0e9a98a597b85902da0b1ca251813ad0b3d2190fdd08dbaae4330365a711246b  /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_before.txt
+--- c6 stderr ---
+--- c7 stdout ---
+--- c7 stderr ---
+--- c8 stdout (redirected to evidence file audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json: 1051 bytes; SHA-256 bound by command 23) ---
+--- c8 stderr ---
+--- c9 stdout (redirected to evidence file audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json: 1051 bytes; SHA-256 bound by command 23) ---
+--- c9 stderr ---
+--- c10 stdout ---
+M10-G001 expected.signals[0] rapport_delta q 0 to 1
+--- c10 stderr ---
+--- c11 stdout ---
+9f99c6aa633cf4713c3de9d37a1d70157fe632e08740ec1c505ecc202486ace5  tests/fixtures/magic10/v1/goldens.json
+b8624a02bcc1f24aa689389fc976a5e4939f34a91e080748367e1d155824322f  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+--- c11 stderr ---
+--- c12 stdout ---
+--- c12 stderr ---
+GOLDEN_COMPARISON_MISMATCH:2
+--- c13 stdout ---
+1
+--- c13 stderr ---
+--- c14 stdout ---
+--- c14 stderr ---
+--- c15 stdout ---
+--- c15 stderr ---
+--- c16 stdout ---
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+--- c16 stderr ---
+--- c17 stdout (scratch file tree_after.z: 457102 bytes, 7299 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c17 stderr ---
+--- c18 stdout (scratch file tree_after.sorted.z: 457102 bytes, 7299 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c18 stderr ---
+--- c19 stdout (scratch file tree_after.txt: 938836 bytes, 7299 lines; not embedded, bound by the digest of command 20) ---
+--- c19 stderr ---
+--- c20 stdout ---
+0e9a98a597b85902da0b1ca251813ad0b3d2190fdd08dbaae4330365a711246b  /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/tree_after.txt
+--- c20 stderr ---
+--- c21 stdout ---
+--- c21 stderr ---
+--- c22 stdout ---
+--- c22 stderr ---
+--- c23 stdout ---
+bea29970107fe750394e0f78c1047de93ebd9193565cd82a8e6e92e7b515dca8  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json
+bea29970107fe750394e0f78c1047de93ebd9193565cd82a8e6e92e7b515dca8  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json
+b8624a02bcc1f24aa689389fc976a5e4939f34a91e080748367e1d155824322f  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+--- c23 stderr ---
+--- c24 stdout ---
+........................................................................ [ 47%]
+........................................................................ [ 94%]
+.........                                                                [100%]
+153 passed in 40.03s
+--- c24 stderr ---
+=== PREDICATES ===
+E1 PASS: dependency gate (command 1, manifest read) exited 0; d0-discovery status in gate.out is PASS
+E2 PASS: readiness R1 printed [Python 3.12.3]; R2 printed [/tmp/hde-epic040-qa-v1.2/venv/bin/python]; R3 matched the closed posture (six pin values and nine UNSET lines)
+E3 PASS: match runs 1 and 2 (commands 8 and 9) exited 0 and 0; byte identity of the two reports (command 22, cmp) exited 0
+E4 PASS: mismatch run (command 12) exited 1 (expected 1); stderr was [GOLDEN_COMPARISON_MISMATCH:2]; command 13 (grep -c -x -E for GOLDEN_COMPARISON_MISMATCH with n of at least 2) printed 1 (expected 1)
+E5 PASS: report copy (command 15, cmp of mismatch_report.json and compare_mismatch_report.json) exited 0
+E6 PASS: before-digest [0e9a98a597b85902da0b1ca251813ad0b3d2190fdd08dbaae4330365a711246b] and after-digest [0e9a98a597b85902da0b1ca251813ad0b3d2190fdd08dbaae4330365a711246b] of the tree (excluding .git, audit/qa/hde-epic040, __pycache__ and .pytest_cache; 7299 entries each); command 21 (cmp of the two lists) exited 0
+E7 PASS: command 24 (pytest group C, 1 file) exited 0; summary line [153 passed in 40.03s]; no failure or error reported; no skipped test reported in the -rs summary
+INPUT WRITER (command 10) exited 0 and printed the one changed leaf: [M10-G001 expected.signals[0] rapport_delta q 0 to 1]
+SHA256 OF FIXTURE AND ALTERED FILE (command 11):
+9f99c6aa633cf4713c3de9d37a1d70157fe632e08740ec1c505ecc202486ace5  tests/fixtures/magic10/v1/goldens.json
+b8624a02bcc1f24aa689389fc976a5e4939f34a91e080748367e1d155824322f  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+SHA256 OF MISMATCH REPORT AND ITS COPY (command 16):
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  /tmp/hde-epic040-qa-v1.2/ac040-06-golden-comparison/mismatch_report.json
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+SHA256 BINDING LINES (command 23; Plan section 8):
+bea29970107fe750394e0f78c1047de93ebd9193565cd82a8e6e92e7b515dca8  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run1.json
+bea29970107fe750394e0f78c1047de93ebd9193565cd82a8e6e92e7b515dca8  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_match_run2.json
+b8624a02bcc1f24aa689389fc976a5e4939f34a91e080748367e1d155824322f  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/tmp_goldens_altered.json
+54d567373300a7d4a86ca44cb31a61db62d8c39493efc85d06496d2d17ae0026  audit/qa/hde-epic040/checks/ac040-06-golden-comparison/compare_mismatch_report.json
+K1 pending QA-110: both match reports (compare_match_run1.json, compare_match_run2.json) have ok true, empty mismatches, cases exactly M10-G001 to M10-G008 each with outcome match, config_id m10-channel-state-v1.0.0 and candidate_release_id equal to the manifest SHA-256 (MANIFEST_SHA256 above)
+K2 pending QA-110: compare_mismatch_report.json has ok false; every mismatch row has case_id M10-G001; one row has path transcription.expected; cases M10-G002 to M10-G008 have outcome match
+K3 pending QA-110: tmp_goldens_altered.json differs from tests/fixtures/magic10/v1/goldens.json (at the tested source) only in case M10-G001 expected.signals[0].q, changed from 0 to 1
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+=== LIMITS ===
+Proof class: class 2 local/offline (no vendor), closed rails (Plan check 6). The comparison is read-only: the tree digests before and after the comparator runs are equal. The four QA-created files are the deliverables named in the Plan (compare_match_run1.json, compare_match_run2.json, tmp_goldens_altered.json, compare_mismatch_report.json); their contents are evaluated by Kronos at QA-110, not by the executor.
+Nonclaims: no QA PASS for the change, acceptance, closure, PF09 status change, deployment, token, new public route or flag, or PF edit follows from this task result (Plan section 12).

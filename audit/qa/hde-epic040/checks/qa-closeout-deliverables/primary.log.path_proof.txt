@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log
+size_bytes: 64249
+sha256: df03f7b6561d6182cdc59d095c8dc140ba8e3a048f5c31ee9842c7d3eaab35ff
+mtime_utc: 2026-09-29T13:50:25Z
+produced_at_utc: 2026-09-29T13:50:37Z

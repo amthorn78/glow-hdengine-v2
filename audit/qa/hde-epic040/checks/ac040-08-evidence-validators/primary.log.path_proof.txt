@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log
+size_bytes: 28542
+sha256: 170171e1bbdb61b45c5650207425eabb63fea83597a2d0088023096ef1f11aed
+mtime_utc: 2026-09-29T01:46:26Z
+produced_at_utc: 2026-09-29T13:48:00Z

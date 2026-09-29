@@ -1,0 +1,29 @@
+check_id: open-rails-showcompat-vendor
+plan: docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md, CHECK 11
+task: docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.3.md, T11, attempt 1
+executor: Nathan (Product Owner), PO-only execution of the vendor commands
+authorization: Product Owner selection of QA Plan v1.2 check 11 at the QA-90 invocation of 2026-09-29, and the Product Owner running this task; PO disposition Q-2 (docs/ephemeral/HDE-EPIC040-QA10-po-disposition-v1.0.md)
+target: CLI-local vendor smoke, hdctl showcompat --source vendor, local process, APP_ENV=dev, not production
+tuple_provenance: QA Audit L-51 default, audit/ops/hde-epic030/ops-02/vendor_command.txt, equal to audit/ops/hde-epic030/ops-02/sample_birth_inputs.json; synthetic QA tuples (QA50-S01, QA-70 review v1.1)
+tuple_a: birthdate 1999-10-16, birthtime 04:37, location Santiago, Chile
+tuple_b: birthdate 1978-06-17, birthtime 02:35, location Tallinn, Estonia
+SAFE_MODE=0
+ALLOW_NETWORK=1
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+HD_API_BASE_URL=SET
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HDAPI_BASE_URL=UNSET
+DATABASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+time_utc: 2026-09-29T05:51:11Z
+exact_commands, one per line, as they are run (AB, then BA):
+env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1999-10-16 --birthtime-a 04:37 --location-a "Santiago, Chile" --birthdate-b 1978-06-17 --birthtime-b 02:35 --location-b "Tallinn, Estonia" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ab.json
+env -u HDAPI_BASE_URL -u DATABASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC hdctl showcompat --source vendor --birthdate-a 1978-06-17 --birthtime-a 02:35 --location-a "Tallinn, Estonia" --birthdate-b 1999-10-16 --birthtime-b 04:37 --location-b "Santiago, Chile" --dump-reader audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/reader_v1_ba.json
+No secret value is recorded in this file.

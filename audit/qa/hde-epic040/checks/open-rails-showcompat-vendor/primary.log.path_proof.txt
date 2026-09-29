@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/open-rails-showcompat-vendor/primary.log
+size_bytes: 64998
+sha256: 1e4341e27e1ce47fe172546581ac4737e2dcb9745f82bac42f0001ac6f5f4674
+mtime_utc: 2026-09-29T05:53:32Z
+produced_at_utc: 2026-09-29T13:48:00Z
