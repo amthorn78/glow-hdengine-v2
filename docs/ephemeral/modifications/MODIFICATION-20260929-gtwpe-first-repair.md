@@ -969,12 +969,15 @@ on the new MGMT-10 page". No new page exists and nothing in Notion changed; the 
 75 phrases, and no edit has been applied. It also says PF10-AINEUTRAL-001 may not be on `main`; it is,
 at `fffadb5` (§A, TF-1).
 
-**Where `EXECUTE` starts.** The change prompt's find rule now finds the record on `main` and on no
-branch, so `EXECUTE` opens the branch anew. These replace §P's X1.0 (5) and add a step before X1.1:
+**Where `EXECUTE` starts.** The record is now on `main` at `PLANNED`, and this successor is on the
+restarted branch `docs/20260929-modification-gtwpe-first-repair` (`cbd151b` and later), also at
+`PLANNED`. The change prompt's find rule prefers `main` when two copies are level, which would drop this
+section unless the branch has merged (C8, below). So `EXECUTE` uses the copy that holds this section.
+These replace §P's X1.0 (5) and add a step before X1.1:
 
 | # | Step | Check |
 |---|---|---|
-| X1.0a | `git fetch --prune origin`; `git checkout --no-track -B docs/20260929-modification-gtwpe-first-repair origin/main` | `git rev-parse origin/main:docs/ephemeral/modifications/MODIFICATION-20260929-gtwpe-first-repair.md` equals the local file's blob before Nathan's approval is recorded in it, and the ten evidence files are on `origin/main` |
+| X1.0a | `git fetch --prune origin`. If `origin/docs/20260929-modification-gtwpe-first-repair` exists, `git checkout --no-track -B docs/20260929-modification-gtwpe-first-repair origin/docs/20260929-modification-gtwpe-first-repair`; otherwise, once this section is on `main`, the same command with `origin/main` | The checked-out record holds the heading of this section; `modification_validate.py` and the evidence `gtwpe_record_check.py` exit 0 on it at `PLANNED`; the ten evidence files are present |
 | X1.0 (5) | The branch, restarted at X1.0a, holds this record with `plan_approved_by` set once the approval is recorded, and the evidence tool's sha256 is «H» | As stated |
 
 X2's pull request is a new one: the branch's first, #565, is merged. Every reference in §P to "the
@@ -996,3 +999,9 @@ item on the TW prompts' repair list". Checked against this plan:
   E12's meter is the session's clock for its own stop rule, not advice on a model or a session.
 - **A new candidate, C7:** the TW repair Nathan has put on the list, removing the eight model-guidance
   blocks and retiring TW-ASSESS-10. It is new scope, so it is a Modification of its own.
+
+**A new finding against GTWPE-MGMT-10, candidate C8.** Its find rule ("if they are level, use `main`")
+compares status only. A copy on a branch that holds more at the same status, such as this section, loses
+to `main`'s, and a fresh session would work from the shorter copy without noticing. This session carries
+on into `EXECUTE` itself and records the approval in the branch's copy, which then leads at `EXECUTING`.
+New scope, for a later Modification.
