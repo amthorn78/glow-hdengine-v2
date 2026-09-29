@@ -244,11 +244,16 @@ don't want to implement anything until we are confident in the change management
 
 > I just want to make sure the discipline of the prompts is not glossed over. I have put a LOT of work into these. PF20 and 30 don't need a redliner, since they are only getting one session, but all other processes MUST go through the redlining and redline apply process, with reports for each phase. this is an important determinism and drift control
 
+Nathan's correction, same day, verbatim:
+
+> When I say "y are only getting one session" I mean they only get one SECTION
+
 What this means for the design:
 - Every document except PF20 and PF30 (PF03, PF09 and the generic documents) goes through two
   phases: redline creation, then redline apply to the drafts copy. Each phase produces its own
   report.
-- PF20 and PF30 each run in one session, with no redliner, and produce a report.
+- PF20 and PF30 need no redliner because each change adds only one section to them. That section is
+  written directly, and the pass still produces a report.
 - The existing redlining and redline-apply prompts' rules are kept and carried into the new flow,
   not replaced.
 
