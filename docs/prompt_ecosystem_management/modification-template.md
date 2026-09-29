@@ -110,7 +110,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"             # D26; a record with no format is a legacy record
 modification_id: MODIFICATION-20260923-example-slug
 status: INTAKE            # INTAKE ANALYZING ANALYZED PLANNING PLANNED EXECUTING COMPLETE BLOCKED ABANDONED
-targets: []               # union across parts: prompt skill rule graph registry notion_control
+targets: []               # union across parts: prompt skill rule graph registry notion_control tool
 gate_tier:                # 0 1 2 -- the highest across parts, computed from closure.py, never judged
 closure:                  # computed; do not type these by hand
   upstream: []

@@ -78,7 +78,9 @@ READINESS = ["READY", "SPLIT_RECOMMENDED", "NEEDS_RULING"]
 # script checks is well-formedness: an override cannot make a malformed record well-formed.
 OVERRIDABLE = ["scope_freeze", "readiness", "modification_class", "gate_tier", "deferral",
                "review_cap", "dry_run"]
-TARGETS = ["prompt", "skill", "rule", "graph", "registry", "notion_control"]
+# `tool` is a repository script together with its lock file and selftest. The GTWPE change prompt
+# changes tools; no other class names them (GTWPE ledger E-017).
+TARGETS = ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 DISPOSITIONS = ["APPLIED", "VERIFIED", "BLOCKED", "NOT_APPLICABLE"]
 
 # status -> (section that must exist, the approval field that gates reaching this status)
@@ -911,6 +913,21 @@ def selftest():
             f, t = _run_cases(td, name, fixture, regressions, filename)
             failures += f
             total += t
+        # E-017: the `tool` target class is accepted, and an unknown class still fails.
+        base = _GOOD_D26
+        assert base.count("targets: [skill]") == 1
+        for name, targets, want_ok in (("targets [tool, prompt] passes", "[tool, prompt]", True),
+                                       ("unknown target class 'tools' fails", "[tools]", False)):
+            total += 1
+            f = Path(td) / "MODIFICATION-tool-target.md"
+            f.write_text(base.replace("targets: [skill]", f"targets: {targets}", 1), encoding="utf-8")
+            found = check(f)
+            ok = (not found) if want_ok else any("target 'tools'" in x for x in found)
+            if ok:
+                print(f"ok    {name}")
+            else:
+                print(f"SELFTEST FAIL: {name} -> {found}")
+                failures += 1
         # PAIR-001: every fixture above is hand-written, so none of them can notice the shipped
         # template drifting away from this script. Validate the template itself: as shipped, at
         # INTAKE, and filled in the minimum ANALYZE fills, at ANALYZING.
