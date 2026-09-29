@@ -5,14 +5,14 @@ worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P1r Design revision, complete with its repair round and final full review; stopped before G1 (P0 accepted: V0 PASSED; P1 superseded by P1r)
-updated: 2026-09-29T02:30Z
+phase: P2(b) Foundations, under G1 and G2 approved 2026-09-29; then P3's ANALYZE, stopping at Nathan's first approval (P1r closed at G1)
+updated: 2026-09-29T04:40Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**P1r is complete and W1 has stopped before G1 (§11).** Design v1.2 repairs full review 1's five findings and adds one real TW prompt repair to the pilot. The final full review left one required finding, which goes to G1 as an accepted risk with P1r-5. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
+**G1 is approved and W1 is in P2(b) (§12).** Before it: **P1r is complete (§11).** Design v1.2 repairs full review 1's five findings and adds one real TW prompt repair to the pilot. The final full review left one required finding, which goes to G1 as an accepted risk with P1r-5. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
 §2 to §7 are the P0 record as it was accepted, with later disclosures added to §5. §8 holds Nathan's
 rulings, §9 carries P1, and §9.7 carries W1's proposal on Nathan's direction after the P1 report:
 the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r. §11 carries PE37's
@@ -30,7 +30,7 @@ decision on P1r and the repair round it started.
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
 | Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023. Open there: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **New from P1r, for PE37 to enter:** §11.2's rows: P1r-1 to P1r-5, full review 1's five required findings (four fixed, and RF-1 fixed with a new defect), and full review 2's R2-1, open |
-| Next action | **None until the relay returns.** Design v1.2 goes to G1 with R2-1 and P1r-5 as accepted risks (design §16 and D-18). PE37: the G1 request, the re-pricing and the plan edits in §11.10. Nathan: G1, through PE37 |
+| Next action | **P2(b), then P3's `ANALYZE`** (§12.1). W1 stops at the first point where Nathan must approve, or at twice a phase's estimate |
 
 ## 2. Authority used
 
@@ -788,3 +788,42 @@ so this update and the report are not in it.
    before P2.
 4. **For `ERRORS.md`:** §11.2's eleven rows.
 5. **Stopped before G1.** W1 writes no page, tool, prompt, skill or canon file until G1 is approved.
+
+## 12. G1, P2(b) and the pilot
+
+### 12.1 G1, and the instruction for P2(b) and P3 (PE37, through Nathan)
+
+Received at 2026-09-29T04:24:54Z, verbatim (994 B as received):
+
+```plain text
+PE37: Nathan approved G1 on 2026-09-29 with "yes". That covers the design, the remaining false-alarm
+finding accepted with its one-line fix at publication, the cost overrun, and publishing the parent
+page and GTWPE-MGMT-10 (G2 for those two pages only). Record it in your checkpoint.
+
+The validator's `tool` target class is done: branch docs/20260929-pe37-validator-tool-target,
+commit 2e0f4e5, PR #548. Read the validator from that branch until it merges.
+
+Now:
+1. Create the parent page "GTWPE — Glow Technical Writing Prompt Ecosystem" under AI Prompts / HDE TW.
+2. Publish GTWPE-MGMT-10 under it, with the one-line fix applied. Read both pages back.
+3. Start the pilot: run GTWPE-MGMT-10 on the one-instruction repair of the TW management prompt
+   named in the design. Stop at the first point where Nathan must approve.
+Watch cost against the plan's estimate, and stop at twice it.
+Report to Nathan in at most five plain sentences, and end with exactly what he must approve, if
+anything.
+```
+
+| Item | Recorded |
+|---|---|
+| G1 | Nathan's "yes", 2026-09-29, as PE37 relays it. It approves design v1.2 as pushed at `d0e3f85`, with D-1 to D-18 at their recommendations. By PE37's words it covers "the remaining false-alarm finding accepted with its one-line fix at publication" (R2-1) and the cost overrun (`ERRORS.md` E-024, `ACCEPTED_RISK`, at `feb14e5`). By D-18's recommendation, P1r-5 is accepted with its fix in P4. P1r closes |
+| G2 | For the GTWPE parent page and GTWPE-MGMT-10 only. The pilot's own Notion writes come at `EXECUTE`, after Nathan's `ANALYZE` and `PLAN` approvals, and are not yet authorized |
+| G2's body review | Design §12.2 has a G2 request give each body for review. Nathan approved G2 before the body existed, so the review §12.2 expects falls to the readback and the pilot's cold run |
+| The validator | PR #548 merged into `main` as `feb14e5` before W1 read it, so W1 reads `modification_validate.py` from `main` |
+| The pilot's request | "run GTWPE-MGMT-10 on the one-instruction repair of the TW management prompt named in the design". W1 takes these words as the pilot's request: design §13.2's PART-02. PART-01, the reader, is not in it, and PE37 routes it |
+| Where W1 stops | At the first point where Nathan must approve: `ANALYZE`'s approval (design §11.4 A7) |
+| Cost | Design §12.5: P2 about 1M, P3 about 2M plus 0.3M. W1 stops at twice either |
+
+`main` moved from `0db3f0e` to `4ad12fe`. Three watched paths changed (design §11.7): PF10, now
+v13.4.4, with addenda 2.32 and 2.33 on QA; `modification-template.md` and `modification_validate.py`,
+which gained `tool` (#548). The pilot's A0 reports them, since the catalog's checked-through commit
+starts at `0db3f0e`. A canon-first search of the two new PF10 addenda found no prompt-ecosystem rule.
