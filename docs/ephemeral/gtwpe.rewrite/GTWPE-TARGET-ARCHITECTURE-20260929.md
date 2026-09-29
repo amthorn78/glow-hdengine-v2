@@ -234,3 +234,30 @@ PF20 is also becoming large enough that it may eventually require the same kind 
 That structural change has not yet been implemented or formally established, so the Flow Manager should not invent a PF20 volume structure on its own merely because the document is large.
 However, the architecture should not assume that PF20 will necessarily remain a single document forever. The workflow should be compatible with a future decision to split PF20 into multiple volumes if that becomes necessary.
 Until that change is formally made, PF20 should continue to be handled according to its current established structure.
+
+## Nathan's later directions, 2026-09-29, verbatim
+
+These are part of the target. Nothing in this record is implemented yet: Nathan's direction is "I
+don't want to implement anything until we are confident in the change management system."
+
+### Redlining discipline
+
+> I just want to make sure the discipline of the prompts is not glossed over. I have put a LOT of work into these. PF20 and 30 don't need a redliner, since they are only getting one session, but all other processes MUST go through the redlining and redline apply process, with reports for each phase. this is an important determinism and drift control
+
+What this means for the design:
+- Every document except PF20 and PF30 (PF03, PF09 and the generic documents) goes through two
+  phases: redline creation, then redline apply to the drafts copy. Each phase produces its own
+  report.
+- PF20 and PF30 each run in one session, with no redliner, and produce a report.
+- The existing redlining and redline-apply prompts' rules are kept and carried into the new flow,
+  not replaced.
+
+### Stop rather than produce substandard results
+
+> if it just ends up being too much for a single turn, then some sort of stop mechanism might be needed. I want that over the production of substandard results.
+
+What this means for the design:
+- The Flow Manager's one-turn run is the goal, not a guarantee. When the work does not fit one turn
+  at full quality, the Flow Manager stops at a clean phase boundary and reports what is done, what
+  is not, and how to resume. It never finishes by lowering quality.
+- The exact stop signals and the resume method are still to be designed.
