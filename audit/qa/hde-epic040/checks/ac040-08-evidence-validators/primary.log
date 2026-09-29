@@ -1,0 +1,161 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac040-08-evidence-validators","check_name":"Owner evidence coherence and evidence tests","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","umask"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","stat","-c","%a %n","docs/evidence/INDEX.sha256"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","find","docs/evidence","artifacts","audit/gates","-type","f","-print0"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sort","-z","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.z"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","xargs","-0","-a","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.sorted.z","sha256sum"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/update_evidence_index.py","--check"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/orientation_demo.py","--check"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/validate_evidence_paths.py"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","./ci/checks/check_mirror_schema.sh"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","./ci/checks/check_evidence_index_hash.sh"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/run_canonical_json_gate.py","--check-only"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/evidence/check_lf_endings.py"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","./ci/checks/check_env_pins.sh"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/config/generate_config_artifacts.py","--check"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","PYTHONDONTWRITEBYTECODE=1","python","-m","pytest","-q","-p","no:cacheprovider","-rs","tests/evidence/test_canonical_json_gate_check_outputs.py","tests/evidence/test_cli_conformance_artifacts.py","tests/evidence/test_determinism_gate_proofs.py","tests/evidence/test_dev_conjunction_identity.py","tests/evidence/test_engine_core_evidence.py","tests/evidence/test_epic030_pr05_category_framework_evidence.py","tests/evidence/test_evidence_index_missing_state.py","tests/evidence/test_evidence_tool_ownership.py","tests/evidence/test_open_rails_abba_proof.py","tests/evidence/test_rails_ci_workflow_integration.py","tests/evidence/test_sanity_pipeline.py","tests/qa/test_qa_tool_ownership.py"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","find","docs/evidence","artifacts","audit/gates","-type","f","-print0"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sort","-z","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.z"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","xargs","-0","-a","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.sorted.z","sha256sum"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sha256sum","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","cmp","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.txt","/tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.txt"]],"command_provenance":"QA Plan v1.2 CHECK 3 ac040-08-evidence-validators (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.1 task T03 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.1.md); attempt 1; executed by Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner; normalizations: N-01, N-02, N-03, N-04, N-05, N-06, N-07, N-10","evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF12-Canon-HDE-Schemas-and-Artifacts","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-29T01:46:26Z"}
+=== CONTEXT ===
+EXECUTOR: Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner
+VENUE: Product Owner-controlled Linux shell (host Linux 6.8.0-142-generic); not a GitHub Codespace.
+CHECKOUT: /home/nathan/hde-epic040-qa
+TESTED_SOURCE (git rev-parse HEAD as captured by T01 command 3): 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d
+INTERPRETER (readiness R1): Python 3.12.3
+SYS_EXECUTABLE (readiness R2): /tmp/hde-epic040-qa-v1.2/venv/bin/python
+CLOSED_POSTURE_AS_APPLIED (readiness R3):
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+VENUE_EVIDENCE (required before command 1 of the validators; Plan check 3): umask (command 3) = 0022 ; stat -c %a %n docs/evidence/INDEX.sha256 (command 4) = 644 docs/evidence/INDEX.sha256
+MECHANICS: as recorded in the T01 body (inline shell function appends the literal command text to argv.txt and evaluates it with stdout, stderr and exit code captured; the long pytest line and the recording invocation were taken mechanically from the collection file). Command 18 ran as a background job of the tool harness with the same captures. No script file was created.
+=== COMMANDS ===
+c1 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+c2a exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+c2b exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+c2c exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+c3 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c umask
+c4 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC stat -c '%a %n' docs/evidence/INDEX.sha256
+c5 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC find docs/evidence artifacts audit/gates -type f -print0
+c6 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sort -z /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.z
+c7 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC xargs -0 -a /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.sorted.z sha256sum
+c8 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.txt
+c9 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check
+c10 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py --check
+c11 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/validate_evidence_paths.py
+c12 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC ./ci/checks/check_mirror_schema.sh
+c13 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC ./ci/checks/check_evidence_index_hash.sh
+c14 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_canonical_json_gate.py --check-only
+c15 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_lf_endings.py
+c16 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC ./ci/checks/check_env_pins.sh
+c17 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/config/generate_config_artifacts.py --check
+c18 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider -rs tests/evidence/test_canonical_json_gate_check_outputs.py tests/evidence/test_cli_conformance_artifacts.py tests/evidence/test_determinism_gate_proofs.py tests/evidence/test_dev_conjunction_identity.py tests/evidence/test_engine_core_evidence.py tests/evidence/test_epic030_pr05_category_framework_evidence.py tests/evidence/test_evidence_index_missing_state.py tests/evidence/test_evidence_tool_ownership.py tests/evidence/test_open_rails_abba_proof.py tests/evidence/test_rails_ci_workflow_integration.py tests/evidence/test_sanity_pipeline.py tests/qa/test_qa_tool_ownership.py
+c19 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC find docs/evidence artifacts audit/gates -type f -print0
+c20 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sort -z /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.z
+c21 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC xargs -0 -a /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.sorted.z sha256sum
+c22 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sha256sum /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.txt
+c23 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cmp /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.txt /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.txt
+c24 recording: tools.qa.qa_harness.record_check invoked once after this body was composed; it is the recording mechanism and is not listed in argv.txt
+=== OUTPUT ===
+--- c1 stdout (gate.out) ---
+{
+    "d0-discovery": {
+        "check_id": "d0-discovery",
+        "log_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "status": "PASS"
+    },
+    "step-0b-doc-delta-capture": {
+        "check_id": "step-0b-doc-delta-capture",
+        "log_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "status": "PASS"
+    }
+}
+--- c1 stderr ---
+--- c2a stdout ---
+Python 3.12.3
+--- c2a stderr ---
+--- c2b stdout ---
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+--- c2b stderr ---
+--- c2c stdout ---
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+--- c2c stderr ---
+--- c3 stdout ---
+0022
+--- c3 stderr ---
+--- c4 stdout ---
+644 docs/evidence/INDEX.sha256
+--- c4 stderr ---
+--- c5 stdout (scratch file graph_before.z: 53415 bytes, 1098 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c5 stderr ---
+--- c6 stdout (scratch file graph_before.sorted.z: 53415 bytes, 1098 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c6 stderr ---
+--- c7 stdout (scratch file graph_before.txt: 125883 bytes, 1098 lines; not embedded, bound by the digest of command 8) ---
+--- c7 stderr ---
+--- c8 stdout ---
+29b7d9cbc557bc855d25b55b6cee9a562ef1f01840b788b1dad56ad7a4045150  /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_before.txt
+--- c8 stderr ---
+--- c9 stdout ---
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+--- c9 stderr ---
+--- c10 stdout ---
+--- c10 stderr ---
+--- c11 stdout ---
+--- c11 stderr ---
+--- c12 stdout ---
+--- c12 stderr ---
+--- c13 stdout ---
+--- c13 stderr ---
+--- c14 stdout ---
+--- c14 stderr ---
+--- c15 stdout ---
+--- c15 stderr ---
+--- c16 stdout ---
+[env-pins] OK: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+--- c16 stderr ---
+--- c17 stdout ---
+--- c17 stderr ---
+--- c18 stdout ---
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+........................................................................ [ 36%]
+........................................................................ [ 49%]
+........................................................................ [ 61%]
+........................................................................ [ 73%]
+........................................................................ [ 85%]
+........................................................................ [ 98%]
+...........                                                              [100%]
+587 passed in 659.57s (0:10:59)
+--- c18 stderr ---
+--- c19 stdout (scratch file graph_after.z: 53415 bytes, 1098 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c19 stderr ---
+--- c20 stdout (scratch file graph_after.sorted.z: 53415 bytes, 1098 NUL-terminated entries; NUL-delimited data, not embedded) ---
+--- c20 stderr ---
+--- c21 stdout (scratch file graph_after.txt: 125883 bytes, 1098 lines; not embedded, bound by the digest of command 22) ---
+--- c21 stderr ---
+--- c22 stdout ---
+29b7d9cbc557bc855d25b55b6cee9a562ef1f01840b788b1dad56ad7a4045150  /tmp/hde-epic040-qa-v1.2/ac040-08-evidence-validators/graph_after.txt
+--- c22 stderr ---
+--- c23 stdout ---
+--- c23 stderr ---
+=== PREDICATES ===
+E1 PASS: dependency gate (command 1, manifest read) exited 0; d0-discovery status in gate.out is PASS
+E2 PASS: readiness R1 printed [Python 3.12.3]; R2 printed [/tmp/hde-epic040-qa-v1.2/venv/bin/python]; R3 matched the closed posture (six pin values and nine UNSET lines)
+E3 PASS: commands 9 to 17 each exited 0: c9=0 c10=0 c11=0 c12=0 c13=0 c14=0 c15=0 c16=0 c17=0
+E4 PASS: command 18 (pytest group G, 12 files) exited 0; summary line [587 passed in 659.57s (0:10:59)]; no failure or error reported; no skipped test reported in the -rs summary
+VENUE RULE: not applied. The recorded checkout mode of docs/evidence/INDEX.sha256 is 644 (command 4), so group G file-mode assertion was verdictable at attempt 1.
+SUPPLEMENTARY, NON-GATING (commands 5 to 8 and 19 to 23): digest of the sorted path and SHA-256 list of docs/evidence, artifacts and audit/gates before command 9 = [29b7d9cbc557bc855d25b55b6cee9a562ef1f01840b788b1dad56ad7a4045150]; after command 18 = [29b7d9cbc557bc855d25b55b6cee9a562ef1f01840b788b1dad56ad7a4045150]; cmp of the two lists (command 23) exited 0. No difference to report to Kronos.
+K predicates: none for this task (Kronos confirms any venue-rule attribution from the pytest output and commands 3 and 4; none applies).
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+=== LIMITS ===
+Proof class: class 2 local/offline (no vendor), closed rails (Plan check 3). It re-verifies read-only that the owner-generated evidence graph and governed families are coherent at the tested source through nine tracked validators, and runs pytest group G. It proves nothing about live vendor, deployed-service or live-database behavior. The scratch listings of commands 5, 6, 7, 19, 20 and 21 stay in the scratch root and are bound by the digests of commands 8 and 22.
+Nonclaims: no QA PASS for the change, acceptance, closure, PF09 status change, deployment, token, new public route or flag, or PF edit follows from this task result (Plan section 12).

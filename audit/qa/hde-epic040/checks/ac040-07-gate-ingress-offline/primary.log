@@ -1,0 +1,146 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"ac040-07-gate-ingress-offline","check_name":"Gate ingress and readiness, offline","claimed_tokens":[],"command":[["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-m","json.tool","audit/qa/hde-epic040/qa_step_logs_manifest.json"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","--version"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","-c","import sys, tools.qa.qa_harness, engine; print(sys.executable)"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","sh","-c","for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo \"$k=$(printenv \"$k\")\"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv \"$k\" > /dev/null; then echo \"$k=SET\"; else echo \"$k=UNSET\"; fi; done"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","touch","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/empty_selection.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/bodygraph/check_magic10_gate_readiness.py","--selection-file","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/empty_selection.txt"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/bodygraph/check_magic10_gate_readiness.py","--user-id","00000000-0000-0000-0000-00000000000G"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","python","tools/bodygraph/check_magic10_gate_readiness.py","--user-id","00000000-0000-0000-0000-000000000001"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-F","READINESS_EMPTY_SELECTION","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c4.err"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-F","READINESS_SELECTION_INVALID","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c5.err"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","grep","-c","-x","-F","READINESS_UNAVAILABLE","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c6.err"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-s","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c4.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-s","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c5.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","test","-s","/tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c6.out"],["env","-u","DATABASE_URL","-u","HD_API_KEY","-u","GEO_API_KEY","-u","HD_API_BASE_URL","-u","HDAPI_BASE_URL","-u","DB_BRIDGE_URL","-u","DB_FORCE_BRIDGE","-u","DB_ALLOW_BRIDGE_IN_PROD","-u","ENGINE_ENV","PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH","SAFE_MODE=1","ALLOW_NETWORK=0","APP_ENV=dev","LC_ALL=C","LANG=C","TZ=UTC","PYTHONDONTWRITEBYTECODE=1","python","-m","pytest","-q","-p","no:cacheprovider","-rs","tests/bodygraph/test_gates.py","tests/bodygraph/test_projection_gate_ingress.py","tests/bodygraph/test_resolve_compat_chart.py","tests/bodygraph/test_check_magic10_gate_readiness.py"]],"command_provenance":"QA Plan v1.2 CHECK 7 ac040-07-gate-ingress-offline (docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md); QA-90 collection v1.1 task T07 (docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.1.md); attempt 1; executed by Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner; normalizations: N-01, N-02, N-03, N-04, N-05, N-06, N-12","evidence_artifacts":["audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF09.3-Canon-HDE-Build-Checklist-Separation"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-29T01:53:21Z"}
+=== CONTEXT ===
+EXECUTOR: Claude Code (model claude-sonnet-5-5), local VS Code session fd43ebfd-1614-44e1-8ee5-6d03da21b70a (id taken from the session scratchpad path; no claude.ai session URL is available to this session), QA-100 QA/infra executor delegated by the Product Owner (Nathan); not Kronos, not the Product Owner
+VENUE: Product Owner-controlled Linux shell (host Linux 6.8.0-142-generic); not a GitHub Codespace.
+CHECKOUT: /home/nathan/hde-epic040-qa
+TESTED_SOURCE (git rev-parse HEAD as captured by T01 command 3): 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d
+INTERPRETER (readiness R1): Python 3.12.3
+SYS_EXECUTABLE (readiness R2): /tmp/hde-epic040-qa-v1.2/venv/bin/python
+CLOSED_POSTURE_AS_APPLIED (readiness R3):
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+PF_ANCHORS: PF09.3-Canon-HDE-Build-Checklist-Separation (HDE-SEPA005.3, HDE-SEPA005.5); PF10 HDE Build Notes, addendum 2.20 "HDE-EPIC040-PR05 — PR Work-Unit Lineage Review v1.0". PF10 is cited here in the body because the harness pf_refs pattern does not admit its title (Plan section 8).
+INPUTS: empty selection file created in the scratch directory (command 3); synthetic identifiers 00000000-0000-0000-0000-00000000000G (invalid) and 00000000-0000-0000-0000-000000000001; DATABASE_URL is unset by the CLOSED prefix (readiness R3: UNSET).
+MECHANICS: as recorded in the T01 body (inline shell function appends the literal command text to argv.txt and evaluates it with stdout, stderr and exit code captured; the command lines and the recording invocation were taken mechanically from the collection file). Command 13 ran as a background job of the tool harness with the same captures. No script file was created.
+=== COMMANDS ===
+c1 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m json.tool audit/qa/hde-epic040/qa_step_logs_manifest.json
+c2a exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python --version
+c2b exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -c "import sys, tools.qa.qa_harness, engine; print(sys.executable)"
+c2c exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -c 'for k in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do echo "$k=$(printenv "$k")"; done; for k in DATABASE_URL HD_API_KEY GEO_API_KEY HD_API_BASE_URL HDAPI_BASE_URL DB_BRIDGE_URL DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD ENGINE_ENV; do if printenv "$k" > /dev/null; then echo "$k=SET"; else echo "$k=UNSET"; fi; done'
+c3 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC touch /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/empty_selection.txt
+c4 exit=5: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/bodygraph/check_magic10_gate_readiness.py --selection-file /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/empty_selection.txt
+c5 exit=5: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/bodygraph/check_magic10_gate_readiness.py --user-id 00000000-0000-0000-0000-00000000000G
+c6 exit=5: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/bodygraph/check_magic10_gate_readiness.py --user-id 00000000-0000-0000-0000-000000000001
+c7 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -F READINESS_EMPTY_SELECTION /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c4.err
+c8 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -F READINESS_SELECTION_INVALID /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c5.err
+c9 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC grep -c -x -F READINESS_UNAVAILABLE /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c6.err
+c10 exit=1: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -s /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c4.out
+c11 exit=1: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -s /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c5.out
+c12 exit=1: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC test -s /tmp/hde-epic040-qa-v1.2/ac040-07-gate-ingress-offline/c6.out
+c13 exit=0: env -u DATABASE_URL -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u DB_BRIDGE_URL -u DB_FORCE_BRIDGE -u DB_ALLOW_BRIDGE_IN_PROD -u ENGINE_ENV PATH=/tmp/hde-epic040-qa-v1.2/venv/bin:$PATH SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider -rs tests/bodygraph/test_gates.py tests/bodygraph/test_projection_gate_ingress.py tests/bodygraph/test_resolve_compat_chart.py tests/bodygraph/test_check_magic10_gate_readiness.py
+c14 recording: tools.qa.qa_harness.record_check invoked once after this body was composed; it is the recording mechanism and is not listed in argv.txt
+=== OUTPUT ===
+--- c1 stdout (gate.out) ---
+{
+    "ac040-02-03-catalog-config": {
+        "check_id": "ac040-02-03-catalog-config",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log",
+        "status": "PASS"
+    },
+    "ac040-04-05-admission-identity": {
+        "check_id": "ac040-04-05-admission-identity",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log",
+        "status": "PASS"
+    },
+    "ac040-06-golden-comparison": {
+        "check_id": "ac040-06-golden-comparison",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log",
+        "status": "PASS"
+    },
+    "ac040-08-evidence-validators": {
+        "check_id": "ac040-08-evidence-validators",
+        "log_path": "audit/qa/hde-epic040/checks/ac040-08-evidence-validators/primary.log",
+        "status": "PASS"
+    },
+    "d0-discovery": {
+        "check_id": "d0-discovery",
+        "log_path": "audit/qa/hde-epic040/checks/d0-discovery/primary.log",
+        "status": "PASS"
+    },
+    "step-0b-doc-delta-capture": {
+        "check_id": "step-0b-doc-delta-capture",
+        "log_path": "audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log",
+        "status": "PASS"
+    }
+}
+--- c1 stderr ---
+--- c2a stdout ---
+Python 3.12.3
+--- c2a stderr ---
+--- c2b stdout ---
+/tmp/hde-epic040-qa-v1.2/venv/bin/python
+--- c2b stderr ---
+--- c2c stdout ---
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=C
+TZ=UTC
+DATABASE_URL=UNSET
+HD_API_KEY=UNSET
+GEO_API_KEY=UNSET
+HD_API_BASE_URL=UNSET
+HDAPI_BASE_URL=UNSET
+DB_BRIDGE_URL=UNSET
+DB_FORCE_BRIDGE=UNSET
+DB_ALLOW_BRIDGE_IN_PROD=UNSET
+ENGINE_ENV=UNSET
+--- c2c stderr ---
+--- c3 stdout ---
+--- c3 stderr ---
+--- c4 stdout ---
+--- c4 stderr ---
+READINESS_EMPTY_SELECTION
+--- c5 stdout ---
+--- c5 stderr ---
+READINESS_SELECTION_INVALID
+--- c6 stdout ---
+--- c6 stderr ---
+READINESS_UNAVAILABLE
+--- c7 stdout ---
+1
+--- c7 stderr ---
+--- c8 stdout ---
+1
+--- c8 stderr ---
+--- c9 stdout ---
+1
+--- c9 stderr ---
+--- c10 stdout ---
+--- c10 stderr ---
+--- c11 stdout ---
+--- c11 stderr ---
+--- c12 stdout ---
+--- c12 stderr ---
+--- c13 stdout ---
+........................................................................ [ 37%]
+........................................................................ [ 75%]
+...............................................                          [100%]
+191 passed in 1.22s
+--- c13 stderr ---
+=== PREDICATES ===
+E1 PASS: dependency gate (command 1, manifest read) exited 0; d0-discovery status in gate.out is PASS
+E2 PASS: readiness R1 printed [Python 3.12.3]; R2 printed [/tmp/hde-epic040-qa-v1.2/venv/bin/python]; R3 matched the closed posture (six pin values and nine UNSET lines)
+E3 PASS: commands 4, 5 and 6 (readiness refusals) exited 5, 5 and 5 (expected 5, 5 and 5)
+E4 PASS: commands 7, 8 and 9 (grep -c -x -F of READINESS_EMPTY_SELECTION, READINESS_SELECTION_INVALID and READINESS_UNAVAILABLE on the matching stderr captures) printed 1, 1 and 1 (expected 1, 1 and 1)
+E5 PASS: commands 10, 11 and 12 (test -s on the stdout captures of commands 4, 5 and 6) exited 1, 1 and 1 (expected 1, 1 and 1: empty stdout, no report)
+E6 PASS: command 13 (pytest group D, 4 files) exited 0; summary line [191 passed in 1.22s]; no failure or error reported; no skipped test reported in the -rs summary
+K predicates: none for this task.
+Step-log status attests the execution layer only; [K] predicates are evaluated by Kronos at QA-110.
+=== LIMITS ===
+Proof class: class 2 local/offline (no vendor), closed rails (Plan check 7). The readiness tool refuses at runtime without a database; group D passes. The open-rails refusal of the readiness command (RAILS_CLOSED_REQUIRED when SAFE_MODE=0) is not re-run: group D proves it, and rails never change inside a task (Plan check 7). No live Gate readiness against current rows is claimed: that requirement is deferred under Glow QA Guide section 3.3 (Plan section 2).
+Nonclaims: no QA PASS for the change, acceptance, closure, PF09 status change, deployment, token, new public route or flag, or PF edit follows from this task result (Plan section 12).
