@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-first-repair
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control, tool]
 gate_tier: 1
 closure:
@@ -1081,3 +1081,34 @@ by it (ITEM-03; §A risk 2).
   found none; `D21-C` says what a merge means.
 - `GTWPE-TARGET-ARCHITECTURE-20260929.md` on `main`, its section on model recommendations and strength
   assessments in the TW prompts (#564), read in full.
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+092926.1*, fetched live at the start of the mode (X1.2). The input is §P as Nathan approved it on
+2026-09-29, consolidated at `9051288` (`plan_approved_by`), checked out by X1.0a at `6d0c0c5`, the
+commit that records the approval.
+
+### Values, fixed at X1.1 (2026-09-29T23:45:29Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-09-29 |
+| «P» | 2026-09-29, `plan_approved_date` |
+| «V» | `092926.2`, fixed at X1.2: the GTWPE parent page's child pages titled `GTWPE-MGMT-10 — Manage the GTWPE — 092926.N` are 092926.1 alone |
+| «NEW» | Fixed at X1.6, below |
+| «M», «m» | Fixed at X3 |
+
+The clock starts at X1.1, 2026-09-29T23:45:29Z. The stop falls at 4 h of counted time (§P, *The stop rule, by time*).
+
+### Steps
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.0a | — | VERIFIED | At 2026-09-29T23:45:13Z: `git fetch --prune origin`; `origin/docs/20260929-modification-gtwpe-first-repair` exists, so the branch was checked out from it with `--no-track -B`, at `6d0c0c5`. The record has the heading *Starting point, and the merge rule*; `modification_validate.py` and the evidence `gtwpe_record_check.py` each exit 0 on it at `PLANNED` (1/1); the ten committed evidence files are present; the working tree is clean |
+| X1.1 | — | APPLIED | Status set to `EXECUTING`; «D» and «P» fixed above, at 2026-09-29T23:45:29Z |
+| X1.2 | — | VERIFIED | X1.0 (1): GTWPE-MGMT-10 092926.1, fetched live at about 23:45Z, edited 2026-09-29T04:38:37.656Z, its parent the GTWPE parent page. (2): the GTWPE parent page, fetched at the same time, edited 2026-09-29T20:11:58.508Z; C1, C2, C3 and C4 each occur once, by reading; its two child pages are GTWPE-MGMT-10 092926.1 and *GTWPE Target Architecture — Document-Writing Flow*, so none carries `GTWPE-MGMT-10 — Manage the GTWPE — 092926.2`, and «V» is fixed. (3): `git fetch origin main`: `main` at `ffb5922`; `docs/prompt_ecosystem_management/gtwpe/` has no entry; the validator's blob is `0cd1e5c` and the template's `8fc21ab`, as expected. (4): the PE Metaprompt 091426.1, fetched: the harness saved the result, a script read its edit time and title only, 2026-09-23T17:17:22.217Z, and the save was deleted (exit 0). (5): the copy X1.0a checked out has the heading *Starting point, and the merge rule* and `plan_approved_by` set; the evidence tool's sha256 is «H» |
+| X1.3 | PART-02 | APPLIED | At 2026-09-29T23:45:55Z: `mkdir -p docs/prompt_ecosystem_management/gtwpe` and the evidence `gtwpe_record_check.py` copied there. Its sha256 is «H», `5d3aa623…d179247f`; `git status --porcelain` lists only the record (modified) and `docs/prompt_ecosystem_management/gtwpe/`, which holds only the tool |
+| X1.4 | PART-02 | VERIFIED | From the branch, with `PYTHONDONTWRITEBYTECODE=1`: (1) the installed tool's `--selftest`: 17/17 selftest cases passed, exit 0. (2) `guard_proof.py` on the installed tool: 5/5 guard-proof runs held, exit 0. (3) The tool over `docs/ephemeral/modifications/`: exit 0; 2 GTWPE records, both ok (this record and the pilot's), and 4 others left to `modification_validate.py`. (4) `modification_validate.py --selftest`: 66/66, exit 0; over the directory: 6/6 passed, exit 0. No `__pycache__` was written |
