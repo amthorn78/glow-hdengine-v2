@@ -951,3 +951,48 @@ by it (ITEM-03; §A risk 2).
 - The PE Metaprompt 091426.1, read as §P's opening says, for its version rule, its identity lines,
   its publication rules and its authoring exclusion.
 - Nathan's `ANALYZE` approval of 2026-09-29, with Q1's option (a) and the stop rule by time.
+
+### Successor, 2026-09-29 — after the record's merge in #565, and Nathan's direction in #564
+
+*Written by MODE = PLAN after the plan was returned for approval, below the dated plan and not as a
+rewrite of it (GTWPE-MGMT-10, `PLAN`). It changes where `EXECUTE` starts, and nothing it does.*
+
+**What happened.** At 23:16:07Z the branch's pull request, amthorn78/glow-hdengine-v2#565, opened from
+the Claude Code UI, was merged as `ffb5922`, and the branch was deleted. `main` now holds this record at
+`PLANNED`, byte-identical to the pushed copy (blob `808726d`), and its ten evidence files. Merging
+preserves the record and approves nothing (`D21-C`): `plan_approved_by` is empty, no Notion page has
+changed, and `docs/prompt_ecosystem_management/gtwpe/` does not exist.
+
+**A correction to #565's description**, which the UI wrote and which is left as written. It says the
+merge "lands the first repair to GTWPE-MGMT-10" and that "all 43 phrases and 27 edits" were "verified
+on the new MGMT-10 page". No new page exists and nothing in Notion changed; the plan has 43 edits and
+75 phrases, and no edit has been applied. It also says PF10-AINEUTRAL-001 may not be on `main`; it is,
+at `fffadb5` (§A, TF-1).
+
+**Where `EXECUTE` starts.** The change prompt's find rule now finds the record on `main` and on no
+branch, so `EXECUTE` opens the branch anew. These replace §P's X1.0 (5) and add a step before X1.1:
+
+| # | Step | Check |
+|---|---|---|
+| X1.0a | `git fetch --prune origin`; `git checkout --no-track -B docs/20260929-modification-gtwpe-first-repair origin/main` | `git rev-parse origin/main:docs/ephemeral/modifications/MODIFICATION-20260929-gtwpe-first-repair.md` equals the local file's blob before Nathan's approval is recorded in it, and the ten evidence files are on `origin/main` |
+| X1.0 (5) | The branch, restarted at X1.0a, holds this record with `plan_approved_by` set once the approval is recorded, and the evidence tool's sha256 is «H» | As stated |
+
+X2's pull request is a new one: the branch's first, #565, is merged. Every reference in §P to "the
+branch's pull request" before X3 means that new one, in the *Failure path* and PO-5 too.
+
+**Drift since the plan.** `main` moved from `fffadb5` to `ffb5922`, through #564 (`9b23e07`) and #565.
+Neither touches a watched path, and X4.1's range `fffadb5..«M»` covers both.
+
+**Nathan's direction in #564**, recorded in `GTWPE-TARGET-ARCHITECTURE-20260929.md`: no technical-writing
+prompt carries a model, surface or effort recommendation, a workload profile or a strength assessment;
+the eight TW-ALPHA prompts lose their model-guidance blocks; TW-ASSESS-10 is retired; and this is "an
+item on the TW prompts' repair list". Checked against this plan:
+
+- **ITEM-14 (E41) stays consistent.** It says a repaired TW-ALPHA member keeps a human header its
+  approved edits do not touch, and that "removing it is a repair of its own, which only `ANALYZE`
+  scopes". That is the route by which Nathan's item is carried out, and it stops the removal from
+  happening, unscoped, inside another repair.
+- **Nothing in the 43 edits adds model, surface, effort, workload or strength text** (D7's scan).
+  E12's meter is the session's clock for its own stop rule, not advice on a model or a session.
+- **A new candidate, C7:** the TW repair Nathan has put on the list, removing the eight model-guidance
+  blocks and retiring TW-ASSESS-10. It is new scope, so it is a Modification of its own.
