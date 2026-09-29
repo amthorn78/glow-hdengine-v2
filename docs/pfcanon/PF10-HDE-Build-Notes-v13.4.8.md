@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.4.6**  
+**Version: v13.4.8**  
 Effective Date: Sep 29, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -217,7 +217,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.32 HDE-EPIC040-QA110 — QA Evidence Review v1.0 (tasks T01 to T10 of QA Plan v1.2)  
 * 2.33 PF10-OPENRAILS-001 — Mandatory Live Vendor Open-Rails Test in Every QA Plan Touching Production-Functional Surfaces  
 * 2.34 PF10-VENDOR-001 — Agents Run Live Vendor Calls When the Product Owner Directs; Vendor Configuration Comes from Environment Variables  
-* 2.35 HDE-EPIC040-QA110 — QA Evidence Review of task T11 open-rails-showcompat-vendor v1.0 (check 11 of QA Plan v1.2)
+* 2.35 HDE-EPIC040-QA110 — QA Evidence Review of task T11 open-rails-showcompat-vendor v1.0 (check 11 of QA Plan v1.2)  
+* 2.36 HDE-EPIC040-QA110 — QA Evidence Review of task T12 qa-closeout-deliverables v1.0 (check 12 of QA Plan v1.2; run complete)
 
 # **2\) Numbered Addenda**
 
@@ -3438,5 +3439,167 @@ Path proofs remain unproduced until check 12\. The QA-120 Report and the two def
 ### Relationship to existing PF10 guidance
 
 This addendum continues addendum 2.32, whose ruling LR-01, lessons K-01 to K-04, routing of unissued checks to QA-90 and carried register it relies on without superseding. Addendum 2.34 governs the authority for T11's execution, and addendum 2.33 governs the synthetic-data and retained open-rails conditions that T11 met. The addendum supersedes no PF10 addendum.
+
+## 2.36 HDE-EPIC040-QA110 — QA Evidence Review of task T12 qa-closeout-deliverables v1.0 (check 12 of QA Plan v1.2; run complete)
+
+Timestamp: 092926 16:13 (UTC)  
+Details: Records the QA-110 review of the QA-100 execution result for HDE-EPIC040 QA Plan v1.2 check 12, the close-out deliverables check: ACCEPT with per-task result PASS, evidence integrity of the final commit, the complete twelve-check run state, deviations and lesson K-07, and routing of the completed run to QA-120.
+
+### Approval and source record
+
+* Artifact: QA\_EVIDENCE\_REVIEW v1.0 for task T12, HDE-EPIC040-QA110-QA-EVIDENCE-REVIEW-T12, docs/ephemeral/HDE-EPIC040-QA110-qa-evidence-review-t12-v1.0.md. State MEMBER\_ACCEPT\_RUN\_COMPLETE. Change: EPIC HDE-EPIC040, Separation Pass 3\. Author: Kronos-23, continuing QA authority (session disposition RETAIN\_EXISTING; execution identity https://claude.ai/code/session\_01PnD4YNbFZStRQWZ7TCM6jV). Execution posture MANUAL\_PROMPT\_EXECUTION. Context conflict: NONE.  
+* Predecessors, none superseded: the review of tasks T01 to T10 (addendum 2.32; SHA-256 2d45e7f0d252a3009ffb9cc0fe3d51b9652a7929eeb798bd618f2c497ab34ac3) and the review of task T11 (addendum 2.35; SHA-256 c7abc4441a87d942c471ffcaa5388599e876263b3d26b5d740464200ac24ac64).  
+* Prompt: QA-110 — Review QA Evidence and Route the Next Action — 091426.1 (Notion 3db4590a05eb816984d1d34da0e08f40, page as of 2026-09-24T15:52:32.947Z). Ecosystem release GCFPE-20260914.1 (091426.1). Invocation binding: EPIC / HDE-EPIC040 / QA-110 / QA task collection v1.4 task T12 against QA-100 execution result T12 v1.0.  
+* Inputs and pins: QA Plan v1.2 (SHA-256 330ffadf7e83a99259780a0e73c63f7b7084ddd131cb9c460eb8c29f5d714010, immutable); QA Plan Review v1.4 (APPROVE by Isis-52, SHA-256 e2c3f7d4003dff36aa864e2a83556abf36cfa879a49dbbdfa2b227a53eb1c025); QA Audit v1.0 (SHA-256 1c561fea4668487005e4b857ccf54c024184898220176c62a61d037ca662e3df); task collection v1.4 (HDE-EPIC040-QA90-qa-task-collection-v1.4.md, task T12, attempt 1, SHA-256 06498acbb5576f2e389affbf19d46f3371aebae6783eac17c91e3c8565e8d499); execution result HDE-EPIC040-QA100-qa-execution-results-t12-v1.0.md (T12 COMPLETE, step-log PASS, SHA-256 f09b3cb423b70217549591987b754577fb310e4581a3ebb73cbd16d84774a02f); execution checkpoint HDE-EPIC040-QA100-checkpoint-t12-v1.0.md (SHA-256 fcbfa1588b426e0d45b2dc0c6e55e157640b523a2a8f34a500a44f71adafe42a). The SHA-256 of the collection, Plan, review v1.4, Audit and the T11 review were recomputed on main and equal the result's pins.  
+* Evidence of record: branch qa/hde-epic040-qa100-plan-v1.2-run-20260929, commit 787bb97b58b638d6b307cad6d76484c883c58aec on 380cf46fda95686ccf71f256521e63ca0eb5c9e1 (the Run B stream of ruling LR-01, addendum 2.32). Tested source 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d. Observed revision 0988c1624c6858fb676a7146038369d50cc1b51b (origin/main; pull request amthorn78/glow-hdengine-v2\#553, carrying the QA-100 records for T12, is merged).  
+* Venue: the Run B venue of LR-01 item 6: Product Owner-controlled Linux shell glow-devops-vps, checkout /home/nathan/hde-epic040-qa, virtual environment /tmp/hde-epic040-qa-v1.2/venv (Python 3.12.3).  
+* Canon relied on: HDE Build Notes v13.4.6 (SHA-256 34e7015f268a760bdc431b20011810cdc6d37865ccd4be979ec4427a74afe019; its complete difference from v13.4.5 is addendum 2.35, which states no new rule and supersedes no addendum; governing hits only in 2.32 and 2.35, with 2.34 and 2.29 relied on as recorded in those addenda); Glow QA Guide §3.1.2, §3.4.7 to §3.4.10, §4.3, §4.4.1 to §4.4.7, §9.2.15.5 to §9.2.15.8, §10.6, §10.8, §11.1; Plan Templates "Step-log header schema expectations (required; v2)"; HDE Schemas and Artifacts "Machine Evidence Mirror" and "MTIME-UTC-SEMANTICS"; HDE Governance §2.0.19; Change Process Guide §0.6.7 and §1.1.4; Technical Writing Best Practices "Truth and source fidelity". Repository instruction, not PF-Canon: AGENTS.md "Path-proof portability" (clone-local modification times are not a correctness input). docs/pfcanon/ at 0988c16 differs from 633ca5d, where the collection read it, only in that PF10 v13.4.6 replaces v13.4.5.
+
+### Retained decisions and requirements
+
+* Decision. T12 (Plan v1.2 check 12, attempt 1\) is ACCEPT, per-task result PASS. Execution layer: step-log PASS, E1 to E7 re-verified against the captured output. \[K\] layer: K1 to K5 and the step 8 proofs evaluated in the review, all PASS (Plan §12, two result layers). The decision covers one bounded check and is not whole-change QA PASS. No escalation: this check makes no product-behavior claim, and there is no invalid Plan, no scope or authority boundary, and no code or Ops remediation.  
+* What T12 establishes for the Run B stream at 787bb97: the integrity of the manifest, of the 12 primary logs and of the 14 supplementary files; DD-13 appended to both doc-delta surfaces; path proofs for all 12 primary logs, the manifest and both doc-delta surfaces; the governed evidence checks passing with the QA files present; and the coverage accounting that QA-120 uses. It makes no product-behavior claim, claims no ledger-bound manifest, and registers nothing in the Human Evidence Index or the Machine Mirror (Plan §8; Glow QA Guide §4.4.3).  
+* Inputs and matches. Task T12 of collection v1.4, attempt 1, check 12\. Command 2 lists 25 paths, all under audit/ (QA evidence of checks 1 to 11); git diff \--name-only 0db3f0ef 787bb97 lists 41 paths, all under audit/ (19 from checks 1 to 10, 6 from check 11, 16 from check 12). Dependency: check 12 needs every other check recorded with any status (Plan §11); the manifest the gate read holds 11 entries, all PASS (commands 3 to 5), each ACCEPT at QA-110. Attempt 1: before this execution no branch on origin held the check 12 directory or an HDE-EPIC040 path proof (at 380cf46 none exist under audit/qa/hde-epic040/ and none for the doc-delta surfaces); of the 15 remote branches only the Run B branch holds them now; 787bb97 is the first commit touching the check 12 directory; command labels 1 to 23, no r repeat. The collection pins PF10 v13.4.5; the QA-100 session and the review read v13.4.6 (result D-07).  
+* Commit. 787bb97b58b638d6b307cad6d76484c883c58aec, parent 380cf46, 2026-09-29T13:51:59Z, author and committer amthorn78 \<146120956+amthorn78@users.noreply.github.com\> (same identity as 345148b and 380cf46); the message is the one collection §4.8 step 5 states plus an attribution line; the remote branch head is 787bb97. It touches 19 paths (3 modified, 16 new), exactly the collection §4.8 permitted list, with SHA-256 and byte size of each equal to the result's §7 table (19 of 19):
+
+| Path under audit/ | Bytes | SHA-256 | Change |
+| :---- | :---- | :---- | :---- |
+| qa/hde-epic040/qa\_step\_logs\_manifest.json | 1,997 | 2bb4764f46bd5b362504f53f2894e9ed28b8f40e857d062cf663e1b4af2f1dfc | modified |
+| docdeltas/hde-epic040\_doc\_deltas.md | 3,585 | f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5 | modified |
+| qa/hde-epic040/00\_meta/doc\_deltas.md | 3,585 | f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5 | modified |
+| qa/hde-epic040/checks/qa-closeout-deliverables/primary.log | 64,249 | df03f7b6561d6182cdc59d095c8dc140ba8e3a048f5c31ee9842c7d3eaab35ff | new |
+| .../checks/d0-discovery/primary.log.path\_proof.txt | 221 | c96cd0da106cc3291d0a46169a052e557a9424ac9c18eb28e64f7db5b1d8f950 | new |
+| .../checks/step-0b-doc-delta-capture/primary.log.path\_proof.txt | 233 | ba39b79978f6097a9d3444aabf8df8c3de0b4a4a578ca6c6789a20a396433e72 | new |
+| .../checks/ac040-08-evidence-validators/primary.log.path\_proof.txt | 236 | 235ab44d5662aa97cc5a136a1c9b66202b00856c1b9458d958df3f5ace5802c3 | new |
+| .../checks/ac040-02-03-catalog-config/primary.log.path\_proof.txt | 234 | 8d6a18b3043f3b1092105435d9c38c56ba7d6da362e849c16038990e8e62bfb3 | new |
+| .../checks/ac040-04-05-admission-identity/primary.log.path\_proof.txt | 238 | ef0162926e9fabf5f57550ed8360a9b535aac71b3b7aa024b812388dd930ef5e | new |
+| .../checks/ac040-06-golden-comparison/primary.log.path\_proof.txt | 234 | aa5289cd3dda743095256d1e3b8e0be7c4fb796cdc8b59c4589c2d50c0f983b6 | new |
+| .../checks/ac040-07-gate-ingress-offline/primary.log.path\_proof.txt | 237 | d42413e85edec39e72395001dc14ac4fadf9407954bf4bce6f132d1cb9d826a8 | new |
+| .../checks/ac040-04-09-compat-cli-offline/primary.log.path\_proof.txt | 238 | 9e4cb76eabc816b200620b39ece20508dae75be0e8ad7b5a49685752f021fca4 | new |
+| .../checks/ac040-09-reader-http-in-process/primary.log.path\_proof.txt | 239 | 98741bca10074dab8ec839ff1aa81267e0f1dd8e1c837af7d41b7a0454c6a8fd | new |
+| .../checks/sec-reader-http-live/primary.log.path\_proof.txt | 228 | cdbc318d2cbc8f5ca62f8cbe18c279575b42bc582674486b4723258e4e07a45a | new |
+| .../checks/open-rails-showcompat-vendor/primary.log.path\_proof.txt | 236 | c594a518b108d23b83499e5af6b3c300b555e411a752a90eb993ddf0467747dd | new |
+| .../checks/qa-closeout-deliverables/primary.log.path\_proof.txt | 232 | b90010dd6d7f34bf7147c4f8732529f0d0be1c8c52497e5f6a7b268a493fa1e7 | new |
+| qa/hde-epic040/qa\_step\_logs\_manifest.json.path\_proof.txt | 214 | 446d58aca605fa1e6d1c4aa6fa6c1b83bd49184c9ed73877f3592d716337701e | new |
+| docdeltas/hde-epic040\_doc\_deltas.md.path\_proof.txt | 208 | 8f499fb31ca52486206c03aab776136c10b8d4b27fe5b1db8ed8fa5c13a39ea4 | new |
+| qa/hde-epic040/00\_meta/doc\_deltas.md.path\_proof.txt | 209 | 9227a6f208964912499a8b567d3b045c0aa7bb1fc3542c239e81d059baf740dd | new |
+
+* Manifest. Valid compact canonical JSON (sorted keys, compact separators, one final LF, no CR; re-serialization reproduces the stored bytes), 12 entries; the 11 earlier entries are unchanged from 380cf46; the new entry is {"check\_id":"qa-closeout-deliverables","log\_path":"audit/qa/hde-epic040/checks/qa-closeout-deliverables/primary.log","status":"PASS"}, its status equal to the header status (Glow QA Guide §4.4.3).  
+* Primary log. 64,249 bytes, 384 lines, LF-terminated, no CR. One canonical header line pf27.step\_log\_header.v2 with 14 keys: status PASS, empty status\_reason; exit\_code 0 equal to command 20's; command 23 argv lists with no empty part, each equal to the shell tokenization of the collection's command line; command\_provenance naming Plan check 12, collection v1.4 task T12, attempt 1, the executor identity, and N-01, N-02, N-03, N-05, N-06 and N-36 to N-45; captured\_env the six closed values (SAFE\_MODE 1, ALLOW\_NETWORK 0, APP\_ENV dev, LC\_ALL C, LANG C, TZ UTC); evidence\_artifacts 16 paths all present at 787bb97 (the log, both doc-delta surfaces and the 13 step-3 proofs); pf\_refs the PF06 and PF19 titles; both token arrays empty; timestamp\_utc 2026-09-29T13:50:25Z. The five Plan §8 sections appear in order (CONTEXT lines 2 to 8, COMMANDS 9 to 32, OUTPUT 33 to 345, PREDICATES 346 to 378, LIMITS 379 to 384). The 23 COMMANDS lines equal the collection's command lines byte for byte; every command exited 0 with empty stderr; the writer output equals the collection's writer text (W1 CONTEXT lines; W3's 17 observed-value lines, each reconstructible from the OUTPUT captures; W4's 13 lines).  
+* Doc-delta surfaces. Both files are 3,585 bytes and identical, each equal to its 2,867 bytes at 380cf46 followed by exactly the section command 13's writer composes (heading, source line, one item DD-13). DD-13's text is line 488 of the check 11 primary log, verbatim, the only DOC\_DELTA: line in the primary logs of checks 3 to 11\. DD-13 records a documentation conflict: HDE CLI/API Vendor Ref §3.7 names HDAPI\_BASE\_URL among the target facts of the CLI vendor smoke, while the same guide's §1, Glow Infrastructure §2.7 and Glow QA Guide §3.5.7 make HD\_API\_BASE\_URL canonical. Owner: the HDE CLI/API Vendor Ref maintainer; documentation drainage only.  
+* Path proofs. 15, each with the five fields path, size\_bytes, sha256, mtime\_utc, produced\_at\_utc, its path, size and SHA-256 equal to the file at 787bb97, timestamps of UTC shape. The 13 step-3 proofs (produced 13:48:00Z) equal byte for byte the 13 blocks command 18 printed; the two step-8 proofs (produced 13:50:37Z) bind the final primary log and the final manifest. In the step-3 proofs of checks 1 to 11 each mtime\_utc equals that check's header timestamp\_utc (01:31:42Z to 05:53:32Z), capture-time provenance only (HDE Schemas and Artifacts "MTIME-UTC-SEMANTICS").  
+* Chronology (2026-09-29, UTC). 13:48:00Z step-3 proofs produced; 13:50:25Z recording (header timestamp and step-8 proofs' mtime\_utc); 13:50:37Z finalization; 13:51:59Z evidence commit; 13:55:00Z result record.  
+* Independent re-run (reviewer aid, not QA evidence). In a scratch clone at 787bb97 outside the repository, under the CLOSED prefix of collection §4.4, Python 3.12.3: \_refresh\_path\_proof(..., check=True) passed for all 15 proofs; python tools/evidence/update\_evidence\_index.py \--check exited 0; python tools/evidence/validate\_evidence\_paths.py exited 0; the working tree stayed clean. A fresh checkout with its own modification times passes, consistent with AGENTS.md "Path-proof portability".  
+* Secret posture. T12 handles no secret. The nine vendor and database names appear only as names (in the command lines and in command 8's nine presence lines, all UNSET); no NAME=value pair other than SET or UNSET appears in the 19 files; a counts-only check of the review session's own HD\_API\_KEY, GEO\_API\_KEY, HDAPI\_BASE\_URL and DATABASE\_URL values found each in 0 of 19 files (adds assurance only if those are the values the QA console holds, which is unknown); strings of 32 or more token-shaped characters, digests aside, are identifiers only.  
+* Execution layer, all PASS. E1 dependency gate (command 3 exit 0; commands 4 and 5 printed 11); E2 readiness line (Python 3.12.3; command 7 exit 0, /tmp/hde-epic040-qa-v1.2/venv/bin/python; command 9 printed 15; command 8 printed the six closed values and the nine names UNSET); E3 step-1 digests captured (command 10 exit 0, empty stderr, 25 lines; command 11 printed 25 /tmp/hde-epic040-qa-v1.2/qa-closeout-deliverables/c10.out); E4 doc-delta surfaces byte-identical after the append (commands 12 to 14 exit 0; command 13 appended 1 and DD-13 open-rails-showcompat-vendor; command 15 printed f440538c… for both); E5 path proofs pass check mode (commands 16 and 17 exit 0; default\_produced\_at 2026-09-29T13:48:00Z, 13 proof paths, check mode passed 13); E6 governed graph with the QA files present (commands 19 and 20 exit 0; \[evidence-index\] env pins: ALLOW\_NETWORK=0,LANG=C,LC\_ALL=C,SAFE\_MODE=1,TZ=UTC); E7 coverage accounting written (command 22 exit 0 with 12 COVERAGE lines and one DEFERRED line; command 23 printed 12). No stop rule of collection §4.6 fired and no FAIL\_TOOLING or TOOLING\_BLOCKED condition of §4.7 held; PASS with empty reason follows the §4.7 precedence. Commands 1, 2, 15, 18 and 21 are attribution or capture only; command 1 printed 380cf46fda95686ccf71f256521e63ca0eb5c9e1; command 21 listed the two doc-delta surfaces as modified and the 13 step-3 proofs as untracked, nothing else.  
+* \[K\] layer, all PASS.  
+  * K1: the manifest whose digest command 10 recorded (f11fbdbc5a978772cd8ad0847a4341320939fbd17505843ef6426ed2d623bc96, 1,836 bytes, the manifest at 380cf46, equal to the T11 review's digest) holds exactly one entry for each of checks 1 to 11 of Plan §10 and §11, all recorded before this check.  
+  * K2: each of the 11 entries has check\_id equal to its key and log\_path audit/qa/hde-epic040/checks/\<check\_id\>/primary.log, the path each Plan block states.  
+  * K3: the 11 logs at 380cf46 range from 12,737 to 329,498 bytes; each ends with LF, no CR, has a 14-key v2 header with status PASS equal to the manifest; each SHA-256 equals command 10's digest and the digest recorded at that check's QA-110 acceptance. T12's own log meets the same predicate against the final manifest.  
+  * K4: the evidence\_artifacts of the 11 headers name 14 supplementary files, each once (the manifest named by d0-discovery; both doc-delta surfaces by step-0b-doc-delta-capture; the four golden-comparison files; http\_probes.jsonl; gunicorn\_server.log; the five check 11 files), exactly the 14 non-log files of command 10, each existing at 380cf46 with the digest command 10 captured and recorded at QA-110 acceptance. Of these 25 files only three changed between 380cf46 and 787bb97, each by T12's designed write: the manifest by the recording, the two doc-delta surfaces by the append; their new bytes are verified by E4, the writer-section check and their path proofs.  
+  * K5: command 22 printed 12 COVERAGE lines numbered 1 to 12 in Plan order, then the DEFERRED line naming the two deferred requirements of Plan §2; for checks 1 to 11 each line reproduces the manifest entry at 380cf46 and the header's evidence\_artifacts and records the attempt lineage (ruling LR-01 for checks 1 to 10, with check 3's attempt label unknown; the T11 review for check 11); line 12 names this check, attempt 1, and the step 3 and step 8 proofs.  
+  * Step 8: primary.log.path\_proof.txt records 64,249 bytes and df03f7b6…, equal to the log; qa\_step\_logs\_manifest.json.path\_proof.txt records 1,997 bytes and 2bb4764f…, equal to the final manifest; both produced at 13:50:37Z, after the 13:50:25Z recording, which was the last manifest change; both pass check mode in the scratch clone.
+
+#### Dispositions of the QA-100 deviations
+
+| ID | Disposition |
+| :---- | :---- |
+| D-01 | Accepted. Collection §4.1 designates the QA/infra executor, an operator session that is neither the Product Owner nor Kronos; its capability clause permits an automated agent because T12 makes no vendor call, handles no secret and connects to no database. The identity was captured to executor\_identity.txt and flows into the CONTEXT EXECUTOR: line and the header's command\_provenance, as lesson K-06 requires. Addendum 2.34 is not engaged |
+| D-02 | Accepted. The authorization of record is the Product Owner's answer "Yes, store it." to the restated question (branch, 3 modified and 16 new files, one pushed commit, no pull request), recorded before Part A. The outcome of the first, interrupted request was not relied on (Glow QA Guide §9.2.15.5). Storage is not a check (Plan §7.2); the commit matches collection §4.8 exactly |
+| D-03 | Accepted, with observation O-01. The executed command bytes equal the collection's (23 argv lists, 23 COMMANDS lines) and the writer output equals the collection's writer text; proof target, rails, evidence identity and predicates are unchanged. Same class as T11's E-01, accepted as a syntax-origin normalization (Glow QA Guide §3.4.7, §3.4.10) |
+| D-04 | Accepted. Committer identity equals that of 345148b and 380cf46; no configuration was changed for the commit |
+| D-05 | Accepted with one wording correction: the result says none of the nine names "appears in any file T12 produced", but they appear in the primary log in the command lines and command 8's presence lines, all UNSET; no value appears |
+| D-06 | Noted. One model was used throughout; no effect on identity, scratch state or evidence |
+| D-07 | Accepted. The review's own complete read of the v13.4.5 to v13.4.6 difference confirms the only addition is addendum 2.35, with no new rule and no constraint on check 12 |
+
+#### Observations and lesson K-07
+
+| ID | Observation and class | Effect | Correction for future collections |
+| :---- | :---- | :---- | :---- |
+| O-01, carried as lesson K-07 | The executor transcribed the 23 check commands and the Part A and Part C blocks into "one reviewed runner script" (result D-03). Collection §6 applies C040-09's interim treatment, which includes "no script file". The result records neither the script's path nor its role, although T11's result named its helper files (T11 D-05). provenance.txt, and so the header's command\_provenance, lists no executor normalization although collection C3 asks for "any executor normalization, with its reason"; D-03 is recorded only in the QA-100 result. Class: execution-recording deviation from the task; not a syntax or behavior matter | None on any executed byte, output or predicate. The executed commands are the collection's tracked-entrypoint and baseline commands byte for byte. The treatment exists so that no program written at run time evaluates a decisive predicate (C040-09; Glow QA Guide §3.4.8, which permits execution-only /tmp helper scripts); that purpose holds because each \[E\] result was re-derived from the raw captures and each \[K\] predicate evaluated in the review. Governed bytes are not edited (Glow QA Guide §4.3). No correction required, since the primary log alone reconstructs what ran (Glow QA Guide §4.4.6) | State how blocks are fed (pasted one at a time, or read from the collection by line number as T11's E-01 did); if an intermediate file is used, require the result to give its path and role and state that it evaluates nothing; have C3 take its normalization list from a captured file rather than free text |
+| O-02 | PF10 v13.4.6 formatting: in addendum 2.28 row RA-06 is still split at dev | test | local; in 2.35's "Deferred obligations and unresolved work" table the row reporting this defect is itself split at the same text, giving five cells in a three-column table; the file ends with the \<eof\> marker and no final newline. Class: PF10 publication formatting | None on the review; non-gating | For the Product Owner's PF10 publication: escape each literal pipe inside a table cell with a backslash. The review does not edit PF-Canon |
+
+Collection v1.4 applied lessons K-01 to K-06 and none recurred in T12 (K-01 no empty argv part; K-02 every block complete in itself and no stray character; K-03 setup checked origin before anything ran; K-04 the dry run went through the real recording and argv.txt holds only the 23 check commands; K-05 not applicable, T12 uses no vendor configuration; K-06 executor identity from a captured file). None of K-01 to K-07 changes a Plan objective, proof target, rails posture, evidence identity or predicate. All seven are carried to the QA-120 RCA.
+
+### Epic, task, and status effects
+
+* Run state: complete. Plan v1.2 has 12 checks, each with a task, an execution and a QA-110 decision ACCEPT and per-task result PASS. No selected check is unexecuted, no already-authored or dependency-waiting task remains, and no rerun is pending.
+
+| \# | check\_id | Task (collection) | Attempt lineage | Evidence commit | QA-110 decision |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| 1 | d0-discovery | T01 (v1.1) | Run A (e5b671c) executed first, as attempt 1; the Run B execution is the evidence of record and is not an authorized attempt 2 (LR-01) | 345148b | ACCEPT (addendum 2.32) |
+| 2 | step-0b-doc-delta-capture | T02 (v1.1) | As check 1 | 345148b | ACCEPT (2.32) |
+| 3 | ac040-08-evidence-validators | T03 (v1.1) | One recorded execution, Run B; attempt label unknown because Run A's T03 outcome is open (LR-01 items 2, 3, 7\) | 345148b | ACCEPT (2.32) |
+| 4 to 10 | ac040-02-03-catalog-config, ac040-04-05-admission-identity, ac040-06-golden-comparison, ac040-07-gate-ingress-offline, ac040-04-09-compat-cli-offline, ac040-09-reader-http-in-process, sec-reader-http-live | T04 to T10 (v1.1) | As check 1 | 345148b | ACCEPT (2.32) |
+| 11 | open-rails-showcompat-vendor | T11 (v1.3), result T11 v1.0 | Attempt 1 | 380cf46 | ACCEPT (addendum 2.35) |
+| 12 | qa-closeout-deliverables | T12 (v1.4), result T12 v1.0 | Attempt 1 | 787bb97 | ACCEPT (this addendum) |
+
+* Proof surfaces of the complete run at 787bb97 (Glow QA Guide §4.4.1). Every manifest status PASS; every header pf27.step\_log\_header.v2 with status PASS, empty reason, exit\_code 0, both token arrays \[\]; every captured\_env holds SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV, LC\_ALL, LANG, TZ with LC\_ALL and LANG C and TZ UTC throughout; every path proof has size and SHA-256 equal to its file. Per check: evidence\_artifacts count, timestamp\_utc (2026-09-29), primary log bytes and SHA-256 (checks 1 to 10 as recorded in addendum 2.32 and check 11 in addendum 2.35):
+
+| \# | check\_id | SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV | evidence\_artifacts | timestamp\_utc | Log bytes | Log SHA-256 | Path proof produced\_at\_utc |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| 1 | d0-discovery | 1, 0, dev | 2 | 01:31:42Z | 329,498 | f5b0f82c7974307bc52efac98232947726f534441fe07992ce384321aa7d5c1d | 13:48:00Z |
+| 2 | step-0b-doc-delta-capture | 1, 0, dev | 3 | 01:33:05Z | 15,951 | a64483b5460b75fbc4ce7028f238ff9e72a3f62c617c8e3361ab3d3c163d2c4b | 13:48:00Z |
+| 3 | ac040-08-evidence-validators | 1, 0, dev | 1 | 01:46:26Z | 28,542 | 170171e1bbdb61b45c5650207425eabb63fea83597a2d0088023096ef1f11aed | 13:48:00Z |
+| 4 | ac040-02-03-catalog-config | 1, 0, dev | 1 | 01:48:22Z | 12,806 | 6e622d117b9cbb9dc96845e61b34572c9d667bf62ed9d900a9cbebfaef65b5f6 | 13:48:00Z |
+| 5 | ac040-04-05-admission-identity | 1, 0, dev | 1 | 01:50:07Z | 14,284 | ffa2a4629db34c415554f32ed88365641471f2995ac440c5b688b8b7262a45cc | 13:48:00Z |
+| 6 | ac040-06-golden-comparison | 1, 0, dev | 5 | 01:52:28Z | 36,195 | 0b8cda3488141932d45205c9285620ac1545b78c93a6a5a322f218890a6c2e73 | 13:48:00Z |
+| 7 | ac040-07-gate-ingress-offline | 1, 0, dev | 1 | 01:53:21Z | 19,946 | fea547063e4b5f2476736e0b0e1f9f35bb6b2a1ad51cab97de4db6c4e3b2758e | 13:48:00Z |
+| 8 | ac040-04-09-compat-cli-offline | 1, 0, dev | 1 | 01:54:22Z | 14,003 | 2c69c50a0520ab0f5b2a5e7d7ed94fa745ff10120bade979f127fec6a682ac87 | 13:48:00Z |
+| 9 | ac040-09-reader-http-in-process | 1, 0, dev | 1 | 01:55:14Z | 12,737 | 6e53c15e3e0b496c62457887ccc39b9629c1305dfcd830bc9b6964e315452854 | 13:48:00Z |
+| 10 | sec-reader-http-live | 1, 0, dev | 3 | 02:00:29Z | 73,940 | 97e37e38b75d793bef7b57d47bb024070bc7366df718edb1303d0c378022d960 | 13:48:00Z |
+| 11 | open-rails-showcompat-vendor | 0, 1, dev | 6 | 05:53:32Z | 64,998 | 1e4341e27e1ce47fe172546581ac4737e2dcb9745f82bac42f0001ac6f5f4674 | 13:48:00Z |
+| 12 | qa-closeout-deliverables | 1, 0, dev | 16 | 13:50:25Z | 64,249 | df03f7b6561d6182cdc59d095c8dc140ba8e3a048f5c31ee9842c7d3eaab35ff | 13:50:37Z |
+
+Further bindings: the manifest 1,997 bytes, 2bb4764f46bd5b362504f53f2894e9ed28b8f40e857d062cf663e1b4af2f1dfc, produced 13:50:37Z; each doc-delta surface 3,585 bytes, f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5, produced 13:48:00Z.
+
+* Artifact versions (under docs/ephemeral/, prefix HDE-EPIC040-): collections v1.0 (Plan v1.0 checks 1 to 10, from the revoked approval, not carried forward per the Alpha state record v1.0), v1.1 (T01 to T10), v1.2 (T11, never executed, superseded for T11 by v1.3), v1.3 (T11), v1.4 (T12); results v1.0 superseded by v1.1 (T01 to T10), with T11 and T12 each a v1.0 result; reviews v1.0 (T01 to T10), T11 v1.0 and T12 v1.0. Evidence: the Run B branch at 787bb97 is the one evidence stream; the Run A branch qa/hde-epic040-qa100-plan-v1.2 at e5b671c is preserved and non-canonical; the 06b04a9 evidence of Plan v1.0 is not carried forward.  
+* Route. With the whole approved run complete and every decision ACCEPT, the QA-110 decision rules continue to QA-120 — Create Final QA Report and RCA — 091426.1, in the continuing Kronos-23 session. QA-120 reconciles the run against the complete Plan and issues the Report and the separate RCA. The whole-change verdict and the conclusion for each criterion AC040-01 to AC040-09 are QA-120's; the review makes neither.  
+* Working state: QA-110 complete for T12; checkpoint docs/ephemeral/HDE-EPIC040-QA110-checkpoint-t12-v1.0.md; handoff docs/ephemeral/HDE-EPIC040-QA110-handoff-to-qa120-t12-v1.0.md; resume point QA-120.  
+* No PF09 task or subtask closure determination, status recommendation or status action is made in the source; no PF09 row-closure record arises.
+
+### Canon-conflict register
+
+C040-01 to C040-10 are carried unchanged from collection v1.4 §6, which carried the T11 review's register; the register as recorded in addendum 2.32 (C040-01 to C040-09) and addendum 2.35 (C040-10) governs them. The only change is to C040-10's history, which is now also recorded in addendum 2.35. The review adds no entry and changes no decision. C040-09's interim treatment governed T12: read-only git observations are for attribution only, never a PASS gate; tracked harness APIs are invoked through python \-c; no script file; no decisive evaluator is written at run time; O-01 records the executor's runner script against that treatment. PF10 references in the register use the v13.3.9 numbering, which v13.4.2 to v13.4.6 keep for 2.2 to 2.28. Affected requirements are unchanged: C040-09 AC040-08 and AC040-09 evidence attribution (K040-REQ-012, K040-REQ-013); C040-10 the vendor-backed part of AC040-04 and AC040-09 (Plan check 11\) and PO Q-2. A proposal recorded in the register is not approval.
+
+### Required canon drainage
+
+Every drainage item is unperformed: DD-01 to DD-13 to their named maintainers (documentation drainage only, never a blocker for a step verdict, Plan §13; DD-13 to the HDE CLI/API Vendor Ref maintainer); C040-05 to C040-10 to their named maintainers as recorded in addendum 2.32 and addendum 2.35. This addendum performs none of them and establishes no PF-Canon drainage.
+
+### Deferred obligations and unresolved work
+
+| Item | Owner | Status |
+| :---- | :---- | :---- |
+| QA-120 Report and separate RCA for the complete run (Plan §13; Glow QA Guide §9.2.15.5, §9.2.15.6) | Kronos-23 at QA-120 | Next |
+| Deferred requirements of Plan §2: live Gate readiness and live DB Reader success; not checks and no command ran for them (the DEFERRED line of command 22); Plan §13 has the Report state them as not supported because blocked by the environment and deferred, not as failures | QA-120 | Open |
+| Index and Mirror registration of the HDE-EPIC040 QA evidence (QA Audit finding QA50-F01); the manifest is not ledger-bound (Glow QA Guide §4.4.3); the "indexed evidence" element of Glow QA Guide §9.2.15.6 is absent for these files | Evidence owner, through the whole-change IA PR route (Plan §14) | Follow-up; not part of check 12 |
+| Evidence of record is on the Run B branch at 787bb97, not on main; any pull request and merge | Product Owner | Open |
+| Run A branch qa/hde-epic040-qa100-plan-v1.2: preserved, non-canonical, never merged into main as the QA root | Product Owner (merge authority) | Standing |
+| Run A's T03 outcome and T10 receipt (LR-01 item 7\) | Product Owner | Open, non-gating; unchanged |
+| Which execution environments hold the vendor configuration (a 2.34 deferred obligation) | Product Owner | Open, non-gating |
+| .env.example lacks GEO\_API\_KEY (T11 D-08; a 2.34 deferred obligation) | Implementation lane | Documentation drift; for the RCA |
+| T11 D-07: 2.34 rule 5 against the Plan v1.2 posture that unsets HDAPI\_BASE\_URL | Kronos-23, QA-120 RCA | No vendor task remains in Plan v1.2; carried |
+| Lessons K-01 to K-07; D-13 and the duplicate-execution deviation of the T01 to T10 review | Kronos-23, QA-120 RCA | Carried |
+| PF10 v13.4.6 formatting (O-02) | Product Owner (PF10 publication) | Observed, non-gating; not edited by the review |
+| Repository persistence of GCFPE\_PROMPT\_USES | The authorized repository writer under an installed docs/changes/GCFPE\_PROMPT\_PROVENANCE.md procedure | PENDING / NON\_GATING; no such procedure at 0988c16 |
+
+Closed since the T11 review: the selection of check 12, its execution and this review; and the path proofs, unproduced until check 12 and now existing for all 12 primary logs, the manifest and both doc-delta surfaces.
+
+### Scope boundaries and nonclaims
+
+* The ACCEPT covers one bounded check. The completeness of the run is not QA PASS for the change: the whole-change verdict belongs to QA-120, and closure belongs to Isis through the closure receiver.  
+* The review establishes no acceptance, closure, PF09 status movement, PF-Canon drainage, deployment, release activation, token satisfaction, ledger-bound manifest, close pack, or Index or Mirror publication.  
+* T12 makes no product-behavior claim.  
+* QA-110 executed no task, made no vendor call, changed no approved artifact or evidence, repaired nothing and produced no PF10 addendum; its re-run of read-only checks happened in a scratch clone outside the repository, and nothing was written to the QA checkout or the evidence branch.  
+* Merging the pull request that carries the review record preserves the record and approves nothing (D21-C).
+
+### Evidence anchors
+
+* Review: docs/ephemeral/HDE-EPIC040-QA110-qa-evidence-review-t12-v1.0.md; provenance GCFPE-USE-HDE-EPIC040-QA-110-20260929-03 (capture time 2026-09-29T15:36:56Z; requirements AC040-01 and AC040-08 evidence integrity of the QA run, and D11, as mapped by Plan v1.2 check 12); earlier uses GCFPE-USE-HDE-EPIC040-QA-100-20260929-03, GCFPE-USE-HDE-EPIC040-QA-90-20260929-03, GCFPE-USE-HDE-EPIC040-QA-110-20260929-02, GCFPE-USE-HDE-EPIC040-QA-100-20260929-02, GCFPE-USE-HDE-EPIC040-QA-90-20260929-02, GCFPE-USE-HDE-EPIC040-QA-90-20260929-01, GCFPE-USE-HDE-EPIC040-QA-110-20260929-01, GCFPE-USE-HDE-EPIC040-QA-100-20260929-01, GCFPE-USE-HDE-EPIC040-QA-90-20260928-01.  
+* Evidence: branch qa/hde-epic040-qa100-plan-v1.2-run-20260929, commit 787bb97b58b638d6b307cad6d76484c883c58aec; the 19 digests in the table above.
+
+### Relationship to existing PF10 guidance
+
+This addendum continues addenda 2.32 and 2.35, whose ruling LR-01, lessons K-01 to K-06, register and routing it relies on without superseding. Addendum 2.34 governs the authority for T11, which the review does not re-decide; addendum 2.34 is not engaged by T12. The addendum supersedes no PF10 addendum.
 
 \<eof\>
