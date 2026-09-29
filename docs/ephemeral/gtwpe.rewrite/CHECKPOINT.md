@@ -26,11 +26,11 @@ decision on P1r and the repair round it started.
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1, P1r and its repair round: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
+| External writes | **Notion, P2(b) under G2 (§12.2): the GTWPE parent page and GTWPE-MGMT-10, created, and the catalog updated, each read back.** Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1, P1r and its repair round: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
 | Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023. Open there: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **New from P1r, for PE37 to enter:** §11.2's rows: P1r-1 to P1r-5, full review 1's five required findings (four fixed, and RF-1 fixed with a new defect), and full review 2's R2-1, open |
-| Next action | **P2(b), then P3's `ANALYZE`** (§12.1). W1 stops at the first point where Nathan must approve, or at twice a phase's estimate |
+| Next action | **P3's `ANALYZE`** (§12.1). P2(b) is done (§12.2). W1 stops at the first point where Nathan must approve, or at twice a phase's estimate |
 
 ## 2. Authority used
 
@@ -827,3 +827,55 @@ anything.
 v13.4.4, with addenda 2.32 and 2.33 on QA; `modification-template.md` and `modification_validate.py`,
 which gained `tool` (#548). The pilot's A0 reports them, since the catalog's checked-through commit
 starts at `0db3f0e`. A canon-first search of the two new PF10 addenda found no prompt-ecosystem rule.
+
+### 12.2 P2(b): the parent page and GTWPE-MGMT-10, published and read back
+
+All three writes follow design §12.2's order, and each was read back before the next. Before the
+first write, searches for "GTWPE" and "Glow Technical Writing Prompt Ecosystem" found no such page;
+the only "GTWPE" pages are the TypeSafe usage-log entries. A scoped search found no page carrying
+GTWPE-MGMT-10's title.
+
+| # | Write | Result | Readback |
+|---|---|---|---|
+| 1 | Create *GTWPE — Glow Technical Writing Prompt Ecosystem* under *AI Prompts / HDE TW* (`3c74590a05eb8176baf8cb59f1631f3c`), with a catalog block that lists no member | Page `3ea4590a05eb818c915bdfd3d150c44b` | Exact title; parent HDE TW; the catalog's four headings, with no member, pin or commit. Edited 2026-09-29T04:33:53.656Z |
+| 2 | Create *GTWPE-MGMT-10 — Manage the GTWPE — 092926.1* under the parent | Page `3ea4590a05eb817093b3feea624aa24a` | Exact title; parent the GTWPE page; identity lines `GTWPE-MGMT-10 — Manage the GTWPE — 092926.1` and `Prompt Version: 092926.1`; 24 headings in order, from *Manage the GTWPE* to *Relation to the PE Metaprompt*; five tables; R2-1's fix in A0 (a) and X4; no page ID, URL, model or effort text in the body. Edited 2026-09-29T04:38:37.656Z |
+| 3 | Update the catalog: GTWPE-MGMT-10's row; the lineage pins, each with the page the register selects beside it (R2-1's fix); the checked-through commit `0db3f0e` | The parent page | The rows equal the ones written; GTWPE-MGMT-10 appears as the page's one child. Edited 2026-09-29T04:39:19.987Z |
+
+**How the body was authored.** The approved design's §11 was the brief. The PE Metaprompt was used in
+Ecosystem Update mode under the approved design, with its general rules and the kickoff's four
+workarounds. Its GCFPE overlay did not apply (design §11.10; decision record, the successor of
+2026-09-23). Its identity rule gives the first two lines (D-5), and it sets the version as the
+execution date with `.1`. It gives external references by directory and versionless name, not page
+ID, and bars model and workload content. It requires a title search before creation and a whole-page
+fetch after. The source body's structure and wording are kept where §11.9 does not customize them. That includes the
+first step, *Consult*, and the readiness predicates and interaction-cost formula, which the design's
+A-step table leaves implicit. The PE's rule for a `PF10_BUILD_NOTES_ADDENDUM` was checked and does not
+apply: GTWPE-MGMT-10 records approvals of Modifications, not of a material change to an approved HDE
+plan. PL1 also says "Name every Notion write the plan will make", which design §12.2 requires ("its
+approved plan lists them").
+
+**R2-1's fix, as applied.** The catalog records, beside each pin, the page the register selects and
+its edit time. For GCFPE-MGMT-10 those are the proposed body, pinned at 2026-09-24T11:00:24.691Z,
+and the live `091426.1` page (`3db4590a05eb81d1bb64ebcb3ca8eb54`), 2026-09-24T15:38. For the PE
+Metaprompt both are `3db4590a05eb8174be35d9e35acb3f77`, 2026-09-23T17:17:22.217Z. A0 (a) reports a
+trigger only when the register's selection differs from the recorded selected page, or either
+recorded page was edited after its recorded time. X4 records both again and moves a pin only when a
+Modification adopts a new source page. The fix does not flag a new page with the stable name that is
+neither selected nor pinned. Reviewer A named that gap (R2A-1), and design §16's correction does not
+cover it; it stays a known limit.
+
+**What was read** (`D22` condition 5):
+
+| Read | What came back | Handling |
+|---|---|---|
+| PE Metaprompt 091426.1, `3db4590a05eb8174be35d9e35acb3f77`, as of 2026-09-23T17:17:22.217Z | 76,125 characters, too large to return inline. The harness saved them to `…/tool-results/mcp-Notion-notion-fetch-1790656265109.txt` | Read by JSON parse in six character slices, 0 to 76,125, ending at `</page>`. Never hashed, compared or copied. Deleted with `rm` (exit 0) once the read was done |
+| The source body, `3e34590a05eb811b93d2da9b4ef8106d`, as of 2026-09-24T11:00:24.691Z, the pinned time | Inline, complete, ending at `</page>` | No file made |
+| The GCFPE register, `3d24590a05eb81ce942ad994cfca9fa1`, a control page | 91,078 characters, saved to `…/tool-results/mcp-Notion-notion-fetch-1790656195234.txt` | The *Current selection* section and the current-membership lines only, by script. Deleted (exit 0) |
+| Searches: "GTWPE", "Glow Technical Writing Prompt Ecosystem", "PE Metaprompt", "GCFPE-MGMT-10", and the scoped title search | Titles, paths and times, with highlights off | No file made |
+| The two pages W1 wrote, each fetched back | Inline | No file made |
+
+`tool-results/` now holds only its two files from 2026-09-28. This session's transcript holds the
+two bodies, and it is left to teardown.
+
+**Cost so far:** P2, from 04:24:54Z to 04:39:30Z, 647,365 tokens on plan v1.2 §16.3's measure, against
+about 1M.
