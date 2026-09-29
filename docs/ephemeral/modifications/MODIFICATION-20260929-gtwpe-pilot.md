@@ -26,6 +26,7 @@ reviews:
     date: 2026-09-29
     required_open: 0
     outcome: "By W1, read-only: the validator exits 0 on a copy at ANALYZED; A0 and A3 reproduce; the front matter and every table are well formed. No required defect. Design §13.2 gives ANALYZE no full review"
+item_count_at_approval: 1
 items:
   - id: ITEM-01
     statement: "TW-MGMT-10 no longer tells its author to use a PE Metaprompt feature that no longer exists, and nothing else it instructs changes."
@@ -39,8 +40,8 @@ parts:
     after: []
 request: "Start the pilot: run GTWPE-MGMT-10 on the one-instruction repair of the TW management prompt named in the design. Stop at the first point where Nathan must approve."
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-09-29: \"Nathan approves the pilot's analysis (2026-09-29). The fix updates the current-version note on all four pages.\" This rules Q1: option (b)"
+analyze_approved_date: 2026-09-29
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
