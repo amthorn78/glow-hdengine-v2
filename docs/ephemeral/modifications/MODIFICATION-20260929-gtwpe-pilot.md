@@ -52,8 +52,8 @@ request: "Start the pilot: run GTWPE-MGMT-10 on the one-instruction repair of th
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-09-29: \"Nathan approves the pilot's analysis (2026-09-29). The fix updates the current-version note on all four pages.\" This rules Q1: option (b)"
 analyze_approved_date: 2026-09-29
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-09-29: \"Nathan approves the pilot's plan (2026-09-29), including that you make its eight Notion changes from this Claude session. The older rule that Notion changes are made in ChatGPT does not apply to this work; record it on the change prompt's repair list.\" This settles PO-1, the execution surface for W1 to W8"
+plan_approved_date: 2026-09-29
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
