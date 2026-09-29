@@ -148,8 +148,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-09-29: \"Nathan approves the first repair's analysis (2026-09-29). Q1: when a TW prompt is repaired, the change prompt updates every page that names TW's current release, as in the pilot. Continue to PLAN, stop at Nathan's plan approval, and apply the stop rule by time as the analysis proposes.\" This rules Q1: option (a), and sets time as the stop rule's meter for this run"
 analyze_approved_date: 2026-09-29
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-09-29: \"Nathan approves the first repair's plan as consolidated at 9051288 (2026-09-29), including Notion writes W1 to W4 from this session, the X1.12 readback worker, the pull request at X2 and the record's pull request at X5, a failure record's pull request after the merge as an X5 exception, and risks K-1 to K-21. Candidate C9 (stating the merge rule in the body) waits for a later Modification. Proceed to EXECUTE; stop when you need Nathan's merge at X3.\""
+plan_approved_date: 2026-09-29
 supersedes: ""
 spawned_from: MODIFICATION-20260929-gtwpe-pilot
 shares_package_with: []
