@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.4.5**  
+**Version: v13.4.6**  
 Effective Date: Sep 29, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -216,7 +216,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.31 PF10-HDR-001 — Retirement of the Human Operator Header Model-Advice Review  
 * 2.32 HDE-EPIC040-QA110 — QA Evidence Review v1.0 (tasks T01 to T10 of QA Plan v1.2)  
 * 2.33 PF10-OPENRAILS-001 — Mandatory Live Vendor Open-Rails Test in Every QA Plan Touching Production-Functional Surfaces  
-* 2.34 PF10-VENDOR-001 — Agents Run Live Vendor Calls When the Product Owner Directs; Vendor Configuration Comes from Environment Variables
+* 2.34 PF10-VENDOR-001 — Agents Run Live Vendor Calls When the Product Owner Directs; Vendor Configuration Comes from Environment Variables  
+* 2.35 HDE-EPIC040-QA110 — QA Evidence Review of task T11 open-rails-showcompat-vendor v1.0 (check 11 of QA Plan v1.2)
 
 # **2\) Numbered Addenda**
 
@@ -3299,5 +3300,143 @@ When each listed document is next revised, the superseded scope is removed or co
 ### **Relationship to existing PF10 guidance**
 
 The addendum is consistent with addendum 2.33 (PF10-OPENRAILS-001), whose mandatory open-rails test is a live vendor call with synthetic data only, and it leaves 2.33's retained conditions unchanged. Addendum 2.27 records an Ops execution by an automated session under Product Owner delegation. The addendum amends no PF10 addendum.
+
+## 2.35 HDE-EPIC040-QA110 — QA Evidence Review of task T11 open-rails-showcompat-vendor v1.0 (check 11 of QA Plan v1.2)
+
+Timestamp: 092926 12:49 (UTC)  
+Details: Records the QA-110 review of the QA-100 execution result for HDE-EPIC040 QA Plan v1.2 check 11, the live vendor-backed showcompat check: ACCEPT with per-task result PASS, the authority for its agent-executed live vendor calls under addendum 2.34, deviations and collection defects K-05 and K-06, the added canon-conflict entry C040-10, and the run state, which remains incomplete with check 12 unissued.
+
+### Approval and source record
+
+* Artifact: QA\_EVIDENCE\_REVIEW v1.0 for task T11, HDE-EPIC040-QA110-QA-EVIDENCE-REVIEW-T11, docs/ephemeral/HDE-EPIC040-QA110-qa-evidence-review-t11-v1.0.md. State MEMBER\_ACCEPT\_RUN\_INCOMPLETE. Change: EPIC HDE-EPIC040, Separation Pass 3\. Author: Kronos-23, continuing QA authority (session disposition RETAIN\_EXISTING; execution identity https://claude.ai/code/session\_01PnD4YNbFZStRQWZ7TCM6jV). Execution posture MANUAL\_PROMPT\_EXECUTION. Context conflict: NONE.  
+* Predecessor: none for T11. The review of tasks T01 to T10 (addendum 2.32; HDE-EPIC040-QA110-qa-evidence-review-v1.0.md, SHA-256 2d45e7f0d252a3009ffb9cc0fe3d51b9652a7929eeb798bd618f2c497ab34ac3) is not superseded.  
+* Prompt: QA-110 — Review QA Evidence and Route the Next Action — 091426.1 (Notion 3db4590a05eb816984d1d34da0e08f40, page as of 2026-09-24T15:52:32.947Z). Ecosystem release GCFPE-20260914.1 (091426.1). Invocation binding: EPIC / HDE-EPIC040 / QA-110 / QA task collection v1.3 task T11 against QA-100 execution result T11 v1.0.  
+* Inputs and pins: QA Plan v1.2 (SHA-256 330ffadf7e83a99259780a0e73c63f7b7084ddd131cb9c460eb8c29f5d714010, immutable); QA Plan Review v1.4 (APPROVE by Isis-52, SHA-256 e2c3f7d4003dff36aa864e2a83556abf36cfa879a49dbbdfa2b227a53eb1c025); QA Audit v1.0 (SHA-256 1c561fea4668487005e4b857ccf54c024184898220176c62a61d037ca662e3df); task collection v1.3 (HDE-EPIC040-QA90-qa-task-collection-v1.3.md, task T11, attempt 1, SHA-256 c4ae999f9a38b7bcfabb66ac92ae542a1754682debd17fbd87c18fcc936de16b); execution result HDE-EPIC040-QA100-qa-execution-results-t11-v1.0.md (T11 COMPLETE, step-log PASS, SHA-256 0c884e8f6e56fdf959c68ec77860faef60ac1d2899494231745a3594e0dfe397); execution checkpoint HDE-EPIC040-QA100-checkpoint-t11-v1.0.md (SHA-256 60855b9aaf0c2162a2a6c469d665394d9efd524dcd4dee0f7f804c45d0374f2a). All pins equal the files on main.  
+* Evidence of record: branch qa/hde-epic040-qa100-plan-v1.2-run-20260929, commit 380cf46fda95686ccf71f256521e63ca0eb5c9e1 on parent 345148b7fce2482349828f897abbc0d7d12fe7fa (the Run B stream of ruling LR-01 in addendum 2.32), committed 2026-09-29T05:54:18Z. Tested source 0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d. Observed revision 633ca5d340110d8058b795c366f6041bd0747929 (origin/main at review; pull request amthorn78/glow-hdengine-v2\#551, carrying the QA-100 records for T11, is merged).  
+* Venue: the Run B venue that LR-01 item 6 requires: Product Owner-controlled Linux shell, checkout /home/nathan/hde-epic040-qa, virtual environment /tmp/hde-epic040-qa-v1.2/venv (Python 3.12.3).  
+* Canon relied on: HDE Build Notes v13.4.5 (addendum 2.34 read in full; 2.33, 2.32 and 2.29 relied on; whole-document search for QA-110, T11, check 11, open-rails-showcompat-vendor, directed agent, delegat, vendor call, evidence review, two executions, attempt 2, per-task result, QA-120, check 12, qa-closeout-deliverables and environment variable, with governing hits only in 2.32, 2.33 and 2.34); Glow QA Guide §3.1.2, §3.3, §3.4.7 to §3.4.10, §3.5.5 to §3.5.7, §4.3, §4.4.1 to §4.4.7, §9.2.15.5, §10.6, §10.8, §11.1; Plan Templates "Execution authority (normative)", "Step-log header schema expectations (required; v2)" and "Proof-class and controlled vendor-smoke boundary (required when applicable)"; HDE Governance §3.4 and §9.1 "Ops tasks"; Change Process Guide "Ops tasks"; HDE CLI/API Vendor Ref §3.7 and §7.3.9; Glow Infrastructure §2.7; Technical Writing Best Practices "Truth and source fidelity". docs/pfcanon/ on main at 633ca5d differs from f4be532, where the QA-100 session read it, only in that PF10 v13.4.5 replaces v13.4.4 by adding addendum 2.34.
+
+### Retained decisions and requirements
+
+* Decision. T11 (Plan v1.2 check 11, attempt 1\) is ACCEPT, per-task result PASS. The execution layer (step-log PASS, every \[E\] predicate re-verified against the captured output) and the \[K\] layer (K1, K2 and K3 evaluated in the review) both pass (Plan §12, two result layers). The decision covers one bounded check and is not whole-change QA PASS. No escalation: no behavior defect, no invalid Plan, no open authority boundary once addendum 2.34 governs, and no code or Ops remediation.  
+* Inputs and matches. The result names task T11 of collection v1.3, attempt 1, check 11, and its pins equal the files on main. Dependencies d0-discovery and ac040-04-09-compat-cli-offline are PASS in the manifest (10 of 10 PASS at commands 9 and 10\) and each is ACCEPT in the review of T01 to T10. Attempt 1: no execution of check 11 existed on origin before this one; the evidence commit is the first to touch the check 11 directory; no rerun and no operator-error repeat. The tested source 0db3f0ef is confirmed by command 2, which lists only the 19 QA evidence files of checks 1 to 10\.  
+* Evidence integrity of commit 380cf46. The commit adds 6 paths and modifies the manifest, 7 paths in all, each on collection v1.3 §4.8's permitted list; SHA-256 and byte size of each file equal the result's §7 table:
+
+| Path under audit/qa/hde-epic040/ | Bytes | SHA-256 |
+| :---- | :---- | :---- |
+| qa\_step\_logs\_manifest.json | 1,836 | f11fbdbc5a978772cd8ad0847a4341320939fbd17505843ef6426ed2d623bc96 |
+| checks/open-rails-showcompat-vendor/primary.log | 64,998 | 1e4341e27e1ce47fe172546581ac4737e2dcb9745f82bac42f0001ac6f5f4674 |
+| checks/open-rails-showcompat-vendor/vendor\_request.txt | 2,312 | 328508d8a020e84d6d74078331c7221233556ee69b389893160057073e92c4a9 |
+| checks/open-rails-showcompat-vendor/vendor\_run\_ab.json | 3,303 | e33377d7eab26ed1693b6ebbe5166b88cca5c38f300999c94a30db057c1fa564 |
+| checks/open-rails-showcompat-vendor/vendor\_run\_ba.json | 3,303 | e33377d7eab26ed1693b6ebbe5166b88cca5c38f300999c94a30db057c1fa564 |
+| checks/open-rails-showcompat-vendor/reader\_v1\_ab.json | 330 | 103df389283c7e577ebd78d377eb49fe6b7d014b732389577ea9efbbe1de32d0 |
+| checks/open-rails-showcompat-vendor/reader\_v1\_ba.json | 330 | 103df389283c7e577ebd78d377eb49fe6b7d014b732389577ea9efbbe1de32d0 |
+
+The manifest is valid JSON with sorted keys and 11 entries; the 10 earlier entries are unchanged from 345148b; the new entry has check\_id open-rails-showcompat-vendor, the full log\_path, and status PASS equal to the header status (Glow QA Guide §4.4.3). The primary log is 64,998 bytes, LF-terminated, no CR; header pf27.step\_log\_header.v2 with 14 keys, status PASS, empty status\_reason, exit\_code 0 equal to command 26's exit code, 28 argv lists with no empty part, command\_provenance naming the actual executor of commands 4 to 28 and E-01, captured\_env the six vendor-posture values (SAFE\_MODE 0, ALLOW\_NETWORK 1, APP\_ENV dev, LC\_ALL C, LANG C, TZ UTC), evidence\_artifacts the log and five deliverables, pf\_refs the PF05, PF19 and PF07 titles, both token arrays empty, timestamp 2026-09-29T05:53:32Z; body has the five Plan §8 sections in order and a PREDICATES EXECUTION DEVIATION: line. The 28 recorded argv lists equal collection v1.3's command lines byte for byte, which verifies E-01. vendor\_request.txt (29 lines, presence-only SET or UNSET) was written at 05:51:11Z, before the vendor commands began (05:52:14Z).
+
+* Secret safety. Commands 21 and 22 exited 1 with 89 and 93 path:count lines, every count 0; D2 printed 1, 1, END; Q1 and Q2 were not run; no quarantine directory exists; a sweep of the 7 files for token-shaped strings of 32 or more characters (hex digests excluded) found only identifiers. A supplementary counts-only check of the review session's own HD\_API\_KEY and GEO\_API\_KEY values found each in 0 of 7 files; it adds assurance only if those are the keys the QA-100 run used, which is unknown.  
+* Execution layer, all PASS. E1 recording and readiness preflight (command 3 exit 0; command 4 printed 2); E2 readiness line (Python 3.12.3; command 6 exit 0); E3 preflight matrix (command 8 printed 15; command 10 printed 10; commands 11 to 13 exit 0; command 11 printed 52be45584acbaa327da2d1cac724857dcdc999ca8c7a8f65108427942a4afe96 catalog/manifest.json, the SHA-256 of catalog/manifest.json at the tested source); E4 exact commands (command 16 printed 2); E5 both vendor runs (commands 14 and 15 exit 0 with empty stderr; command 17 printed vendor\_run\_ab.json 3303, vendor\_run\_ba.json 3303, reader\_v1\_ab.json 330, reader\_v1\_ba.json 330); E6 byte identity (commands 18 and 19 exit 0); E7 secret scan (commands 21 and 22 exit 1, every count 0); E8 parse (commands 23 to 26 exit 0); R restore, which does not change the status (command 28 printed HD\_API\_KEY=UNSET, GEO\_API\_KEY=UNSET, HD\_API\_BASE\_URL=UNSET). No stop rule triggered: D1 matched every expectation, D2 printed 1, 1, END, W2 printed W2\_WRITTEN, C1 printed c14.rc=0, c15.rc=0, c21.rc=1, c22.rc=1, 2, END. The request limit held: commands 14 and 15 each ran once, two CLI invocations in all (collection §5). Inputs were the synthetic L-51 tuples (QA50-S01; addendum 2.33).  
+* \[K\] layer, all PASS.  
+  * K1: vendor\_run\_ab.json and vendor\_run\_ba.json are canonical JSON (sorted keys, compact separators, one final LF, no CR; re-serialization reproduces the stored bytes); have exactly the keys categories, config\_id, pair\_key, release\_id, schema and signals, with schema magic10\_compat\_result.v1 and config\_id m10-channel-state-v1.0.0; release\_id equals the command 11 digest; pair\_key is a string, signals has 20 items, categories has 10 items in the order harmony, heat, communication, alignment, comfort, consistency, expansion, creativity, drive, balance; the two files are byte-identical (E6).  
+  * K2: reader\_v1\_ab.json and reader\_v1\_ba.json have exactly six keys (categories, eligible, idempotence\_hash, meta, reader\_version, release\_id), reader\_version v1, categories \[{"band":"Cool","id":"harmony"}\], no JSON number at any depth, are 330 bytes, end with one LF and are canonical.  
+  * K3: the captured stderr of commands 14 and 15 is empty, so the LIMITS statement that the exact vendor resource path, auth-header family and adapter status are "inferred, not exercised, unless the captured stderr shows it" is true of this run. The "Exercised" statement holds: with \--source vendor, showcompat resolves each birth-only party through resolve\_compat\_chart with no local lookup, and \_resolve\_stored reaches \_acquire\_dry\_run, the live acquisition through the vendor client (engine/cli/main.py; engine/bodygraph/resolver.py). Exit 0 under open rails therefore means both tuples were resolved through HumanDesignAPI, the pair was evaluated, and the canonical output and Reader v1 dumps were emitted.
+
+#### Authority of the delegated execution (D-01)
+
+* Facts. Commands 4 to 28, the displays and W2 were executed by the QA-100 session as the Product Owner's delegated agent, on the Product Owner's direction during the session. Plan v1.2 §7.1 and collection v1.3 §4.1 assign them to the Product Owner in person. The vendor configuration came from the environment the Product Owner set (D-02). The command text was taken mechanically from the collection (E-01).  
+* Canon at execution (v13.4.4). Against delegation: Glow QA Guide §3.5.7 and HDE CLI/API Vendor Ref §3.7 barred an automated agent from executing the vendor call. For delegation: HDE Governance §3.4 and §9.1, the Change Process Guide "Ops tasks" passage and Plan Templates "Execution authority (normative)" provide for Product Owner-delegated execution but are written for Ops tasks, and the Change Process Guide states "Delegation does not convert Ops into PR work or QA work". Collection v1.3 §7 recorded the tension; no text then in canon authorized a directed agent in a QA check.  
+* Canon now (v13.4.5, addendum 2.34). Addendum 2.34 covers "open-rails HumanDesignAPI calls in QA checks": an automated session agent executes a live vendor call when the Product Owner directs it, and "PO-only" names the authorizing and accountable principal. It supersedes the bars of Glow QA Guide §3.3 and §3.5.7, HDE CLI/API Vendor Ref §3.7 and the other listed passages for that scope. A plan that assigns vendor commands to the Product Owner in person remains a valid record, and a directed agent executes its commands unchanged. It names T11 and records the authority for that execution, leaving the per-task result to the QA-110 review.  
+* Same controls (2.34 rule 3), verified from the evidence. The exact commands (byte-identical to the collection); the rails per command (VENDOR prefix for commands 4 to 26; CLOSED prefix for commands 1 to 3 and the recording); the request limit and stop checks (D1, D2, W2's gate, C1); synthetic inputs, secret scan and quarantine (zero findings), presence-only redaction, and the evidence contract (7 files).  
+* Secret posture (2.34 rule 6). Passing the environment to the product process is not handling a plaintext secret. No value was printed, recorded or persisted.  
+* Conclusion. The delegated execution of T11 is authorized under current PF10; no scope or authority boundary remains open and no escalation arises. Two fixed-text lines in the evidence still name the Product Owner as executor (K-06); the accurate executor is recorded in the header's command\_provenance, the EXECUTION DEVIATION: line, result D-01 and addendum 2.34. Governed bytes are not edited (Glow QA Guide §4.3).
+
+#### Dispositions of the QA-100 deviations
+
+| ID | Disposition |
+| :---- | :---- |
+| D-01 | Accepted under addendum 2.34; the same controls were applied unchanged |
+| D-02 | Accepted. The environment held HD\_API\_KEY, GEO\_API\_KEY and HD\_API\_BASE\_URL once the Product Owner set them, and HDAPI\_BASE\_URL was unset. The read \-rs lines were skipped, as collection §5 Part B allows. This matches 2.34 rules 4 and 5\. DATABASE\_URL was removed from every vendor command by the VENDOR prefix (command 7\) |
+| D-03 | Accepted. Command 27 unset the keys in the shell that ran commands 23 to 28 and command 28 confirmed it. Later shells regain them from the environment the Product Owner configured; the closed posture of every later command comes from the CLOSED prefix, which unsets the nine names per command (Plan §5.2, §7.5). Constraint carried to check 12 |
+| D-04 | Accepted. Evidence storage is not a check (Plan §7.2). The identity of the Run B commit was passed with git \-c for one command; no configuration was changed |
+| D-05 | Accepted. /tmp helper files (Glow QA Guide §3.4.8), not evidence and not committed; .c13\_src was present during the scans and scanned 0 |
+| D-06 | Confirmed as a defect of the collection: K-05. No effect on the execution |
+| D-07 | Noted. Plan v1.2 §5.2 unsets HDAPI\_BASE\_URL in the CLI-local vendor posture; addendum 2.34 rule 5 says "A rails posture does not remove the only base URL the environment holds", so for any later vendor task under Plan v1.2 whose environment holds only the alias, 2.34 governs. No effect on T11, where HD\_API\_BASE\_URL was set; no vendor task remains in Plan v1.2. Carried to the QA-120 RCA |
+| D-08 | Noted. .env.example lacks GEO\_API\_KEY: documentation drift recorded by 2.34 as a deferred obligation owned by the implementation lane. It is not a DOC\_DELTA: line in T11's primary log, so check 12's doc-delta append does not collect it; carried to QA-120 |
+| D-09 | Noted. A model switch during the session did not change the session's identity, its scratch state or the evidence |
+| E-01 | Accepted as a syntax-origin normalization (Glow QA Guide §3.4.10); the executed bytes equal the collection's bytes |
+
+#### Defects in the QA-90 task collection v1.3 (K-05, K-06)
+
+| ID | Defect and class | Effect | Correction for future collections |
+| :---- | :---- | :---- | :---- |
+| K-05 | Part B told the Product Owner to "Set the three vendor keys", and §4.1 treated HD\_API\_BASE\_URL as a secret entered with read \-rs. The base URL is configuration, not an API key: the product reads two credentials (HD\_API\_KEY, GEO\_API\_KEY) and takes the base URL from HD\_API\_BASE\_URL or its alias. Task content, conservative, not a safety defect | None; the lines were skipped because the environment held the values (D-02) | Treat the base URL as configuration, use the environment's vendor configuration with a presence preflight, and never ask for values to be typed (2.34 rules 4, 5 and 7\) |
+| K-06 | The executor of the vendor commands was fixed text: W1's CONTEXT line VENDOR\_COMMAND\_EXECUTOR: Nathan (Product Owner), PO-only, commands 4 to 28, and the executor: and authorization: lines command 13 writes into vendor\_request.txt. When the Product Owner directed an agent to execute, these three stored lines misstated the executor. Evidence design | Three stored lines misstate the executor; the header's command\_provenance, the EXECUTION DEVIATION: line, result D-01 and 2.34 state it accurately; governed bytes are not edited (Glow QA Guide §4.3); the evidence stays reconstructible from the primary log (Glow QA Guide §4.4.6) | Record the executor of each part from a captured identity file, as recorder\_identity.txt already does, not as fixed text |
+
+K-01 to K-04 (addendum 2.32) were applied in collection v1.3 and none recurred in T11. The collection's repairs V-01 to V-05 were exercised: the scans ran before the restore, D2 printed the three-line summary, W2's gate held, and C1's gate read was mechanical. None of K-01 to K-06 changes a Plan objective, proof target, rails posture, evidence identity or predicate. All six are carried to the QA-120 RCA.
+
+### Epic, task, and status effects
+
+* Run state: Plan v1.2 has 12 checks. Checks 1 to 10 are ACCEPT (addendum 2.32) and check 11 is ACCEPT (this addendum). Check 12 qa-closeout-deliverables is unissued, has no task and has no Product Owner selection: NOT RUN. No already-authored task remains, so nothing is reusable through QA-100 and the run cannot go to QA-120.  
+* Route: QA-90 — Create Bounded QA Execution Task — 091426.1 (Kronos-23), for check 12, on the Product Owner's selection. QA-90 converts only Product Owner-selected steps, following the routing addendum 2.32 records for unissued checks.  
+* Dependency: check 12 needs every other check recorded (Plan §11); that now holds, the manifest having 11 entries.  
+* Constraints on the QA-90 task for check 12: it runs in the Run B checkout and stores on the Run B branch, whose head is now 380cf46 (LR-01 item 6); its \[K\] manifest predicate counts exactly one entry for each of checks 1 to 11; its doc-delta append collects T11's DOC\_DELTA: line (primary log line 488: the base-URL variable name in HDE CLI/API Vendor Ref §3.7), the only DOC\_DELTA: line in the primary logs of checks 3 to 11 at 380cf46, so it becomes DD-13 (Plan check 12 step 2); its path proofs cover T11's primary log with the ten earlier ones (Plan check 12 step 3); every command runs under the closed posture with the CLOSED prefix, because the vendor configuration is held in the QA console's environment (D-03; 2.34 rule 4); lessons K-01 to K-06 apply.  
+* Working state: QA-110 complete for T11; checkpoint docs/ephemeral/HDE-EPIC040-QA110-checkpoint-t11-v1.0.md; handoff docs/ephemeral/HDE-EPIC040-QA110-handoff-to-qa90-t11-v1.0.md; resume point QA-90 for Plan check 12\.  
+* No PF09 task or subtask closure determination, status recommendation or status action is made in the source; no PF09 row-closure record arises.
+
+### Canon-conflict register
+
+C040-01 to C040-09 are carried unchanged from Plan v1.2 §2.3, through collection v1.3 §6 and the review of T01 to T10; the register as recorded in addendum 2.32 governs them. This review adds C040-10, which records a matter of this change already decided by its owner in PF10 and is not a local resolution. PF10 references in the register use the v13.3.9 numbering, which v13.4.2 to v13.4.5 keep for 2.2 to 2.28. A proposal recorded in the register is not approval.
+
+| Field | C040-10 |
+| :---- | :---- |
+| Classification | CANON\_CONFLICT (vendor execution authority) |
+| Sources and clauses | Barring an automated agent from the vendor call or requiring the Product Owner as executor: Glow QA Guide §3.3 and §3.5.7; HDE CLI/API Vendor Ref §3.7 and §7.1.8a; HDE Governance §3.4 ("Controlled vendor-backed no-user validation") and §11.1; HDE Mechanics Guide §1.1 and §17.9.4; Plan Templates "Artifact execution boundary" and "Proof-class and controlled vendor-smoke boundary"; HDE Build Checklist Fermentation, HDE-FERM008 and HDE-FERM008.2. Versus Product Owner-delegated execution: HDE Governance §3.4 ("HDAPI v2 open-rails vendor proof posture") and §9.1; Change Process Guide "Ops tasks"; Plan Templates "Execution authority (normative)", which are written for Ops tasks |
+| Decision and status | Product Owner decision, 2026-09-29, recorded as addendum 2.34 PF10-VENDOR-001 (v13.4.5): a directed agent executes live vendor calls, including open-rails HumanDesignAPI calls in QA checks; "PO-only" names the authorizing principal; vendor configuration comes from environment variables. The listed bars are superseded for that scope |
+| Reviewer, artifact, time | Product Owner; addendum 2.34 (Timestamp 092926 06:04 UTC); direction given in the QA-100 session that executed T11 |
+| Interim treatment | PF10 2.34 governs; T11's delegated execution is authorized |
+| Drainage target and owner | The passages in 2.34's superseded-passage table; their maintainers; pending (2.34: "Drainage into the listed documents is unperformed") |
+| Full history | Observed as a canon tension in collection v1.3 §7 on 2026-09-29 and not entered then because no decision of the change depended on it; it became decisive when the Product Owner directed the QA-100 session to execute T11's vendor commands (result D-01) and was decided the same day by addendum 2.34; entered by this review |
+| Affected requirements | The vendor-backed part of AC040-04 and AC040-09 (Plan check 11\) and PO Q-2 |
+
+C040-09's affected requirements (AC040-08 and AC040-09 evidence attribution, K040-REQ-012, K040-REQ-013) are unchanged.
+
+### Required canon drainage
+
+Every drainage item is unperformed. C040-10's target is the set of passages in addendum 2.34's superseded-passage table, with their maintainers. The C040-01 to C040-09 targets are those recorded in addendum 2.32. This addendum performs none of them and establishes no PF-Canon drainage.
+
+### Deferred obligations and unresolved work
+
+| Item | Owner | Status |
+| :---- | :---- | :---- |
+| Selection of Plan check 12 qa-closeout-deliverables | Product Owner, at the QA-90 invocation | Open; the run cannot complete without it |
+| Drainage of the passages addendum 2.34 supersedes (C040-10) | Their maintainers | Pending, per 2.34 |
+| Which execution environments hold the vendor configuration | Product Owner (2.34 deferred obligation) | Open, non-gating for check 12, which makes no vendor call |
+| .env.example lacks GEO\_API\_KEY (D-08) | Implementation lane (2.34 deferred obligation) | Documentation drift; carried to QA-120 |
+| D-07: 2.34 rule 5 against the Plan v1.2 posture that unsets HDAPI\_BASE\_URL | Kronos-23, QA-120 RCA | No vendor task remains in Plan v1.2; carried |
+| Lessons K-01 to K-06, D-13 and the duplicate-execution deviation of the T01 to T10 review | Kronos-23, QA-120 RCA; K-01 to K-06 also applied at QA-90 for check 12 | Carried |
+| Run A's T03 outcome and T10 receipt (LR-01 item 7\) | Product Owner | Open, non-gating; unchanged |
+| Run A branch qa/hde-epic040-qa100-plan-v1.2: preserved, non-canonical, never merged into main as the QA root | Product Owner (merge authority) | Standing |
+| Run B branch: the one evidence stream, now checks 1 to 11, to which check 12 appends; any pull request and merge | Product Owner | Open |
+| PF10 v13.4.5 formatting: in addendum 2.28, row RA-06 is still split at dev | test | local; the file ends with the \<eof\> marker and no final newline; the index lists 2.33 and 2.34 | Product Owner (PF10 publication) | Observed, non-gating; not edited by the review |
+| Repository persistence of GCFPE\_PROMPT\_USES | The authorized repository writer under an installed docs/changes/GCFPE\_PROMPT\_PROVENANCE.md procedure | PENDING / NON\_GATING; no such procedure at 633ca5d |
+
+Path proofs remain unproduced until check 12\. The QA-120 Report and the two deferred requirements of Plan §2 (live Gate readiness; live DB Reader success) remain outstanding.
+
+### Scope boundaries and nonclaims
+
+* The ACCEPT covers one bounded check and is not whole-change QA PASS.  
+* The review establishes no acceptance, closure, PF09 status movement, PF-Canon drainage, deployment, release activation, token satisfaction, Index or Mirror publication, or broad HumanDesignAPI v2 conformance.  
+* The vendor calls prove only what check 11 exercises (collection v1.3 §5): live vendor-backed CLI resolution, canonical stdout, AB↔BA identity, a bands-only Reader v1 dump and the binding to the admitted release. They do not prove the exact vendor resource path, auth-header family, rate-limit or error handling, mapped-cache persistence, Reader v2 over HTTP or any deployed service.  
+* QA-110 executed no task, made no vendor call, changed no approved artifact, repaired nothing and produced no PF10 addendum; addendum 2.34 is the Product Owner's canon action. The review makes no claim for check 12\.
+
+### Evidence anchors
+
+* Review: docs/ephemeral/HDE-EPIC040-QA110-qa-evidence-review-t11-v1.0.md; provenance GCFPE-USE-HDE-EPIC040-QA-110-20260929-02 (capture time 2026-09-29T06:41:04Z; requirements AC040-04 and AC040-09 vendor-backed part and PO Q-2, as mapped by Plan v1.2 check 11); earlier uses GCFPE-USE-HDE-EPIC040-QA-100-20260929-02, GCFPE-USE-HDE-EPIC040-QA-90-20260929-02, GCFPE-USE-HDE-EPIC040-QA-90-20260929-01, GCFPE-USE-HDE-EPIC040-QA-110-20260929-01, GCFPE-USE-HDE-EPIC040-QA-100-20260929-01, GCFPE-USE-HDE-EPIC040-QA-90-20260928-01.  
+* Evidence: branch qa/hde-epic040-qa100-plan-v1.2-run-20260929, commit 380cf46fda95686ccf71f256521e63ca0eb5c9e1; the seven digests in the table above.  
+* Product code read for K3: engine/cli/main.py (showcompat, \_resolve\_party); engine/bodygraph/resolver.py (resolve\_compat\_chart, \_resolve\_stored, \_acquire\_dry\_run).
+
+### Relationship to existing PF10 guidance
+
+This addendum continues addendum 2.32, whose ruling LR-01, lessons K-01 to K-04, routing of unissued checks to QA-90 and carried register it relies on without superseding. Addendum 2.34 governs the authority for T11's execution, and addendum 2.33 governs the synthetic-data and retained open-rails conditions that T11 met. The addendum supersedes no PF10 addendum.
 
 \<eof\>
