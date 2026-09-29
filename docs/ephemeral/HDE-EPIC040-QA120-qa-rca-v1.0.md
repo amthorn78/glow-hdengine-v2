@@ -277,7 +277,7 @@ Owner of PF19D-001 to PF19D-004: the Glow QA Guide maintainer.
 | ID | Document and section | Delta | Tag | Why PF19 is not the home, and evidence |
 | --- | --- | --- | --- | --- |
 | OPFD-001 | PF07-Canon-Glow-Infrastructure §2.4 | Give QA Codespaces a complete rails pair and an inventory that matches the console | CONSISTENCY | Environment inventories are owned by Glow Infrastructure (RCA v1.1 D-2, D-3; overlaps DD-01) |
-| OPFD-002 | PF06-Canon-Change-Process-Guide §0.4.1.2 "Location" | Reconcile the governed placement of the QA RCA summary with HDE Build Notes 2.29's storage of change-process RCAs in `docs/ephemeral/`. State whether a `docs/ephemeral/` RCA suffices at the Close Gate or must be copied by the close-pack writer | CONSISTENCY | The location rule is owned by the Change Process Guide. This RCA exists only in `docs/ephemeral/` (§11) |
+| OPFD-002 | PF06-Canon-Change-Process-Guide §0.4.1.2 "Location" | Reconcile the governed placement of the QA RCA summary with HDE Build Notes 2.29's storage of change-process RCAs in `docs/ephemeral/`. State whether a `docs/ephemeral/` RCA suffices at the Close Gate or must be copied by the close-pack writer | CONSISTENCY | The location rule is owned by the Change Process Guide. This RCA exists only in `docs/ephemeral/` (§13) |
 
 Prompt-level causes (R1 to R6, RC-1, P-1, P-2) are not PF-Canon deltas. They are routed to GCFPE-MGMT-10 through the Alpha feedback brief and the QA-90 handoff RCA.
 
