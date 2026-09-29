@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-pilot
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -16,7 +16,7 @@ override:
   overrides: []
   reason: ""
 interaction_cost_predicted: 7
-interaction_cost_actual:
+interaction_cost_actual: 8
 estimate:
   plan: "about 1.5 h and 1.5M tokens: §P, a dry run, and one full review by two reviewers"
   execute: "about 1 h and 0.5M tokens: the new page, the three selection writes, the catalog, and their readbacks; with Q1's option (b), about 1.25 h and 0.65M, for the writes and readbacks on three more pages"
@@ -41,7 +41,7 @@ items:
   - id: ITEM-01
     statement: "TW-MGMT-10 no longer tells its author to use a PE Metaprompt feature that no longer exists, and nothing else it instructs changes."
     source: "TW-MGMT-10-ANALYSIS-20260924.md F6, its first half; PE-METAPROMPT-TEST-20260924.md D8; GTWPE design v1.2 §13.2, PART-02"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     name: "Remove TW-MGMT-10's pointer to the PE Metaprompt's retired complexity profile"
@@ -831,3 +831,114 @@ as Nathan approved it on 2026-09-29, with his ruling on the execution surface (`
 | X1.7 | PART-01 | APPLIED | **W3**, `update_content`, `allow_async: false`, three replacements: E1, E2 and E3 as §P gives them, with «V» = `092926.1`. Returned synchronously, no task |
 | X1.8 | PART-01 | VERIFIED | Fetched whole, edited 2026-09-29T20:10:20.073Z. (1) the title is exact; (2) the parent is the selection page; (3) the first nonblank line equals the title, and the second is `Prompt Version: 092926.1`; (4) `090826.2` does not occur; (5) neither `five-dimension` nor `complexity` occurs; (6) `supported identity/header scheme` and `human guidance non-operative` each occur once, joined by single spaces where E3 cut; (7) the eight level-2 headings, in D2's order; (8) the model-guidance block, with its markers and its `Approximate workload` line, before the first heading. The last section's final sentence is present |
 | X1.9 | PART-01 | VERIFIED | Scoped to the selection page, highlights off: exactly one page carries the new title, `3ea4590a05eb81d09391f5e87fcaebe0`. 090826.2 (`3d54590a05eb81a8b55afabc42298df9`) still shows 2026-09-08 |
+| X2 | — | APPLIED | The record at `EXECUTING`, with X1's rows, committed as `df6565b` and pushed to `docs/20260929-modification-gtwpe-pilot` at 2026-09-29T20:11:12Z. `modification_validate.py` exited 0 (1/1 passed), and the branch's blob equals the local file, `0dd8da31`. No pull request, as the plan says |
+| X3 | — | NOT_APPLICABLE | Nothing waits on a merge or an install |
+| X4.1 | — | VERIFIED | «M» is `74f6cc96b2a2c06e70bff8f9adfefde0b811071f`, «m» `74f6cc9`. The command lists four commits, each a PF10 update and none touching `AGENTS.md` or `docs/prompt_ecosystem_management/`: `633ca5d`, which the plan expected, then `4c96970`, `917909c` and `c48a79a`. Each has a trigger finding below, with its search. None contradicts the GTWPE |
+| X4.2 | PART-01 | VERIFIED | **W4**, the GTWPE catalog. Pre-read, edited 2026-09-29T04:39:19.987Z: *CAT-OLD* once. `update_content`, `allow_async: false`: *CAT-OLD* to *CAT-NEW*, with «M», «m» and «D» as fixed. Returned synchronously, no task. Readback, edited 2026-09-29T20:11:58.508Z: *CAT-NEW* once and *CAT-OLD* absent, and the whole body equals the pre-read with that one replacement, so the members table, the lineage pins and the approved-design line are as the pre-read showed them |
+| X4.3 | PART-01 | VERIFIED | **W5**, the selection page. Pre-read, edited 2026-09-08T07:15:27.010Z: *S-OLD* once, as the first line, directly above *H-OLD*, once; `Selected release — TW-ALPHA-20260929.1` absent; the seven rows other than TW-MGMT-10's equal *ROWS*' first seven; 11 headings; 7 child pages, «NEW» among them. `update_content`, `allow_async: false`, the two replacements in one call. Returned synchronously, no task. Readback, edited 2026-09-29T20:14:15.580Z: the status line is *S-NEW*; directly below it, *SECTION*, its first seven rows equal to *ROWS*' and its eighth linking «NEW» at 092926.1; directly below that, `## Historical selected release — TW-ALPHA-20260908.1`. The whole body equals the pre-read with the two replacements, except that Notion shows the eighth row's link, to a child page, with that page's title (PF-27). 12 headings; the 7 child pages unchanged |
+| X4.4 | PART-01 | VERIFIED | **W6**, *Alpha 1*. Pre-read, edited 2026-09-08T07:15:29.132Z: *H-OLD* once, as the first line; its seven rows other than TW-MGMT-10's equal *ROWS*' first seven; 30 headings; one child page. `update_content`, `allow_async: false`, one replacement. Returned synchronously, no task. Readback, edited 2026-09-29T20:15:21.232Z: the page begins with *SECTION*, its eight rows equal to *ROWS*, then the renamed heading. The whole body equals the pre-read with the one replacement: 31 headings, the stale *Current selection* among them; the child page unchanged. As K-11 foresaw, the renamed heading is a third heading style on this page |
+| X4.5 | PART-01 | VERIFIED | **W7**, *HDE TW*. Pre-read, edited 2026-09-23T17:44:08.540Z: `## Current TW follow-up — 2026-09-08` once, as the first line; 9 headings; 21 child pages. `update_content`, `allow_async: false`, one replacement. Returned synchronously, no task. Readback, edited 2026-09-29T20:17:20.875Z: the page begins with *HDE-NEW*, its paragraph naming «R», «V» and «NEW», then `## Historical TW follow-up — 2026-09-08`. The whole body equals the pre-read with the one replacement: 10 headings; the 21 child pages unchanged |
+| X4.6 | PART-01 | VERIFIED | **W8**, the *Glow Operations Hub*, which the harness saved to a file. Pre-read, by `hub.py` over the save, edited 2026-09-24T16:03:38.449Z: `## Current Glow TW follow-up — 2026-09-08` once; 137 headings, the sha256 of their list `35a9823bffab576531a2e451e06a893453b1196d64691f0386a6d7f112bd747c`, as D6 recorded; 14 child pages; no truncation or unknown blocks. `update_content`, `allow_async: false`, one replacement. Returned synchronously, no task. Readback, by the same script over a new save, edited 2026-09-29T20:18:21.747Z: `## Current Glow TW release — TW-ALPHA-20260929.1` once, its paragraph holding «R», «V» and «NEW», directly above `## Historical Glow TW follow-up — 2026-09-08`, once; the old heading absent; the heading list equals the pre-read's with the new heading added and the old one renamed, 138 headings, sha256 `2defcf8894aed75bd0f18c7c82a310e898a4621446e76c6281b89a0909e3adb8`; the whole body equals the pre-read with the one replacement; the 14 child pages unchanged. Both saves deleted (exit 0) |
+| X4.7 | PART-01 | VERIFIED | The selection page, fetched after W8 and still as W5 left it (edited 2026-09-29T20:14:15.580Z): *SECTION*'s TW-MGMT-10 row links «NEW», and «NEW», *TW-MGMT-10 — Manage the Glow TW Ecosystem — 092926.1*, is a child of the page |
+| X5 | — | VERIFIED | This section completed and the status set to `COMPLETE`; `modification_validate.py` exits 0 at `COMPLETE`; committed and pushed, and the pushed blob read back against the local file. W1's checkpoint records the commit |
+
+No check failed, no tool call returned an error or a task, and nothing was rolled back.
+
+### Trigger findings (X4.1)
+
+The terms for `633ca5d` are the plan's. For the other three, which the plan could not know, W1 took
+each addendum's own identifiers (K-19). Each term was searched in GTWPE-MGMT-10's body as fetched at
+the start of this mode, and in `docs/prompt_ecosystem_management/gtwpe/` on «M». That directory
+does not exist yet, on `main` or on W1's branch, so its search finds nothing by construction (as
+D10 found). W1 also searched the lines the three later commits add to PF10 for `notion`,
+`prompt ecosystem`, `chatgpt`, `claude code`, `GTWPE`, `TW-`, `technical writing`, `metaprompt`,
+`9.1.3`, `9.1.6` and `execution surface`. The hits are the QA records' own citations of GCFPE
+prompts, the venue of a QA run, and one canon-conflict row about the Glow QA Guide (PF19). None
+bears on the GTWPE, or on where its Notion writes are made.
+
+| Commit | Change | Terms | Count in GTWPE-MGMT-10 | Finding |
+|---|---|---|---|---|
+| `633ca5d`, 2026-09-29T06:34:56Z | PF10 v13.4.5, addendum 2.34 PF10-VENDOR-001: agents run live vendor calls when the Product Owner directs, and vendor configuration comes from environment variables | `vendor`, `PO-only`, `open-rails` | 0, 0, 0 | No bearing: it governs HDE's vendor calls, not prompt maintenance |
+| `4c96970`, 2026-09-29T12:58:28Z | PF10 v13.4.6, addendum 2.35 HDE-EPIC040-QA110: the QA-110 review of HDE-EPIC040's task T11 | `QA-110`, `HDE-EPIC040` | 0, 0 | No bearing: a QA record of another change |
+| `917909c`, 2026-09-29T16:24:11Z | PF10 v13.4.8, addendum 2.36 HDE-EPIC040-QA110: the review of task T12, which completes the run | `QA-110`, `HDE-EPIC040` | 0, 0 | No bearing, as above |
+| `c48a79a`, 2026-09-29T17:26:55Z | PF10 v13.4.9, addendum 2.37 HDE-EPIC040-QA120: the final QA report (PASS) and its RCA | `QA-120`, `HDE-EPIC040` | 0, 0 | No bearing, as above |
+
+### Pilot findings from `EXECUTE`, against GTWPE-MGMT-10 092926.1
+
+These join PF-1 to PF-24 for GTWPE-MGMT-10's first repair.
+
+| # | Where | Finding | What W1 did |
+|---|---|---|---|
+| PF-25 | *Notion writes*; the route table; design §9 | Nathan's ruling of 2026-09-29, which he directed onto this list: "The older rule that Notion changes are made in ChatGPT does not apply to this work." The body should name where its Notion writes are made, and the rule that allows it. HDE Governance §9.1.3 still says standard ChatGPT is required for live Notion mutation and prompt publication, and no HDE Build Notes addendum records the ruling; one is Nathan's or PE37's to direct (PF-23) | Made W1 to W8 from this Claude Code session, under the ruling |
+| PF-26 | The prompt-page route ("Search for the exact new title first"; "The current version's edit time … is unchanged") | Notion's search now returns `ai_search` results dated to the day ("21 days ago (2026-09-08)"), and does not return every matching page: two searches missed TW-TRIAGE-10. A precondition checked "by a search that fetches no body" can no longer see an edit made earlier the same day, or a page the search leaves out | Fetched TW-TRIAGE-10 live for its exact edit time, and compared the other members' dates, all earlier than today (X1.2) |
+| PF-27 | `PLAN`'s rollback rule; *Failure contract* | Notion shows a mention of a child page with that page's title, so a readback differs from the text sent wherever a new line links a child page. A reverse replacement taken from the plan's text "as written, with its values" would not match, and would fail when it was needed. The rollback's text should be taken from the readback | Checked W5's readback allowing that one difference. No rollback was needed |
+| PF-28 | *Reading prompt bodies* | The body does not say what a session does when its context is compacted mid-mode, which drops its in-context reading of a body: fetch the body live again, or read the transcript's copy of the earlier fetch | After this session's compaction, recounted X4.1's six terms in GTWPE-MGMT-10's body by a script over the transcript's copy of the start-of-mode fetch, printing counts only (*Harness files*, below) |
+
+### Harness files (`D22` condition 5), for `EXECUTE`
+
+- **This session's transcript** holds, from this mode, GTWPE-MGMT-10's body, fetched at its start;
+  TW-TRIAGE-10's, fetched at X1.2 for its edit time; «NEW»'s, fetched at X1.4 and X1.8; and the
+  control pages' fetches. The session's context was compacted during X4.3, between its pre-read and
+  W5. After that, W1 read the transcript by script, printing results only: to compare the
+  pre-reads and readbacks of the catalog, the selection page, *Alpha 1* and *HDE TW*, all control
+  pages; to count X4.1's six terms in GTWPE-MGMT-10's body (PF-28), printing six counts; to recover
+  this mode's earlier commands and results for X4.1's and X4.2's rows, with every page body elided;
+  and, through `cost.py`, its usage fields. Nothing hashed, byte-compared or kept a prompt body. K-7
+  had the three inline pages checked by reading; W1 checked them by script instead, which removes
+  K-7's misread risk, and discloses it here. The transcript is left to teardown.
+- **Three tool-results saves**, all of control pages: *Alpha 1*'s readback, compared by script with
+  its pre-read, and the *Glow Operations Hub*'s pre-read and readback, checked by `hub.py`. All
+  three were deleted (exit 0).
+- **Scratch files**, in the scratchpad's `p3-exec/`: `texts.json`, §P's texts with the values
+  substituted; the check scripts; and `hub_pre_heads.json`, the Hub's heading list and child pages.
+  No transient file holds a prompt body.
+
+### Parts
+
+PART-01 landed whole. ITEM-01 is `VERIFIED`: TW-MGMT-10 092926.1 no longer tells its author to use
+the PE Metaprompt's retired complexity profile, it keeps the sentence's other two instructions, and
+TW-ALPHA-20260929.1 selects it on all four pages that name the current release. W1 to W8 were each
+applied and read back, and nothing was rolled back.
+
+### Artifacts produced
+
+| Artifact | Where | How it was read back |
+|---|---|---|
+| *TW-MGMT-10 — Manage the Glow TW Ecosystem — 092926.1* | Notion `3ea4590a05eb81d09391f5e87fcaebe0`, under the selection page | X1.8's eight checks, X1.9's two searches, and X4.7 |
+| The catalog's checked-through commit, `74f6cc9` | The GTWPE catalog, `3ea4590a05eb818c915bdfd3d150c44b` | X4.2: the whole body against the pre-read |
+| The selection of TW-ALPHA-20260929.1 | *Glow Technical Writing Ecosystem*, `3d44590a05eb8171ab6ff4dab33b00ef` | X4.3 and X4.7 |
+| The current-release notes | *Alpha 1*, `3d44590a05eb81fe991ff0114cb43029`; *HDE TW*, `3c74590a05eb8176baf8cb59f1631f3c`; the *Glow Operations Hub*, `3ce4590a05eb814f8892f88ff8539308` | X4.4 to X4.6: each whole body against its pre-read |
+| This record | `docs/ephemeral/modifications/MODIFICATION-20260929-gtwpe-pilot.md`, on `docs/20260929-modification-gtwpe-pilot` | The validator at each status, and each pushed blob against the local file |
+
+### Author, checker and acceptor (HDE Governance §9.1.6)
+
+- **Author:** W1, this Claude Code session, which made W1 to W8.
+- **Checker:** W1's own readbacks (K-3), which no isolated worker repeated; before approval, the
+  plan's texts were checked by its two reviewers, GTWPE-PILOT-PLAN-A and GTWPE-PILOT-PLAN-B.
+- **Acceptor:** Nathan, who approved the plan and its eight writes on 2026-09-29.
+
+### Interaction cost, actual against predicted
+
+Predicted 7. Actual 8:
+
+    interaction_cost = 2 rulings + 2 approvals + 3 review rounds + 0 skill reviews + 0 installs + 1 merge = 8
+
+The difference is the second ruling, on where the Notion writes are made (PO-1, K-28), which Nathan
+gave with his plan approval. `ANALYZE` did not foresee it, since neither the body nor the design
+names that surface (PF-23, PF-25). The merge is PO-3's, still to come. The identical second copy of
+Nathan's `ANALYZE` approval asked for nothing, and is not counted.
+
+**Cost.** `EXECUTE` measured 398,181 tokens on the design's measure when this section was written
+(uncached 128, cache writes 318,983, output 79,070, over 64 calls, by `cost.py` over this session's
+transcript from Nathan's approval at 2026-09-29T20:07:31Z), against the estimate of 0.65M, and took
+about 35 minutes against about 1 h 15 min. The close's own commit and checks add a little.
+
+### Remaining Product Owner actions
+
+- **PO-3:** merge this record when he chooses. It has no pull request (K-13); nothing waits on it,
+  and merging it approves nothing (`D21-C`).
+- The findings PF-1 to PF-28 and PF-D1 to PF-D3 wait for GTWPE-MGMT-10's first repair (K-10).
+  Recording PF-25's ruling in canon is his or PE37's to direct.
+
+**Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with X4.1's four trigger findings, none of which
+contradicts the GTWPE.
