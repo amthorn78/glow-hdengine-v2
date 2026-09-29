@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.4.4**  
+**Version: v13.4.5**  
 Effective Date: Sep 29, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -214,7 +214,9 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.29 PF10-CANON-001 — Repository PF-Canon Authority, Change-Process Document Storage and Canon Consultation  
 * 2.30 PF10-CITE-001 — PF Documents Do Not Cite HDE Build Notes by Internal Locator  
 * 2.31 PF10-HDR-001 — Retirement of the Human Operator Header Model-Advice Review  
-* 2.32 HDE-EPIC040-QA110 — QA Evidence Review v1.0 (tasks T01 to T10 of QA Plan v1.2)
+* 2.32 HDE-EPIC040-QA110 — QA Evidence Review v1.0 (tasks T01 to T10 of QA Plan v1.2)  
+* 2.33 PF10-OPENRAILS-001 — Mandatory Live Vendor Open-Rails Test in Every QA Plan Touching Production-Functional Surfaces  
+* 2.34 PF10-VENDOR-001 — Agents Run Live Vendor Calls When the Product Owner Directs; Vendor Configuration Comes from Environment Variables
 
 # **2\) Numbered Addenda**
 
@@ -3229,5 +3231,73 @@ When each document is next revised, the superseded scope is removed or conformed
 ### Relationship to existing PF10 guidance
 
 The addendum supersedes the exemption alternative of the open-rails requirement as recorded in permanent canon for the stated scope. It does not amend any PF10 addendum. Addendum 2.28 (Change Audit Triage v1.0) records that the exemption was reserved to the Product Owner or Canon; this addendum is that Canon action for the stated scope.
+
+## **2.34 PF10-VENDOR-001 — Agents Run Live Vendor Calls When the Product Owner Directs; Vendor Configuration Comes from Environment Variables**
+
+Timestamp: 092926 06:04 (UTC)  
+Details: Establishes that an automated session agent executes live vendor calls when the Product Owner directs it, and that the vendor configuration for those calls is held in the environment variables of the execution environment, and supersedes the canon passages that bar a directed agent from live vendor calls or that require the Product Owner to execute the calls or enter vendor values by hand.
+
+### **Source and authority**
+
+This addendum records the Product Owner's direction of 2026-09-29, given during the QA-100 execution of HDE-EPIC040 QA Plan v1.2 check 11 open-rails-showcompat-vendor: "you need to execute all the steps as my agent"; "There are 2 api keys needed for a vendor call, and there always have been, in the env variables"; and "yes agents can run live vendor calls when directed, and the environmental variables hold the vendor information, and always have". Where this addendum conflicts with earlier PF-Canon, this addendum governs for the scope below.
+
+### **Rule**
+
+1. Scope. The rule applies to every live vendor call made for HD Engine work, including open-rails HumanDesignAPI calls in QA checks, Ops tasks, controlled vendor-backed no-user smokes and implementation validation.  
+2. Agent execution when directed. An automated session agent executes a live vendor call when the Product Owner directs it to for the identified task. "PO-only" in PF-Canon identifies the Product Owner as the authorizing and accountable principal. It does not require the Product Owner to be the physical executor. The directed agent is the executor and evidence producer, not an independent approver.  
+3. Same controls. A directed agent is bound by exactly the controls that bind a human executor: the task's scope, exact commands, rails, request limit, stop checks, synthetic inputs, secret scan and quarantine, redaction and evidence contract. No command is changed by guesswork, and no completion is claimed without the required evidence.  
+4. Vendor configuration. The vendor configuration is held in environment variables of the execution environment. A vendor call needs two API keys, HD\_API\_KEY and GEO\_API\_KEY, and a base URL. The base URL is configuration, not an API key; the product reads it from HD\_API\_BASE\_URL, or from the compatibility alias HDAPI\_BASE\_URL when HD\_API\_BASE\_URL is absent, and fails closed when the two hold different values.  
+5. Use from the environment. Plans, tasks and agents use the vendor configuration from the environment. They do not require the Product Owner to type, paste or re-enter vendor values. A rails posture does not remove the only base URL the environment holds.  
+6. Secret safety. Passing the environment to the product process is not handling a plaintext secret. The agent records presence only (SET or UNSET), never prints, logs, stores, commits or transmits a value, keeps values off process argument lists, and scans captured output before it enters evidence.  
+7. Missing configuration. When the execution environment lacks a required vendor variable, no vendor call runs. The missing names are recorded by presence only, and the step is TOOLING\_BLOCKED when it has begun. Manual entry of vendor values is not substituted into the task.
+
+### **Superseded permanent passages and drain targets**
+
+| Document and section | Superseded scope |
+| :---- | :---- |
+| Glow QA Guide §3.3, "Controlled vendor-backed no-user smoke execution is PO-only and IA-guided" and "The controlled vendor-backed no-user implementation smoke above retains its stated PO-only boundary" | Any reading that requires the Product Owner as the physical executor or excludes a directed agent |
+| Glow QA Guide §3.5.7, "Open-rails HDAPI v2 vendor smoke is PO-only execution, IA-guided. Automated agents may define intent, safety rails, success criteria, evidence requirements, and rollback intent, but MUST NOT execute the vendor call, handle plaintext secrets, or claim completion without PO-run evidence" | The bar on a directed agent executing the vendor call and on using environment-held configuration; "PO-run evidence" includes evidence of a run the Product Owner directed |
+| HDE CLI/API Vendor Ref §3.7, "MUST be PO-only and IA-guided. Automated agents MUST NOT run the vendor call" | The bar on a directed agent running the vendor call |
+| HDE CLI/API Vendor Ref §7.1.8a, "OPS discovery and open-rails execution remain PO-only, IA-guided" and "Automated agents MUST NOT perform live external vendor actions" | The bar on live vendor actions by a directed agent. The bars on exposing secret values, simulating external state changes and claiming OPS completion without evidence are unchanged |
+| HDE Governance §3.4 "Controlled vendor-backed no-user validation", "It MUST be PO-only, IA-guided"; §11.1, "PO-only open-rails posture" | Any reading that requires the Product Owner as the physical executor |
+| HDE Mechanics Guide §1.1, "Default open-rails posture", and §17.9.4, "The controlled smoke MUST be PO-only, IA-guided" | Same |
+| Plan Templates "Artifact execution boundary", "MUST NOT assign privileged external execution to automated agents"; "Proof-class and controlled vendor-smoke boundary", "Controlled vendor or external smoke steps are PO-only and IA-guided" | For live vendor calls: the bar on assigning execution to a directed agent |
+| HDE Build Checklist Fermentation, Task HDE-FERM008, "Automated agents must not execute vendor calls or claim completion without PO-run evidence", and Subtask HDE-FERM008.2, "must not execute vendor calls" | The bar on a directed agent executing vendor calls |
+
+HDE Governance §3.4 "HDAPI v2 open-rails vendor proof posture" and §9.1 "Ops tasks", the Change Process Guide "Ops tasks" execution authority and delegation contract, and Plan Templates "Execution authority (normative)" already provide for Product Owner-delegated agent execution and are not superseded.
+
+When each listed document is next revised, the superseded scope is removed or conformed to this addendum.
+
+### **Epic, task, and status effects**
+
+* Every plan, task and review within scope is subject to this rule from the date of this addendum. An existing plan or task that assigns vendor commands to the Product Owner in person, or that has the Product Owner enter vendor values, remains a valid record; under a Product Owner direction a directed agent executes its commands unchanged, using the environment's configuration.  
+* HDE-EPIC040 QA Plan v1.2 check 11 (task T11, attempt 1\) was executed on 2026-09-29 by the QA-100 session as the Product Owner's directed agent. This addendum records the authority for that execution. It does not decide the per-task result, which remains with the QA-110 review.  
+* No epic, task or PF09 row changes status by this addendum.
+
+### **Deferred obligations and unresolved work**
+
+* Drainage into the listed documents is unperformed.  
+* The repository template .env.example lists HD\_API\_BASE\_URL and HD\_API\_KEY but not GEO\_API\_KEY. Owner: the implementation lane. Documentation drift only.  
+* Which execution environments hold the vendor configuration is environment setup owned by the Product Owner. On 2026-09-29 the local session on glow-devops-vps first showed all vendor variables UNSET until the Product Owner set them; the Claude Code cloud environment and the Codespaces of earlier vendor runs held them.
+
+### **Scope boundaries and nonclaims**
+
+* A vendor call by an agent requires a Product Owner direction for the identified task or work. This addendum creates no standing authority to call a vendor without one.  
+* The rule changes none of the existing open-rails conditions it does not name: synthetic data only (addendum 2.33), request limits, rails scoped to the vendor step, redaction, secret-safe evidence, and classification of open-rails failures before any is treated as a product failure. Open-rails Ops evidence remains Ops evidence and is not converted into QA evidence.  
+* The rule does not authorize printing, storing, committing or transmitting a secret value, reading a value into an agent's conversation, load or volume testing, real personal or user data, a public route or payload change, or any AI-provider call.  
+* A directed vendor call proves only what it exercises. It establishes no QA PASS, acceptance, PF09 status movement, deployment or epic closure.  
+* This addendum changes no text in any permanent document.
+
+### **Evidence anchors**
+
+* Product Owner direction, 2026-09-29, in Claude Code local VS Code session f0edea78-3120-4040-92a1-020776ba5a6f.  
+* docs/ephemeral/HDE-EPIC040-QA100-qa-execution-results-t11-v1.0.md, deviations D-01, D-02, D-06 and D-07; T11 evidence on branch qa/hde-epic040-qa100-plan-v1.2-run-20260929, commit 380cf46fda95686ccf71f256521e63ca0eb5c9e1.  
+* Product code: engine/bodygraph/vendor\_client.py (base-URL resolution from HD\_API\_BASE\_URL or HDAPI\_BASE\_URL; credential read of HD\_API\_KEY and GEO\_API\_KEY); engine/bodygraph/resolver.py (missing base URL refused as PROVIDER\_CONFIG\_MISSING); engine/providers/vendor\_http\_hdapi.py (HD\_API\_KEY and GEO\_API\_KEY required).  
+* Earlier vendor runs with the configuration present in the operator environment: audit/ops/hde-epic028/ops-02/, audit/ops/hde-epic034/ops-02/ (executed by "Codex acting as PO tooling per user authorization"), audit/ops/hde-epic035/ops-01/, audit/ops/hde-epic037/ops-hde-epic037-001/, audit/ops/hde-epic038/ops-02/.  
+* Superseded sources as read on main at f4be532: Glow QA Guide §3.3 and §3.5.7; HDE CLI/API Vendor Ref §3.7 and §7.1.8a; HDE Governance §3.4 and §11.1; HDE Mechanics Guide §1.1 and §17.9.4; Plan Templates "Artifact execution boundary" and "Proof-class and controlled vendor-smoke boundary"; HDE Build Checklist Fermentation, Task HDE-FERM008 and Subtask HDE-FERM008.2.
+
+### **Relationship to existing PF10 guidance**
+
+The addendum is consistent with addendum 2.33 (PF10-OPENRAILS-001), whose mandatory open-rails test is a live vendor call with synthetic data only, and it leaves 2.33's retained conditions unchanged. Addendum 2.27 records an Ops execution by an automated session under Product Owner delegation. The addendum amends no PF10 addendum.
 
 \<eof\>
