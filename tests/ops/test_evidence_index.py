@@ -83,6 +83,39 @@ EPIC029_TARGETS = [
     ),
 ]
 
+EPIC040_CHECK_IDS = [
+    "ac040-02-03-catalog-config",
+    "ac040-04-05-admission-identity",
+    "ac040-04-09-compat-cli-offline",
+    "ac040-06-golden-comparison",
+    "ac040-07-gate-ingress-offline",
+    "ac040-08-evidence-validators",
+    "ac040-09-reader-http-in-process",
+    "d0-discovery",
+    "open-rails-showcompat-vendor",
+    "qa-closeout-deliverables",
+    "sec-reader-http-live",
+    "step-0b-doc-delta-capture",
+]
+
+EPIC040_TARGETS = [
+    (
+        "epic040.qa_step_logs_manifest",
+        "audit/qa/hde-epic040/qa_step_logs_manifest.json",
+    ),
+    (
+        "epic040.doc_deltas",
+        "audit/docdeltas/hde-epic040_doc_deltas.md",
+    ),
+    *(
+        (
+            f"audit.qa.hde_epic040.checks.{check_id.replace('-', '_')}.primary.log",
+            f"audit/qa/hde-epic040/checks/{check_id}/primary.log",
+        )
+        for check_id in EPIC040_CHECK_IDS
+    ),
+]
+
 EPIC027_TARGETS = [
     ("epic027.acceptance_map", "docs/acceptance_map_epic027.json"),
     (
@@ -295,6 +328,30 @@ def test_epic029_primary_roster_matches_canonical_bindings():
     assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC029"}
     assert len({key for key, _ in actual}) == len(actual)
     assert len({path for _, path in actual}) == len(actual)
+
+
+def test_evidence_index_has_required_epic040_artifacts():
+    _assert_targets_present(EPIC040_TARGETS)
+
+
+def test_epic040_qa_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC040_QA_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC040_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC040"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+    manifest = json.loads(
+        Path("audit/qa/hde-epic040/qa_step_logs_manifest.json").read_text(encoding="utf-8")
+    )
+    assert sorted(manifest) == EPIC040_CHECK_IDS
+    assert [manifest[check_id]["log_path"] for check_id in EPIC040_CHECK_IDS] == [
+        path for _, path in EPIC040_TARGETS[2:]
+    ]
 
 
 def test_epic027_primary_roster_matches_canonical_bindings():
