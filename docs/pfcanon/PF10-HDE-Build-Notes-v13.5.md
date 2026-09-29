@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.4.9**  
+**Version: v13.5**  
 Effective Date: Sep 29, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -167,7 +167,7 @@ Agents must apply PF10 in this order:
 
 Inside this file, all references to PF documents MUST be **titles-only** (for example “HDE-Phased Epics”, “Glow QA Guide”), never file names or version numbers in the body text.
 
-When editing or extending this file, ChatGPT sessions must:
+When editing or extending this file, AI Agent sessions must:
 
 * Not restate PF content here.  
     
@@ -219,7 +219,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.34 PF10-VENDOR-001 — Agents Run Live Vendor Calls When the Product Owner Directs; Vendor Configuration Comes from Environment Variables  
 * 2.35 HDE-EPIC040-QA110 — QA Evidence Review of task T11 open-rails-showcompat-vendor v1.0 (check 11 of QA Plan v1.2)  
 * 2.36 HDE-EPIC040-QA110 — QA Evidence Review of task T12 qa-closeout-deliverables v1.0 (check 12 of QA Plan v1.2; run complete)  
-* 2.37 HDE-EPIC040-QA120 — Final QA Report v1.0 (verdict PASS) and QA RCA v1.0 for QA Plan v1.2
+* 2.37 HDE-EPIC040-QA120 — Final QA Report v1.0 (verdict PASS) and QA RCA v1.0 for QA Plan v1.2  
+* 2.38 PF10-AINEUTRAL-001 — Governance Requires No Specific AI Provider, Product or Model
 
 # **2\) Numbered Addenda**
 
@@ -3843,5 +3844,83 @@ PF19D-001 to PF19D-004 and OPFD-001, OPFD-002 are proposals of the RCA and not a
 ### Relationship to existing PF10 guidance
 
 This addendum continues addenda 2.32, 2.35 and 2.36, whose QA-110 decisions, LR-01, lessons K-01 to K-07 and register it relies on and completes into the final QA verdict. It records that the run met addendum 2.33 (check 11 is the required live vendor call) and that the delegated vendor execution was authorized by addendum 2.34. It supersedes no PF10 addendum.
+
+## 2.38 PF10-AINEUTRAL-001 — Governance Requires No Specific AI Provider, Product or Model
+
+Timestamp: 092926 20:51 (UTC)  
+Details: Establishes that no PF-Canon governance rule requires a specific AI provider, product, model or effort level, supersedes the HDE Governance rule that reserves development, live Notion changes, prompt publication and other work to standard ChatGPT, and reads the governance roles and evidence that canon assigns through Codex or ChatGPT by function.
+
+### Source and authority
+
+This addendum records the Product Owner's directions of 2026-09-29:
+
+* His approval of the Glow Technical Writing Prompt Ecosystem pilot's plan records the ruling "The older rule that Notion changes are made in ChatGPT does not apply to this work".  
+* Told that this rule still stands in HDE Governance §9.1.3 and that no addendum overrides it, he directed: "ok, create a PF10 build notes addendum (standalone) to correct that."  
+* On its extent he stated: "I don't want, generally, specific AI models or provider referenced in canon, at least not as requirements", and "it only matters if it is dictating governance". The references are not to be removed wholesale.
+
+Where this addendum conflicts with earlier PF-Canon, this addendum governs for the scope below.
+
+### Rule
+
+1. Scope. The rule applies to every PF-Canon passage whose governance effect depends on a named AI provider, product, model or effort level. Such a passage requires, reserves, defaults to or prefers one for any work, or decides through one who acts, on which surface, with which tool, or what counts as evidence. Every other mention of an AI product is outside the scope.  
+2. No required provider, product or model. No governance rule requires a specific AI provider, product, model or effort level. Work that PF-Canon reserves to a named surface is performed on any surface that has the access, tools and authority the task requires. Guidance that PF-Canon cites from outside PF-Canon creates no such requirement.  
+3. Conditions unchanged. Every other condition on the work stands: the authorization it needs, the role or session that owns it, write and mutation boundaries, readback, and evidence. The surface that performs work confers no permission. Live Notion changes, prompt publication, registry, routing, activation and lifecycle work, PF mutation, and runtime and production operations keep the authority PF-Canon requires for each.  
+4. Roles read by function. Where PF-Canon assigns a governance role, duty, permission, restriction or evidence standing through a named AI product, it attaches to the function, whichever product performs it:  
+   * "CodEx" or "Codex" as an actor is the executing agent: the agent that audits the repository, builds and tests, and performs the mutation route authorized for the change. "Non-CodEx process roles" are the roles other than the executing agent.  
+   * "Implementation Agent (ChatGPT)" is the Implementation Agent.  
+   * "ChatGPT sessions" in this document's front matter are every session and agent that edits or extends this document.  
+   * A "Codex Audit", "Codex audit", "CodEx audit" or planning Codex audit is a read-only repository audit supplied for the change, whichever agent produced it. It has exactly the standing and limits PF-Canon gives a Codex Audit.  
+   * A "Codex prompt", "CodEx Prompt" or "Codex-facing prompt", and any implementation prompt given to Codex, is the prompt given to the executing agent. The rules for it apply whichever agent receives it.  
+5. Labels and field names. Vocabulary values and field names that carry a product name keep their exact spelling and denote the function in rule 4: "CA vetted", "Observed Evidence (Codex Audit)", "Observed repo reality (Codex Audit)", the command-provenance value "Codex prompt", and the machine-header keys codex, codex\_inputs and codex\_can\_see\_pf\_docs.  
+6. Capability statements. A statement of what a named product can or cannot do, such as the constraints in Change Process Guide Appendix A, describes that product. For another executing agent, the capability is established for the change, as each Implementation Guide resolves codex\_can\_see\_pf\_docs. The rules those statements support stand: self-contained implementation prompts, verbatim execution-critical material and Asset Draft Packs.
+
+### Superseded passages and drain targets
+
+The passages below are those a line-level search of PF-Canon found. Rule 1 governs any other passage within its scope in the same way.
+
+| Document and section | Superseded scope |
+| :---- | :---- |
+| HDE Governance §9.1.3, the paragraph beginning "Local CLI eligibility remains bounded" | The sentence "Standard ChatGPT remains required for development, tasks assigned to a specific authoritative session role, PO decision/authorization packets, live Notion/Drive/Docs mutation, Library persistence/version management, prompt publication, registry/routing/activation/lifecycle work and runtime/production operations"; the clause "QA is ordinarily on that surface"; and the sentence "When a required skill, source or access boundary is unknown, select standard ChatGPT". The paragraph's eligibility conditions, directly verified skill and input access, task capability, and net benefit after packaging, transfer, verification and review, apply to the choice of any surface. Its remaining content stands: PF mutation's exact-document and exact-action authority, the reference to §9.1.4, the local-handoff packaging rule, the cost-measurement limit and the limits on advice. |
+| HDE Governance §9.7.7, §9.7.9 and §9.8.2 | Codex as the actor, the prompt recipient or the owner of PR work; the planning Codex audit behind "CA vetted"; and the command-provenance value "Codex prompt". Each is read under rules 4 and 5\. The rules themselves stand. |
+| Change Process Guide §0.1 to §0.4, §0.5.1, §1.1.1, §1.1.8 and §1.1.11; Sections 2 to 5, including their headings; Appendix A; and Appendix C, "Mechanical blockers" and "Canonical Remediation Task Plan Template (paste-ready)" | "Implementation Agent (ChatGPT)"; CodEx or Codex as participant, executor, auditor, PR owner or prompt recipient; "non-CodEx process roles"; and CodEx or Codex Audit evidence. Each is read under rules 4 and 5, and Appendix A's constraints under rule 6\. The route, gate, role-separation and evidence rules stand. |
+| Plan Templates: "Repository loci and file minting"; the Live QA Plan's "Front matter"; "Hard blockers for plan approval/execution"; and the Ops Task Record's "Not a PR (normative)" | Codex as operator, auditor, PR owner or prompt recipient, read under rule 4, and the label "Observed Evidence (Codex Audit)", under rule 5\. The rules stand. |
+| Glow QA Guide §3.4.10, §3.5.5, §3.6 and §11.3 | Codex or CodEx as executor, auditor or prompt recipient, read under rule 4, and the labels "Observed Evidence (Codex Audit)" and "Observed repo reality (Codex Audit)", under rule 5\. The rules stand. |
+| HDE Mechanics Guide §1.1, "Codex Audit repo-reality posture" | The Codex Audit, read under rule 4\. |
+| Glow Infrastructure §0, "PR-first via CodEx" and "Codex Audit repo-reality posture" | CodEx as the owner of the PR, and the Codex Audit, read under rule 4\. |
+| HDE Architecture §0, "Change control" | "CodEx opens the PR automatically": the executing agent, under rule 4\. |
+| Reality Audits §0 | "Codex review passes run by the Product Owner": review passes the Product Owner runs, whichever agent performs them, under rule 4\. |
+| This document's front matter, "Cross-references" | "ChatGPT sessions must": every session and agent that edits or extends this document, under rule 4\. |
+
+When each listed document is next revised, the superseded sentences of HDE Governance §9.1.3 are removed, and each named product in the other listed passages is replaced by the function rule 4 gives it. The labels and field names in rule 5 keep their spelling.
+
+### Epic, task, and status effects
+
+* No epic, task or PF09 row changes status by this addendum.  
+* Records made before this addendum keep their wording and standing, including records of work performed on a surface other than standard ChatGPT under a Product Owner ruling.
+
+### Deferred obligations and unresolved work
+
+* Drainage into the listed documents is unperformed.  
+* HDE Governance §9.1.3 also requires every downstream-session prompt to receive human advice on execution surface, model and reasoning level. That requirement names no provider, product or model and is outside this addendum. Whether it continues is open for Product Owner determination.  
+* The selection guidance that HDE Governance §9.1.3 locates in Glow / Ops is outside PF-Canon, and its placement is undecided (addendum 2.29). Under rule 2 it creates no provider, product or model requirement.
+
+### Scope boundaries and nonclaims
+
+* Only governance effect changes. Mentions of AI products that decide no governance are outside the scope and are not drain targets: historical records, provenance and evidence citations, examples, environment and infrastructure inventories, repository paths and identifiers such as codex/out/\*\* and audit/codex/, and conversation text reproduced in reference documents.  
+* The product boundaries that exclude AI providers, LLMs, model calls and AI enablement from the HD Engine, the Glow App runtime and the vendor paths are unchanged. They apply to every provider, whichever one they name as an example.  
+* The addendum grants no tool, credential, network, rails, mutation, publication or privileged-action permission, and no standing authority for any agent to change Notion, publish or select prompts, or operate production. PF mutation stays under the Product Owner's exact authority.  
+* It changes no text in any permanent document, and no prompt body, prompt header, register or prompt selection.  
+* It establishes no QA verdict, acceptance, build-checklist status movement or closure.
+
+### Evidence anchors
+
+* Product Owner directions, 2026-09-29, in Claude Code cloud session session\_018teDumz2XyKdoXF9p3BKFM.  
+* The pilot's Modification record, docs/ephemeral/modifications/MODIFICATION-20260929-gtwpe-pilot.md: plan\_approved\_by, pilot findings PF-23 and PF-25, and open finding K-28; on branch docs/20260929-modification-gtwpe-pilot at commit c4d3292.  
+* Line-level search of docs/pfcanon/ on main at 74f6cc9, 2026-09-29, for AI provider, product, model and effort terms, with each match classified by governance effect.  
+* Superseded sources as read on main at 74f6cc9: HDE Governance §9.1.3, §9.7.7, §9.7.9 and §9.8.2; the Change Process Guide, Plan Templates and Glow QA Guide sections listed above; HDE Mechanics Guide §1.1; Glow Infrastructure §0; HDE Architecture §0; Reality Audits §0.
+
+### Relationship to existing PF10 guidance
+
+The addendum is consistent with addendum 2.29 (PF10-CANON-001), which removed ChatGPT Library and Google Drive as destinations and authorities for change-process documents, and with addendum 2.34 (PF10-VENDOR-001), under which a directed agent executes live vendor calls. Addendum 2.31 (PF10-HDR-001) retired the review of header model advice; the requirement for that advice is not changed here. The addendum amends no PF10 addendum.
 
 \<eof\>
