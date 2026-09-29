@@ -942,3 +942,16 @@ about 35 minutes against about 1 h 15 min. The close's own commit and checks add
 
 **Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with X4.1's four trigger findings, none of which
 contradicts the GTWPE.
+
+**Corrections, 2026-09-29, after the close's commit `1426e43`.** Two statements above are
+corrected here, not in place:
+
+- *Cost* says `EXECUTE` took about 35 minutes. By the transcript's timestamps it took about 18, from
+  Nathan's approval at 20:07:31Z to the close's push at 20:25:36Z.
+- *Trigger findings (X4.1)* describes the keyword search's hits too narrowly. All eight are in the
+  QA records' own provenance: three citations of GCFPE prompts with their Notion pages; two
+  citations of the canon document *Technical Writing Best Practices*; a QA run's executors, in
+  Claude Code; that run's tested source, whose later commits include the two prompt-ecosystem-
+  management files `modification-template.md` and `modification_validate.py`; and one
+  canon-conflict row about the Glow QA Guide (PF19). As stated, none bears on the GTWPE, or on where
+  its Notion writes are made.
