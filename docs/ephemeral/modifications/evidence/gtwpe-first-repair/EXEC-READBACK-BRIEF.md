@@ -44,60 +44,62 @@ P16	which the plan records, restored the same way
 P17	made by the same writes
 P18	made by the same three writes
 P19	also find every page that names the member's current version or links its page
-P20	The session's meter is the clock
-P21	or tokens where the session can measure them
-P22	when time or tokens pass twice the estimate
-P23	by the meter in
-P24	twice it is where the session stops.
-P25	can still be landing when its call returns
-P26	waiting for each write to land
-P27	and apply the approved edits.
-P28	A page other sessions also write, such as a control page
-P29	or Nathan's restoration from page history.
-P30	A search only discovers
-P31	at minute resolution
-P32	a script reads that section from the save
-P33	read its child pages' titles
-P34	Search for the exact new title first
-P35	Fetch the parent again
-P36	Search for the exact new title again
-P37	read from a fetch of that page
-P38	a search that fetches no body
-P39	a read lost to a context compaction
-P40	A script over a save prints only what the check needs
-P41	A save is deleted once its check is done
-P42	and left to the harness's teardown.
-P43	sets the anchors, than the clause at issue
-P44	whether a command or a reading made it
-P45	The search command and its count
-P46	no AI provider or product is a governance requirement
-P47	gives way to the write-nothing clause
-P48	Workers and reviewers write nothing
-P49	Workers write nothing, so
-P50	in a directory named for the Modification's slug
-P51	the record's file unedited
-P52	After every push, the branch has one open pull request
-P53	gtwpe/gtwpe_record_check.py docs/ephemeral
-P54	modification_validate.py docs/ephemeral
-P55	then the GTWPE rules a script can check
-P56	`gtwpe_record_check.py` exits 0
-P57	`modification_validate.py` exits 0
-P58	subsection in each mode's section names each one.
-P59	and opens, from
-P60	and opens the branch
-P61	continues on the record and branch it finds
-P62	number the items, and commit and push the record
-P63	Copy the request verbatim, and number
-P64	the change's own terms, searched in this prompt's body
-P65	search it calls for
-P66	including a human header the PE's authoring exclusion would remove
-P67	dry runs included, and so does every pull request Nathan merges
-P68	subsection of the mode's own section
-P69	092926.1
-P70	Search for the exact new title
-P71	or Nathan's restoration from page history
-P72	app.notion.com
-P73	http
+P20	and each page the record of TW's latest selection says it wrote
+P21	The session's meter is the clock
+P22	a wait for Nathan's approval, a merge or an install does not count
+P23	or tokens where the session can measure them
+P24	when time or tokens pass twice the estimate
+P25	by the meter in
+P26	twice it is where the session stops.
+P27	can still be landing when its call returns
+P28	waiting for each write to land
+P29	and apply the approved edits.
+P30	A page other sessions also write, such as a control page
+P31	or Nathan's restoration from page history.
+P32	A search only discovers
+P33	at minute resolution
+P34	a script reads that section from the save
+P35	read its child pages' titles
+P36	Search for the exact new title first
+P37	Fetch the parent again
+P38	Search for the exact new title again
+P39	read from a fetch of that page
+P40	a search that fetches no body
+P41	a read lost to a context compaction
+P42	A script over a save prints only what the check needs
+P43	A save is deleted once its check is done
+P44	and left to the harness's teardown.
+P45	sets the anchors, than the clause at issue
+P46	whether a command or a reading made it
+P47	The search command and its count
+P48	no AI provider or product is a governance requirement
+P49	gives way to the write-nothing clause
+P50	Workers and reviewers write nothing
+P51	Workers write nothing, so
+P52	in a directory named for the Modification's slug
+P53	the record's file unedited
+P54	After every push, the branch has one open pull request
+P55	gtwpe/gtwpe_record_check.py docs/ephemeral
+P56	modification_validate.py docs/ephemeral
+P57	then the GTWPE rules a script can check
+P58	`gtwpe_record_check.py` exits 0
+P59	`modification_validate.py` exits 0
+P60	subsection in each mode's section names each one.
+P61	and opens, from
+P62	and opens the branch
+P63	continues on the record and branch it finds
+P64	number the items, and commit and push the record
+P65	Copy the request verbatim, and number
+P66	the change's own terms, searched in this prompt's body
+P67	search it calls for
+P68	including a human header the PE's authoring exclusion would remove
+P69	dry runs included, and so does every pull request Nathan merges
+P70	subsection of the mode's own section
+P71	092926.1
+P72	Search for the exact new title
+P73	or Nathan's restoration from page history
+P74	app.notion.com
+P75	http
 
 Answer as plain text: the three items above, then one line per phrase, "P01 <count>" and so on, in order. Do not judge whether a count is right; do not explain. Close with NOTHING NEEDED.
 ```

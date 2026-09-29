@@ -13,7 +13,8 @@
    "matches": 1,
    "check": "GTWPE-MGMT-10 — Manage the GTWPE — «V»",
    "check_count": 1,
-   "absent": "— 092926.1"
+   "absent": "— 092926.1",
+   "check2": null
   },
   {
    "id": "E2",
@@ -25,7 +26,8 @@
    "matches": 1,
    "check": "Prompt Version: «V»",
    "check_count": 1,
-   "absent": ": 092926.1"
+   "absent": ": 092926.1",
+   "check2": null
   },
   {
    "id": "E3",
@@ -37,7 +39,8 @@
    "matches": 1,
    "check": "the current-release note on each page that names TW's current release",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E4",
@@ -49,7 +52,8 @@
    "matches": 1,
    "check": "and update the current-release note on every other page",
    "check_count": 1,
-   "absent": "and make the three selection writes."
+   "absent": "and make the three selection writes.",
+   "check2": null
   },
   {
    "id": "E5",
@@ -61,7 +65,8 @@
    "matches": 1,
    "check": "and until G5 the pages that name TW's current release",
    "check_count": 1,
-   "absent": "(the GTWPE catalog)"
+   "absent": "(the GTWPE catalog)",
+   "check2": null
   },
   {
    "id": "E6",
@@ -73,7 +78,8 @@
    "matches": 1,
    "check": "every page whose current-release note it changed",
    "check_count": 1,
-   "absent": "any TW-ALPHA selection page"
+   "absent": "any TW-ALPHA selection page",
+   "check2": null
   },
   {
    "id": "E7",
@@ -85,7 +91,8 @@
    "matches": 1,
    "check": "(4) On every other page that names TW's current release",
    "check_count": 1,
-   "absent": "Nothing else on the page changes"
+   "absent": "Nothing else on the page changes",
+   "check2": null
   },
   {
    "id": "E8",
@@ -97,7 +104,8 @@
    "matches": 1,
    "check": "the new note directly above the prior note's historical heading",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E9",
@@ -109,7 +117,8 @@
    "matches": 1,
    "check": "with its text taken from that write's readback rather than from the plan",
    "check_count": 1,
-   "absent": "which the plan records, restored the same way"
+   "absent": "which the plan records, restored the same way",
+   "check2": null
   },
   {
    "id": "E10",
@@ -121,31 +130,34 @@
    "matches": 1,
    "check": "made by the same writes",
    "check_count": 1,
-   "absent": "made by the same three writes"
+   "absent": "made by the same three writes",
+   "check2": null
   },
   {
    "id": "E11",
    "item": "ITEM-02",
    "where": "ANALYZE, A3 step",
    "old": "Never enumerate known phrasings.",
-   "new": "Never enumerate known phrasings. For a prompt change, also find every page that names the member's current version or links its page, and for a TW-ALPHA member every page that names TW's current release: search on the member's ID, title and version, fetch each page found and each page the member's own text names as holding its selection, and list each page with whether the route writes it.",
+   "new": "Never enumerate known phrasings. For a prompt change, also find every page that names the member's current version or links its page, and for a TW-ALPHA member every page that names TW's current release: search on the member's ID, title and version, and for a TW-ALPHA member on TW's current release; fetch each page found, each page the member's own text names as holding its selection, and each page the record of TW's latest selection says it wrote; and list each page with whether the route writes it.",
    "replace_all": false,
    "matches": 1,
    "check": "also find every page that names the member's current version or links its page",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": "and each page the record of TW's latest selection says it wrote"
   },
   {
    "id": "E12",
    "item": "ITEM-03",
    "where": "The record, estimate row",
    "old": "Tokens are uncached input plus cache writes plus output",
-   "new": "Tokens are uncached input plus cache writes plus output. The session's meter is the clock: it records the UTC time when each mode starts and compares the time elapsed with the estimate at every step boundary. It records tokens only from a figure it can read without opening a file that holds a prompt body, and otherwise records them as not measured",
+   "new": "Tokens are uncached input plus cache writes plus output. The session's meter is the clock: it records the UTC time when each mode starts and compares the time elapsed with the estimate at every step boundary; a wait for Nathan's approval, a merge or an install does not count. It records tokens only from a figure it can read without opening a file that holds a prompt body, and otherwise records them as not measured",
    "replace_all": false,
    "matches": 1,
    "check": "The session's meter is the clock",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": "a wait for Nathan's approval, a merge or an install does not count"
   },
   {
    "id": "E13",
@@ -157,7 +169,8 @@
    "matches": 1,
    "check": "or tokens where the session can measure them",
    "check_count": 1,
-   "absent": "when time or tokens pass twice the estimate"
+   "absent": "when time or tokens pass twice the estimate",
+   "check2": null
   },
   {
    "id": "E14",
@@ -169,7 +182,8 @@
    "matches": 1,
    "check": "by the meter in",
    "check_count": 1,
-   "absent": "twice it is where the session stops."
+   "absent": "twice it is where the session stops.",
+   "check2": null
   },
   {
    "id": "E15",
@@ -181,7 +195,8 @@
    "matches": 1,
    "check": "can still be landing when its call returns",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E16",
@@ -193,7 +208,8 @@
    "matches": 1,
    "check": "waiting for each write to land",
    "check_count": 1,
-   "absent": "and apply the approved edits."
+   "absent": "and apply the approved edits.",
+   "check2": null
   },
   {
    "id": "E17",
@@ -205,7 +221,8 @@
    "matches": 1,
    "check": "A page other sessions also write, such as a control page",
    "check_count": 1,
-   "absent": "or Nathan's restoration from page history."
+   "absent": "or Nathan's restoration from page history.",
+   "check2": null
   },
   {
    "id": "E18",
@@ -217,7 +234,8 @@
    "matches": 1,
    "check": "A search only discovers",
    "check_count": 1,
-   "absent": "at minute resolution"
+   "absent": "at minute resolution",
+   "check2": null
   },
   {
    "id": "E19",
@@ -229,7 +247,8 @@
    "matches": 1,
    "check": "a script reads that section from the save",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E20",
@@ -241,7 +260,8 @@
    "matches": 1,
    "check": "read its child pages' titles",
    "check_count": 1,
-   "absent": "Search for the exact new title first"
+   "absent": "Search for the exact new title first",
+   "check2": null
   },
   {
    "id": "E21",
@@ -253,7 +273,8 @@
    "matches": 1,
    "check": "Fetch the parent again",
    "check_count": 1,
-   "absent": "Search for the exact new title again"
+   "absent": "Search for the exact new title again",
+   "check2": null
   },
   {
    "id": "E22",
@@ -265,7 +286,8 @@
    "matches": 1,
    "check": "read from a fetch of that page",
    "check_count": 1,
-   "absent": "a search that fetches no body"
+   "absent": "a search that fetches no body",
+   "check2": null
   },
   {
    "id": "E23",
@@ -277,7 +299,8 @@
    "matches": 1,
    "check": "a read lost to a context compaction",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E24",
@@ -289,7 +312,8 @@
    "matches": 1,
    "check": "A script over a save prints only what the check needs",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E25",
@@ -301,7 +325,8 @@
    "matches": 1,
    "check": "A save is deleted once its check is done",
    "check_count": 1,
-   "absent": "and left to the harness's teardown."
+   "absent": "and left to the harness's teardown.",
+   "check2": null
   },
   {
    "id": "E26",
@@ -313,7 +338,8 @@
    "matches": 1,
    "check": "sets the anchors, than the clause at issue",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E27",
@@ -325,7 +351,8 @@
    "matches": 1,
    "check": "whether a command or a reading made it",
    "check_count": 1,
-   "absent": "The search command and its count"
+   "absent": "The search command and its count",
+   "check2": null
   },
   {
    "id": "E28",
@@ -337,7 +364,8 @@
    "matches": 1,
    "check": "no AI provider or product is a governance requirement",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E29",
@@ -349,7 +377,8 @@
    "matches": 1,
    "check": "gives way to the write-nothing clause",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E30",
@@ -361,7 +390,8 @@
    "matches": 1,
    "check": "Workers and reviewers write nothing",
    "check_count": 1,
-   "absent": "Workers write nothing, so"
+   "absent": "Workers write nothing, so",
+   "check2": null
   },
   {
    "id": "E31",
@@ -373,7 +403,8 @@
    "matches": 1,
    "check": "in a directory named for the Modification's slug",
    "check_count": 1,
-   "absent": "the record's file unedited"
+   "absent": "the record's file unedited",
+   "check2": null
   },
   {
    "id": "E32",
@@ -385,7 +416,8 @@
    "matches": 1,
    "check": "After every push, the branch has one open pull request",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E33",
@@ -397,7 +429,8 @@
    "matches": 1,
    "check": "gtwpe/gtwpe_record_check.py docs/ephemeral",
    "check_count": 1,
-   "absent": "modification_validate.py docs/ephemeral"
+   "absent": "modification_validate.py docs/ephemeral",
+   "check2": null
   },
   {
    "id": "E34",
@@ -409,7 +442,8 @@
    "matches": 1,
    "check": "then the GTWPE rules a script can check",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E35",
@@ -421,7 +455,8 @@
    "matches": 4,
    "check": "`gtwpe_record_check.py` exits 0",
    "check_count": 4,
-   "absent": "`modification_validate.py` exits 0"
+   "absent": "`modification_validate.py` exits 0",
+   "check2": null
   },
   {
    "id": "E36",
@@ -433,7 +468,8 @@
    "matches": 1,
    "check": "subsection in each mode's section names each one.",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E37",
@@ -445,7 +481,8 @@
    "matches": 1,
    "check": "and opens, from",
    "check_count": 1,
-   "absent": "and opens the branch"
+   "absent": "and opens the branch",
+   "check2": null
   },
   {
    "id": "E38",
@@ -457,7 +494,8 @@
    "matches": 1,
    "check": "continues on the record and branch it finds",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E39",
@@ -469,7 +507,8 @@
    "matches": 1,
    "check": "number the items, and commit and push the record",
    "check_count": 1,
-   "absent": "Copy the request verbatim, and number"
+   "absent": "Copy the request verbatim, and number",
+   "check2": null
   },
   {
    "id": "E40",
@@ -481,7 +520,8 @@
    "matches": 1,
    "check": "the change's own terms, searched in this prompt's body",
    "check_count": 1,
-   "absent": "search it calls for"
+   "absent": "search it calls for",
+   "check2": null
   },
   {
    "id": "E41",
@@ -493,7 +533,8 @@
    "matches": 1,
    "check": "including a human header the PE's authoring exclusion would remove",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E42",
@@ -505,7 +546,8 @@
    "matches": 1,
    "check": "dry runs included, and so does every pull request Nathan merges",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   },
   {
    "id": "E43",
@@ -517,7 +559,8 @@
    "matches": 1,
    "check": "subsection of the mode's own section",
    "check_count": 1,
-   "absent": null
+   "absent": null,
+   "check2": null
   }
  ]
 }

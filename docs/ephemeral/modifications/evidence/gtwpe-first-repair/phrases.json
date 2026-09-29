@@ -156,6 +156,14 @@
   },
   {
    "id": "P20",
+   "text": "and each page the record of TW's latest selection says it wrote",
+   "expect": 1,
+   "sources": [
+    "E11 check, second phrase"
+   ]
+  },
+  {
+   "id": "P21",
    "text": "The session's meter is the clock",
    "expect": 1,
    "sources": [
@@ -163,7 +171,15 @@
    ]
   },
   {
-   "id": "P21",
+   "id": "P22",
+   "text": "a wait for Nathan's approval, a merge or an install does not count",
+   "expect": 1,
+   "sources": [
+    "E12 check, second phrase"
+   ]
+  },
+  {
+   "id": "P23",
    "text": "or tokens where the session can measure them",
    "expect": 1,
    "sources": [
@@ -171,7 +187,7 @@
    ]
   },
   {
-   "id": "P22",
+   "id": "P24",
    "text": "when time or tokens pass twice the estimate",
    "expect": 0,
    "sources": [
@@ -179,7 +195,7 @@
    ]
   },
   {
-   "id": "P23",
+   "id": "P25",
    "text": "by the meter in",
    "expect": 1,
    "sources": [
@@ -187,7 +203,7 @@
    ]
   },
   {
-   "id": "P24",
+   "id": "P26",
    "text": "twice it is where the session stops.",
    "expect": 0,
    "sources": [
@@ -195,7 +211,7 @@
    ]
   },
   {
-   "id": "P25",
+   "id": "P27",
    "text": "can still be landing when its call returns",
    "expect": 1,
    "sources": [
@@ -203,7 +219,7 @@
    ]
   },
   {
-   "id": "P26",
+   "id": "P28",
    "text": "waiting for each write to land",
    "expect": 1,
    "sources": [
@@ -211,7 +227,7 @@
    ]
   },
   {
-   "id": "P27",
+   "id": "P29",
    "text": "and apply the approved edits.",
    "expect": 0,
    "sources": [
@@ -219,7 +235,7 @@
    ]
   },
   {
-   "id": "P28",
+   "id": "P30",
    "text": "A page other sessions also write, such as a control page",
    "expect": 1,
    "sources": [
@@ -227,7 +243,7 @@
    ]
   },
   {
-   "id": "P29",
+   "id": "P31",
    "text": "or Nathan's restoration from page history.",
    "expect": 0,
    "sources": [
@@ -235,7 +251,7 @@
    ]
   },
   {
-   "id": "P30",
+   "id": "P32",
    "text": "A search only discovers",
    "expect": 1,
    "sources": [
@@ -243,7 +259,7 @@
    ]
   },
   {
-   "id": "P31",
+   "id": "P33",
    "text": "at minute resolution",
    "expect": 0,
    "sources": [
@@ -251,7 +267,7 @@
    ]
   },
   {
-   "id": "P32",
+   "id": "P34",
    "text": "a script reads that section from the save",
    "expect": 1,
    "sources": [
@@ -259,7 +275,7 @@
    ]
   },
   {
-   "id": "P33",
+   "id": "P35",
    "text": "read its child pages' titles",
    "expect": 1,
    "sources": [
@@ -267,7 +283,7 @@
    ]
   },
   {
-   "id": "P34",
+   "id": "P36",
    "text": "Search for the exact new title first",
    "expect": 0,
    "sources": [
@@ -275,7 +291,7 @@
    ]
   },
   {
-   "id": "P35",
+   "id": "P37",
    "text": "Fetch the parent again",
    "expect": 1,
    "sources": [
@@ -283,7 +299,7 @@
    ]
   },
   {
-   "id": "P36",
+   "id": "P38",
    "text": "Search for the exact new title again",
    "expect": 0,
    "sources": [
@@ -291,7 +307,7 @@
    ]
   },
   {
-   "id": "P37",
+   "id": "P39",
    "text": "read from a fetch of that page",
    "expect": 1,
    "sources": [
@@ -299,7 +315,7 @@
    ]
   },
   {
-   "id": "P38",
+   "id": "P40",
    "text": "a search that fetches no body",
    "expect": 0,
    "sources": [
@@ -308,7 +324,7 @@
    ]
   },
   {
-   "id": "P39",
+   "id": "P41",
    "text": "a read lost to a context compaction",
    "expect": 1,
    "sources": [
@@ -316,7 +332,7 @@
    ]
   },
   {
-   "id": "P40",
+   "id": "P42",
    "text": "A script over a save prints only what the check needs",
    "expect": 1,
    "sources": [
@@ -324,7 +340,7 @@
    ]
   },
   {
-   "id": "P41",
+   "id": "P43",
    "text": "A save is deleted once its check is done",
    "expect": 1,
    "sources": [
@@ -332,7 +348,7 @@
    ]
   },
   {
-   "id": "P42",
+   "id": "P44",
    "text": "and left to the harness's teardown.",
    "expect": 0,
    "sources": [
@@ -340,7 +356,7 @@
    ]
   },
   {
-   "id": "P43",
+   "id": "P45",
    "text": "sets the anchors, than the clause at issue",
    "expect": 1,
    "sources": [
@@ -348,7 +364,7 @@
    ]
   },
   {
-   "id": "P44",
+   "id": "P46",
    "text": "whether a command or a reading made it",
    "expect": 1,
    "sources": [
@@ -356,7 +372,7 @@
    ]
   },
   {
-   "id": "P45",
+   "id": "P47",
    "text": "The search command and its count",
    "expect": 0,
    "sources": [
@@ -364,7 +380,7 @@
    ]
   },
   {
-   "id": "P46",
+   "id": "P48",
    "text": "no AI provider or product is a governance requirement",
    "expect": 1,
    "sources": [
@@ -372,7 +388,7 @@
    ]
   },
   {
-   "id": "P47",
+   "id": "P49",
    "text": "gives way to the write-nothing clause",
    "expect": 1,
    "sources": [
@@ -380,7 +396,7 @@
    ]
   },
   {
-   "id": "P48",
+   "id": "P50",
    "text": "Workers and reviewers write nothing",
    "expect": 1,
    "sources": [
@@ -388,7 +404,7 @@
    ]
   },
   {
-   "id": "P49",
+   "id": "P51",
    "text": "Workers write nothing, so",
    "expect": 0,
    "sources": [
@@ -396,7 +412,7 @@
    ]
   },
   {
-   "id": "P50",
+   "id": "P52",
    "text": "in a directory named for the Modification's slug",
    "expect": 1,
    "sources": [
@@ -404,7 +420,7 @@
    ]
   },
   {
-   "id": "P51",
+   "id": "P53",
    "text": "the record's file unedited",
    "expect": 0,
    "sources": [
@@ -412,7 +428,7 @@
    ]
   },
   {
-   "id": "P52",
+   "id": "P54",
    "text": "After every push, the branch has one open pull request",
    "expect": 1,
    "sources": [
@@ -420,7 +436,7 @@
    ]
   },
   {
-   "id": "P53",
+   "id": "P55",
    "text": "gtwpe/gtwpe_record_check.py docs/ephemeral",
    "expect": 1,
    "sources": [
@@ -428,7 +444,7 @@
    ]
   },
   {
-   "id": "P54",
+   "id": "P56",
    "text": "modification_validate.py docs/ephemeral",
    "expect": 0,
    "sources": [
@@ -436,7 +452,7 @@
    ]
   },
   {
-   "id": "P55",
+   "id": "P57",
    "text": "then the GTWPE rules a script can check",
    "expect": 1,
    "sources": [
@@ -444,7 +460,7 @@
    ]
   },
   {
-   "id": "P56",
+   "id": "P58",
    "text": "`gtwpe_record_check.py` exits 0",
    "expect": 4,
    "sources": [
@@ -452,7 +468,7 @@
    ]
   },
   {
-   "id": "P57",
+   "id": "P59",
    "text": "`modification_validate.py` exits 0",
    "expect": 0,
    "sources": [
@@ -461,7 +477,7 @@
    ]
   },
   {
-   "id": "P58",
+   "id": "P60",
    "text": "subsection in each mode's section names each one.",
    "expect": 1,
    "sources": [
@@ -469,7 +485,7 @@
    ]
   },
   {
-   "id": "P59",
+   "id": "P61",
    "text": "and opens, from",
    "expect": 1,
    "sources": [
@@ -477,7 +493,7 @@
    ]
   },
   {
-   "id": "P60",
+   "id": "P62",
    "text": "and opens the branch",
    "expect": 0,
    "sources": [
@@ -485,7 +501,7 @@
    ]
   },
   {
-   "id": "P61",
+   "id": "P63",
    "text": "continues on the record and branch it finds",
    "expect": 1,
    "sources": [
@@ -493,7 +509,7 @@
    ]
   },
   {
-   "id": "P62",
+   "id": "P64",
    "text": "number the items, and commit and push the record",
    "expect": 1,
    "sources": [
@@ -501,7 +517,7 @@
    ]
   },
   {
-   "id": "P63",
+   "id": "P65",
    "text": "Copy the request verbatim, and number",
    "expect": 0,
    "sources": [
@@ -509,7 +525,7 @@
    ]
   },
   {
-   "id": "P64",
+   "id": "P66",
    "text": "the change's own terms, searched in this prompt's body",
    "expect": 1,
    "sources": [
@@ -517,7 +533,7 @@
    ]
   },
   {
-   "id": "P65",
+   "id": "P67",
    "text": "search it calls for",
    "expect": 0,
    "sources": [
@@ -525,7 +541,7 @@
    ]
   },
   {
-   "id": "P66",
+   "id": "P68",
    "text": "including a human header the PE's authoring exclusion would remove",
    "expect": 1,
    "sources": [
@@ -533,7 +549,7 @@
    ]
   },
   {
-   "id": "P67",
+   "id": "P69",
    "text": "dry runs included, and so does every pull request Nathan merges",
    "expect": 1,
    "sources": [
@@ -541,7 +557,7 @@
    ]
   },
   {
-   "id": "P68",
+   "id": "P70",
    "text": "subsection of the mode's own section",
    "expect": 1,
    "sources": [
@@ -549,7 +565,7 @@
    ]
   },
   {
-   "id": "P69",
+   "id": "P71",
    "text": "092926.1",
    "expect": 0,
    "sources": [
@@ -557,7 +573,7 @@
    ]
   },
   {
-   "id": "P70",
+   "id": "P72",
    "text": "Search for the exact new title",
    "expect": 0,
    "sources": [
@@ -565,7 +581,7 @@
    ]
   },
   {
-   "id": "P71",
+   "id": "P73",
    "text": "or Nathan's restoration from page history",
    "expect": 0,
    "sources": [
@@ -573,7 +589,7 @@
    ]
   },
   {
-   "id": "P72",
+   "id": "P74",
    "text": "app.notion.com",
    "expect": 0,
    "sources": [
@@ -581,7 +597,7 @@
    ]
   },
   {
-   "id": "P73",
+   "id": "P75",
    "text": "http",
    "expect": 0,
    "sources": [
