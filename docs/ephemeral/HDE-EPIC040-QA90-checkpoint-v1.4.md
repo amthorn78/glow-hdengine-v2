@@ -17,7 +17,7 @@ time_utc: 2026-09-29
 | --- | --- |
 | Task | QA-90 invocation with the Product Owner's selection "Selection: check 12" = QA Plan v1.2 check 12 `qa-closeout-deliverables`, the last unissued check of the approved Plan |
 | Result | `TASK_READY`; no `QA_PREEXECUTION_FINDING` |
-| Decision | T12 authored from Plan check 12, with normalizations N-36 to N-45 and the carried N-01 to N-06. It applies the six constraints of QA-110 review T11 v1.0 §6 and lessons K-01 to K-06. The step 1 hash list is the 25 files that the recorded headers name; T11's `DOC_DELTA:` line becomes DD-13; 13 path proofs before recording and 2 after |
+| Decision | T12 authored from Plan check 12, with normalizations N-36 to N-45 and the carried N-01, N-02, N-03, N-05 and N-06. It applies the six constraints of QA-110 review T11 v1.0 §6 and lessons K-01 to K-06. The step 1 hash list is the 25 files that the recorded headers name; T11's `DOC_DELTA:` line becomes DD-13; 13 path proofs before recording and 2 after |
 | Collection | `docs/ephemeral/HDE-EPIC040-QA90-qa-task-collection-v1.4.md`, task T12, attempt 1 |
 | Handoff | `docs/ephemeral/HDE-EPIC040-QA90-handoff-to-qa100-v1.4.md` |
 | Approved base | `docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md`, SHA-256 330ffadf7e83a99259780a0e73c63f7b7084ddd131cb9c460eb8c29f5d714010 |
