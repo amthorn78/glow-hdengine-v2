@@ -278,4 +278,4 @@ Nathan's clarification, same day, verbatim:
 What this means for the design:
 - No technical-writing prompt carries a model, surface or effort recommendation, a workload profile, a strength rating or a session-strength assessment. Nathan chooses the model and effort for each session.
 - The eight current TW-ALPHA prompts lose their model-guidance blocks, and TW-ASSESS-10, the session-strength assessment prompt, is retired with no replacement. The rebuilt GTWPE prompts carry none of this.
-- Canon required such advice in every prompt (HDE Governance §9.1.3) and permitted a human model header (§9.1.6). PE37 drafted a PF10 addendum, PF10-NOMODELADVICE-001, which Nathan adds himself.
+- It is an item on the TW prompts' repair list, not a canon change: Nathan ruled that no PF10 addendum is needed ("We don't need an addendum for this, it can just go in the list of repairs.").
