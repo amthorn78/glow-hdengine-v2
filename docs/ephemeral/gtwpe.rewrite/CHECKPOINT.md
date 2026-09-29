@@ -5,23 +5,24 @@ worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P1r Design revision, at its checkpoint; stopped before G1 (P0 accepted: V0 PASSED; P1 superseded by P1r)
-updated: 2026-09-28T21:37Z
+phase: P1r Design revision, repair round (PE37's decision of 2026-09-29); design v1.2 under full review 2, the last (P0 accepted: V0 PASSED; P1 superseded by P1r)
+updated: 2026-09-29T02:00Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**P1r is at its checkpoint and W1 has stopped before G1.** P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
+**P1r's repair round is under way (§11): design v1.2 is written and under its last full review.** P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
 §2 to §7 are the P0 record as it was accepted, with later disclosures added to §5. §8 holds Nathan's
 rulings, §9 carries P1, and §9.7 carries W1's proposal on Nathan's direction after the P1 report:
-the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r.
+the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r. §11 carries PE37's
+decision on P1r and the repair round it started.
 
 ## 1. State (plan §9)
 
 | Item | Value |
 |---|---|
-| Last completed step | **P1r** (§10): `design/GTWPE-DESIGN-v1.1.md` (`AWAITING_APPROVAL`), its dry run and repair, one full review by two reviewers, and the reviews ledger. Before it, P1 (§9) and W1's proposal (§9.7), which plan v1.2 adopted. P0 was accepted (V0 PASSED) |
+| Last completed step | **P1r's repair** (§11): `design/GTWPE-DESIGN-v1.2.md` (`AWAITING_APPROVAL`, `6f8022f`), repairing full review 1's five required findings and adding one real TW prompt repair to the pilot. Before it, P1r (§10), P1 (§9) and W1's proposal (§9.7). P0 was accepted (V0 PASSED) |
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
@@ -29,7 +30,7 @@ the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r.
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
 | `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
 | Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023. Open there: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **New from P1r, for PE37 to enter:** P1r-1 to P1r-4 (design §15), P1r-5 (§10.4), and the full review's five open required findings (§10.4) |
-| Next action | **None until the relay returns.** The full review left five required findings open, and their count did not halve, so P1r stops here (§10.4). PE37: the next step, a repair round or G1 with the five as accepted risks (§10.8). Nathan: nothing yet |
+| Next action | **Full review 2 of v1.2, in flight** (§11.5). Then this file is updated, pushed, and W1 stops; the design goes to G1 with whatever stays open listed as accepted risk (§11.1) |
 
 ## 2. Authority used
 
@@ -556,3 +557,107 @@ read (§9.2 above; design §1) still hold: `docs/pfcanon/`, `AGENTS.md` and
 4. **G1 is not asked for yet.** When it is, it covers decisions D-1 to D-15. D-11 is settled; D-12
    to D-15 are new; and D-14 should also name `glow-write-boundary`'s branch rule.
 5. **Stopped before G1.** W1 writes no page, tool, prompt, skill or canon file until G1 is approved.
+
+## 11. P1r repair round and the final full review
+
+### 11.1 PE37's decision on P1r, 2026-09-29 (through Nathan)
+
+Received at 2026-09-29T01:15:02Z, verbatim (726 B as received, sha256 `a4a160ce…`):
+
+```plain text
+PE37 decision on P1r:
+1. Repair the five open required findings from the full review, in design v1.1 (or as v1.2).
+2. Change the pilot (plan v1.2 §16.1, P3) so it includes one real repair of an existing TW prompt
+   through GTWPE-MGMT-10, not only the input reader. Pick the smallest real defect the analyses
+   already found and name it in the design.
+3. Then run the second and final full review, which D26-A allows, with fresh reviewers. After that,
+   the design goes to G1 with anything still open listed as accepted risk. There are no further
+   review rounds.
+Enter P1r-1 to P1r-5 and the five findings in your checkpoint for PE37's ledger.
+Checkpoint, push, and stop. Report to Nathan in at most five plain sentences.
+```
+
+| Item | Applied |
+|---|---|
+| 1 | Repaired as a new version, `design/GTWPE-DESIGN-v1.2.md` (`6f8022f`); v1.1 is kept as reviewed. Design §0.2 maps each finding to its repair |
+| 2 | The pilot gains PART-02, a repair of TW-MGMT-10 090826.2 (design §13.2; §11.4 below). Plan v1.2 §16.1's P3 row still names only the reader, and plan §2.5 keeps TW-ALPHA-20260908.1 "intact"; both texts are PE37's to change. Design D-16 asks Nathan to adopt the exception at G1 |
+| 3 | Full review 2, by two fresh reviewers (§11.5). No round follows it |
+| Ledger | §11.2 |
+| Report | At most five plain sentences, as in §10.1 |
+
+The repair round began at 2026-09-29T01:15:02Z, at branch head `3f27ac4`.
+
+### 11.2 For PE37's ledger (`ERRORS.md`)
+
+W1 does not write the ledger. P1r-1 to P1r-5 are design §15's. The other five rows are full review
+1's required findings (§10.4), each set out in `design/REVIEW-P1r-R1-A.md` or `-B.md`.
+
+| # | Class | Severity | Finding | Evidence | Disposition |
+|---|---|---|---|---|---|
+| P1r-1 | PLAN_DEFECT | LISTED | v1.0's D-10 limited GTWPE-MGMT-10's Notion writes to the parent page and its catalog block, while its §4.4 had it produce successor prompt pages | v1.0 §4.4, §14 D-10 | Fixed in v1.1 (§14 D-10) |
+| P1r-2 | PLAN_DEFECT | LISTED | v1.0 gave GTWPE records no rule for `gate_tier`, which the validator requires beyond `INTAKE`, and `closure.py` cannot run on the GTWPE | `modification_validate.py` `REQUIRED_BEYOND_INTAKE` | Fixed in v1.1 (§11.3) |
+| P1r-3 | PLAN_DEFECT | LISTED | v1.0 named triggers for GTWPE-MGMT-10, and no step that detects one | v1.0 §11 | Fixed in v1.1 (§11.4 A0) |
+| P1r-4 | SOURCE | LISTED | The validator requires `artifact_type: GCFPE_MODIFICATION_RECORD` (line 340), so a GTWPE record carries the GCFPE type | `modification_validate.py` line 340 | Accepted in design §11.3, with the `ecosystem` key |
+| P1r-5 | PLAN_DEFECT | REQUIRED (R3) | S1's refusal misses a prompt body outside `AI Prompts` whose title lacks the identity pattern | Both reviewers' L15; §10.4 | Open. Fixed in P4 with RQ-3's fix; design §16 lists it until then |
+| RF-1 | PLAN_DEFECT | REQUIRED (R4) | The drift check compared only the two pinned pages. A lineage source's next version arrives as a new page, so it was never seen | Reviewer A; B's L17 | Fixed in v1.2: §11.4 A0 (a) searches each stable name and reads the register's current release entry; X4 re-pins |
+| RF-2, also RB-4 | PLAN_DEFECT | REQUIRED (R1) | The watched paths were checked once, at A0. Commits landing while a Modification was open went unexamined, and so did the gap between the design's canon read and the first pin | Reviewer A's RF-2; reviewer B's RB-4 | Fixed in v1.2: X4 re-runs the check up to the new checked-through commit; P2(b)'s first pin is `0db3f0e` (§11.7) |
+| RB-1 | PLAN_DEFECT | REQUIRED (R1) | A duplicated prompt page kept the old version's title. Nothing retitled it, and the readback checked neither title nor parent | Reviewer B; A's L11 | Fixed in v1.2: §11.5 retitles the copy once populated, requires exactly one page with the new title, and reads back the title and parent |
+| RB-2 | PLAN_DEFECT | REQUIRED (R1) | A change to prompt pages only could not be selected until Nathan merged a pull request holding only the record, against his ruling that pull requests "cannot gate" (§8) | Reviewer B; A's L27 | Fixed in v1.2: X2 opens a pull request only for repository files or an install; X3 runs only after one; X5 keeps the branch otherwise |
+| RB-3 | PLAN_DEFECT | REQUIRED (R3) | From P4, `capture` scanned every subagent transcript, so it would re-read one holding a prompt body, against `D22` | Reviewer B | Fixed in v1.2: §7.4, §11.4 and §11.6 open only the transcript the agent ID names |
+
+"Fixed in v1.2" means repaired in the text at `6f8022f`. Full review 2 (§11.5) gives each one's
+disposition.
+
+### 11.3 What v1.2 changes
+
+Design §0.2 lists it: the five repairs above; the pilot's second part; GTWPE-MGMT-10's TW-ALPHA writes
+until G5, which are a new versioned sibling of a member and, on TW-ALPHA's selection page, the three
+writes that make a new release (design §11.2, §11.5, §12.2, D-10, D-16); and D-17, which carries
+everything outside an approved edit unchanged. Before committing, W1 checked the new text against
+its sources:
+
+- PART-02 is class B, not D. `ecosystem-change-management.md` §2 verifies class D with "The
+  registry assertion that should have caught it, added", and TW has no registry (TW-MGMT-10
+  analysis F8). The repair carries a settled change to a consumer it did not reach (PE test D8),
+  under the ruling that the PE's general rules also govern TW (`gcfpe.decision-record.md`,
+  *Successor, 2026-09-23 — `D23-G` reaches the PE Metaprompt*).
+- The selection writes follow the page's own convention, seen in the 2026-09-29 fetch (§11.4): a
+  status line naming the selected release, and earlier releases kept under historical headings.
+- Synthetic two-part pilot records (`targets: [tool, prompt]`; both parts class B; three items;
+  `item_count_at_approval: 3`) pass the scratch validator with `tool` added at `ANALYZED`,
+  `PLANNED`, `EXECUTING` and `COMPLETE`: 4/4, exit 0.
+- PF04 — HDE Governance §9.1.6 on `main` at `0db3f0e`: "The prompt's own version and human model
+  header remain permitted." PF10 2.31 (PF10-HDR-001) leaves that permission unchanged. Both back D-17.
+
+### 11.4 The pilot's prompt repair, and why this one
+
+**Chosen:** TW-MGMT-10 090826.2 tells its author to "Use PE's five-dimension descriptive complexity
+profile", and the selected PE Metaprompt 091426.1 has none (TW-MGMT-10 analysis F6; PE test D8). The
+repair removes that instruction. It is one clause in one prompt, and it changes none of the
+relationships TW-ALPHA's *Current operation* records.
+
+**Not chosen.** F1, the Drive canon source, is shared by TW-MGMT-10 and TW-DRAIN-10, so fixing one
+prompt would split a rule (`ecosystem-change-management.md` §1). Each of F2 to F5 and F7 to F10
+needs a new destination, a member change, a platform change, new sources, several prompts, a skill
+change or a rename. F6's other half, the source register's "useful fingerprints", needs the
+register's purpose established first, and is left for a later repair.
+
+**Notion reads in this round** (`D22` condition 5). No prompt body was fetched.
+
+| Time (UTC) | Read | What came back |
+|---|---|---|
+| 01:17:38 | Fetch of the *Glow Technical Writing Ecosystem* page, `3d44590a05eb8171ab6ff4dab33b00ef` | A control page, not a body: 22,107 characters, last edited 2026-09-08. Its layout is in design §1; its text is not copied |
+| 01:19:24 | Search for "five-dimension descriptive complexity profile", highlights off | Ten titles and paths: TW-MGMT-10's five versions, the *HDE TW* page, and four pages outside the TW prompts |
+| 01:24:40 | Search for "PE Metaprompt" within the GCFPE register page, highlights off | Five titles and paths: the register and four pages under it, among them its current release entry |
+| 01:24:53 | Search for "PE Metaprompt 091426.1" within that release entry, highlights up to 200 characters | One result, the entry itself, a control page, with a 192-character highlight from it |
+
+To write design §1, W1 re-read from this session's transcript the fetch's headings and release
+lines, and the searches' titles and paths, by scripts that print nothing else. None of them holds a
+prompt body. The scratch files are scripts, a copy of plan v1.2 and the decision's text; none holds
+a prompt body.
+
+### 11.5 Full review 2
+
+In flight at this commit. Two fresh reviewers, GTWPE-P1R-R2-A and GTWPE-P1R-R2-B, review the commit
+that adds this section, with the brief `design/REVIEW-BRIEF-P1r-FULL-2.md`. The results, the
+post-check, the cost and the relay follow in the next update.
