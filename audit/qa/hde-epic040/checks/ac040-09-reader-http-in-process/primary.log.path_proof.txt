@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-09-reader-http-in-process/primary.log
+size_bytes: 12737
+sha256: 6e53c15e3e0b496c62457887ccc39b9629c1305dfcd830bc9b6964e315452854
+mtime_utc: 2026-09-29T01:55:14Z
+produced_at_utc: 2026-09-29T13:48:00Z

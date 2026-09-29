@@ -22,3 +22,9 @@ none
 | DD-10 | CAVEAT, carried | `ci/checks/check_mirror_schema.sh` is Python; AGENTS.md invocation (RA-13) | AGENTS.md | Repository docs owner | Drives decision: No |
 | DD-11 | CAVEAT, carried | `docs/ADAPTER_009.md:174` says `body_not_allowed`; code emits `invalid_json` (FND-017) | `docs/ADAPTER_009.md` | Compat docs owner | Drives decision: No |
 | DD-12 | CAVEAT, carried | PF10 v13.3.9 §2.28 line references to §2.19 and §2.20 are off by two | PF10-HDE-Build-Notes §2.28 | PF10 drain owner | Drives decision: No |
+
+## QA-DISCOVERED CAVEATS (check qa-closeout-deliverables)
+
+Source: every line starting DOC_DELTA: in the primary logs of QA Plan v1.2 checks 3 to 11, in Plan order. Class: CAVEAT. Drives decision: No.
+
+- DD-13 (source check open-rails-showcompat-vendor): DOC_DELTA: PF05-Canon-HDE-CLI-API-Vendor-Ref section 3.7 lists HDAPI_BASE_URL among the target facts of the CLI vendor smoke, while its section 1, PF07-Canon-Glow-Infrastructure section 2.7 and PF19-Canon-Glow-QA-Guide section 3.5.7 make HD_API_BASE_URL canonical and HDAPI_BASE_URL a deprecated alias; this check used HD_API_BASE_URL with HDAPI_BASE_URL unset (QA Plan v1.2 section 5.2). Owner: PF05 maintainer. Documentation drainage only; drives no decision.

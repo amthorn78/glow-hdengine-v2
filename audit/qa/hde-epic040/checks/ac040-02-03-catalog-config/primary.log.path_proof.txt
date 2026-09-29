@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-02-03-catalog-config/primary.log
+size_bytes: 12806
+sha256: 6e622d117b9cbb9dc96845e61b34572c9d667bf62ed9d900a9cbebfaef65b5f6
+mtime_utc: 2026-09-29T01:48:22Z
+produced_at_utc: 2026-09-29T13:48:00Z

@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-04-09-compat-cli-offline/primary.log
+size_bytes: 14003
+sha256: 2c69c50a0520ab0f5b2a5e7d7ed94fa745ff10120bade979f127fec6a682ac87
+mtime_utc: 2026-09-29T01:54:22Z
+produced_at_utc: 2026-09-29T13:48:00Z

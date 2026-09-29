@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-07-gate-ingress-offline/primary.log
+size_bytes: 19946
+sha256: fea547063e4b5f2476736e0b0e1f9f35bb6b2a1ad51cab97de4db6c4e3b2758e
+mtime_utc: 2026-09-29T01:53:21Z
+produced_at_utc: 2026-09-29T13:48:00Z
