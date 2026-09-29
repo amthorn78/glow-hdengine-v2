@@ -9,7 +9,7 @@ author: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 canon_read_at: "main @ 0db3f0e; docs/pfcanon/, AGENTS.md and docs/prompt_ecosystem_management/ are byte-identical to 8eb4ce0, where P1 read them"
 result: AWAITING_APPROVAL
-revised: 2026-09-29 — v1.1 repaired for full review 1's five required findings, and the pilot extended (§0.2)
+revised: 2026-09-29 — v1.1 repaired for full review 1's five required findings, and the pilot extended (§0.2); after full review 2, only its ledger entries changed: §0.2's last row, §14 D-18, §15, §16 and §17
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
@@ -97,6 +97,7 @@ of an existing TW prompt, and then to run the second and final full review (`CHE
 | The pilot adds one real repair of an existing TW prompt: TW-MGMT-10's pointer to a PE feature that no longer exists | §3; §12.1; §12.5; §13.2 | PE37's decision of 2026-09-29 |
 | Until G5, GTWPE-MGMT-10 may maintain a TW-ALPHA member, only by a new versioned sibling and, on TW-ALPHA's selection page, by the three writes that make a new release | §2.1; §4.4; §11.2; §11.3; §11.5; §12.2; §12.3; §14 D-10, D-16 | The pilot's prompt repair |
 | A repaired TW-ALPHA member carries everything outside its approved edits unchanged | §13.2; §14 D-17 | The pilot's prompt repair |
+| After full review 2, its open findings are listed as accepted risks, and D-18 puts the two required ones to Nathan. No other text changed after that review | §14 D-18; §15; §16; §17 | PE37's decision: anything still open after the final review goes to G1 as an accepted risk |
 
 ## 1. Sources relied on
 
@@ -1126,6 +1127,7 @@ Each has a default. G1's approval takes the default unless Nathan's words say ot
 | D-15 | Does the *Glow HDE Living Prompt Flow Map* record GTWPE prompts? HDE Governance §9.1.6 introduces the map within its GCFPE governance text, and does not say | **No.** The GTWPE catalog is its navigation, and D-10's destination rule does not reach the map | Canon is silent, so the answer is his |
 | D-16 | The pilot's TW-MGMT-10 repair is selected on the *Glow Technical Writing Ecosystem* page by a new TW-ALPHA release that changes only TW-MGMT-10's row, made by §11.5's three writes. Plan §2.5 says TW-ALPHA-20260908.1 "stays intact" and that none of its pages "is rewritten", so this is an exception to it; the plan's text is PE37's to change | **Adopt, as the one exception.** The writes follow the page's own convention for a new release, no prompt page changes, and the prior release's text is kept. The pilot's approved plan names the selection | It changes TW's live selection before G5 |
 | D-17 | A repaired TW-ALPHA member carries everything outside its approved edits unchanged, including an existing model-advice block. The TW-MGMT-10 analysis (F3) reads the PE Metaprompt as unable to revise a TW member without deleting that block; HDE Governance §9.1.6 keeps "The prompt's own version and human model header" permitted, and PF10 2.31 (PF10-HDR-001) leaves that permission unchanged | **Carry it unchanged.** Removing it is a separate repair | It weighs the PE's ban against canon's permission |
+| D-18 | The final full review left two required findings open: R2-1, the drift check's false finding for GCFPE-MGMT-10, and P1r-5, S1's gap for a prompt body outside `AI Prompts` (§16). PE37's decision sends them to G1 as accepted risks. Plan §7 closes no phase with a `REQUIRED` error open, and records `ACCEPTED_RISK` only when Nathan approves it (`DISP-001`) | **Accept both, with each fix placed:** R2-1's correction, as §16 states it, applied when P2(b) authors GTWPE-MGMT-10; P1r-5's added S1 case built in P4. Without the first, the pilot's first A0 reports R2-1, and it becomes the first item of GTWPE-MGMT-10's first repair | R2-1's correction would reach the published body without a review of its own; the P2(b) readback and the pilot test it |
 | D-13 | Who runs the pilot: W1, as a GTWPE-MGMT-10 session checked by the cold run (§13.2), or a fresh session Nathan starts with the published body | **W1, with the cold run.** A fresh session is the truer test, and costs Nathan one action | It needs his action if he chooses the fresh session |
 
 ## 15. Errors for the ledger
@@ -1139,15 +1141,18 @@ enter. W1 does not write the ledger.
 | P1r-2 | PLAN_DEFECT | LISTED | v1.0 gave GTWPE records no rule for `gate_tier`, which the validator requires beyond `INTAKE`; the template computes it from `closure.py`, which cannot run on the GTWPE | `modification_validate.py` `REQUIRED_BEYOND_INTAKE`; `modification-template.md` | Fixed in v1.1: §11.3 |
 | P1r-3 | PLAN_DEFECT | LISTED | v1.0 named triggers for GTWPE-MGMT-10, such as a PE Metaprompt change, and no step that detects one | v1.0 §11 | Fixed in v1.1: §11.4, A0 |
 | P1r-4 | SOURCE | LISTED | The validator requires `artifact_type: GCFPE_MODIFICATION_RECORD` (line 340), so a GTWPE record carries the GCFPE type | `modification_validate.py` line 340 | Accepted in §11.3 with the `ecosystem` key. A type of its own would be a GCFPE change, as E-017 is |
-| P1r-5 | PLAN_DEFECT | REQUIRED (R3) | S1's refusal misses a prompt body outside `AI Prompts` whose title lacks the identity pattern: the GCFPE-MGMT-10 proposed body sits under the Glow Operations Hub, and its title ends "PROPOSED BODY (D20 redesign)" | Both P1r reviewers' L15; the live searches of 2026-09-28, whose results carry each page's path (`CHECKPOINT.md` §10.4) | Open. Fixed in P4 with RQ-3's fix; listed in §16 until then |
+| P1r-5 | PLAN_DEFECT | REQUIRED (R3) | S1's refusal misses a prompt body outside `AI Prompts` whose title lacks the identity pattern: the GCFPE-MGMT-10 proposed body sits under the Glow Operations Hub, and its title ends "PROPOSED BODY (D20 redesign)" | Both P1r reviewers' L15; the live searches of 2026-09-28, whose results carry each page's path (`CHECKPOINT.md` §10.4) | Open at G1 (§14 D-18). RQ-3's title-and-path test cannot catch it (full review 2, reviewer A), so P4 adds an S1 case, with its selftest case, that refuses a page the GCFPE register or TW-ALPHA's selection page binds as a prompt; listed in §16 until then |
 
 Full review 1's five required findings are repaired in this version (§0.2) and are for PE37's ledger
-with that disposition (`CHECKPOINT.md` §11.2).
+with that disposition (`CHECKPOINT.md` §11.2). Full review 2 found four of them fixed, and RF-1 fixed
+for the PE Metaprompt but with a new defect for GCFPE-MGMT-10, R2-1 (§16).
 
 ## 16. Open findings, listed as accepted risks
 
 Listed, not repaired (`D26-A` rule 4). Each is a loud stop, outside the normal path, or carried to
-the build by PE37's decision.
+the build by PE37's decision, except R2-1 and P1r-5. Those are required findings the final full
+review left open, and they go to G1 as accepted risks under PE37's decision of 2026-09-29; §14 D-18
+puts them to Nathan.
 
 **Carried to the build** (E-020 to E-022, accepted under Nathan's delegation). Until P3 and P4 build
 them, the fixes §0.1 lists for RQ-1 to RQ-3 exist only as this design's text. Each is proved by a
@@ -1164,7 +1169,9 @@ selftest case that fails without it (§13.2, §13.3).
 | A GTWPE-MGMT-10 worker's harness file that holds a prompt body is read once more, to capture that worker's return (§11.6) | normal, when a plan names such a worker | low | Read strictly, `D22` counts the capture as a second read | It is the check in hand, and it is disclosed, as GCFPE's follow-up did. The pilot names only the cold run; its prompt repair's readback is the session's own |
 | The P1 diff check's other listed findings: #1 to #4, #6 to #9, #11 and #12, and #10's half on §4.2 and §4.3. #5 falls away with RQ-3's option (i), and #13 was fixed when P1's ledger was written (`c7ceb41`) | as recorded | as recorded | as recorded | Not repaired unless Nathan opts in (`D26-A` rule 4); `design/REVIEW-P1-DIFFCHECK-R1.md` |
 | A new versioned prompt page is read back whole, but no bytes are compared (§11.5) | normal, for a prompt change | low | A change Notion's duplication made inside an unedited paragraph could pass | `D22` forbids comparing the body's bytes; the duplicate is Notion's own copy. The pilot's TW-MGMT-10 repair is the first to run the route (§13.2) |
-| P1r-5: S1's refusal misses a prompt body outside `AI Prompts` whose title lacks the identity pattern (§15) | normal, Path A with a Notion page | low | A prompt body could be recorded into a run's `.md` and pushed (`D22`) | Open until P4 builds S1 with RQ-3's fix |
+| P1r-5: S1's refusal misses a prompt body outside `AI Prompts` whose title lacks the identity pattern (§15) | normal, Path A with a Notion page | low | A prompt body could be recorded into a run's `.md` and pushed (`D22`) | Open at G1 (D-18). P4 adds the S1 case §15 names, since RQ-3's fix alone does not catch it |
+| R2-1, full review 2 (reviewer A's R2A-1, reviewer B's R2B-1): A0 (a) compares the page the GCFPE register selects for GCFPE-MGMT-10, the live `091426.1` body, with the pinned source, the unpromoted proposed body (§11.1). Every A0 then reports a trigger finding that is not drift, and X4 can re-pin the lineage to the live page | normal, every A0 until the proposed body is promoted | certain for the false finding; likely for the wrong re-pin | A meaningless adopt-or-decline question at every `ANALYZE`; then a promotion, or an edit to the real source, passes unreported, as `E-019` feared | Open at G1 (D-18). The correction both reviewers give: P2(b) records beside each lineage pin the page the register selects and its edit time; A0 reports a trigger only when the register's selection differs from that recorded page, or either recorded page was edited after its recorded time; X4 records both again, and moves a pin to another page only when the Modification adopts that page as the source |
+| Full review 1's listed findings that v1.2 did not resolve, as reviewer GTWPE-P1R-R2-A carries them, and full review 2's listed findings: R2A-L1 to R2A-L21, and B's L1 to L28 | as recorded | as recorded | as recorded | Not repaired unless Nathan opts in (`D26-A` rule 4); `design/REVIEW-P1r-R1-A.md`, `-R1-B.md`, `-R2-A.md` and `-R2-B.md`. `CHECKPOINT.md` §11.5 names those both reviewers of full review 2 raised |
 
 ## 17. Reviews ledger
 
@@ -1172,6 +1179,7 @@ selftest case that fails without it (§13.2, §13.3).
 reviewed as a plan. P1's budget was one dry run and one diff check. Plan v1.2 gives P1r one dry run
 and one fresh full review, the first of the two full reviews `D26-A` allows. PE37's decision of
 2026-09-29 adds the repair and the second, final full review. Each round's row is added after it.
+`D26-A`'s budget is now spent: two full reviews, and P1's diff check.
 
 ```yaml
 reviews:
@@ -1195,6 +1203,11 @@ reviews:
     date: 2026-09-28
     required_open: 5
     outcome: "P1r, v1.1 at a33647c, two reviewers: GTWPE-P1R-R1-A (2 required, 31 listed) and GTWPE-P1R-R1-B (4 required, 24 listed), in design/REVIEW-P1r-R1-A.md and -B.md; 5 distinct, since A's RF-2 and B's RB-4 are one. 6 to 5 does not halve (D26-A rule 5), and P1r's budget of one dry run and one full review is spent: returned to Nathan through PE37, DECISION NEEDED, not repaired"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-09-29
+    required_open: 1
+    outcome: "P1r, v1.2 at a08999e, two reviewers: GTWPE-P1R-R2-A (1 required, 21 new listed, round-1 findings carried) and GTWPE-P1R-R2-B (1 required, 28 listed), in design/REVIEW-P1r-R2-A.md and -B.md; 1 distinct, since A's R2A-1 and B's R2B-1 are one (R2-1). Of full review 1's five, four fixed, and RF-1 fixed for the PE Metaprompt with a new defect for GCFPE-MGMT-10 (R2-1). 5 to 1 halves; R2-1 sits in the last repair's text (D26-A rule 5). The last round: to G1 with R2-1 and P1r-5 as accepted risks (§16; §14 D-18)"
 ```
 
 The full review was two fresh `general-purpose` reviewers, GTWPE-P1R-R1-A and GTWPE-P1R-R1-B, each
@@ -1204,6 +1217,14 @@ script from the reviewer's own transcript, as its handback message: 24,894 and 2
 `34f84b88…` and `c62a9656…`, written unedited with a final newline added. The post-check found no
 write attributable to either reviewer; reviewer A disclosed one harness save of an oversized
 `grep` output (`CHECKPOINT.md` §10.5).
+
+Full review 2 was two fresh `general-purpose` reviewers, GTWPE-P1R-R2-A and GTWPE-P1R-R2-B, each
+briefed only by `design/REVIEW-BRIEF-P1r-FULL-2.md` (commit `98ea4f4`). Each brief as sent equals the
+committed brief: sha256 `dd3352bf…` and `70ef463e…`, 11,419 bytes each. Each record was captured by
+script from the reviewer's own transcript, opened by its agent ID, as its handback message: 22,967
+and 23,840 bytes, sha256 `862c6694…` and `2284896c…`, written unedited with a final newline added
+(`90ab003`). The post-check found no write attributable to either reviewer, no Notion call and no
+harness save (`CHECKPOINT.md` §11.7).
 
 ## 18. What this package does not claim
 
