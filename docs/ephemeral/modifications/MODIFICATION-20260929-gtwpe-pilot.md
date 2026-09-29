@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-pilot
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -798,3 +798,36 @@ template's fixed text, a listed finding is repaired only if Nathan opts in.
 The dry run's row-check gap, closed before this round, was by the rubric an R2 defect: a changed row
 would have been overwritten silently. The dry run counted it as a gap, and its ledger row says 0;
 this round's row records the correction.
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+W1 ran this mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE — 092926.1*,
+fetched live at the start of the mode (edited 2026-09-29T04:38:37.656Z, unchanged). The input is §P
+as Nathan approved it on 2026-09-29, with his ruling on the execution surface (`plan_approved_by`).
+
+### Values, fixed at X1.1 (2026-09-29T20:09:02Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-09-29 |
+| «V» | `092926.1` |
+| «R» | `TW-ALPHA-20260929.1` |
+| «P» | 2026-09-29, `plan_approved_date` |
+| «NEW» | `3ea4590a05eb81d09391f5e87fcaebe0`, returned by W1 at X1.3 |
+| «M», «m» | Fixed at X4.1, below |
+
+### Steps
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.1 | PART-01 | APPLIED | Status set to `EXECUTING`; the values above recorded |
+| X1.2 | PART-01 | VERIFIED | X1.0 (1): GTWPE-MGMT-10 fetched live, edited 2026-09-29T04:38:37.656Z. (2): TW-MGMT-10 090826.2 shows 2026-09-08 in a search that fetched no body. (3): TW-ASSESS-10, TW-DRAIN-10, TW-DRAIN-20 and TW-APPLY-10 show 2026-09-08, and TW-RECORD-10 and TW-RECORD-20 show 2026-09-07, by searches; TW-TRIAGE-10, which the searches did not return, was fetched live: edited 2026-09-07T17:01:58.706Z, P1's value exactly. No member was edited since, so A3's match B was not repeated. (4): no page carries the new title. The searches now return dates, not minutes (PF-26); every date is P1's and earlier than today, and the dry run confirmed the minutes today, so no edit happened since |
+| X1.3 | PART-01 | APPLIED | **W1**, `notion-duplicate-page` on `3d54590a05eb81a8b55afabc42298df9`, at 2026-09-29T20:10Z: «NEW» `3ea4590a05eb81d09391f5e87fcaebe0`, which differs from the original's ID |
+| X1.4 | PART-01 | VERIFIED | Populated at the first fetch: its first line was the 090826.2 identity line, *Durable checkpoint, recovery and final handoff* was present with its full last paragraph, and the fetch reported no truncation or unknown blocks. The copy's title was the original's with ` (1)` appended |
+| X1.5 | PART-01 | VERIFIED | Parent: *Glow Technical Writing Ecosystem*, `3d44590a05eb8171ab6ff4dab33b00ef` |
+| X1.6 | PART-01 | APPLIED | **W2**, `update_properties`, `allow_async: false`: title *TW-MGMT-10 — Manage the Glow TW Ecosystem — 092926.1*. Returned synchronously, no task |
+| X1.7 | PART-01 | APPLIED | **W3**, `update_content`, `allow_async: false`, three replacements: E1, E2 and E3 as §P gives them, with «V» = `092926.1`. Returned synchronously, no task |
+| X1.8 | PART-01 | VERIFIED | Fetched whole, edited 2026-09-29T20:10:20.073Z. (1) the title is exact; (2) the parent is the selection page; (3) the first nonblank line equals the title, and the second is `Prompt Version: 092926.1`; (4) `090826.2` does not occur; (5) neither `five-dimension` nor `complexity` occurs; (6) `supported identity/header scheme` and `human guidance non-operative` each occur once, joined by single spaces where E3 cut; (7) the eight level-2 headings, in D2's order; (8) the model-guidance block, with its markers and its `Approximate workload` line, before the first heading. The last section's final sentence is present |
+| X1.9 | PART-01 | VERIFIED | Scoped to the selection page, highlights off: exactly one page carries the new title, `3ea4590a05eb81d09391f5e87fcaebe0`. 090826.2 (`3d54590a05eb81a8b55afabc42298df9`) still shows 2026-09-08 |
