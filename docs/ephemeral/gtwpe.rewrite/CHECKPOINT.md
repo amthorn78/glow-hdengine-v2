@@ -5,14 +5,14 @@ worker: W1, session_01UZ7d2wTQuWPE5Wk4ADwRET (title "GTWPE W1 phase P0", created
 facilitator: PE37, session_018teDumz2XyKdoXF9p3BKFM
 branch: docs/20260925-gtwpe-w1, restarted from main @ e1ab8ba on 2026-09-28 after #495 merged
 pull_request: "#495 merged 2026-09-25T08:05:40Z (P0 record). PRs carry records only and gate nothing (§8)"
-phase: P2(b) Foundations, under G1 and G2 approved 2026-09-29; then P3's ANALYZE, stopping at Nathan's first approval (P1r closed at G1)
-updated: 2026-09-29T04:40Z
+phase: P3 Pilot. GTWPE-MGMT-10's ANALYZE is done, revised after the cold run, and stopped at Nathan's ANALYZE approval and the Q1 ruling (§12.3). P2(b) is done under G1 and G2 (§12.2)
+updated: 2026-09-29T05:45Z
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
 ---
 
 # GTWPE checkpoint
 
-**G1 is approved and W1 is in P2(b) (§12).** Before it: **P1r is complete (§11).** Design v1.2 repairs full review 1's five findings and adds one real TW prompt repair to the pilot. The final full review left one required finding, which goes to G1 as an accepted risk with P1r-5. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
+**P3's `ANALYZE` is done and waits on Nathan's approval and one ruling (§12.3).** Before it, G1 and P2(b) (§12.1, §12.2); before them, **P1r is complete (§11).** Design v1.2 repairs full review 1's five findings and adds one real TW prompt repair to the pilot. The final full review left one required finding, which goes to G1 as an accepted risk with P1r-5. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
 §2 to §7 are the P0 record as it was accepted, with later disclosures added to §5. §8 holds Nathan's
 rulings, §9 carries P1, and §9.7 carries W1's proposal on Nathan's direction after the P1 report:
 the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r. §11 carries PE37's
@@ -22,15 +22,15 @@ decision on P1r and the repair round it started.
 
 | Item | Value |
 |---|---|
-| Last completed step | **P1r, with its repair round** (§11): `design/GTWPE-DESIGN-v1.2.md` (`AWAITING_APPROVAL`), which repairs full review 1's five required findings, adds one real TW prompt repair to the pilot, and has had its second and final full review. Before it, v1.1's round (§10), P1 (§9) and W1's proposal (§9.7). P0 was accepted (V0 PASSED) |
+| Last completed step | **P3's `ANALYZE`** (§12.3): the pilot's record at `ANALYZED` on `docs/20260929-modification-gtwpe-pilot`, revised after the cold run, readiness `NEEDS_RULING`. Before it, P2(b) (§12.2): the GTWPE parent page and GTWPE-MGMT-10, published under G2; and P1r with its repair round (§11), whose design v1.2 G1 approved. P0 was accepted (V0 PASSED) |
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | **Notion, P2(b) under G2 (§12.2): the GTWPE parent page and GTWPE-MGMT-10, created, and the catalog updated, each read back.** Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1, P1r and its repair round: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
+| External writes | **P3: pushes to `docs/20260929-modification-gtwpe-pilot`, the record only, and to this branch; no Notion write (§12.3).** **Notion, P2(b) under G2 (§12.2): the GTWPE parent page and GTWPE-MGMT-10, created, and the catalog updated, each read back.** Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1, P1r and its repair round: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
-| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `53449c9`, with `docs/pfcanon/` and `AGENTS.md` byte-identical to `8eb4ce0` |
-| Open errors | `ERRORS.md` on PE37's branch at `0ecb6a1` holds E-001 to E-023. Open there: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **New from P1r, for PE37 to enter:** §11.2's rows: P1r-1 to P1r-5, full review 1's five required findings (four fixed, and RF-1 fixed with a new defect), and full review 2's R2-1, open |
-| Next action | **P3's `ANALYZE`** (§12.1). P2(b) is done (§12.2). W1 stops at the first point where Nathan must approve, or at twice a phase's estimate |
+| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `f4be532`. Since the design's canon read at `0db3f0e`, the watched paths changed only at `feb14e5` (the validator's `tool`) and `4ad12fe` (PF10 v13.4.4) (§12.1, §12.3) |
+| Open errors | `ERRORS.md` on `main`, last changed at `feb14e5`, holds E-001 to E-024; E-024 is the cost overrun, accepted at G1. Open as of `0ecb6a1`: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **For PE37 to enter:** §11.2's rows, P1r-1 to P1r-5 and full review 2's R2-1; and §12.3's rows, P3-1 to P3-4 |
+| Next action | **Nathan's approval of the pilot's `ANALYZE`, and his ruling on Q1** (§12.3). Then `PLAN` in this session, stopping at `PLAN`'s approval, or at twice P3's estimate (4.6M) |
 
 ## 2. Authority used
 
@@ -222,6 +222,15 @@ No other prompt body was fetched. The probe subagent fetched only the HDE TW hub
 | 9 | none from W1's reads | W1 fetched no prompt body: one control page, *Glow Technical Writing Ecosystem*, inline, and three searches (§11.4) | No file was made |
 | 10 | `…/subagents/agent-a991d4921600fe64a.jsonl` and `agent-a194b777780190301.jsonl`, the full-review-2 reviewers' transcripts | Repository files only; neither made a Notion call (§11.7) | W1 read each by script only: to check the brief as sent, to capture the handback by agent ID, to list tool-use names and inputs, and to sum usage. Left to teardown |
 | 11 | This session's own transcript | As row 8 | Read again by script: to sum usage, to list this round's Notion calls with their results' titles and paths, to print the selection page's headings and release lines, and to take PE37's decision verbatim. The scripts printed nothing from P0's or P1's body fetches. The same strain on `D22` condition 4 as row 8, which full review 2 carries (A's carried L2; B's L16) |
+
+**Added in P2(b) and P3** (§12.2, §12.3).
+
+| # | File | Held | Handling |
+|---|---|---|---|
+| 12 | `…/tool-results/` saves of three control pages: the GCFPE register, twice (P2(b) and P3's A0), and the *Glow Operations Hub* (177,658 B, for P3's revision) | Control pages, no prompt body. The PE Metaprompt's save in P2(b) is in §12.2 | The register read at its *Current selection* section, and the Operations Hub counted over its whole text and its two TW sections printed, each by script. All deleted (exit 0). `tool-results/` again holds only its two files from 2026-09-28 |
+| 13 | none from W1's P3 fetches of prompt bodies | The eight TW bodies and GTWPE-MGMT-10 at `ANALYZE`'s start; GTWPE-MGMT-10 and TW-MGMT-10 again for the revision | Every result came back inline, so no file was made. None hashed, compared or copied |
+| 14 | `…/subagents/agent-ab5c6760d50100f76.jsonl`, the cold run's transcript | GTWPE-MGMT-10's and TW-MGMT-10's bodies, which the worker fetched inline, and the control pages it read | W1 read it by script only: to check the brief as sent, to capture the handback by agent ID, to list its tool uses for the post-check, and to sum usage. Left to teardown |
+| 15 | This session's own transcript | As rows 8 and 11, and P3's fetches | Read by script within A3, to count the retired feature over the eight fetch results (`a3_measure.py`, and a second count for `profile`), printing counts and matching lines only; and to sum usage. The record names both as pilot findings (PF-2, PF-14). The same strain on `D22` condition 4 as rows 8 and 11 |
 
 ## 6. Errors found at P0, for `ERRORS.md`
 
@@ -879,3 +888,110 @@ two bodies, and it is left to teardown.
 
 **Cost so far:** P2, from 04:24:54Z to 04:39:30Z, 647,365 tokens on plan v1.2 §16.3's measure, against
 about 1M.
+
+### 12.3 P3: the pilot's `ANALYZE`, the cold run, and the stop
+
+**Where W1 stopped:** at the first point where Nathan must approve, `ANALYZE`'s approval (A7,
+`PRODUCT_OWNER_ACTION_PENDING`), with one open ruling, Q1. The record is
+`docs/ephemeral/modifications/MODIFICATION-20260929-gtwpe-pilot.md` on
+`docs/20260929-modification-gtwpe-pilot`, branched from `main` at `4ad12fe`. It holds only the
+record, so no pull request is opened at this mode. It is at `ANALYZED`, readiness `NEEDS_RULING`,
+interaction cost 7.
+
+| Commit | What it holds |
+|---|---|
+| `457da8f` | A1: the record created at `ANALYZING`, with the request and ITEM-01 |
+| `483ce51` | A7: §A's first version, at `ANALYZED`, readiness `READY`, cost 5 |
+| `1ba64bc` | §A revised after the cold run, before approval: Q1; `NEEDS_RULING`; cost 7; ITEM-01 narrowed so that nothing else in the prompt changes; risks 7 to 11; the defect classes; candidates C1 to C6; pilot findings PF-1 to PF-20 against the body and PF-D1 to PF-D3 against the design |
+
+Each push was read back: the branch's blob equals the local file (`a7e6d707…` at `1ba64bc`), and
+`main`'s validator (blob `0cd1e5c`, unchanged at `f4be532`) exits 0 on it.
+
+**What Nathan is asked for:**
+
+1. His approval of the pilot's `ANALYZE`. The session records his words and the date in
+   `analyze_approved_by`, and sets `item_count_at_approval` to 1.
+2. His ruling on Q1: which pages change when the repaired TW-MGMT-10 is selected. TW names its
+   current release, and TW-MGMT-10 090826.2 as its maintenance prompt, on four pages: the selection
+   page, *Alpha 1*, *HDE TW* and the *Glow Operations Hub*. The approved route (D-10) writes only the
+   first. **(a)** the selection page only, the other three stale until G5; **(b)** all four, as TW's
+   own release procedure does, for about 15 minutes and 0.15M tokens more in `EXECUTE`; **(c)**
+   select nothing yet. W1 recommends (b). It widens the Notion destination rule G2 set, which is
+   why it is his.
+
+**The pilot's `ANALYZE`, in brief.** W1 followed GTWPE-MGMT-10 092926.1, fetched live at the start of
+the mode. R2-1's fix held: A0 (a) raised no false lineage trigger, at `4ad12fe` or on the re-run at
+`f4be532`. A0 (b) found the two watched-path commits since `0db3f0e`, `feb14e5` and `4ad12fe`, and
+neither contradicts the GTWPE. A3 measured the retired feature across the eight selected TW bodies
+by broad match minus exceptions: one instance, in one sentence that gives two other instructions
+(risk 7). The record validated at `ANALYZED` each time.
+
+**The cold run** (design §13.2):
+
+| Item | Value |
+|---|---|
+| Worker | Agent `ab5c6760d50100f76`, general-purpose, in the background. Its transcript runs from 2026-09-29T04:50:08Z to 05:21:51Z, about 31.7 minutes |
+| Brief | `coldrun/brief_exact.txt` in W1's scratchpad: 2,256 B, sha256 `660b809e7fddd3911e663d3b8bcec45467490595ba7e4e230d25ec90b8a026d5`. The brief as sent, read from the worker's transcript, equals it. It carries §7.2's write-nothing clause; the prompt's page ID; the request, verbatim; three limits (fetch only the prompt page and the one prompt page the request names; state writes, never make them; stop where `ANALYZE` stops); and the return's frame, with nonce `6100960928ca` |
+| Return | Captured by agent ID, by a JSON parse of its final handback, to `pilot/COLD-RUN-ANALYZE-R1.md`, unedited. The handback is 37,737 B, sha256 `708c41a6d0d7ff2425b8337ad4fe785df0dd41f3b45b2e78aef00c7686371605`; the file adds one final newline (37,738 B, sha256 `148b9bdd08f66ce7c355ae763fdcb6664e7a0c1f3e4b49707aea50f919d2fb26`). Its first and last lines carry the nonce |
+| Tool use | 90 calls, among them 6 Notion fetches (GTWPE-MGMT-10, TW-MGMT-10, the GTWPE page, the selection page, *Alpha 1* and *HDE TW*), 6 searches and 74 Bash calls. The scan found every Bash command read-only; the worker's own account says it ran `git status --short` once, which may refresh git's index cache |
+| Post-check | Snapshots before and after (`coldrun/snap.sh`): the working tree, the stash, branches, local and remote heads, the scratchpad, `/tmp`, `tool-results/` and the subagents directory. After: the working tree's only change was the capture W1 wrote; `origin/main` had moved to `f4be532` (#550, another session's merge); the subagents directory had gained the worker's transcript; `tool-results/` was unchanged |
+| Cost | 473,511 tokens on the plan's measure, from its transcript: uncached 176, cache writes 471,845, output 1,490 as recorded. The Agent tool reported 474,458. The transcript under-records output, since the return alone is about 12,600 tokens. Design §12.5 put the cold run at about 0.25M, so it cost about 1.9 times that |
+
+**The comparison.** The record's *Pilot findings* holds it in full. The cold run agreed with W1's
+first §A on the item, the part, the class, the tier, the targets, the closure, the drift check and
+the instance. It found three things the first §A missed, and W1 verified each before adopting it:
+
+- **TW names its current release on more than one page** (Q1). The cold run found three and left
+  the *Glow Operations Hub* unmeasured; W1 read it and found the fourth. TW-MGMT-10's own selection
+  procedure updates all four. The route in GTWPE-MGMT-10 and design D-10 writes one. This is the
+  pilot's main result so far: a defect in the change prompt's route that a first pass through the
+  prompt did not surface, and that the prompt's steps give no way to find (PF-4, PF-5).
+- **The sentence under repair carries two other instructions** (risk 7): deleting the whole
+  sentence would be a silent wrong edit. `PLAN`'s edit removes one clause.
+- **GTWPE-MGMT-10's PE workarounds omit D-17** (PF-6): an author applying the PE's ban on workload
+  ratings would meet a conflict the body does not resolve. The scope freeze turns it into a stop.
+
+Twenty findings against the body go to GTWPE-MGMT-10's first repair (design §13.2, *After it*). Three
+go to Nathan against the design: the pilot, as routed, does not exercise the tool route (X2, X3, V3's
+reader checks); the cold run's brief cannot test A3 across TW-ALPHA or A0 (a)'s register read; and
+D-10's selection route writes one of four pages.
+
+**Control pages read for the revision**, each inline unless stated: the selection page (edited
+2026-09-08T07:15:27.010Z); *Alpha 1* (2026-09-08T07:15:29.132Z); *HDE TW* (2026-09-23T17:44:08.540Z);
+and the *Glow Operations Hub* (2026-09-24T16:03:38.449Z), which came back as a 177,658-byte save.
+Prompt bodies read live again: GTWPE-MGMT-10 (unchanged, 04:38:37.656Z) and TW-MGMT-10 090826.2
+(unchanged, 2026-09-08T07:07:26.670Z), to check the claims about them. The installed `tw-flowmaster`
+`SKILL.md` was searched: no match for TW-MGMT-10, `090826.2` or its page ID. Searches, highlights
+off: "Glow Operations Hub"; "TW-MGMT-10 090826.2" and "TW-ALPHA-20260908.1", scoped to the Operations
+Hub; and A0 (a)'s three. In the repository: the decision record's `D23-G` successor, D26-E and D26-F;
+the defect-class catalogue; the review template's write instructions; and the GCFPE's
+merge-counting convention (`MODIFICATION-20260923-closeout-residuals.md` §A).
+
+**`main` moved** from `4ad12fe` to `f4be532` (#550, 2026-09-29T05:02:45Z): three HDE-EPIC040 QA files
+under `docs/ephemeral/`. No watched path changed.
+
+**Cost on the record** (plan v1.2 §16.3's measure). P3 from 04:40Z, measured at 05:41Z: this session
+658,355 (77 calls: uncached 154, cache writes 479,842, output 178,359), and the cold run 473,511; about
+1.13M in all, against P3's estimate of about 2.3M (design §12.5), so the stop at twice it is 4.6M.
+`PLAN` is estimated at about 1.5M and `EXECUTE` at 0.5M to 0.65M, so P3 is heading for about 3.2M to
+3.35M, about 1.4 times its estimate: the cold run cost nearly twice its share, and the revision added
+about 0.2M. It stays under the stop. Output counts are as the transcripts record them, which
+understates a worker's (PF-14).
+
+**For PE37's ledger** (`ERRORS.md`), new from P3:
+
+| Row | Kind | Finding | Where | State |
+|---|---|---|---|---|
+| P3-1 | PLAN_DEFECT | The TW-ALPHA selection route writes one of the four pages that name TW's current release, and the change prompt has no step that finds the others | Design §11.5, §14 D-10; GTWPE-MGMT-10 092926.1 (PF-4, PF-5) | Open: Q1 to Nathan; the body's repair is GTWPE-MGMT-10's first Modification |
+| P3-2 | PLAN_DEFECT | The pilot, as routed, does not exercise the tool route: X2, X3 and V3's reader checks | Design §13.2 (PF-D1) | Open: exercised when the reader is routed (C1) |
+| P3-3 | PLAN_DEFECT | The cold run's brief cannot test A3 across TW-ALPHA or A0 (a)'s register read | Design §13.2 (PF-D2) | Listed |
+| P3-4 | PLAN_DEFECT | The token measure has no meter that the harness-file rule permits, and a worker's transcript under-records its output | Design §7.6, §11.6; GTWPE-MGMT-10 (PF-14) | Listed; W1 measures by script and discloses it |
+
+Also for PE37: the decision record's `D23-G` successor of 2026-09-23 keeps TW out of scope for
+GCFPE's work, and no entry records this workstream's authority over TW (the record's risk 11). Not
+blocking.
+
+**Next action.** On Nathan's approval and Q1 ruling, W1 records both in the record and goes straight
+on to `PLAN` in this session (PL1 to PL4): §P, a `PLAN` dry run, and one full review by two reviewers,
+stopping at `PLAN`'s approval. `PLAN` reads TW-MGMT-10 live again to set the exact edit, and names
+every Notion write, which Nathan's `PLAN` approval then authorizes.
