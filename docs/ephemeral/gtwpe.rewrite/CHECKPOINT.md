@@ -12,7 +12,7 @@ status: RECORD. Merging preserves the record and approves nothing (D21-C)
 
 # GTWPE checkpoint
 
-**P3's `PLAN` is done and waits on Nathan's approval (§12.4); its `ANALYZE` is approved (§12.3, §12.4).** Before it, G1 and P2(b) (§12.1, §12.2); before them, **P1r is complete (§11).** Design v1.2 repairs full review 1's five findings and adds one real TW prompt repair to the pilot. The final full review left one required finding, which goes to G1 as an accepted risk with P1r-5. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
+**P3, the pilot, is complete (§12.5): TW-MGMT-10 092926.1 is published, and TW-ALPHA-20260929.1 selects it on all four pages that name TW's current release.** Nathan approved its `ANALYZE` and `PLAN` (§12.3 to §12.5). Before it, G1 and P2(b) (§12.1, §12.2); before them, **P1r is complete (§11).** Design v1.2 repairs full review 1's five findings and adds one real TW prompt repair to the pilot. The final full review left one required finding, which goes to G1 as an accepted risk with P1r-5. P0 was accepted by PE37 (V0 PASSED, relayed 2026-09-28).
 §2 to §7 are the P0 record as it was accepted, with later disclosures added to §5. §8 holds Nathan's
 rulings, §9 carries P1, and §9.7 carries W1's proposal on Nathan's direction after the P1 report:
 the change prompt first. Plan v1.2 adopted that proposal, and §10 carries P1r. §11 carries PE37's
@@ -22,15 +22,15 @@ decision on P1r and the repair round it started.
 
 | Item | Value |
 |---|---|
-| Last completed step | **P3's `PLAN`** (§12.4): the pilot's record at `PLANNED` on `docs/20260929-modification-gtwpe-pilot`, commit `b216327`, after its dry run and one full review by two reviewers, whose two required findings are repaired. Before it, P3's `ANALYZE`, approved by Nathan on 2026-09-29 with Q1 ruled (b) (§12.3, §12.4); P2(b) (§12.2); P1r (§11). P0 was accepted (V0 PASSED) |
+| Last completed step | **P3's `EXECUTE`** (§12.5): the pilot's record at `COMPLETE` on `docs/20260929-modification-gtwpe-pilot`, commit `c4d3292`: TW-MGMT-10 092926.1 published, the catalog's checked-through commit moved to `74f6cc9`, and TW-ALPHA-20260929.1 selected on four pages, each write read back. Before it, P3's `PLAN` (§12.4), approved by Nathan on 2026-09-29 with the execution surface (§12.5); P3's `ANALYZE`, approved with Q1 ruled (b) (§12.3, §12.4); P2(b) (§12.2); P1r (§11). P0 was accepted (V0 PASSED) |
 | Base | `main` @ `8eb4ce0`, merged into this branch as `1ef6c8d` (brings plan v1.1 and `ERRORS.md` from #541). P0 was read at `f141e5d` |
 | Head of `docs/20260925-gtwpe-w1` | the latest commit touching this file; read it with `git log -1 -- docs/ephemeral/gtwpe.rewrite/CHECKPOINT.md` |
 | Other branches | none. The harness-designated branch `claude/cool-meitner-six1hv` is unused; Nathan's kickoff names `docs/20260925-gtwpe-w1` |
-| External writes | **P3: pushes to `docs/20260929-modification-gtwpe-pilot`, the record only, and to this branch; no Notion write (§12.3).** **Notion, P2(b) under G2 (§12.2): the GTWPE parent page and GTWPE-MGMT-10, created, and the catalog updated, each read back.** Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1, P1r and its repair round: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
+| External writes | **P3's `EXECUTE`, under Nathan's plan approval (§12.5): eight Notion writes, W1 to W8. TW-MGMT-10 092926.1, a duplicate of 090826.2, with its title and three text edits; the GTWPE catalog's checked-through commit; and the current-release notes on the selection page, *Alpha 1*, *HDE TW* and the *Glow Operations Hub*. Each read back whole.** P3's `ANALYZE` and `PLAN`: pushes to `docs/20260929-modification-gtwpe-pilot`, the record only, and to this branch; no Notion write (§12.3, §12.4). **Notion, P2(b) under G2 (§12.2): the GTWPE parent page and GTWPE-MGMT-10, created, and the catalog updated, each read back.** Git: this branch, pushed, first commit `b8a4d57c3778ab8d7c073ec005fc199edb365833`. GitHub: draft PR #495 from this branch, created 2026-09-25T07:54:02Z, merged by Nathan 2026-09-25T08:05:40Z. **P1, P1r and its repair round: pushes to this branch only.** Neither opened a PR or wrote to Notion, Drive, skills, canon, the registry or the graph. They only read Notion, GitHub and the session list |
 | Readback | After each push, the file is read back from origin and compared with the local copy. The last result is in PR #495's "Checks run" and in the relay report |
-| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `f4be532`. Since the design's canon read at `0db3f0e`, the watched paths changed only at `feb14e5` (the validator's `tool`) and `4ad12fe` (PF10 v13.4.4) (§12.1, §12.3) |
-| Open errors | `ERRORS.md` on `main`, last changed at `feb14e5`, holds E-001 to E-024; E-024 is the cost overrun, accepted at G1. Open as of `0ecb6a1`: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **For PE37 to enter:** §11.2's rows, P1r-1 to P1r-5 and full review 2's R2-1; and §12.3's rows, P3-1 to P3-4; and §12.4's, P3-5 to P3-7 |
-| Next action | **Nathan's approval of the pilot's plan** (§12.4), which also settles the execution surface for its eight Notion writes (PO-1). Then `EXECUTE` in this session |
+| `main` since P0 | PF10 is now `PF10-HDE-Build-Notes-v13.4.2.md` (316,408 B), up from v13.3 at P0; P1 reads the current file. **`AGENTS.md` changed** on 2026-09-27, in five commits, from sha256 `94c38926…` (50,015 B) to `2a28ac5c…` (55,079 B); P1 read it in full (design §10.1). `main` is now `74f6cc9`. Since the design's canon read at `0db3f0e`, the watched paths changed at `feb14e5` (the validator's `tool`) and `4ad12fe` (PF10 v13.4.4) (§12.1, §12.3), then at four PF10 updates, `633ca5d` to `c48a79a` (v13.4.5 to v13.4.9), none bearing on the GTWPE (§12.5) |
+| Open errors | `ERRORS.md` on `main`, last changed at `feb14e5`, holds E-001 to E-024; E-024 is the cost overrun, accepted at G1. Open as of `0ecb6a1`: E-004, E-006, E-007, E-009, E-010 and E-015 to E-022. **For PE37 to enter:** §11.2's rows, P1r-1 to P1r-5 and full review 2's R2-1; and §12.3's rows, P3-1 to P3-4; §12.4's, P3-5 to P3-7; and §12.5's, P3-8 to P3-10 |
+| Next action | **PE37's decision on the pilot's result** (§12.5). V3 is met: the record validates at `COMPLETE`, every step and the item have a disposition, and the interaction cost is 8 against 7. The pilot's findings, PF-1 to PF-28 and PF-D1 to PF-D3, wait for GTWPE-MGMT-10's first repair (design §13.2); P4 Build follows, with G2 before its pages (plan v1.2 §16.1). Nathan merges the pilot's record when he chooses (PO-3; it has no pull request, K-13) |
 
 ## 2. Authority used
 
@@ -234,6 +234,9 @@ No other prompt body was fetched. The probe subagent fetched only the HDE TW hub
 | 16 | `…/subagents/agent-aa0beef1b4332d7f1.jsonl` and `agent-ac7851a1271cf90c6.jsonl`, the two `PLAN` reviewers' transcripts (§12.4) | The record, the design, the four control pages they fetched, and no prompt body | W1 read each by script only: to check the brief as sent, capture the handback by agent ID, list tool uses for the post-check, and sum usage. Left to teardown |
 | 17 | `…/tool-results/` save of the *Glow Operations Hub* for `PLAN`'s dry run, 177,658 B | A control page | Counted by script over its text; deleted (exit 0) |
 | 18 | This session's own transcript, in `PLAN` | GTWPE-MGMT-10's body, fetched at the mode's start, and TW-MGMT-10 090826.2's, fetched for the dry run's D2 | D2's counts made by reading in context; read by script only to sum usage |
+| 19 | `…/tool-results/` saves in `EXECUTE`: *Alpha 1*'s readback, and the *Glow Operations Hub*'s pre-read and readback | Control pages, no prompt body | *Alpha 1*'s compared by script with its pre-read, the Hub's checked by `hub.py`; all three deleted (exit 0). `tool-results/` again holds only its two files from 2026-09-28 |
+| 20 | none from W1's `EXECUTE` fetches of prompt bodies | GTWPE-MGMT-10 at the mode's start; TW-TRIAGE-10, for its edit time; «NEW» at X1.4 and X1.8 | Every result came back inline, so no file was made. None hashed, compared or copied |
+| 21 | This session's own transcript, in `EXECUTE` | As row 18, and this mode's fetches | The context was compacted during X4.3. After that, read by script: to compare the pre-reads and readbacks of four control pages (the catalog, the selection page, *Alpha 1*, *HDE TW*); to count X4.1's six terms in GTWPE-MGMT-10's body, printing six counts (PF-28); to recover this mode's earlier commands and results, with page bodies elided; and to sum usage. The plan's K-7 expected the inline pages to be checked by reading. The same strain on `D22` condition 4 as rows 8, 11 and 15 |
 
 ## 6. Errors found at P0, for `ERRORS.md`
 
@@ -1099,3 +1102,43 @@ before it; the work it asked for was already done, and nothing was repeated.
 | `PLAN` approval | Nathan, 2026-09-29, in the record's `plan_approved_by` with his words quoted. Commit on `docs/20260929-modification-gtwpe-pilot`, read back |
 | The execution surface | Nathan's ruling: "The older rule that Notion changes are made in ChatGPT does not apply to this work". It settles PO-1 and P3-5 for this work. It goes on the change prompt's repair list as a pilot finding in §E. Canon still carries HDE Governance §9.1.3's sentence; recording the ruling there, by an HDE Build Notes addendum, is Nathan's or PE37's to direct, and W1 writes no PF10 |
 | Where W1 stops | Only if a check fails (`D26-B`), or at twice `EXECUTE`'s estimate of 0.65M tokens |
+
+**Result: `EXECUTE` complete, 2026-09-29, 20:07Z to 20:26Z, with no failed check.** The pilot's
+record is `COMPLETE`: commit `1426e43`, with a dated correction note at `c4d3292` (blob
+`2f9a6b2f836545b27b865e1e796059376a9a40e9`, read back against the local file). Both commits
+validate (exit 0), with `main`'s validator at blob `0cd1e5c`. Its §E holds every step's evidence.
+
+| Step | Outcome |
+|---|---|
+| X1 | TW-MGMT-10 092926.1 made as `3ea4590a05eb81d09391f5e87fcaebe0` (W1 to W3) and read back: the retired instruction gone, the sentence's other two instructions kept, and 090826.2 untouched |
+| X2, X3 | The record pushed at `EXECUTING` (`df6565b`); X3 not applicable |
+| X4.1 | `main` at `74f6cc9`. Four PF10 updates since `f4be532`: 2.34 PF10-VENDOR-001, and three QA records of HDE-EPIC040. None bears on the GTWPE |
+| X4.2 to X4.6 | W4 to W8: the catalog's checked-through commit, then TW-ALPHA-20260929.1 on the selection page, *Alpha 1*, *HDE TW* and the *Glow Operations Hub*. Each sent synchronously, no task returned; each whole page compared with its pre-read, and nothing else on it changed |
+| X4.7 | The new row links the new page, which sits under the selection page |
+| X5 | ITEM-01 `VERIFIED`, PART-01 landed whole, interaction cost 8 against 7 (the second ruling, on the execution surface) |
+
+**New pilot findings, for GTWPE-MGMT-10's first repair.** PF-25 is Nathan's ruling, which he
+directed onto the change prompt's repair list: "The older rule that Notion changes are made in
+ChatGPT does not apply to this work." Canon still carries HDE Governance §9.1.3's sentence;
+recording the ruling there is Nathan's or PE37's to direct. PF-26: Notion's search now dates
+results to the day and does not return every match. PF-27: a rollback taken from the plan's text
+would not match a readback where Notion shows a child page's title. PF-28: the body does not say
+what to do when a session's context is compacted mid-mode.
+
+**For PE37's ledger** (`ERRORS.md`), new from `EXECUTE`:
+
+| Row | Kind | Finding | Where | State |
+|---|---|---|---|---|
+| P3-8 | PLAN_DEFECT | Notion's search returns `ai_search` results dated to the day and misses pages, so edit-time preconditions checked by search lose their precision | GTWPE-MGMT-10's prompt-page route (PF-26) | Worked around by a live fetch; open for GTWPE-MGMT-10's first repair |
+| P3-9 | PLAN_DEFECT | Rollback texts taken from the plan would not match a readback in which Notion shows a child page's title | The pilot's plan; GTWPE-MGMT-10's rollback rule (PF-27) | No rollback was needed; open for GTWPE-MGMT-10's first repair |
+| P3-10 | PLAN_DEFECT | No rule for a session whose context is compacted mid-mode: W1 recounted a body's terms from the transcript's copy, and checked three inline pages by script where the plan's K-7 expected reading | GTWPE-MGMT-10, *Reading prompt bodies* (PF-28); `D22` condition 4 | Disclosed in the record; open for GTWPE-MGMT-10's first repair |
+
+P3-5 is settled for this work by Nathan's ruling; canon is unchanged.
+
+**Cost on the record** (plan v1.2 §16.3's measure). `EXECUTE`: 463,936 tokens at 20:27Z (uncached
+152, cache writes 363,938, output 99,846, over 76 calls), against the estimate of 0.65M, and about
+18 minutes against about 1 h 15 min. P3 in all: about 3.69M against its estimate of 2.3M, 1.6
+times it, below the stop at 4.6M.
+
+**Next action.** PE37's decision on the pilot's result. Nathan merges the pilot's record when he
+chooses; nothing waits on it, and it approves nothing (`D21-C`).
