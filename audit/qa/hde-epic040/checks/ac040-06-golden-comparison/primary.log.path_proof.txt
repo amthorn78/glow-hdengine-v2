@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-06-golden-comparison/primary.log
+size_bytes: 36195
+sha256: 0b8cda3488141932d45205c9285620ac1545b78c93a6a5a322f218890a6c2e73
+mtime_utc: 2026-09-29T01:52:28Z
+produced_at_utc: 2026-09-29T13:48:00Z

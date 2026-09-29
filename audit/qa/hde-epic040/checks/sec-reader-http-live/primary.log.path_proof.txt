@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/sec-reader-http-live/primary.log
+size_bytes: 73940
+sha256: 97e37e38b75d793bef7b57d47bb024070bc7366df718edb1303d0c378022d960
+mtime_utc: 2026-09-29T02:00:29Z
+produced_at_utc: 2026-09-29T13:48:00Z

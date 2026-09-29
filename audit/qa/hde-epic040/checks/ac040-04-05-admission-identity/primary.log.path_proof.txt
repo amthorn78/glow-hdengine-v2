@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/ac040-04-05-admission-identity/primary.log
+size_bytes: 14284
+sha256: ffa2a4629db34c415554f32ed88365641471f2995ac440c5b688b8b7262a45cc
+mtime_utc: 2026-09-29T01:50:07Z
+produced_at_utc: 2026-09-29T13:48:00Z

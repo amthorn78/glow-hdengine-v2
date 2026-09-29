@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/checks/step-0b-doc-delta-capture/primary.log
+size_bytes: 15951
+sha256: a64483b5460b75fbc4ce7028f238ff9e72a3f62c617c8e3361ab3d3c163d2c4b
+mtime_utc: 2026-09-29T01:33:05Z
+produced_at_utc: 2026-09-29T13:48:00Z

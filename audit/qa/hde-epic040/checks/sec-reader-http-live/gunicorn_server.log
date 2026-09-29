@@ -1,0 +1,9 @@
+[2026-09-29 01:58:24 +0000] [78820] [INFO] Starting gunicorn 21.2.0
+[2026-09-29 01:58:24 +0000] [78820] [INFO] Listening at: http://0.0.0.0:8000 (78820)
+[2026-09-29 01:58:24 +0000] [78820] [INFO] Using worker: gthread
+[2026-09-29 01:58:24 +0000] [78838] [INFO] Booting worker with pid: 78838
+[2026-09-29 01:58:24 +0000] [78839] [INFO] Booting worker with pid: 78839
+[2026-09-29 01:58:56 +0000] [78820] [INFO] Handling signal: term
+[2026-09-29 01:58:57 +0000] [78838] [INFO] Worker exiting (pid: 78838)
+[2026-09-29 01:58:57 +0000] [78839] [INFO] Worker exiting (pid: 78839)
+[2026-09-29 01:58:57 +0000] [78820] [INFO] Shutting down: Master

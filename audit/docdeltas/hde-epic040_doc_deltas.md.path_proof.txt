@@ -1,0 +1,5 @@
+path: audit/docdeltas/hde-epic040_doc_deltas.md
+size_bytes: 3585
+sha256: f440538c9bc8e7f3dc6d008bb061175c3d12a20a10cb3f2450b8c6316d099ab5
+mtime_utc: 2026-09-29T13:48:00Z
+produced_at_utc: 2026-09-29T13:48:00Z

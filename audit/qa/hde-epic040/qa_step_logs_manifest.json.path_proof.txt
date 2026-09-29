@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic040/qa_step_logs_manifest.json
+size_bytes: 1997
+sha256: 2bb4764f46bd5b362504f53f2894e9ed28b8f40e857d062cf663e1b4af2f1dfc
+mtime_utc: 2026-09-29T13:50:25Z
+produced_at_utc: 2026-09-29T13:50:37Z
