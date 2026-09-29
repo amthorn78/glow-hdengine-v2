@@ -2,7 +2,7 @@
 artifact_type: GTWPE_ERROR_LEDGER
 plan: GTWPE-IMPLEMENTATION-PLAN-v1.2.md, §7
 kept_by: PE37 (`session_018teDumz2XyKdoXF9p3BKFM`)
-updated: 2026-09-28 (E-009 to E-023 from W1 P1, design §15 and CHECKPOINT §9)
+updated: 2026-09-29 (E-024; E-025 and E-026 from PE37's acceptance check of the pilot)
 ---
 
 # GTWPE error ledger
@@ -35,3 +35,5 @@ A phase does not close with a `REQUIRED` error open (plan §7).
 | E-022 | P1 / diff check | PLAN_DEFECT | REQUIRED | P1 reviewer (RQ-3, R3) | A live read of a prompt-body input leaves an unreported transcript copy (`D22`) | same | OPEN. Proposed `ACCEPTED_RISK` with option (i): a Notion prompt body is `UNSUPPORTED_INPUT`; accepted under Nathan's direction of 2026-09-28 (plan v1.2 §16.4) |
 | E-023 | P0 relay | PLAN_DEFECT | LISTED | W1 (§9.1) | PE37's relay text carried a `<paste Nathan's words>` slot; it reached W1 unfilled, so G0 is still unrecorded | `CHECKPOINT.md` §9.1 | FIXED in practice: relay texts carry no slot to fill. G0 asked for directly |
 | E-024 | P1r / cost | PLAN_DEFECT | LISTED | W1 | P1r and its repair round cost about 5.8M tokens against 2M, nearly three times the estimate; the reviewers' work was reloaded several times, cause not found | W1 `CHECKPOINT.md` | ACCEPTED_RISK: Nathan approved the overrun, 2026-09-29 ("yes"). PE37 watches the next phases against their estimates |
+| E-025 | P3 / relay | PLAN_DEFECT | REQUIRED | PE37 (acceptance check) | PE37's pilot request named only the prompt repair (design §13.2, PART-02) and left out PART-01, the tool part, so the pilot never exercised the change prompt's repository route: X2's pull request, X3's merge detection and a tool's selftest | Pilot record §A *Intake*, risk 6 and PF-D1 (`docs/20260929-modification-gtwpe-pilot`, `c4d3292`); PE37's request: "run GTWPE-MGMT-10 on the one-instruction repair of the TW management prompt named in the design" | OPEN. GTWPE-MGMT-10's first repair carries a small tool part taken from the pilot's template and validator findings, so the route gets its first test there. The input reader itself waits with the writing-side build (Nathan, 2026-09-29: nothing is implemented until the change management system is proven). P3 does not close until that repair passes |
+| E-026 | P2–P3 / canon | SOURCE | LISTED | W1 (PF-23, PF-25, K-28) | HDE Governance §9.1.3 requires standard ChatGPT for live Notion changes and prompt publication; the GTWPE made both from Claude Code under Nathan's per-plan rulings | Pilot record PF-23, PF-25 and K-28 | FIXED when merged: PF10 v13.4.10, addendum 2.38 PF10-AINEUTRAL-001, on Nathan's direction of 2026-09-29. Merging it is his action; until then each plan approval carries the ruling |
