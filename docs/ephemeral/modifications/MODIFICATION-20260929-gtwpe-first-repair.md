@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-first-repair
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control, tool]
 gate_tier: 1
 closure:
@@ -29,13 +29,18 @@ reviews:
   - mode: PLAN
     kind: DRY_RUN
     date: 2026-09-29
-    required_open: 0
+    required_open: 1
     outcome: "By this session, read-only against the live pages: the validator and the GTWPE check exit 0 on a copy at PLANNED; the 43 anchors occur as expected on 092926.1, by reading, twice; C1 to C4 once each on the catalog; the tool's selftest 17/17 and guard proof 5/5; edits.json and phrases.json consistent by script. One required defect, in the tool's first draft (fenced headings), fixed before this row"
   - mode: PLAN
     kind: FULL
     date: 2026-09-29
-    required_open: 0
+    required_open: 7
     outcome: "Two fresh reviewers on e7e4d4c: GTWPE-FIRST-REPAIR-PLAN-A (5 required, 27 listed) and -B (5 required, 21 listed), captured in evidence/gtwpe-first-repair/PLAN-REVIEW-A.md and -B.md. 7 distinct, three raised by both; all 7 repaired in the commit that adds this row, and checked read-only (Repair check, P1 to P6), the X5 push in scratch repositories. Listed findings are K-15 to K-17"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-29
+    required_open: 2
+    outcome: "One fresh reviewer, GTWPE-FIRST-REPAIR-PLAN-DC, on e7e4d4c..bba16f9, captured in evidence/gtwpe-first-repair/PLAN-DIFFCHECK.md: of the seven, six fixed and one fixed with new defects; 2 required (DC-1, DC-2) and 12 listed, both required and 11 listed in text the repair added, which is D26-A rule 5's stop signal. No further round. DC-1 and DC-2 were then corrected by the checker's own smallest corrections, which no reviewer has read (K-19); the plan goes to Nathan"
 item_count_at_approval: 17
 items:
   - id: ITEM-01
@@ -759,8 +764,9 @@ From W1 on, a failed check or a tool error stops the run, and nothing more is bu
    named, and the Modification stays `EXECUTING`.
 4. **A return to Nathan**, `IMPLEMENTATION_BLOCKED`, ending `DECISION NEEDED`. Before X4, he archives
    «NEW». If PART-02 must not land, he says so; the session then restarts the branch from
-   `origin/main` with X5's commands, commits the failure record alone, and opens a record-only pull
-   request, and only then does he close the branch's first pull request unmerged. W4 is reversed only
+   `origin/main` with X5's commands and commits the failure record alone, so that X2's pull request,
+   which follows the branch, carries the record alone, and the session updates its title and body to
+   say so. Nathan merges it; no pull request is closed (DC-1). W4 is reversed only
    when X4.2's or X4.3's own check failed: by its reverse replacements, texts taken from W4's readback,
    made by Nathan or at his direction. A failure at X5 reverses no Notion write. No page is restored
    from its history, and no rollback needs a copy of a prompt body.
@@ -791,6 +797,8 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-15 | The reviewers' listed findings, each with the path, likelihood and consequence its record gives it: `PLAN-REVIEW-A.md` LA-1 to LA-27 and `PLAN-REVIEW-B.md` LB-1 to LB-21. These pairs are one finding: LA-2 and LB-2; LA-3 and LB-3; LA-5 and LB-7; LA-6 and LB-10; LA-7 and LB-9; LA-8 and LB-8; LA-13 and LB-12; LA-14 and LB-13; LA-15 and LB-14; LA-21 and LB-16; LA-22 and LB-11. LA-9 is RB-3 and LB-1 is RA-3, both required and repaired | As each record states | As each record states | `D26-A` rule 4: a listed finding is repaired only if Nathan opts in |
 | K-16 | Of K-15, four can stop a correct `EXECUTE` loudly, and each has a one-line repair if Nathan opts in: LA-4 (X1.10 (4) does not say the counts are over the page's content), LA-5 and LB-7 (X3's fixed record counts), LA-8 and LB-8 (X4.2's readback wording against Notion's rendering), and LB-19 (X1.7's wait between fetches) | Low to medium | A loud stop on a correct run, and a return to Nathan | Listed by both reviewers; loud |
 | K-17 | LA-18 does not reproduce: in D2's fetch, E12's anchor ends its table cell, so no following text attaches to E12's new sentences | — | None | Refuted from the dry run's own reading |
+| K-18 | The diff check's listed findings, DL-1 to DL-12, each with the path, likelihood and consequence `PLAN-DIFFCHECK.md` gives it. Its phrase numbers, and those in K-15's records, are `phrases.json`'s at `e7e4d4c`, before E11's and E12's second phrases were inserted (DL-11) | As the record states | As the record states | No round is left (`D26-A` rules 2 and 5) |
+| K-19 | DC-1 and DC-2 were corrected after the last review the rules allow, by the diff check's own smallest corrections, in *Failure path* step 4 and PO-5. No reviewer has read the corrected text | Low: both sit on failure paths that need a stop after W1 | A defect in the correction would surface only on those paths, with Nathan acting on the return | `D26-A` rule 5's stop signal fired; a further round is Nathan's override (`review_cap`) |
 
 ### Product Owner actions
 
@@ -800,7 +808,7 @@ Approving this plan accepts each of these (`DISP-001`).
 | PO-2 | Merge the pull request X2 opens, after reading the new page «NEW» if he wishes | X3: the blobs on `main` equal the branch's |
 | PO-3 | The selection of «V»: this plan names it (W4), so PO-1 makes it; there is no separate promotion step | X4.2 and X4.3 |
 | PO-4 | Merge the record's pull request, opened at X5, when he chooses. Nothing waits on it, and it approves nothing (`D21-C`) | Its blob on `main` equals the branch's, whenever he merges |
-| PO-5 | Only after a failure: archive «NEW»; merge the pull request that carries the failure record; if PART-02 must not land, close X2's pull request unmerged once the record-only one exists; have W4 reversed from its readback only if X4.2 or X4.3 failed | The read-only sweep, after he acts |
+| PO-5 | Only after a failure: archive «NEW» if the failure came before X4, or once W4 has been reversed (DC-2); merge the pull request that carries the failure record, which after a restart before the merge is X2's own, carrying the record alone (DC-1); have W4 reversed from its readback only if X4.2 or X4.3 failed | The read-only sweep, after he acts |
 
 ### Explicitly not in scope
 
@@ -887,6 +895,27 @@ After the repairs, by this session, read-only:
 | P5 | E11's and E12's anchors | Unchanged, so D2's counts stand |
 | P6 | The tool | Unchanged: sha256 «H» |
 
+### Check of the repair's diff (PL3)
+
+The one check `D26-A` rule 2 allows, by one fresh general-purpose reviewer, GTWPE-FIRST-REPAIR-PLAN-DC,
+on `e7e4d4c..bba16f9`, briefed by `DIFFCHECK-BRIEF.md` at `602abcb` in the same way. Its record,
+`PLAN-DIFFCHECK.md`, was captured unedited from its transcript: 12,793 bytes with a final newline,
+sha256 `de8f1efbea81dff0d7d6a5a7761f59d9454611e5869953946ae4fd9900c5c345`, first line "2 distinct
+confirmed REQUIRED findings". Cost, as the harness reported it: 240,238 tokens, about 13 minutes. The
+post-check found no change but the capture and the harness's own logs.
+
+- **The seven:** six fixed; repair 6 fixed with new defects.
+- **The trend:** 7 required, then 2, a halving. But both required findings, and 11 of the 12 listed,
+  sit in text the last repair added: `D26-A` rule 5's stop signal. No further round runs.
+- **DC-1 (R3), failure path.** Step 4 restarted this Modification's own branch with X5's commands,
+  which makes X2's open pull request carry the record, then told Nathan to close "the branch's first
+  pull request": the same one. The failure record would never reach `main`. Corrected by the
+  checker's first correction: X2's pull request carries the record alone, and Nathan merges it.
+- **DC-2 (R4), failure path.** PO-5 told Nathan to archive «NEW» after any failure, while step 4
+  leaves W4 in place after a failure at X5: the selected page archived. Corrected by the checker's
+  correction: archive «NEW» only before X4, or once W4 has been reversed.
+- **Listed:** DL-1 to DL-12, as K-18.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode, GTWPE-MGMT-10 092926.1's body, fetched at the
@@ -896,5 +925,29 @@ After the repairs, by this session, read-only:
   reading, in context. It is left to teardown.
 - **One tool-results save**, the PE Metaprompt 091426.1, a prompt body, read by script for its edit
   time, its headings and the slices above, never hashed or compared, then deleted (exit 0).
-- **Scratch:** `make_edits.py` in the scratchpad, which wrote `edits.json`; it holds the anchors and new
-  texts `edits.json` holds, and no body. `a6/` from `ANALYZE`.
+- **The three reviewers' transcripts**, one each, at the paths the harness named for their agent IDs.
+  Each was opened by `capture.py` for its `SubagentHandback` answer, and nothing else. B's was also read
+  once for its record types and tool names only, when the first capture found no answer as text. None
+  holds a prompt body: no reviewer fetched a prompt page. B reports one harness save of repository
+  text, left to teardown. They are left to teardown.
+- **Scratch:** `make_edits.py`, which wrote `edits.json`, holds the anchors and new texts `edits.json`
+  holds, and no body; `make_brief.py`, `capture.py`, `repair_p.py`, the post-check snapshots, the
+  scratch repositories of P2, and `a6/` and `pl3/`, copies of this record. No transient file holds a
+  prompt body.
+
+### Cost of this mode
+
+Time: from 21:50:59Z, when Nathan's `ANALYZE` approval was recorded, to PL4. Tokens: the three
+reviewers used 954,445 between them, as the harness reported; this session's own use is not measured
+by it (ITEM-03; §A risk 2).
+
+### Canon and rulings relied on
+
+- HDE Governance §9.1.6 and HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, read in full on `main` at
+  `fffadb5`, as §A cites them.
+- `gcfpe.decision-record.md` `D21`, `D22` and `D26`; `notion-write-boundary.md`;
+  `prompt-body-content-policy.md`; `execution-and-delegation-model.md` §0, §1 and §7;
+  `reviewer-prompt-template.md`'s second template; `modification-template.md` 2.1.
+- The PE Metaprompt 091426.1, read as §P's opening says, for its version rule, its identity lines,
+  its publication rules and its authoring exclusion.
+- Nathan's `ANALYZE` approval of 2026-09-29, with Q1's option (a) and the stop rule by time.
