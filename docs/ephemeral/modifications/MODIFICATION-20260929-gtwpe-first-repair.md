@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-first-repair
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control, tool]
 gate_tier: 1
 closure:
@@ -26,6 +26,7 @@ reviews:
     date: 2026-09-29
     required_open: 0
     outcome: "By this session, read-only: the validator exits 0 on a copy at ANALYZED; A0 (b) reproduces at fffadb5; the front matter and all five tables are well formed; PART-02's premises hold on main. A second reading of the scope table corrected 11 of 16 rows, one of them a required defect (ITEM-11 missed four mode checks), repaired before this row. No full review"
+item_count_at_approval: 17
 items:
   - id: ITEM-01
     statement: "When GTWPE-MGMT-10 selects a new TW-ALPHA release, no other page goes on naming the superseded release unnoticed: ANALYZE finds every page that names TW's current release, the plan updates each one or lists it for Nathan as his ruling on Q1 sets, and `notion_control` names the pages the route writes."
@@ -125,8 +126,8 @@ request: |
 
   Report to Nathan in at most five plain sentences, and end with exactly what he must approve, if anything.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-09-29: \"Nathan approves the first repair's analysis (2026-09-29). Q1: when a TW prompt is repaired, the change prompt updates every page that names TW's current release, as in the pilot. Continue to PLAN, stop at Nathan's plan approval, and apply the stop rule by time as the analysis proposes.\" This rules Q1: option (a), and sets time as the stop rule's meter for this run"
+analyze_approved_date: 2026-09-29
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
