@@ -462,7 +462,7 @@ The estimate is in the front matter. Time is the meter this session can read; to
 measured by it (ITEM-03, risk 2). Twice either figure is where the session stops.
 
 **This mode's own cost.** Time: from shortly after 21:22:07Z, when the session's first fetch already
-found `fffadb5`, to A7 at about 21:50Z, so about half an hour. Tokens: not measured by this session
+found `fffadb5`, to A7, pushed at 21:45:09Z: under half an hour. Tokens: not measured by this session
 (risk 2).
 
 ### Dry run (A6)
