@@ -995,3 +995,21 @@ blocking.
 on to `PLAN` in this session (PL1 to PL4): §P, a `PLAN` dry run, and one full review by two reviewers,
 stopping at `PLAN`'s approval. `PLAN` reads TW-MGMT-10 live again to set the exact edit, and names
 every Notion write, which Nathan's `PLAN` approval then authorizes.
+
+### 12.4 Nathan's approval of the pilot's `ANALYZE`, and the pilot's `PLAN`
+
+Received in this session on 2026-09-29, verbatim:
+
+```plain text
+Nathan approves the pilot's analysis (2026-09-29). The fix updates the current-version note on all
+four pages. Record this in the pilot record and your checkpoint, then write the plan, have it
+reviewed, and stop for approval. Report in at most five plain sentences.
+```
+
+| Item | Recorded |
+|---|---|
+| `ANALYZE` approval | Nathan, 2026-09-29, in the record's `analyze_approved_by` with his words quoted; `item_count_at_approval: 1`, so the scope is frozen. Commit `5852fac` on `docs/20260929-modification-gtwpe-pilot`, read back (blob `ab1d6ad5…` on the branch equals the local file; the validator exits 0) |
+| Q1 | Ruled (b): the release updates the current-version note on all four pages, the selection page, *Alpha 1*, *HDE TW* and the *Glow Operations Hub*. It widens design D-10's Notion destination rule for this Modification only; the Notion writes themselves are authorized when Nathan approves the plan that names them |
+| `readiness` | Stays `NEEDS_RULING`: it is `ANALYZE`'s advice, frozen with §A, and the ruling is recorded in the approval field |
+| Where W1 stops | At `PLAN`'s approval (PL4), after a `PLAN` dry run and one full review by two reviewers (design §13.2), or at twice `PLAN`'s estimate of 1.5M tokens |
+| `main` | Moved to `633ca5d`: PF10 is now v13.4.5, adding 2.34 PF10-VENDOR-001 (a directed agent runs live vendor calls, with vendor configuration from environment variables). It is a watched path; X4's drift check records it. A canon-first read found no prompt-ecosystem or Notion rule in it |
