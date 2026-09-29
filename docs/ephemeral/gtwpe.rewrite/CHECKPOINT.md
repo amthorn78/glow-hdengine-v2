@@ -1079,3 +1079,23 @@ about 1.7 times its estimate.
 **Next action.** On Nathan's approval of the plan, W1 records his words in `plan_approved_by` and
 runs `EXECUTE` in this session, stopping at a failed check (`D26-B`) or at twice `EXECUTE`'s
 estimate.
+
+### 12.5 Nathan's approval of the pilot's plan, and `EXECUTE`
+
+Received in this session on 2026-09-29, verbatim:
+
+```plain text
+Nathan approves the pilot's plan (2026-09-29), including that you make its eight Notion changes
+from this Claude session. The older rule that Notion changes are made in ChatGPT does not apply to
+this work; record it on the change prompt's repair list. Record this approval, then carry out the
+plan. Stop only if a check fails. Report in at most five plain sentences.
+```
+
+An identical copy of his earlier instruction (the `ANALYZE` approval and Q1 ruling) had arrived
+before it; the work it asked for was already done, and nothing was repeated.
+
+| Item | Recorded |
+|---|---|
+| `PLAN` approval | Nathan, 2026-09-29, in the record's `plan_approved_by` with his words quoted. Commit on `docs/20260929-modification-gtwpe-pilot`, read back |
+| The execution surface | Nathan's ruling: "The older rule that Notion changes are made in ChatGPT does not apply to this work". It settles PO-1 and P3-5 for this work. It goes on the change prompt's repair list as a pilot finding in §E. Canon still carries HDE Governance §9.1.3's sentence; recording the ruling there, by an HDE Build Notes addendum, is Nathan's or PE37's to direct, and W1 writes no PF10 |
+| Where W1 stops | Only if a check fails (`D26-B`), or at twice `EXECUTE`'s estimate of 0.65M tokens |
