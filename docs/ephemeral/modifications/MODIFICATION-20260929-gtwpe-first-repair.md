@@ -524,3 +524,301 @@ edits are checked, and Nathan's approval of this section is its check.
 - Design v1.2, approved at G1: §6, §11, §13.2, D-10, D-16 and D-17.
 - The GTWPE target architecture (Nathan, 2026-09-29): nothing on the writing side is built until the
   change management system is proven. This Modification builds nothing there.
+
+## §P — Plan
+
+*Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+092926.1*, fetched live at the start of the mode (about 21:51Z): edited 2026-09-29T04:38:37.656Z, unchanged.
+The input is §A as Nathan approved it on 2026-09-29, with his Q1 ruling, option (a), and his direction
+to apply the stop rule by time (`analyze_approved_by`). The body's edits were authored through the
+selected PE Metaprompt 091426.1 (edited 2026-09-23T17:17:22.217Z), read in this mode except characters
+38,000 to 55,901 of its 76,125, the rest of its GCFPE overlay, which the body's workarounds set aside.
+They follow its general rules and the body's four workarounds: identity lines, the `MMDDYY.N` version rule, a new page under the exact source
+parent after a title check, versionless references, and no runtime-selection or workload text.
+
+### How the plan runs
+
+`EXECUTE` applies the steps below in order, and every step's check must pass before the next starts.
+
+- **X1** runs the preconditions (X1.0), installs and tests the tool (PART-02), commits it on this
+  branch, then makes the new GTWPE-MGMT-10 page with its edits (PART-01) and reads it back, twice: by
+  this session, and by the isolated readback worker this plan names (X1.12).
+- **X2** pushes the branch, opens its pull request, and stops: `PRODUCT_OWNER_ACTION_PENDING`, `IN
+  FLIGHT`, for Nathan's merge. The new page exists unselected until X4, so Nathan can read it beside
+  the pull request.
+- **X3**, after the merge, resumes from `main`: the merge is detected by blobs, and the tool's gates
+  run again from `main`.
+- **X4** runs the drift check and selects the new version in the catalog (W4). PART-01 lands there,
+  after PART-02 (`after: [PART-02]`).
+- **X5** closes the record, restarts the branch from `main`, and opens the record's pull request.
+
+A failed check, or a tool error, stops the run. Before W1, the part is recorded `BLOCKED` and the
+run returns; from W1 on, it takes `D26-B`'s path (*Failure path*).
+
+**Waiting for each write** (ITEM-04, applied ahead of its landing). Every `notion-update-page` call is
+sent with `allow_async: false`. If a call still returns an `async_task`, the run polls
+`notion-get-async-task` until it reports `succeeded`, and only then makes the step's check. A task
+that reports `failed` is a tool error, and the page is fetched again before anything else. The
+duplicate, W1, is awaited by X1.7.
+
+**The stop rule, by time** (Nathan, `analyze_approved_by`; ITEM-03). `EXECUTE`'s estimate is about 2
+h, so the session stops at a clean step boundary when 4 h have elapsed. The time counts from X1.1 to
+X2's return, and again from X3's resume to X5; the wait for Nathan's merge does not count. Tokens are
+recorded only where the session can read them without opening a file that holds a prompt body.
+
+**Values, fixed once and recorded in §E:**
+
+| Value | What it is |
+|---|---|
+| «D» | `EXECUTE`'s UTC date at X1.1, as `yyyy-mm-dd`, used for the rest of the run |
+| «V» | Fixed at X1.2 by the PE Metaprompt's version rule: «D» as `MMDDYY`, then `.N`, where N is one more than the highest N among the GTWPE parent's child pages titled `GTWPE-MGMT-10 — Manage the GTWPE — <MMDDYY>.N` for that `MMDDYY`, or 1 if there is none. For «D» = 2026-09-29 it is `092926.2` |
+| «P» | `plan_approved_date` |
+| «NEW» | The page ID W1 returns, without dashes |
+| «M», «m» | At X3, the first commit on `origin/main` that holds the tool, `git log -1 --format=%H origin/main -- docs/prompt_ecosystem_management/gtwpe/gtwpe_record_check.py`, in full and as its first seven characters |
+
+Every text below is sent exactly as written, with these values substituted and nothing else changed.
+
+**The quoting limit.** A passage of GTWPE-MGMT-10's body in this record is at most 94 characters, the
+length of this plan's longest anchor (E18). Every anchor is in `edits.json`.
+
+### Values fixed in this plan
+
+| Value | Fixed as |
+|---|---|
+| «H» | `5d3aa623578c7e64e6f04e1aef9ea40a8d34cf7f017fe7d14652d4fed179247f`, the sha256 of `gtwpe_record_check.py` in the evidence directory, 14,307 bytes |
+
+### Evidence files
+
+In `docs/ephemeral/modifications/evidence/gtwpe-first-repair/`, committed with this section:
+
+| File | What it is |
+|---|---|
+| `gtwpe_record_check.py` | PART-02, the exact file X1.3 installs. Its sha256 is «H» (*Values fixed in this plan*, below) |
+| `guard_proof.py` | The guard proof X1.4 and X3 run: each of the tool's four checks, disabled in a scratch copy, fails exactly its own cases |
+| `edits.json` | W3's 43 replacements, E1 to E43: for each, its item, where it sits, the anchor, the new text, the matches expected before the write, and the phrases checked after it |
+| `phrases.json` | The 73 phrases X1.10 and X1.12 count on the new page, each with its expected count, built from `edits.json` by script |
+| `EXEC-READBACK-BRIEF.md` | X1.12's brief: the phrases without their counts, built from `phrases.json` by script |
+| `PLAN-REVIEW-BRIEF.md` | PL3's review brief, committed before the reviewers are spawned |
+
+### Before any write: X1.0, the preconditions
+
+All read-only. If any fails, stop and return `IMPLEMENTATION_BLOCKED`; nothing has been written.
+
+1. GTWPE-MGMT-10 092926.1, fetched live at the start of `EXECUTE`: edited 2026-09-29T04:38:37.656Z,
+   the edit time at which the dry run found every anchor (D2). A later edit means the anchors may
+   have moved.
+2. The GTWPE parent page, `3ea4590a05eb818c915bdfd3d150c44b`, fetched: C1 to C4 (*The catalog texts*)
+   each occur once; no child page carries the title `GTWPE-MGMT-10 — Manage the GTWPE — «V»`. «V» is
+   fixed from its child list.
+3. `git fetch origin main`: `docs/prompt_ecosystem_management/gtwpe/` has no entry on `origin/main`.
+   If `modification_validate.py` or `modification-template.md` has a blob on `origin/main` other than
+   `0cd1e5c` and `8fc21ab`, record it; X1.4's gates then decide.
+4. The PE Metaprompt 091426.1, fetched: edited 2026-09-23T17:17:22.217Z. The harness saves that fetch;
+   a script reads the edit time alone, and the save is deleted (the pilot plan's K-27).
+5. The branch holds this record with `plan_approved_by` set, and the evidence tool's sha256 is «H».
+
+### The steps
+
+Four Notion writes, W1 to W4. The plan makes no other.
+
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| X1.1 | — | the record | Set the status to `EXECUTING`. Fix «D» and «P», and record them in §E, with the UTC time, which starts the clock | GTWPE-MGMT-10 X1 | The values are in §E before X1.2 | None needed |
+| X1.2 | — | — | The preconditions X1.0 1 to 5; fix «V» | This plan | Each as X1.0 states it | None needed |
+| X1.3 | PART-02 | `tool` | `mkdir -p docs/prompt_ecosystem_management/gtwpe` and copy the evidence `gtwpe_record_check.py` there | The route for a tool (GTWPE-MGMT-10, *How each kind of target changes*) | `sha256sum` of the installed file is «H»; `git status --porcelain` lists only it and the record | Delete the file (nothing is committed yet) |
+| X1.4 | PART-02 | `tool` | Run the tool's gates from the branch | The same | (1) `PYTHONDONTWRITEBYTECODE=1 python3 docs/prompt_ecosystem_management/gtwpe/gtwpe_record_check.py --selftest`: 17/17, exit 0. (2) `PYTHONDONTWRITEBYTECODE=1 python3 docs/ephemeral/modifications/evidence/gtwpe-first-repair/guard_proof.py docs/prompt_ecosystem_management/gtwpe/gtwpe_record_check.py .`: 5/5, exit 0. (3) The tool over `docs/ephemeral/modifications/`: 2/2 GTWPE records pass, 4 others left to the validator. (4) `modification_validate.py --selftest` 66/66, and the directory 6/6 | As X1.3 |
+| X1.5 | PART-02 | `tool` | Commit the tool and the record on this branch; no push yet | The same | `git show --stat HEAD` lists exactly those two paths | `git reset --hard HEAD~1`, before X2 only |
+| X1.6 | PART-01 | `prompt` | **W1.** `notion-duplicate-page` on `3ea4590a05eb817093b3feea624aa24a`; «NEW» is the returned ID | The prompt-page route; this plan's approval (`notion-write-boundary.md`) | The call returns an ID, and «NEW» differs from `3ea4590a05eb817093b3feea624aa24a` (the pilot plan's K-25). This is the first Notion write | Nathan archives «NEW» |
+| X1.7 | PART-01 | `prompt` | Fetch «NEW» until populated: at most six fetches, the second onwards after a wait of about 20 seconds (K-16). Populated means: its first nonblank line is `GTWPE-MGMT-10 — Manage the GTWPE — 092926.1`, the heading `## Relation to the PE Metaprompt` is present and its paragraph ends `is ignored.`, and the fetch reports no truncation or unknown blocks | The route ("fetch it until it is populated") | Populated by the sixth fetch, and its parent is the GTWPE parent page; otherwise stop (`D26-B`) | As X1.6 |
+| X1.8 | PART-01 | `prompt` | **W2.** `notion-update-page` on «NEW», `update_properties`: title `GTWPE-MGMT-10 — Manage the GTWPE — «V»` | The route ("set its title") | Checked at X1.10 (1) | As X1.6 |
+| X1.9 | PART-01 | `prompt` | **W3.** `notion-update-page` on «NEW», `update_content`: the 43 replacements of `edits.json`, E1 to E43, in its order, in one call, with «V» substituted in E1 and E2. E35 is sent with `replace_all_matches: true` and matches 4 times; every other anchor matches once | ITEM-01 to ITEM-16; the route ("set its identity lines … and apply the approved edits") | Checked at X1.10 | As X1.6 |
+| X1.10 | PART-01 | `prompt` | Fetch «NEW» whole, into this session's context, and check it. Every count is made by reading and checked by a second reading (ITEM-07, applied ahead of its landing) | The route's verification; HDE Governance §9.1.6 ("read back complete changed published bodies") | (1) The title is exactly `GTWPE-MGMT-10 — Manage the GTWPE — «V»`; (2) the parent is the GTWPE parent page; (3) the first two nonblank lines are that title and `Prompt Version: «V»`; (4) each of the 73 phrases of `phrases.json` occurs exactly its expected number of times; (5) the 24 headings, in order, are 092926.1's (D3); (6) the last paragraph ends with E41's new sentence, complete; (7) the fetch reports no truncation or unknown blocks | As X1.6 |
+| X1.11 | PART-01 | `prompt` | Fetch the GTWPE parent page, and fetch 092926.1 | The route (the two title checks and the current version's edit time, as ITEM-06 words them) | Exactly one child page carries `GTWPE-MGMT-10 — Manage the GTWPE — «V»`, and it is «NEW». 092926.1 still shows 2026-09-29T04:38:37.656Z | As X1.6 |
+| X1.12 | PART-01 | `prompt` | The isolated readback worker: commit nothing new; take a post-check snapshot; spawn one fresh general-purpose subagent, neither forked nor context-inheriting, with `EXEC-READBACK-BRIEF.md`'s block and «NEW» and «V» substituted; take the snapshot again; capture its final answer to `EXEC-READBACK.md` in the evidence directory | GTWPE-MGMT-10, *Reading prompt bodies* (an isolated readback worker, which an approval names: this plan's); `execution-and-delegation-model.md` §7 | Its 73 counts equal `phrases.json`'s, compared by this session, and its headings and first two lines equal X1.10's. A difference is re-read; a confirmed one stops the run (`D26-B`). The post-check finds no change outside the capture file. If the harness refuses the capture's transcript read, §E records the refusal and the comparison, and no capture file is written | As X1.6 |
+| X2 | — | the record | Run `gtwpe_record_check.py` and `modification_validate.py` on the record at `EXECUTING`; push the branch; open its pull request against `main`, not a draft, its body following `.github/pull_request_template.md`'s headings as `AGENTS.md` sets them; return `PRODUCT_OWNER_ACTION_PENDING`, `IN FLIGHT`, for Nathan's merge | GTWPE-MGMT-10 X2 | Both exit 0; the branch's blob of the record equals the local file; the pull request lists the tool, the record and the evidence files | Before the merge: the pull request is closed unmerged, and Nathan archives «NEW» |
+| X3 | PART-02 | `tool` | After Nathan's merge: `git fetch origin main`; fix «M» and «m»; add a worktree of `origin/main` in the scratchpad and run X1.4's four gates there, with the repository root at the worktree; remove the worktree | GTWPE-MGMT-10 X3 (`D26-C`) | For every path the pull request changed, `git rev-parse origin/main:<path>` equals the branch's blob; the four gates pass from `main`; «NEW» and 092926.1 still show the edit times X1.10 and X1.11 read | After the merge, a new Modification reverses the change |
+| X4.1 | — | — | `git log --format='%H %cI %s' fffadb5..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms, in GTWPE-MGMT-10 092926.1's body as fetched at the start of `EXECUTE`, and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `fffadb5` | Every commit the log lists has a trigger finding in §E. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
+| X4.2 | PART-01 | `notion_control` | **W4.** The GTWPE parent page. Pre-read: C1 to C4 each once. Then `update_content`, four replacements in one call: C1 to C4 become C1-NEW to C4-NEW | GTWPE-MGMT-10 X4 (the checked-through commit; the selection, which this plan names) | Readback: C1-NEW to C4-NEW present, the members row linking «NEW», which Notion shows by its title (PF-27); C1, C2, C3's link to `3ea4590a05eb817093b3feea624aa24a` and C4 absent; the lineage pins, the approved-design line and the child pages as the pre-read showed them | The reverse replacements, with the texts taken from this readback (ITEM-05), never from page history |
+| X4.3 | PART-01 | `prompt` | Fetch the GTWPE parent page again | The route ("after X4, the selection's link to it") | The members row links «NEW», and «NEW» is a child of the page | As X4.2 |
+| X5 | — | the record | Record every step's and item's disposition, `interaction_cost_actual` against 8, the actual author, checker and acceptor of each part, and the time on the clock; set the status to `COMPLETE`. Save the record, restart the branch from `origin/main` (`git checkout -B docs/20260929-modification-gtwpe-first-repair origin/main`), write the saved record back, commit, `git push --force-with-lease`, and open the record's pull request. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings | GTWPE-MGMT-10 X5; this plan, for the pull request | Both checks exit 0 at `COMPLETE`; the branch's blob equals the local file | — |
+
+**X2's clause for a branch that holds only the record** (§A, ITEM-10's second place) needs no edit: it
+already says nothing waits on such a pull request, which stays true once ITEM-10 opens one.
+
+### The body edits, by item
+
+`edits.json` holds each edit's exact anchor and new text; this table says where each goes.
+
+| Item | Edits | Where, in GTWPE-MGMT-10 |
+|---|---|---|
+| identity | E1, E2 | The two identity lines |
+| ITEM-01 | E3 to E8, E10 | *What this prompt may change*; *Notion writes*; `targets` in *The record*; X4's check; the catalog and selection row of *How each kind of target changes* |
+| ITEM-02 | E11 | A3's step |
+| ITEM-03 | E12 to E14 | The estimate row of *The record*; *Reviews are bounded* rule 4; the readiness paragraph |
+| ITEM-04 | E15, E16 | `EXECUTE`'s *Read back every write*; the prompt-page route |
+| ITEM-05 | E9, E17 | The catalog and selection row's rollback; `PLAN`'s rollback sentence |
+| ITEM-06 | E18 to E22 | A0 (a); the prompt-page route's two title checks and its edit-time check |
+| ITEM-07 | E23 to E27 | *Reading prompt bodies*, its three bullets; A3's check |
+| ITEM-08 | E28 | *Notion writes* |
+| ITEM-09 | E29 to E31 | *Reviews are bounded*, the brief; `EXECUTE`'s capture paragraph |
+| ITEM-10 | E32 | *Boundaries*, first bullet |
+| ITEM-11 | E33 to E36 | The validation command; the sentence before the GTWPE rules table; the checks of A7, PL4, X2 and X5; *Reading prompt bodies*, *Harness files* |
+| ITEM-12 | E37 to E39 | The entry contract's raw-request paragraph; A1 |
+| ITEM-13 | E40 | A0's check |
+| ITEM-14 | E41 | *Relation to the PE Metaprompt* |
+| ITEM-15 | E42 | The readiness paragraph |
+| ITEM-16 | E43 | *Reviews are bounded* rule 1 |
+
+The class B guard for this part is X1.10 (4)'s absence checks: the old texts the new rules replace,
+among them `a search that fetches no body`, `Search for the exact new title`, `at minute resolution`,
+`or Nathan's restoration from page history`, `the record's file unedited` and
+`` `modification_validate.py` exits 0 `` (`D26-E`).
+
+### The catalog texts (W4)
+
+**C1** → **C1-NEW**, the members row's title cell:
+
+```
+<td>GTWPE-MGMT-10 — Manage the GTWPE — 092926.1</td>
+```
+```
+<td>GTWPE-MGMT-10 — Manage the GTWPE — «V»</td>
+```
+
+**C2** → **C2-NEW**, its version cell:
+
+```
+<td>092926.1</td>
+```
+```
+<td>«V»</td>
+```
+
+**C3** → **C3-NEW**, its page cell:
+
+```
+<mention-page url="https://app.notion.com/p/3ea4590a05eb817093b3feea624aa24a">GTWPE-MGMT-10 — Manage the GTWPE — 092926.1</mention-page> `3ea4590a05eb817093b3feea624aa24a`
+```
+```
+<mention-page url="https://app.notion.com/p/«NEW»"/> `«NEW»`
+```
+
+**C4** → **C4-NEW**, the checked-through commit:
+
+```
+`74f6cc96b2a2c06e70bff8f9adfefde0b811071f` (`74f6cc9`), examined by `EXECUTE` of MODIFICATION-20260929-gtwpe-pilot on 2026-09-29.
+```
+```
+`«M»` (`«m»`), examined by `EXECUTE` of MODIFICATION-20260929-gtwpe-first-repair on «D». Before it, `74f6cc9`, examined by MODIFICATION-20260929-gtwpe-pilot.
+```
+
+The lineage pins do not change: A0 found no lineage trigger, and X4.1 records any later one for
+Nathan.
+
+### The tool's selftest cases and guard proof (PART-02)
+
+The selftest's 17 cases, in `gtwpe_record_check.py`: a known-good GTWPE record at `COMPLETE`;
+11 must-fail cases, each with the code it must raise (`GTWPE:` twice, `HARNESS` five times, `DRY RUN`
+three times, and `ENTRY GATE` for a shared rule, which proves the shared check runs); and 5 must-pass
+cases: a record at `ANALYZING` with no *Harness files* yet, one at `PLANNED` with no §E, an abandoned
+one, a fenced block in §P quoting a level-2 heading as the pilot's §P does, and headings written with
+a suffix as the pilot's record writes them. The guard proof disables each of the four checks in turn
+in a scratch copy, and requires that exactly its own cases fail: 1, 2, 5 and 3 (`CHK-001`,
+`GUARD-001`). The fenced-block case is a must-pass: without the parser's fence handling, the pilot's
+own record fails, as the first draft of the tool did (*Dry run*, D5).
+
+### Failure path (`D26-B`)
+
+From W1 on, a failed check or a tool error stops the run, and nothing more is built for it:
+
+1. **A failure record** in §E: every step's disposition, the failed step with its evidence, and the
+   steps after it `NOT_RUN`, citing the stop.
+2. **A read-only sweep** of what landed: «NEW», the GTWPE parent page, the branch and its pull request,
+   each read once, with what each now says recorded in §E.
+3. **The freeze kept:** no further Notion write. The failed part is `BLOCKED` with its applied steps
+   named, and the Modification stays `EXECUTING`.
+4. **A return to Nathan**, `IMPLEMENTATION_BLOCKED`, ending `DECISION NEEDED`. Before X4, he archives
+   «NEW», and closes the pull request unmerged if PART-02 failed. After W4, the catalog is set back by
+   its reverse replacements, texts taken from W4's readback, made by Nathan or at his direction. No
+   page is restored from its history, and no rollback needs a copy of a prompt body.
+
+The failure record reaches `main` in the branch's pull request (ITEM-10's rule, applied ahead of its
+landing: X2 opens it; a failure before X2 opens it then).
+
+### Open findings, accepted as risks
+
+Approving this plan accepts each of these (`DISP-001`).
+
+| # | Path | Likelihood | Consequence | Why listed, not repaired |
+|---|---|---|---|---|
+| K-1 | «NEW» sits unselected under the GTWPE parent from W1 until W4, across Nathan's merge | Certain | A reader of the parent's children sees two versions; the catalog, which is the selection, names 092926.1 until W4 | By design: it lets Nathan read the new page beside the pull request |
+| K-2 | The dry run's anchor counts, and X1.10's readback, are made by reading (PF-2 stays until this repair lands) | Low | A miscount: an anchor that matches twice or not at all makes W3 fail loudly; a misread readback is caught by X1.12's independent counts | The body forbids a transcript read, and an inline fetch leaves no save; X1.12 is the second reading |
+| K-3 | W3 sends 43 replacements in one call, and the tool does not say a call is all-or-nothing | Low | A half-edited, unselected page: loud at X1.10 | Nathan archives «NEW»; nothing selects it |
+| K-4 | C1 to C3 anchor on table-cell and mention markup as the fetch shows it | Low | W4 fails loudly after the merge; «NEW» stays unselected until a corrected plan | The dry run found each once in the fetched page (D4) |
+| K-5 | Notion's Markdown round trip can show new text differently near inline code and italics | Low | A check phrase with such markup miscounts: loud | Check phrases are plain text except E1, E2 and E35's; E35's is inline code, which the fetch shows as written |
+| K-6 | The harness may refuse the capture's transcript read at X1.12 and at PL3 (§A risk 3), and the post-check cannot list the session directory, which this session's harness refused | Medium | No capture file; the comparison stands on the return in context | Recorded, not worked around; a capture method that reads no transcript is §A's C6 |
+| K-7 | This `EXECUTE` follows 092926.1, including its search-based checks; the plan uses fetches instead (X1.0, X1.11) | Certain | None: the plan's checks are stricter than the body's | A run started under one version finishes under it (design §6) |
+| K-8 | 092926.1 stays, never edited, with its defects; a session started from its link runs the old rules | Low | The old rules | §A risk 6; the catalog is the selection |
+| K-9 | The tool imports the shared validator; a later change there changes the GTWPE check | Low | Caught by the drift check (a watched path) and by the selftest at X1.4 and X3 | Importing it is what keeps one copy of the shared rules (`DERIV-001`) |
+| K-10 | The evidence copy of the tool is in `docs/ephemeral/`, which Nathan prunes | Certain, later | None once merged: `gtwpe/`'s copy is the tool | Evidence, not the tool |
+| K-11 | E7 and E8 describe writes to other TW pages that this Modification never makes | Certain | They are first exercised by the next TW repair | No TW page changes here (§A) |
+| K-12 | The clock does not count the wait for Nathan's merge, and tokens stay unmeasured by the session | Certain | The stop rule meters the session's work only | Nathan's direction: the stop rule by time |
+| K-13 | A fresh session resuming at X3 has only this record and the evidence files | Low | None if the record is complete; the resume point is a designed checkpoint (`D26-C`) | Values and texts are in the record and `edits.json` |
+| K-14 | Reviewers do not read GTWPE-MGMT-10's body, so they judge each new text from its anchor and `where`, not in context | Certain | A new text that reads wrongly in place passes review; X1.10 reads it in place | The body lets only an isolated readback worker and a cold run read a body |
+
+### Product Owner actions
+
+| # | Action | How it is verified |
+|---|---|---|
+| PO-1 | Approve this plan. It authorizes W1 to W4 and nothing else in Notion (`notion-write-boundary.md`), the isolated readback worker of X1.12, the pull request at X2, and the record's pull request at X5. The writes are made from this session, under HDE Build Notes PF10-AINEUTRAL-001 | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
+| PO-2 | Merge the pull request X2 opens, after reading the new page «NEW» if he wishes | X3: the blobs on `main` equal the branch's |
+| PO-3 | The selection of «V»: this plan names it (W4), so PO-1 makes it; there is no separate promotion step | X4.2 and X4.3 |
+| PO-4 | Merge the record's pull request, opened at X5, when he chooses. Nothing waits on it, and it approves nothing (`D21-C`) | Its blob on `main` equals the branch's, whenever he merges |
+| PO-5 | Only after a failure: archive «NEW»; close the pull request unmerged; have W4 reversed from its readback | The read-only sweep, after he acts |
+
+### Explicitly not in scope
+
+- The input reader (the design's PART-01), and every candidate in §A (C1 to C6).
+- Any TW-ALPHA page: this Modification writes none.
+- `modification_validate.py`, `modification-template.md`, `reviewer-prompt-template.md` and every
+  other shared control; PF canon; the design documents; skills.
+- The deferred findings PF-16, PF-18 and PF-19, and the declined PF-7 and PF-D2.
+
+### Dry run (PL3)
+
+On 2026-09-29, by this session, read-only against the live pages, before any full review.
+
+| # | Gate | Result |
+|---|---|---|
+| D1 | `modification_validate.py` and the evidence `gtwpe_record_check.py` on a copy of this record at `PLANNED`, with this round in `reviews` | Both exit 0, 1/1 |
+| D2 | GTWPE-MGMT-10 092926.1, fetched at this mode's start (about 21:51Z): edited 2026-09-29T04:38:37.656Z, parent the GTWPE parent page | Each of `edits.json`'s 43 anchors occurs as expected: 42 once, and E35's four times, in the checks of A7, PL4, X2 and X5. None of the 43 check phrases occurs, and each absent phrase occurs, as its anchor does; `http` and `app.notion.com` do not occur. Every count by reading, each read twice (PF-2) |
+| D3 | The same fetch: its headings, in order | 24: *Manage the GTWPE*; *Native purpose*; *Lineage*; *Entry contract*; *The spine — true in every mode*; *Read these; do not restate them*; *The catalog*; *What this prompt may change*; *The record*; *Scope freezes at analysis approval*; *Reviews are bounded (`D26`)*; *One run is one Modification, and parts carry failure*; *One session, and workers by workload*; *Reading prompt bodies (`D22`)*; *The Product Owner is never blocked by this prompt*; *Boundaries*; *Failure contract*; *`MODE = ANALYZE`*; *`MODE = PLAN`*; *`MODE = EXECUTE`*; *How each kind of target changes*; *The watched sources*; *Result routing*; *Relation to the PE Metaprompt*. No edit adds, removes or renames one |
+| D4 | The GTWPE parent page, fetched at 21:58Z: edited 2026-09-29T20:11:58.508Z | C1, C2, C3 and C4 each once. Two child pages: GTWPE-MGMT-10 092926.1 and the *Target Architecture* page. «V» for «D» = 2026-09-29 would be `092926.2`, which no child carries |
+| D5 | The tool, from the evidence directory | Selftest 17/17; guard proof 5/5 (each disabled check fails exactly its 1, 2, 5 or 3 cases); over `docs/ephemeral/modifications/`, 2/2 GTWPE records pass and 4 are left to the validator; sha256 «H». The first draft failed the pilot's record: its §P quotes `## ` headings inside fenced blocks, which ended the section early. The parser now skips fenced lines, and a must-pass case holds it |
+| D6 | `git fetch origin main` | Still `fffadb5`; `gtwpe/` has no entry; the validator's blob `0cd1e5c`, the template's `8fc21ab`; the validator's selftest 66/66 |
+| D7 | `edits.json`, by script | 43 edits, E1 to E43, covering ITEM-01 to ITEM-16 and the identity lines. Each check phrase is in its new text; each absent phrase is in its anchor and not in its new text; no new text holds another edit's anchor or another check phrase; no new text holds a link, a page ID, a version-pinned reference, or model, effort or reasoning wording. The longest anchor is 94 characters (E18) |
+| D8 | `phrases.json` and `EXEC-READBACK-BRIEF.md`, by script | 73 phrases, 43 expected present and 30 absent; the brief lists all 73 and holds no expected count |
+| D9 | The tools the plan calls, from their schemas | `notion-update-page`'s `update_content` takes up to 100 replacements in one call; an anchor must match exactly, and matching more than once fails unless `replace_all_matches` is set. `allow_async` defaults to true; with it false, the call waits when it can and may still return a task, which `notion-get-async-task` resolves. `notion-duplicate-page` completes asynchronously |
+| D10 | The PE Metaprompt 091426.1, fetched at 21:51:47Z | Edited 2026-09-23T17:17:22.217Z: the edit time X1.0 (4) expects |
+| D11 | The record's front matter and tables | They parse, and every table row has its table's column count |
+
+Not exercised: any Notion write, the duplication, and every readback, since `PLAN` writes nothing to
+Notion.
+
+No required defect was found in §P. One was found in the tool while it was drafted, and fixed before
+this round (D5): as first drafted it would have failed every GTWPE record that quotes a heading in a
+fence, the pilot's included, a normal-path defect.
+
+### Harness files (`D22` condition 5), for `PLAN`
+
+- **This session's transcript** holds, from this mode, GTWPE-MGMT-10 092926.1's body, fetched at the
+  start of the mode; the PE Metaprompt 091426.1's body, printed from its save in three slices by
+  script (characters 0 to 38,000 and 55,901 to 76,125) together with its heading list; and control
+  pages: the GTWPE parent page. No script read the transcript, and every count over a body was made by
+  reading, in context. It is left to teardown.
+- **One tool-results save**, the PE Metaprompt 091426.1, a prompt body, read by script for its edit
+  time, its headings and the slices above, never hashed or compared, then deleted (exit 0).
+- **Scratch:** `make_edits.py` in the scratchpad, which wrote `edits.json`; it holds the anchors and new
+  texts `edits.json` holds, and no body. `a6/` from `ANALYZE`.
