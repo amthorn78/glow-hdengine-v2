@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-pilot
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -26,6 +26,11 @@ reviews:
     date: 2026-09-29
     required_open: 0
     outcome: "By W1, read-only: the validator exits 0 on a copy at ANALYZED; A0 and A3 reproduce; the front matter and every table are well formed. No required defect. Design §13.2 gives ANALYZE no full review"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-29
+    required_open: 0
+    outcome: "By W1, read-only: the validator exits 0 on a copy at PLANNED; every anchor the plan names occurs once on the live pages; the new title is unused; the drift-check command lists 633ca5d. No required defect. Before the full review, the pre-reads of X4.3 and X4.4 gained a check of the unchanged rows"
 item_count_at_approval: 1
 items:
   - id: ITEM-01
@@ -433,3 +438,260 @@ Against the first version of this §A, `483ce51`:
   selection* section; and the Glow Operations Hub, counted by script for the revision. Both were
   deleted (exit 0).
 - No transient file holds a prompt body.
+
+## §P — Plan
+
+*Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
+
+W1 ran this mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE — 092926.1*,
+fetched live at the start of the mode (edited 2026-09-29T04:38:37.656Z, unchanged). The input is
+§A as Nathan approved it on 2026-09-29, with his Q1 ruling: "The fix updates the current-version
+note on all four pages" (`analyze_approved_by`).
+
+### How the plan runs
+
+`EXECUTE` applies the steps below in order. X1 makes the new page; X2 pushes the record, since no
+repository file other than the record changes; X3 does not apply, since nothing waits on a merge or
+an install; X4 runs the drift check, updates the catalog and makes the selection writes; X5 closes
+the record. Every step's check must pass before the next step starts. A failed check, or a tool
+error, stops the run: before the first Notion write, the run records the part `BLOCKED` and returns;
+from the first Notion write on, it takes `D26-B`'s path (*Failure path*, below).
+
+**Values fixed once, at X1.1, and recorded in §E:**
+
+| Value | What it is |
+|---|---|
+| «D» | `EXECUTE`'s UTC date when X1.1 runs, as `yyyy-mm-dd`, used for the rest of the run even past midnight |
+| «V» | «D» as `MMDDYY` followed by `.1`: `092926.1` if «D» is 2026-09-29 (the PE Metaprompt's version rule) |
+| «R» | `TW-ALPHA-` followed by «D» as `yyyymmdd` and `.1`: `TW-ALPHA-20260929.1` if «D» is 2026-09-29 |
+| «P» | `plan_approved_date`, the date of Nathan's approval of this plan |
+| «NEW» | The page ID that the duplicate call in X1.3 returns, without dashes |
+| «M», «m» | `origin/main` at X4.1, in full and as its first seven characters |
+
+Every text below is sent exactly as written, with these values substituted and nothing else changed.
+
+**The quoting limit.** A body passage in this record is at most 50 characters, the length of this
+plan's longest edit anchor (E3). §A's quotation of the defective clause, 54 characters, predates any
+edit (pilot finding PF-17).
+
+### Before any write: X1.0, the preconditions
+
+All read-only, each against the value `PLAN` recorded (*Dry run*, below). If any differs, stop and
+return `IMPLEMENTATION_BLOCKED`; nothing has been written.
+
+1. GTWPE-MGMT-10, fetched live at the start of `EXECUTE`: edited 2026-09-29T04:38:37.656Z. A
+   later edit means this plan may no longer match the body it follows.
+2. TW-MGMT-10 090826.2 (`3d54590a05eb81a8b55afabc42298df9`), by a search that fetches no body:
+   edited 2026-09-08T07:07. A later edit means the anchors may have moved.
+3. The other seven members, by searches that fetch no body: each at the edit time §A's reading
+   used (*Dry run*, D9's table). For any member edited since, fetch its body live and repeat A3's match B,
+   `five-dimension|five dimensions|complexity`; any hit outside the permitted exceptions is new
+   scope, and the run stops.
+4. A search for the exact title *TW-MGMT-10 — Manage the Glow TW Ecosystem — «V»*, scoped to the
+   *Glow Technical Writing Ecosystem* page, with highlights off: no page carries it. One that does
+   stops the run: never write twice blind.
+
+### The steps
+
+Each Notion write is named W1 to W8. The plan makes no other Notion write.
+
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| X1.1 | PART-01 | the record | Set the status to `EXECUTING`. Fix «D», «V» and «R», and record them in §E | GTWPE-MGMT-10 X1; the PE Metaprompt's version rule (MMDDYY.N, the execution date, `.1`) | The values are in §E before X1.2 | None needed |
+| X1.2 | PART-01 | — | The preconditions X1.0 1 to 4 | GTWPE-MGMT-10, the prompt-page route ("Search for the exact new title first") | Each as stated in X1.0 | None needed |
+| X1.3 | PART-01 | `prompt` | **W1.** `notion-duplicate-page` on `3d54590a05eb81a8b55afabc42298df9`; «NEW» is the returned ID | The prompt-page route for a TW-ALPHA member; design D-16; this plan's approval (`notion-write-boundary.md`) | The call returns an ID. This is the first Notion write | Nathan archives «NEW» (the route's rollback before X4) |
+| X1.4 | PART-01 | `prompt` | Fetch «NEW» until populated: at most six fetches, one after another. Populated means its first line is the 090826.2 identity line and its heading *Durable checkpoint, recovery and final handoff* is present, and the fetch reports no truncation or unknown blocks | The route ("fetch it until it is populated") | Populated by the sixth fetch, or stop (`D26-B`) | As X1.3 |
+| X1.5 | PART-01 | `prompt` | Read «NEW»'s parent from that fetch | The route ("under the current version's parent") | The parent is *Glow Technical Writing Ecosystem*, `3d44590a05eb8171ab6ff4dab33b00ef`; any other parent stops the run (`D26-B`) | As X1.3 |
+| X1.6 | PART-01 | `prompt` | **W2.** `notion-update-page` on «NEW», `update_properties`: title *TW-MGMT-10 — Manage the Glow TW Ecosystem — «V»* | The route ("set its title to the exact new title") | Checked in X1.8 (1) | As X1.3 |
+| X1.7 | PART-01 | `prompt` | **W3.** `notion-update-page` on «NEW», `update_content`, three replacements, each required to match exactly once: **E1** `— 090826.2` becomes `— «V»` (identity line 1); **E2** `: 090826.2` becomes `: «V»` (identity line 2); **E3** `five-dimension descriptive complexity profile and ` (with its final space) becomes nothing (ITEM-01) | ITEM-01; §A *Remainder* and risk 7; the route ("apply the approved edits") | Checked in X1.8 (3) to (6) | As X1.3 |
+| X1.8 | PART-01 | `prompt` | Fetch «NEW» whole, into this session's context, and check it | The route's verification; HDE Governance §9.1.6 ("read back complete changed published bodies and required links") | (1) the title is exactly *TW-MGMT-10 — Manage the Glow TW Ecosystem — «V»*; (2) the parent is the selection page; (3) the first nonblank line equals the new title, and the second is `Prompt Version: «V»`; (4) `090826.2` does not occur; (5) `five-dimension` and `complexity` do not occur; (6) `supported identity/header scheme` and `human guidance non-operative` each occur once, the two kept instructions of risk 7; (7) the eight level-2 headings, in order, are those of 090826.2 (*Dry run*, D2); (8) the model-guidance block is still before the first heading, between its opening and closing markers, with its `Approximate workload` line (design D-17) | As X1.3 |
+| X1.9 | PART-01 | `prompt` | Two searches that fetch no body, highlights off, scoped to the selection page: the exact new title, and `TW-MGMT-10 090826.2` | The route ("exactly one page carries it"; "The current version's edit time … is unchanged") | Exactly one page carries the new title, and it is «NEW». The result for `3d54590a05eb81a8b55afabc42298df9` still shows 2026-09-08T07:07. If the first search finds no page, it is repeated after X2 and again after X4.1, before any X4 write; still none then, or two or more at any time, stops the run (`D26-B`) | As X1.3 |
+| X2 | — | the record | Commit and push the record. No pull request: no repository file other than the record changes | GTWPE-MGMT-10 X2 | `modification_validate.py` exits 0 at `EXECUTING`; the branch's blob equals the local file | Before X4, as X1.3 |
+| X3 | — | — | Not applicable: nothing waits on a merge or an install | GTWPE-MGMT-10 X3 | Recorded `NOT_APPLICABLE` in §E with this reason | — |
+| X4.1 | — | — | `git fetch origin main`; «M» is `origin/main`. Run `git log --format='%H %cI %s' f4be532..«M» -- 'docs/pfcanon/PF03-*' 'docs/pfcanon/PF04-*' 'docs/pfcanon/PF06-*' 'docs/pfcanon/PF10-*' 'docs/pfcanon/PF20-*' 'docs/pfcanon/PF27-*' 'docs/pfcanon/PF30.*' AGENTS.md`, followed by the eight files and the `gtwpe/` directory that *The watched sources* names under `docs/prompt_ecosystem_management/`. For each commit, record in §E a trigger finding with its `D26-E` search: the terms of the change, searched in GTWPE-MGMT-10's body as fetched at the start of `EXECUTE` and in `docs/prompt_ecosystem_management/gtwpe/` on «M». `633ca5d` (PF10 v13.4.5, 2.34 PF10-VENDOR-001) is expected; its terms are `vendor`, `PO-only` and `open-rails` | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `f4be532` | Every commit the log lists has a trigger finding in §E with its search and count. A change that contradicts the GTWPE is recorded for Nathan; it does not stop this run | None needed |
+| X4.2 | PART-01 | `notion_control` | **W4.** The GTWPE catalog, page `3ea4590a05eb818c915bdfd3d150c44b`. Pre-read: *CAT-OLD* (below) occurs once. Then `update_content`, one replacement: *CAT-OLD* becomes *CAT-NEW*. The lineage pins do not change: A0 and its re-run found no lineage trigger | GTWPE-MGMT-10 X4 ("Then set the checked-through commit") | Readback: the new line once; the old line absent; the members table, the lineage pins and the approved-design line as the pre-read showed them | The same replacement in reverse: *CAT-NEW* back to *CAT-OLD* |
+| X4.3 | PART-01 | `notion_control` | **W5.** The selection page, *Glow Technical Writing Ecosystem*, `3d44590a05eb8171ab6ff4dab33b00ef`: the three selection writes. Pre-read: *S-OLD* and *H-OLD* (below) each occur once, *S-OLD* directly above *H-OLD*; `Selected release — «R»` does not occur; and the current release's seven rows other than TW-MGMT-10's equal *ROWS*' first seven. Any difference stops the run. Then `update_content`, two replacements in one call: *S-OLD* becomes *S-NEW*, then a newline, then *SECTION*; *H-OLD* becomes `## Historical selected release — TW-ALPHA-20260908.1` | Design D-16 and the route for TW-ALPHA's selection; §A Q1 | Readback: the status line is *S-NEW*; directly below it, *SECTION*, with its first seven rows equal to *ROWS*' and its eighth row linking «NEW» at «V»; directly below that, `## Historical selected release — TW-ALPHA-20260908.1`; every other heading, and the child pages, as the pre-read showed them, «NEW» among them | A newer release selecting 090826.2, made by the same three writes; or Nathan's restoration from page history |
+| X4.4 | PART-01 | `notion_control` | **W6.** *Alpha 1 — Implementation and Validation*, `3d44590a05eb81fe991ff0114cb43029`. Pre-read: *H-OLD* occurs once, as the page's first line, and its section's seven rows other than TW-MGMT-10's equal *ROWS*' first seven; any difference stops the run. Then `update_content`, one replacement: *H-OLD* becomes *SECTION*, then a newline, then `## Historical selected release — TW-ALPHA-20260908.1` | Nathan's Q1 ruling (b), 2026-09-29; TW-MGMT-10's own selection procedure ("the exact TW catalog/current checkpoint selection") | Readback: the page begins with *SECTION*, rows as in X4.3, then the renamed heading; every other heading as the pre-read showed them, including the stale *Current selection* (candidate C6, out of scope) | A newer note naming 090826.2, made the same way; or Nathan's restoration from page history |
+| X4.5 | PART-01 | `notion_control` | **W7.** *HDE TW*, `3c74590a05eb8176baf8cb59f1631f3c`. Pre-read: `## Current TW follow-up — 2026-09-08` occurs once, as the page's first line. Then `update_content`, one replacement: that heading becomes *HDE-NEW* | Nathan's Q1 ruling (b); TW-MGMT-10's selection procedure ("TW navigation in HDE TW and Glow Operations Hub") | Readback: the page begins with *HDE-NEW*: the new heading, its paragraph naming «R», «V» and «NEW», then `## Historical TW follow-up — 2026-09-08`; every other heading and every child page as the pre-read showed them | As X4.4 |
+| X4.6 | PART-01 | `notion_control` | **W8.** *Glow Operations Hub*, `3ce4590a05eb814f8892f88ff8539308`, which the harness saves to a file. Pre-read, by a script over the save: `## Current Glow TW follow-up — 2026-09-08` occurs once, and the page's heading count and the sha256 of its heading list are recorded in §E. Then `update_content`, one replacement: that heading becomes *HUB-NEW* | As X4.5 | Readback, by the same script over a new save: `## Current Glow TW release — «R»` once, directly above `## Historical Glow TW follow-up — 2026-09-08`, once; `## Current Glow TW follow-up — 2026-09-08` absent; the new section holds «R», «V» and «NEW»; the heading list equals the pre-read's with the new heading added and the old one renamed. Both saves are deleted after the check | As X4.4 |
+| X4.7 | PART-01 | `prompt` | The route's last check: fetch the selection page | The route ("after X4, the selection's link to it") | *SECTION*'s TW-MGMT-10 row links «NEW», and «NEW» is a child of the page | As X4.3 |
+| X5 | — | the record | Record `interaction_cost_actual` against 7, with the reason for any difference; the actual author, checker and acceptor (HDE Governance §9.1.6); the dispositions of ITEM-01 and PART-01. Set the status to `COMPLETE`, commit and push. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings | GTWPE-MGMT-10 X5 | `modification_validate.py` exits 0 at `COMPLETE`; the branch's blob equals the local file | — |
+
+No tool or rule changes, so there are no selftest cases or guard proof. The class B guard is the
+absence check in X1.8 (5), with A3's reading of the other seven members, which X1.0 (3) keeps
+current.
+
+### The texts
+
+**S-OLD**, the selection page's current status line:
+
+```
+**Status: TW-ALPHA-20260908.1 selected; follow-up contracts published and verified. Live follow-up trial pending; PF04 cause unresolved.**
+```
+
+**H-OLD**, the heading of the current release on the selection page and on *Alpha 1*:
+
+```
+## Selected follow-up — TW-ALPHA-20260908.1
+```
+
+**S-NEW**, the new status line:
+
+```
+**Status: «R» selected; TW-MGMT-10 repaired and verified. Live follow-up trial pending; PF04 cause unresolved.**
+```
+
+**ROWS**, the eight member rows. The first seven are the current rows of both pages, character for
+character; only the eighth is new:
+
+```
+- `TW-ASSESS-10` — <mention-page url="https://app.notion.com/p/3d54590a05eb81c395f4f2d92e9cccc5"/> — Assessment before creation and before application; 090826.2.
+- `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/3d44590a05eb813283aefa68329609cc"/> — PF10 target list only; unchanged; 090726.2.
+- `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/3d54590a05eb81489659dd250624a220"/> — General PF redlines/report or exact no redlines; 090826.1.
+- `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/3d54590a05eb81d0986be1200bfd4a3b"/> — PF09 redlines/report; board optional; 090826.1.
+- `TW-RECORD-10` — <mention-page url="https://app.notion.com/p/3d44590a05eb817fa047f69764b93396"/> — PF20 paste-ready section only; unchanged; 090726.2.
+- `TW-RECORD-20` — <mention-page url="https://app.notion.com/p/3d44590a05eb819e8482d0a1650c5239"/> — PF30 paste-ready section only; unchanged; 090726.2.
+- `TW-APPLY-10` — <mention-page url="https://app.notion.com/p/3d54590a05eb81f99ce6e7908a2a5a60"/> — Atomic validated application plus bounded header provenance; 090826.1.
+- `TW-MGMT-10` — <mention-page url="https://app.notion.com/p/«NEW»"/> — Sole TW prompt maintenance owner; «V»; repaired by MODIFICATION-20260929-gtwpe-pilot.
+```
+
+**SECTION**, the new release's section on the selection page and on *Alpha 1*, with *ROWS* where
+its last line stands:
+
+```
+## Selected release — «R»
+**Selected: «D».** Authority: MODIFICATION-20260929-gtwpe-pilot, run through GTWPE-MGMT-10 on Nathan's plan approval of «P». TW-MGMT-10 «V» no longer tells its author to use a PE Metaprompt feature that no longer exists, and nothing else it instructs changes. Only its row below is new. The *Current operation* and *Verification and runtime limits* of TW-ALPHA-20260908.1, below, still apply, and all old prompt pages remain intact.
+ROWS
+```
+
+**HDE-NEW**, for *HDE TW*:
+
+```
+## Current TW release — «R»
+<mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef">Glow Technical Writing Ecosystem</mention-page> selects «R»: TW-ALPHA-20260908.1 with TW-MGMT-10 repaired to «V», which no longer tells its author to use a PE Metaprompt feature that no longer exists. Maintenance owner: <mention-page url="https://app.notion.com/p/«NEW»"/>. Everything else in the 2026-09-08 follow-up below still applies. Exact rows: <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/>. Changed by MODIFICATION-20260929-gtwpe-pilot, run through GTWPE-MGMT-10 on Nathan's plan approval of «P».
+## Historical TW follow-up — 2026-09-08
+```
+
+**HUB-NEW**, for the *Glow Operations Hub*:
+
+```
+## Current Glow TW release — «R»
+**«R» is selected.** <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/> and <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/> hold the exact eight-member catalog. It is TW-ALPHA-20260908.1 with TW-MGMT-10 repaired to «V», which no longer tells its author to use a PE Metaprompt feature that no longer exists. Maintenance: <mention-page url="https://app.notion.com/p/«NEW»"/>. Everything else in the 2026-09-08 follow-up below still applies. Changed by MODIFICATION-20260929-gtwpe-pilot, run through GTWPE-MGMT-10 on Nathan's plan approval of «P».
+## Historical Glow TW follow-up — 2026-09-08
+```
+
+**CAT-OLD**, the catalog's checked-through commit:
+
+```
+`0db3f0ef33e7a7a3aa85a2c221e06ac5581c7b8d` (`0db3f0e`), the commit at which the approved design read its sources. The first drift check examines the watched paths from here.
+```
+
+**CAT-NEW:**
+
+```
+`«M»` (`«m»`), examined by `EXECUTE` of MODIFICATION-20260929-gtwpe-pilot on «D». Before it, `0db3f0e`, the commit at which the approved design read its sources.
+```
+
+Each page keeps its own convention: the selection page and *Alpha 1* already head earlier releases
+*Historical selected release — <release>*; *HDE TW* and the *Glow Operations Hub* head earlier TW
+sections *Historical …* with a date.
+
+### Failure path (`D26-B`)
+
+From W1 on, a failed check or a tool error stops the run, and nothing more is built for it:
+
+1. **A failure record** in §E: every step's disposition, the failed step with its evidence, and the
+   steps after it `NOT_RUN`, citing the stop.
+2. **A read-only sweep** of what landed: «NEW», the catalog, the selection page, *Alpha 1*, *HDE TW*
+   and the *Glow Operations Hub*, each fetched once, with what each now says recorded in §E.
+3. **The freeze kept:** no further Notion write. PART-01 is `BLOCKED` with its applied writes named,
+   and the Modification stays `EXECUTING`.
+4. **A return to Nathan**, `IMPLEMENTATION_BLOCKED`, ending `DECISION NEEDED`. He archives «NEW» or
+   restores a page from its history; no rollback needs a copy of a prompt body.
+
+The record is committed and pushed on the Modification's branch; no pull request gates anything
+(Nathan, 2026-09-28).
+
+### Open findings, accepted as risks
+
+Approving this plan accepts each of these (`DISP-001`).
+
+| # | Path | Likelihood | Consequence | Why listed, not repaired |
+|---|---|---|---|---|
+| K-1 | «NEW» becomes a child of the live selection page at W1, before W5 selects it | Certain, for minutes | A reader of the page's children sees an unselected version meanwhile | Design review R2A-L6 and B's L12, accepted at G1 |
+| K-2 | The title search in X1.9 may meet Notion's index lag | Low | A loud stop | R2A-L11 and B's L9, accepted at G1; the search is repeated twice before it fails |
+| K-3 | Every readback is this session's own, not an isolated worker's | Certain | A misread by the session goes unseen | R2A-L1 and B's L3, accepted at G1 |
+| K-4 | The seven unchanged rows are written from this plan's *ROWS*. The pre-reads of X4.3 and X4.4 compare them with the live rows first, by reading | Low | A misread comparison would carry a stale row | R2A-L3 and B's L8, accepted at G1; the pre-read comparison leaves only the misread of K-7 |
+| K-5 | A failure between W5 and W8 leaves some of the four pages naming the new release and some the old | Low | Pages disagree until Nathan restores or completes them | Each page's change is one call, and the selection page goes first. B's L14, accepted at G1 |
+| K-6 | No byte comparison of «NEW» with 090826.2 (`D22`) | Low | A change Notion's duplication made inside an unedited paragraph could pass | Design §16's accepted risk |
+| K-7 | The checks of headings and rows on the three pages fetched inline are made by reading, not by a script, since a script would have to read a transcript that holds prompt bodies | Low | A misread passes | The *Glow Operations Hub*, whose fetch is saved to a file, is checked by script |
+| K-8 | Another session edits the *Glow Operations Hub* or *HDE TW* between the pre-read and the readback | Low | The heading comparison fails: a loud stop | A replacement touches only its own anchor, so another session's edit is not lost |
+| K-9 | No standing guard (`GUARD-001`); the model-advice block stays (D-17); the Drive canon source stays (F1) | As §A risks 1 to 3 | As §A | Accepted at G1, and in §A |
+| K-10 | The twenty pilot findings against GTWPE-MGMT-10 and three against the design stay open | Certain | They wait for GTWPE-MGMT-10's first repair | Design §13.2, *After it*; none blocks this plan |
+
+### Product Owner actions
+
+| # | Action | How it is verified |
+|---|---|---|
+| PO-1 | Approve this plan. It authorizes W1 to W8 and nothing else (`notion-write-boundary.md`) | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
+| PO-2 | The selection of «V»: this plan names it (design D-16), so PO-1 makes it; there is no separate promotion step | X4.3 and X4.7 |
+| PO-3 | Merge the record when he chooses. Nothing waits on it, and it approves nothing (`D21-C`) | The record's blob on `main` equals the branch's, whenever he merges |
+| PO-4 | Only after a failure: archive «NEW», or restore a page from its history (`D26-B`) | W1's read-only sweep, after he acts |
+
+### Explicitly not in scope
+
+- The design's PART-01, the input reader (C1), and candidates C2 to C6.
+- The other seven TW-ALPHA members, the four earlier TW-MGMT-10 versions, and `tw-flowmaster`.
+- The model-advice block of TW-MGMT-10 (D-17), and the Drive canon source every TW worker reads (F1).
+- The four Drive reference files TW's own releases updated: Drive receives a file only where Nathan
+  directs that file.
+- The GCFPE register, catalog and Living Prompt Flow Map (design D-15), and PF canon.
+- The repair of the pilot findings, which is GTWPE-MGMT-10's first Modification.
+
+### Canon and rulings relied on
+
+- HDE Governance §9.1.6, on `main` at `633ca5d`: "read back complete changed published bodies and
+  required links"; "The prompt's own version and human model header remain permitted"; "Preserve
+  predecessor advice when still applicable"; "Record actual author, checker and acceptor".
+- HDE Build Notes (PF10) v13.4.5: 2.31 PF10-HDR-001 (the header permission, unchanged), and 2.34
+  PF10-VENDOR-001, which X4.1 records. Neither bears on a Notion write.
+- Design v1.2 at `d0e3f85`: §11.5, §13.2, and D-10, D-16 and D-17 (G1); Nathan's Q1 ruling of
+  2026-09-29, which widens D-10 for this Modification.
+- `notion-write-boundary.md`: a Notion write needs "explicit task-level authorization".
+
+### Dry run (PL3)
+
+On 2026-09-29, by W1, read-only, before any full review. Every page was read after this mode began,
+except *Alpha 1*, as D4 says.
+
+| # | Gate | Result |
+|---|---|---|
+| D1 | `modification_validate.py` on a copy of this record at `PLANNED` | Exit 0, 1/1 passed |
+| D2 | TW-MGMT-10 090826.2, fetched live: edited 2026-09-08T07:07:26.670Z, its parent the selection page | E1's anchor `— 090826.2` once, on identity line 1; E2's `: 090826.2` once, on line 2; `090826.2` twice in all; E3's anchor once; `five-dimension` once; `complexity` once; `supported identity/header scheme` once; `human guidance non-operative` once. The level-2 headings, in order: *Coded identity and relationships*; *Purpose, membership and limits*; *Intake, source register and mode*; *Impact, design and complete authoring*; *Alpha follow-up invariants*; *Proportionate validation*; *Versioned Notion publication and exact selection*; *Durable checkpoint, recovery and final handoff*. The model-guidance block, with its `Approximate workload` line, before the first heading |
+| D3 | The selection page, fetched live: edited 2026-09-08T07:15:27.010Z | *S-OLD* once, as its first line, directly above *H-OLD*, once. `Selected release — TW-ALPHA-2026` absent. The current release's seven rows other than TW-MGMT-10's equal *ROWS*' first seven, read character for character. 11 headings; 6 child pages, *Alpha 1* and TW-MGMT-10's five versions |
+| D4 | *Alpha 1*: edited 2026-09-08T07:15:29.132Z. Fetched in this session for §A's revision; a search in this mode shows it unchanged since | *H-OLD* once, as its first line. Its seven rows other than TW-MGMT-10's equal *ROWS*' first seven. 30 headings |
+| D5 | *HDE TW*, fetched live: edited 2026-09-23T17:44:08.540Z | `## Current TW follow-up — 2026-09-08` once, as its first line. 9 headings; 21 child pages |
+| D6 | The *Glow Operations Hub*, fetched live: edited 2026-09-24T16:03:38.449Z; its save counted by script | `## Current Glow TW follow-up — 2026-09-08` once, as the first line of its content; neither new heading occurs. 137 headings; the sha256 of their list is `35a9823bffab576531a2e451e06a893453b1196d64691f0386a6d7f112bd747c`. The save was deleted (exit 0) |
+| D7 | The GTWPE catalog, fetched live: edited 2026-09-29T04:39:19.987Z | *CAT-OLD* once |
+| D8 | X1.0 (4), for «V» = `092926.1`: the exact title, searched under the selection page | No page carries it |
+| D9 | X1.0 (2) and (3): one search that fetched no body | Every member at the edit time below, equal to P1's to the second where P1 recorded seconds |
+| D10 | X4.1's command, on `origin/main` at `633ca5d` | It lists `633ca5d`, PF10 v13.4.5. `git grep -n -i -E 'vendor\|PO-only\|open-rails'` over `docs/prompt_ecosystem_management/gtwpe/` on that commit: no match, since the directory does not exist yet. GTWPE-MGMT-10's body, read at this mode's start, holds none of the three terms |
+| D11 | The tools the plan calls, from their schemas | `notion-duplicate-page` returns the new page's ID and completes asynchronously. `notion-update-page` sets a page's title by `update_properties`; `update_content` takes `old_str` and `new_str` pairs, where each `old_str` must match the page exactly, and a pair fails if its `old_str` matches more than once |
+| D12 | This record: the front matter parses, and every table has a consistent column count | Passed |
+
+Not exercised: any Notion write, the duplication, and every readback, since nothing is written.
+
+| Member | Page | Edit time, to the minute (D9) |
+|---|---|---|
+| TW-ASSESS-10 090826.2 | `3d54590a05eb81c395f4f2d92e9cccc5` | 2026-09-08T07:06 |
+| TW-TRIAGE-10 090726.2 | `3d44590a05eb813283aefa68329609cc` | 2026-09-07T17:01 |
+| TW-DRAIN-10 090826.1 | `3d54590a05eb81489659dd250624a220` | 2026-09-08T06:57 |
+| TW-DRAIN-20 090826.1 | `3d54590a05eb81d0986be1200bfd4a3b` | 2026-09-08T06:58 |
+| TW-RECORD-10 090726.2 | `3d44590a05eb817fa047f69764b93396` | 2026-09-07T17:02 |
+| TW-RECORD-20 090726.2 | `3d44590a05eb819e8482d0a1650c5239` | 2026-09-07T17:02 |
+| TW-APPLY-10 090826.1 | `3d54590a05eb81f99ce6e7908a2a5a60` | 2026-09-08T06:59 |
+| TW-MGMT-10 090826.2 | `3d54590a05eb81a8b55afabc42298df9` | 2026-09-08T07:07 |
+
+No required defect was found. One gap was closed before the full review: the pre-reads of X4.3 and
+X4.4 now also compare the seven unchanged rows with *ROWS*, so that a row changed since this plan
+stops the run instead of being overwritten.
