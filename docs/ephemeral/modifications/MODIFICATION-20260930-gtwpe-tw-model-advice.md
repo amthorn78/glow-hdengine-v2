@@ -31,6 +31,11 @@ reviews:
     date: 2026-09-30
     required_open: 0
     outcome: "Rerun by this session, read-only, on §A as revised at Nathan's direction of 2026-09-30: the validator and the GTWPE check exit 0 at ANALYZED; A0 reproduces at f83c755, and 092926.2 is unchanged; the front matter and every table parse; the validator passes on an isolated root of the installed skills and stops fatally on the installed tree (F-3); three scratch trials show the assertions that pin the old wording and the validator's self-identity; the guard candidates occur nowhere in tw-flowmaster's core; the skill scope table's 37 anchors are on their lines. No required defect. No full review"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-09-30
+    required_open: 0
+    outcome: "By this session, read-only, before any full review: the validator and the GTWPE check exit 0 at PLANNED; main still f83c755, no watched-path change; the seven members and the control pages at the edit times the plan expects, every anchor found once by reading; the skill edits build, pass the suite strict and the guard proof 12/12, and package into archives that extract to the built trees; a three-site trial fails on PROFILE_IDENTITY, so the plan moves all four validator_revision sites (P-F2); edits.json consistent. No required defect"
 item_count_at_approval: 4
 items:
   - id: ITEM-01
@@ -630,5 +635,313 @@ Not exercised: any Notion write, and every readback, since `ANALYZE` writes noth
   `flowmaster-validate` (its entry points and self-identity), read as the harness files say.
 
 ## §P — Plan
+
+*Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+092926.2*, fetched live in this session after a context compaction (edited
+2026-09-29T23:47:58.009Z). The input is §A as Nathan approved it at `119057f` on 2026-09-30
+(`analyze_approved_by`). The mode started at 2026-09-30T01:59Z, when the approval was recorded.
+
+### Nathan's directions at approval, and how this plan applies them
+
+- **"this flow can be simplified, let's not overcomplicate this".** The plan is lean: one dry run and
+  one full review by a single reviewer, with no second reviewer or diff check unless that review
+  finds a required defect (his item 1). `EXECUTE` drops the isolated readback worker the first
+  repair used, since 092926.2's route asks only for this session's whole-page readback. `D24` still
+  governs the skill packages: it is a standing ruling, which this plan does not relitigate, so two
+  skill reviewers remain.
+- **Scope is removal (his item 2).** The guard §A's risk S-1 asked for, making `tw-flowmaster` refuse
+  the old release, is dropped: the profile's condition is only rewritten to the new contract, and
+  the selection waits for Nathan's install. The validator's guard against the removed wording
+  returning stays. S-1 is an accepted risk, K-1.
+- **Half the estimated time (his item 3).** The aim is about 2 h for `PLAN` and about 2 h for
+  `EXECUTE` without the waits. The stop rule is unchanged: twice the recorded estimate, by the clock.
+- **"the change manager needs a skill check layer like the gcfpe one has".** Recorded as candidate
+  C5 (*Explicitly not in scope*), for GTWPE-MGMT-10's next repair.
+
+### Finding against §A (recorded, not repaired)
+
+- **P-F1.** §A's *Interacting controls* says the two `Glow / Ops` guides "are no longer cited by a
+  TW prompt". TW-MGMT-10's intake still cites *General Prompt Flow and Creation Guidelines* and
+  *Prompt Selection and Session Delegation Protocol* as maintenance reading, a passage outside §A's
+  21 for that member and kept by its rule ("everything else"). The edits are unaffected. §A stays as
+  approved; Nathan sees this with the plan.
+- **P-F2.** §A counts three `validator_revision` sites. There are four: the GCFPE validation profile
+  in `flowmaster-validate/references/` carries the fourth, and `change-flow`'s GCFPE check compares
+  it. The dry run's trial (R6) moved only the three and failed with `PROFILE_IDENTITY`; with the
+  fourth moved, the suite passes. The plan moves all four, which is §A's own element ("move from
+  3.3.1 to a new revision") correctly counted, not new scope; Nathan sees it with the plan.
+
+### Values
+
+| Value | Fixed |
+|---|---|
+| «D» | At X1.1: the UTC date the seven pages are created |
+| «V» | At X1.1: `MMDDYY.1` for «D», the version of all seven new pages (PE's scheme; the pilot's precedent) |
+| «ID:…» | At X1.5: each new page's ID, returned by its duplication |
+| «S», «R» | At X4: the selection date, and `TW-ALPHA-<yyyymmdd of «S»>.1` |
+| «PA» | Nathan's plan approval date, from `plan_approved_date` |
+| «M» | At X4.1: `origin/main`'s commit then, full and short |
+| Built `tw-flowmaster` | tree digest `0581205ba29f195ce784ff585ca9019de5644750c9e357b06e377e91827a722c` (2 files, 55,131 bytes); `SKILL.md` sha256 `21c632e1b92a6096bb521d990fde1d7aee383af029e7f0e99fce68eac09b1575`, 54,711 bytes |
+| Built `flowmaster-validate` | tree digest and `SKILL_TREE_SHA256` `284b3ac150bedb51054aa9b3d0ce7ddfc1679d29dfb4178ded6095022d1fd733` (31 files, 1,915,296 bytes) |
+| Installed, before | `tw-flowmaster` `fd6c344befd9ce9e89648e6e404dd39f02e50bfaef2ca13d4e56ab84f5576617` (2 files); `flowmaster-validate` `ed52208f48479124f39119a54f29774096381ab85f54109a73bc3a7f3cc572af` (31 files), its declared digest |
+
+Tree digests are `validate_gcfpe_20260914.skill_tree_digest`, run with `PYTHONDONTWRITEBYTECODE=1`.
+
+### Evidence files
+
+In `docs/ephemeral/modifications/evidence/gtwpe-tw-model-advice/`:
+
+| File | What it is | Written |
+|---|---|---|
+| `edits.json` | The 69 prompt edits: for each, its member, item, what it removes, and its `old` anchor, or its `start` and `end` anchors, and its new text; plus the phrases that must be absent after, and the kept terms' counts | `PLAN` |
+| `skill_edits.py` | PART-02's 32 skill edits, as literal old and new strings, each required to match once; it copies the two installed skills to a new directory, edits them, and recomputes `SKILL_TREE_SHA256` | `PLAN` |
+| `guard_proof.py` | The validator guard's proof: each of its six identifiers, injected, is reported; with its guard line removed, it is not | `PLAN` |
+| `PLAN-REVIEW-BRIEF.md`, `PLAN-REVIEW.md` | PL3's brief, committed before the reviewer is spawned, and its record, captured unedited | `PLAN` |
+| `D24-BRIEF.md`, `SECTION-10-REVIEW-tw1-1.md`, `SECTION-10-REVIEW-tw1-2.md` | X1.4's filled skill brief, committed before the reviewers are spawned, and their two records, captured unedited | `EXECUTE` |
+| `packages.json`, `CHANGE-NOTE.md` | X1.3's archive names, sizes and sha256; the note that goes to Nathan with the archives | `EXECUTE` |
+
+### Before any write: X1.0, the preconditions
+
+All read-only. If any fails, stop and return `IMPLEMENTATION_BLOCKED`; nothing has been written.
+
+0. GTWPE-MGMT-10 092926.2, fetched live at the start of `EXECUTE`: edited 2026-09-29T23:47:58.009Z.
+1. Each of the seven current members, fetched live: its edit time is §A's (*The members, read live*).
+2. `edits.json`: every anchor found once in its member's fetch, and every span's `start` before its
+   `end`, by reading, checked by a second reading.
+3. The installed skills: `tw-flowmaster` and `flowmaster-validate` tree digests equal *Installed,
+   before*. The synced directory is only read.
+4. *HDE TW* and the selection page: no child page title ends `— «V»`.
+5. The four control pages carry their anchors once (*The control texts*), at the edit times the dry
+   run found: the selection page 2026-09-29T20:14:15.580Z, *Alpha 1* 20:15:21.232Z, *HDE TW*
+   20:17:20.875Z, the *Glow Operations Hub* 20:18:21.747Z, and the GTWPE parent page
+   2026-09-30T00:00:57.785Z. A later edit is read and recorded; the step stops only if an anchor is
+   gone.
+
+### The steps
+
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| X1.1 | — | the record | Status `EXECUTING`; fix «D» and «V»; record the UTC start | GTWPE-MGMT-10 X1 | In §E before X1.2 | None needed |
+| X1.2 | PART-02 | `skill` | Build: `PYTHONDONTWRITEBYTECODE=1 python3 skill_edits.py <synced skills root> <scratch>/built`. Make an isolated root: every installed skill except `canva-drive-facebook-workflow` (F-3), with the two built skills in place of the installed ones. Run `validate_flowmaster.py --skills-root <root> --strict-warnings` from the built validator, then `guard_proof.py <root> <scratch>/guard` | Nathan's direction of 2026-09-30 (F-2); `D24` | The script exits 0 and prints the built values in *Values*; the validator exits 0, `FLOWMASTER_SUITE_PASS`, `self_identity` OK, `validator_revision` 3.3.2, no skill error or warning; guard proof 12/12, exit 0; `diff -rq` of each built skill against the installed lists only the files `skill_edits.py` edits; the Primary core block of `tw-flowmaster` is byte-identical; in the built `tw-flowmaster`, the broad terms of §A's skill scope occur only in its kept exceptions (`D26-E`) | Delete the scratch directory |
+| X1.3 | PART-02 | `skill` | Package each built skill with `skill-creator`'s `package_skill` into `tw-flowmaster.skill` and `flowmaster-validate.skill`; write `packages.json` | `D24` ("each `.skill` by its digest") | `package_skill` reports `Successfully packaged skill` for each; each archive extracted in a clean directory equals its built tree (`diff -r`, no output); `packages.json` holds each archive's name, size and sha256 | Delete the archives |
+| X1.4 | PART-02 | `skill` | Fill `reviewer-prompt-template.md`'s first template as *The D24 brief* says; commit it as `D24-BRIEF.md` and push; spawn two fresh reviewer subagents, neither forked nor context-inheriting, with the brief as their only prompt; capture each final answer unedited to `SECTION-10-REVIEW-tw1-<n>.md` | `D24`; *Capturing a reviewer's or worker's return* | Both return `SKILL_FIT_CONFIRMED`, bound to `packages.json`'s digests. A `SKILL_REPAIR_REQUIRED` stops `EXECUTE` before X2, since its repair changes the plan | None needed; nothing is installed |
+| X1.5 | PART-01 | `prompt` | For each member in the order TRIAGE, DRAIN-10, DRAIN-20, RECORD-10, RECORD-20, APPLY-10, MGMT-10, three writes. (a) Fetch its parent (*HDE TW*, or for TW-MGMT-10 the selection page): no child titled `<title> — «V»`. (b) **Write 1:** `notion-duplicate-page` on its current page; «ID» is the returned ID. (c) Fetch «ID» until populated: at most six fetches, about 20 seconds apart (`sleep 20` in the background); populated means its first line is the current identity line, its last heading is the current version's, and no truncation or unknown block is reported. (d) **Write 2:** `update_properties`, title `<title> — «V»`. (e) **Write 3:** `update_content`, `allow_async: false`, the member's edits from `edits.json` in one call, in file order, «V» substituted; a span's `old_str` is composed from (c)'s fetch as `edits.json`'s rule says. If the call fails for no match and the only unmatched edit is the block, it is sent once more with the block's tags written without backslashes; any other failure stops | The prompt-page route; ITEM-01 and ITEM-02 | Fetch «ID» whole, into this session's context: the title and parent; the first two lines `<title> — «V»` and `Prompt Version: «V»`; each edit's new text present; each phrase of `absent_after` absent; each term of `counts_after` at its count, case-sensitive; the headings those of the current version. Every count by reading, checked by a second reading. Then fetch the parent: exactly one child carries the new title, and it is «ID»; the current page's edit time unchanged | Before X4, Nathan archives «ID»; the current page is untouched |
+| X2 | — | the record | Commit the record and the `EXECUTE` evidence; run both record checks at `EXECUTING`; push; send Nathan the two archives, then `CHANGE-NOTE.md`, by `SendUserFile`; return `PRODUCT_OWNER_ACTION_PENDING`, `IN FLIGHT`, for his install | GTWPE-MGMT-10 X2 ("needs an install") | Both checks exit 0; the branch's blob equals the local file; #568 is open | — |
+| X3 | PART-02 | `skill` | After Nathan says he has installed: read the installed trees; rebuild an isolated root from the installed skills, less the canva skill; run the validator from the installed `flowmaster-validate`, strict | GTWPE-MGMT-10 X3 ("for a skill, compare the installed digest"); `D24` | The installed `tw-flowmaster` and `flowmaster-validate` tree digests equal the built values; the validator exits 0 with X1.2's results. If the synced directory still holds the old digests, stop and record it: X3 resumes in a session Nathan starts after the install (S-3, `D26-C`) | Nathan reinstalls the prior archives, whose digests are *Installed, before* |
+| X4.1 | — | — | `git fetch origin main`; fix «M»; `git log e000819..«M»` over *The watched sources*, less this Modification's files | GTWPE-MGMT-10 X4 | Each commit listed is a trigger finding in §E with its `D26-E` search | — |
+| X4.2 | — | `notion_control` | **The catalog.** The GTWPE parent page, `update_content`: *CAT-OLD* becomes *CAT-NEW* | X4 ("set the checked-through commit") | Readback: *CAT-NEW* present, *CAT-OLD* absent, the rest of the page as the pre-read showed it | The reverse replacement, from the readback's text |
+| X4.3 | PART-01 | `notion_control` | **The selection.** The selection page, `update_content`, one replacement: *S-OLD* becomes *S-NEW* | The route for TW-ALPHA's selection; F-1 | Readback: the new status line; below it *SECTION*, whose seven rows link the seven «ID»s at «V»; below that `## Historical selected release — TW-ALPHA-20260929.1`; every other heading and child page as the pre-read showed them | The reverse replacement, from the readback's text; or a newer release selecting the prior versions by the same writes |
+| X4.4 | PART-01 | `notion_control` | *Alpha 1*, one replacement: `## Selected release — TW-ALPHA-20260929.1` becomes *SECTION*, a newline, and `## Historical selected release — TW-ALPHA-20260929.1` | Nathan's Q1 ruling of the first repair | Readback, by a script over the harness's save: the page begins with *SECTION*'s heading, then the renamed heading; 32 headings, the old list with one added and one renamed | As X4.3 |
+| X4.5 | PART-01 | `notion_control` | *HDE TW*, one replacement: *HDE-OLD* becomes *HDE-NEW* | As X4.4 | Readback: the page begins with *HDE-NEW*; every other heading and child page as the pre-read showed them | As X4.3 |
+| X4.6 | PART-01 | `notion_control` | The *Glow Operations Hub*, one replacement: *HUB-OLD* becomes *HUB-NEW* | As X4.4 | Readback, by a script over the harness's save: *HUB-NEW*'s heading once, directly above `## Historical Glow TW release — TW-ALPHA-20260929.1`; 139 headings, the old list with one added and one renamed | As X4.3 |
+| X5 | — | the record | Dispositions for every step and item; `interaction_cost_actual` against 10; author, checker and acceptor of each part; status `COMPLETE`; commit and push. The branch is kept, since X2 waited for an install, not a merge | GTWPE-MGMT-10 X5 | Both record checks exit 0 at `COMPLETE`; the branch's blob equals the local file | — |
+
+**Waiting for each update.** Every `notion-update-page` call is sent with `allow_async: false`; a
+returned async task is polled until it succeeds before the readback (*Read back every write*).
+
+**Order.** X1.2 to X1.4 build and review the packages; while the reviewers run, X1.5 creates the
+pages. X2 waits for both. X4.3 to X4.6 run only after X3 passes (PART-01 after PART-02).
+
+### The prompt edits (`edits.json`)
+
+| Member | Edits | What they remove |
+|---|---|---|
+| TW-TRIAGE-10 | 4 | Identity (2); the block; the sentence that TW-ASSESS-10 supplies task assessment |
+| TW-DRAIN-10, TW-DRAIN-20 | 12 each | Identity (2); the block; the relationship sentences; the Ultra clause; preflight step 5, keeping its prompt, baseline and capability checks; the checkpoints sentence, keeping its no-manifest rule; the corrected package's pre-Apply route; the READY next step, now TW-APPLY-10; the analyzer sentence; the handoff's recommendation field; "assessment" among its gates |
+| TW-RECORD-10, TW-RECORD-20 | 6 each | Identity (2); the block; the optional-advice clause; the Ultra clause; preflight step 5, keeping its capability blocker |
+| TW-APPLY-10 | 12 | Identity (2); the block; intake after the appraisal; the Strength Analyzer clause; the Ultra clause; preflight step 5 as the drains'; the three sentences requiring pre-Apply assessment, keeping the no-manifest rule; "assessment" in the no-change list; the report-only exemption; the diagnostic's model advice; pre-Apply for a corrected package |
+| TW-MGMT-10 | 17 | Identity (2); the block; the eight-member catalog, now seven, and TW-ASSESS-10's relationship; its three membership mentions; the workers' Strength Analyzer checkpoints; its mandate; the analyzer paragraph; the Ultra gate; the research, workload, human-guidance and account-picker sentences, keeping the header scheme and capability rule; the alpha invariants' checkpoints, recommendations and advisory research; the `openai-docs` sentences; the analyzer and advice validation cases; "followed by its human guidance"; "model evidence" |
+
+**Total:** 69 edits, 14 of them identity lines, covering §A's 63 passages. Every kept term is one of
+§A's exceptions. The guard (`GUARD-001`) is X1.5's absence check: `operator_model_guidance`,
+`TW-ASSESS-10`, `Ultra`, `Strength Analyzer`, `pre-Apply`, `analyzer`, `recommendation`, `Astra`,
+`GPT-`, `surface`, `effort`, `reasoning`, `openai-docs`, `human guidance`, `apprais` and
+`eight-member` absent from every new page (`D26-E`).
+
+### The skill edits (`skill_edits.py`)
+
+`tw-flowmaster/SKILL.md`, 21 edits: §A's 23 passages as 20 edits (line 341's three as two, and
+lines 351's and 352's two each as one), and the revision, 1.2.0 to 1.3.0. The profile's condition becomes "carry the exact no-redlines contract";
+READY output points to TW-APPLY-10; line 339 keeps only "Record actual configuration only when
+directly verified."; lines 351 and 352 keep only their GCFPE sentences.
+
+`flowmaster-validate`, 11 edits: in `validate_flowmaster.py`, the TW revision required as 1.3.0, the
+three old required terms removed, and six forbidden identifiers added for `tw-flowmaster`
+(`TW-ASSESS-10`, `PRE_CREATION_ASSESSMENT`, `PRE_APPLY_ASSESSMENT`, `STRENGTH_ANALYZER_PROMPT_ID`,
+`APPLICATION_REASONING_POLICY`, `PF_RENDERED_PAGE_COUNTS`); `validator_revision` 3.3.1 to 3.3.2 at
+its four sites (three scripts and the GCFPE validation profile, P-F2); `FLOWMASTER_VALIDATE_REVISION` 3.3.1 to 3.3.2; `SKILL.md`'s TW paragraph;
+and, after the edits, `SKILL_TREE_SHA256` recomputed.
+
+### The control texts
+
+In these, `«ID:X»` is member X's new page, and each row is one line.
+
+**S-OLD**, the selection page's status line and the current release's heading, two lines:
+
+```
+**Status: TW-ALPHA-20260929.1 selected; TW-MGMT-10 repaired and verified. Live follow-up trial pending; PF04 cause unresolved.**
+## Selected release — TW-ALPHA-20260929.1
+```
+
+**S-NEW:** the line below, a newline, *SECTION*, a newline, and
+`## Historical selected release — TW-ALPHA-20260929.1`:
+
+```
+**Status: «R» selected; model advice removed and TW-ASSESS-10 retired. Live follow-up trial pending; PF04 cause unresolved.**
+```
+
+**SECTION**, on the selection page and on *Alpha 1*:
+
+```
+## Selected release — «R»
+**Selected: «S».** Authority: MODIFICATION-20260930-gtwpe-tw-model-advice, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». As Nathan directed on 2026-09-29, no member carries a model, surface or effort recommendation, a workload profile or a strength rating, and TW-ASSESS-10 is retired with no replacement: no assessment runs before creation or application, and a READY package goes straight to TW-APPLY-10. Every row below is new. The *Current operation* and *Verification and runtime limits* of TW-ALPHA-20260908.1, below, still apply except where they run or name TW-ASSESS-10 or give model or effort advice; the next manual entry is the selected drain prompt. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2, installed by Nathan, match this release. All old prompt pages remain intact; TW-ASSESS-10 090826.2 is not selected.
+- `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/«ID:TRIAGE»"/> — PF10 target list only; «V».
+- `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-10»"/> — General PF redlines/report or exact no redlines; «V».
+- `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-20»"/> — PF09 redlines/report; board optional; «V».
+- `TW-RECORD-10` — <mention-page url="https://app.notion.com/p/«ID:RECORD-10»"/> — PF20 paste-ready section only; «V».
+- `TW-RECORD-20` — <mention-page url="https://app.notion.com/p/«ID:RECORD-20»"/> — PF30 paste-ready section only; «V».
+- `TW-APPLY-10` — <mention-page url="https://app.notion.com/p/«ID:APPLY-10»"/> — Atomic validated application plus bounded header provenance; «V».
+- `TW-MGMT-10` — <mention-page url="https://app.notion.com/p/«ID:MGMT-10»"/> — Sole TW prompt maintenance owner; «V».
+```
+
+**HDE-OLD** is `## Current TW release — TW-ALPHA-20260929.1`. **HDE-NEW:**
+
+```
+## Current TW release — «R»
+<mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef">Glow Technical Writing Ecosystem</mention-page> selects «R»: every member at «V», with no model, surface or effort recommendation, and TW-ASSESS-10 retired with no replacement, so a READY package goes straight to TW-APPLY-10. Entry: the selected drain prompt. Maintenance owner: <mention-page url="https://app.notion.com/p/«ID:MGMT-10»"/>. The 2026-09-08 follow-up below still applies except where it runs or names TW-ASSESS-10 or gives model advice. Exact rows: <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/>. Changed by MODIFICATION-20260930-gtwpe-tw-model-advice, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA».
+## Historical TW release — TW-ALPHA-20260929.1
+```
+
+**HUB-OLD** is `## Current Glow TW release — TW-ALPHA-20260929.1`. **HUB-NEW:**
+
+```
+## Current Glow TW release — «R»
+**«R» is selected.** <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/> and <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/> hold the exact seven-member catalog. Every member is at «V», with no model, surface or effort recommendation, and TW-ASSESS-10 is retired with no replacement. Maintenance: <mention-page url="https://app.notion.com/p/«ID:MGMT-10»"/>. The 2026-09-08 follow-up below still applies except where it runs or names TW-ASSESS-10 or gives model advice. Changed by MODIFICATION-20260930-gtwpe-tw-model-advice, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA».
+## Historical Glow TW release — TW-ALPHA-20260929.1
+```
+
+**CAT-OLD**, in the GTWPE catalog's *Checked-through commit*:
+
+```
+`e0008199e4ba83ad04ffa576c34fc0785da99cf9` (`e000819`), examined by `EXECUTE` of MODIFICATION-20260929-gtwpe-first-repair on 2026-09-29.
+```
+
+**CAT-NEW:**
+
+```
+`«M, full»` (`«M»`), examined by `EXECUTE` of MODIFICATION-20260930-gtwpe-tw-model-advice on «the X4.1 date». Before it, `e000819`, examined by `EXECUTE` of MODIFICATION-20260929-gtwpe-first-repair.
+```
+
+A readback compares a mention by its link, since Notion shows a linked page by its title (the pilot's
+PF-27).
+
+### The `D24` brief (X1.4)
+
+The first template of `reviewer-prompt-template.md`, every slot filled. §1: the two archives from
+`packages.json`, installed together. §2: `NONE`, first review. §3: the installed trees' digests
+(*Installed, before*) and the built ones, by `skill_tree_digest`. §4: this repository, branch
+`docs/20260930-modification-gtwpe-tw-model-advice`, not merged, pull request #568; `AGENTS.md`;
+`skill_edits.py`, `guard_proof.py` and this record. §5, the claims: C1, the built skills differ from
+the installed only as `skill_edits.py` says; C2, the Primary core is byte-identical; C3, no stage,
+input or rule of `tw-flowmaster` runs, requires or names TW-ASSESS-10, and no fixed model or effort
+policy remains, outside §A's kept exceptions; C4, the suite passes strict, and each new guard fires;
+C5, the authority is Nathan's direction of 2026-09-30, quoted from §A. §6, to attack: A1, the
+rewritten profile condition and what now governs a selected-catalog run; A2, the kept GCFPE
+clauses (C4 of §A) and line 339's kept rule; A3, the fourth `validator_revision` site (P-F2), in a
+GCFPE reference; A4, whether any fixture or reference still expects the old terms. §7: the
+canva skill's front matter (F-3); the isolated root. §8: X1.2's and X1.3's commands. §9: the
+template's prohibitions, and no prompt body is fetched.
+
+**`CHANGE-NOTE.md`**, to Nathan with the archives: the two archives' names and sha256; what changed
+(this plan's two paragraphs above); the two reviewers' verdicts; that the selection waits for his
+install; and that he installs both together, and rolls back by reinstalling the prior archives.
+
+### Failure path (`D26-B`)
+
+Before X1.5's first write, a failure stops `EXECUTE` with nothing written. After it: a failure record
+in §E, a read-only sweep of the pages this run created and the control pages, the freeze kept, and a
+return to Nathan. Pages already created stay unselected until he archives them; a landed control
+write is undone by its reverse replacement, never from page history. A partial skill install is his
+to reverse by reinstalling the prior archives.
+
+### Open findings, accepted as risks
+
+| # | Risk | Likelihood | Consequence |
+|---|---|---|---|
+| K-1 | §A's S-1, accepted by Nathan's direction: between the install and X4.3, the installed profile matches the old release and skips the assessments it requires | Low: the window is X3 to X4.3 in one session | A Flowmaster run started in that window would skip them |
+| K-2 | 18 span edits, seven of them the blocks, compose `old_str` from the fetch; a wrong character fails the call | Low | Loud: the call fails, and the step stops before its readback |
+| K-3 | A multi-edit `update_content` call may be applied in part | Low | Loud: X1.5's readback catches it; the page stays unselected (the first repair's K-15) |
+| K-4 | X3's validation needs the isolated root (F-3), and this session may not see the install (S-3) | Certain for F-3; unknown for S-3 | Loud: X3 stops and resumes in a new session |
+| K-5 | The reviewer checks the plan without prompt bodies (`D22`); only the dry run and X1.0 check anchors against them | Certain | A wrong anchor fails loudly at X1.5 |
+| K-6 | TW has no executable check or live trial | Certain | The selection page says runtime is unproven |
+
+### Product Owner actions
+
+| # | Action | How it is verified |
+|---|---|---|
+| PO-1 | Approve this plan. It authorizes the 21 page writes of X1.5 and the five control writes of X4.2 to X4.6, and nothing else in Notion | `plan_approved_by` |
+| PO-2 | Install the two archives X2 sends, together | X3's digest comparison and validation |
+| PO-3 | Merge #568 when the record is `COMPLETE` | Not needed by this run (`D21-C`) |
+| PO-4 | Only after a failure: archive unselected pages, or reinstall the prior archives | The failure record's sweep |
+
+### Explicitly not in scope
+
+- **C5, from Nathan's direction at approval:** a skill route in GTWPE-MGMT-10 with a skill check
+  layer modelled on the GCFPE one, so a skill part runs through the change prompt instead of around
+  it (with F-2). For GTWPE-MGMT-10's next repair.
+- C2 (F-1), C3 and C4 of §A; the canva skill (F-3); the stale Flowmaster revisions on the selection
+  page's historical limits; TW-ASSESS-10's page, which stays intact and unselected.
+
+### Dry run (PL3)
+
+On 2026-09-30, from about 02:05Z, by this session, read-only, before any full review.
+
+| # | Gate | Result |
+|---|---|---|
+| P1 | `modification_validate.py` and `gtwpe_record_check.py` (on `main` at `f83c755`) on this record at `PLANNED`, with this round in `reviews` | Both exit 0, 1/1 |
+| P2 | `git fetch --prune origin`; the watched-path log from `e000819` | `main` still `f83c755`; the log lists nothing |
+| P3 | The seven members, fetched live at this mode's start | Each at §A's edit time |
+| P4 | `edits.json`'s anchors in those fetches | Every `old`, `start` and `end` found once, and every `start` before its `end`, by reading, checked by a second reading |
+| P5 | The control pages | The selection page 2026-09-29T20:14:15.580Z, *S-OLD* once, as its first two lines; *HDE TW* 20:17:20.875Z, *HDE-OLD* once, as its first line; *Alpha 1* 20:15:21.232Z and the *Glow Operations Hub* 20:18:21.747Z, each read by script from the harness's save: the anchor once, and 31 and 138 headings; the GTWPE parent page 2026-09-30T00:00:57.785Z, *CAT-OLD* once |
+| P6 | X1.0 (4) for 2026-09-30 | No child page of *HDE TW* or of the selection page carries a `093026` version |
+| P7 | X1.2 on the installed skills, in the scratchpad | `skill_edits.py` exits 0 and prints *Values*' built digests; the validator exits 0 with `--strict-warnings`: `FLOWMASTER_SUITE_PASS`, `self_identity` OK, `validator_revision` 3.3.2, no skill error or warning; the guard proof 12/12, exit 0 (each "guard disabled" case exits 1 on the validator's own digest, with no `tw-flowmaster` error, as expected); `diff -rq` lists exactly the six edited files; the core block identical; in the built `tw-flowmaster`'s specialization, the broad terms remain only on its kept exceptions: GCFPE lines, the stall prohibitions, `/model`, the checksum, the report row, and "checkpoint" meaning a ledger checkpoint |
+| P8 | The same with `validator_revision` moved at three sites only | Exit 1: `change-flow` reports `FMV-GCF-CURRENT-001: PROFILE_IDENTITY` (P-F2) |
+| P9 | `edits.json`, by script | 69 edits, 69 distinct IDs, 18 spans; no new text holds a phrase of `absent_after` |
+| P10 | X1.3, trial packaging | Both archives written (19,193 and 322,860 bytes); 2 and 31 entries, none outside its root; each extracted tree equals the built one (`diff -r`, no output) |
+| P11 | The front matter and tables, by script | They parse, and every table row has its table's column count |
+
+Not exercised: any Notion write, X1.5's duplication and polling, X3's install, and the reviewers.
+
+### Harness files (`D22` condition 5), for `PLAN`
+
+- **This session's transcript** holds, from this mode, the bodies of the seven members and the control
+  pages *Glow Technical Writing Ecosystem*, *HDE TW* and the GTWPE parent page, each fetched once into
+  context. No script read the transcript; every anchor was found by reading. It is left to teardown.
+- **Two tool-results saves**, both control pages: *Alpha 1* and the *Glow Operations Hub*, each read
+  by script for its edit time, headings and anchor, then deleted (exit 0).
+- **The skill files** were read by `grep`, `sed` and scripts, and copied into the scratchpad.
+- **Scratch:** `gen_skill_edits.py` and `make_tw_edits.py`, which wrote the evidence files;
+  `sectionP.md`, this section's draft; `ctl.py`; `pl-out/`, `pl-root/`, `pkg/` and `pkgx-*/`, the
+  built skills, isolated root and trial archives; `pl-*.json` and `pl-*.txt`, gate output. No
+  transient file holds a prompt body.
+
+### Cost of this mode
+
+Time: from 01:59Z, when Nathan's approval was recorded, to PL4. Tokens: not measured by this
+session.
+
+### Canon and rulings relied on
+
+- Nathan's approval of 2026-09-30 and its three directions, quoted in `analyze_approved_by`.
+- GTWPE-MGMT-10 092926.2, as fetched live: *PLAN*, *EXECUTE*, *How each kind of target changes*,
+  *Reviews are bounded*, *Reading prompt bodies*, *Boundaries*.
+- `gcfpe.decision-record.md` `D22`, `D24` and `D26`; `reviewer-prompt-template.md`, both templates;
+  `modification-template.md` 2.1.
+- HDE Governance (PF04) §9.1.6, as §A read it; HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001: no
+  model or effort level is a requirement, which the removed texts no longer imply.
+- The pilot's and the first repair's records, for the selection writes, the readback of mentions
+  (PF-27) and the one-call edits.
 
 ## §E — Execution
