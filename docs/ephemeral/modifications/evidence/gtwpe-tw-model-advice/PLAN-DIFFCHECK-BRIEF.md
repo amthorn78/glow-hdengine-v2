@@ -14,6 +14,12 @@ status: RECORD. Merging preserves the record and approves nothing (D21-C)
 §3 and §5 are the template's fixed text; §6 is too, except its record-path sentence, which says the
 checker writes nothing and its answer is captured (GTWPE-MGMT-10 092926.2, *Reviews are bounded*).
 
+## Canon relied on
+
+- `AGENTS.md`: the canon-first rule; PF canon is read-only.
+- HDE Governance (PF04) §9.1.6 and HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, on `main` at `f83c755`, as §A read them.
+- In flight: the record's §A (approved) and §P; `gcfpe.decision-record.md` D22, D24 and D26; `reviewer-prompt-template.md`; `skill-packaging-and-delivery.md`.
+
 ```plain text
 You are GTWPE-TW-ADVICE-PLAN-DC, reviewing PLAN of MODIFICATION-20260930-gtwpe-tw-model-advice. You did not author it.
 This is the check of the repair's diff (D26-A rule 2), after full review 1 of 1. Prior round's record: docs/ephemeral/modifications/evidence/gtwpe-tw-model-advice/PLAN-REVIEW.md (3 required: R-1, R-2, R-3; 21 listed). The repair diff: `git diff 2673c2519f3a6c7512f53ce0e9fad482895b5d06 e431d25a8c8e0ee844128cd4e2af521a3926de2a -- docs/ephemeral/modifications/MODIFICATION-20260930-gtwpe-tw-model-advice.md docs/ephemeral/modifications/evidence/gtwpe-tw-model-advice/ctl_check.py` (PLAN-REVIEW.md in that range is the prior record itself, captured, not repair).
