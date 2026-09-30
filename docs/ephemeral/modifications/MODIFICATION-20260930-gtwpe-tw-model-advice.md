@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260930-gtwpe-tw-model-advice
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control, skill]
 gate_tier: 2
 closure:
@@ -31,6 +31,7 @@ reviews:
     date: 2026-09-30
     required_open: 0
     outcome: "Rerun by this session, read-only, on §A as revised at Nathan's direction of 2026-09-30: the validator and the GTWPE check exit 0 at ANALYZED; A0 reproduces at f83c755, and 092926.2 is unchanged; the front matter and every table parse; the validator passes on an isolated root of the installed skills and stops fatally on the installed tree (F-3); three scratch trials show the assertions that pin the old wording and the validator's self-identity; the guard candidates occur nowhere in tw-flowmaster's core; the skill scope table's 37 anchors are on their lines. No required defect. No full review"
+item_count_at_approval: 4
 items:
   - id: ITEM-01
     statement: "No selected TW-ALPHA prompt carries a model-guidance block, or any model, surface or effort recommendation, workload profile or strength rating."
@@ -69,8 +70,8 @@ request: |
 
   Standing directions: stop rather than produce substandard results (the stop rule's meter is time); no Modification branch is merged before its record is COMPLETE, except the pull requests the plan itself opens. Report to Nathan in at most five plain sentences, ending with exactly what he must approve.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-09-30: \"Nathan approves the revised analysis at 119057f (2026-09-30), with two directions: \"the change manager needs a skill check layer like the gcfpe one has\" and \"this flow can be simplified, let's not overcomplicate this\". For this Modification: 1. Keep PLAN lean: one dry run and one full review by a single reviewer; no second reviewer or diff check unless the review finds a required defect. 2. Keep scope to removal: drop the new guard that makes tw-flowmaster refuse the old release (selection already waits for Nathan's install). Keep the validator guard against the removed wording returning. 3. Aim for about half the estimated time; the stop rule (time) still applies. Record as a candidate for GTWPE-MGMT-10's next repair: a skill route with a skill check layer modelled on the GCFPE one, so a skill part runs through the change prompt instead of around it. Continue to PLAN and stop at Nathan's plan approval.\""
+analyze_approved_date: 2026-09-30
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
