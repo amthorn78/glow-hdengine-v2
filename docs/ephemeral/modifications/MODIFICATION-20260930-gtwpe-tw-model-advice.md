@@ -684,7 +684,7 @@ This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 �
 |---|---|
 | «D» | At X1.1: the UTC date the seven pages are created |
 | «V» | At X1.1: `MMDDYY.1` for «D», the version of all seven new pages (PE's scheme; the pilot's precedent) |
-| «ID:…» | At X1.5: each new page's ID, returned by its duplication |
+| «ID:…» | At X1.5: each new page's ID, returned by its duplication, written as 32 hex digits without dashes, the form in its page URL (R-2's checks match on it) |
 | «S», «R» | At X4: the selection date, and `TW-ALPHA-<yyyymmdd of «S»>.1` |
 | «PA» | Nathan's plan approval date, from `plan_approved_date` |
 | «M» | At X4.1: `origin/main`'s commit then, full and short |
