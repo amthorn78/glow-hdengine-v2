@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260930-gtwpe-tw-model-advice
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control, skill]
 gate_tier: 2
 closure:
@@ -41,6 +41,11 @@ reviews:
     date: 2026-09-30
     required_open: 3
     outcome: "One reviewer, GTWPE-TW-ADVICE-PLAN-A, as Nathan directed, on cc08e2a: 3 required defects (R-1, X4's missing pre-reads; R-2, X4.4 and X4.6 readbacks blind to their values; R-3, X2's delivery short of D24's brief and verdicts and the delivery conventions), each confirmed and repaired; 21 listed findings, to Nathan unrepaired. Record: PLAN-REVIEW.md"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-09-30
+    required_open: 0
+    outcome: "One checker, GTWPE-TW-ADVICE-PLAN-DC, on 2673c25..e431d25: R-1 to R-3 fixed, 0 required defects (3 to 0); 9 listed findings, 8 in text the repair added, to Nathan unrepaired. Record: PLAN-DIFFCHECK.md"
 item_count_at_approval: 4
 items:
   - id: ITEM-01
@@ -968,6 +973,32 @@ listed findings.
 | L20 | *S-OLD* and the block spans cross Notion block boundaries in one `old_str`, untried before | Normal | Unknown | Loud (K-2) |
 | L21 | The front matter's plan estimate still names two reviewers; X1.0 (5) says four control pages and lists five | Normal | Certain | Cosmetic |
 
+### Check of the repair's diff (PL3)
+
+The one check `D26-A` rule 2 allows, run because the full review found required defects, as Nathan's
+direction permits: GTWPE-TW-ADVICE-PLAN-DC, a fresh general-purpose subagent, neither forked nor
+context-inheriting, briefed only with `PLAN-DIFFCHECK-BRIEF.md`, committed at `1a6696d` before it was
+spawned (its *Canon relied on* block was added at `1a6696d`, after the repository's hook flagged its
+absence at `112e54b`, and before the spawn). It checked `2673c25..e431d25`, wrote nothing and ran no
+script. Its answer was captured unedited to `PLAN-DIFFCHECK.md` (10,102 bytes, sha256
+`4e0e4b16cd06466d35ee0a902839170f4f77e082bad003de60307674898e93b1`).
+
+**0 required defects.** R-1, R-2 and R-3 are fixed; the trend is 3 to 0. Eight of its nine listed
+findings sit in text the repair added, which `D26-A` rule 5 names as a stop signal; no round is left
+in any case. The listed findings go to Nathan unrepaired:
+
+| # | Finding | Path | Likelihood | Consequence |
+|---|---|---|---|---|
+| DL-1 | `ctl_check.py` has run only on synthetic saves; its first real run is X4.4's pre-read, after X4.3 has switched the selection page | Failure | Low | Loud; the pages disagree until `D26-B`'s sweep. Moving X4.4's and X4.6's pre-reads ahead of X4.3 would close it |
+| DL-2 | X4.3, X4.4 and X4.6 check values and links, not the sent wording or that *SECTION* has exactly seven rows | Failure | Very low | A silent wording error or extra row on a control page |
+| DL-3 | X4.4's `--has '«PA»'` is also met by «S» when both fall on the same day | Normal | Low | Silent, cosmetic |
+| DL-4 | X4.4's and X4.6's pre-reads go to a scratch state file, not to §E | Normal | Certain | The pre-read's heading list is not kept as evidence |
+| DL-5 | X2's verification does not name what the third `SendUserFile` call carries, and the change note does not name the brief | Failure | Low | An incomplete delivery caught only by comparison |
+| DL-6 | No step writes `CHANGE-NOTE-tw1.md` | Normal | Certain | The executor infers the step (after X1.4) |
+| DL-7 | `ctl_check.py` is named without its path | Normal | Low | Loud: file not found |
+| DL-8 | *Full review* cites `D26-A` rule 3 where rule 4 is meant | Normal | Certain | Cosmetic |
+| DL-9 | X1.5 (b) says "«ID» is the returned ID" while *Values* fixes the dashless form | Normal | Low | Loud, after X4.4's write |
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode, the bodies of the seven members and the control
@@ -976,15 +1007,23 @@ listed findings.
 - **Two tool-results saves**, both control pages: *Alpha 1* and the *Glow Operations Hub*, each read
   by script for its edit time, headings and anchor, then deleted (exit 0).
 - **The skill files** were read by `grep`, `sed` and scripts, and copied into the scratchpad.
-- **Scratch:** `gen_skill_edits.py` and `make_tw_edits.py`, which wrote the evidence files;
+- **The two review transcripts**, the reviewer's and the checker's, each found by the path the
+  harness gave for its agent ID and read by `capture.py` for its final message only; neither fetched
+  a prompt body. They are left to teardown. The reviewer's own oversized `grep` output, saved by the
+  harness (validator source lines and a docs search, no prompt body), was deleted by this session
+  (exit 0). Three older saves in the same directory, dated 2026-09-29, predate this Modification and
+  were left untouched.
+- **Scratch:** `gen_skill_edits.py` and `make_tw_edits.py`, which wrote the evidence files; `cc/`,
+  `ctl_check.py`'s synthetic test saves; `capture.py`;
   `sectionP.md`, this section's draft; `ctl.py`; `pl-out/`, `pl-root/`, `pkg/` and `pkgx-*/`, the
   built skills, isolated root and trial archives; `pl-*.json` and `pl-*.txt`, gate output. No
   transient file holds a prompt body.
 
 ### Cost of this mode
 
-Time: from 01:59Z, when Nathan's approval was recorded, to PL4. Tokens: not measured by this
-session.
+Time: from 01:59Z, when Nathan's approval was recorded, to PL4 at 2026-09-30T03:00:33Z: about 61 minutes,
+against Nathan's aim of about 2 h and the recorded estimate of about 4 h. Tokens: not measured by this
+session; the reviewer and the checker reported 367,588 and 270,209 subagent tokens.
 
 ### Canon and rulings relied on
 
