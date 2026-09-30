@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260929-gtwpe-first-repair
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, notion_control, tool]
 gate_tier: 1
 closure:
@@ -16,7 +16,7 @@ override:
   overrides: []
   reason: ""
 interaction_cost_predicted: 8
-interaction_cost_actual:
+interaction_cost_actual: 13
 estimate:
   plan: "about 3 h and 2.5M tokens: §P for sixteen body items and the tool (anchors, new texts, selftest cases, guard proof), a dry run, and one full review by two reviewers with its repair"
   execute: "about 2 h and 1.2M tokens, not counting the wait for Nathan's merge: the tool with its selftest and guard proof, the pull request, merge detection from main, the new GTWPE-MGMT-10 version with its edits and whole-page readback, and the catalog. Time is the meter the session can read (ITEM-03)"
@@ -51,71 +51,71 @@ items:
   - id: ITEM-01
     statement: "When GTWPE-MGMT-10 selects a new TW-ALPHA release, no other page goes on naming the superseded release unnoticed: ANALYZE finds every page that names TW's current release, the plan updates each one or lists it for Nathan as his ruling on Q1 sets, and `notion_control` names the pages the route writes."
     source: "Pilot findings PF-4, PF-1 and PF-D3 (MODIFICATION-20260929-gtwpe-pilot); Q1 below"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-02
     statement: "For any prompt change, ANALYZE finds every page that names the member's current version or links its page, and records whether the route writes each one."
     source: "Pilot finding PF-5"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "The stop at twice the estimate has a meter the session can read: elapsed time, recorded when each mode starts and checked at every step boundary, with tokens recorded only where the session can read them without opening a file that holds a prompt body, and otherwise recorded as not measured."
     source: "Pilot finding PF-14; reproduced in this ANALYZE (Harness files)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-04
     statement: "No Notion write is read back before it has landed: the session waits for each write to complete, polls any pending task until it reports success, and treats a failed task as a tool error."
     source: "Pilot finding PF-21 (the pilot's full review, RA-1 and PLB-1)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-05
     statement: "A rollback never reverts other work and never fails for want of matching text: a page other sessions also write is rolled back only by reversing this Modification's own replacement, with the text taken from that write's readback, and is never restored from page history."
     source: "Pilot findings PF-22 and PF-27"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-06
     statement: "Exact facts come from fetched pages, never from Notion search: edit times, the register's selection and whether a title is already taken under a parent are read from fetches, and search is used only to discover pages."
     source: "Pilot findings PF-26 and PF-10; reproduced in this ANALYZE's drift check"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-07
     statement: "After a context compaction drops a prompt body read earlier in the mode, the session fetches it live again and never recovers it from a transcript; a count over a body says whether it was made by reading or by a command over the harness's save of a fetch; and before PLAN a quotation from a body is no longer than the defective clause."
     source: "Pilot findings PF-28, PF-2 and PF-17"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-08
     statement: "The body says where its Notion writes are made: from the managing session, on whatever surface it runs, because no AI product is a governance requirement (HDE Build Notes, PF10-AINEUTRAL-001), and the surface confers no permission."
     source: "Pilot findings PF-23 and PF-25; GTWPE ledger E-026"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-09
     statement: "A review in ANALYZE or PLAN follows one capture rule: its brief replaces the template's instruction to write a record with the write-nothing clause, and the reviewer's return is captured unedited, in whichever mode it ran, to a named evidence file under the Modification's evidence directory."
     source: "Pilot findings PF-12 and PF-20"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-10
     statement: "After every push, the Modification's branch has an open pull request, which gates nothing, so that the record, and any failure record, reach main when Nathan merges."
     source: "Pilot finding PF-24 (the pilot plan's K-13)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-11
     statement: "The body's validation command, and every mode check that names the validator, run the GTWPE record check of ITEM-17, which runs modification_validate.py and the GTWPE's own record rules."
     source: "Pilot finding PF-13"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-12
     statement: "ANALYZE branches from origin/main, commits and pushes the record at A1, and a restarted ANALYZE that finds its record already on a branch continues there instead of creating a second."
     source: "Pilot findings PF-8 and PF-9"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-13
     statement: "The drift check names its D26-E search: the terms of each change, searched in this prompt's body as fetched at the start of the mode and in docs/prompt_ecosystem_management/gtwpe/ at the commit examined."
     source: "Pilot finding PF-11"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-14
     statement: "A repaired TW-ALPHA member carries everything outside its approved edits unchanged, including its model-advice block, even where the PE Metaprompt's authoring exclusion would remove it (design D-17)."
     source: "Pilot finding PF-6"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-15
     statement: "The interaction cost counts every round in reviews, dry runs included, and every pull request Nathan merges, the record's included."
     source: "Pilot finding PF-15"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-16
     statement: "Each mode's dry run records its gates and results in a Dry run subsection of that mode's section."
     source: "Pilot finding PF-3"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-17
     statement: "A GTWPE record check, docs/prompt_ecosystem_management/gtwpe/gtwpe_record_check.py, runs modification_validate.py and adds the GTWPE's own record rules (the record is marked ecosystem GTWPE; each mode section it has reached carries a Harness files subsection; each mode that ran a dry run carries a Dry run subsection), with a selftest at 100% and a guard proof, and the pilot's record passes it."
     source: "Pilot findings PF-13, PF-3 and PF-D1; GTWPE ledger E-025"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     name: "GTWPE-MGMT-10's next version, carrying the pilot's repairs"
@@ -1121,6 +1121,11 @@ The clock starts at X1.1, 2026-09-29T23:45:29Z. The stop falls at 4 h of counted
 | X1.11 | PART-01 | VERIFIED | The GTWPE parent page, fetched: three child pages, GTWPE-MGMT-10 092926.1, `GTWPE-MGMT-10 — Manage the GTWPE — 092926.2` (`3ea4590a05eb81f8ae9ed681b5c358b8`) and the *Target Architecture* page, so exactly one carries the new title, and it is «NEW». The page is otherwise as X1.2 read it: edited 2026-09-29T20:11:58.508Z, C1 to C4 once each. GTWPE-MGMT-10 092926.1, fetched: still edited 2026-09-29T04:38:37.656Z |
 | X1.12 | PART-01 | VERIFIED | Nothing new committed. Snapshot at 23:49:18Z. One fresh general-purpose subagent, GTWPE-FIRST-REPAIR-READBACK, neither forked nor context-inheriting, spawned with `EXEC-READBACK-BRIEF.md`'s block, «NEW» and «V» substituted and nothing else changed (4,776 bytes, sha256 `8e5b37bdff2416d00457b618221992b8fefd496ebedd3615f0642be4d4fa724b`). The harness reported 3 tool calls, 102,529 tokens and about 2 minutes. Its answer was captured by `capture.py`, from the one transcript the harness named for its agent ID, to `evidence/gtwpe-first-repair/EXEC-READBACK.md`: 1,445 bytes with a final newline, sha256 `aa3dbad0aaf48267116ba3134300416233409062dcb033ff92d569451144c084`, first line "1. Title property: GTWPE-MGMT-10 — Manage the GTWPE — 092926.2". Its 75 counts equal `phrases.json`'s, compared by script over the capture and `phrases.json`, with no difference; its title, parent, edit time, first two lines and 24 headings equal X1.10's. Post-check at 23:51:55Z: no change but the brief this session wrote to the scratchpad after the first snapshot, and the harness's own logs in `/tmp` |
 | X2 | — | APPLIED | The record, with X1's rows, and `EXEC-READBACK.md` committed as `cf56d8a`; `git show --stat HEAD` lists exactly those two. `gtwpe_record_check.py` and `modification_validate.py` each exit 0 on the record at `EXECUTING` (1/1). Pushed at about 23:53Z; after `git fetch`, the branch's blobs of the record, `EXEC-READBACK.md` and the tool equal the local files. Pull request amthorn78/glow-hdengine-v2#566 opened against `main`, not a draft, its body under the template's five headings as `AGENTS.md` sets them. It lists exactly the tool, the record and `EXEC-READBACK.md`, and no other path, read by script from the harness's save of the file list, which is repository text, then deleted. This row was added after the pull request opened, and pushed to the same branch. Returned `PRODUCT_OWNER_ACTION_PENDING`, `IN FLIGHT`, for Nathan's merge, at 2026-09-29T23:54:11Z |
+| X3 | PART-02 | VERIFIED | Resumed at 2026-09-29T23:59:53Z, on Nathan's word that #566 was merged. `git fetch --prune origin`: `main` at `e000819`, and the branch deleted on the remote. «M» is `e0008199e4ba83ad04ffa576c34fc0785da99cf9`, «m» `e000819`. The merge was detected by blobs, not by the commit subject: for each of the three paths the pull request changed, `git rev-parse origin/main:<path>` equals the branch's blob at `3ad2184` (the record `da1d05b`, `EXEC-READBACK.md` `6738b83`, the tool `a2116a8`). X1.4's four gates, from a worktree of `origin/main` in the scratchpad, removed after: selftest 17/17, guard proof 5/5, the tool over the directory exit 0 (2 GTWPE records, 4 others), the validator's selftest 66/66 and the directory 6/6, each exit 0. «NEW» and 092926.1, fetched whole: still edited 2026-09-29T23:47:58.009Z and 2026-09-29T04:38:37.656Z |
+| X4.1 | — | VERIFIED | `git log --format='%H %cI %s' fffadb5..e000819` over *The watched sources* lists one commit, `e000819`, whose only watched path is `docs/prompt_ecosystem_management/gtwpe/gtwpe_record_check.py`, this Modification's own tool, which X4.1 leaves out. The range's other two commits, `9b23e07` (#564) and `ffb5922` (#565), touch no watched path. So no trigger finding, and none of the `D26-E` searches has anything to search for |
+| X4.2 | PART-01 | VERIFIED | **W4**, the GTWPE catalog. Pre-read, at 2026-09-30T00:00Z, edited 2026-09-29T20:11:58.508Z: C1 to C4 each once; the lineage pins, the approved-design line and three child pages (092926.1, «NEW», *Target Architecture*). `update_content`, `allow_async: false`, the four replacements in one call, C1 to C4 becoming C1-NEW to C4-NEW with «V», «NEW», «M», «m» and «D» = 2026-09-29 substituted. Returned synchronously, no task. Readback, edited 2026-09-30T00:00:57.785Z: C1-NEW, C2-NEW and C4-NEW present as sent; C3-NEW in its rendered form, the mention showing `GTWPE-MGMT-10 — Manage the GTWPE — 092926.2`; in the members table and the *Checked-through commit* paragraph, C1 to C4 absent; 092926.1's child-page entry stays; the lineage pins, the approved-design line and the three child pages as the pre-read showed them |
+| X4.3 | PART-01 | VERIFIED | The GTWPE catalog, fetched again (edited 2026-09-30T00:00:57.785Z): the members row links «NEW», and «NEW» is a child of the page |
+| X5 | — | VERIFIED | This section completed, every item `VERIFIED`, `interaction_cost_actual` set, and the status set to `COMPLETE` at 2026-09-30T00:02:45Z. The record was saved to the scratchpad, the branch restarted from `origin/main` (`e000819`) with X5's commands, the record written back, committed and pushed; both checks exit 0 at `COMPLETE`, and the pushed blob is read back against the local file. The record's pull request is opened after this commit |
 
 No check failed, no tool call returned an error or a task, and nothing was rolled back.
 
@@ -1128,16 +1133,98 @@ No check failed, no tool call returned an error or a task, and nothing was rolle
 
 **Waiting:** X3 to X5 wait for Nathan's merge of amthorn78/glow-hdengine-v2#566. The new page «NEW» exists, unselected; the catalog names 092926.1 until W4.
 
-### Harness files (`D22` condition 5), for `EXECUTE`, through X2
+**Resumed** at X3, 2026-09-29T23:59:53Z, after Nathan's merge of amthorn78/glow-hdengine-v2#566 as
+`e000819`. The clock ran again from there to X5, 2026-09-30T00:02:45Z. A correction to the paragraph above,
+added rather than made in place: X1.1 to X2's return, 23:45:29Z to 23:54:11Z, is about 9 minutes,
+not about 12. The whole of `EXECUTE`'s counted time is therefore about 20 minutes, against an
+estimate of about 2 h. Tokens: the readback worker used 102,529, as the harness reported; this
+session's own use is not measured by it (ITEM-03; §A risk 2).
+
+### Trigger findings (X4.1)
+
+None. The only commit X4.1's log lists, `e000819`, changes only this Modification's own tool, which
+X4.1 leaves out; nothing else on a watched path changed since `fffadb5`.
+
+### Harness files (`D22` condition 5), for `EXECUTE`
 
 - **This session's transcript** holds, from this mode, GTWPE-MGMT-10 092926.1's body, fetched at X1.2
   and at X1.11; «NEW»'s body, fetched at X1.7 and at X1.10; and the GTWPE parent page, a control page.
   No script read the transcript, and every count over a body was made by reading, in context. It is
   left to teardown.
-- **One tool-results save**, the PE Metaprompt 091426.1 at X1.2, a prompt body, read by script for
-  its edit time and title only, never hashed or compared, then deleted (exit 0).
+- **At X3 and X4:** 092926.1's body and «NEW»'s body, fetched again at X3, and the GTWPE catalog
+  at X4.2 (three times: the pre-read, the readback and X4.3's fetch), into this session's context; no
+  count over a body was made by command.
+- **Two tool-results saves.** The PE Metaprompt 091426.1 at X1.2, a prompt body, read by script for
+  its edit time and title only, never hashed or compared, then deleted (exit 0). And #566's file list
+  at X2, repository text, read by script for its paths only, then deleted (exit 0).
 - **The readback worker's transcript**, at the path the harness named for its agent ID, holds «NEW»'s
   body. `capture.py` opened it for the worker's `SubagentHandback` answer only. It is left to teardown.
 - **Scratch:** `snap.sh` and the two X1.12 snapshots; `x112-brief.txt`, the brief as sent; `w3.json`,
   `edits.json`'s texts with «V» substituted, from which W3's call was typed; and `x14_*.txt`, X1.4's
-  gate output. No transient file holds a prompt body.
+  gate output; `x3_*.txt`, X3's gate output, from a worktree of `origin/main` that was removed after.
+  No transient file holds a prompt body.
+
+### Parts
+
+PART-02 landed whole: `docs/prompt_ecosystem_management/gtwpe/gtwpe_record_check.py` is on `main` at
+`e000819` through #566, byte-identical to the evidence copy the plan fixed (sha256 «H»), and its
+gates pass from `main` (X3). ITEM-17 is `VERIFIED`.
+
+PART-01 landed whole, after PART-02 as ordered: *GTWPE-MGMT-10 — Manage the GTWPE — 092926.2*
+carries the 43 approved edits for ITEM-01 to ITEM-16, read back by this session and independently by
+the isolated readback worker, and the catalog selects it (W4). ITEM-01 to ITEM-16 are `VERIFIED`.
+W1 to W4 were each applied and read back, and nothing was rolled back. 092926.1 stays, unchanged and
+no longer selected (K-8).
+
+### Artifacts produced
+
+| Artifact | Where | How it was read back |
+|---|---|---|
+| *GTWPE-MGMT-10 — Manage the GTWPE — 092926.2* | Notion `3ea4590a05eb81f8ae9ed681b5c358b8`, under the GTWPE parent page | X1.10's seven checks, X1.11, X1.12's independent counts, X3's edit time, and X4.3 |
+| The selection of 092926.2, and the checked-through commit `e000819` | The GTWPE catalog, `3ea4590a05eb818c915bdfd3d150c44b` | X4.2 against its pre-read, and X4.3 |
+| `gtwpe_record_check.py` | `docs/prompt_ecosystem_management/gtwpe/` on `main` at `e000819`, blob `a2116a8` | X1.4, and X3 from `main` |
+| `EXEC-READBACK.md` | `docs/ephemeral/modifications/evidence/gtwpe-first-repair/`, on `main` at `e000819` | Its blob on `main` against the branch's (X3); its counts against `phrases.json` (X1.12) |
+| This record | `docs/ephemeral/modifications/MODIFICATION-20260929-gtwpe-first-repair.md` | Both checks at each status, and each pushed blob against the local file |
+
+### Author, checker and acceptor (HDE Governance §9.1.6)
+
+- **PART-01. Author:** this Claude Code session, the GTWPE-MGMT-10 session, which wrote the 43 edits
+  in `PLAN` and made W1 to W4. **Checker:** this session's readbacks (X1.10, X1.11, X3, X4.2, X4.3)
+  and the isolated readback worker GTWPE-FIRST-REPAIR-READBACK (X1.12); before approval, the plan's
+  texts were checked by GTWPE-FIRST-REPAIR-PLAN-A and -B and the diff checker -PLAN-DC. **Acceptor:**
+  Nathan, who approved the plan, with its four writes and the selection of 092926.2, on 2026-09-29.
+- **PART-02. Author:** this session. **Checker:** the tool's selftest and guard proof, on the branch
+  (X1.4) and from `main` (X3), and the same plan reviewers. **Acceptor:** Nathan, by his plan approval;
+  his merge of #566 landed it, and a merge approves nothing by itself (`D21-C`).
+
+### Interaction cost, actual against predicted
+
+Predicted 8. Actual 13:
+
+    interaction_cost = 3 rulings + 2 approvals + 5 review rounds + 0 skill reviews + 0 installs + 3 merges = 13
+
+- **Rulings, 3 against 1.** Q1, as predicted; Nathan's direction after #565's merge to consolidate
+  §P, with his opt-in to K-16's repairs and his merge rule; and his confirmation, with the plan
+  approval, that a failure record's pull request after the merge counts as X5's.
+- **Review rounds, 5 against 3.** The diff check, which `D26-A` rule 2 allows after a full review with
+  required findings, and the rerun of `PLAN`'s dry run that Nathan directed.
+- **Merges, 3 against 2.** #565, merged mid-run from the app while the plan awaited approval; #566,
+  X2's; and the record's pull request, still to come (PO-4).
+
+**Cost.** `EXECUTE`'s counted time was about 20 minutes, against about 2 h; `PLAN`'s about 2 h, against
+about 3 h. Tokens are not measured by this session; the workers' own figures are recorded where each
+ran.
+
+### Remaining Product Owner actions
+
+- **PO-4:** merge the record's pull request, opened at X5, when he chooses. Nothing waits on it, and
+  merging it approves nothing (`D21-C`). It is the X5 exception to his merge rule, and the record is
+  `COMPLETE`.
+- The candidates C1 to C9 wait for later Modifications, among them C7 (removing the TW-ALPHA
+  model-guidance blocks and retiring TW-ASSESS-10), C8 (the find rule) and C9 (the merge rule in the
+  body). So do the deferred findings PF-16, PF-18 and PF-19 (C4).
+
+**Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with no trigger finding from X4.1.
+
+**X5's pull request:** amthorn78/glow-hdengine-v2#567, opened at 2026-09-30T00:03:37Z, after the commit that set
+`COMPLETE` (`9c66ded`). It carries this record alone.
