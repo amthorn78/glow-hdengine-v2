@@ -1225,3 +1225,6 @@ ran.
   body). So do the deferred findings PF-16, PF-18 and PF-19 (C4).
 
 **Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with no trigger finding from X4.1.
+
+**X5's pull request:** amthorn78/glow-hdengine-v2#567, opened at 2026-09-30T00:03:37Z, after the commit that set
+`COMPLETE` (`9c66ded`). It carries this record alone.
