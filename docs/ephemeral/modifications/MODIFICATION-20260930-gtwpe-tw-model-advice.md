@@ -4,28 +4,33 @@ format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260930-gtwpe-tw-model-advice
 status: ANALYZED
-targets: [prompt, notion_control]
+targets: [prompt, notion_control, skill]
 gate_tier: 2
 closure:
   upstream: [TW-ASSESS-10, TW-DRAIN-10, TW-DRAIN-20, TW-APPLY-10]
   downstream: [TW-DRAIN-10, TW-DRAIN-20, TW-APPLY-10]
   state_sharers: [TW-DRAIN-10, TW-DRAIN-20]
-readiness: NEEDS_RULING
+readiness: READY
 override:
   by: ""
   overrides: []
   reason: ""
-interaction_cost_predicted: 7
+interaction_cost_predicted: 10
 interaction_cost_actual:
 estimate:
-  plan: "about 3 h: §P for 63 passages across seven members (anchors, new texts and absence checks), the selection's three writes and three notes, a dry run, and one full review by two reviewers with its repair. Time is the meter the session can read"
-  execute: "about 2.5 h, not counting any wait for Nathan: seven new versions (duplicate, title, edits), each read back whole by this session and by an isolated readback worker, and the selection's three writes and three notes, each read back. Time is the meter"
+  plan: "about 4 h: §P for 63 passages across seven members (anchors, new texts and absence checks), the selection's three writes and three notes, and the skill part's 23 passages, validator edits, package build and D24 brief; a dry run, and one full review by two reviewers with its repair. Time is the meter the session can read"
+  execute: "about 4 h, not counting any wait for Nathan: seven new versions (duplicate, title, edits), each read back whole by this session and by an isolated readback worker; the two skill packages built, validated on an isolated root and reviewed under D24 by two reviewer subagents; after Nathan's install, the digest comparison and the validator on the installed skills; then the selection's three writes and three notes, each read back. Time is the meter"
 reviews:
   - mode: ANALYZE
     kind: DRY_RUN
     date: 2026-09-30
     required_open: 0
     outcome: "By this session, read-only: the validator and the GTWPE check exit 0 on the record at ANALYZED; A0 reproduces at f83c755; the front matter and every table parse; the seven new versions' titles and the new release label are free under their parents; the Flowmaster facts behind Q1 reproduce from the installed skill; the scope counts were checked by a second reading. No required defect. No full review"
+  - mode: ANALYZE
+    kind: DRY_RUN
+    date: 2026-09-30
+    required_open: 0
+    outcome: "Rerun by this session, read-only, on §A as revised at Nathan's direction of 2026-09-30: the validator and the GTWPE check exit 0 at ANALYZED; A0 reproduces at f83c755, and 092926.2 is unchanged; the front matter and every table parse; the validator passes on an isolated root of the installed skills and stops fatally on the installed tree (F-3); three scratch trials show the assertions that pin the old wording and the validator's self-identity; the guard candidates occur nowhere in tw-flowmaster's core; the skill scope table's 37 anchors are on their lines. No required defect. No full review"
 items:
   - id: ITEM-01
     statement: "No selected TW-ALPHA prompt carries a model-guidance block, or any model, surface or effort recommendation, workload profile or strength rating."
@@ -36,13 +41,22 @@ items:
     source: "Request item 2; the same direction"
     disposition: ""
   - id: ITEM-03
-    statement: "The release that carries these changes is selected, and every page that names TW's current release is updated, as Nathan ruled on Q1 of MODIFICATION-20260929-gtwpe-first-repair."
-    source: "Request, the paragraph after item 2"
+    statement: "The release that carries these changes is selected only after Nathan has installed the updated TW Flowmaster skill and it validates as installed, and every page that names TW's current release is updated, as Nathan ruled on Q1 of MODIFICATION-20260929-gtwpe-first-repair."
+    source: "Request, the paragraph after item 2; Nathan's direction of 2026-09-30, its item 2 (§A, Revision of 2026-09-30)"
+    disposition: ""
+  - id: ITEM-04
+    statement: "The installed tw-flowmaster skill carries no TW-ASSESS-10 stage and no fixed model or effort policy, matching the new prompts, and flowmaster-validate asserts the new wording, not the old."
+    source: "Nathan's direction of 2026-09-30, approving the analysis with Q1 (b): \"we should update the skill\"; its item 1 (§A, Revision of 2026-09-30)"
     disposition: ""
 parts:
   - id: PART-01
     name: "The seven TW-ALPHA members without model advice, TW-ASSESS-10 retired, and the new release selected"
     items: [ITEM-01, ITEM-02, ITEM-03]
+    class: B
+    after: [PART-02]
+  - id: PART-02
+    name: "The TW Flowmaster skill packages: tw-flowmaster without TW-ASSESS-10's stages or its fixed model policy, and flowmaster-validate's assertions to match"
+    items: [ITEM-04]
     class: B
     after: []
 request: |
@@ -78,6 +92,9 @@ prompts changes" bounds all three.
 ## §A — Analysis
 
 *Written by MODE = ANALYZE. Requires nothing upstream. Frozen once approved.*
+
+*Revised on 2026-09-30 at Nathan's direction, before approval: see* Revision of 2026-09-30*, below,
+which says what it supersedes.*
 
 This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
 092926.2*, fetched live at the start of the mode: edited 2026-09-29T23:47:58.009Z, the version the
@@ -330,6 +347,228 @@ The estimate is in the front matter; time is the meter. Twice it is where the se
 **This mode's own cost.** Time: from about 00:10Z to A7 at 2026-09-30T00:30:47Z, about 25 minutes. Tokens: not
 measured by this session.
 
+### Revision of 2026-09-30, at Nathan's direction
+
+*Added by this mode on 2026-09-30, before `ANALYZE` approval. It supersedes the subsections it
+names; the text above it stays as written, since a dated record is never corrected in place.*
+
+**Nathan's direction, as PE37 relayed it on 2026-09-30:**
+
+> Nathan approves the TW prompts repair's analysis (2026-09-30). Q1: option (b), plus the skill
+> update — Nathan: "we should update the skill". Revise §A before PLAN (scope change; no new ruling
+> needed beyond this): 1. Add a skill part: an updated tw-flowmaster package with TW-ASSESS-10's
+> stages and its fixed model policy removed, matching the new prompts, and any flowmaster-validate
+> assertions that pin the old wording updated to match. Nathan's direction is the explicit
+> skill-update scope the body requires; Nathan alone installs. Prepare the package, run the
+> validator against it, and hand Nathan the package with a change note. 2. Publish the seven new
+> prompt versions, but select the new release only after Nathan has installed the updated skill and
+> it validates as installed (X3-style wait). If GTWPE-MGMT-10 092926.2 has no route for a skill
+> part, record that as a finding against the body and carry the part under Nathan's direction
+> anyway. Set the record back to ANALYZED with a dry run, and stop for Nathan's approval before
+> PLAN.
+
+The direction widens the scope, so `analyze_approved_by` stays empty until Nathan approves this
+revision, and the scope freezes then (*Scope freezes at analysis approval*).
+
+**What it settles.** Q1 is answered: option (b), with the skill updated in this Modification. Risk 1
+and candidate C1 become PART-02. This subsection supersedes *Per part*, Q1's recommendation and
+*Readiness and interaction cost*; everything else in §A stands.
+
+**Items and parts, as revised.**
+
+- **ITEM-04** (new, from the direction's item 1): the installed `tw-flowmaster` carries no
+  TW-ASSESS-10 stage and no fixed model or effort policy, matching the new prompts, and
+  `flowmaster-validate` asserts the new wording, not the old. It comes from Nathan's direction, not
+  from the request.
+- **ITEM-03** (revised, from the direction's item 2): the new release is selected only after Nathan
+  has installed the updated skill and it validates as installed.
+- **PART-02** (new): the two skill packages, `tw-flowmaster` and `flowmaster-validate`, holding
+  ITEM-04. Target `skill`. Class B: Nathan's direction is the ruling, and HDE Governance §9.1.6
+  already requires an interacting skill to be reconciled with the members it serves. Tier 2, as the
+  Modification's: the skill consumes the handoffs the members change (a READY package now goes to
+  TW-APPLY-10 directly), and both sides change here. Closure adds nothing, since the skill is not a
+  TW-ALPHA member.
+- **PART-01** is ordered after PART-02: its selection writes and the three current-release notes
+  wait until PART-02 has landed, which is when X3 has verified Nathan's install. Its seven new
+  versions may be created before then and stay unselected, as the direction's item 2 allows. If
+  PART-02 does not land, no selection is made, and the unselected pages take the route's rollback
+  before X4: Nathan archives them.
+
+**The skill part's scope, measured (`SCOPE-001`).** Method: the prompts' broad terms, plus
+`rendered`, `page count` and `checkpoint`, searched by `grep` in the installed
+`tw-flowmaster/SKILL.md` (a skill file, not a prompt body, so a command may count over it), and each
+hit read in context. The installed file is revision 1.2.0: 499 lines, 58,355 bytes, sha256
+`e0fad7be3bff06e229d54dd89e851b7b2d466bf7e986f857a67d9de0607e62a6`. Its embedded Primary core is
+lines 12 to 228, and its TW specialization lines 229 to 499.
+
+What is removed, from Nathan's words ("TW-ASSESS-10's stages and its fixed model policy removed,
+matching the new prompts"): (1) every stage, input, check, route or report item that runs, requires
+or names TW-ASSESS-10 or its assessments; (2) every fixed model, reasoning or effort policy, and
+every input or rule that serves only such a policy, which is the rendered page count; (3) where the
+profile names either, its text is rewritten to the new prompts' contract.
+
+Kept unchanged:
+
+- the embedded Primary core, lines 12 to 228, its three model or assessment mentions included: the
+  validator requires it byte-identical to `flowmaster-primary`'s, and the skill's maintenance rule
+  forbids editing it on its own;
+- every clause that states the GCFPE's own contract: the GCFPE binding (lines 313, 315 and 317), the
+  GCFPE sentences of lines 351, 352, 393 and 451, and line 355's `/model`, which GCFPE stages still
+  use. Nathan's direction about the TW prompts does not reach them (candidate C4);
+- records of the actual configuration: the composer checksum's "model/reasoning" (line 441), the
+  report row's "application model/reasoning" (line 481), and line 339's rule to record the actual
+  configuration only when directly verified;
+- the prohibitions in the stall bullet, line 345: "Max did not prove the task should complete", "a
+  hang does not prove model mismatch", and its ban on escalating effort because time elapsed;
+- everything else.
+
+| Line | Passage | Why it is in scope |
+|---|---|---|
+| 8 | `TW_FLOWMASTER_SPECIALIZATION_REVISION: 1.2.0` | TW behaviour changes, so the skill's maintenance rule moves the revision, to 1.3.0 |
+| 258 | The fixed policy `APPLICATION_REASONING_POLICY = ULTRA_IF_RENDERED_PAGES_GT_100_OR_UNKNOWN`, the whole line, with its notes on TW's assessment policy and the GCFPE's own, which qualify only this line | (2), and (1) |
+| 266 | The accepted input `PF_RENDERED_PAGE_COUNTS` | (2): it feeds only the page-count rule |
+| 268 | The accepted input `STRENGTH_ANALYZER_PROMPT_ID`, which resolves TW-ASSESS-10 | (1) |
+| 331 | The profile's condition, that the prompts "carry the mandatory pre-creation/pre-Apply assessment and exact no-redlines contracts" | (3): rewritten to the new contract; see risk S-1 |
+| 333 | "fixed-model/page-count, direct creation-to-application", in the list of legacy clauses the profile supersedes | (3): the first goes below, and without the pre-Apply stage the profile no longer departs from direct creation-to-application |
+| 337, 338, 340 | Three bullets: TW-ASSESS-10's two assessment turns; the analyzer's documentation research; the `PRE_CREATION_ASSESSMENT` and `PRE_APPLY_ASSESSMENT` stages | (1), whole |
+| 339 | The bullet on task-bound recommendations | (1), all but its rule on the actual configuration |
+| 341 | "analyzer/"; "model/reasoning recommendation or qualified limit"; the sentence that sends READY output to pre-Apply TW-ASSESS-10, and the assessment to TW-APPLY-10 | (1), three passages: READY now points to TW-APPLY-10, as in the new prompts |
+| 342 | "pre-Apply assessment/" | (1) |
+| 343 | "and assessed", for a corrected package | (1) |
+| 345 | "recommendation versus", before "observed configuration" | (1) |
+| 347 | "assessments," among the report's counts | (1) |
+| 351 | The sentence fixing GPT-5.6 Sol with Max reasoning for legacy runs; "for selected-catalog TW, apply its two-checkpoint policy" | (2) and (1), two passages |
+| 352 | The legacy Ultra and Max sentences; the clause that TW uses its pre-Apply assessment | (2) and (1), two passages |
+| 353 | "Never infer rendered pages from …" | (2): it serves only the page-count rule |
+| 393 | ", or Sol Max for a non-GCFPE target" | (2) |
+| 451 | Step 3's sentence selecting Sol Ultra or Sol Max for a non-GCFPE application | (2) |
+
+**Total:** 23 passages on 19 lines, and the revision line. Nothing in the core changes.
+
+**`flowmaster-validate`: the assertions that pin the old wording.** Measured by `grep` over the
+whole installed `flowmaster-validate` tree for `tw-flowmaster`, `pre-Apply`, `pre-creation`,
+`selected-catalog`, `1.2.0` and the removed identifiers, each hit read:
+
+- `scripts/validate_flowmaster.py`, `CONTRACT_REQUIRED["tw-flowmaster"]`: four of its strings pin the
+  old wording, `TW_FLOWMASTER_SPECIALIZATION_REVISION: 1.2.0`, `PRE_CREATION_ASSESSMENT`,
+  `PRE_APPLY_ASSESSMENT` and `ULTRA_IF_RENDERED_PAGES_GT_100_OR_UNKNOWN`. The first moves to the new
+  revision; the other three are removed.
+- The same file's `CONTRACT_FORBIDDEN["tw-flowmaster"]` gains the guard (`GUARD-001`): the removed
+  identifiers, so that none returns unnoticed. It is matched case-insensitively against the whole
+  file, core included. The candidates, `TW-ASSESS-10`, `PRE_CREATION_ASSESSMENT`,
+  `PRE_APPLY_ASSESSMENT`, `STRENGTH_ANALYZER_PROMPT_ID`, `APPLICATION_REASONING_POLICY` and
+  `PF_RENDERED_PAGE_COUNTS`, occur nowhere in lines 1 to 228 (*Dry run, rerun*, R5). `PLAN` fixes
+  the set, with a guard proof that each fires on the old file.
+- `SKILL.md` line 184, the paragraph on the TW specialization, names revision 1.2.0 and
+  "pre-creation and pre-Apply assessments". It is rewritten to the new revision and contract.
+- The validator's own identity. Validation behaviour changes, so, by the skill's own convention,
+  `FLOWMASTER_VALIDATE_REVISION` in `SKILL.md` and `validator_revision` at its three sites
+  (`validate_flowmaster.py`, `validate_gcfpe_20260914.py` and `run_gcfpe_20260914_fixtures.py`) move
+  from 3.3.1 to a new revision, and `SKILL_TREE_SHA256`, the skill's digest of itself, is
+  recomputed: the validator refuses a tree whose digest differs from its declaration (R6).
+- Nothing else. No fixture or reference names the TW contract, and no other skill's list, fixture
+  or oracle changes, so the GCFPE's validation is unchanged.
+
+**Finding against GTWPE-MGMT-10 092926.2.**
+
+- **F-2: it has no route for this skill part.** *What this prompt may change* lists one skill, "The
+  GTWPE wording of `glow-write-boundary`'s exception", and its `targets` vocabulary defines `skill`
+  as that exception. Its *Native purpose* says it does not change "another ecosystem's controls",
+  and `flowmaster-validate` validates the whole Flowmaster suite, GCFPE's `change-flow` among it. No
+  overridable gate names a route (`OVERRIDABLE` in `modification_validate.py`), so no `override`
+  block is recorded: Nathan's direction carries the part, as he said. It takes the route the body
+  gives its one skill, by analogy: a `D24` package, two reviewer subagents on the first template of
+  `reviewer-prompt-template.md`, Nathan's install, the post-install digest comparison, and, to roll
+  back, Nathan's reinstall of the prior digest. X2 and X3 already provide for an install. The
+  *Boundaries* let this prompt write only the record and its evidence here, so the packages' bytes
+  and change note are evidence files of this Modification; `PLAN` sets their paths and how they
+  reach Nathan.
+
+**Finding outside the GTWPE.**
+
+- **F-3: the installed skills cannot be validated as they are.** `flowmaster-validate` on the
+  installed tree stops fatally (exit 2) on `canva-drive-facebook-workflow/SKILL.md`, whose quoted
+  `name:` its front-matter check rejects, before it checks any Flowmaster skill (R4). Every
+  validation in this Modification, the post-install one included, runs on an isolated root that
+  copies every installed skill except that one, as the validator's documentation allows ("Use
+  SKILLS_ROOT or --skills-root only for an exact fresh checkout or isolated test root"). The fix
+  belongs to that skill's owner, outside this scope.
+
+**Risks added.**
+
+- **S-1: the interval between Nathan's install and the selection.** In that interval the installed
+  skill has no assessment stage, while the selected release, TW-ALPHA-20260929.1, still requires
+  TW-ASSESS-10. If the profile's new condition matched the old release, a Flowmaster run in that
+  interval would skip assessments the selected prompts require, a silent wrong path; if it fell
+  through to the legacy clauses, the run would resolve the wrong sources. So the rewritten condition
+  must match only a release with no TW-ASSESS-10 dependency, and state that a selected release which
+  still requires it is the profile's existing "scope/compatibility blocker", a loud stop. `PLAN`
+  writes that text and checks it against both releases' contracts, and keeps the interval to X3's
+  checks and the selection in one session.
+- **S-2: the post-install validation needs the isolated root** (F-3). The root is rebuilt from the
+  installed tree after Nathan's install, and the digest comparison runs on the installed files
+  themselves.
+- **S-3: this session may not see the install.** The synced skill directories date from
+  2026-09-29T21:24Z; the directory's manifest was rewritten at 2026-09-30T01:07Z, but nothing shows
+  that installed files refresh within a session. If they do not change after Nathan's install, X3
+  resumes in a session Nathan starts after it, at the post-install checkpoint (`D26-C`).
+- **S-4: `flowmaster-validate` is shared with the GCFPE.** Its new revision and digest are what every
+  GCFPE session will see installed, though its GCFPE checks do not change. A search of
+  `docs/prompt_ecosystem_management/` and `docs/graph/` on `main` for its declared digest
+  `ed52208f…` and for its revision 3.3.1 as `validator_revision` or `FLOWMASTER_VALIDATE_REVISION`
+  found no pin (`git grep`, no match).
+- **S-5: a `D24` repair.** A `SKILL_REPAIR_REQUIRED` verdict means a repair and fresh reviewers on
+  the new bytes: one more skill review cycle each time, under the stop rule by time.
+
+**Candidates for separate Modifications, as revised.** C1 is taken, as PART-02. C2 and C3 stand. One
+is added:
+
+- **C4:** `tw-flowmaster`'s GCFPE binding (lines 315 and 317) still carries predecessor assessment
+  and surface, model and reasoning advice for GCFPE stages: phrases that `session-relay-flowmaster`'s
+  guard in `flowmaster-validate` forbids since MODIFICATION-20260923-closeout-residuals (ITEM-02,
+  `D23-A` and `D23-B`). It is the GCFPE's contract, for GCFPE-MGMT-10, and outside Nathan's direction
+  about the TW prompts.
+
+**Readiness and interaction cost, as revised.** `READY`. Q1 is answered; PART-01's selection waits
+on PART-02's install, which is an ordering, not sequential discovery; and every item's scope is
+measured.
+
+    interaction_cost = 1 ruling + 2 + 4 review rounds + 1 skill review cycle + 1 install + 1 merge = 10
+
+- The ruling is Q1, answered in Nathan's approval of 2026-09-30; its round trip has happened.
+- The review rounds are this mode's two dry runs, and `PLAN`'s dry run and one full review. A check
+  of a repair's diff makes 11.
+- The skill review cycle is `D24`'s two reviewers on the same bytes; each repair adds one (S-5).
+- The install is one round trip for both packages, and X2 waits for it.
+- The merge is still the record's pull request, #568. The packages are evidence files, so X2 waits
+  for no merge.
+- Moving PART-02 to a separate run saves nothing: PART-01 cannot land before it, and a second run
+  adds its own approvals and merge.
+
+The estimate in the front matter is revised: `PLAN` about 4 h, `EXECUTE` about 4 h without the
+waits. Time is the meter, and twice it is where the session stops.
+
+**This revision's own cost.** Time: from before 2026-09-30T01:09:02Z, when it wrote its first file,
+to A7 at 2026-09-30T01:23:14Z. Tokens: not measured by this session.
+
+### Dry run, rerun (A6)
+
+On 2026-09-30, by this session, read-only, on §A as revised, before A7. No full review follows: the
+skill part's scope is measured, no question is open, and `PLAN` reviews the exact texts.
+
+| # | Gate | Result |
+|---|---|---|
+| R1 | `modification_validate.py` and `gtwpe_record_check.py` (on `main` at `f83c755`) on this record at `ANALYZED`, with this round in `reviews` | Both exit 0, 1/1 |
+| R2 | A0 again: `git fetch --prune origin`; the watched-path log from `e000819`; GTWPE-MGMT-10 092926.2 fetched live again | `main` still `f83c755`; the log lists nothing; 092926.2 edited 2026-09-29T23:47:58.009Z, as at the mode's start |
+| R3 | The front matter and tables, by script | They parse, and every table row has its table's column count |
+| R4 | `validate_flowmaster.py` on the installed tree, then on a fresh isolated root: the 28 installed skills other than `canva-drive-facebook-workflow`, copied, with `tw-flowmaster` and `flowmaster-validate` equal to the installed (`diff -rq`, no output) | Installed tree: exit 2, `fatal_error` on the canva skill's front matter (F-3). Isolated root: `FLOWMASTER_SUITE_PASS`, exit 0, and exit 0 with `--strict-warnings`; `self_identity` OK; `validator_revision` 3.3.1; no skill error or warning |
+| R5 | The guard candidates, counted case-insensitively by `grep` in `tw-flowmaster/SKILL.md` lines 1 to 228 (front matter, header and core) | 0 for each of `TW-ASSESS-10`, `PRE_CREATION_ASSESSMENT`, `PRE_APPLY_ASSESSMENT`, `STRENGTH_ANALYZER_PROMPT_ID`, `APPLICATION_REASONING_POLICY`, `PF_RENDERED_PAGE_COUNTS`, `ULTRA_IF_RENDERED_PAGES_GT_100_OR_UNKNOWN`, `two-checkpoint`, `Sol Max`, `Sol Ultra` and `GPT-5.6` |
+| R6 | Three scratch trials, each on its own copy of the isolated root | `PRE_APPLY_ASSESSMENT` renamed in `tw-flowmaster`: exit 1, "missing specialization contract: PRE_APPLY_ASSESSMENT". The revision set to 1.3.0: exit 1, "missing specialization contract: TW_FLOWMASTER_SPECIALIZATION_REVISION: 1.2.0". `flowmaster-validate`'s `SKILL.md` line 184 changed: exit 1, `SKILL_SELF_IDENTITY:DECLARED_ed52208f4847_MEASURED_beb910eb3c98`. Apart from the error each names, which the third also reports under `change-flow`, each report's fixture results equal R4's |
+| R7 | The skill scope table, by script: each row's anchor text on its line of the installed file | 37 of 38 on their lines; the revision line is line 8, not line 7, and the table was corrected before this row |
+| R8 | 092926.2's *What this prompt may change*, its `targets` rule and *Native purpose*, read in the live fetch | As F-2 quotes them |
+
+Not exercised: any Notion write, any package build, and any reviewer.
+
 ### Dry run (A6)
 
 On 2026-09-30, by this session, read-only, before A7. No full review follows: the scope is measured,
@@ -362,6 +601,13 @@ Not exercised: any Notion write, and every readback, since `ANALYZE` writes noth
   profile. It holds no prompt body.
 - **Scratch:** `tw-notes.md` (short clauses and page identities, no body) and `sectionA.md` (this
   section's draft). No transient file holds a prompt body.
+- **For the revision of 2026-09-30.** GTWPE-MGMT-10 092926.2 was fetched live again into this
+  session's context, after a context compaction and before any step relied on it; it is left to
+  teardown with the transcript, and nothing counted over it by script. The installed skill files
+  `tw-flowmaster/SKILL.md` and `flowmaster-validate/`'s `SKILL.md` and scripts were read by `grep`,
+  `sed` and a script; none holds a prompt body. Scratch: `fvroot/` and `fvroot2/`, the isolated
+  roots; `tr-t1/` to `tr-t3/`, the trials' copies; `fv-*.json` and `dr-*.json`, the validator's
+  reports; and `revise_a.py`, this revision's edit script. No transient file holds a prompt body.
 
 ### Canon and rulings relied on
 
@@ -375,6 +621,12 @@ Not exercised: any Notion write, and every readback, since `ANALYZE` writes noth
   design v1.2 D-17; `modification-template.md` 2.1.
 - The first repair's record, for C7, the route and its conventions; the pilot's record, for the four
   pages W5 to W8 wrote.
+- For the revision: Nathan's direction of 2026-09-30, quoted in it; GTWPE-MGMT-10 092926.2 as fetched
+  live again (*What this prompt may change*, the `targets` rule, *Boundaries*, *Reviews are bounded*,
+  X2, X3 and *How each kind of target changes*); `gcfpe.decision-record.md` `D24`, read in full, and
+  `D23-B`; `modification-template.md`'s `override` rules and `after`; HDE Governance §9.1.6 on
+  interacting skills; and the installed `tw-flowmaster` (its maintenance rule) and
+  `flowmaster-validate` (its entry points and self-identity), read as the harness files say.
 
 ## §P — Plan
 
