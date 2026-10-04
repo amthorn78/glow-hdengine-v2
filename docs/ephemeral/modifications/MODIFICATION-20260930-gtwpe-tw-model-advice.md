@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20260930-gtwpe-tw-model-advice
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control, skill]
 gate_tier: 2
 closure:
@@ -1070,3 +1070,37 @@ PO-1's authorization, the 21 page writes of X1.5 and the five control writes of 
 unchanged. *Order* still holds: X4 runs only after X3 passes.
 
 ## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+092926.2*, fetched live at the start of the mode (edited 2026-09-29T23:47:58.009Z, unchanged). The
+input is §P as Nathan approved it at `5f13420` on 2026-10-04, with his DL-1 reorder recorded as §P's
+successor subsection (`plan_approved_by`, committed at `3534317`). The mode started at
+2026-10-04T13:28Z, when the approval was recorded. The meter is the clock: the recorded estimate for
+`EXECUTE` is about 4 h, so the stop is at about 8 h, 2026-10-04T21:28Z; Nathan's aim was about 2 h.
+
+The record and its evidence are pushed to `docs/20260930-modification-gtwpe-tw-model-advice`, the
+Modification's own branch, as 092926.2 requires (*The record*, *Branch*; the find rule in *Entry
+contract*), with its open pull request amthorn78/glow-hdengine-v2#568. The session's harness had
+named another branch, `claude/tw-prompts-x4-reorder-1d4psw`; nothing was pushed there, since a
+record on a branch outside `docs/*-modification-gtwpe-*` would not be found by the next mode.
+
+### Values, fixed at X1.1 (2026-10-04T13:31:54Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-10-04 |
+| «V» | `100426.1` |
+| «PA» | 2026-10-04, `plan_approved_date` |
+| «ID:…» | Fixed at X1.5, below, as 32 hex digits without dashes |
+| «S», «R», «M» | Fixed at X4, after Nathan's install |
+
+### Steps
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.0 | — | VERIFIED | Read-only, 13:28Z to 13:31Z. (0) GTWPE-MGMT-10 092926.2 fetched live: edited 2026-09-29T23:47:58.009Z. (1) The seven members fetched live, each at §A's edit time: TW-TRIAGE-10 2026-09-07T17:01:58.706Z, TW-DRAIN-10 2026-09-08T06:57:45.615Z, TW-DRAIN-20 06:58:40.452Z, TW-RECORD-10 2026-09-07T17:02:12.635Z, TW-RECORD-20 17:02:17.512Z, TW-APPLY-10 2026-09-08T06:59:20.213Z, TW-MGMT-10 2026-09-29T20:10:20.073Z. (2) `edits.json`: each of the 69 edits' `old`, `start` and `end` found exactly once in its member's fetch, and each of the 18 spans' `start` before its `end`, by reading, checked by a second reading. (3) Installed tree digests, by `skill_tree_digest` with `PYTHONDONTWRITEBYTECODE=1`: `tw-flowmaster` `fd6c344b…f5576617` (2 files), `flowmaster-validate` `ed52208f…3cc572af` (31 files), both equal to *Installed, before*; the installed revisions are 1.2.0 and 3.3.1. (4) No child page of *HDE TW* (21 children) or of the selection page (7 children) has a title ending `— 100426.1`. (5) The selection page, edited 2026-09-29T20:14:15.580Z: *S-OLD* once, as its first two lines. *HDE TW*, 20:17:20.875Z: *HDE-OLD* once, as its first line. *Alpha 1*, 20:15:21.232Z, and the *Glow Operations Hub*, 20:18:21.747Z, each saved by the harness and read by `ctlpeek.py` (edit time, flags and heading counts only): each anchor heading once; 31 and 138 headings; no truncation or unknown blocks. The GTWPE parent page, 2026-09-30T00:00:57.785Z: *CAT-OLD* once. Every edit time is the one the dry run found |
+| X1.1 | — | APPLIED | Status set to `EXECUTING`; the values above recorded at 2026-10-04T13:31:54Z |
+| X1.2 | PART-02 | VERIFIED | 13:33Z. `PYTHONDONTWRITEBYTECODE=1 python3 skill_edits.py <synced root> <scratch>/built`: exit 0, 32 edits; `tw-flowmaster/SKILL.md` sha256 `21c632e1…b09b1575`, 54,711 bytes; `SKILL_TREE_SHA256 284b3ac1…d1fd733`. Tree digests of the built skills: `tw-flowmaster` `0581205b…a827722c`, 2 files, 55,131 bytes; `flowmaster-validate` `284b3ac1…d1fd733`, 31 files, 1,915,296 bytes: each equal to *Values*. Isolated root: the 29 installed skill directories other than `canva-drive-facebook-workflow` (F-3), with the two built skills in place of the installed ones; the synced directory now holds 30 skill directories, against §A's 29, and the additions are unrelated. The built validator, `--strict-warnings`: exit 0, `FLOWMASTER_SUITE_PASS`, `suite_ok` true, `self_identity` OK, `validator_revision` 3.3.2, every finding count 0, no warning; the six Flowmaster skills each PASS with 0 errors and 0 warnings; `change-flow` fixtures 32 passed, 0 failed. `guard_proof.py`: 12 of 12 PASS, exit 0; each "guard disabled" case exits 1 on the validator's own digest with no `tw-flowmaster` error, as P7 found. `diff -rq` of each built skill against the installed lists exactly the six files `skill_edits.py` edits. The Primary core block (`FLOWMASTER_CORE_BEGIN` to `_END`, 18,255 bytes) is identical in the installed and built `tw-flowmaster` and in `flowmaster-primary`; before the core only line 8, the revision, differs. In the built specialization, the broad terms of §A's skill scope, searched by `grep` and each hit read in context, occur only on kept exceptions: the GCFPE binding and GCFPE sentences (built lines 310, 312, 314, 345, 346, 386, 444), the stall prohibitions (339), `/model` (348), the composer checksum (434), the report row (474), "checkpoint" meaning a ledger or target-outcome checkpoint (239, 280, 318, 386, 459), and "profile" as the name of the selected-catalog TW profile itself (326, 328, 330), a homonym of §A's "workload profile". No `__pycache__` was written into the synced directory |
+| X1.3 | PART-02 | VERIFIED | 13:34Z. `skill-creator`'s `quick_validate` and `package_skill`, run with `PYTHONDONTWRITEBYTECODE=1` from the isolated root's copy of `skill-creator` (byte-identical to the installed one, `diff -rq` no output), so that nothing was written into the synced directory (L14): `Skill is valid!` and `Successfully packaged skill` for each. `tw-flowmaster.skill`: 19,193 bytes, 2 entries, sha256 `88166c3d48fee16900e125f1cf2fe15cf2b46a2e0a6ac05ea0fdd5ef3c1a4b89`. `flowmaster-validate.skill`: 322,860 bytes, 31 entries, sha256 `e1f495b3f40f9a75c713433236391763505cb3895364076f71eb771a72710f3f`. No entry outside its root or with a traversal sequence; each archive extracted in a clean directory equals its built tree (`diff -r`, no output). The sizes equal P10's trial archives; the sha256 values differ from them, since a zip carries timestamps. Both archives and their directory made read-only for the review freeze. `packages-tw1.json` written with each archive's name, size and sha256, and each tree's digest |
