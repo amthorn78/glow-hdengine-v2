@@ -1111,6 +1111,8 @@ record on a branch outside `docs/*-modification-gtwpe-*` would not be found by t
 | X1.5 RECORD-10 | PART-01 | VERIFIED | (a) The parent fetch that closed DRAIN-20: no child with the new title. (b) **Write 1** on `3d44590a05eb817fa047f69764b93396` at 14:09Z: «ID:RECORD-10» `3ef4590a05eb81f28e25fb2cb7044eaa`. (c) Populated at the first fetch: the 090726.2 identity line first, the last heading `## PF20 schema and native detail` with its full last paragraph, no truncation or unknown block. (d) **Write 2**, the title. (e) **Write 3**, RECORD-10.01 to RECORD-10.06 in one call; returned synchronously, no task, at the first send. Readback, edited 2026-10-04T14:16:53.241Z, by reading and checked by a second reading: title exact; parent *HDE TW*; identity lines at 100426.1; each of the 6 new texts present; all 16 `absent_after` phrases absent; `counts_after` assessment 0, model 1, advice 1, workload 1 (the kept "model advice" in *Section-only output and completion*, and preflight step 4's "verification workload"); the 8 headings the current version's. Parent fetched again: 25 child pages, exactly one with the new title, and it is «ID:RECORD-10» |
 | X1.5 RECORD-20 | PART-01 | VERIFIED | (a) The parent fetch that closed RECORD-10: no child with the new title. (b) **Write 1** on `3d44590a05eb819e8482d0a1650c5239` at 14:17Z: «ID:RECORD-20» `3ef4590a05eb81cba424e4d3ec08871f`. (c) Populated at the first fetch, its last heading `## PF30 schema and native detail`, complete. (d) **Write 2**, the title. (e) **Write 3**, RECORD-20.01 to RECORD-20.06 in one call; returned synchronously, no task, at the first send. Readback, edited 2026-10-04T14:20:11.935Z, by reading and checked by a second reading: title exact; parent *HDE TW*; identity lines at 100426.1; each of the 6 new texts present; all 16 `absent_after` phrases absent; `counts_after` 0, 1, 1, 1, as RECORD-10's; the 8 headings the current version's. Parent fetched again: 26 child pages, exactly one with the new title, and it is «ID:RECORD-20» |
 | X1.5 APPLY-10 | PART-01 | VERIFIED | (a) The parent fetch that closed RECORD-20: no child with the new title. (b) **Write 1** on `3d54590a05eb81f99ce6e7908a2a5a60` at 14:20Z: «ID:APPLY-10» `3ef4590a05eb8107a59bcc474348ca5e`. (c) Populated at the first fetch, its last heading `## Diagnostic handoff`, complete. (d) **Write 2**, the title, at about 14:21Z. The session was then paused outside its control until about 16:28Z; the page stayed as (d) left it, unselected. (e) **Write 3**, APPLY-10.01 to APPLY-10.12 in one call, the three spans composed from (c)'s fetch; returned synchronously, no task, at the first send. Readback, edited 2026-10-04T16:28:52.435Z, by reading and checked by a second reading: title exact; parent *HDE TW*; identity lines at 100426.1; each of the 12 new texts present; all 16 `absent_after` phrases absent; `counts_after` 0, 0, 0, 1; the 11 headings the current version's. Parent fetched again: 27 child pages, exactly one with the new title, and it is «ID:APPLY-10». A search scoped to *HDE TW* still dates the current 090826.1 page 2026-09-08 |
+| X1.5 MGMT-10 | PART-01 | VERIFIED | (a) The selection page fetched at 16:29Z, unchanged since 2026-09-29T20:14:15.580Z: 7 child pages, none with the new title. (b) **Write 1** on `3ea4590a05eb81d09391f5e87fcaebe0` at 16:29Z: «ID:MGMT-10» `3ef4590a05eb81b5bc74f393bdf358b9`. (c) Populated at the first fetch: the 092926.1 identity line first, the last heading `## Durable checkpoint, recovery and final handoff` with its full last paragraph, no truncation or unknown block; parent the selection page. (d) **Write 2**, the title. (e) **Write 3**, MGMT-10.01 to MGMT-10.17 in one call, the six spans composed from (c)'s fetch; returned synchronously, no task, at the first send. Readback, edited 2026-10-04T16:30:45.633Z, by reading and checked by a second reading: title exact; parent *Glow Technical Writing Ecosystem*; identity lines at 100426.1; each of the 17 new texts present; all 16 `absent_after` phrases absent ("human headers belong solely in Notion", a kept location rule, is not `human guidance`); `counts_after` assessment 0, model 3, advice 1, workload 0 (the kept "capability/model assumptions", "model self-reconfiguration" and "maintenance or model advice"); the 8 headings the current version's. Selection page fetched again: 8 child pages, exactly one with the new title, and it is «ID:MGMT-10»; its own text still as at 2026-09-29T20:14:15.580Z |
+| X1.5 | PART-01 | VERIFIED | Seven new versions at 100426.1, 21 page writes, each returned synchronously with no task, every edit call at its first send (the block's backslash fallback was never needed). Searches scoped to *HDE TW* at 16:31Z date each current page as before this run: TW-TRIAGE-10, TW-RECORD-10 and TW-RECORD-20 2026-09-07; TW-DRAIN-10, TW-DRAIN-20 and TW-APPLY-10 2026-09-08; TW-MGMT-10 2026-09-29. No page is selected: the selection page, *Alpha 1*, *HDE TW* and the *Glow Operations Hub* are untouched until X4 |
 
 ### Findings from `EXECUTE`
 
@@ -1138,3 +1140,54 @@ record on a branch outside `docs/*-modification-gtwpe-*` would not be found by t
   2.38 leaves to him for TW, so the packages are fit. No edit, byte or step changes, and this
   section does not correct §A in place. It goes to Nathan to confirm that reading; whether canon
   should record it is his decision, and nothing here writes canon.
+
+### Harness files (`D22` condition 5), for `EXECUTE`
+
+- **This session's transcript** holds, from this mode, the bodies of GTWPE-MGMT-10 092926.2, the seven
+  current members (X1.0) and the seven new pages (each X1.5 (c) fetch and readback), each fetched
+  into context; and control pages: the selection page (three fetches), *HDE TW* (eight), the GTWPE
+  parent page, and searches scoped to *HDE TW* and the selection page. No script read the
+  transcript; every anchor, count and absence was checked by reading, and checked by a second
+  reading. It is left to teardown.
+- **Two tool-results saves**, both control pages, never prompt bodies: *Alpha 1*
+  (`toolu_017qhH5gEAhpVCufSpymSMhR.json`) and the *Glow Operations Hub*
+  (`mcp-Notion-notion-fetch-1791120617040.txt`), each read once by `ctlpeek.py` for its edit time,
+  flags, heading count and anchor count (X1.0 (5)). The session's `rm` of the first was refused by the
+  harness ("Session Transcript Tampering"), as `D22`'s refinement foresees, so both are left to
+  teardown and were not read again.
+- **The two reviewer transcripts**, `agent-aa69f55b0449a8b6e.jsonl` (SFR-TW1-1) and
+  `agent-a6ba246136d9b1668.jsonl` (SFR-TW1-2), each found by the path the harness gave for its agent
+  ID and read by `capture.py` for its final handback only. For SFR-TW1-2, whose last text message was
+  not its record, the session also read the types of its last eight records and the name and result
+  of its last tool call, which identified the `SubagentHandback` call; nothing else was read. Neither
+  reviewer fetched a prompt body. Both are left to teardown.
+- **The skill files**: the installed `tw-flowmaster` and `flowmaster-validate`, read by `grep`, `sed`
+  and scripts, and copied into the scratchpad. They hold no prompt body.
+- **Scratch:** `built/`, `root/`, `x-*/` and `pkg-tw1/` (the built skills, isolated root,
+  extractions and archives); `spec.md` (the built specialization, a skill file); `x12-validate.json`;
+  `ctlpeek.py`; `capture.py`; `x15-notes.txt` (page IDs and times only); and the reviewers' own
+  `review-SFR-TW1-1/` and `review-SFR-TW1-2/`. The guard proof's copies were deleted by the script.
+  No transient file holds a prompt body.
+
+### Canon and rulings relied on, for `EXECUTE`
+
+- `AGENTS.md`: the canon-first rule; PF canon is read-only.
+- HDE Governance (PF04) §9.1.3 and §9.1.6, and HDE Build Notes (PF10) 2.31 PF10-HDR-001 and 2.38
+  PF10-AINEUTRAL-001, each read in full on `main` at `f83c755` (E-F2).
+- GTWPE-MGMT-10 092926.2, fetched live: *Entry contract*, *The record* (its *Branch* row),
+  *Reviews are bounded*, *Reading prompt bodies*, *Boundaries*, *Failure contract*, `MODE = EXECUTE`
+  with *Capturing a reviewer's or worker's return*, and *How each kind of target changes*.
+- `gcfpe.decision-record.md` `D21`, `D22`, `D24` and `D26`; `reviewer-prompt-template.md`, the first
+  template; `skill-packaging-and-delivery.md`; `modification-template.md` 2.1, its rules and §E;
+  `notion-write-boundary.md`.
+- Nathan's plan approval of 2026-10-04 (`plan_approved_by`) and his direction of about 13:46Z on
+  E-F1, quoted there.
+
+### Remaining Product Owner actions
+
+| # | Action | How it is verified |
+|---|---|---|
+| PO-2 | Install `tw-flowmaster.skill` and `flowmaster-validate.skill`, delivered at X2, together | X3: the installed tree digests equal *Values*' built digests, and the validator passes strict on an isolated root |
+| PO-3 | Merge amthorn78/glow-hdengine-v2#568 when the record is `COMPLETE` | Not needed by this run (`D21-C`) |
+| PO-4 | Only after a failure: archive the seven unselected 100426.1 pages, or reinstall the prior skills | The failure record's sweep |
+| E-F2 | Confirm, or rule otherwise on, the reading that the direction of 2026-09-29 is the determination PF10 2.38 leaves open for HDE Governance §9.1.3's advice requirement in TW | Recorded in §E when given |
