@@ -87,8 +87,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-09-30: \"Nathan approves the revised analysis at 119057f (2026-09-30), with two directions: \"the change manager needs a skill check layer like the gcfpe one has\" and \"this flow can be simplified, let's not overcomplicate this\". For this Modification: 1. Keep PLAN lean: one dry run and one full review by a single reviewer; no second reviewer or diff check unless the review finds a required defect. 2. Keep scope to removal: drop the new guard that makes tw-flowmaster refuse the old release (selection already waits for Nathan's install). Keep the validator guard against the removed wording returning. 3. Aim for about half the estimated time; the stop rule (time) still applies. Record as a candidate for GTWPE-MGMT-10's next repair: a skill route with a skill check layer modelled on the GCFPE one, so a skill part runs through the change prompt instead of around it. Continue to PLAN and stop at Nathan's plan approval.\""
 analyze_approved_date: 2026-09-30
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-04: \"Nathan approves the TW prompts plan at 5f13420 (2026-10-04), with one opt-in repair: DL-1 — move X4.4's and X4.6's pre-reads ahead of X4.3, so Alpha 1 and the Operations Hub are checked before the selection page switches. Record the reorder in §P (no new review round). All other listed findings, L1–L21 and DL-2–DL-9, are accepted as risks. Proceed to EXECUTE; stop when Nathan must install the two skill packages.\""
+plan_approved_date: 2026-10-04
 supersedes: ""
 spawned_from: MODIFICATION-20260929-gtwpe-first-repair
 shares_package_with: []
@@ -1036,5 +1036,37 @@ session; the reviewer and the checker reported 367,588 and 270,209 subagent toke
   model or effort level is a requirement, which the removed texts no longer imply.
 - The pilot's and the first repair's records, for the selection writes, the readback of mentions
   (PF-27) and the one-call edits.
+
+### Successor, 2026-10-04 — Nathan's approval, and the DL-1 reorder
+
+*Added on 2026-10-04, when Nathan approved this plan at `5f13420`. The plan above stays as written,
+since a dated record is never corrected in place; this subsection supersedes only the order of X4's
+steps, as it says below.*
+
+Nathan's approval, quoted in `plan_approved_by`, opts in to one repair, DL-1, and accepts every
+other listed finding, L1 to L21 and DL-2 to DL-9, as a risk (`D26-A` rule 4). At his direction no
+review round follows the reorder, and none is entered in `reviews`. «PA» is 2026-10-04.
+
+**The reorder (DL-1).** X4.4's pre-read and X4.6's pre-read move ahead of X4.3, so that *Alpha 1* and
+the *Glow Operations Hub* are checked, and `ctl_check.py` first runs on a real save, before the
+selection page switches. Every step keeps its text in *The steps*; only the order changes. X4 runs:
+
+1. X4.1.
+2. X4.2.
+3. X4.4's pre-read, exactly as X4.4 gives it: fetch *Alpha 1*; the harness saves it; `python3
+   ctl_check.py pre <save> <scratch>/alpha1.json '## Selected release — TW-ALPHA-20260929.1'` exits
+   0; delete the save.
+4. X4.6's pre-read, exactly as X4.6 gives it: fetch the *Glow Operations Hub*; the harness saves it;
+   `python3 ctl_check.py pre <save> <scratch>/hub.json '## Current Glow TW release —
+   TW-ALPHA-20260929.1'` exits 0; delete the save.
+5. X4.3, whole: its pre-read, its write and its readback.
+6. X4.4's write and readback, against the state file its pre-read wrote in item 3.
+7. X4.5, whole.
+8. X4.6's write and readback, against the state file its pre-read wrote in item 4.
+
+If either pre-read in items 3 and 4 does not exit 0, X4 stops before X4.3's write, and the failure
+takes `D26-B`'s path, since X1.5's writes are already external. The reorder adds no Notion write:
+PO-1's authorization, the 21 page writes of X1.5 and the five control writes of X4.2 to X4.6, is
+unchanged. *Order* still holds: X4 runs only after X3 passes.
 
 ## §E — Execution
