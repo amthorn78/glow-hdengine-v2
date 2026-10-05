@@ -1,0 +1,756 @@
+{
+ "modification": "MODIFICATION-20260930-gtwpe-tw-model-advice",
+ "rules": {
+  "anchor": "old_str is `old` exactly; it must match once",
+  "span": "old_str is the page's text from the first character of `start` through the last character of `end`, taken from this session's fetch of the new page; `start` and `end` each occur once, `start` before `end`",
+  "values": "«V» is fixed at X1.1",
+  "escapes": "anchors are as the fetch shows the page: the block's tags carry their backslashes"
+ },
+ "members": {
+  "TRIAGE": {
+   "title": "TW-TRIAGE-10 — Identify PF10 Drain Targets",
+   "current_version": "090726.2",
+   "page": "3d44590a05eb813283aefa68329609cc",
+   "parent": "HDE TW"
+  },
+  "DRAIN-10": {
+   "title": "TW-DRAIN-10 — Prepare PF Document Redlines",
+   "current_version": "090826.1",
+   "page": "3d54590a05eb81489659dd250624a220",
+   "parent": "HDE TW"
+  },
+  "DRAIN-20": {
+   "title": "TW-DRAIN-20 — Prepare PF09 Redlines",
+   "current_version": "090826.1",
+   "page": "3d54590a05eb81d0986be1200bfd4a3b",
+   "parent": "HDE TW"
+  },
+  "RECORD-10": {
+   "title": "TW-RECORD-10 — Create Epic History Section",
+   "current_version": "090726.2",
+   "page": "3d44590a05eb817fa047f69764b93396",
+   "parent": "HDE TW"
+  },
+  "RECORD-20": {
+   "title": "TW-RECORD-20 — Create CRD History Section",
+   "current_version": "090726.2",
+   "page": "3d44590a05eb819e8482d0a1650c5239",
+   "parent": "HDE TW"
+  },
+  "APPLY-10": {
+   "title": "TW-APPLY-10 — Apply Validated Redlines",
+   "current_version": "090826.1",
+   "page": "3d54590a05eb81f99ce6e7908a2a5a60",
+   "parent": "HDE TW"
+  },
+  "MGMT-10": {
+   "title": "TW-MGMT-10 — Manage the Glow TW Ecosystem",
+   "current_version": "092926.1",
+   "page": "3ea4590a05eb81d09391f5e87fcaebe0",
+   "parent": "Glow Technical Writing Ecosystem"
+  }
+ },
+ "edits": [
+  {
+   "member": "TRIAGE",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-TRIAGE-10 — Identify PF10 Drain Targets — 090726.2",
+   "new": "TW-TRIAGE-10 — Identify PF10 Drain Targets — «V»",
+   "id": "TRIAGE.01"
+  },
+  {
+   "member": "TRIAGE",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 090726.2",
+   "new": "Prompt Version: «V»",
+   "id": "TRIAGE.02"
+  },
+  {
+   "member": "TRIAGE",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "TRIAGE.03"
+  },
+  {
+   "member": "TRIAGE",
+   "item": "ITEM-02",
+   "what": "the sentence that says TW-ASSESS-10 supplies task assessment",
+   "kind": "anchor",
+   "old": "TW-ASSESS-10 supplies separately requested task assessment. TW-MGMT-10 maintains this prompt.",
+   "new": "TW-MGMT-10 maintains this prompt.",
+   "id": "TRIAGE.04"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-DRAIN-10 — Prepare PF Document Redlines — 090826.1",
+   "new": "TW-DRAIN-10 — Prepare PF Document Redlines — «V»",
+   "id": "DRAIN-10.01"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 090826.1",
+   "new": "Prompt Version: «V»",
+   "id": "DRAIN-10.02"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "DRAIN-10.03"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "the two relationship sentences that put TW-ASSESS-10 before creation and before application",
+   "kind": "anchor",
+   "old": "TW-ASSESS-10 must precede substantive creation. A complete READY package returns to TW-ASSESS-10 for assessment of the actual application workload, then Nathan invokes TW-APPLY-10.",
+   "new": "For a complete READY package, Nathan invokes TW-APPLY-10.",
+   "id": "DRAIN-10.04"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-01",
+   "what": "preflight step 4's Ultra clause",
+   "kind": "anchor",
+   "old": "No fixed page-count gate or automatic Ultra requirement applies.",
+   "new": "No fixed page-count gate applies.",
+   "id": "DRAIN-10.05"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "preflight step 5, the two assessment checkpoints; its prompt, baseline and capability checks kept",
+   "kind": "span",
+   "start": "5. Before substantive redline creation",
+   "end": "restart, launch or delegation.",
+   "new": "5. Confirm exact prompt/version, target baseline, source selection, package identities where present, and capabilities. A real missing essential capability remains an exact blocker.",
+   "id": "DRAIN-10.06"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "the sentence on the two assessment checkpoints",
+   "kind": "anchor",
+   "old": "The two required assessment checkpoints do not require a large manifest, opaque approval token, separate audit, restart or analyzer on every unchanged continuation.",
+   "new": "Preflight does not require a large manifest, opaque approval token, separate audit or restart on every unchanged continuation.",
+   "id": "DRAIN-10.07"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "the corrected package's route through pre-Apply assessment",
+   "kind": "anchor",
+   "old": "repeat producer validation. Route it through pre-Apply assessment before Nathan reruns application.",
+   "new": "repeat producer validation.",
+   "id": "DRAIN-10.08"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "the READY next step naming TW-ASSESS-10",
+   "kind": "anchor",
+   "old": "the immediate next prompt is TW-ASSESS-10 assessing TW-APPLY-10, not direct application.",
+   "new": "the immediate next prompt is TW-APPLY-10.",
+   "id": "DRAIN-10.09"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "the sentence on the analyzer",
+   "kind": "anchor",
+   "old": "source-file header provenance. The analyzer returns the populated TW-APPLY-10 invocation to Nathan.",
+   "new": "source-file header provenance.",
+   "id": "DRAIN-10.10"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-01",
+   "what": "the handoff's recommendation field",
+   "kind": "anchor",
+   "old": "target and exact whole/selected scope; human surface/model/reasoning recommendation or explicit provisional/unknown limit; redline preparation/save status",
+   "new": "target and exact whole/selected scope; redline preparation/save status",
+   "id": "DRAIN-10.11"
+  },
+  {
+   "member": "DRAIN-10",
+   "item": "ITEM-02",
+   "what": "assessment among the handoff's gates",
+   "kind": "anchor",
+   "old": "applicable assessment, source, validation and launch gates",
+   "new": "applicable source, validation and launch gates",
+   "id": "DRAIN-10.12"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-DRAIN-20 — Prepare PF09 Redlines — 090826.1",
+   "new": "TW-DRAIN-20 — Prepare PF09 Redlines — «V»",
+   "id": "DRAIN-20.01"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 090826.1",
+   "new": "Prompt Version: «V»",
+   "id": "DRAIN-20.02"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "DRAIN-20.03"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "the two relationship sentences that put TW-ASSESS-10 before creation and before application",
+   "kind": "anchor",
+   "old": "TW-ASSESS-10 must precede substantive creation. A complete READY package returns to TW-ASSESS-10 for assessment of the actual application workload, then Nathan invokes TW-APPLY-10.",
+   "new": "For a complete READY package, Nathan invokes TW-APPLY-10.",
+   "id": "DRAIN-20.04"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-01",
+   "what": "preflight step 4's Ultra clause",
+   "kind": "anchor",
+   "old": "No fixed page-count gate or automatic Ultra requirement applies.",
+   "new": "No fixed page-count gate applies.",
+   "id": "DRAIN-20.05"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "preflight step 5, the two assessment checkpoints; its prompt, baseline and capability checks kept",
+   "kind": "span",
+   "start": "5. Before substantive redline creation",
+   "end": "restart, launch or delegation.",
+   "new": "5. Confirm exact prompt/version, target baseline, source selection, package identities where present, and capabilities. A real missing essential capability remains an exact blocker.",
+   "id": "DRAIN-20.06"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "the sentence on the two assessment checkpoints",
+   "kind": "anchor",
+   "old": "The two required assessment checkpoints do not require a large manifest, opaque approval token, separate audit, restart or analyzer on every unchanged continuation.",
+   "new": "Preflight does not require a large manifest, opaque approval token, separate audit or restart on every unchanged continuation.",
+   "id": "DRAIN-20.07"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "the corrected package's route through pre-Apply assessment",
+   "kind": "anchor",
+   "old": "repeat producer validation. Route it through pre-Apply assessment before Nathan reruns application.",
+   "new": "repeat producer validation.",
+   "id": "DRAIN-20.08"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "the READY next step naming TW-ASSESS-10",
+   "kind": "anchor",
+   "old": "the immediate next prompt is TW-ASSESS-10 assessing TW-APPLY-10, not direct application.",
+   "new": "the immediate next prompt is TW-APPLY-10.",
+   "id": "DRAIN-20.09"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "the sentence on the analyzer",
+   "kind": "anchor",
+   "old": "source-file header provenance. The analyzer returns the populated TW-APPLY-10 invocation to Nathan.",
+   "new": "source-file header provenance.",
+   "id": "DRAIN-20.10"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-01",
+   "what": "the handoff's recommendation field",
+   "kind": "anchor",
+   "old": "target and exact whole/selected scope; human surface/model/reasoning recommendation or explicit provisional/unknown limit; redline preparation/save status",
+   "new": "target and exact whole/selected scope; redline preparation/save status",
+   "id": "DRAIN-20.11"
+  },
+  {
+   "member": "DRAIN-20",
+   "item": "ITEM-02",
+   "what": "assessment among the handoff's gates",
+   "kind": "anchor",
+   "old": "applicable assessment, source, validation and launch gates",
+   "new": "applicable source, validation and launch gates",
+   "id": "DRAIN-20.12"
+  },
+  {
+   "member": "RECORD-10",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-RECORD-10 — Create Epic History Section — 090726.2",
+   "new": "TW-RECORD-10 — Create Epic History Section — «V»",
+   "id": "RECORD-10.01"
+  },
+  {
+   "member": "RECORD-10",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 090726.2",
+   "new": "Prompt Version: «V»",
+   "id": "RECORD-10.02"
+  },
+  {
+   "member": "RECORD-10",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "RECORD-10.03"
+  },
+  {
+   "member": "RECORD-10",
+   "item": "ITEM-02",
+   "what": "the clause that TW-ASSESS-10 supplies optional advice",
+   "kind": "anchor",
+   "old": "TW-ASSESS-10 supplies optional task advice; TW-MGMT-10 maintains this prompt.",
+   "new": "TW-MGMT-10 maintains this prompt.",
+   "id": "RECORD-10.04"
+  },
+  {
+   "member": "RECORD-10",
+   "item": "ITEM-01",
+   "what": "preflight step 4's Ultra clause",
+   "kind": "anchor",
+   "old": "No fixed page-count gate or automatic Ultra requirement applies.",
+   "new": "No fixed page-count gate applies.",
+   "id": "RECORD-10.05"
+  },
+  {
+   "member": "RECORD-10",
+   "item": "ITEM-01",
+   "what": "preflight step 5, which chooses a surface, model and effort; its capability blocker kept",
+   "kind": "span",
+   "start": "5. Whether the predecessor's task assessment",
+   "end": "unverified advisory options alone are not.",
+   "new": "5. The capabilities these inputs, scope and output require. A real missing essential capability is an exact blocker.",
+   "id": "RECORD-10.06"
+  },
+  {
+   "member": "RECORD-20",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-RECORD-20 — Create CRD History Section — 090726.2",
+   "new": "TW-RECORD-20 — Create CRD History Section — «V»",
+   "id": "RECORD-20.01"
+  },
+  {
+   "member": "RECORD-20",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 090726.2",
+   "new": "Prompt Version: «V»",
+   "id": "RECORD-20.02"
+  },
+  {
+   "member": "RECORD-20",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "RECORD-20.03"
+  },
+  {
+   "member": "RECORD-20",
+   "item": "ITEM-02",
+   "what": "the clause that TW-ASSESS-10 supplies optional advice",
+   "kind": "anchor",
+   "old": "TW-ASSESS-10 supplies optional task advice; TW-MGMT-10 maintains this prompt.",
+   "new": "TW-MGMT-10 maintains this prompt.",
+   "id": "RECORD-20.04"
+  },
+  {
+   "member": "RECORD-20",
+   "item": "ITEM-01",
+   "what": "preflight step 4's Ultra clause",
+   "kind": "anchor",
+   "old": "No fixed page-count gate or automatic Ultra requirement applies.",
+   "new": "No fixed page-count gate applies.",
+   "id": "RECORD-20.05"
+  },
+  {
+   "member": "RECORD-20",
+   "item": "ITEM-01",
+   "what": "preflight step 5, which chooses a surface, model and effort; its capability blocker kept",
+   "kind": "span",
+   "start": "5. Whether the predecessor's task assessment",
+   "end": "unverified advisory options alone are not.",
+   "new": "5. The capabilities these inputs, scope and output require. A real missing essential capability is an exact blocker.",
+   "id": "RECORD-20.06"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-APPLY-10 — Apply Validated Redlines — 090826.1",
+   "new": "TW-APPLY-10 — Apply Validated Redlines — «V»",
+   "id": "APPLY-10.01"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 090826.1",
+   "new": "Prompt Version: «V»",
+   "id": "APPLY-10.02"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "APPLY-10.03"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "intake after TW-ASSESS-10's appraisal",
+   "kind": "anchor",
+   "old": "or verifiable supported legacy intake, after TW-ASSESS-10 appraises this actual application package.",
+   "new": "or verifiable supported legacy intake.",
+   "id": "APPLY-10.04"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "the Strength Analyzer checkpoint clause",
+   "kind": "anchor",
+   "old": "Work can be invoked directly subject to the applicable Strength Analyzer checkpoint below; direct invocation never bypasses assessment.",
+   "new": "Work can be invoked directly.",
+   "id": "APPLY-10.05"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-01",
+   "what": "preflight step 4's Ultra clause",
+   "kind": "anchor",
+   "old": "No fixed page-count gate or automatic Ultra requirement applies.",
+   "new": "No fixed page-count gate applies.",
+   "id": "APPLY-10.06"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "preflight step 5, the two assessment checkpoints; its prompt, baseline and capability checks kept",
+   "kind": "span",
+   "start": "5. Before substantive redline creation",
+   "end": "restart, launch or delegation.",
+   "new": "5. Confirm exact prompt/version, target baseline, source selection, package identities where present, and capabilities. A real missing essential capability remains an exact blocker.",
+   "id": "APPLY-10.07"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "the three sentences after step 5 that require pre-Apply TW-ASSESS-10",
+   "kind": "span",
+   "start": "Keep preflight concise. Require task-bound pre-Apply TW-ASSESS-10",
+   "end": "and requires no pre-Apply assessment.",
+   "new": "Keep preflight concise. Do not require a large manifest, opaque approval token or restart on every unchanged continuation. Preserve run identity and verified work.",
+   "id": "APPLY-10.08"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "assessment in the no-change list",
+   "kind": "anchor",
+   "old": "no artifacts, handoff, assessment or application is required.",
+   "new": "no artifacts, handoff or application is required.",
+   "id": "APPLY-10.09"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "the sentence that exempts the report-only path from assessment",
+   "kind": "anchor",
+   "old": "do not rerun drainage merely to manufacture artifacts. This report-only path requires no pre-Apply assessment because it performs no substantive creation or application.",
+   "new": "do not rerun drainage merely to manufacture artifacts.",
+   "id": "APPLY-10.10"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-01",
+   "what": "the diagnostic handoff's model advice",
+   "kind": "anchor",
+   "old": "precise repair and model advice or limitation, and populated invocation",
+   "new": "precise repair, and populated invocation",
+   "id": "APPLY-10.11"
+  },
+  {
+   "member": "APPLY-10",
+   "item": "ITEM-02",
+   "what": "pre-Apply TW-ASSESS-10 for a corrected package",
+   "kind": "anchor",
+   "old": "require full validation and pre-Apply TW-ASSESS-10 of the corrected package",
+   "new": "require full validation of the corrected package",
+   "id": "APPLY-10.12"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "identity",
+   "what": "the first identity line",
+   "kind": "anchor",
+   "old": "TW-MGMT-10 — Manage the Glow TW Ecosystem — 092926.1",
+   "new": "TW-MGMT-10 — Manage the Glow TW Ecosystem — «V»",
+   "id": "MGMT-10.01"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "identity",
+   "what": "the second identity line",
+   "kind": "anchor",
+   "old": "Prompt Version: 092926.1",
+   "new": "Prompt Version: «V»",
+   "id": "MGMT-10.02"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-01",
+   "what": "the model-guidance block, whole",
+   "kind": "span",
+   "start": "\\<operator_model_guidance\\>",
+   "end": "## Coded identity and relationships",
+   "new": "## Coded identity and relationships",
+   "id": "MGMT-10.03"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the eight-member catalog and TW-ASSESS-10's relationship",
+   "kind": "anchor",
+   "old": "Maintain the eight-member catalog and both sides of every changed relationship: TW-ASSESS-10 returns assessment to Nathan; TW-TRIAGE-10",
+   "new": "Maintain the seven-member catalog and both sides of every changed relationship: TW-TRIAGE-10",
+   "id": "MGMT-10.04"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the assessment-only TW-ASSESS-10 in the membership",
+   "kind": "anchor",
+   "old": "operational prompts, the assessment-only TW-ASSESS-10, and this maintenance prompt.",
+   "new": "operational prompts and this maintenance prompt.",
+   "id": "MGMT-10.05"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the additional assessment role, and one assessment prompt in the count",
+   "kind": "span",
+   "start": "The additional assessment role is",
+   "end": "one assessment prompt and one maintenance prompt.",
+   "new": "The selected ecosystem therefore has six document/routing workers and one maintenance prompt.",
+   "id": "MGMT-10.06"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the workers' Strength Analyzer checkpoints",
+   "kind": "anchor",
+   "old": "Workers remain directly invocable subject to their applicable Strength Analyzer checkpoints, Nathan-coordinated",
+   "new": "Workers remain directly invocable, Nathan-coordinated",
+   "id": "MGMT-10.07"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "TW-ASSESS-10's mandate",
+   "kind": "anchor",
+   "old": "TW-ASSESS-10 is mandatory before substantive redline creation and separately before application of the actual completed package; retain matching assessments on unchanged continuations. It never launches work. PF10 triage",
+   "new": "PF10 triage",
+   "id": "MGMT-10.08"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the analyzer contract paragraph, whole",
+   "kind": "span",
+   "start": "Explain any necessary incompatible interface change and its exact authority.",
+   "end": "Triage retains list-only output without per-target advice.",
+   "new": "Explain any necessary incompatible interface change and its exact authority.",
+   "id": "MGMT-10.09"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-01",
+   "what": "the Ultra gate clause",
+   "kind": "anchor",
+   "old": "No fixed page-count/automatic Ultra gate, mandatory maintenance gateway",
+   "new": "No fixed page-count gate, mandatory maintenance gateway",
+   "id": "MGMT-10.10"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-01",
+   "what": "the model research, workload, human-guidance and account-picker sentences; the header scheme and capability rule kept",
+   "kind": "span",
+   "start": "Research current models/prompting practices",
+   "end": "real missing task capabilities remain exact blockers.",
+   "new": "Use PE's supported identity/header scheme. Real missing task capabilities remain exact blockers.",
+   "id": "MGMT-10.11"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the mandatory assessment checkpoints and task-bound recommendations",
+   "kind": "anchor",
+   "old": "Maintain both mandatory assessment checkpoints and final-response handoffs with task-bound recommendations, exact inputs,",
+   "new": "Maintain final-response handoffs with exact inputs,",
+   "id": "MGMT-10.12"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-01",
+   "what": "the advisory research clause",
+   "kind": "anchor",
+   "old": "Missing advisory research/account visibility remains qualified advice; missing decisive input is incomplete.",
+   "new": "Missing decisive input is incomplete.",
+   "id": "MGMT-10.13"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the analyzer's openai-docs sentences",
+   "kind": "span",
+   "start": "The analyzer uses openai-docs",
+   "end": "never replaced by invented claims. PF04 remains unresolved",
+   "new": "PF04 remains unresolved",
+   "id": "MGMT-10.14"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-02",
+   "what": "the validation cases for the analyzer and advice",
+   "kind": "span",
+   "start": "For analyzer/preflight changes",
+   "end": "and unchanged triage behavior.",
+   "new": "For preflight changes, include exact prompt/target/scope binding, whole/selected reading, application output burden, changed or missing sources, successor access and unchanged triage behavior.",
+   "id": "MGMT-10.15"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-01",
+   "what": "the identity lines followed by human guidance",
+   "kind": "anchor",
+   "old": "`Prompt Version: <target version>`, followed by its human guidance.",
+   "new": "`Prompt Version: <target version>`.",
+   "id": "MGMT-10.16"
+  },
+  {
+   "member": "MGMT-10",
+   "item": "ITEM-01",
+   "what": "model evidence in the checkpoint",
+   "kind": "anchor",
+   "old": "requirement/finding dispositions, model evidence, candidate/publication/selection identities",
+   "new": "requirement/finding dispositions, candidate/publication/selection identities",
+   "id": "MGMT-10.17"
+  }
+ ],
+ "absent_after": [
+  "operator_model_guidance",
+  "TW-ASSESS-10",
+  "Ultra",
+  "Strength Analyzer",
+  "pre-Apply",
+  "analyzer",
+  "recommendation",
+  "Astra",
+  "GPT-",
+  "surface",
+  "effort",
+  "reasoning",
+  "openai-docs",
+  "human guidance",
+  "apprais",
+  "eight-member"
+ ],
+ "counts_after": {
+  "TRIAGE": {
+   "assessment": 2,
+   "model": 3,
+   "advice": 2,
+   "workload": 0
+  },
+  "DRAIN-10": {
+   "assessment": 0,
+   "model": 0,
+   "advice": 0,
+   "workload": 1
+  },
+  "DRAIN-20": {
+   "assessment": 0,
+   "model": 0,
+   "advice": 0,
+   "workload": 1
+  },
+  "RECORD-10": {
+   "assessment": 0,
+   "model": 1,
+   "advice": 1,
+   "workload": 1
+  },
+  "RECORD-20": {
+   "assessment": 0,
+   "model": 1,
+   "advice": 1,
+   "workload": 1
+  },
+  "APPLY-10": {
+   "assessment": 0,
+   "model": 0,
+   "advice": 0,
+   "workload": 1
+  },
+  "MGMT-10": {
+   "assessment": 0,
+   "model": 3,
+   "advice": 1,
+   "workload": 0
+  }
+ }
+}

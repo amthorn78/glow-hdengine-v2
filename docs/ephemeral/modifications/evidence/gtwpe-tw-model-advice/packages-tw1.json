@@ -1,0 +1,33 @@
+{
+  "modification": "MODIFICATION-20260930-gtwpe-tw-model-advice",
+  "round": "tw1",
+  "built_at_utc": "2026-10-04T13:34Z",
+  "install": "together: both archives in one install, never one alone",
+  "digest_recipe": "flowmaster-validate/scripts/validate_gcfpe_20260914.py skill_tree_digest, run with PYTHONDONTWRITEBYTECODE=1",
+  "packages": [
+    {
+      "archive": "tw-flowmaster.skill",
+      "archive_bytes": 19193,
+      "archive_sha256": "88166c3d48fee16900e125f1cf2fe15cf2b46a2e0a6ac05ea0fdd5ef3c1a4b89",
+      "archive_entries": 2,
+      "skill": "tw-flowmaster",
+      "revision": "TW_FLOWMASTER_SPECIALIZATION_REVISION: 1.3.0",
+      "tree_digest": "0581205ba29f195ce784ff585ca9019de5644750c9e357b06e377e91827a722c",
+      "tree_files": 2,
+      "tree_bytes": 55131,
+      "replaces": {"revision": "1.2.0", "tree_digest": "fd6c344befd9ce9e89648e6e404dd39f02e50bfaef2ca13d4e56ab84f5576617", "tree_files": 2}
+    },
+    {
+      "archive": "flowmaster-validate.skill",
+      "archive_bytes": 322860,
+      "archive_sha256": "e1f495b3f40f9a75c713433236391763505cb3895364076f71eb771a72710f3f",
+      "archive_entries": 31,
+      "skill": "flowmaster-validate",
+      "revision": "FLOWMASTER_VALIDATE_REVISION: 3.3.2",
+      "tree_digest": "284b3ac150bedb51054aa9b3d0ce7ddfc1679d29dfb4178ded6095022d1fd733",
+      "tree_files": 31,
+      "tree_bytes": 1915296,
+      "replaces": {"revision": "3.3.1", "tree_digest": "ed52208f48479124f39119a54f29774096381ab85f54109a73bc3a7f3cc572af", "tree_files": 31}
+    }
+  ]
+}
