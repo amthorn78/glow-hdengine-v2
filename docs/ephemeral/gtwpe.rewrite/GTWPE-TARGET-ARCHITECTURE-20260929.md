@@ -307,3 +307,12 @@ request to a verified landing, each analysed, planned, reviewed and approved by 
 
 The writing side described here is still not built; its build is the next decision for Nathan. Open items carried
 forward are in `ERRORS.md` (E-029) and the change prompt's candidate list.
+
+### Update, 2026-10-05 (PE39)
+
+Nathan started the build. He approved the analysis of MODIFICATION-20261005-gtwpe-writing-side, which orders it
+as six changes, C1 to C6, each run through GTWPE-MGMT-10. The three roles were settled from canon. Nathan kept his
+Last Update Gate rule, and he adds one sentence to PF10 exempting the gate before C3. C1 is `COMPLETE` (#573,
+merged at `ef75b31`): GTWPE-MGMT-10 100526.2 is selected, and it keeps GTWPE-D1 whole through every later change.
+PE39 accepted it against the record on `main`, both record checks, and the catalog and 100526.2 read live. C2, the
+TW prompts on the repository with their proof logs, is next when Nathan says so.
