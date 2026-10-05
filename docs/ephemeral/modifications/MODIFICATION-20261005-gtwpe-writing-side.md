@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-writing-side
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -26,6 +26,7 @@ reviews:
     date: 2026-10-05
     required_open: 0
     outcome: "By this session, read-only: both record checks exit 0 on a scratch copy at ANALYZED; both selftests pass (17/17, 66/66); every table parses consistently; A0 reproduces at 31deec4; the new title is free under the GTWPE parent; a second reading of the body corrected one count (page back: 2 hits, the second an exception), no place to edit changed; the record tools need no change. No required defect. No full review"
+item_count_at_approval: 3
 items:
   - id: ITEM-01
     statement: "GTWPE-MGMT-10 keeps GTWPE-D1 whole through every later revision, consolidation and handoff of a prompt that writes a redlines Markdown file or a final updated PF Markdown file: it reads the GTWPE decision record, checks each such change against GTWPE-D1 in ANALYZE, verifies the requirement on the new page by phrase, and never drops or weakens it."
@@ -104,8 +105,8 @@ request: |
   > The proof log should provide enough evidence for another session or reviewer to understand what changed, what those changes were based on, how the artifact was produced, and what was verified.
   > This requirement must remain intact throughout the GTWPE system. It must not be omitted, weakened, or lost during prompt revisions, consolidation, or handoffs.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-writing-side at bc5019e (2026-10-05). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass the record at ANALYZED and all five GTWPE records together (5/5), the selftests pass 17/17 and 66/66, main is still 31deec4, and HDE Build Notes 2.30 PF10-CITE-001 and HDE Governance §9.1.6 read as the analysis quotes them; since 2.30 landed (b7b0dee), only PF10 has changed under docs/pfcanon/. The order C1 to C6 is accepted; each later change runs its own ANALYZE and may split. Last Update Gate: Nathan keeps his rule (BN plus the version of the PF file used, or BN plus the source filename when the source is not a PF), and he will add one sentence to PF10 exempting the Last Update Gate from addendum 2.30 before C3 starts; C3's ANALYZE confirms that sentence is on main. N-1 to N-3 go to PE39. Continue to PLAN for this Modification only (ITEM-01 to ITEM-03): one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
+analyze_approved_date: 2026-10-05
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
