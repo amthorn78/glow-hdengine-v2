@@ -1,0 +1,348 @@
+{
+ "artifact": "MODIFICATION-20261005-gtwpe-second-repair §P: W3's replacements on the new GTWPE-MGMT-10 page",
+ "source_body": "GTWPE-MGMT-10 — Manage the GTWPE — 092926.2, page 3ea4590a05eb81f8ae9ed681b5c358b8, edited 2026-09-29T23:47:58.009Z",
+ "substitution": "«V» only, in E1's and E2's new text and check phrases, the value X1.2 fixes",
+ "send": "One notion-update-page call, command update_content, allow_async false, with E1 to E18 as content_updates in this order: old_str = old, new_str = new, replace_all_matches false. Every old is sent as written; each matches exactly `matches` times in the duplicate, which is 092926.2's content",
+ "checks": "After the call, on the new page's content as fetched (not its title property or the fetch's URLs), by reading, checked by a second reading, case-sensitive: each check phrase occurs exactly its count; each absent phrase occurs 0 times. Each check phrase occurs 0 times in 092926.2 (dry run P3). Where an edit has a `prefix`, the kept text directly before its old in 092926.2 (dry run P3), its check phrase is read across that prefix and its new text; each absent phrase occurs in 092926.2 only inside the old it belongs to",
+ "readings": [
+  {
+   "term": "glow-write-boundary",
+   "in_source": 2,
+   "after": 1,
+   "kept": "E3's new text, which states the new rule"
+  },
+  {
+   "term": "D24",
+   "in_source": 2,
+   "after": 1,
+   "kept": "E15's new text, which cites the ruling the skill check layer applies"
+  },
+  {
+   "term": "Current operation",
+   "in_source": 2,
+   "after": 7,
+   "kept": "the closure row; write (1)'s otherwise branch; E8, E11, E12 and E13's new texts"
+  }
+ ],
+ "readings_rule": "D26-E's broad match, read on the new page and recorded with the exception that keeps each hit (ITEM-02, applied ahead of its landing). A hit that still says what an edit removes is a finding, and the run stops (If the plan is wrong). A count that differs from `after` is read; it is not a stop by itself",
+ "edits": [
+  {
+   "id": "E1",
+   "item": "identity",
+   "where": "identity line 1",
+   "old": "— 092926.2",
+   "new": "— «V»",
+   "matches": 1,
+   "check": [
+    [
+     "GTWPE-MGMT-10 — Manage the GTWPE — «V»",
+     1
+    ]
+   ],
+   "absent": [
+    "092926.2"
+   ],
+   "prefix": "GTWPE-MGMT-10 — Manage the GTWPE "
+  },
+  {
+   "id": "E2",
+   "item": "identity",
+   "where": "identity line 2",
+   "old": ": 092926.2",
+   "new": ": «V»",
+   "matches": 1,
+   "check": [
+    [
+     "Prompt Version: «V»",
+     1
+    ]
+   ],
+   "absent": [],
+   "prefix": "Prompt Version"
+  },
+  {
+   "id": "E3",
+   "item": "ITEM-01",
+   "where": "What this prompt may change: the skill row, its first cell",
+   "old": "The GTWPE wording of `glow-write-boundary`'s exception",
+   "new": "A skill the request names: the GTWPE exception in `glow-write-boundary`, or a skill that runs or validates the TW flow or the GTWPE",
+   "matches": 1,
+   "check": [
+    [
+     "the GTWPE exception in `glow-write-boundary`",
+     1
+    ]
+   ],
+   "absent": [
+    "wording of `glow-write-boundary`"
+   ]
+  },
+  {
+   "id": "E4",
+   "item": "ITEM-01",
+   "where": "What this prompt may change: the skill row, its second cell",
+   "old": "A `D24` skill package",
+   "new": "Its package, through the skill check layer (*How each kind of target changes*)",
+   "matches": 1,
+   "check": [
+    [
+     "through the skill check layer",
+     1
+    ]
+   ],
+   "absent": [
+    "`D24` skill package"
+   ]
+  },
+  {
+   "id": "E5",
+   "item": "ITEM-01",
+   "where": "The record: the `targets` row",
+   "old": "(the `glow-write-boundary` exception)",
+   "new": "(a skill the request names, as *What this prompt may change* says)",
+   "matches": 1,
+   "check": [
+    [
+     "as *What this prompt may change* says",
+     1
+    ]
+   ],
+   "absent": [
+    "(the `glow-write-boundary` exception)"
+   ]
+  },
+  {
+   "id": "E6",
+   "item": "ITEM-01",
+   "where": "Reviews are bounded: the brief sentence",
+   "old": "Brief each full review with the *ANALYZE and PLAN review brief* in",
+   "new": "Brief each full review with the template its kind takes, the first for a skill review and the *ANALYZE and PLAN review brief* for the others, in",
+   "matches": 1,
+   "check": [
+    [
+     "the first for a skill review",
+     1
+    ]
+   ],
+   "absent": [
+    "review with the *ANALYZE and PLAN review brief* in"
+   ]
+  },
+  {
+   "id": "E7",
+   "item": "ITEM-03",
+   "where": "Boundaries: the first bullet",
+   "old": "reach `main` when Nathan merges.",
+   "new": "reach `main` when Nathan merges. **No Modification branch is merged before its record is `COMPLETE`, except the pull requests the plan itself opens** (Nathan, 2026-09-29): the branch's pull request at X2, when Nathan merges a repository change before X3, and the one that carries a failure record. A failure record (`D26-B`) reaches `main` in the branch's open pull request, or, after a merge X3 has detected, in a record-only pull request from the branch restarted at `origin/main`, as X5 restarts it.",
+   "matches": 1,
+   "check": [
+    [
+     "No Modification branch is merged before its record is",
+     1
+    ],
+    [
+     "a record-only pull request from the branch restarted",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E8",
+   "item": "ITEM-04",
+   "where": "MODE = ANALYZE: A3's step",
+   "old": "For a rule change, run the",
+   "new": "For a TW-ALPHA change, also record whether it alters how the TW flow runs, as the *Current operation* on the *Glow Technical Writing Ecosystem* page describes it. For a rule change, run the",
+   "matches": 1,
+   "check": [
+    [
+     "also record whether it alters how the TW flow runs",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E9",
+   "item": "ITEM-02",
+   "where": "MODE = PLAN: the paragraph on a complete plan",
+   "old": "exceptions (`D26-E`).",
+   "new": "exceptions (`D26-E`). **Absence is checked by phrase.** A check that removed text is gone matches the removed phrase, never a single word of it, so kept text that only shares a word with it does not stop the run. `D26-E`'s broad match runs beside it, by reading: a hit in kept text is recorded with the exception that keeps it, and only a hit that still says what the change removes is a finding.",
+   "matches": 1,
+   "check": [
+    [
+     "Absence is checked by phrase.",
+     1
+    ],
+    [
+     "never a single word of it",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E10",
+   "item": "ITEM-01",
+   "where": "MODE = EXECUTE: X3's step",
+   "old": "for a skill, compare the installed digest",
+   "new": "for a skill, make its route's post-install checks",
+   "matches": 1,
+   "check": [
+    [
+     "make its route's post-install checks",
+     1
+    ]
+   ],
+   "absent": [
+    "compare the installed digest"
+   ]
+  },
+  {
+   "id": "E11",
+   "item": "ITEM-04",
+   "where": "How each kind of target changes: the selection row, write (1)",
+   "old": "and states that the prior release's",
+   "new": "and, when the change alters how the TW flow runs, carries below its members a subsection headed `Current operation` that describes the flow as the new release runs it; otherwise it states that the prior release's",
+   "matches": 1,
+   "check": [
+    [
+     "a subsection headed `Current operation`",
+     1
+    ]
+   ],
+   "absent": [
+    "and states that the prior release's"
+   ]
+  },
+  {
+   "id": "E12",
+   "item": "ITEM-04",
+   "where": "How each kind of target changes: the selection row, write (3)",
+   "old": "`Historical selected release — <release>`",
+   "new": "`Historical selected release — <release>`, and, when (1) carries a *Current operation*, the heading of the one it replaces, made historical in that page's own style",
+   "matches": 1,
+   "check": [
+    [
+     "the heading of the one it replaces",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E13",
+   "item": "ITEM-04",
+   "where": "How each kind of target changes: the selection row's verification",
+   "old": "and every other section heading unchanged",
+   "new": "the new *Current operation* and the replaced one's historical heading, when (1) carries one; exactly one heading on the page named `Current operation`; and every other section heading unchanged",
+   "matches": 1,
+   "check": [
+    [
+     "exactly one heading on the page named `Current operation`",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E14",
+   "item": "ITEM-01",
+   "where": "How each kind of target changes: the skill row, its target",
+   "old": "The skill exception",
+   "new": "A skill the request names",
+   "matches": 1,
+   "check": [
+    [
+     "A skill the request names",
+     2
+    ]
+   ],
+   "absent": [
+    "The skill exception"
+   ]
+  },
+  {
+   "id": "E15",
+   "item": "ITEM-01",
+   "where": "How each kind of target changes: the skill row, its route (start)",
+   "old": "A `D24` package: two reviewer subagents on",
+   "new": "Copy the installed skill, apply the plan's edits to the copy, and package and validate it as `skill-packaging-and-delivery.md` says. In a skill another ecosystem also uses, change only what serves the TW flow or the GTWPE, and any identity values the skill declares. Then the skill check layer, a `SKILL` review under *Reviews are bounded* (`D24`): a dry run of the package's gates, then two fresh reviewer subagents, never forked or context-inheriting, each briefed only by",
+   "matches": 1,
+   "check": [
+    [
+     "Copy the installed skill, apply the plan's edits",
+     1
+    ],
+    [
+     "In a skill another ecosystem also uses",
+     1
+    ],
+    [
+     "Then the skill check layer",
+     1
+    ]
+   ],
+   "absent": [
+    "A `D24` package:"
+   ]
+  },
+  {
+   "id": "E16",
+   "item": "ITEM-01",
+   "where": "How each kind of target changes: the skill row, its route (end)",
+   "old": "; Nathan installs",
+   "new": "; their returns are captured, and nothing is installed while a review runs. A `SKILL_REPAIR_REQUIRED` verdict stops the part before X2: its repair changes the plan's edits, so it returns to `PLAN`, and fresh reviewers review the new bytes. At X2, Nathan receives each `.skill` in its own message, its sha256 first in the caption, then the brief and both verdicts; Nathan installs",
+   "matches": 1,
+   "check": [
+    [
+     "verdict stops the part before X2",
+     1
+    ],
+    [
+     "its sha256 first in the caption",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E17",
+   "item": "ITEM-01",
+   "where": "How each kind of target changes: the skill row, its verification",
+   "old": "The post-install digest comparison",
+   "new": "Both reviewers return `SKILL_FIT_CONFIRMED` against the same package digests. After the install, at X3: each installed skill's digest equals its reviewed package's, and its own gates pass on the installed tree",
+   "matches": 1,
+   "check": [
+    [
+     "against the same package digests",
+     1
+    ],
+    [
+     "each installed skill's digest equals its reviewed package's",
+     1
+    ]
+   ],
+   "absent": [
+    "post-install digest comparison"
+   ]
+  },
+  {
+   "id": "E18",
+   "item": "ITEM-01",
+   "where": "How each kind of target changes: the skill row, its rollback",
+   "old": "Nathan reinstalls the prior digest",
+   "new": "None before the install. After it, Nathan reinstalls the prior package, by the digest the plan records",
+   "matches": 1,
+   "check": [
+    [
+     "by the digest the plan records",
+     1
+    ]
+   ],
+   "absent": [
+    "reinstalls the prior digest"
+   ]
+  }
+ ]
+}
