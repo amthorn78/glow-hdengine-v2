@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-second-repair
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -26,6 +26,7 @@ reviews:
     date: 2026-10-05
     required_open: 0
     outcome: "By this session, read-only: both record checks exit 0 at ANALYZED; both selftests pass (17/17, 66/66); A0 reproduces at 5cbfc74; the front matter and every table parse; the new title is free under the GTWPE parent; a second reading of the scope corrected two counts, neither a place to edit; the record tools already support a SKILL round. No required defect. No full review"
+item_count_at_approval: 4
 items:
   - id: ITEM-01
     statement: "GTWPE-MGMT-10 has a route for a skill part, with a skill check layer modelled on the GCFPE skill review (D24): a reviewer brief committed before any reviewer is spawned; two fresh, independent reviewer subagents, each returning SKILL_FIT_CONFIRMED against the same package digests; Nathan's install; then a post-install digest comparison and validation."
@@ -77,8 +78,8 @@ request: |
   - No Modification branch is merged before its record is COMPLETE, except the pull requests the plan itself opens.
   - Report to Nathan in at most five plain sentences, in plain language, ending with exactly what he must approve.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-second-repair at 0b39660 (2026-10-05). PE38 checked it: main's modification_validate.py and gtwpe_record_check.py each pass the record 1/1 at ANALYZED, the selftests pass 17/17 and 66/66, and main is still 5cbfc74. Candidate N1 (Alpha 1 and HDE TW still point to the 2026-09-08 operation sections) stays recorded and is not taken. Continue to PLAN as the request directs: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
+analyze_approved_date: 2026-10-05
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
