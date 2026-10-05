@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-writing-side
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -16,7 +16,7 @@ override:
   overrides: []
   reason: ""
 interaction_cost_predicted: 6
-interaction_cost_actual:
+interaction_cost_actual: 8
 estimate:
   plan: "about 1.5 h: §P for seven places (four and one in the body, two in the catalog) and the two identity lines (anchors, new texts, phrase checks, and a check that the new proof-log check can fail), the catalog texts, a dry run, and one full review by a single reviewer. Time is the meter the session can read; tokens are not measured"
   execute: "about 1 h, not counting any wait for Nathan: one new version (duplicate, title, the edits) read back whole by this session, the catalog write and its readback, and the record. Time is the meter"
@@ -46,15 +46,15 @@ items:
   - id: ITEM-01
     statement: "GTWPE-MGMT-10 keeps GTWPE-D1 whole through every later revision, consolidation and handoff of a prompt that writes a redlines Markdown file or a final updated PF Markdown file: it reads the GTWPE decision record, checks each such change against GTWPE-D1 in ANALYZE, verifies the requirement on the new page by phrase, and never drops or weakens it."
     source: "Request item 8, binding Nathan's requirement of 2026-10-05 (GTWPE-D1 in docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md, #572); drift-check trigger finding T-1"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-02
     statement: "GTWPE-MGMT-10 no longer points to gtwpe_redline.py, which the build drops: a reviewer's or worker's return is captured by a JSON parse of that worker's own transcript, as the standing method."
     source: "Request item 3 (no new redlining script; the earlier plan's gtwpe_redline.py is dropped)"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "The GTWPE catalog states the approved build: its design entry names Nathan's target architecture as governing, with this Modification's approved analysis and design v1.2 where the architecture does not supersede it, and its members note no longer says that GTWPE-RUN-10, GTWPE-RECORD-10 and GTWPE-RECORD-20 will be added."
     source: "Request items 2 and 5; the catalog's members note and Approved design entry, as read on 2026-10-05"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     name: "GTWPE-MGMT-10's next version: the proof-log guard and the standing capture method"
@@ -1294,3 +1294,88 @@ stop is at 2 h from X1.1, about 18:35Z, not counting a wait for Nathan.
 | X1.6 | PART-01 | APPLIED | **W3**, `update_content`, `allow_async: false`: E1 to E8 in one call, in `edits.json`'s order, each `old_str` and `new_str` printed by script from `edits.json` as committed (sha256 «H»), with «V» substituted in E1 and E2. Returned synchronously, no task, at the first send |
 | X1.7 | PART-01 | VERIFIED | «NEW» fetched whole, edited 2026-10-05T16:36:11.384Z, read in context; every count by reading, checked by a second reading. (1) Title exactly `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2`. (2) Parent the GTWPE parent page. (3) First two lines `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2` and `Prompt Version: 100526.2`. (4) All 9 check phrases once each, `Capture` among them (the two `Capturing` do not match), and both absent phrases, `100526.1` and `` Until `gtwpe_redline.py capture` exists ``, 0 times. (5) Each edit's new text present whole, at the place its `where` names. (6) The 24 headings, in order, are 100526.1's. (7) The last paragraph is complete, to `scopes.`. (8) No truncation or unknown block. (9) Readings: `gtwpe_redline` 0; `proof` 7, the tool route's two guard proofs and the five in E5, E6 and E8's new texts; `GTWPE-D1` 4, in E4, E5, E6 and E8's; `decision-record` 4, twice in E3's new text, and in *The watched sources* and *Relation to the PE Metaprompt*. No hit says what an edit removed |
 | X1.8 | PART-01 | VERIFIED | The GTWPE parent page fetched: five child pages, exactly one titled `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2`, and it is «NEW»; the page's own edit time unchanged, 16:16:10.995Z. 100526.1 fetched: still 03:24:07.081Z |
+| X2 | — | VERIFIED | The record with X1's dispositions committed at `8e17e4a`; `gtwpe_record_check.py` and `modification_validate.py` each exit 0 at `EXECUTING` (1/1); pushed, and the branch's blob equals the local file; amthorn78/glow-hdengine-v2#573 open, its head `8e17e4a`. No repository file other than the record and its evidence changed and nothing is installed, so the run went on to X4 |
+| X3 | — | NOT_APPLICABLE | X2 waited for no merge or install (X2's own rule) |
+| X4.1 | — | VERIFIED | At 16:37:30Z: `git fetch origin main`; «M» `31deec4bfc9278dcd33854ae112a3ef918cd142a`, the commit §A examined. `git log 31deec4..«M»` over *The watched sources* lists nothing, and the range holds no commit at all. No trigger finding |
+| X4.2 | PART-01, PART-02 | VERIFIED | Pre-read at about 16:37Z: the GTWPE parent page, edited 2026-10-05T16:16:10.995Z, with PE39's opening paragraph, as the approval expects; C1 to C6 each once, by reading, checked by a second reading; five headings (`## Catalog`, `### Members`, `### Lineage pins`, `### Checked-through commit`, `### Approved design`); five child pages (092926.1, 092926.2, 100526.1, 100526.2, the *Target Architecture* page); readings `GTWPE-RUN-10` 1, `P4` 1, `GTWPE-DESIGN-v1.2` 1. No part was blocked, so W4 sent all six. **W4**, `update_content`, `allow_async: false`, C1 to C6 → C1-NEW to C6-NEW in one call, the texts printed by script from §P as committed, with the values substituted; returned synchronously, no task. Readback, edited 2026-10-05T16:37:57.178Z, by reading, checked by a second reading: C1-NEW, C2-NEW, C4-NEW, C5-NEW and C6-NEW as sent; C3-NEW in its rendered form, the mention showing `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2`; C1 to C4 absent from the members table and the checked-through commit, while 100526.1's child-page entry stays; `are added when P4 publishes them` 0 times; the *Approved design* entry is C6-NEW alone. Readings: `GTWPE-RUN-10` 1, in C5-NEW, which says it is not built; `P4` 0; `GTWPE-DESIGN-v1.2` 1, in C6-NEW. The page-preservation checks: the page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the five child pages as the pre-read showed them |
+| X4.3 | PART-01 | VERIFIED | The GTWPE parent page fetched again: the members row links «NEW», and «NEW» is one of its five child pages |
+| X5 | — | VERIFIED | Item dispositions recorded: ITEM-01, ITEM-02 and ITEM-03 `VERIFIED`. Then T-1 recorded as settled by ITEM-01, citing its disposition, `VERIFIED` (*T-1*, below). `interaction_cost_actual` 8 against 6, the author, checker and acceptor of each part, and the clock, below. Status `COMPLETE`; both record checks exit 0 at `COMPLETE`; the record committed and pushed, and the pushed blob read back against the local file. The branch is kept, since X2 waited for no merge |
+
+### T-1
+
+T-1, §A's trigger finding for the GTWPE decision record and its `GTWPE-D1`, is **settled by ITEM-01**,
+whose disposition is `VERIFIED`: GTWPE-MGMT-10 100526.2, which the catalog now selects, reads the
+GTWPE decision record and carries `GTWPE-D1`'s guard (X1.7, X4.2, X4.3).
+
+### Findings from `EXECUTE`
+
+None. Every check passed at its first attempt, and no step was repeated. X1.4 found the duplicate
+populated at its first fetch, so no wait was needed.
+
+### Harness files (`D22` condition 5), for `EXECUTE`
+
+- **This session's transcript** holds, from this mode, 100526.1, fetched inline twice (X1.2, X1.8);
+  «NEW», fetched inline twice (X1.4, X1.7); and the GTWPE parent page, a control page, fetched inline
+  five times (X1.2, X1.8, X4.2's pre-read and readback, X4.3). No script read the transcript; every
+  check on a body was made by reading. It is left to teardown.
+- **One harness save of a body**: the PE Metaprompt 091426.1
+  (`mcp-Notion-notion-fetch-1791218129501.txt`), read by a script for its title and edit time only.
+  The harness refused this session's `rm` on its tool-results directory in `ANALYZE`, so the save is
+  left to its teardown, not deleted, and not read again.
+- **No body in the repository or in scratch.** W3's and W4's texts were printed by script from the
+  committed `edits.json` and §P, which hold no body beyond the anchors. Nothing new was written to
+  scratch in this mode.
+
+### Canon and rulings relied on, for `EXECUTE`
+
+- Nathan's plan approval of 2026-10-05, quoted in `plan_approved_by`, with its three conditions, met
+  at `fed7f34`.
+- GTWPE-MGMT-10 100526.1, fetched live at X1.2: `MODE = EXECUTE`, *How each kind of target changes*,
+  *Reading prompt bodies* and *Boundaries*.
+- The PE Metaprompt 091426.1's *Identity and Notion publication*: the identity lines, the version
+  rule, the title check before creation, and the recheck of source versions before publication.
+- HDE Governance (PF04) §9.1.6: the complete readback of the changed published body, and the author,
+  checker and acceptor below. HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001: the Notion writes made
+  from this session. Both on `main` at `31deec4`.
+- `gcfpe.decision-record.md` `D22`, and `D26-B` and `D26-C`; `notion-write-boundary.md`; the GTWPE
+  decision record's `GTWPE-D1`, for T-1.
+
+### Parts
+
+**PART-01 landed whole.** GTWPE-MGMT-10 100526.2 exists under the GTWPE parent page with the eight
+approved edits, read back whole, and the catalog selects it. 100526.1 is unchanged and unselected.
+
+**PART-02 landed whole.** The catalog's members note and *Approved design* entry read as approved.
+
+### Artifacts produced
+
+| Artifact | Where | Read back |
+|---|---|---|
+| GTWPE-MGMT-10 — Manage the GTWPE — 100526.2 | Notion, `3f04590a05eb8128b8c8ff3650ab2d5a`, under the GTWPE parent page | X1.7, whole; X1.8 |
+| The GTWPE catalog: the members row, the members note, the checked-through commit and the design entry | Notion, the GTWPE parent page's *Catalog* | X4.2 and X4.3 |
+| This record and its evidence: `edits.json`, `edits_check.py`, `e8_guard_proof.py`, the two briefs and the two captured returns | `docs/20261005-modification-gtwpe-writing-side`, pull request amthorn78/glow-hdengine-v2#573 | Each pushed blob against the local file |
+
+### Author, checker and acceptor (HDE Governance §9.1.6)
+
+| Part | Author | Checker | Acceptor |
+|---|---|---|---|
+| PART-01 | This GTWPE-MGMT-10 session, through the PE Metaprompt's general rules | GTWPE-WRITING-SIDE-PLAN-A, a fresh reviewer, on the eight edits before they were sent (0 required findings); GTWPE-WRITING-SIDE-PLAN-DC, a fresh checker, on the repair's diff (R-1, corrected as Nathan directed); this session's whole-page readback after (X1.7) | Nathan, by his approvals of the analysis and the plan; PE39 checks the result for him |
+| PART-02 | This GTWPE-MGMT-10 session | The same two reviewers, on C5 and C6 in §P; this session's readback after (X4.2) | Nathan, as for PART-01 |
+
+### Interaction cost, actual against predicted
+
+Predicted 6. Actual 8: 1 ruling, Nathan's opt-in to repairing the eight listed findings; the 2 fixed
+round trips; 4 review rounds (`ANALYZE`'s dry run, and `PLAN`'s dry run, full review and check of the
+repair's diff); no skill review or install; and 1 merge, #573, still to come. The difference is the
+opt-in and the check it brought, which the prediction did not foresee; R-1's correction came within
+the plan approval. The clock: `EXECUTE` ran from 16:35:08Z to about 16:40Z, against an estimate of
+about 1 h. Tokens: not measured by this session.
+
+### Remaining Product Owner actions
+
+- Merge amthorn78/glow-hdengine-v2#573 when he chooses. The record is `COMPLETE`, so his rule allows
+  it, and nothing waits on that merge (`D21-C`).
+- C2 to C6 wait for their own Modifications, in §A's order.
+
+**Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with no trigger finding from X4.1, and T-1 settled by ITEM-01.
+`NOTHING NEEDED`.
