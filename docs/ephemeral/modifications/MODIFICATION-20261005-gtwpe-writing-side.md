@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-writing-side
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -31,6 +31,11 @@ reviews:
     date: 2026-10-05
     required_open: 0
     outcome: "By this session, read-only, before any full review: both record checks exit 0 at PLANNED; edits_check.py passes, and 10 injected faults are each caught by their own code; every anchor found once in 100526.1 as fetched at the mode's start, by reading, twice, with E1's, E2's and E7's kept text beside it; C1 to C6 once each on the GTWPE parent page, and the new title free; main still 31deec4; the PE's version rule gives 100526.2 for 2026-10-05; GTWPE-D1 does not bind GTWPE-MGMT-10, which writes neither artifact. No required defect"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-10-05
+    required_open: 0
+    outcome: "One reviewer, GTWPE-WRITING-SIDE-PLAN-A, as Nathan directed, on c622a55: 0 required defects; 8 listed findings, L1 to L8, to Nathan unrepaired (D26-A rule 4), L3 confirmed by the session. No second reviewer or diff check, by Nathan's direction. Record: PLAN-REVIEW.md"
 item_count_at_approval: 3
 items:
   - id: ITEM-01
@@ -1021,6 +1026,52 @@ No required defect. Not exercised: any Notion write, the duplication and its pol
 renders the new texts (K-4). That E8's check fails on a bound prompt lacking the requirement rests on
 §A A.8's reading of the three TW writers; no TW page was read in this mode (K-2).
 
+### Full review (PL3)
+
+One reviewer, GTWPE-WRITING-SIDE-PLAN-A, a fresh general-purpose subagent, neither forked nor
+context-inheriting, as Nathan's approval directs. Its only brief was `PLAN-REVIEW-BRIEF.md` (10,881
+bytes, sha256 `59ac3178456de6a10d14bd8d76edaf280466a94474181ff8808b0a0963d408be`), committed and pushed
+at `1d73850` before it was spawned at about 13:03Z; it confirmed that sha256 before reviewing. It
+reviewed §P at `c622a55`, fetched no prompt body, wrote nothing, and ran for about 30 minutes. Its
+return came back through the harness's `SubagentHandback` call; the session captured that call's
+`message` from the reviewer's own transcript, found by the path the harness gave for its agent ID, with
+`capture.py`: `PLAN-REVIEW.md`, 18,877 bytes, sha256
+`ef2c0197618fa6176c870a8aaee94762c973dee6459c45ca86209e584237a833`, the message's 18,876 bytes and one
+final LF. Its first line, `0`, is its own count of required findings.
+
+**Result: 0 required findings and 8 listed (L1 to L8).** Under Nathan's direction, no second reviewer
+and no check of a repair's diff follows. The reviewer reproduced «H» and `edits_check.py`'s result.
+Every listed finding goes to Nathan unrepaired: under `D26-A` rule 4 a repair is his opt-in, and a
+session asks before making one, a statement correction included (his direction at the second repair's
+plan approval, recorded in its §E). `PLAN-REVIEW.md` gives each one's path, likelihood, consequence and
+smallest correction.
+
+| Finding | In brief | The reviewer's correction |
+|---|---|---|
+| L1 | X4.2 is written for both parts. On X1.0's one-part branch its pre-read or readback fails, so the run stops loudly instead of landing the other part | One sentence in X4.2: its pre-read, send and readback cover only the texts W4 sends |
+| L2 | E6 restates the combined-log exception without `GTWPE-D1`'s "that clearly covers both outputs", and its "each proof log's link to its file" does not fit a combined log | "one combined proof log it explicitly defines that clearly covers both"; "its file or files" |
+| L3 | E7's kept prefix, anchor and kept suffix are 147 contiguous characters of 100526.1 in `edits.json`, beyond the body's quoting rule and §P's own "at most 96 characters". The brief also quotes one line of 100526.1, 114 characters | Drop E7's prefix and suffix, and check E7 by its new text and its place; this changes «H» |
+| L4 | C6-NEW sets no order between §A and design v1.2 where §A departs from v1.2 on other authority, such as `gtwpe_redline.py` and the reader lock | "Where neither the architecture nor that analysis supersedes it, …" |
+| L5 | C5-NEW can read as three kinds of member | "the Flow Manager (a new prompt) and the TW prompts the build extends" |
+| L6 | No step records T-1 as settled, as §A says X4 does | X4.1 records T-1 as settled by ITEM-01 |
+| L7 | X1.0 (1) names a successor plan as PART-01's recovery, but X5 then sets `COMPLETE`, so the recovery is in practice a new Modification | "its recovery is a new Modification, Nathan's to order" |
+| L8 | E8, the guard, ships unfired: nothing here runs it on a text that lacks the requirement (`D14`, `GUARD-001`) | None to the texts: a dry run on a synthetic text, or X5's return saying the guard is unfired |
+
+**Confirmed by the session: L3's counts.** E7's `prefix`, `old` and `suffix` are 32, 96 and 19
+characters, adjacent in 100526.1 (P3), so 147 together, and the brief's quoted line is 114. §P's
+sentence that a passage of 100526.1 in §P or its evidence is at most 96 characters therefore does not
+hold. It stays as written until Nathan decides (`D26-A` rule 4). If he takes no repair, approving the
+plan accepts both passages in the repository; the brief, a dated record the reviewer read, stays as
+committed either way.
+
+**The recommendation, if Nathan opts in.** The reviewer would take L1 and L3, each a one-sentence
+change, L3 changing «H». The session would add L2, since it is `GTWPE-D1`'s own wording inside the
+guard. A repair is followed by one check of the repair's diff (`D26-A` rule 2), one more review round.
+
+**A harness side effect the reviewer disclosed.** The repository's own `PostToolUse` hook
+(`.claude/hooks/check_canon_relied_on.py`) keeps its state in `.git/canon_relied_on_hook.json`, which
+it updated during the review. That is no tracked file and holds no prompt body.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode, GTWPE-MGMT-10 100526.1, fetched inline twice
@@ -1035,8 +1086,20 @@ renders the new texts (K-4). That E8's check fails on a bound prompt lacking the
   Nothing was written from it, hashed or compared. The harness refused this session's `rm` on its
   tool-results directory in `ANALYZE` (§A, *Harness files*), so this save is left to its teardown and
   not read again.
+- **The reviewer's transcript**, the output file the harness gave for its agent ID in this session's
+  tasks directory: read twice by `capture.py` for its one `SubagentHandback` call (transcript line
+  377), first printing only its shape (line numbers, lengths, the message's first three lines), then
+  writing its message to `PLAN-REVIEW.md`. The reviewer fetched no prompt body (its brief, §1), so the
+  transcript holds none. It is left to teardown.
 - **Scratch**, in this session's scratchpad: ten mutated copies of `edits.json` for P2, each deleted
-  after its run; a copy of this record at `PLANNED` for P1. No scratch file holds a prompt body.
+  after its run; a copy of this record at `PLANNED` for P1; `capture.py`. No scratch file holds a
+  prompt body.
+
+### Cost of this mode
+
+Time: from 12:39:58Z, when the approval was recorded, to PL4 at about 13:37Z, about 1 h, of which the
+review took about 30 minutes, against the recorded estimate of about 1.5 h. Tokens: not measured by
+this session; the reviewer reported 458,797 subagent tokens.
 
 ### Canon and rulings relied on, for `PLAN`
 
