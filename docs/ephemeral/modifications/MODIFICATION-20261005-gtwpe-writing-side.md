@@ -1118,6 +1118,9 @@ as P3 found them.
 phrases, 4 readings, longest anchor 96 characters, E7). `e8_guard_proof.py`: exit 0, as P10 records.
 `gtwpe_record_check.py` and `modification_validate.py` on this record at `PLANNING`: both exit 0,
 1/1 each; with the other four GTWPE records, 5/5.
+After its first commit, at `4cc7b54`, `e8_guard_proof.py` was changed once, so that it builds its
+default path to the decision record only when no path is given; it then also runs from `git show`
+through process substitution. Both ways, exit 0.
 
 ### Harness files (`D22` condition 5), for `PLAN`
 

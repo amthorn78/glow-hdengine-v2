@@ -47,9 +47,11 @@ def bound_prompt(items, requirement=REQUIREMENT):
 
 
 def main(argv):
-    here = Path(__file__).resolve()
-    default = here.parents[4] / "prompt_ecosystem_management" / "gtwpe" / "gtwpe.decision-record.md"
-    record = Path(argv[1]) if len(argv) > 1 else default
+    if len(argv) > 1:
+        record = Path(argv[1])
+    else:
+        docs = Path(__file__).resolve().parents[4]
+        record = docs / "prompt_ecosystem_management" / "gtwpe" / "gtwpe.decision-record.md"
     items = minimum_items(record)
     phrases = [REQUIREMENT] + items
     fails = []
