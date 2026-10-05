@@ -1277,6 +1277,20 @@ stop is at 2 h from X1.1, about 18:35Z, not counting a wait for Nathan.
 |---|---|
 | «D» | 2026-10-05 |
 | «P» | 2026-10-05, `plan_approved_date` |
-| «V» | Fixed at X1.2 |
-| «NEW» | Returned by W1 at X1.3 |
+| «V» | `100526.2`, fixed at X1.2: the GTWPE parent page's child pages carry `100526.1` as the highest `100526` version |
+| «NEW» | `3f04590a05eb8128b8c8ff3650ab2d5a`, returned by W1 at X1.3 |
 | «M», «m» | Fixed at X4.1 |
+
+### Steps
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.0 | — | VERIFIED | Read-only, at X1.2; no part blocked. (1) PART-01: 100526.1 fetched live, edited 2026-10-05T03:24:07.081Z. (2) The GTWPE parent page fetched: edited 2026-10-05T16:16:10.995Z, PE39's replacement of its opening paragraph outside the catalog, as Nathan's approval says; C1 to C6 each once, by reading, checked by a second reading; four child pages, 092926.1, 092926.2, 100526.1 and the *Target Architecture* page, none titled `… — 100526.2`; five headings. (3) `git fetch origin main`: `origin/main` `31deec4bfc9278dcd33854ae112a3ef918cd142a`, the commit §A examined. (4) PART-01: the PE Metaprompt 091426.1 fetched; the harness saved it; a script printed its title and edit time, 2026-09-23T17:17:22.217Z. (5) The checked-out record holds §P with `plan_approved_by` set (`7e61183`), and `edits.json`'s sha256, at that commit and in the working tree, is «H» |
+| X1.1 | — | APPLIED | Status `EXECUTING`; «D» and «P» fixed at 16:35:08Z, which starts the clock; the stop is at about 18:35Z |
+| X1.2 | — | VERIFIED | X1.0 (1) to (5) as above; «V» fixed as `100526.2` |
+| X1.3 | PART-01 | VERIFIED | **W1**, `notion-duplicate-page` on `3f04590a05eb8171ba1ed7051bbefc53`: returned «NEW» `3f04590a05eb8128b8c8ff3650ab2d5a`, which differs from the source. The first Notion write |
+| X1.4 | PART-01 | VERIFIED | Fetch 1, at 16:35:49Z, already populated, so no wait was needed: title `GTWPE-MGMT-10 — Manage the GTWPE — 100526.1 (1)`; its first line the 100526.1 identity line; its last heading `## Relation to the PE Metaprompt`, with that paragraph's last sentence complete to its final word, `scopes.`; no truncation or unknown block; parent the GTWPE parent page |
+| X1.5 | PART-01 | APPLIED | **W2**, `update_properties`, `allow_async: false`: title `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2`. Returned synchronously, no task. Checked at X1.7 (1) |
+| X1.6 | PART-01 | APPLIED | **W3**, `update_content`, `allow_async: false`: E1 to E8 in one call, in `edits.json`'s order, each `old_str` and `new_str` printed by script from `edits.json` as committed (sha256 «H»), with «V» substituted in E1 and E2. Returned synchronously, no task, at the first send |
+| X1.7 | PART-01 | VERIFIED | «NEW» fetched whole, edited 2026-10-05T16:36:11.384Z, read in context; every count by reading, checked by a second reading. (1) Title exactly `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2`. (2) Parent the GTWPE parent page. (3) First two lines `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2` and `Prompt Version: 100526.2`. (4) All 9 check phrases once each, `Capture` among them (the two `Capturing` do not match), and both absent phrases, `100526.1` and `` Until `gtwpe_redline.py capture` exists ``, 0 times. (5) Each edit's new text present whole, at the place its `where` names. (6) The 24 headings, in order, are 100526.1's. (7) The last paragraph is complete, to `scopes.`. (8) No truncation or unknown block. (9) Readings: `gtwpe_redline` 0; `proof` 7, the tool route's two guard proofs and the five in E5, E6 and E8's new texts; `GTWPE-D1` 4, in E4, E5, E6 and E8's; `decision-record` 4, twice in E3's new text, and in *The watched sources* and *Relation to the PE Metaprompt*. No hit says what an edit removed |
+| X1.8 | PART-01 | VERIFIED | The GTWPE parent page fetched: five child pages, exactly one titled `GTWPE-MGMT-10 — Manage the GTWPE — 100526.2`, and it is «NEW»; the page's own edit time unchanged, 16:16:10.995Z. 100526.1 fetched: still 03:24:07.081Z |
