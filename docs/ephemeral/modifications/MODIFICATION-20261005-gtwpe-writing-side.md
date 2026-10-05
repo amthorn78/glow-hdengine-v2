@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-writing-side
-status: PLANNED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -769,8 +769,12 @@ step's check. A task that reports failure is a tool error, and the page is fetch
 anything else. On the failure path, every pending task is polled to its end before the sweep.
 
 **Every text below is sent exactly as written**, with the values substituted and nothing else
-changed. A passage of 100526.1's body in §P or its evidence is at most 96 characters, the length of
-the longest anchor (E7), which is the clause that edit removes; every other anchor is at most 30.
+changed. A passage of 100526.1's body in §P, `edits.json`, `edits_check.py` or `e8_guard_proof.py` is
+at most 96 characters, the length of the longest anchor (E7): the 89-character clause that edit
+removes, and the kept word it recapitalizes. Every other anchor is at most 30, and no kept text beside
+an anchor makes a longer passage: E1's anchor with its kept text is 43 characters, E2's 24. The PLAN
+review brief, a dated record, quotes one line of 100526.1 of 114 characters (L3); it stays as
+committed.
 
 ### Values
 
@@ -789,16 +793,19 @@ In `docs/ephemeral/modifications/evidence/gtwpe-writing-side/`, committed with t
 
 | File | What it is |
 |---|---|
-| `edits.json` | W3's 8 replacements, E1 to E8: for each, its item, where it sits, its anchor (`old`), its new text, the matches expected before the write, the phrases that must occur after it with their counts, and the replaced phrases that must be absent; for E1, E2 and E7, the kept text directly before or after the anchor; how they are sent; and the four readings for `D26-E` |
+| `edits.json` | W3's 8 replacements, E1 to E8: for each, its item, where it sits, its anchor (`old`), its new text, the matches expected before the write, the phrases that must occur after it with their counts, and the replaced phrases that must be absent; for E1 and E2, the kept text directly before the anchor; how they are sent; and the four readings for `D26-E` |
 | `edits_check.py` | The file's consistency check, which reads `edits.json` only and writes nothing: the second repair's check, with a `suffix` read beside a `prefix`, and a `NEWLINE` check so that no edit leaves its block (dry run P2) |
 | `PLAN-REVIEW-BRIEF.md` | PL3's review brief, committed before the reviewer is spawned |
 | `PLAN-REVIEW.md` | The reviewer's return, captured unedited from its own transcript |
+| `e8_guard_proof.py` | P10's check, added in the repair round (L8): it fires E8's readback rule on synthetic bound-prompt texts, with the phrases taken from `GTWPE-D1` in the decision record. It reads no prompt body and writes nothing |
+| `PLAN-DIFFCHECK-BRIEF.md` | The brief for the check of the repair's diff, committed before the checker is spawned |
+| `PLAN-DIFFCHECK.md` | The checker's return, captured unedited from its own transcript |
 
 ### Values fixed in this plan
 
 | Value | Fixed as |
 |---|---|
-| «H» | `addb3d313794b3dafc543ca0520974f82fb667b554ede2c62b42b962655ad53f`, the sha256 of `edits.json` as committed with this section, 5,899 bytes |
+| «H» | `f451dff65c33e506789891709fd928e5b92bfa91fc3116637b129c8280373113`, the sha256 of `edits.json` as committed with the repair round (L2, L3), 5,815 bytes. Before it, at `c622a55`: `addb3d313794b3dafc543ca0520974f82fb667b554ede2c62b42b962655ad53f`, 5,899 bytes |
 
 ### Before any write: X1.0, the preconditions
 
@@ -811,7 +818,7 @@ with the other part: W4 then sends C4 with the other part's texts only. If a pre
 1. **PART-01.** GTWPE-MGMT-10 100526.1, `3f04590a05eb8171ba1ed7051bbefc53`, fetched live at the start of
    `EXECUTE`: edited 2026-10-05T03:24:07.081Z, the edit time at which the dry run found every anchor
    (P3). A later edit means the anchors may have moved, so the plan is wrong for PART-01, and its
-   recovery is a successor plan, Nathan's to order.
+   recovery is a new Modification, Nathan's to order.
 2. **PART-01, PART-02 and both.** The GTWPE parent page, `3ea4590a05eb818c915bdfd3d150c44b`, fetched:
    C1 to C3 each occur once (PART-01), C5 and C6 each once (PART-02), and C4 once (*both*); no child
    page carries the title `GTWPE-MGMT-10 — Manage the GTWPE — «V»` (PART-01). «V» is fixed from its
@@ -842,8 +849,8 @@ Four Notion writes, W1 to W4. The plan makes no other.
 | X1.8 | PART-01 | `prompt` | Fetch the GTWPE parent page, and fetch 100526.1 | The route (the parent's title check and the current version's edit time) | Exactly one child page carries `GTWPE-MGMT-10 — Manage the GTWPE — «V»`, and it is «NEW»; 100526.1 still shows 2026-10-05T03:24:07.081Z | As X1.3 |
 | X2 | — | the record | Commit the record with X1's values and dispositions. Run `gtwpe_record_check.py` and `modification_validate.py` on it at `EXECUTING`; push. No repository file other than the record and its evidence changes, and nothing is installed, so the run goes on to X4 | GTWPE-MGMT-10 X2 ("Otherwise push the record and go on to X4") | Both exit 0; after the push, the branch's blob equals the local file; amthorn78/glow-hdengine-v2#573 is open | — |
 | X3 | — | — | Not applicable: X2 waits for no merge or install. Recorded `NOT_APPLICABLE` with that reason | GTWPE-MGMT-10 X3 | The disposition is in §E | — |
-| X4.1 | — | — | `git fetch origin main`; fix «M» and «m»; `git log --format='%H %cI %s' 31deec4..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.1 as fetched at X1.2, in «NEW» as fetched at X1.7, and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `31deec4` | Every commit the log lists has a trigger finding in §E. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
-| X4.2 | PART-01, PART-02 | `notion_control` | **W4.** The GTWPE parent page. Pre-read: fetch it; C1 to C6 each once, by reading; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, six replacements in one call, in this order: C1 to C6 become C1-NEW to C6-NEW. C1 to C3 select the new version (PART-01), C4 moves the checked-through commit, and C5 and C6 are ITEM-03 (PART-02) | GTWPE-MGMT-10 X4 (the checked-through commit; the selection, which this plan names); ITEM-03 | Fetch it again, by reading, checked by a second reading: C1-NEW, C2-NEW, C4-NEW, C5-NEW and C6-NEW present as sent, and C3-NEW in its rendered form (*The catalog texts*); C1 to C4 absent from the members table and the checked-through commit, while 100526.1's own child-page entry stays; `are added when P4 publishes them` 0 times; the *Approved design* entry is C6-NEW alone. Readings: `GTWPE-RUN-10` 1, in C5-NEW, which says it is not built; `P4` 0; `GTWPE-DESIGN-v1.2` 1, in C6-NEW. The page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the child pages as the pre-read showed them | The reverse replacements, with the texts taken from this readback, never from page history |
+| X4.1 | — | — | `git fetch origin main`; fix «M» and «m»; `git log --format='%H %cI %s' 31deec4..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.1 as fetched at X1.2, in «NEW» as fetched at X1.7, and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count. Then record §A's trigger finding T-1, the GTWPE decision record, as settled by ITEM-01, citing ITEM-01's disposition, when that disposition is `VERIFIED` | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `31deec4` and says X4 records T-1 as settled | Every commit the log lists has a trigger finding in §E; T-1 is recorded as settled, with ITEM-01's disposition cited, or, if ITEM-01 is not `VERIFIED`, as still open. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
+| X4.2 | PART-01, PART-02 | `notion_control` | **W4.** The GTWPE parent page. Pre-read: fetch it; C1 to C6 each once, by reading; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, six replacements in one call, in this order: C1 to C6 become C1-NEW to C6-NEW. C1 to C3 select the new version (PART-01), C4 moves the checked-through commit, and C5 and C6 are ITEM-03 (PART-02). When X1.0 blocked a part, the pre-read, the send and the readback cover only the texts W4 sends, and the blocked part's readings are not made | GTWPE-MGMT-10 X4 (the checked-through commit; the selection, which this plan names); ITEM-03 | Fetch it again, by reading, checked by a second reading: C1-NEW, C2-NEW, C4-NEW, C5-NEW and C6-NEW present as sent, and C3-NEW in its rendered form (*The catalog texts*); C1 to C4 absent from the members table and the checked-through commit, while 100526.1's own child-page entry stays; `are added when P4 publishes them` 0 times; the *Approved design* entry is C6-NEW alone. Readings: `GTWPE-RUN-10` 1, in C5-NEW, which says it is not built; `P4` 0; `GTWPE-DESIGN-v1.2` 1, in C6-NEW. The page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the child pages as the pre-read showed them | The reverse replacements, with the texts taken from this readback, never from page history |
 | X4.3 | PART-01 | `prompt` | Fetch the GTWPE parent page again | The route ("after X4, the selection's link to it") | The members row links «NEW», and «NEW» is one of the page's child pages | As X4.2 |
 | X5 | — | the record | Record every step's and item's disposition, `interaction_cost_actual` against 6, the actual author, checker and acceptor of each part, and the time on the clock; set the status to `COMPLETE`; commit and push. The branch is kept, since X2 waited for no merge. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings; or, if a part was blocked before any write, `IMPLEMENTATION_BLOCKED` with its blocker, owner and recovery point | GTWPE-MGMT-10 X5 | Both checks exit 0 at `COMPLETE`; after `git fetch`, the branch's blob equals the local file | — |
 
@@ -868,13 +875,13 @@ revision, consolidation, retirement or handoff drops or weakens `GTWPE-D1`, glos
 required for every redlines Markdown file and every final updated PF Markdown file a prompt writes. E6
 makes A2 record, for each prompt a part reaches, whether it writes either file before or after the
 change, and how the part leaves `GTWPE-D1` whole there: a separate proof log for each such file, or,
-where a prompt writes both, one combined proof log it explicitly defines; every minimum item; and each
-proof log's link to its file. E8 makes the prompt route's readback check, for a prompt that writes
-either file, `GTWPE-D1`'s proof-log requirement and each minimum item, by phrase. E7 removes the
-clause, so the JSON parse of the worker's own transcript is the standing method; the rest of the
-paragraph is unchanged. The new texts cite `GTWPE-D1` and do not copy its eight items, which stay in
-the decision record (the PE's "Put each operative rule in one clear place"; the spine's *Read these;
-do not restate them*).
+where a prompt writes both, one combined proof log it explicitly defines that clearly covers both;
+every minimum item; and each proof log's link to its file or files. E8 makes the prompt route's readback
+check, for a prompt that writes either file, `GTWPE-D1`'s proof-log requirement and each minimum item,
+by phrase. E7 removes the clause, so the JSON parse of the worker's own transcript is the standing
+method; the rest of the paragraph is unchanged. The new texts cite `GTWPE-D1` and do not copy its eight
+items, which stay in the decision record (the PE's "Put each operative rule in one clear place"; the
+spine's *Read these; do not restate them*).
 
 **The class B guard is X1.7 (4)**: the 9 check phrases present at their counts, and the 2 replaced
 phrases absent, by phrase: E1's `100526.1` and E7's `` Until `gtwpe_redline.py capture` exists ``.
@@ -937,7 +944,7 @@ second repair's X4.2 found. X4.2 checks this form:
 GTWPE-RUN-10, GTWPE-RECORD-10 and GTWPE-RECORD-20 are added when P4 publishes them.
 ```
 ```
-Further members are added as the approved build selects them: the Flow Manager, a new prompt, and the TW prompts the build extends (*Approved design*). Design v1.2's GTWPE-RUN-10, GTWPE-RECORD-10 and GTWPE-RECORD-20 are not built.
+Further members are added as the approved build selects them: the Flow Manager (a new prompt) and the TW prompts the build extends (*Approved design*). Design v1.2's GTWPE-RUN-10, GTWPE-RECORD-10 and GTWPE-RECORD-20 are not built.
 ```
 
 **C6** → **C6-NEW**, the *Approved design* entry (PART-02, ITEM-03):
@@ -946,7 +953,7 @@ Further members are added as the approved build selects them: the Flow Manager, 
 `docs/ephemeral/gtwpe.rewrite/design/GTWPE-DESIGN-v1.2.md`, approved by Nathan at G1 on 2026-09-29.
 ```
 ```
-Nathan's target architecture governs: `docs/ephemeral/gtwpe.rewrite/GTWPE-TARGET-ARCHITECTURE-20260929.md`. The build, and the order of its changes, is settled in §A of MODIFICATION-20261005-gtwpe-writing-side, approved by Nathan on 2026-10-05. Where the architecture does not supersede it, `docs/ephemeral/gtwpe.rewrite/design/GTWPE-DESIGN-v1.2.md`, approved by Nathan at G1 on 2026-09-29, still applies.
+Nathan's target architecture governs: `docs/ephemeral/gtwpe.rewrite/GTWPE-TARGET-ARCHITECTURE-20260929.md`. The build, and the order of its changes, is settled in §A of MODIFICATION-20261005-gtwpe-writing-side, approved by Nathan on 2026-10-05. Where neither the architecture nor that analysis supersedes it, `docs/ephemeral/gtwpe.rewrite/design/GTWPE-DESIGN-v1.2.md`, approved by Nathan at G1 on 2026-09-29, still applies.
 ```
 
 C6-NEW keeps design v1.2 named, so 100526.1's *Read these* line on "the approved GTWPE design package
@@ -1021,10 +1028,13 @@ normal-path gate and readback the run can make before a write.
 | P7 | Each sentence an edit touches, read whole with its new text in place, by reading | Each reads as one sentence or table cell, in the body's style: the *Read these* bullet, in the form of the one there that already names two files; the *Boundaries* bullet; A2's cell, ending without a full stop as the body's cells do; the capture paragraph; the prompt route's verification cell |
 | P8 | Every step of *The steps* names a check that could fail, and every value is fixed once (*Values*) | By reading: yes. X3 is `NOT_APPLICABLE` by X2's own rule |
 | P9 | ITEM-01, applied ahead of its landing: A2's new record, for this Modification | PART-01 changes GTWPE-MGMT-10, which writes neither artifact before or after the change, so `GTWPE-D1` does not bind it, and X1.7 has no proof-log check. PART-02 changes no prompt |
+| P10 | Added in the repair round (L8, Nathan's opt-in): E8's readback rule fired by `e8_guard_proof.py` on synthetic bound-prompt texts, with the requirement phrase and the eight minimum items taken from `GTWPE-D1` in the decision record. No TW page or prompt body is read | Exit 0: the complete text passes; each of the eight texts lacking one minimum item fails, naming that item alone; the text with no separate proof log fails on the requirement alone |
 
 No required defect. Not exercised: any Notion write, the duplication and its polling, and how Notion
 renders the new texts (K-4). That E8's check fails on a bound prompt lacking the requirement rests on
-§A A.8's reading of the three TW writers; no TW page was read in this mode (K-2).
+§A A.8's reading of the three TW writers; no TW page was read in this mode (K-2). P10, added in the
+repair round, shows E8's rule failing on synthetic texts that lack the requirement or one minimum item;
+it reads no live TW page.
 
 ### Full review (PL3)
 
@@ -1072,6 +1082,43 @@ guard. A repair is followed by one check of the repair's diff (`D26-A` rule 2), 
 (`.claude/hooks/check_canon_relied_on.py`) keeps its state in `.git/canon_relied_on_hook.json`, which
 it updated during the review. That is no tracked file and holds no prompt body.
 
+### Repair round (PL3), Nathan's opt-in
+
+Nathan opted in on 2026-10-05, in PE39's relay, verbatim:
+
+> Nathan opts in to repairing all eight listed findings of the PLAN review of MODIFICATION-20261005-gtwpe-writing-side at c0c6690 (D26-A rule 4), in one repair round, each by the reviewer's own correction in PLAN-REVIEW.md: L1 (X4.2's pre-read, send and readback cover only the texts W4 sends when X1.0 blocked a part); L2 (E6 reads "one combined proof log it explicitly defines that clearly covers both", and "its file or files"); L3 (drop E7's prefix and suffix, check E7 by its new text alone with X1.7 checking its place, and recompute «H»); L4 ("Where neither the architecture nor that analysis supersedes it"); L5 ("the Flow Manager (a new prompt) and the TW prompts the build extends"); L6 (X4.1 also records T-1 as settled by ITEM-01, citing its disposition); L7 ("its recovery is a new Modification, Nathan's to order"); L8 (a dry-run step that fires E8 against a synthetic bound-prompt text lacking one minimum item and shows the check fails; no TW page is read). PE39 checked the plan at c0c6690: main's modification_validate.py and gtwpe_record_check.py each pass all five GTWPE records (5/5), edits_check.py passes, main is still 31deec4, and the branch changes only docs/ephemeral/. After the repair, run one check of the repair's diff by a fresh reviewer, re-run both record checks and edits_check.py, and return to Nathan for plan approval at the repaired commit. Report in at most five plain sentences ending with exactly what he must approve.
+
+The repair started at about 15:53Z, after the opt-in; the wait for Nathan is not on the meter. The
+status went back to `PLANNING` for the round. Each finding was repaired by the reviewer's own
+correction, here:
+
+| Finding | Repaired in |
+|---|---|
+| L1 | X4.2's edit cell: when X1.0 blocked a part, the pre-read, the send and the readback cover only the texts W4 sends, and the blocked part's readings are not made |
+| L2 | `edits.json`, E6's new text: "one combined proof log it explicitly defines that clearly covers both", and "its file or files"; *What the new texts say, in brief* to match |
+| L3 | `edits.json`, E7: its `prefix` and `suffix` dropped, and its check phrase now `Capture`, count 1 (*Readings for the repair*, below); X1.7 (5) checks its place, as for every edit. «H» recomputed (*Values fixed in this plan*). The quoting sentence under *How the plan runs*, and the *Evidence files* row for `edits.json`, restated so that they hold |
+| L4 | C6-NEW: "Where neither the architecture nor that analysis supersedes it" |
+| L5 | C5-NEW: "the Flow Manager (a new prompt) and the TW prompts the build extends" |
+| L6 | X4.1: T-1 is recorded as settled by ITEM-01, citing its disposition, when that is `VERIFIED`; otherwise as still open |
+| L7 | X1.0 (1): "its recovery is a new Modification, Nathan's to order" |
+| L8 | *Dry run (PL3)*, P10, with a new evidence file, `e8_guard_proof.py`, and a sentence under its table |
+
+Two repairs go a little past the reviewer's words, and say so here: L3's restated sentence, since the
+finding was that the sentence did not hold, and L6's "otherwise as still open", since T-1 is settled
+only if ITEM-01 lands. The *Evidence files* table also gains rows for `e8_guard_proof.py` and the diff
+check's two files. Nothing else in §P changed.
+
+**Readings for the repair**, in 100526.1 as fetched at this mode's start, by reading, checked by a
+second reading. `Capture`, case-sensitive, occurs 0 times: the body has `Capturing` twice, and
+`capture` and `captured` in lower case, none of which match. So E7's new check phrase occurs 0 times in
+the source and once after the edit. E7's anchor, and every other anchor, prefix and check phrase, are
+as P3 found them.
+
+**Checks after the repair.** `edits_check.py`: `PASS`, exit 0 (8 edits, 9 check phrases, 2 absent
+phrases, 4 readings, longest anchor 96 characters, E7). `e8_guard_proof.py`: exit 0, as P10 records.
+`gtwpe_record_check.py` and `modification_validate.py` on this record at `PLANNING`: both exit 0,
+1/1 each; with the other four GTWPE records, 5/5.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode, GTWPE-MGMT-10 100526.1, fetched inline twice
@@ -1092,8 +1139,9 @@ it updated during the review. That is no tracked file and holds no prompt body.
   writing its message to `PLAN-REVIEW.md`. The reviewer fetched no prompt body (its brief, §1), so the
   transcript holds none. It is left to teardown.
 - **Scratch**, in this session's scratchpad: ten mutated copies of `edits.json` for P2, each deleted
-  after its run; a copy of this record at `PLANNED` for P1; `capture.py`. No scratch file holds a
-  prompt body.
+  after its run; a copy of this record at `PLANNED` for P1; `capture.py`; and, in the repair round, a
+  copy of `edits.json` as it stood before the repair, deleted once the repair's diff was read. No
+  scratch file holds a prompt body.
 
 ### Cost of this mode
 

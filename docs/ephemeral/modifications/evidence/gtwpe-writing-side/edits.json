@@ -116,7 +116,7 @@
    "item": "ITEM-01",
    "where": "MODE = ANALYZE: A2's step",
    "old": "reason (HDE Governance §9.1.6)",
-   "new": "reason (HDE Governance §9.1.6). For a part that changes, adds, merges or retires a prompt, record whether each prompt it reaches writes a redlines Markdown file or a final updated PF Markdown file, before or after the change, and how the part leaves `GTWPE-D1` whole in each: a separate proof log for each such file, or, where a prompt writes both, one combined proof log it explicitly defines; every minimum item; and each proof log's link to its file",
+   "new": "reason (HDE Governance §9.1.6). For a part that changes, adds, merges or retires a prompt, record whether each prompt it reaches writes a redlines Markdown file or a final updated PF Markdown file, before or after the change, and how the part leaves `GTWPE-D1` whole in each: a separate proof log for each such file, or, where a prompt writes both, one combined proof log it explicitly defines that clearly covers both; every minimum item; and each proof log's link to its file or files",
    "matches": 1,
    "check": [
     [
@@ -139,15 +139,13 @@
    "matches": 1,
    "check": [
     [
-     "(`EVID-001`). Capture it by a JSON parse",
+     "Capture",
      1
     ]
    ],
    "absent": [
     "Until `gtwpe_redline.py capture` exists"
-   ],
-   "prefix": "never by retyping (`EVID-001`). ",
-   "suffix": " it by a JSON parse"
+   ]
   },
   {
    "id": "E8",
