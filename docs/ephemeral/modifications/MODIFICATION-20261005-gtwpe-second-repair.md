@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-second-repair
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -31,6 +31,11 @@ reviews:
     date: 2026-10-05
     required_open: 0
     outcome: "By this session, read-only, before any full review: both record checks exit 0 at PLANNED; edits_check.py passes, and 9 injected faults are each caught by their own code; every anchor found once in 092926.2 as fetched at the mode's start, by reading, twice; C1 to C4 once each on the GTWPE parent page, and the new title free; main still 5cbfc74; the PE's version rule gives 100526.1 for 2026-10-05. No required defect"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-10-05
+    required_open: 0
+    outcome: "One reviewer, GTWPE-SECOND-REPAIR-PLAN-A, as Nathan directed, on 555db67: 0 required defects; 17 listed findings, L1 the session's own PL4 step and L2 to L17 to Nathan unrepaired. No second reviewer or diff check, by Nathan's direction. Record: PLAN-REVIEW.md"
 item_count_at_approval: 4
 items:
   - id: ITEM-01
@@ -432,8 +437,9 @@ step's check. A task that reports failure is a tool error, and the page is fetch
 anything else. On the failure path, every pending task is polled to its end before the sweep.
 
 **Every text below is sent exactly as written**, with the values substituted and nothing else
-changed. A passage of 092926.2's body in this record or its evidence is at most 66 characters, the
-length of the longest anchor (E6).
+changed. A passage of 092926.2's body in §P or its evidence is at most 66 characters, the length
+of the longest anchor (E6); §A, written before the anchors were set, quotes one clause of 74
+characters, as the body allows before `PLAN` sets them.
 
 ### Values
 
@@ -621,7 +627,7 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-2 | The skill route is untested until a skill part runs through it (§A risk 7) | Certain | Its first use may find a gap | It is new; the TW prompts repair ran the same steps around the old body |
 | K-3 | A paraphrase of removed text is caught only by reading (§A risk 4; `FUNC-001`) | Low | An unscoped survivor reported late | `D26-E`'s broad match still runs, by reading, beside the phrase checks |
 | K-4 | The selection row still lists "the eight members" (§A risk 6; candidate C2) | Certain | A later release with another count adapts the text, as the TW prompts repair did | The request keeps the other candidates out |
-| K-5 | *What this prompt may change* says it never changes the GCFPE's "validator", which the design means as `modification_validate.py` (design §8 and §4.4, *Exclusions*), while the skill route lets a request name `flowmaster-validate`'s checks of a TW skill | Low | A reader takes the two as conflicting | The route limits a shared skill to what serves the TW flow or the GTWPE (§A risk 1) |
+| K-5 | *What this prompt may change* says it never changes the GCFPE's "validator", which the design means as `modification_validate.py` (design §12.1, P2(a), and §18), while the skill route lets a request name `flowmaster-validate`'s checks of a TW skill | Low | A reader takes the two as conflicting | The route limits a shared skill to what serves the TW flow or the GTWPE (§A risk 1) |
 | K-6 | A failure record's pull request carries whatever else the branch holds | Low | A failed part's repository change could land with the record | Nathan merges it after a loud return; this Modification changes no repository file but the record |
 | K-7 | Whether a change alters how the TW flow runs is a reading, made by `ANALYZE` | Low | A flow change recorded as none leaves the operation lagging | Nathan approves that reading with the analysis; the readback's one-heading check catches a lag left by a rename |
 | K-8 | Notion may render inserted text differently, such as escaping a character or a mention by its title | Low | A check phrase read as missing | A miss stops the run loudly; the readback compares on substance |
@@ -649,7 +655,7 @@ normal-path gate and readback the run can make before a write.
 
 | # | Gate | Result |
 |---|---|---|
-| P1 | `gtwpe_record_check.py` and `modification_validate.py` on a scratch copy of this record at `PLANNED`, with this round in `reviews` | Both exit 0, 1/1 |
+| P1 | `gtwpe_record_check.py` and `modification_validate.py` on a scratch copy of this record at `PLANNED`, with this round in `reviews` and a placeholder *Harness files* subsection standing for the one PL4 writes | Both exit 0, 1/1. Without the placeholder, `gtwpe_record_check.py` raises `HARNESS`, as it should |
 | P2 | `edits_check.py` on `edits.json`; then nine injected faults in scratch copies, one for each of its seven checks and two more for `CHECK` and `ABSENT` | `PASS`, exit 0: 18 edits, 24 check phrases, 11 absent phrases, 3 readings, longest anchor 66 characters. Each fault caught by its own code, 9/9, exit 1 each |
 | P3 | In 092926.2 as fetched at this mode's start, by reading, checked by a second reading: each `old` occurs exactly once; E1's and E2's `prefix` sits directly before its `old`; each check phrase occurs 0 times; each absent phrase occurs only in its own `old` (`092926.2` twice, in E1's and E2's); each reading's `in_source` (2, 2, 2); and the 24 headings | All as stated. No anchor occurs in a heading |
 | P4 | The GTWPE parent page, fetched: C1 to C4 each once, by reading; the new title free | Edited 2026-10-04T17:08:52.631Z. C1 to C4 once each; C1's text also appears inside C3's mention and in the child-page list, but not as a table cell; three child pages, 092926.1, 092926.2 and the *Target Architecture* page; five headings |
@@ -660,3 +666,95 @@ normal-path gate and readback the run can make before a write.
 
 No required defect. Not exercised: any Notion write, the duplication and its polling, and the
 rendering of the new texts by Notion (K-8).
+
+### Full review (PL3)
+
+One reviewer, GTWPE-SECOND-REPAIR-PLAN-A, a fresh general-purpose subagent, neither forked nor
+context-inheriting, as the request and Nathan's approval direct. Its only brief was
+`PLAN-REVIEW-BRIEF.md` (10,675 bytes, sha256
+`5e9d5fa415a45a40e72ae86cf62ca44f52f4a74da2aa8448bbcce909be7f2a57`), committed and pushed at `ed844f4`
+before it was spawned at about 01:39Z; it confirmed that sha256 before reviewing. It reviewed §P at
+`555db67`, fetched no prompt body, and wrote nothing. Its return came back through the harness's
+`SubagentHandback` call; the session captured that call's `message` from the reviewer's own
+transcript, found by the path the harness gave for its agent ID, with `capture.py`:
+`PLAN-REVIEW.md`, 16,691 bytes, sha256 `c6f3dbe7208f953ac8a34d3dd2d6c7e58b53379de0c00081e75b7973bd58eb3e`, one final LF appended. A first capture took the
+transcript's last assistant line instead of the hand-back; the repository's canon-block hook flagged
+the file, and it was overwritten by the correct capture before anything was committed.
+
+**Result: 0 required findings and 17 listed (L1 to L17).** Under Nathan's direction, no second
+reviewer and no check of a repair's diff follows. The reviewer reproduced «H».
+
+| Finding | Disposition |
+|---|---|
+| L1 | Not a repair: the mode's own PL4 step. §P's *Harness files* subsection, below, names the PE Metaprompt save, and P1's row now says its copy carried a placeholder for that subsection |
+| L2 to L17 | Listed, not repaired (`D26-A` rule 4). Approving this plan accepts each, as `PLAN-REVIEW.md` gives its path, likelihood and consequence; repairing any is Nathan's opt-in, priced as another round |
+
+**How three of them read in this run.**
+
+- **L14 and K-8.** E7's bold sentence holds inline code. Notion is expected to serialize it as
+  092926.2 shows its own bold text around code, with the bold closed and reopened at the code.
+  X1.7 (5) reads "present whole" on substance, as K-8 says: such a serialization is a representation
+  change, not a missing text. E7's check phrases avoid the markup.
+- **L10.** In this run, X1.7 (9) stops on a hit that still says what an edit removes. In the body,
+  *If the plan is wrong* supplies that stop.
+- **L13.** §A, as approved, scopes ITEM-04 to a TW-ALPHA change. A change that alters the flow
+  through a skill alone is outside it.
+
+**Candidates for a later Modification** (recorded, not taken): L13's upkeep for a change that alters
+the TW flow without a TW-ALPHA selection; L9's watched sources, which do not list the skill rules the
+new route cites; and L2 and L15, the first repair's DC-1 and DC-2 (a failure record's pull request
+restarted to carry the record alone, and «NEW» archived after W4 is reversed), carried into the body.
+
+**Statement corrections made after the review.** No step, edit, value or text to be sent changed
+between `555db67` and the commit that sets `PLANNED`; three statements and one explanation did:
+
+- P1's row (L1): its scratch copy carried a placeholder *Harness files* subsection.
+- K-5's citation (L8): design §8 is the GTWPE's own change package and redline validator. The reading
+  of "the GCFPE's … validator" as `modification_validate.py` rests on design §12.1, P2(a), and §18.
+- The quoting limit (L16): 66 characters holds for §P and its evidence; §A quotes one clause of 74.
+- L17: §A named the selection row's "Nothing else on that page changes" among ITEM-04's places. §P
+  leaves it as it is, since E12 puts the heading's rename inside write (3), so the sentence stays
+  true.
+
+### Harness files (`D22` condition 5), for `PLAN`
+
+- **This session's transcript** holds, from this mode, GTWPE-MGMT-10 092926.2, fetched once inline
+  at the mode's start and read in context, and the GTWPE parent page, a control page, fetched once
+  inline. No script read the transcript; every anchor and count was found by reading. It is left to
+  teardown.
+- **One harness save of a body**: the PE Metaprompt 091426.1 (`mcp-Notion-notion-fetch-1791163552099.txt`),
+  whose fetch was too large to return inline. Within that fetch, a script printed its edit time and
+  heading offsets, then its general rules in four slices covering characters 0 to 28,300 and 55,900
+  to 76,125, into this session's context to be read; of its GCFPE overlay (28,293 to 55,900), only
+  the first seven characters of its heading were printed. Nothing was written
+  from it, hashed or compared, and the save was deleted (exit 0).
+- **The reviewer's transcript**, found by the path the harness gave for its agent ID, and read by
+  `capture.py` for its hand-back message only (a first run read its last assistant line, *Full review*);
+  the reviewer fetched no prompt body (its brief, §1). It is left to teardown.
+- **Scratch**, in this session's scratchpad: a copy of this record at `PLANNED` for P1, and nine
+  mutated copies of `edits.json` for P2, each deleted after its run; `capture.py`; this subsection's
+  draft. No scratch file holds a prompt body.
+
+### Cost of this mode
+
+Time: from 01:24:57Z, when Nathan's approval was recorded, to PL4 at 02:15Z, about 50 minutes,
+of which the review took about 34, against the recorded estimate of about 1.5 h. Tokens: not
+measured by this session; the reviewer reported 499,851 subagent tokens.
+
+### Canon and rulings relied on, for `PLAN`
+
+- Nathan's approval of 2026-10-05, quoted in `analyze_approved_by`, and the request's standing
+  directions.
+- GTWPE-MGMT-10 092926.2, as fetched live in this mode: `MODE = PLAN`, `MODE = EXECUTE`, *How each
+  kind of target changes*, *Reviews are bounded*, *Reading prompt bodies*, *Boundaries* and
+  *Relation to the PE Metaprompt*.
+- The PE Metaprompt 091426.1's general rules, as read in this mode: *Standards and preservation*,
+  *Authoring and validation exclusion*, *Authoring and quality control* and *Identity and Notion
+  publication*.
+- `gcfpe.decision-record.md` `D21`, `D22`, `D24` and `D26`; `reviewer-prompt-template.md`, both
+  templates; `modification-template.md` 2.1; `skill-packaging-and-delivery.md`;
+  `skill-identity-and-freeze.md`; `notion-write-boundary.md`.
+- HDE Governance (PF04) §9.1.6, and HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, on `main` at
+  `5cbfc74`, as §A read them.
+- The first repair's and the TW prompts repair's records, for the plan's shape: the catalog texts,
+  the merge rule and the capture.
