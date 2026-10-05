@@ -742,8 +742,9 @@ rather than copied, and no runtime-selection, configuration or workload text.
 - **Stop rather than produce substandard results.** A failed check stops the run (*How the plan
   runs*); nothing is repaired in flight.
 - **The stop rule's meter is time.** The recorded estimate is about 1.5 h for `PLAN` and about 1 h for
-  `EXECUTE`, so this mode stops at about 3 h, 2026-10-05T15:40Z, and `EXECUTE` at 2 h from X1.1, not
-  counting a wait for Nathan.
+  `EXECUTE`, so this mode stops at about 3 h on the meter, which leaves out each wait for Nathan: about
+  18:02Z, after the waits from 13:36Z to 15:53Z and from 16:27Z to 16:32Z. `EXECUTE` stops at 2 h from
+  X1.1, not counting a wait for Nathan.
 - **ITEM-01 is applied ahead of its landing.** PART-01 changes one prompt, GTWPE-MGMT-10, which writes
   neither a redlines Markdown file nor a final updated PF Markdown file, before or after the change: it
   writes the record, its evidence and Notion pages. `GTWPE-D1` does not bind it, so X1.7 has no
@@ -854,10 +855,10 @@ Four Notion writes, W1 to W4. The plan makes no other.
 | X1.8 | PART-01 | `prompt` | Fetch the GTWPE parent page, and fetch 100526.1 | The route (the parent's title check and the current version's edit time) | Exactly one child page carries `GTWPE-MGMT-10 — Manage the GTWPE — «V»`, and it is «NEW»; 100526.1 still shows 2026-10-05T03:24:07.081Z | As X1.3 |
 | X2 | — | the record | Commit the record with X1's values and dispositions. Run `gtwpe_record_check.py` and `modification_validate.py` on it at `EXECUTING`; push. No repository file other than the record and its evidence changes, and nothing is installed, so the run goes on to X4 | GTWPE-MGMT-10 X2 ("Otherwise push the record and go on to X4") | Both exit 0; after the push, the branch's blob equals the local file; amthorn78/glow-hdengine-v2#573 is open | — |
 | X3 | — | — | Not applicable: X2 waits for no merge or install. Recorded `NOT_APPLICABLE` with that reason | GTWPE-MGMT-10 X3 | The disposition is in §E | — |
-| X4.1 | — | — | `git fetch origin main`; fix «M» and «m»; `git log --format='%H %cI %s' 31deec4..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.1 as fetched at X1.2, in «NEW» as fetched at X1.7, and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count. Then record §A's trigger finding T-1, the GTWPE decision record, as settled by ITEM-01, citing ITEM-01's disposition, when that disposition is `VERIFIED` | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `31deec4` and says X4 records T-1 as settled | Every commit the log lists has a trigger finding in §E; T-1 is recorded as settled, with ITEM-01's disposition cited, or, if ITEM-01 is not `VERIFIED`, as still open. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
-| X4.2 | PART-01, PART-02 | `notion_control` | **W4.** The GTWPE parent page. Pre-read: fetch it; C1 to C6 each once, by reading; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, six replacements in one call, in this order: C1 to C6 become C1-NEW to C6-NEW. C1 to C3 select the new version (PART-01), C4 moves the checked-through commit, and C5 and C6 are ITEM-03 (PART-02). When X1.0 blocked a part, the pre-read, the send and the readback cover only the texts W4 sends, and the blocked part's readings are not made | GTWPE-MGMT-10 X4 (the checked-through commit; the selection, which this plan names); ITEM-03 | Fetch it again, by reading, checked by a second reading: C1-NEW, C2-NEW, C4-NEW, C5-NEW and C6-NEW present as sent, and C3-NEW in its rendered form (*The catalog texts*); C1 to C4 absent from the members table and the checked-through commit, while 100526.1's own child-page entry stays; `are added when P4 publishes them` 0 times; the *Approved design* entry is C6-NEW alone. Readings: `GTWPE-RUN-10` 1, in C5-NEW, which says it is not built; `P4` 0; `GTWPE-DESIGN-v1.2` 1, in C6-NEW. The page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the child pages as the pre-read showed them | The reverse replacements, with the texts taken from this readback, never from page history |
+| X4.1 | — | — | `git fetch origin main`; fix «M» and «m»; `git log --format='%H %cI %s' 31deec4..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.1 as fetched at X1.2, in «NEW» as fetched at X1.7, and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `31deec4` | Every commit the log lists has a trigger finding in §E. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
+| X4.2 | PART-01, PART-02 | `notion_control` | **W4.** The GTWPE parent page. Pre-read: fetch it; C1 to C6 each once, by reading; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, six replacements in one call, in this order: C1 to C6 become C1-NEW to C6-NEW. C1 to C3 select the new version (PART-01), C4 moves the checked-through commit, and C5 and C6 are ITEM-03 (PART-02). When X1.0 blocked a part, the pre-read, the send and the readback cover only the texts W4 sends, and the blocked part's readings are not made; the page-preservation checks are made on every branch | GTWPE-MGMT-10 X4 (the checked-through commit; the selection, which this plan names); ITEM-03 | Fetch it again, by reading, checked by a second reading: C1-NEW, C2-NEW, C4-NEW, C5-NEW and C6-NEW present as sent, and C3-NEW in its rendered form (*The catalog texts*); C1 to C4 absent from the members table and the checked-through commit, while 100526.1's own child-page entry stays; `are added when P4 publishes them` 0 times; the *Approved design* entry is C6-NEW alone. Readings: `GTWPE-RUN-10` 1, in C5-NEW, which says it is not built; `P4` 0; `GTWPE-DESIGN-v1.2` 1, in C6-NEW. The page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the child pages as the pre-read showed them | The reverse replacements, with the texts taken from this readback, never from page history |
 | X4.3 | PART-01 | `prompt` | Fetch the GTWPE parent page again | The route ("after X4, the selection's link to it") | The members row links «NEW», and «NEW» is one of the page's child pages | As X4.2 |
-| X5 | — | the record | Record every step's and item's disposition, `interaction_cost_actual` against 6, the actual author, checker and acceptor of each part, and the time on the clock; set the status to `COMPLETE`; commit and push. The branch is kept, since X2 waited for no merge. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings; or, if a part was blocked before any write, `IMPLEMENTATION_BLOCKED` with its blocker, owner and recovery point | GTWPE-MGMT-10 X5 | Both checks exit 0 at `COMPLETE`; after `git fetch`, the branch's blob equals the local file | — |
+| X5 | — | the record | Record every step's and item's disposition; then record T-1 as settled by ITEM-01, citing its disposition, when that is `VERIFIED`; otherwise as still open. Record `interaction_cost_actual` against 6, the actual author, checker and acceptor of each part, and the time on the clock; set the status to `COMPLETE`; commit and push. The branch is kept, since X2 waited for no merge. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings and T-1's status beside them; or, if a part was blocked before any write, `IMPLEMENTATION_BLOCKED` with its blocker, owner and recovery point | GTWPE-MGMT-10 X5; §A *Drift check* (T-1) | T-1 is recorded as settled, with ITEM-01's disposition cited, or, if ITEM-01 is not `VERIFIED`, as still open; both checks exit 0 at `COMPLETE`; after `git fetch`, the branch's blob equals the local file | — |
 
 ### The body edits, by item
 
@@ -1171,6 +1172,31 @@ R-1's correction, the one-sentence move from X4.1 to X5, and say whether it is t
 session recommends directing R-1's correction without another review round: the move is fully
 specified here, changes no Notion text, anchor or value, and both record checks would run on it.
 
+### Plan approval (PL4)
+
+Nathan approved the plan as repaired at `44a2973` on 2026-10-05, with two further changes and no
+further review; his words are in `plan_approved_by`. The two changes, made here and nowhere else:
+
+- **R-1**, by the diff check's own correction: the T-1 sentence and its verification clause move from
+  X4.1 to X5, after the item dispositions are recorded, reading "record T-1 as settled by ITEM-01,
+  citing its disposition, when that is `VERIFIED`; otherwise as still open", and X5 returns T-1's
+  status beside X4.1's trigger findings.
+- **L-4**: X4.2 adds "the page-preservation checks are made on every branch".
+
+L-1, L-2, L-3 and L-5 are accepted as risks. As L-5 says, *Nathan's directions* and *Cost of this
+mode* now give the stop time and the cost on the meter, which leaves out each wait for Nathan. The
+approval holds at the commit that carries these changes only if §P's diff from `cb05a74` is these two
+changes and this logging, `edits.json` is unchanged at «H», and both record checks pass;
+`plan_approved_by` names that commit and the three results. It authorizes W1 to W4 from this session
+and nothing else in Notion, and names the catalog's selection of the new version (X4.2) and PART-02's
+catalog texts.
+
+**A change since the dry run, which X4.2's pre-read expects.** On Nathan's direction, PE39 replaced the
+GTWPE parent page's opening paragraph, outside the catalog: no catalog text was touched, and none of the
+plan's counted phrases is used. The page was edited 2026-10-05T16:16:10.995Z. PE39 also updated the
+architecture page, and N-1 to N-3 are done (ledger E-032, with E-018 and E-019 closed, in
+amthorn78/glow-hdengine-v2#574).
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode, GTWPE-MGMT-10 100526.1, fetched inline twice
@@ -1211,6 +1237,10 @@ about 16:27Z, about 35 minutes, of which the check took about 25. With the wait 
 13:36Z to 15:53Z, off the meter, this mode's time is about 1 h 30 min, against its estimate of about
 1.5 h and under twice it. Tokens: not measured by this session; the checker reported 366,610
 subagent tokens.
+
+Nathan's approval came at about 16:32Z. The two changes it directs and this logging ran from then to
+about 16:36Z, about 4 minutes. With each wait for Nathan off the meter, this mode's time is about
+1 h 35 min, against its estimate of about 1.5 h and under twice it.
 
 ### Canon and rulings relied on, for `PLAN`
 
