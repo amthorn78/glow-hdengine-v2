@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-second-repair
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -758,3 +758,46 @@ measured by this session; the reviewer reported 499,851 subagent tokens.
   `5cbfc74`, as §A read them.
 - The first repair's and the TW prompts repair's records, for the plan's shape: the catalog texts,
   the merge rule and the capture.
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+092926.2*, fetched live at the start of the mode (X1.2). The input is §P as Nathan approved it at
+`b7db3ee` on 2026-10-05 (`plan_approved_by`, committed and pushed at `5179a8c`). The mode started at
+2026-10-05T03:22:00Z, when the approval was recorded. The meter is the clock: the recorded estimate
+for `EXECUTE` is about 1 h, so the stop is at 2 h from X1.1.
+
+**Nathan's check at X1.0, before any write.** `PLAN-REVIEW.md` begins with a line holding only `0`.
+A script read the reviewer's own transcript, at the path the harness gave for its agent ID, for its
+one `SubagentHandback` call (transcript line 516) and printed only that call's message's first lines,
+its length and a comparison: the message's first line is `0`, its second is empty, and its third
+begins `GTWPE-SECOND-REPAIR-PLAN-A: full PLAN review 1`. The message is 16,690 bytes with no final
+LF, and the committed file equals the message plus one LF (16,691 bytes, sha256 `c6f3dbe7…`). The
+`0` is the reviewer's own first line, the count of required findings the brief's deliverable asks
+for first. Not a finding; the file is unedited.
+
+### Values, fixed at X1.1 (2026-10-05T03:22:46Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-10-05 |
+| «P» | 2026-10-05, `plan_approved_date` |
+| «V» | `100526.1`, fixed at X1.2: the GTWPE parent page's child pages carry no `1005…` version |
+| «NEW» | `3f04590a05eb8171ba1ed7051bbefc53`, returned by W1 at X1.3 |
+| «M», «m» | Fixed at X4.1 |
+
+### Steps
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.0 | — | VERIFIED | Read-only, at X1.2. (1) 092926.2, fetched live: edited 2026-09-29T23:47:58.009Z. (2) The GTWPE parent page, fetched: edited 2026-10-04T17:08:52.631Z; C1 to C4 each once, by reading; three child pages, 092926.1, 092926.2 and the *Target Architecture* page, none titled `… — 100526.1`. (3) `git fetch origin main`: `origin/main` `5cbfc74`. (4) The PE Metaprompt 091426.1, fetched; the harness saved it; a script printed its title and edit time, 2026-09-23T17:17:22.217Z; the save was deleted (exit 0). (5) The checked-out record holds §P and `plan_approved_by` (`5179a8c`); `edits.json`'s sha256 is «H» |
+| X1.1 | — | APPLIED | Status `EXECUTING`; «D» and «P» fixed at 03:22:46Z (*Values*), which starts the clock; the stop is at 05:22Z |
+| X1.2 | — | VERIFIED | X1.0 (1) to (5) as above; «V» fixed as `100526.1` |
+| X1.3 | PART-01 | VERIFIED | **W1**, `notion-duplicate-page` on `3ea4590a05eb81f8ae9ed681b5c358b8`: returned «NEW» `3f04590a05eb8171ba1ed7051bbefc53`, which differs from the source. The first Notion write |
+| X1.4 | PART-01 | VERIFIED | Fetch 1 (03:23:04Z): blank, untitled, under the GTWPE parent page. A background `sleep 20`, then fetch 2: populated, edited 03:23:10.513Z, title `GTWPE-MGMT-10 — Manage the GTWPE — 092926.2 (1)`; its first line the 092926.2 identity line; its last heading `## Relation to the PE Metaprompt`, with that paragraph's last sentence complete to its final word, `scopes.`; no truncation or unknown block; parent the GTWPE parent page |
+| X1.5 | PART-01 | APPLIED | **W2**, `update_properties`, `allow_async: false`: title `GTWPE-MGMT-10 — Manage the GTWPE — 100526.1`. Returned synchronously, no task. Checked at X1.7 (1) |
+| X1.6 | PART-01 | APPLIED | **W3**, `update_content`, `allow_async: false`: E1 to E18 in one call, in `edits.json`'s order, each `old_str` and `new_str` printed from the committed `edits.json` by script with «V» substituted. Returned synchronously, no task, at the first send |
+| X1.7 | PART-01 | VERIFIED | «NEW» fetched whole, edited 2026-10-05T03:24:07.081Z, read in context; every count by reading, checked by a second reading. (1) Title exactly `GTWPE-MGMT-10 — Manage the GTWPE — 100526.1`. (2) Parent the GTWPE parent page. (3) First two lines `GTWPE-MGMT-10 — Manage the GTWPE — 100526.1` and `Prompt Version: 100526.1`. (4) All 24 check phrases at their counts (`A skill the request names` twice, in E3's and E14's places; each other once) and all 11 absent phrases at 0, `092926.2` among them. (5) Each edit's new text present whole, read against `edits.json`; E7's bold sentence is serialized with the bold closed and reopened around `COMPLETE`, as 092926.2 serializes its own bold around code: a representation change, read on substance, as K-8 and L14 say. (6) The 24 headings, in order, are 092926.2's. (7) The last paragraph is complete. (8) No truncation or unknown block. (9) Readings: `glow-write-boundary` 1, in E3's new text; `D24` 1, in E15's; `Current operation` 7, in the `closure` row, write (1)'s kept otherwise branch, and E8, E11, E12 and E13's new texts. No hit says what an edit removed |
+| X1.8 | PART-01 | VERIFIED | The GTWPE parent page fetched: four child pages, exactly one titled `GTWPE-MGMT-10 — Manage the GTWPE — 100526.1`, and it is «NEW»; the page's own edit time unchanged, 2026-10-04T17:08:52.631Z. 092926.2 fetched: still 2026-09-29T23:47:58.009Z |
