@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-tw-repository-io
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -12,14 +12,15 @@ closure:
   state_sharers: [TW-DRAIN-10, TW-DRAIN-20]
 readiness: NEEDS_RULING
 override:
-  by: ""
-  overrides: []
-  reason: ""
+  by: Nathan
+  overrides: [readiness]
+  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2, so the new TW-ALPHA release is selected in this Modification although they do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged"
 interaction_cost_predicted: 8
 interaction_cost_actual:
 estimate:
   plan: "about 3.5 h: §P for 72 passages and 12 identity lines in six members (anchors, new texts, phrase and absence checks), the selection page's three writes with a new Current operation, the three current-release notes and the catalog's checked-through commit; a dry run, and one full review by a single reviewer. Time is the meter the session can read; tokens are not measured"
   execute: "about 3 h, not counting any wait for Nathan: six new versions (duplicate, title, edits), each read back whole by this session; the selection's three writes, the three notes and the catalog, each read back; the record. Time is the meter"
+item_count_at_approval: 6
 reviews:
   - mode: ANALYZE
     kind: DRY_RUN
@@ -86,8 +87,8 @@ request: |
   - No TypeSafe scoring in this work.
   - Report to Nathan in at most five plain sentences, in plain language, ending with exactly what he must approve or decide.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-tw-repository-io at 8cd6fcc (2026-10-05). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6), main is still 20d0dd8, and the branch changes only the record. Q-1: option (a). Select the new release in this Modification; the selection page and the notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, and TW runs by Nathan's direct invocations until the Flow Manager (C4). Record in the override block that Nathan waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, because C4 replaces it, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. Q-2: option (a). A correction: the words \"copy or excerpt\" in the request's item 1 were PE39's, not Nathan's; his direction was \"writing prompts do not belong in repo.\" Read item 1 as GTWPE-MGMT-10 100526.2 states it: no body and no copy enters the repository, and no passage longer than an edit's shortest unique anchor, or in ANALYZE the clause at issue. Continue to PLAN: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
+analyze_approved_date: 2026-10-05
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
