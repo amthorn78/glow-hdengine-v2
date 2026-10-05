@@ -14,7 +14,7 @@ readiness: NEEDS_RULING
 override:
   by: Nathan
   overrides: [readiness]
-  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2, so the new TW-ALPHA release is selected in this Modification although they do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged"
+  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, so the new TW-ALPHA release is selected in this Modification although tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged"
 interaction_cost_predicted: 8
 interaction_cost_actual:
 estimate:
@@ -32,6 +32,11 @@ reviews:
     date: 2026-10-05
     required_open: 0
     outcome: "By this session, read-only, before any full review: both record checks exit 0 on a scratch copy at PLANNED; edits_check.py passes, and its ten injected faults are each caught by their own code; every anchor found once in its member's live page at §A's edit time, by reading, twice; each passage read with its new text in place, which found four defects in the plan's own new texts (PL-C and PL-G had a proof log name the commit that holds it; PL-B's and PL-F's 'Within that'; OUT-G gave TW-APPLY-10 no final-response path), repaired before review, and two gaps the analysis leaves, listed as K-12 and K-13; the control pages carry their old texts once, at §A's edit times; `git fetch origin main` refused by the session's permission classifier, not retried (K-14). No required defect open"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-10-05
+    required_open: 2
+    outcome: "One reviewer, GTWPE-TW-REPOSITORY-IO-PLAN-A, as Nathan directed, on 29fe341: 1 required finding, R-1 (HDE-NEW and HUB-NEW omit flowmaster-validate 3.3.2 and the direct-invocation sentence of Nathan's Q-1 answer), confirmed by the session; 16 listed, L1 to L16, of which the session counts L1 (the waiver stated wider than Nathan's words, on the selection page and in the override block) as required under D26-A rule 3. Both repaired; L2 to L16 to Nathan unrepaired (D26-A rule 4). Record: PLAN-REVIEW.md"
 items:
   - id: ITEM-01
     statement: "The TW prompts stay single-homed in Notion: no TW prompt body, copy or excerpt enters the repository, and this change alters where they read and write, not where they live."
@@ -734,7 +739,8 @@ This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 �
 - **Q-1, option (a).** The new release is selected in this Modification (X4.3). The selection page and the
   three notes say that `tw-flowmaster` 1.3.0 and `flowmaster-validate` 3.3.2 do not run it, and that TW
   runs by Nathan's direct invocations until the Flow Manager (C4). His waiver of HDE Governance §9.1.6's
-  interacting-skill readiness is in the `override` block. No skill is changed or installed.
+  interacting-skill readiness for `tw-flowmaster` is in the `override` block. No skill is changed or
+  installed.
 - **Q-2, option (a), with his correction.** The words "copy or excerpt" in the request's item 1 were
   PE39's. Nathan's direction was "writing prompts do not belong in repo." Item 1 is read as GTWPE-MGMT-10
   100526.2 states it:
@@ -958,10 +964,10 @@ Twenty-three Notion writes, W1 to W23. The plan makes no other.
 | X3 | — | — | Not applicable: X2 waits for no merge or install. Recorded `NOT_APPLICABLE` with that reason | GTWPE-MGMT-10 X3 | The disposition is in §E | — |
 | X4.1 | — | — | `git fetch origin main`; fix «M», «m» and «S»; `git log --format='%H %cI %s' 20d0dd8..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.2 as fetched at X1.2 and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `20d0dd8` | Every commit the log lists has a trigger finding in §E. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
 | X4.2 | — | `notion_control` | **W19.** The GTWPE parent page. Pre-read: fetch it; CAT-OLD once, by reading; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`: CAT-OLD becomes CAT-NEW | GTWPE-MGMT-10 X4 ("set the checked-through commit") | Fetch it again: CAT-NEW present and CAT-OLD absent, by reading; the members table, the lineage pins, the *Approved design* entry, the headings and the child pages as the pre-read showed them | The reverse replacement, with its text taken from this readback |
-| X4.3 | PART-01 | `notion_control` | **W20.** The selection page. Pre-read: fetch it; fix «R» from it; SEL-1's old text once and SEL-2's once; `Selected release — «R»` absent; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, two replacements in one call, in this order: SEL-1, then SEL-2 | The route for TW-ALPHA's selection, its writes (1) to (3); ITEM-05, ITEM-06; Q-1 | Fetch it again, by reading, checked by a second reading. (1) The first line is the new status line. (2) Below it, `## Selected release — «R»`, with «S» and «PA» as sent and its six rows, each linking its «ID» and ending `; «V».`. (3) Below them, `### Current operation`, with the diagram and the three paragraphs as sent. (4) Then `## Historical selected release — TW-ALPHA-20261004.1`, and within that section `### Historical operation — TW-ALPHA-20261004.1`. (5) Exactly one heading on the page is named `Current operation`. (6) The heading list is the pre-read's, with the new section's two headings added at the top and the two renamed. (7) The child pages are as the pre-read showed them, and nothing else on the page changed | The reverse replacements, with their texts taken from this readback; or a newer release selecting the prior versions by the same writes |
-| X4.4 | PART-01 | `notion_control` | **W21.** *Alpha 1*. Pre-read: fetch it; the harness saves it; `python3 ctl_check.py pre <save> <scratch>/alpha1.json '## Selected release — TW-ALPHA-20261004.1'` exits 0. Then one replacement: A1-OLD becomes A1-NEW | The route's write (4) | Fetch it again; `python3 ctl_check.py post <save> <scratch>/alpha1.json '## Selected release — «R»' '## Historical selected release — TW-ALPHA-20261004.1' --has 'Selected: «S».' --has '«PA»' --row TW-TRIAGE-10=«ID:TRIAGE»@«V» --row TW-DRAIN-10=«ID:DRAIN-10»@«V» --row TW-DRAIN-20=«ID:DRAIN-20»@«V» --row TW-RECORD-10=«ID:RECORD-10»@«V» --row TW-RECORD-20=«ID:RECORD-20»@«V» --row TW-APPLY-10=«ID:APPLY-10»@«V»` exits 0, every check `PASS`. Each save is deleted after its check, or, where the harness refuses, left to its teardown and named in §E | As X4.3 |
-| X4.5 | PART-01 | `notion_control` | **W22.** *HDE TW*. Pre-read: fetch it; HDE-OLD once, as its first line, by reading; record its edit time, headings and child pages (the six new ones among them since X1.3) in §E. Then one replacement: HDE-OLD becomes HDE-NEW | The route's write (4) | Fetch it again: the page begins with HDE-NEW, with «R», «V» and «PA» as sent; the heading list is the pre-read's, with HDE-NEW's heading added above the renamed one; the child pages as the pre-read showed them | As X4.3 |
-| X4.6 | PART-01 | `notion_control` | **W23.** The Operations Hub. Pre-read: fetch it; the harness saves it; `python3 ctl_check.py pre <save> <scratch>/hub.json '## Current Glow TW release — TW-ALPHA-20261004.1'` exits 0. Then one replacement: HUB-OLD becomes HUB-NEW | The route's write (4) | Fetch it again; `python3 ctl_check.py post <save> <scratch>/hub.json '## Current Glow TW release — «R»' '## Historical Glow TW release — TW-ALPHA-20261004.1' --has '**«R» is selected.**' --has 'Every member is at «V»' --has '«PA»' --has 'six-member catalog'` exits 0, every check `PASS`; the saves as X4.4 | As X4.3 |
+| X4.3 | PART-01 | `notion_control` | **W20.** The selection page. Pre-read: fetch it; fix «R» from it; SEL-1's old text once and SEL-2's once; `Selected release — «R»` absent; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, two replacements in one call, in this order: SEL-1, then SEL-2 | The route for TW-ALPHA's selection, its writes (1) to (3); ITEM-05, ITEM-06; Q-1 | Fetch it again, by reading, checked by a second reading. (1) The first line is the new status line. (2) Below it, `## Selected release — «R»`: its paragraph as sent, with «S», «PA» and its sentence on TW Flowmaster and flowmaster-validate, and its six rows, each linking its «ID» and ending `; «V».`. (3) Below them, `### Current operation`, with the diagram and the three paragraphs as sent. (4) Then `## Historical selected release — TW-ALPHA-20261004.1`, and within that section `### Historical operation — TW-ALPHA-20261004.1`. (5) Exactly one heading on the page is named `Current operation`. (6) The heading list is the pre-read's, with the new section's two headings added at the top and the two renamed. (7) The child pages are as the pre-read showed them, and nothing else on the page changed | The reverse replacements, with their texts taken from this readback; or a newer release selecting the prior versions by the same writes |
+| X4.4 | PART-01 | `notion_control` | **W21.** *Alpha 1*. Pre-read: fetch it; the harness saves it; `python3 ctl_check.py pre <save> <scratch>/alpha1.json '## Selected release — TW-ALPHA-20261004.1'` exits 0. Then one replacement: A1-OLD becomes A1-NEW | The route's write (4) | Fetch it again; `python3 ctl_check.py post <save> <scratch>/alpha1.json '## Selected release — «R»' '## Historical selected release — TW-ALPHA-20261004.1' --has 'Selected: «S».' --has '«PA»' --has "TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4)." --row TW-TRIAGE-10=«ID:TRIAGE»@«V» --row TW-DRAIN-10=«ID:DRAIN-10»@«V» --row TW-DRAIN-20=«ID:DRAIN-20»@«V» --row TW-RECORD-10=«ID:RECORD-10»@«V» --row TW-RECORD-20=«ID:RECORD-20»@«V» --row TW-APPLY-10=«ID:APPLY-10»@«V»` exits 0, every check `PASS`. Each save is deleted after its check, or, where the harness refuses, left to its teardown and named in §E | As X4.3 |
+| X4.5 | PART-01 | `notion_control` | **W22.** *HDE TW*. Pre-read: fetch it; HDE-OLD once, as its first line, by reading; record its edit time, headings and child pages (the six new ones among them since X1.3) in §E. Then one replacement: HDE-OLD becomes HDE-NEW | The route's write (4) | Fetch it again: the page begins with HDE-NEW, with «R», «V», «PA» and its sentence on TW Flowmaster and flowmaster-validate as sent; the heading list is the pre-read's, with HDE-NEW's heading added above the renamed one; the child pages as the pre-read showed them | As X4.3 |
+| X4.6 | PART-01 | `notion_control` | **W23.** The Operations Hub. Pre-read: fetch it; the harness saves it; `python3 ctl_check.py pre <save> <scratch>/hub.json '## Current Glow TW release — TW-ALPHA-20261004.1'` exits 0. Then one replacement: HUB-OLD becomes HUB-NEW | The route's write (4) | Fetch it again; `python3 ctl_check.py post <save> <scratch>/hub.json '## Current Glow TW release — «R»' '## Historical Glow TW release — TW-ALPHA-20261004.1' --has '**«R» is selected.**' --has 'Every member is at «V»' --has '«PA»' --has 'six-member catalog' --has "TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4)."` exits 0, every check `PASS`; the saves as X4.4 | As X4.3 |
 | X5 | — | the record | Record every step's and item's disposition. ITEM-01 is `VERIFIED` when `git diff --stat origin/main...HEAD` lists only files under `docs/ephemeral/modifications/` and `edits_check.py` still exits 0. Record `interaction_cost_actual` against 8, the actual author, checker and acceptor of the part, and the time on the clock. Set the status to `COMPLETE`; commit and push. The branch is kept, since X2 waited for no merge. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings | GTWPE-MGMT-10 X5 | Both checks exit 0 at `COMPLETE`; after `git fetch`, the branch's blob equals the local file | — |
 
 ### The control texts
@@ -999,7 +1005,7 @@ SEL-1's new text does not contain SEL-2's old text, so each still matches once w
 
 ````
 ## Selected release — «R»
-**Selected: «S».** Authority: MODIFICATION-20261005-gtwpe-tw-repository-io, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». The six operational TW prompts read PF canon from `docs/pfcanon/` on `main`, take their other inputs as attached files or repository paths, and write their outputs at the repository path each invocation names under `docs/ephemeral/`, never to Google Drive or ChatGPT Library. TW-DRAIN-10, TW-DRAIN-20 and TW-APPLY-10 write a separate proof log beside each redlines file and each revised PF, as GTWPE-D1 requires. GTWPE-MGMT-10 maintains the TW prompts, so TW-MGMT-10 100426.1 is not selected. Every row below is new. Its *Current operation*, directly below this list, replaces the one under TW-ALPHA-20261004.1, which is now historical. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release, and Nathan waived HDE Governance §9.1.6's interacting-skill readiness for them: TW runs by Nathan's direct invocations until the Flow Manager (C4) replaces the Flowmaster, which C6 retires. All old prompt pages remain intact.
+**Selected: «S».** Authority: MODIFICATION-20261005-gtwpe-tw-repository-io, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». The six operational TW prompts read PF canon from `docs/pfcanon/` on `main`, take their other inputs as attached files or repository paths, and write their outputs at the repository path each invocation names under `docs/ephemeral/`, never to Google Drive or ChatGPT Library. TW-DRAIN-10, TW-DRAIN-20 and TW-APPLY-10 write a separate proof log beside each redlines file and each revised PF, as GTWPE-D1 requires. GTWPE-MGMT-10 maintains the TW prompts, so TW-MGMT-10 100426.1 is not selected. Every row below is new. Its *Current operation*, directly below this list, replaces the one under TW-ALPHA-20261004.1, which is now historical. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release, and Nathan waived HDE Governance §9.1.6's interacting-skill readiness for TW Flowmaster: TW runs by Nathan's direct invocations until the Flow Manager (C4) replaces the Flowmaster, which C6 retires. All old prompt pages remain intact.
 - `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/«ID:TRIAGE»"/> — PF10 target list only; «V».
 - `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-10»"/> — General PF redlines and proof log, or exact no redlines; «V».
 - `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-20»"/> — PF09 redlines and proof log; board optional; «V».
@@ -1038,7 +1044,7 @@ newline, and `## Historical selected release — TW-ALPHA-20261004.1`:
 
 ```
 ## Current TW release — «R»
-<mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef">Glow Technical Writing Ecosystem</mention-page> selects «R»: TW-TRIAGE-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10, each at «V». They read PF canon from `docs/pfcanon/` on `main` and write their outputs at the repository path each invocation names under `docs/ephemeral/`; the drains and the apply write a separate proof log beside each redlines file and revised PF. Entry: the selected drain prompt. Maintenance owner: GTWPE-MGMT-10, as the <mention-page url="https://app.notion.com/p/3ea4590a05eb818c915bdfd3d150c44b"/> catalog selects it; TW-MGMT-10 is not selected. TW Flowmaster 1.3.0 does not run this release. Exact rows: <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/>. Changed by MODIFICATION-20261005-gtwpe-tw-repository-io, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA».
+<mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef">Glow Technical Writing Ecosystem</mention-page> selects «R»: TW-TRIAGE-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10, each at «V». They read PF canon from `docs/pfcanon/` on `main` and write their outputs at the repository path each invocation names under `docs/ephemeral/`; the drains and the apply write a separate proof log beside each redlines file and revised PF. Entry: the selected drain prompt. Maintenance owner: GTWPE-MGMT-10, as the <mention-page url="https://app.notion.com/p/3ea4590a05eb818c915bdfd3d150c44b"/> catalog selects it; TW-MGMT-10 is not selected. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4). Exact rows: <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/>. Changed by MODIFICATION-20261005-gtwpe-tw-repository-io, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA».
 ## Historical TW release — TW-ALPHA-20261004.1
 ```
 
@@ -1046,7 +1052,7 @@ newline, and `## Historical selected release — TW-ALPHA-20261004.1`:
 
 ```
 ## Current Glow TW release — «R»
-**«R» is selected.** <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/> and <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/> hold the exact six-member catalog. Every member is at «V»: the TW prompts read PF canon from `docs/pfcanon/` on `main` and write their outputs at the repository path each invocation names under `docs/ephemeral/`, and the drains and the apply write a separate proof log beside each artifact. Maintenance: GTWPE-MGMT-10, as the <mention-page url="https://app.notion.com/p/3ea4590a05eb818c915bdfd3d150c44b"/> catalog selects it; TW-MGMT-10 is not selected. TW Flowmaster 1.3.0 does not run this release. Changed by MODIFICATION-20261005-gtwpe-tw-repository-io, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA».
+**«R» is selected.** <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/> and <mention-page url="https://app.notion.com/p/3d44590a05eb81fe991ff0114cb43029"/> hold the exact six-member catalog. Every member is at «V»: the TW prompts read PF canon from `docs/pfcanon/` on `main` and write their outputs at the repository path each invocation names under `docs/ephemeral/`, and the drains and the apply write a separate proof log beside each artifact. Maintenance: GTWPE-MGMT-10, as the <mention-page url="https://app.notion.com/p/3ea4590a05eb818c915bdfd3d150c44b"/> catalog selects it; TW-MGMT-10 is not selected. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4). Changed by MODIFICATION-20261005-gtwpe-tw-repository-io, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA».
 ## Historical Glow TW release — TW-ALPHA-20261004.1
 ```
 
@@ -1166,6 +1172,60 @@ count or passage changed.
 No required defect is open. Not exercised: any Notion write; the duplication and its polling; how Notion
 renders the new texts (K-4); and P5 (K-14).
 
+### Full review (PL3)
+
+One reviewer, GTWPE-TW-REPOSITORY-IO-PLAN-A, a fresh general-purpose subagent, neither forked nor
+context-inheriting, as Nathan's approval directs.
+- **Brief.** Its only brief was `PLAN-REVIEW-BRIEF.md`: 11,651 bytes, sha256
+  `920face887a95f32541384cf92faa6401c7ea54647d11de19d8397edf2147872`. The brief was committed and
+  pushed at `a34cf0f` before the reviewer was spawned, at about 23:17Z, and the reviewer confirmed that
+  sha256 before reviewing.
+- **The run.** It reviewed §P at `29fe341`. It fetched no prompt body and wrote nothing. It ran for
+  about 32 minutes, and the harness reported 474,419 subagent tokens.
+- **The capture.** Its return came back through the harness's `SubagentHandback` call. The session
+  captured that call's `message` with `capture.py`, from the reviewer's own transcript, found by the path
+  the harness gave for its agent ID. The capture is `PLAN-REVIEW.md`: 14,528 bytes, sha256
+  `6f250da10f2fcd317ca860dd3523cb9ebe72ff57ff6d262e23be956c182267d4`, the message's 14,527 bytes and
+  one final LF. Its first line, `1`, is its own count of required findings.
+
+**Result: 1 required finding, R-1, and 16 listed, L1 to L16.**
+- **R-1,** confirmed by the session against the record. HDE-NEW and HUB-NEW said only that TW Flowmaster
+  1.3.0 does not run the release. Nathan's Q-1 answer has every note also say that flowmaster-validate
+  3.3.2 does not run it, and that TW runs by his direct invocations until the Flow Manager (C4). No
+  readback would have seen the gap.
+- **L1, counted as required by the session.** `D26-A` rule 3 counts "a silent wrong edit to a ... control
+  page" as required. *SECTION* would have written on the selection page that Nathan waived §9.1.6's
+  readiness for both skills, and the `override` block recorded the same. His words waive it "for
+  tw-flowmaster", and §A's option (a) says "for the skill".
+
+Both are repaired below (*Repair round (PL3)*). As Nathan directed, a check of the repair's diff follows.
+
+The other fifteen listed findings go to Nathan unrepaired (`D26-A` rule 4). The session adds to three:
+- **L2 and L3.** In P7 the session read each touched passage in place. In the five document prompts, no
+  kept text forbids a pull request, a commit or a push. The read-only line keeps "merge" among its bans
+  after OUT-B, so "never merges" rests on kept text, as L3 says. The readback does not check that ban.
+- **L4.** The quoted kept sentence, 57 characters, is within the length Q-2 allows as §P reads it. But
+  §P's statement in *Nathan's directions* of what it quotes is no longer complete. Both stay for Nathan's
+  opt-in.
+
+**The repository's hook.** Its `check_canon_relied_on.py` hook flags `PLAN-REVIEW.md` after each shell
+command.
+- The return names the canon it relied on, PF10 2.29 and 2.38 and PF04 §9.1.6, under a bullet,
+  `**Canon relied on**`, a form the hook does not parse.
+- The capture is kept unedited, as GTWPE-MGMT-10 requires (*Capturing a reviewer's or worker's return*).
+- The hook is advisory, by its own statement.
+
+### Repair round (PL3)
+
+By this session, on R-1 and L1, from about 23:52Z, in the record alone. `edits.json` is unchanged, so «H»
+stands. No anchor, value or Notion write changed; only the texts and readbacks below.
+
+| Finding | Where | Repair |
+|---|---|---|
+| R-1 | HDE-NEW (W22) and HUB-NEW (W23) | The sentence now reads as A1-NEW's: "TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4)." |
+| R-1 | The readbacks of X4.3 to X4.6 | X4.4 and X4.6 add that sentence as a `--has`. X4.3 (2) reads the new release's paragraph as sent, with its sentence on the two skills. X4.5 reads HDE-NEW's sentence as sent |
+| L1 | The `override` block; *SECTION* (W20); *Nathan's directions* | The waiver is "for tw-flowmaster", as Nathan worded it, and on the selection page "for TW Flowmaster". Each text still says that neither skill runs the release |
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode:
@@ -1178,6 +1238,16 @@ renders the new texts (K-4); and P5 (K-14).
 
   No script read the transcript for a body. Every anchor and count on a body was found by reading. It
   is left to teardown.
+- **The reviewer's transcript**, the output file the harness gave for its agent ID in this session's tasks
+  directory. `capture.py` read it twice for its one `SubagentHandback` call, at transcript line 440:
+  first printing only its shape, then writing its message to `PLAN-REVIEW.md`. The reviewer fetched no
+  prompt body (its brief, §1), so the transcript holds none. It is left to teardown.
+- **Two side effects of the reviewer's run,** as it reported them, neither its own act:
+  - the harness saved one oversized output of the reviewer's, as `tool-results/bi3b40puc.txt`. It is a
+    slice of MODIFICATION-20260930-gtwpe-tw-model-advice.md: repository text, no prompt body. The session
+    has not read it, and it is left to teardown;
+  - the repository's PostToolUse hook updated `.git/canon_relied_on_hook.json` after the reviewer's
+    shell commands, as it does after this session's.
 - **Harness saves**, each read only by a script that printed what its check needed:
   - the PE Metaprompt 091426.1, twice. `mcp-Notion-notion-fetch-1791240338462.txt` was read for its
     general rules in four slices, content characters 0 to 13,600, 13,550 to 27,720, 55,300 to 66,520 and
@@ -1197,6 +1267,7 @@ renders the new texts (K-4); and P5 (K-14).
   - the two control pages' `ctl_check.py` states, which are their heading lists;
   - the dry run's notes, which are results only;
   - a copy of this record at `PLANNED` for P1;
+  - this record as it stood before the repair round;
   - `capture.py`.
 
 ### Canon and rulings relied on, for `PLAN`
