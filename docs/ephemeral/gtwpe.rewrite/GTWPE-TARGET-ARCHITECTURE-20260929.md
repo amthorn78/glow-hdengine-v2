@@ -279,3 +279,18 @@ What this means for the design:
 - No technical-writing prompt carries a model, surface or effort recommendation, a workload profile, a strength rating or a session-strength assessment. Nathan chooses the model and effort for each session.
 - The eight current TW-ALPHA prompts lose their model-guidance blocks, and TW-ASSESS-10, the session-strength assessment prompt, is retired with no replacement. The rebuilt GTWPE prompts carry none of this.
 - It is an item on the TW prompts' repair list, not a canon change: Nathan ruled that no PF10 addendum is needed ("We don't need an addendum for this, it can just go in the list of repairs.").
+
+## Status, 2026-10-05
+
+The change management system this target waited on is proven. GTWPE-MGMT-10 carried three Modifications from
+request to a verified landing, each analysed, planned, reviewed and approved by Nathan:
+
+- MODIFICATION-20260929-gtwpe-pilot: one repair to TW-MGMT-10, selected on all four TW pages.
+- MODIFICATION-20260929-gtwpe-first-repair: GTWPE-MGMT-10's own repair (092926.2), with the record-check tool
+  landed through its own pull request (#566), the first test of the repository route.
+- MODIFICATION-20260930-gtwpe-tw-model-advice: the "no model recommendations or strength assessments" item
+  above. TW-ALPHA-20261004.1 is selected: seven prompts at 100426.1, TW-ASSESS-10 retired, and tw-flowmaster
+  1.3.0 and flowmaster-validate 3.3.2 installed by Nathan.
+
+The writing side described here is still not built; its build is the next decision for Nathan. Open items carried
+forward are in `ERRORS.md` (E-029) and the change prompt's candidate list.
