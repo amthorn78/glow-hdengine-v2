@@ -3,7 +3,7 @@ artifact_type: FILLED_REVIEW_BRIEF
 template: docs/prompt_ecosystem_management/reviewer-prompt-template.md, second template ("ANALYZE and PLAN review brief")
 modification: MODIFICATION-20261005-gtwpe-tw-repository-io
 round: PLAN full review 1 of at most 2 (D26-A rule 2)
-under_review: 7d4223b9efdd3e5f732dad7d148ecf15fb410bc2
+under_review: 29fe34144d6c9f25ab921f1d583a166f33bc1fdc
 reviewers: one, GTWPE-TW-REPOSITORY-IO-PLAN-A, a fresh general-purpose subagent, neither forked nor context-inheriting (Nathan's approval of 2026-10-05: one full review by a single reviewer)
 committed_before_spawn: true
 status: RECORD. Merging preserves the record and approves nothing (D21-C)
@@ -38,7 +38,7 @@ You are GTWPE-TW-REPOSITORY-IO-PLAN-A, reviewing PLAN of MODIFICATION-20261005-g
 This is full review 1 of at most 2 for this mode (D26-A). It is the only full review planned: Nathan directed one review by a single reviewer, with a second reviewer or a diff check only if this review finds a required defect. Whatever stays open goes to Nathan with the plan.
 
 === 1. WHAT YOU ARE REVIEWING ===
-Repository amthorn78/glow-hdengine-v2, branch docs/20261005-modification-gtwpe-tw-repository-io, commit 7d4223b9efdd3e5f732dad7d148ecf15fb410bc2. Read that commit, not the branch head, with `git show 7d4223b9efdd3e5f732dad7d148ecf15fb410bc2:<path>`. The working tree is at /home/user/glow-hdengine-v2.
+Repository amthorn78/glow-hdengine-v2, branch docs/20261005-modification-gtwpe-tw-repository-io, commit 29fe34144d6c9f25ab921f1d583a166f33bc1fdc. Read that commit, not the branch head, with `git show 29fe34144d6c9f25ab921f1d583a166f33bc1fdc:<path>`. The working tree is at /home/user/glow-hdengine-v2.
 The record: docs/ephemeral/modifications/MODIFICATION-20261005-gtwpe-tw-repository-io.md, section §P. §A is approved and frozen: read it as the scope, not as work to review. Its ITEM-01 to ITEM-06, its rules R1 to R6, its passage list and its A3 pages are what §P carries out. Nathan's approval, quoted in analyze_approved_by, answers Q-1 and Q-2 and corrects ITEM-01's wording.
 Its evidence, in docs/ephemeral/modifications/evidence/gtwpe-tw-repository-io/: edits.json (the 94 edits to the six operational TW prompts, with GTWPE-D1's items, §A's counts before and the absent phrases); edits_check.py (its consistency check, which reads edits.json and the GTWPE decision record only); ctl_check.py (the pre-read and readback of two control pages, a copy of the last TW change's script).
 The six prompts §P edits, TW-TRIAGE-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10 at 100426.1, are Notion pages you do not read (D22: workers do not fetch prompt bodies). Each edit's `old` in edits.json is exact page text, cut to the clause at issue; §P's dry run (P3, P7) found each once in a live fetch, by reading, twice, and read each passage with its new text in place. Earlier evidence quotes more of those bodies: docs/ephemeral/modifications/evidence/gtwpe-tw-model-advice/edits.json holds the anchors and new texts that made the 100426.1 versions. The control pages' current texts that §P replaces are quoted in full in §P, *The control texts*. Fetch nothing from Notion.
