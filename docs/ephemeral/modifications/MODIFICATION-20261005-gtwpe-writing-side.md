@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-writing-side
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -36,6 +36,11 @@ reviews:
     date: 2026-10-05
     required_open: 0
     outcome: "One reviewer, GTWPE-WRITING-SIDE-PLAN-A, as Nathan directed, on c622a55: 0 required defects; 8 listed findings, L1 to L8, to Nathan unrepaired (D26-A rule 4), L3 confirmed by the session. No second reviewer or diff check, by Nathan's direction. Record: PLAN-REVIEW.md"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-05
+    required_open: 1
+    outcome: "One checker, GTWPE-WRITING-SIDE-PLAN-DC, on the repair's diff c0c6690..44a2973, as Nathan's opt-in directs: 1 required defect, R-1 (X4.1 records T-1 before ITEM-01 can be VERIFIED), confirmed by the session; 5 listed, L-1 to L-5. The required count rose from 0 to 1 and most findings sit in repaired text, so D26-A rule 4 stops the round; the one diff check is used. To Nathan unrepaired. Record: PLAN-DIFFCHECK.md"
 item_count_at_approval: 3
 items:
   - id: ITEM-01
@@ -1122,6 +1127,50 @@ After its first commit, at `4cc7b54`, `e8_guard_proof.py` was changed once, so t
 default path to the decision record only when no path is given; it then also runs from `git show`
 through process substitution. Both ways, exit 0.
 
+### Diff check (PL3)
+
+One checker, GTWPE-WRITING-SIDE-PLAN-DC, a fresh general-purpose subagent, neither forked nor
+context-inheriting: the one check of a repair's diff that `D26-A` rule 2 allows, as Nathan's opt-in
+directs. Its only brief was `PLAN-DIFFCHECK-BRIEF.md` (8,059 bytes, sha256
+`322b0391f05c65f932889a246d0ccebd296cdd790c114dd45527e7191abc1f32`), committed and pushed at `05d032c`
+before it was spawned at about 15:59Z; it confirmed that sha256. It checked the repair's diff,
+`c0c6690..44a2973`, fetched no prompt body, wrote nothing, and ran for about 25 minutes. The session
+captured its `SubagentHandback` message from its own transcript with `capture.py`: `PLAN-DIFFCHECK.md`,
+17,671 bytes, sha256 `ceb40cb207ccddabcc5ddd6bd099c820a06084e8e76f053393f42d25a9915cc1`, the message's
+17,670 bytes and one final LF. Its first line, `1`, is its own count of required findings.
+
+**Result: 1 required finding, R-1, and 5 listed, L-1 to L-5.** Seven of the eight repairs hold; L6's
+does not.
+
+**R-1** (R1, normal path, in text the repair added). X4.1 records T-1 as settled when ITEM-01's
+disposition is `VERIFIED`, but item dispositions are recorded at X5, after X4.1, and PART-01 lands only
+at X4.2's selection. So on every normal run X4.1 records T-1 as still open, nothing revisits it, and
+the `COMPLETE` record would say T-1 is open while ITEM-01 is `VERIFIED`. Consequence: low, a wrong
+status for T-1 in the record and the return; nothing stops, and no prompt body or control page is
+touched. The checker's smallest correction: move the sentence and its verification clause from X4.1 to
+X5, after the item dispositions are recorded, and return T-1's status beside X4.1's trigger findings.
+**Confirmed by the session**, by reading §P's X4.1 and X5 at `44a2973`.
+
+| Finding | In brief | The checker's correction |
+|---|---|---|
+| L-1 | The *Repair round* says nothing else in §P changed, but the *Harness files* scratch bullet also gained a line, which is true | Name it beside the *Evidence files* sentence |
+| L-2 | `edits.json`'s `checks` still credits each check phrase's 0 count in 100526.1 to P3, while E7's `Capture` count comes from *Readings for the repair* | None now, since editing `edits.json` changes «H»; amend it if the file changes again |
+| L-3 | P10 fires the script's own statement of E8's rule, not E8's committed text; "taken from `GTWPE-D1`" is exact for the items and, for the requirement phrase, holds in wording only | None needed, or "E8's rule as the script states it" |
+| L-4 | On X1.0's one-part branch, X4.2's "the readback cover only the texts W4 sends" can be read to drop the page-preservation checks | "the page-preservation checks are made on every branch" |
+| L-5 | *Cost of this mode* ended at PL4, and *Nathan's directions* gives this mode's stop as 15:40Z, although the wait for Nathan is off the meter | Update both when this check enters `reviews` |
+
+**The bounded reviews stop here** (`D26-A` rule 4, as 100526.1's *Reviews are bounded* states it): the
+count of required defects rose from 0 to 1 instead of halving, and four of this round's six findings
+sit in text the repair added. This was the one check of a repair's diff that rule 2 allows. The plan
+therefore returns to Nathan as it stands at `44a2973`, with R-1 and L-1 to L-5 open and none repaired:
+a further repair is his to direct, and so is any further review. *Cost of this mode*, below, gains the
+round's time, as the meter requires; *Nathan's directions* is unchanged (L-5).
+
+**Nathan's choice.** Approve the plan as it stands, accepting R-1 and L-1 to L-5 as risks; or direct
+R-1's correction, the one-sentence move from X4.1 to X5, and say whether it is to be reviewed. The
+session recommends directing R-1's correction without another review round: the move is fully
+specified here, changes no Notion text, anchor or value, and both record checks would run on it.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode, GTWPE-MGMT-10 100526.1, fetched inline twice
@@ -1141,16 +1190,27 @@ through process substitution. Both ways, exit 0.
   377), first printing only its shape (line numbers, lengths, the message's first three lines), then
   writing its message to `PLAN-REVIEW.md`. The reviewer fetched no prompt body (its brief, §1), so the
   transcript holds none. It is left to teardown.
+- **The checker's transcript**, the output file the harness gave for its agent ID in this session's
+  tasks directory: read twice by `capture.py` for its one `SubagentHandback` call (transcript line
+  347), first printing only its shape, then writing its message to `PLAN-DIFFCHECK.md`. The checker
+  fetched no prompt body (its brief, §1), so the transcript holds none. It is left to teardown.
 - **Scratch**, in this session's scratchpad: ten mutated copies of `edits.json` for P2, each deleted
   after its run; a copy of this record at `PLANNED` for P1; `capture.py`; and, in the repair round, a
-  copy of `edits.json` as it stood before the repair, deleted once the repair's diff was read. No
-  scratch file holds a prompt body.
+  copy of `edits.json` as it stood before the repair, deleted once the repair's diff was read, and a
+  copy of `e8_guard_proof.py`, made and deleted while its run from `git show` was tested. No scratch
+  file holds a prompt body.
 
 ### Cost of this mode
 
 Time: from 12:39:58Z, when the approval was recorded, to PL4 at about 13:37Z, about 1 h, of which the
 review took about 30 minutes, against the recorded estimate of about 1.5 h. Tokens: not measured by
 this session; the reviewer reported 458,797 subagent tokens.
+
+The repair round and the diff check ran from about 15:53Z, after Nathan's opt-in, to this return at
+about 16:27Z, about 35 minutes, of which the check took about 25. With the wait for Nathan, from
+13:36Z to 15:53Z, off the meter, this mode's time is about 1 h 30 min, against its estimate of about
+1.5 h and under twice it. Tokens: not measured by this session; the checker reported 366,610
+subagent tokens.
 
 ### Canon and rulings relied on, for `PLAN`
 
