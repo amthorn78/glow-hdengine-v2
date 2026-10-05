@@ -1,0 +1,168 @@
+{
+ "artifact": "MODIFICATION-20261005-gtwpe-writing-side §P: W3's replacements on the new GTWPE-MGMT-10 page",
+ "source_body": "GTWPE-MGMT-10 — Manage the GTWPE — 100526.1, page 3f04590a05eb8171ba1ed7051bbefc53, edited 2026-10-05T03:24:07.081Z",
+ "substitution": "«V» only, in E1's and E2's new text and check phrases, the value X1.2 fixes",
+ "send": "One notion-update-page call, command update_content, allow_async false, with E1 to E8 as content_updates in this order: old_str = old, new_str = new, replace_all_matches false. Every old is sent as written; each matches exactly `matches` times in the duplicate, which is 100526.1's content. No old or new holds a line break, so each edit stays inside one block, as every earlier GTWPE edit did",
+ "checks": "After the call, on the new page's content as fetched (not its title property or the fetch's URLs), by reading, checked by a second reading, case-sensitive: each check phrase occurs exactly its count; each absent phrase occurs 0 times. Each check phrase occurs 0 times in 100526.1 (dry run P3). Where an edit has a `prefix` or a `suffix`, the kept text directly before or after its old in 100526.1 (dry run P3), its check phrase is read across them and its new text; each absent phrase occurs in 100526.1 only inside the old it belongs to",
+ "readings": [
+  {
+   "term": "gtwpe_redline",
+   "in_source": 1,
+   "after": 0,
+   "kept": "nothing: E7 removes the one hit"
+  },
+  {
+   "term": "proof",
+   "in_source": 2,
+   "after": 7,
+   "kept": "the tool route's guard proof, twice (PL1's step and the tool row's verification), a tool's own check; E5, E6 and E8's new texts"
+  },
+  {
+   "term": "GTWPE-D1",
+   "in_source": 0,
+   "after": 4,
+   "kept": "E4, E5, E6 and E8's new texts"
+  },
+  {
+   "term": "decision-record",
+   "in_source": 3,
+   "after": 4,
+   "kept": "*The watched sources*; *Relation to the PE Metaprompt*; E3's new text, twice"
+  }
+ ],
+ "readings_rule": "D26-E's broad match, case-insensitive on the stem, read on the new page and recorded with the exception that keeps each hit. A hit that still says what an edit removes is a finding, and the run stops (If the plan is wrong). A count that differs from `after` is read; it is not a stop by itself",
+ "edits": [
+  {
+   "id": "E1",
+   "item": "identity",
+   "where": "identity line 1",
+   "old": "— 100526.1",
+   "new": "— «V»",
+   "matches": 1,
+   "check": [
+    [
+     "GTWPE-MGMT-10 — Manage the GTWPE — «V»",
+     1
+    ]
+   ],
+   "absent": [
+    "100526.1"
+   ],
+   "prefix": "GTWPE-MGMT-10 — Manage the GTWPE "
+  },
+  {
+   "id": "E2",
+   "item": "identity",
+   "where": "identity line 2",
+   "old": ": 100526.1",
+   "new": ": «V»",
+   "matches": 1,
+   "check": [
+    [
+     "Prompt Version: «V»",
+     1
+    ]
+   ],
+   "absent": [],
+   "prefix": "Prompt Version"
+  },
+  {
+   "id": "E3",
+   "item": "ITEM-01",
+   "where": "Read these: the decision-record bullet, its files",
+   "old": "gcfpe.decision-record.md`:",
+   "new": "gcfpe.decision-record.md` and `gtwpe/gtwpe.decision-record.md`:",
+   "matches": 1,
+   "check": [
+    [
+     "`gtwpe/gtwpe.decision-record.md`",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E4",
+   "item": "ITEM-01",
+   "where": "Read these: the decision-record bullet, its rulings",
+   "old": "and `D26`. A ruling",
+   "new": "and `D26`; and the GTWPE's own, above all `GTWPE-D1`. A ruling",
+   "matches": 1,
+   "check": [
+    [
+     "and the GTWPE's own, above all `GTWPE-D1`",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E5",
+   "item": "ITEM-01",
+   "where": "Boundaries: the bullet on what a prompt body carries",
+   "old": "never governance state.",
+   "new": "never governance state. No revision, consolidation, retirement or handoff drops or weakens `GTWPE-D1`, the proof log required for every redlines Markdown file and every final updated PF Markdown file a prompt writes.",
+   "matches": 1,
+   "check": [
+    [
+     "No revision, consolidation, retirement or handoff drops or weakens `GTWPE-D1`",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E6",
+   "item": "ITEM-01",
+   "where": "MODE = ANALYZE: A2's step",
+   "old": "reason (HDE Governance §9.1.6)",
+   "new": "reason (HDE Governance §9.1.6). For a part that changes, adds, merges or retires a prompt, record whether each prompt it reaches writes a redlines Markdown file or a final updated PF Markdown file, before or after the change, and how the part leaves `GTWPE-D1` whole in each: a separate proof log for each such file, or, where a prompt writes both, one combined proof log it explicitly defines; every minimum item; and each proof log's link to its file",
+   "matches": 1,
+   "check": [
+    [
+     "For a part that changes, adds, merges or retires a prompt",
+     1
+    ],
+    [
+     "how the part leaves `GTWPE-D1` whole in each",
+     1
+    ]
+   ],
+   "absent": []
+  },
+  {
+   "id": "E7",
+   "item": "ITEM-02",
+   "where": "MODE = EXECUTE: Capturing a reviewer's or worker's return",
+   "old": "Until `gtwpe_redline.py capture` exists under `docs/prompt_ecosystem_management/gtwpe/`, capture",
+   "new": "Capture",
+   "matches": 1,
+   "check": [
+    [
+     "(`EVID-001`). Capture it by a JSON parse",
+     1
+    ]
+   ],
+   "absent": [
+    "Until `gtwpe_redline.py capture` exists"
+   ],
+   "prefix": "never by retyping (`EVID-001`). ",
+   "suffix": " it by a JSON parse"
+  },
+  {
+   "id": "E8",
+   "item": "ITEM-01",
+   "where": "How each kind of target changes: the prompt page row, its verification",
+   "old": "plan changes them;",
+   "new": "plan changes them; for a prompt that writes a redlines Markdown file or a final updated PF Markdown file, `GTWPE-D1`'s proof-log requirement and each of its minimum items present, by phrase;",
+   "matches": 1,
+   "check": [
+    [
+     "`GTWPE-D1`'s proof-log requirement and each of its minimum items present, by phrase",
+     1
+    ]
+   ],
+   "absent": []
+  }
+ ]
+}
