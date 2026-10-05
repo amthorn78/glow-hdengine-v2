@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-writing-side
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control]
 gate_tier: 1
 closure:
@@ -122,8 +122,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-writing-side at bc5019e (2026-10-05). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass the record at ANALYZED and all five GTWPE records together (5/5), the selftests pass 17/17 and 66/66, main is still 31deec4, and HDE Build Notes 2.30 PF10-CITE-001 and HDE Governance §9.1.6 read as the analysis quotes them; since 2.30 landed (b7b0dee), only PF10 has changed under docs/pfcanon/. The order C1 to C6 is accepted; each later change runs its own ANALYZE and may split. Last Update Gate: Nathan keeps his rule (BN plus the version of the PF file used, or BN plus the source filename when the source is not a PF), and he will add one sentence to PF10 exempting the Last Update Gate from addendum 2.30 before C3 starts; C3's ANALYZE confirms that sentence is on main. N-1 to N-3 go to PE39. Continue to PLAN for this Modification only (ITEM-01 to ITEM-03): one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-05
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-05: \"Nathan approves the plan of MODIFICATION-20261005-gtwpe-writing-side as repaired at 44a2973, with two further changes and no further review: R-1, by the diff check's own correction (the T-1 sentence and its verification clause move from X4.1 to X5, after the item dispositions are recorded, reading \"record T-1 as settled by ITEM-01, citing its disposition, when that is VERIFIED; otherwise as still open\", and X5 returns T-1's status beside X4.1's trigger findings); and L-4 (X4.2: \"the page-preservation checks are made on every branch\"). This approval holds at the commit that carries them only if: §P's diff from cb05a74 is those two changes plus the record's own logging of this approval, the round and its cost; edits.json is unchanged, sha256 f451dff65c33e506789891709fd928e5b92bfa91fc3116637b129c8280373113 («H»); and both record checks pass. Record that commit in plan_approved_by. L-1, L-2, L-3 and L-5 are accepted as risks; update the mode's cost and stop time as L-5 says. PE39 checked the plan at cb05a74: main's modification_validate.py and gtwpe_record_check.py each pass all five GTWPE records (5/5), edits_check.py and e8_guard_proof.py pass, main is still 31deec4, and the branch changes only docs/ephemeral/. The approval authorizes W1 to W4 from this session and nothing else in Notion, and names the catalog's selection of the new version (X4.2) and PART-02's catalog texts. One change since your dry run, so X4.2's pre-read expects it: on Nathan's direction, PE39 replaced the GTWPE parent page's opening paragraph, outside the catalog (no catalog text touched, and none of the plan's counted phrases used), edited 2026-10-05T16:16:10.995Z, and updated the architecture page; N-1 to N-3 are done (ledger E-032, with E-018 and E-019 closed, in PR #574). Proceed to EXECUTE, and report in at most five plain sentences.\" Carried by commit fed7f346803086310b519b87ffa9d458282bc929, which meets the three conditions: §P's diff from cb05a74 is R-1, L-4 and the logging of this approval, the round and its cost; edits.json is unchanged, sha256 f451dff65c33e506789891709fd928e5b92bfa91fc3116637b129c8280373113 («H»); and gtwpe_record_check.py and modification_validate.py each exit 0."
+plan_approved_date: 2026-10-05
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -1260,3 +1260,23 @@ about 16:36Z, about 4 minutes. With each wait for Nathan off the meter, this mod
   `31deec4`, as §A read them.
 - The second repair's record and evidence, for the plan's shape: its steps, catalog texts, failure path
   and `edits_check.py`.
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+100526.1*, fetched live at the start of the mode (X1.2). The input is §P as Nathan approved it, carried
+by `fed7f34` on 2026-10-05 (`plan_approved_by`). The mode started at 2026-10-05T16:35:08Z, when the
+approval was recorded. The meter is the clock: the recorded estimate for `EXECUTE` is about 1 h, so the
+stop is at 2 h from X1.1, about 18:35Z, not counting a wait for Nathan.
+
+### Values, fixed at X1.1 (2026-10-05T16:35:08Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-10-05 |
+| «P» | 2026-10-05, `plan_approved_date` |
+| «V» | Fixed at X1.2 |
+| «NEW» | Returned by W1 at X1.3 |
+| «M», «m» | Fixed at X4.1 |
