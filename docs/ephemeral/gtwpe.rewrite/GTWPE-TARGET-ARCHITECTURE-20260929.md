@@ -280,6 +280,19 @@ What this means for the design:
 - The eight current TW-ALPHA prompts lose their model-guidance blocks, and TW-ASSESS-10, the session-strength assessment prompt, is retired with no replacement. The rebuilt GTWPE prompts carry none of this.
 - It is an item on the TW prompts' repair list, not a canon change: Nathan ruled that no PF10 addendum is needed ("We don't need an addendum for this, it can just go in the list of repairs.").
 
+## Nathan's direction, 2026-10-05: a proof log for every artifact
+
+Nathan's words are recorded verbatim, once, as GTWPE-D1 in
+`docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md`, which governs it across the whole
+GTWPE and outlives this record.
+
+What this means for the design:
+- Every step of the writing flow that writes a redlines Markdown file or a final updated PF Markdown file
+  also writes that artifact's own proof log, with at least the contents GTWPE-D1 lists. A step that
+  writes both writes one proof log for each, unless its prompt explicitly defines one combined proof log
+  that clearly covers both.
+- No revision, consolidation or handoff may drop or weaken it.
+
 ## Status, 2026-10-05
 
 The change management system this target waited on is proven. GTWPE-MGMT-10 carried three Modifications from
