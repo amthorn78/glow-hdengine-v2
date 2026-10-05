@@ -90,8 +90,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-second-repair at 0b39660 (2026-10-05). PE38 checked it: main's modification_validate.py and gtwpe_record_check.py each pass the record 1/1 at ANALYZED, the selftests pass 17/17 and 66/66, and main is still 5cbfc74. Candidate N1 (Alpha 1 and HDE TW still point to the 2026-09-08 operation sections) stays recorded and is not taken. Continue to PLAN as the request directs: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-05
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-05: \"Nathan approves the plan of MODIFICATION-20261005-gtwpe-second-repair at b7db3ee (2026-10-05). PE38 checked it: main's modification_validate.py and gtwpe_record_check.py each pass the record 1/1 at PLANNED, edits.json is byte-identical to the reviewed 555db67 (sha256 3ba17721…782515), and main is still 5cbfc74. The approval authorizes W1 to W4 from this session and nothing else in Notion, and names the catalog's selection of the new version (X4.2). Listed findings L2 to L17 are accepted as risks. The three statement corrections made after the review (P1's row, K-5's citation, the 66-character claim) are accepted as written; under D26-A rule 4 a repair of a listed finding is Nathan's opt-in, so next time ask first. One check at X1.0, before any write: PLAN-REVIEW.md begins with a line holding only \"0\", above the reviewer's header. Confirm from the reviewer's hand-back whether that line is part of its message; if it is not, record it as a finding in §E and leave the file unedited. Proceed to EXECUTE, and report in at most five plain sentences.\""
+plan_approved_date: 2026-10-05
 supersedes: ""
 spawned_from: MODIFICATION-20260930-gtwpe-tw-model-advice
 shares_package_with: []
