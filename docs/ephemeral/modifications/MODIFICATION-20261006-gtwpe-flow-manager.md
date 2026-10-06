@@ -27,6 +27,11 @@ reviews:
     date: 2026-10-06
     required_open: 0
     outcome: "By this session, read-only: both record checks exit 0 on a scratch copy at ANALYZED; the front matter and every table parse, and the request is verbatim; A0 reproduces at ad1615d; the new title is free under the GTWPE parent page; a second, independent reading of a second fetch of GTWPE-MGMT-10 100526.2 and of the catalog confirmed every count; every quotation from a repository file or an installed skill found by grep; the record tools need no change. No required defect. No full review"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-10-06
+    required_open: 0
+    outcome: "By this session, read-only, before any full review: both record checks exit 0 on a scratch copy at PLANNED; the front matter parses, and the approval and the request are verbatim; A0 reproduces at 601b330; every live edit time unchanged; the two-sided check of every pass invocation against the five TW bodies read live passes; the catalog's four old texts once each; the new title free; the draft's structure, phrases and absences as planned, by script; the handoff table's carried rows identical to design §6; the PF03, PF06 and PF10 check compatible. No required defect"
 items:
   - id: ITEM-01
     statement: "The Flow Manager, a new prompt GTWPE-FLOW-10 — Run the Technical Writing Flow, that Nathan starts in a new standalone session with an execution prompt and its inputs, and that runs the whole writing flow, itself or through the subagents it judges useful: execution-time triage of the complete supplied context; the run's branch, its one pull request and working copies from docs/pfcanon/ on main; each affected document's passes through the selected TW prompts with Nathan's redlining discipline; the document-control check across the drafts; the cross-document consistency check, whose fixes are new redline-and-apply cycles; the completion standard; and a review-ready pull request. It never merges and never writes docs/pfcanon/."
@@ -856,3 +861,498 @@ This session runs the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 
   furthest copy of the record is therefore on `main`, byte-identical to `772ccfb`'s, and this mode works, as
   the *Entry contract* says for that case, on a new branch: `docs/20261006-modification-gtwpe-flow-manager`,
   restarted from `origin/main` at `601b330`, with a new pull request.
+- **Authoring control:** the selected PE Metaprompt 091426.1, edited 2026-09-23T17:17:22.217Z, as A0 found
+  it, fetched again at this mode's start. Its general rules apply with GTWPE-MGMT-10's workarounds
+  (*Relation to the PE Metaprompt*): `Create` of an ecosystem addition whose design is approved, here §A as
+  Nathan approved it; the two identity lines, at the execution date's `.1`, which the PE allows a net-new
+  prompt; versionless references; no runtime-selection, configuration or workload text; and the mandatory
+  PF03, PF06 and PF10 compatibility check for a new Glow prompt (*Dry run*, P10). Its GCFPE overlay, the
+  section *GCFPE controlled release overlay*, does not apply and was not read.
+- **`main`** is at `601b330`. Since `ad1615d`, which §A examined, it gained #581, this record at `ANALYZED`,
+  and #582, ledger rows E-040 and E-041 in `docs/ephemeral/gtwpe.rewrite/ERRORS.md`. Neither touches a
+  watched path (*Dry run*, P3).
+
+### Nathan's directions, and how this plan applies them
+
+- **The three choices he approved with the analysis.**
+  - No document is copied ahead of its pass: the body says so, and routes every working copy through the pass
+    that changes it (*The new page*).
+  - The body is drafted and reviewed in this session and never stored in the repository. It is the local draft
+    at `/tmp/claude-0/-home-user-glow-hdengine-v2/93ba4e61-b5cc-5c88-a70c-08c9d4d5eb79/scratchpad/c4/flow10/GTWPE-FLOW-10-draft.md`.
+    This plan names it only by its headings, identity lines, last words and check phrases. `EXECUTE` runs in
+    this session and publishes it unchanged, apart from the version in its first two lines. Nathan and PE39
+    read the published page live before the first trial.
+  - The new page is made by duplicating a child page of the GTWPE parent page, retitling it and replacing its
+    content (F-2). The page duplicated is the architecture page, *GTWPE Target Architecture — Document-Writing
+    Flow*, because it holds no prompt body: the duplication copies none, and a copy a failure leaves behind is
+    plainly not a prompt.
+- **One dry run and one full review by a single reviewer, who reads the draft body;** a second reviewer or a
+  diff check only if that review finds a required defect. Nathan's approval names the reviewer's reading of
+  the draft, the one body a worker reads here (`D22`). The reviewer fetches nothing from Notion.
+- **"this flow can be simplified, let's not overcomplicate this".** One part, three targets, four Notion
+  writes and one repository file. The body has twelve sections under its title, and three result codes. The
+  plan builds no tool: the handoff table is one Markdown file, fixed in this plan and copied at `EXECUTE`.
+- **Stop rather than produce substandard results.** A failed check stops `EXECUTE`, and nothing is repaired in
+  flight (*How the plan runs*). The body carries the same rule for a run (S1 to S6).
+- **No GTWPE prompt carries model, effort or strength advice (R16); no TypeSafe scoring.** The body has none,
+  which *The new page's checks* tests by phrase and by reading. Nothing is scored.
+- **The meter is time.** The estimate is about 5 h for `PLAN` and about 2 h for `EXECUTE`, not counting the
+  wait for Nathan's merge. This mode stops at 10 h on the meter from 18:15:59Z, and `EXECUTE` at 4 h from
+  X1.1.
+- **GTWPE-MGMT-10 100526.2's GTWPE-D1 guard.** The body writes neither artifact type, and it carries GTWPE-D1's
+  requirement and its eight minimum items in Nathan's words, which the readback checks by phrase.
+
+### Findings on §A (recorded, not edited)
+
+`PLAN` does not rewrite the analysis. Four of its statements are inexact for the body. None changes the scope,
+the items or the members, and the body follows the sources §A cites.
+
+- **P-1. PF30 changes only with a specification.** §A's routing table sets the specification condition for PF27
+  only. The instruction it cites, Nathan's of 2026-09-25 (plan v1.2 §1: "PF27 and PF30 are updated only when a
+  specification exists"), sets it for both. The body makes the PF30 family a target only when the run has a
+  governing specification, for a new record and for a change to an existing one.
+- **P-2. A held-back PF10 change.** §A's triage lists such a change and does not draft it; its signal table
+  makes it a stop for Nathan's decision (S4). The body joins the two: the change is listed and not drafted, and
+  each document it bears on stops until Nathan decides to draft the change or leave it out.
+- **P-3. The check of the remote after a pass.** §A says the Flow Manager checks "that only the run's branch
+  moved on the remote". During a run, Nathan and other sessions move other branches, `main` among them, so that
+  check would stop runs that did nothing wrong. The body checks instead that no branch was created or deleted
+  and that the run's branch is at the pass's last commit. A pass that pushes to another existing branch is not
+  seen; that limit is listed (*Open findings*, K-1).
+- **P-4. The pull request at X2.** §A names amthorn78/glow-hdengine-v2#581 as the pull request Nathan merges at
+  X2. #581 was merged at `ANALYZED`, so X2's pull request is #583, this branch's. X5 counts #581's merge in
+  `interaction_cost_actual`.
+
+### What the plan settles
+
+§A left these to `PLAN`.
+
+- **The result codes:** `RUN_REVIEW_READY`, `RUN_STOPPED` and `RUN_NO_CHANGE`, as §A proposed.
+- **The pass directory:** `passes/<key>/<NN>-<prompt>/`, one per pass, numbered per document, such as
+  `passes/pf04-canon-hde-governance/01-tw-drain-10/`, where §A wrote `passes/<key>/<attempt>/`.
+- **A draft's file name:** its canon file name with the version token replaced by the new version, so that
+  taking it into canon moves one file and B4 can check the version against the name.
+- **The pull request's state:** opened as a draft at B1, so every pass finds it open, and marked ready for review
+  at B6 or on `RUN_NO_CHANGE`. A stopped run leaves it a draft.
+- **A canon file that changes during a run:** checked before each pass. A changed target restarts its document
+  at B2; a changed source, such as a new PF10 version, stops the run (S4).
+- **A resume that changes the change, its sources or its governing specification:** a stop (S4), since that is a
+  new run.
+- **A capability the session lacks,** such as a reviewer with a fresh context for B5: a stop (S4).
+- **The execution prompt** is kept as `inputs/execution-prompt.md`, so a resume can compare against it.
+
+### How the plan runs
+
+`EXECUTE` applies the steps below in order, and every step's check must pass before the next starts.
+
+- **X1** makes the new page and reads it back (W1 to W3), then commits the handoff table.
+- **X2** commits the record and pushes the branch. The handoff table is a repository file other than the record,
+  so the mode returns `PRODUCT_OWNER_ACTION_PENDING` for Nathan's merge of #583.
+- **X3**, after the merge, detects it by the file on `main` and re-runs the record checks from `main`.
+- **X4** runs the drift check over the range since `ad1615d`, then updates the catalog in one write (W4): the new
+  member's row, the members note, the *Approved design* entry and the checked-through commit.
+- **X5** closes the record on the branch restarted from `origin/main`, with its own pull request.
+
+**A stop.** A failed check or a tool error stops the run. Before W1, a failed precondition stops it with nothing
+written, and it returns `IMPLEMENTATION_BLOCKED`. From W1 on, a failure takes `D26-B`'s path (*Failure path*),
+and nothing more is written.
+
+**Waiting for each write.** Every `notion-update-page` call is sent with `allow_async: false`. If a call still
+returns an async task, the run polls it until it reports success, and only then makes the step's check. A task
+that reports failure is a tool error, and the page is fetched again before anything else.
+
+**Every text is sent exactly as written**, with the values substituted and nothing else changed. W3's text is
+the draft with «V» in its first two lines, written by a script to a scratch file and sent whole. W4's texts are
+printed from this section as committed, by script.
+
+### Values
+
+| Value | What it is, and when it is fixed |
+|---|---|
+| «D» | `EXECUTE`'s UTC date at X1.1, as `yyyy-mm-dd` |
+| «V» | At X1.2: the new page's version, `MMDDYY` of «D» then `.1`, as the PE sets it for a net-new prompt. If «D» is 2026-10-06, «V» is `100626.1`. A child of the GTWPE parent page that already carries the new title is a collision and a stop (X1.0 (4)); the PE forbids incrementing to evade one |
+| «T» | `GTWPE-FLOW-10 — Run the Technical Writing Flow — «V»`, the new page's title and first line |
+| «ID» | At X1.3, the new page's ID as its duplication returns it, as 32 hex digits without dashes |
+| «M», «m» | At X3: the commit on `origin/main` that brought `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, in full and as its first seven characters |
+| «S» | At X4.1: the UTC date, as `yyyy-mm-dd` |
+| «HT» | Fixed in this plan: the sha256 of the handoff table as committed in the evidence directory (*Values fixed in this plan*) |
+
+### Evidence files
+
+In `docs/ephemeral/modifications/evidence/gtwpe-flow-manager/`, committed with this section:
+
+| File | What it is |
+|---|---|
+| `gtwpe.handoffs.md` | The handoff table's exact text, which X1.4 copies byte for byte to `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md` |
+| `PLAN-REVIEW-BRIEF.md` | PL3's review brief, committed before the reviewer is spawned |
+| `PLAN-REVIEW.md` | The reviewer's return, captured unedited from its own transcript |
+
+### Values fixed in this plan
+
+| Value | Fixed as |
+|---|---|
+| «HT» | `d0d727c6b63a1458127e90888c2c258abab8f1d9d0818e09eda4dd8e76a2315b`, the sha256 of `gtwpe.handoffs.md`, 7,508 bytes, as committed with this section |
+
+### The new page
+
+- **Title** «T». **Parent** the GTWPE parent page, *GTWPE — Glow Technical Writing Prompt Ecosystem*,
+  `3ea4590a05eb818c915bdfd3d150c44b`, under *AI Prompts / HDE TW*. **Icon** none.
+- **Duplicated page** *GTWPE Target Architecture — Document-Writing Flow*, `3ea4590a05eb81f7988bd032dfdccfb5`,
+  edited 2026-10-05T16:16:17.223Z at this mode's fetch. It is never edited, and its edit time is checked
+  unchanged after W1 and after W3.
+- **Body** the reviewed draft, 253 lines, sent whole in W3 with «V» substituted in its first two lines and
+  nothing else changed. Its first two lines are «T» and `Prompt Version: «V»`; its third begins `Operator note:`.
+- **Headings, in order (20):** `# Run the Technical Writing Flow`; `## Purpose`; `## Authority and limits`;
+  `## The execution prompt`; `## Sources and reading`; `## Eligibility and routing`;
+  `## The run's branch, pull request and directory`; `## RUN.md`; `## Passes`; `## The flow`; `### B1 Scope`;
+  `### B2 Redlines`; `### B3 Drafts`; `### B4 Document control`; `### B5 Consistency`; `### B6 Complete`;
+  `### Redo from canon`; `## Proof logs (GTWPE-D1)`; `## Stop and resume`; `## Results`.
+- **Last words:** "It names no other prompt to run."
+- **Where each item lands in the body:**
+
+| Item | Sections |
+|---|---|
+| ITEM-01, the flow | *Purpose*; *Authority and limits*; *Passes*; *The flow*, B1 to B6; *Redo from canon* |
+| ITEM-02, the run's layout | *The run's branch, pull request and directory*; *RUN.md* |
+| ITEM-03, stop and resume | *Stop and resume*; *Passes*, "One date for a drain and its apply"; S1's sizing |
+| ITEM-04, the execution prompt | *The execution prompt*; *Authority and limits*, last bullet |
+| ITEM-05, eligibility and routing | *Eligibility and routing* (with P-1) |
+| ITEM-06, GTWPE-D1 in a run | *Proof logs (GTWPE-D1)*; *Passes*, check 5; B6 step 2 |
+| ITEM-07, E-006, E-016, E-022 | *Passes*, "After each pass"; B1 step 3 and B6 step 3; B6 step 4; *Sources and reading*, third bullet |
+| ITEM-08, the handoff table | Not in the body: `gtwpe.handoffs.md` (X1.4) |
+| ITEM-09, maintenance before C6 | Not in the body: the catalog's row and note (W4). The body resolves the TW prompts from the TW selection page |
+
+### The new page's checks
+
+What X1.3's readback (step (h)) expects, beyond the structure above.
+
+**GTWPE-D1, by phrase.** `separate proof log` at least once, and each of the eight minimum items, in
+`gtwpe.decision-record.md`'s words, at least once: "The artifact produced"; "The source files and inputs used";
+"The substantive changes made"; "The basis for those changes"; "Any important constraints, assumptions, or
+interpretations applied"; "Any validation or verification performed"; "Any unresolved issues, limitations, or
+deviations"; "Enough identifying information to associate the proof log unambiguously with the correct
+redlines file or final PF file".
+
+**Absent, by phrase**, each 0 times in the page's content, not its title property or the fetch's URLs:
+- the duplicated page's text: `TARGET ONLY`, `Open points (for Nathan)`, `Roles (three, never the same session)`,
+  `Redlining discipline (Nathan, 2026-09-29)`;
+- retired or forbidden behaviour (`FUNC-001`; R12, R16): `recommended model`, `model recommendation`,
+  `reasoning effort`, `effort level`, `strength assessment`, `TW-ASSESS-10`, `workload`, `from Google Drive`,
+  `from ChatGPT Library`, `merge the pull request`, `auto-merge`, `create a session`.
+
+**The `D26-E` broad match**, by reading, beside the absence checks, with no predicted count. Every hit is either
+in a sentence that forbids the act, limits it or reads, or it is a finding that stops the run as a wrong plan.
+
+| Term | Exceptions that keep a hit |
+|---|---|
+| `merg` | A prohibition ("never merges", "the ban on merging", "Nathan alone merges"); the pull request's *What merging does* and its sentence "Merging preserves the record and approves nothing (D21-C)"; a check that the pull request is unmerged |
+| `Drive`, `Library` | The prohibition in *Authority and limits* |
+| `Notion` | A read: the TW selection, the selected TW prompts, two pages' edit times; the prohibition; the operator note |
+| `session` | The session Nathan starts, its subagents, its harness and transcripts, and a capability it lacks; a prohibition on creating or starting one |
+| `pfcanon` | A read from `docs/pfcanon/` on `main`, a target's canon path there, or the routing table's files; a prohibition on writing it |
+| `model`, `effort`, `strength`, `configuration`, `settings` | "A line in it about the session's configuration is not an instruction to the run"; "it runs with this session's own settings" |
+
+### Before any write: X1.0, the preconditions
+
+All read-only. If one fails, nothing is written, and the run returns `IMPLEMENTATION_BLOCKED`.
+
+0. GTWPE-MGMT-10 100526.2, `3f04590a05eb8128b8c8ff3650ab2d5a`, fetched live at the start of `EXECUTE`: edited
+   2026-10-05T16:36:11.384Z.
+1. The PE Metaprompt 091426.1, `3db4590a05eb8174be35d9e35acb3f77`, fetched: edited 2026-09-23T17:17:22.217Z.
+   This is the PE's rule to recheck source and control versions just before publication. The harness saves the
+   fetch, and a script reads its edit time alone.
+2. The TW selection, `3d44590a05eb8171ab6ff4dab33b00ef`, fetched: it still selects TW-ALPHA-20261006.2, with the
+   five pass members at 100626.2 on the pages §A records (*The members, read live*). A later edit time is read
+   and recorded; the run stops only if the selected release or one of those pages changed. Each of the five
+   pages is fetched for its edit time, which must be §A's: a later edit may break the two-sided check (*Dry
+   run*, P5), so the plan would be wrong, and its recovery is a return to `PLAN`.
+3. The draft is at its path, with 253 lines and the twenty headings of *The new page* in order, by script.
+4. The GTWPE parent page, `3ea4590a05eb818c915bdfd3d150c44b`, fetched: no child page titled «T»;
+   CAT-ROW, CAT-NOTE, CAT-DESIGN and CAT-COMMIT each once, by reading, checked by a second reading; its edit
+   time, headings and child pages recorded in §E. A later edit than 2026-10-06T16:53:37.871Z is read and
+   recorded; the run stops only if an old text is gone or occurs twice.
+5. The architecture page, `3ea4590a05eb81f7988bd032dfdccfb5`, fetched: its edit time, its first line of content,
+   its last heading and its last words recorded in §E, for W1's check.
+6. `git fetch origin main` succeeds, and `origin/main` is recorded in §E. A change to a watched path since
+   `ad1615d` is not a stop here; X4.1 records it.
+7. The evidence file `gtwpe.handoffs.md` has sha256 «HT».
+8. The record checked out holds this plan with `plan_approved_by` set.
+
+### The steps
+
+Four Notion writes, W1 to W4. The plan makes no other.
+
+| # | part | target | edit | authority | verification | rollback |
+|---|---|---|---|---|---|---|
+| X1.1 | — | the record | Set the status to `EXECUTING`. Fix «D», and record it in §E with the UTC time, which starts the clock | GTWPE-MGMT-10 X1 | The values are in §E before X1.2 | None needed |
+| X1.2 | — | — | The preconditions X1.0 (0) to (8); fix «V» and «T» | This plan | Each as X1.0 states it | None needed |
+| X1.3 | PART-01 | `prompt` | **(a)** Fetch the GTWPE parent page: no child page titled «T». **(b)** **W1**: `notion-duplicate-page` on the architecture page; «ID» is the returned ID. **(c)** Fetch «ID» until populated: at most six fetches, the second onwards after a wait of about 20 seconds, run as a background `sleep 20`, since the harness blocks a foreground sleep. Populated means: its first line of content, its last heading and its last words are the architecture page's, as X1.0 (5) recorded them; its parent is the GTWPE parent page; and the fetch reports no truncation or unknown block. **(d)** **W2**: `notion-update-page`, `update_properties`, `allow_async: false`: title «T», and `icon: "none"`. **(e)** A script writes the draft, with the value of «V» in place of the two placeholders `«V»` in its first two lines and nothing else changed, to `GTWPE-FLOW-10-send.md` beside it, and checks that the draft has exactly two `«V»`, both in those lines, and that the two files differ in those lines only. **(f)** **W3**: `notion-update-page`, `replace_content`, `allow_async: false`, `new_str` the send file's text, whole, as read from the file | The prompt-page route, as F-2 applies it to a new member; ITEM-01 to ITEM-07; this plan's approval (`notion-write-boundary.md`) | **(g)** W1 returns an ID other than the architecture page's, and the copy is populated by the sixth fetch; otherwise stop (`D26-B`). W2 and W3 return success, or a task polled to success. **(h)** Fetch «ID» whole, into this session's context, and check it, every check by reading and checked by a second reading: (1) the title is exactly «T»; (2) the parent is the GTWPE parent page; (3) the icon is none; (4) the first two lines are «T» and `Prompt Version: «V»`; (5) the headings, in order, are *The new page*'s twenty; (6) each section's text is the send file's, read against it section by section, allowing only Notion's documented reversible representation changes, such as stripped blank lines, Markdown escaping and a table's spacing; (7) the page ends with *The new page*'s last words; (8) GTWPE-D1's requirement and eight items occur by phrase (*The new page's checks*); (9) each absent phrase occurs 0 times; (10) the `D26-E` broad match, each hit recorded in §E with the exception that keeps it; (11) the fetch reports no truncation or unknown block. **(i)** Fetch the GTWPE parent page: exactly one child page carries «T», and it is «ID»; its other child pages are those X1.0 (4) recorded. Fetch the architecture page: its edit time is X1.0 (5)'s. **(j)** Delete the draft and the send file with `rm`, exit 0. A failed check stops the run (`D26-B`); a hit in (10) that says what the body must not say is a wrong plan (*If the plan is wrong*) | Before X4, Nathan archives the new page. The architecture page is never touched. Neither needs a copy of a body |
+| X1.4 | PART-01 | `rule` | `cp` the evidence file `gtwpe.handoffs.md` to `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`; commit it with the record | The repository route for a procedure file; ITEM-08 | Its sha256 is «HT»; `git diff --name-only origin/main...HEAD` lists only the record, its evidence and this file; the `D26-E` search for old text the move contradicts, `git grep -n -i -E 'handoff table\|design v1.2 §6'` over `docs/prompt_ecosystem_management/` finds hits only in the new file (P9) | Before the merge, a commit on the branch removes the file. After it, a new Modification reverses it |
+| X2 | — | the record | Commit the record with X1's values and dispositions. Run `gtwpe_record_check.py` and `modification_validate.py` on it at `EXECUTING`; push. Update #583's title and description. Return `PRODUCT_OWNER_ACTION_PENDING` for Nathan's merge of #583, ending `IN FLIGHT` | GTWPE-MGMT-10 X2 ("If a part changed a repository file other than the record and its evidence ... push the branch, open its pull request, and return") | Both checks exit 0; after the push, the branch's blob of each changed file equals the local file; #583 is the branch's one open pull request | Before the merge, as X1.4 |
+| X3 | — | — | Only after Nathan's merge, in this session or a fresh one started from `main`: `git fetch origin main`; detect the merge by files on `main`, never by commit subjects (`D26-C`); fix «M» and «m»; run both record checks on the record as `main` holds it | GTWPE-MGMT-10 X3 | `git rev-parse origin/main:<path>` equals the branch's blob for the handoff table, the record and each evidence file; «M» is `git log -1 --format=%H origin/main -- docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`; both checks exit 0 | A new Modification reverses the file |
+| X4.1 | — | — | Fix «S». `git log --format='%H %cI %s' ad1615d..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.2 as fetched at X1.2 and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `ad1615d` | Every commit the log lists has a trigger finding in §E. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run. A0 found no lineage trigger, so nothing is re-pinned | None needed |
+| X4.2 | PART-01 | `notion_control` | **W4.** The GTWPE parent page. Pre-read: fetch it; CAT-ROW, CAT-NOTE, CAT-DESIGN and CAT-COMMIT each once, by reading; record its edit time, headings and child pages in §E. Then `update_content`, `allow_async: false`, four replacements in one call, in this order: CAT-ROW, CAT-NOTE, CAT-DESIGN, CAT-COMMIT, each to its new text (*The catalog texts*) | GTWPE-MGMT-10 X4 ("set the checked-through commit"; the catalog's row for a new member); ITEM-08 and ITEM-09 | Fetch it again, by reading, checked by a second reading: (1) the members table has two rows, GTWPE-MGMT-10's as the pre-read showed it, and below it GTWPE-FLOW-10's, its page cell in the rendered form *The catalog texts* gives; (2) CAT-NOTE-NEW, CAT-DESIGN-NEW and CAT-COMMIT-NEW present as sent, and CAT-NOTE, CAT-COMMIT and the first-row-only table absent; (3) by reading, `§6` and `handoff` occur only in CAT-DESIGN-NEW; (4) the page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the child pages as the pre-read showed them | The reverse replacements, with their texts taken from this readback, never from page history |
+| X5 | — | the record | Record every step's and item's disposition. ITEM-01 to ITEM-07 are `VERIFIED` when X1.3 (h) passed; ITEM-08 when X1.4 and X3 passed; ITEM-09 when X4.2 passed. Record `interaction_cost_actual` against 7, with #581's merge at `ANALYZED`; the actual author, checker and acceptor of the part (HDE Governance §9.1.6); and the time on the clock. Set the status to `COMPLETE`. Restart the branch from `origin/main`, since X2 waited for a merge; commit the record and push; open its pull request. Return `ECOSYSTEM_CHANGE_COMPLETE` with X4.1's trigger findings | GTWPE-MGMT-10 X5 | Both checks exit 0 at `COMPLETE`; after the push, the branch's blob equals the local file; `git diff --stat origin/main...HEAD` lists only the record | — |
+
+### The catalog texts
+
+Catalog text, quoted in full. It is page state, not a prompt body. Each old text occurs once on the GTWPE parent
+page (*Dry run*, P6). A mention is compared by its link, since Notion shows a linked page by its title.
+
+**CAT-ROW**, the members table's last line and its close:
+
+```
+`3f04590a05eb8128b8c8ff3650ab2d5a`</td>
+</tr>
+</table>
+```
+
+**CAT-ROW-NEW** adds GTWPE-FLOW-10's row:
+
+```
+`3f04590a05eb8128b8c8ff3650ab2d5a`</td>
+</tr>
+<tr>
+<td>GTWPE-FLOW-10</td>
+<td>«T»</td>
+<td>«V»</td>
+<td><mention-page url="https://app.notion.com/p/«ID»"/> `«ID»`</td>
+</tr>
+</table>
+```
+
+Read back, Notion renders the new page cell with the page's title inside the mention, as C1's X4.2 found:
+
+```
+<td><mention-page url="https://app.notion.com/p/«ID»">«T»</mention-page> `«ID»`</td>
+```
+
+**CAT-NOTE**, the members note:
+
+```
+Further members are added as the approved build selects them: the Flow Manager (a new prompt) and the TW prompts the build extends (*Approved design*). Design v1.2's GTWPE-RUN-10, GTWPE-RECORD-10 and GTWPE-RECORD-20 are not built.
+```
+
+**CAT-NOTE-NEW:**
+
+```
+GTWPE-FLOW-10, the Flow Manager, joined on «S» (MODIFICATION-20261006-gtwpe-flow-manager). Listing it adopts nothing: it runs only when Nathan starts it, and it runs the TW prompts as the *Glow Technical Writing Ecosystem* page selects them. The TW prompts join as the approved build selects them (*Approved design*). Design v1.2's GTWPE-RUN-10, GTWPE-RECORD-10 and GTWPE-RECORD-20 are not built.
+```
+
+**CAT-DESIGN**, the end of the *Approved design* entry:
+
+```
+`docs/ephemeral/gtwpe.rewrite/design/GTWPE-DESIGN-v1.2.md`, approved by Nathan at G1 on 2026-09-29, still applies.
+```
+
+**CAT-DESIGN-NEW:**
+
+```
+`docs/ephemeral/gtwpe.rewrite/design/GTWPE-DESIGN-v1.2.md`, approved by Nathan at G1 on 2026-09-29, still applies. Its §6 handoff table is replaced by the GTWPE's handoff table, `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md` (MODIFICATION-20261006-gtwpe-flow-manager).
+```
+
+**CAT-COMMIT**, the checked-through commit:
+
+```
+`b1bd7699243395a708a1d49a82df7e0b61efcccb` (`b1bd769`), examined by `EXECUTE` of MODIFICATION-20261006-gtwpe-tw-document-rules on 2026-10-06.
+```
+
+**CAT-COMMIT-NEW:**
+
+```
+`«M»` (`«m»`), examined by `EXECUTE` of MODIFICATION-20261006-gtwpe-flow-manager on «S». Before it, `b1bd769`, examined by `EXECUTE` of MODIFICATION-20261006-gtwpe-tw-document-rules.
+```
+
+The lineage pins do not change: A0 found no trigger, and X4.1 records any later one for Nathan.
+
+### Failure path (`D26-B`)
+
+From W1 on, a failed check or a tool error stops the run, and nothing more is built or written:
+
+1. **A failure record** in §E. It holds every step's disposition and the failed step with its evidence, and marks
+   the steps after it `NOT_RUN`, citing the stop. It is committed and pushed, and reaches `main` in #583 before
+   X2's merge, or after it in a record-only pull request from the branch restarted at `origin/main`. Nathan
+   merges it although the record is not `COMPLETE`: the failure-record exception of his merge rule.
+2. **A read-only sweep** of what landed, after every pending task has been polled to its end: the GTWPE parent
+   page with its child pages, «ID» if it exists, the architecture page and the branch with #583, each read once,
+   and what each now says recorded in §E.
+3. **The freeze kept:** no further Notion write. The part, having applied steps, is `BLOCKED` with its applied
+   steps named, and the Modification stays `EXECUTING`.
+4. **A return to Nathan**, `IMPLEMENTATION_BLOCKED`, ending `DECISION NEEDED`. Before X4, he archives the new
+   page, or a copy titled with the architecture page's title that W1 left. W4 is reversed only when its own check
+   failed, by its reverse replacements, with the texts taken from its readback, made by Nathan or at his
+   direction. No page is restored from its history, and no rollback needs a copy of a prompt body.
+
+### Open findings, accepted as risks
+
+Approving this plan accepts each of these (`DISP-001`).
+
+| # | Finding | Likelihood | Consequence | Why listed, not repaired |
+|---|---|---|---|---|
+| K-1 | P-3's check of the remote does not see a pass push to another existing branch, and B6's Notion check sees only two pages (§A risk 11) | Very low: every TW prompt pushes only to the branch its invocation names | An unauthorized write unseen by the run | §A's wording would stop runs that did nothing wrong whenever another branch moved; the limit is stated in the body |
+| K-2 | B6's Notion check stops a run when another session edits *HDE TW* or the GTWPE parent page during it | Low | A loud stop; Nathan resumes | §A's check, kept as approved; a resume costs little |
+| K-3 | W3 sends a 26,553-character body; a transcription or rendering fault is found only by the readback, which compares by reading | Low | A loud stop at X1.3 (h)(6); Nathan archives the page | `D22` forbids a byte comparison of a body; the readback is read twice, and Nathan and PE39 read the page live before the first trial |
+| K-4 | CAT-ROW-NEW adds a row by replacing a table's closing lines; no earlier GTWPE write has added a table row | Low | A refused call writes nothing; a malformed table fails X4.2's check | A loud stop with its reverse replacement |
+| K-5 | The reviewed draft's identity before W3 rests on this session alone: no fingerprint binds it, since a body is never hashed (§A risk 1) | Low | A changed draft would be published | Only this session writes the scratchpad; X1.0 (3) checks its structure; the readback and Nathan's live reading follow |
+| K-6 | A run reads each TW prompt's selected version as each pass starts, so a run during a TW release change mixes versions | Low: a TW release changes only through GTWPE-MGMT-10 | `RUN.md` shows two versions of one prompt | Recorded per pass; design v1.2 §6's "a run started under one GTWPE version finishes under it" is not carried by §A |
+| K-7 | No executable check exists for TW or for this prompt, and its first run is Nathan's trial (§A risk 7) | Medium | A runtime fault is found in use | The gate is static: P5's two-sided check; the trial is Nathan's, after C4 |
+| K-8 | The phrase checks see phrases, not meaning (§A risk 14) | Low | A text that keeps a phrase while weakening its rule passes the readback | The review reads for behaviour; the readback also reads the page against the reviewed draft |
+| K-9 | The gate's example, `BN 13.5` for PF10 v13.5, names today's PF10 version, as TW-APPLY-10's does | Certain | The example ages as PF10 moves | It shows the form; the rule is the PF10 version used |
+| K-10 | §A's other risks: 2 (the copy's title in W1's window), 3 and 4 (one writer; a redo from canon), 5 (S1 rests on the session's judgement), 6 (`glow-write-boundary`'s "Open the PR when the session's work is done"), 8 (no advice for a downstream session), 9 (E-010), 10 (the table restates the bodies), 12 (capturing a review), 13 (one reader of the bodies) and 16 (drain ordering) | As §A states | As §A states | Approved with the analysis |
+| K-11 | §A's findings P-1 to P-4, and this plan's going on past them where template rule 1 says to return to Nathan | Certain | Four inexact statements in the frozen analysis | None changes the scope, an item or a member; *Findings on §A* records each, and each goes to Nathan with this plan |
+
+### Product Owner actions
+
+| # | Action | How it is verified |
+|---|---|---|
+| PO-1 | Approve this plan. It authorizes W1 to W4 and nothing else in Notion (`notion-write-boundary.md`), made from the session that runs `EXECUTE` of this plan, which is this one (HDE Build Notes, PF10-AINEUTRAL-001) | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
+| PO-2 | Merge amthorn78/glow-hdengine-v2#583 at X2, with the handoff table and the record at `EXECUTING`: the exception of his merge rule for the pull request the plan opens | X3 detects it by files on `main` |
+| PO-3 | With PE39, read the published page live before the first trial | Theirs; nothing in this Modification waits on it |
+| PO-4 | Merge the record's pull request after X5 when he chooses | Nothing waits on that merge (`D21-C`) |
+| PO-5 | Only after a failure: archive the new page, or W1's copy; merge the pull request carrying the failure record | The read-only sweep, after he acts |
+
+### Explicitly not in scope
+
+- C5, the Change Manager; C6, adoption, with E-033 and the retirement of `tw-flowmaster`; E-041, PE39's after C4.
+- F-1, F-2 and F-3, and E-035's count-by-script candidate, for a later GTWPE-MGMT-10 repair; E-010, which stays
+  Nathan's; a PF20 volume rule, until Nathan splits PF20.
+- Any change to a TW prompt, to GTWPE-MGMT-10, to the selection page, *Alpha 1*, *HDE TW*, the Operations Hub or
+  the architecture page.
+- Any change to the catalog beyond W4's four texts.
+- The first live trial, which is Nathan's after C4.
+- Any change to canon.
+
+### Dry run (PL3)
+
+Every normal-path gate and readback of this plan that can run before `EXECUTE`, read-only, by this session,
+before any full review. Counts over the draft were made by a script that printed only counts, positions and the
+last words; the TW bodies, GTWPE-MGMT-10 and the catalog were read in this session's context.
+
+| # | Gate or readback | Result |
+|---|---|---|
+| P1 | Both record checks on a scratch copy of this record at `PLANNED`, with this round in `reviews`: `modification_validate.py` and `gtwpe_record_check.py` | Both exit 0, 1/1 each |
+| P2 | The front matter parses (PyYAML); `analyze_approved_by` quotes Nathan's message exactly, read by script from this session's transcript; the request is unchanged; every table in the record has one column count in every row, by script | Parses; the approval is verbatim, 1,177 characters; the request is verbatim; every table consistent |
+| P3 | A0 reproduced at `601b330`: `git log ad1615d..origin/main` over *The watched sources* | Empty. The range's two commits, #581 and #582, change `docs/ephemeral/` only |
+| P4 | The live reads at this mode's start: GTWPE-MGMT-10 100526.2, the five pass members, the TW selection, the GTWPE parent page, the architecture page and the PE Metaprompt | Each edit time unchanged: 100526.2 2026-10-05T16:36:11.384Z; TW-DRAIN-10 16:39:55.231Z, TW-DRAIN-20 16:45:43.111Z, TW-RECORD-10 16:47:37.162Z, TW-RECORD-20 16:49:11.220Z and TW-APPLY-10 16:50:52.240Z, all 2026-10-06, as §A recorded; the selection page 2026-10-06T16:54:30.403Z, still selecting TW-ALPHA-20261006.2; the GTWPE parent page 2026-10-06T16:53:37.871Z; the architecture page 2026-10-05T16:16:17.223Z; the PE Metaprompt 2026-09-23T17:17:22.217Z |
+| P5 | The two-sided check: every input each pass's prompt requires is in the body's invocation, and every return it gives is consumed (*The two-sided check*, below) | Every requirement is met and every return consumed; no TW prompt needs to change |
+| P6 | The catalog's old texts on the GTWPE parent page as fetched at P4, by reading, checked by a second reading | CAT-ROW, CAT-NOTE, CAT-DESIGN and CAT-COMMIT once each |
+| P7 | The new title is free under the GTWPE parent page | Five child pages: the four GTWPE-MGMT-10 versions and the architecture page. None is a GTWPE-FLOW-10 page |
+| P8 | The draft, by script | 253 lines, 26,553 characters; the twenty headings of *The new page*, in order; two `«V»`, both in lines 1 and 2, and no other `«…»` value; each absent phrase 0 times; `separate proof log` and each of the eight items once; no character Notion escapes outside inline code and the table tags; the last words as *The new page* gives them |
+| P9 | The handoff table: its rows H11 to H13 against design v1.2 §6, by script; the `D26-E` search X1.4 repeats, on `main` | H11, H12 and H13 identical to the design's rows. `git grep -n -i -E 'handoff table\|design v1.2 §6'` over `docs/prompt_ecosystem_management/` at `601b330`: no hit, so no repository text names design §6 as the GTWPE's handoff table; after X1.4 the new file is the only hit |
+| P10 | The PE's compatibility check of a new Glow prompt against PF03, PF06 and PF10 (*The PF03, PF06 and PF10 check*, below) | Compatible; no conflict |
+| P11 | §A's *What each rule becomes*: each of R1 to R18 and the four canon rules found in the draft, by reading | Each found where §A places it, with P-1 and P-2 (*Findings on §A*) |
+| P12 | The draft uses only Notion-flavored Markdown that the spec read at this mode's start supports: headings to level 3, paragraphs, bulleted and numbered lists with no nesting, bold, italics, inline code and `<table>` blocks with `header-row` | Yes |
+| P13 | The broad match of *The new page's checks*, run on the draft by reading | Every hit is within its exceptions: `merg` 7, `Drive` 1, `Library` 1, `Notion` 11, `session` 16, `pfcanon` 6, `configuration` 1, `settings` 1, and `model`, `effort` and `strength` 0 |
+
+No required defect. Before this dry run, the session's own review of the draft made fourteen repairs to the
+draft's text, all before anything was committed; none changes what §A settles.
+
+#### The two-sided check (P5)
+
+Each requirement is quoted from the prompt's live body by its shortest clause.
+
+| Prompt | It requires or returns | The body meets it in |
+|---|---|---|
+| All five | Runs "directly or through a session he started that runs this prompt as a pass" | *Authority and limits*; invocation item 2 |
+| All five | "An invocation that names no such path or branch is a missing input" | Invocation items 6 and 7, in every invocation |
+| All five | "that branch then has one open pull request, opened if none is" | B1 step 6 opens it before any pass; check 4 after each pass |
+| All five | "Use the target/volume the invocation assigns" | Invocation item 4 |
+| TW-DRAIN-10, TW-DRAIN-20, TW-APPLY-10 | "Confirm exact prompt/version, target baseline" | Invocation items 1 and 4 |
+| All five | "establish distinguishable actual output filenames from the target/source version, exact selection and run identity" | Invocation item 3, the pass identity; one directory per pass |
+| All five | "An unrelated collision is a blocker for that name; do not overwrite it" | No copy ahead of a pass; *Redo from canon* moves a superseded draft first |
+| All five | "A filename or an attachment mentioned in another session does not prove access here" | Attached inputs are committed under `inputs/` at B1 and passed by repository path |
+| All five | "each output's repository path, with the commit that holds it" | *Its return*; the checks after each pass |
+| TW-DRAIN-10, TW-DRAIN-20 | "Minimal operator input is the assigned target PF and the incoming source" | Invocation items 4 and 5 |
+| TW-DRAIN-10, TW-DRAIN-20 | "Nathan may optionally select agendas/sections and provide relevant supporting material" | Item 5: the boundary only where the execution prompt sets one; supporting material |
+| TW-DRAIN-10, TW-DRAIN-20 | When the source is PF10, "resolve `PF10-HDE-Build-Notes` in `docs/pfcanon/` on `main`" | Item 5: PF10 by its path on `main` |
+| TW-DRAIN-10, TW-DRAIN-20 | Return `READY`, exactly `no redlines`, or `BLOCKED`; `COMPLETE_PACKAGE` or `PARTIAL_PACKAGE` | *Its return*: each consumed |
+| TW-DRAIN-10, TW-DRAIN-20 | For `READY`, carry "exact original, the completed redlines file and its proof log by repository path, selected scope, producer validation status and source-file header provenance" | TW-APPLY-10's invocation |
+| TW-DRAIN-10, TW-DRAIN-20 | "On a returned Apply diagnostic, preserve original/package/originating-session lineage" | *Its return*: a new drain pass carrying the diagnostic, the package and the earlier pass's identity |
+| TW-DRAIN-10, TW-DRAIN-20 | "Ask one focused question only when an essential choice, identity or selected boundary cannot be established" | *Its return*: a question is a stop (S4) |
+| TW-APPLY-10 | "minimal inputs are the exact original PF, the earlier redlines and their proof log" | Item 4, the target's canon path and base blob; TW-APPLY-10's own line |
+| TW-APPLY-10 | "If the original changed after preparation, require reconciliation by the preparer" | *Before each pass*: a changed target restarts at B2 |
+| TW-APPLY-10 | Two files "at the repository path the invocation names"; a diagnostic "at the repository path the invocation names" | Item 6: `pf-canon-drafts/` with the file name; the pass directory for a diagnostic |
+| TW-APPLY-10 | A package whose change-history entry disagrees with its execution date goes back to the preparer | *One date for a drain and its apply* |
+| TW-APPLY-10 | "Only when Nathan explicitly requests a no-change report" | Never requested: `no redlines` is recorded |
+| TW-RECORD-10 | "the approved Epic specification and the relevant additional material Nathan supplies" | TW-RECORD-10's line; *Eligibility and routing*, the run's Epic Specification |
+| TW-RECORD-10 | "establish that actual completed/historical posture from supplied evidence"; otherwise "ask" | Its line carries the evidence; a question is a stop (S4) |
+| TW-RECORD-10, TW-RECORD-20 | "every PF10 change that modifies, clarifies, supersedes or extends the approved specification" | Their lines: every applicable PF10 change; *Eligibility and routing*'s last bullet |
+| TW-RECORD-10, TW-RECORD-20 | "Write the updated PF20" or "the updated PF30 volume at the repository path the invocation names", with its proof log beside it | Item 6 |
+| TW-RECORD-20 | "the approved CRD specification, its actual specification-approval evidence" | TW-RECORD-20's line |
+| TW-RECORD-20 | "Open a new volume only when the invocation carries his rollover decision", and the review copy "at the repository path the invocation names for it" | TW-RECORD-20's line: the decision and the path |
+| TW-RECORD-10, TW-RECORD-20 | "If several real volumes leave placement ambiguous, ask Nathan"; a missing decisive input writes no updated file | A question or missing input is a stop (S4) |
+
+Each line the body adds to an invocation is one a prompt's intake reads: the version and page (preflight), the
+pass identity (output identity and the originating preparer), the branch's open pull request (the one-pull-request
+rule), and the supporting material (the drains' optional material).
+
+#### The PF03, PF06 and PF10 check (P10)
+
+The PE requires "the mandatory complete PF03, PF06, and PF10 compatibility check" for a new Glow prompt. Design
+v1.2 §1.1 recorded the complete check for the GTWPE's run prompt, at `0db3f0e`. Since then PF03 and PF06 have not
+changed, and PF10 moved from v13.4.2 to v13.5. This mode read PF03 whole, PF06 §0.2, §0.6.10, §1.1.11 and
+§3.5.2.8, and PF10's whole difference since `0db3f0e`, 185,681 bytes of diff: the version, "AI Agent sessions" in
+its front matter, and addenda 2.32 to 2.38.
+
+| Rule | Source | Where the body meets it |
+|---|---|---|
+| Read every relied-on source completely; a partial view is a retrieval failure; unknown stays unknown | Technical Writing Best Practices §3 | *Sources and reading*, first bullet; S2 |
+| One canonical home; route by title; no condensed copy of owned canon | §3, §5 | The body routes to the TW prompts and names documents; it states only the workflow consequences it acts on |
+| Claims of approval, application or merging only on direct evidence | §11, §12 | B6 step 5: the pull request claims no promotion, QA or acceptance |
+| Document-control values change only on explicit authority | §7, §15.1 | The passes set them under their own standing authority; the Flow Manager edits no draft and checks them at B4 |
+| Ask only when the answer changes the result | §12 | It recovers everything else; a question a pass asks goes to Nathan (S4) |
+| The final editorial check | §14 | B6's completion standard, beside the passes' own checks |
+| A canon edit is separate documentation work, and the Product Owner merges | Change Process Guide §0.2 | A run is its own pull request; Nathan alone merges |
+| One-pass redline bundles | §0.6.10 | TW-DRAIN-10, TW-DRAIN-20 and TW-APPLY-10, unchanged |
+| `ASK OK?` on an approval-submitted planning artifact | §1.1.11 | Not applicable: a run's pull request carries replacement documents, not a plan |
+| Post-QA drain ordering | §3.5.2.8 | B1 step 5 |
+| PF20 and PF30 entries only by separately authorized historical drainage | HDE Governance §9.1.1 | *Eligibility and routing*: only with Nathan's authorization |
+| Canon is `docs/pfcanon/` on `main`; change-process documents in `docs/ephemeral/` | HDE Build Notes 2.29 | *Sources and reading*; the run directory |
+| No HDE Build Notes locator in another PF | 2.30 | The passes; the Last Update Gate is not a citation (C3) |
+| Header model-advice review retired | 2.31 | No such content |
+| No required AI provider, product or model; the surface confers no permission | 2.38 | The body names none; a line about the session's configuration is not an instruction to the run |
+| Specification format authority | 2.14 | PF27 only with a governing specification |
+| Precedence; one logical base version; addenda scoped individually | §1 to §9 | The drains' own PF10 rules; the body passes PF10 by its path on `main` |
+
+Addenda 2.32 and 2.35 to 2.37 record HDE-EPIC040's QA, and 2.33 and 2.34 govern QA plans and live vendor calls.
+None sets a rule for a technical-writing run.
+
+### Harness files (`D22` condition 5), for `PLAN`
+
+- **Inline fetches, held only in this session's transcript**, which the harness keeps and leaves to its teardown:
+  GTWPE-MGMT-10 100526.2, once, at the mode's start; TW-DRAIN-10, TW-DRAIN-20, TW-APPLY-10, TW-RECORD-10 and
+  TW-RECORD-20 at 100626.2, once each, for P4 and P5; the control pages: the GTWPE parent page, the TW selection
+  and the architecture page; and Notion's Markdown specification, which is documentation.
+- **A harness save:** the PE Metaprompt 091426.1's fetch, `mcp-Notion-notion-fetch-1791311000399.txt`, 76,839
+  characters. Scripts printed its title, edit time and headings, then its sections outside the GCFPE overlay, in
+  four slices, into this session's context for authoring. It was deleted with `rm` once that reading was done
+  (exit 0). No save was hashed or compared as a body's identity.
+- **The session transcript.** Nathan's approval needed his message, which only the transcript held. A script read
+  it once and printed only the message's timestamp and length, never a tool result, and saved the message to
+  `c4/c4_analyze_approval.txt` in the scratchpad.
+- **The draft**, a prompt body authored in this session: `c4/flow10/GTWPE-FLOW-10-draft.md` in the scratchpad,
+  never in the repository. Scripts over it printed only counts, positions and its last words (P8). X1.3 (j)
+  deletes it once the page is read back.
+- **Other scratch files**, in this session's scratchpad: PF10's difference since `0db3f0e` and a copy of PF06
+  from `main` (canon, not prompt bodies); this section's drafts; and the scripts that set the approval and read
+  the transcript.
+
+### Canon and rulings relied on, for `PLAN`
+
+- **`AGENTS.md`:** the canon-first rule; canon is read-only; the CI-exempt paths; the pull request's headings and
+  "Merging preserves the record and approves nothing (D21-C)".
+- **Technical Writing Best Practices** (PF03), whole, for the compatibility check (P10).
+- **Change Process Guide** (PF06) §0.2, §0.6.10, §1.1.11 and §3.5.2.8, the post-QA drain ordering.
+- **HDE Governance** (PF04) §0.4, lowercase directories; §9.1.1, PF20 and PF30 entries only by separately authorized
+  historical drainage, and merges as Nathan's; §9.1.6, prompt ecosystem governance, as §A applies it.
+- **HDE Build Notes** (PF10), its whole difference since `0db3f0e`; 2.14, 2.29 PF10-CANON-001, 2.30 PF10-CITE-001,
+  2.31 PF10-HDR-001 and 2.38 PF10-AINEUTRAL-001.
+- **Rulings:** GTWPE-D1; in `gcfpe.decision-record.md`, `D21`, `D22` and `D26`; Nathan's target architecture with
+  his answers 1 to 8 and his directions of 2026-09-29 and 2026-10-05; his eligibility rulings of 2026-09-28
+  (design v1.2 §8.7); his instruction of 2026-09-25 (plan v1.2 §1), for P-1; his rulings of 2026-10-06 on the Last
+  Update Gate; and his approval of this Modification's analysis, quoted in `analyze_approved_by`.
+- **Controls:** `modification-template.md` 2.1; `reviewer-prompt-template.md`, its second template;
+  `notion-write-boundary.md`; `prompt-body-content-policy.md`; the PE Metaprompt 091426.1's general rules; Notion's
+  Markdown specification, for the body's form.
+- **GTWPE-MGMT-10 100526.2**, as fetched at the start of this mode: *Entry contract*, *The spine*, `MODE = PLAN`,
+  `MODE = EXECUTE`, *How each kind of target changes* and *The watched sources*.
