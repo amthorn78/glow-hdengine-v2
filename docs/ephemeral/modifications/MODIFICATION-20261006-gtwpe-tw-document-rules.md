@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -42,6 +42,11 @@ reviews:
     date: 2026-10-06
     required_open: 1
     outcome: "One checker, GTWPE-TW-DOCUMENT-RULES-PLAN-DC, on fd14d32..6679e4b, the last round Nathan's direction allows: R-1 and S-1 fixed, and L5 fixed for the formats it named; 1 required finding, DC-R1 (the drains' change-history rule gives an HDE CRD Records §4.2 material-change row a version it has no column for, and the preparation date where its Date is the decision's), confirmed by the session and left open at the cap, with the checker's smallest correction, for Nathan; 7 listed, DC-L1 to DC-L7, DC-L7 met by listing every open finding in §P. Required findings 3 to 1. Record: PLAN-DIFFCHECK.md"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-06
+    required_open: 0
+    outcome: "Second check of a repair's diff, on Nathan's review_cap override for one more round: one checker, GTWPE-TW-DOCUMENT-RULES-PLAN-DC2, on 87b6058..8bd0b38. DC-R1 fixed, the first checker's two strings applied byte for byte and nothing else in edits.json changed; R-1, S-1 and L5 stay fixed; no required finding; 5 listed, DC2-L1 to DC2-L5, three of them in the repair's own text, DC2-L5 met by recording this round. Required findings 3, 1, 0. Record: PLAN-DIFFCHECK-2.md"
 items:
   - id: ITEM-01
     statement: "TW-APPLY-10 brings every document-control field of the revised PF forward from the actual change, and the fields agree with one another: the version, the dates, the Last Update Gate, the change or revision history the document's own rules require, and version-sensitive references; the drains draft that change-history entry as a content redline."
@@ -1115,6 +1120,10 @@ Approving this plan accepts each of these (`DISP-001`).
 | DC-L4 | On a rollover, REC-FIELDS-PF30's "every other byte stays as canon has it" and REC-CHECK's "each updated file" do not name the review copy | Very low | A loud stop, or a review copy Nathan reviews | Rollover only, on his decision; REC-VOL is explicit |
 | DC-L5 | REC-FIELDS-PF30's "The inserted record ... carry no ... placeholder" has no "unless canon requires" clause, and a record entered with its planned state carries HDE CRD Records §7's `Pending` and `Not completed` values | Low | A loud stop | §7 defines those as values |
 | DC-L6 | REC-FIELDS' kept "any change or revision history entry the document's own rules require" could be read to reach an inserted CRD record's own material-change rows, DC-R1's root on the record prompts' side | Low | Misdated rows, or a stop | Not the natural reading, as the checker found; DC-R1's correction would settle the drains' side |
+| DC2-L1 | Whether a format's date is "the revision date" is now each prompt's judgement, and TW-APPLY-10's AP-AUTH lacks the drains' clause on "a date the format gives another meaning", beside the unchanged AP-AGREE. Canon settles it for HDE CRD Records, but not for HDE Governance §9.3.1's dated ID or §9.4's "Date / Author" | Low | When the two prompts judge differently, TW-APPLY-10 returns a correct package with a diagnostic, and the drain resubmits the same date: a loud stop that ends with Nathan | A loud stop. The checker's smallest correction, if Nathan opts in: DC-HIST's clause added to AP-AUTH, or "of this revision" added to AP-AGREE |
+| DC2-L2 | K-4's "as HDE Governance §9.3.1's does on `main`" states the plan's reading as canon's. §9.3.1 gives no meaning to the date in its ID or in §9.4's "Date / Author", and an `EPIC_BOUND` entry keeps the epic Doc-Delta's own date | Certain | A risk stated more firmly, and slightly wider, than canon supports; no text sent to Notion | Plan text only |
+| DC2-L3 | *Repair round 2 (PL3)*'s table says that both the DC-HIST and the AP-AUTH rows carry DC-HIST's clause on "a date the format gives another meaning"; only DC-HIST and its row do | Certain | A reader may take TW-APPLY-10 to carry the clause DC2-L1 turns on | Record text only. *Diff check 2 (PL3)* corrects the account beside it |
+| DC2-L4 | AP-REF's guard, "only when it exactly duplicates the document-control value it restates", does not exclude HDE-CRD-0001's "Last material update: `2026-09-07`", which equals PF30.1's effective date; only the word "restatement" does | Low: it needs a misreading | A closed record's "Last material update" re-dated to the execution date, with no stop; TW-APPLY-10's kept "Report old/new values" shows it | Not one of the four required kinds on the natural reading. L4's twin on TW-APPLY-10's side, outside this repair |
 
 ### Product Owner actions
 
@@ -1329,6 +1338,36 @@ prompt.
 
 The status is `PLANNING` from this repair round until the check of its diff returns.
 
+### Diff check 2 (PL3), at Nathan's opt-in
+
+One checker, GTWPE-TW-DOCUMENT-RULES-PLAN-DC2, a fresh general-purpose subagent, neither forked nor
+context-inheriting. It checked the second repair's diff, `87b6058..8bd0b38`, as Nathan's opt-in directs. The
+`override` names `review_cap` for this round, past `D26-A`'s cap of one.
+- **Brief.** Its only brief was `PLAN-DIFFCHECK-2-BRIEF.md`: 9,854 bytes, sha256
+  `5b98896b37cf398f2768a79be9086ec4ecc47b83dd61b87b18d4b759b66a85ed`. The brief was committed and pushed at
+  `e7d0408` before the checker was spawned, at about 16:04Z, and the checker confirmed that sha256.
+- **The run.** It read no prompt body and no Notion page, and wrote nothing. It ran for about 26 minutes, and
+  the harness reported 420,484 subagent tokens.
+- **The capture.** The session captured its `SubagentHandback` message with `capture.py`, as before:
+  `PLAN-DIFFCHECK-2.md`, 21,747 bytes, sha256
+  `fe5a2c3ab2168ad9e1e36fd14e3715be85893d5d1257c06cae5973f65e4a9d62`, the message's 21,746 bytes and one final
+  LF. Its first line is `0`, and it carries its `## Canon relied on` block.
+
+**Result: 0 required findings and 5 listed, DC2-L1 to DC2-L5.**
+- DC-R1 is fixed: the first checker's two strings were applied byte for byte, and nothing else in `edits.json`
+  changed. R-1, S-1 and L5 stay fixed. The required count went 3, 1, 0.
+- Three of the five sit in text the repair added, the stop rule's second signal (`D26-A` rule 4). This was the
+  one check Nathan's opt-in allowed, and it found no required defect, so the plan returns to him, as he
+  directed.
+- DC2-L1 to DC2-L4 are listed under *Open findings, accepted as risks*, each with its reason.
+- **DC2-L3** is in this record's own account. *Repair round 2 (PL3)*'s table says that the DC-HIST and AP-AUTH
+  rows both carry "a date the format gives another meaning ... keeps that meaning". Only DC-HIST and its row
+  carry that clause. AP-AUTH and its row say that the entry names, "where that format records them, the
+  version and the revision date this plan derives". The table is left as written, and this note corrects it.
+- **DC2-L5** asked that this round be recorded where the mode's sections end. The `reviews` ledger, *Harness
+  files*, *Cost of this mode* and *Canon and rulings relied on, for `PLAN`* now carry it.
+- The status was `PLANNING` from repair round 2 until now, and is `PLANNED` again.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds every prompt body fetched inline in this mode:
@@ -1365,6 +1404,12 @@ The status is `PLANNING` from this repair round until the check of its diff retu
 - **One side effect of the checker's run,** as it reported it, not its own act: the repository's hook rewrote
   `.git/canon_relied_on_hook.json` after its shell commands, as before. It reported no output of its own saved
   to a file by the harness.
+- **The second checker's transcript**, the output file the harness gave for its agent ID in this session's
+  tasks directory. `capture.py` read it twice for its one `SubagentHandback` call, at transcript line 332, and
+  wrote `PLAN-DIFFCHECK-2.md`. The checker fetched no prompt body, so the transcript holds none. It is left to
+  teardown.
+- **One side effect of the second checker's run,** as it reported it, not its own act: the repository's hook
+  rewrote `.git/canon_relied_on_hook.json` after its shell commands, as before.
 - **Scratch**, in this session's scratchpad. None holds a prompt body:
   - the §P drafts;
   - `edits.json` and this record as they stood before the dry run's repairs, and the three scripts that made
@@ -1375,22 +1420,33 @@ The status is `PLANNING` from this repair round until the check of its diff retu
     and wrote it into this record;
   - `capture.py`;
   - this record as it stood before PL4, the script that wrote PL4, and the draft of *Canon and rulings relied
-    on, for `PLAN`*.
+    on, for `PLAN`*;
+  - Nathan's words of his opt-in, as given; `edits.json` and this record as they stood before repair round 2;
+    the script that applied the repair after checking its strings against the first checker's return, and
+    the scripts that recorded the repair and this round.
 
 ### Cost of this mode
 
 - **Time.** From 12:30:32Z on 2026-10-06, when Nathan's approval arrived, to PL4 at about 14:30Z: about
   2 h on the meter, against the recorded estimate of about 4 h, so under it and under twice it. The dry run
   took about 23 minutes, the full review about 32, the repair round about 6, and the diff check about 26.
+- **The wait for Nathan.** From about 14:30Z to his opt-in at about 16:00Z, off the meter.
+- **Repair round 2, its check and this PL4.** From about 16:01Z to about 16:40Z, about 40 minutes, of which the
+  check took about 26.
+- **On the meter.** About 2 h 40 min in all, against the recorded estimate of about 4 h: under it, and under
+  twice it.
 - **Interaction cost.** §A predicted 7, with three review rounds. This mode's diff check, which the full
-  review's required finding called for under Nathan's direction, is a fourth: 8 so far. X5 records the actual.
-- **Tokens.** Not measured by this session. The harness reported subagent tokens of 548,728 for the reviewer
-  and 424,240 for the checker.
+  review's required finding called for under Nathan's direction, is a fourth, and the second diff check, on his
+  opt-in, a fifth: 9 so far. X5 records the actual.
+- **Tokens.** Not measured by this session. The harness reported subagent tokens of 548,728 for the reviewer,
+  424,240 for the first checker and 420,484 for the second.
 
 ### Canon and rulings relied on, for `PLAN`
 
 - Nathan's approval of 2026-10-06, quoted in `analyze_approved_by`: his Q-1 answer and his ruling on the Last
   Update Gate; and the request's standing directions.
+- Nathan's opt-in of 2026-10-06 to repairing DC-R1, overriding `review_cap` for one more round, quoted in
+  *Repair round 2 (PL3)*.
 - GTWPE-MGMT-10 100526.2, as fetched live in this mode:
   - from the spine: *Read these*, *What this prompt may change*, *The record*, *Scope freezes at analysis
     approval*, *Reviews are bounded*, *Reading prompt bodies*, *Boundaries* and *Failure contract*;
@@ -1405,7 +1461,7 @@ The status is `PLANNING` from this repair round until the check of its diff retu
   `notion-write-boundary.md`; `prompt-body-content-policy.md`.
 - Canon on `main` at `b1bd769`:
   - HDE CRD Records (PF30.1): its front matter, §3.2, §6 and §7, read again in this mode for DR-1 and R-1, and
-    §4.2 with HDE-CRD-0001's material-change history in §8, for DC-R1;
+    §4.2 and §4.4 in full, with HDE-CRD-0001's material-change history in §8, for DC-R1 and its repair;
   - HDE Phased Epics (PF20): its front matter, §1 and §2.6.1, for DR-2 and R-1;
   - HDE Governance (PF04) §9.1.1, for R-1 and S-1, and §9.3.1, for L5;
   - HDE CLI-API-Vendor Ref (PF05) §11.1 and the HDE Copy Tonality Guide (PF15)'s change log, for L5;
