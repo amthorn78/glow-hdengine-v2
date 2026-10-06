@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-tw-repository-io
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -42,6 +42,11 @@ reviews:
     date: 2026-10-06
     required_open: 0
     outcome: "One checker, GTWPE-TW-REPOSITORY-IO-PLAN-DC, on the repair's diff 29fe341..2eff7ae, as Nathan's approval allows: 0 required; R-1 and L1 fixed with no new defect; 4 listed, DC-1 to DC-4, three in text the repair added. Required findings fell from 2 to 0, and the cap is reached: to Nathan with every open finding listed in §P. Record: PLAN-DIFFCHECK.md"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-06
+    required_open: 0
+    outcome: "At Nathan's opt-in of 2026-10-06, past the cap (override: review_cap): one fresh checker, GTWPE-TW-REPOSITORY-IO-PLAN-DC2, on the second repair's diff eb80433..277de01: 0 required; L3, L2 with DC-1, L15 and DC-2 made as Nathan worded them, R-1 and L1 still fixed; 9 listed, DC2-1 to DC2-9, most in text the repair added. To Nathan with every open finding listed in §P. Record: PLAN-DIFFCHECK-2.md"
 items:
   - id: ITEM-01
     statement: "The TW prompts stay single-homed in Notion: no TW prompt body, copy or excerpt enters the repository, and this change alters where they read and write, not where they live."
@@ -1184,6 +1189,22 @@ Approving this plan accepts each of these (`DISP-001`).
 | DC-3 | The new `--has` of X4.4 and X4.6 is the first live `ctl_check.py` string with an apostrophe and parentheses | Failure; low | If Notion returns either changed, `post` fails after W20 and W21 or W23 have landed: a loud `D26-B` stop, with the selection switched and the notes split | Both pages, as fetched in P4, show apostrophes and parentheses that the last TW change sent, unchanged |
 | DC-4 | *Full review (PL3)*'s note on L2 and L3 quoted one word of kept text | Normal; certain; negligible | §P's statement of what it quotes is incomplete again, as in L4 | Five characters, within Q-2 |
 
+**From the second diff check,** open and listed (*Diff check 2 (PL3)*; the checker's own words are in
+`PLAN-DIFFCHECK-2.md`). Approving this plan accepts each of these too, unless Nathan opts in to its repair.
+The last column gives why each can be accepted.
+
+| # | Finding | Path; likelihood | Consequence | Why it can be accepted |
+|---|---|---|---|---|
+| DC2-1 | L8's reason covers the selection page, read as sent at X4.3 (2); *HDE TW*, read as sent at X4.5; and the Hub, whose note carries no «S». It does not cover *Alpha 1*, where `--has '«PA»'` can be met by «S» on a same-day run | Normal; medium that the dates coincide, low that «PA» is dropped | A dropped or wrong «PA» on *Alpha 1* would pass | «PA» is one date on all four pages, and two of them are read as sent |
+| DC2-2 | `review_cap` waives the validator's cap for every later round of every mode, which is wider than Nathan's "one more check of the repair's diff" | Normal; low | A further round he has not directed would pass both record checks | The reviews ledger shows every round, and the validator has no narrower gate. The session runs no round he has not directed |
+| DC2-3 | Each document prompt's read-only paragraph now bans merging twice, against §P's "each rule is said once in each prompt" | Normal; certain | Negligible: the two bans agree, and no check is affected | Nathan's L3 words put the sentence in the output rule |
+| DC2-4 | X1.0 does not re-read the R3 broad match's counts before, so a miscount or a missed stem hit first shows at X1.3 (g)(12), after that member's writes | Failure; low | A loud `D26-B` stop, leaving unselected new pages for Nathan to archive (PO-3) | A loud stop. The 13 terms work the same way (K-5), and P9 was checked by a second reading |
+| DC2-5 | (12) stops on a hit that forbids writing, committing, pushing or a pull request, but not on one that forbids the final response's repository path and commit | Normal; very low | A body contradicting OUT-E or OUT-G on that point would pass | None of the five exceptions does. The new texts state the path and the commit |
+| DC2-6 | L13's reason rests on the failure path. After a crash and a successful rerun, a stray copy stays under *HDE TW*, and no action archives it | Failure; low | An orphan copy, titled with the old version | Cosmetic. X4.5's pre-read lists *HDE TW*'s child pages in §E, so the copy is recorded |
+| DC2-7 | The status went from `PLANNED` back to `PLANNING` for repair round 2, which that section does not say | Normal; certain | Negligible | Both record checks pass at either. *Diff check 2 (PL3)* records it |
+| DC2-8 | *Cost of this mode* ended at the first PL4 | Normal; certain; low | The record understated the mode's cost | *Cost of this mode* now covers repair round 2 and this check |
+| DC2-9 | Four inexact statements: (a) *Diff check (PL3)* says that DC-1 stays listed, though it was repaired since; (b) *The new pages' checks* cites P3 for every check phrase's 0, though P10 read `Nathan alone merges`; (c) DC-4's consequence is stale after DC-1's repair; (d) *Repair round 2* says no value changed, though «H» did | Normal; certain | Negligible | Each is put right by text beside it: (a) by *Repair round 2*, (b) by P10, (c) by the DC-1 bullet, (d) by the same section's line on «H» |
+
 ### Product Owner actions
 
 | # | Action | How it is verified |
@@ -1357,6 +1378,31 @@ Also recorded from his words:
   `c433b46b48ab4d33832dcdb0c080bfb29bf70e45b7cb59b468a4f2de565bcfbe`.
 - The other counts after are unchanged.
 
+### Diff check 2 (PL3), at Nathan's opt-in
+
+One checker, GTWPE-TW-REPOSITORY-IO-PLAN-DC2, a fresh general-purpose subagent, neither forked nor
+context-inheriting. It checked the second repair's diff, `eb80433..277de01`, as Nathan's opt-in directs.
+The `override` names `review_cap` for this round, past `D26-A`'s cap of one.
+- **Brief.** Its only brief was `PLAN-DIFFCHECK-2-BRIEF.md`: 9,424 bytes, sha256
+  `8a2f76efec75c36e7c2059f1ad217e7a46112cf57a9e3ef5675d7583a1f581c6`. The brief was committed and
+  pushed at `c515e8b` before the checker was spawned, at about 00:47Z, and the checker confirmed that
+  sha256. Its spawn prompt asked for its canon under a bare "Canon relied on" line, as before.
+- **The run.** It read no prompt body and no Notion page, and wrote nothing. It ran for about 27 minutes,
+  and the harness reported 411,727 subagent tokens.
+- **The capture.** The session captured its `SubagentHandback` message with `capture.py`, as before:
+  `PLAN-DIFFCHECK-2.md`, 19,482 bytes, sha256
+  `a6cf40beadf93349510265ab3300bd8e38eb7713e0447639f715e07b470b453c`, the message's 19,481 bytes and
+  one final LF. Its first line is `0`.
+
+**Result: 0 required findings and 9 listed, DC2-1 to DC2-9.**
+- L3, L2 with DC-1, L15 and DC-2 are made as Nathan worded them, with no new required defect. R-1 and L1
+  stay fixed.
+- Most of the nine sit in text the repair added. That is the stop rule's second signal (*Reviews are
+  bounded*, rule 4). This was the one check his opt-in allowed, so the plan returns to him.
+- The nine are listed under *Open findings, accepted as risks*, each with why it can be accepted. This
+  section records DC2-7, and *Cost of this mode* records DC2-8.
+- The status was `PLANNING` from repair round 2 until this PL4, and is `PLANNED` again.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode:
@@ -1400,6 +1446,15 @@ Also recorded from his words:
   Nothing was written from a save, hashed or compared. The harness refused this session's `rm` of the two
   control-page saves, as it refused one in `ANALYZE`. Every save is left to its teardown and not read
   again. §A's saves were not read in this mode.
+- **The second checker's transcript**, the output file the harness gave for its agent ID in this session's
+  tasks directory. `capture.py` read it twice for its one `SubagentHandback` call, at transcript line
+  540, and wrote `PLAN-DIFFCHECK-2.md`. The checker fetched no prompt body, so the transcript holds none.
+  It is left to teardown.
+- **Two side effects of the second checker's run,** as it reported them, neither its own act:
+  - the harness saved one oversized output of the checker's, the record's repair diff, as
+    `tool-results/boql3mb9g.txt`, 41,572 bytes. That is repository text, no prompt body, and neither
+    the checker nor the session has read it. It is left to teardown;
+  - the repository's hook ran after the checker's shell commands, as before.
 - **Scratch**, in this session's scratchpad. None holds a prompt body:
   - the §P draft;
   - `build_edits.py`, which wrote `edits.json`, and its copy and `edits.json`'s as they stood before the
@@ -1415,12 +1470,16 @@ Also recorded from his words:
 
 ### Cost of this mode
 
-- **Time.** From 22:44:34Z on 2026-10-05, when the approval was recorded, to PL4 at about 00:20Z on
-  2026-10-06: about 1 h 35 min, with no wait for Nathan in between. The recorded estimate was about
-  3.5 h, so this is under it, and under twice it. The full review took about 32 minutes and the diff
-  check about 20.
-- **Tokens.** Not measured by this session. The reviewer reported 474,419 subagent tokens and the checker
-  370,163.
+- **Time.** From 22:44:34Z on 2026-10-05, when the approval was recorded, to the first PL4 at about
+  00:20Z on 2026-10-06: about 1 h 35 min. The full review took about 32 minutes and the diff check about
+  20.
+- **The wait for Nathan.** It ran from about 00:20Z to his opt-in, and is off the meter.
+- **Repair round 2, its check and this PL4.** From about 00:40Z to about 01:16Z, about 36 minutes, of
+  which the check took about 27.
+- **On the meter.** About 2 h 10 min in all, against the recorded estimate of about 3.5 h, so under it and
+  under twice it.
+- **Tokens.** Not measured by this session. The harness reported subagent tokens of 474,419 for the
+  reviewer, 370,163 for the checker and 411,727 for the second checker.
 
 ### Canon and rulings relied on, for `PLAN`
 
