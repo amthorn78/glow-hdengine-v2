@@ -120,8 +120,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-06: \"Nathan approves the analysis of MODIFICATION-20261006-gtwpe-tw-document-rules at f8bbb6c (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all seven GTWPE records (7/7), the request in the front matter equals PE39's message, main is still b1bd769, and the branch changes only the record. Q-1: option (a). Nathan waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for this release as well, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, and the override block records the waiver. The Last Update Gate (ITEM-02 and risk 3): Nathan ruled on 2026-10-06, verbatim, \"the gate name for a non PF10 source should just be the filename of the source. that simple\", and \"I would never use a PF target as a source, that does not make sense.\" So a change's source is PF10 or a file that is not a PF document, never another PF. The gate is BN and the PF10 version used when the source is PF10, and the source's filename alone, with no BN, for any other source. PLAN builds the rule in this form, where the analysis says BN and the source filename, and risk 3 falls away. The ruling is recorded in the architecture record's update of 2026-10-06, \"the gate for a source other than PF10\", in amthorn78/glow-hdengine-v2#579. Continue to PLAN: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-06
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-06: \"Nathan approves the plan of MODIFICATION-20261006-gtwpe-tw-document-rules at 201844c (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all seven GTWPE records (7/7); edits_check.py passes on edits.json at «H» 395394d1…5029a9; between 87b6058 and 201844c, edits.json changed only DC-HIST in both drains and AP-AUTH, each exactly as the first diff check's smallest correction gives it; main is still b1bd769, and the branch changes only docs/ephemeral/. The approval accepts every finding listed under *Open findings, accepted as risks* (DISP-001), DC2-L1 to DC2-L4 among them. It authorizes W1 to W20 from the session that runs this EXECUTE and nothing else in Notion, names the selection of the new TW-ALPHA release, and keeps every risk and override the plan records. Nathan allows `git fetch origin main` in that session. Proceed to EXECUTE, and report in at most five plain sentences.\""
+plan_approved_date: 2026-10-06
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -1367,6 +1367,26 @@ context-inheriting. It checked the second repair's diff, `87b6058..8bd0b38`, as 
 - **DC2-L5** asked that this round be recorded where the mode's sections end. The `reviews` ledger, *Harness
   files*, *Cost of this mode* and *Canon and rulings relied on, for `PLAN`* now carry it.
 - The status was `PLANNING` from repair round 2 until now, and is `PLANNED` again.
+
+### Plan approval (PL4)
+
+Nathan approved the plan at `201844c` on 2026-10-06; his words are in `plan_approved_by`. PE39 checked the plan
+first:
+- both record checks pass all seven GTWPE records;
+- `edits_check.py` passes on `edits.json` at «H»;
+- between `87b6058` and `201844c`, `edits.json` changed only DC-HIST in both drains and AP-AUTH, each exactly as
+  the first diff check's smallest correction gives it;
+- `main` is still `b1bd769`, and the branch changes only `docs/ephemeral/`.
+
+What the approval does:
+- **It authorizes** W1 to W20 from the session that runs `EXECUTE` of this plan, and nothing else in Notion. It
+  names the selection of the new TW-ALPHA release.
+- **It accepts as risks** every finding listed under *Open findings, accepted as risks* (`DISP-001`), DC2-L1 to
+  DC2-L4 among them, and keeps every risk and override the plan records.
+- **It allows** `git fetch origin main` in the session that runs `EXECUTE`.
+
+The approval holds at the commit that records it only if that commit's diff from `201844c` is this section and
+the approval fields, `edits.json` is unchanged at «H», and both record checks pass.
 
 ### Harness files (`D22` condition 5), for `PLAN`
 
