@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -37,6 +37,11 @@ reviews:
     date: 2026-10-06
     required_open: 3
     outcome: "One reviewer, GTWPE-TW-DOCUMENT-RULES-PLAN-A, as Nathan directed, on fd14d32: 1 required finding, R-1 (the record prompts' rule and pre-save check that the updated PF20 or PF30 carries no placeholder or TODO cannot be met on files they copy byte for byte, which carry canon's own template placeholders and history), confirmed by the session; 15 listed, L1 to L15, of which the session counts L5 (a change-history entry dated where the target's own format carries no date) as required under D26-A rule 3; and S-1, found by the session while confirming R-1 (the drains' and TW-APPLY-10's exception does not reach a record kept as history), also required. All three repaired; the other fourteen listed findings go to Nathan unrepaired (D26-A rule 4). Record: PLAN-REVIEW.md"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-06
+    required_open: 1
+    outcome: "One checker, GTWPE-TW-DOCUMENT-RULES-PLAN-DC, on fd14d32..6679e4b, the last round Nathan's direction allows: R-1 and S-1 fixed, and L5 fixed for the formats it named; 1 required finding, DC-R1 (the drains' change-history rule gives an HDE CRD Records §4.2 material-change row a version it has no column for, and the preparation date where its Date is the decision's), confirmed by the session and left open at the cap, with the checker's smallest correction, for Nathan; 7 listed, DC-L1 to DC-L7, DC-L7 met by listing every open finding in §P. Required findings 3 to 1. Record: PLAN-DIFFCHECK.md"
 items:
   - id: ITEM-01
     statement: "TW-APPLY-10 brings every document-control field of the revised PF forward from the actual change, and the fields agree with one another: the version, the dates, the Last Update Gate, the change or revision history the document's own rules require, and version-sensitive references; the drains draft that change-history entry as a content redline."
@@ -1089,6 +1094,27 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-13 | The gate's example, `BN 13.5` for PF10 v13.5, names today's PF10 version | Certain | The example ages as PF10 moves | It shows the form, as an example; the rule is the PF10 version used |
 | K-14 | §A's findings P-1 to P-3 | Certain | Three inexact statements in the frozen analysis | None changes the scope, an item or a member; *Findings on §A* records each |
 | K-15 | The merge rule is a statement, not a gate | Low | A branch merged early | Pull requests "cannot gate" (Nathan, 2026-09-28); the rule is Nathan's own |
+| DC-R1 | **Required, open at the review cap.** DC-HIST has a drain name the version TW-APPLY-10 will derive in every change-history entry, and give a dated entry the preparation date; AP-AUTH expects the same. An HDE CRD Records §4.2 material-change row, which §A names among the entries the drains draft, has no version column, and its Date is the decision's (*Diff check (PL3)*) | Low: drains on PF30 records are rare; certain on that path | A drain updating a PF30 record writes a stray version and the preparation date into the row, which passes every check when TW-APPLY-10 runs the same day; on a later day its package is returned | The cap is reached (`D26-A` rule 2; Nathan's direction). The checker's smallest correction is in *Diff check (PL3)*. Applying it, with a check, is Nathan's opt-in by his `review_cap` override; approving the plan as it stands accepts DC-R1 |
+| L1 | After a rollover, the pull request proposes PF30.1 at `Closed to new CRDs` holding a CRD registered in that same version, and the next volume at `Pending activation`: no volume is `Active` until Nathan publishes the review copy | Low: only Nathan decides a rollover | A careful run may stop on §6's "no new CRD may be registered", or he reviews the proposal | A loud stop or a reviewed proposal. DR-1 follows §A's R8 and HDE CRD Records §6, and the record report says the two files take effect together |
+| L2 | On a rollover, the review copy's version, effective date and gate are left to judgement (§6 sets the version suffix "when that volume is created"), and REC-ENDPT-PF30 names one file and one proof log where a rollover writes two of each | Low | A judgement in a copy Nathan reviews (K-11) | Not one of the four required kinds |
+| L3 | REC-MISSING's "only Nathan's rollover decision opens a new volume" could be read as letting a rollover stand in for a missing active volume | Low | REC-VOL still puts the record in the active volume, so such a run ends at a blocker | A loud stop |
+| L4 | REC-FIELDS' "every internal restatement of the document's own version or date" lacks AP-REF's guard, "only when it exactly duplicates"; HDE-CRD-0001's "Last material update: `2026-09-07`" equals PF30.1's effective date | Low, and lower since R-1's repair keeps earlier records as canon has them | A careless run could change it | Not silent on the plain reading: REC-CHECK's "differs only by" and R-1's repair stand against it. Nathan's opt-in |
+| L6 | DC-HIST's hygiene rule reaches a `Draft` status in the header, which the same paragraph reserves to Apply and AP-STATUS sets | Low: no PF header on `main` says Draft | Overlapping operations meet Apply's kept conflict rules | A loud stop |
+| L7 | Glow Infrastructure marks unknown facts OPEN or TBD (its §2.1: "Replace TBD as facts are confirmed"), and each drain run must judge whether canon requires them there | Low to medium for each run on that document | A block, or a proposed removal visible in the redlines and the proof log | S-1's repair names the test, "unless canon requires that exact language there"; the judgement remains |
+| L8 | AP-GATE's kept "Never substitute the redlines artifact/report filename or an inferred gate token" sits beside a rule that requires values such as `BN 13.5` | Low | A cautious run reads a conflict and stops | A loud stop |
+| L9 | *SECTION*'s third *Current operation* paragraph keeps the historical operation of TW-ALPHA-20260908.1's rules by reference | Not measurable from the record | A superseded rule asserted again by reference | The session read that operation in P7's fetch: its Apply sentence has no "only", its gate rule is excepted, and it says nothing of a status or of a row set on instruction |
+| L10 | HDE-NEW and HUB-NEW rename only the old heading, so C2's present-tense notes sit under historical headings | Certain | Low: wording | The pattern ledger E-038 records, which the request leaves to PE39 after C3 |
+| L11 | X4.3 (2), X4.4 and X4.6 check «PA» by its text, which «S» also matches when approval and selection fall on one UTC day | Medium | A missing «PA» would pass | Carried from C2's review (its L8), which Nathan accepted |
+| L12 | X1.3 (g) predicts no counts, so a stray duplicate shows only if it changes a heading or the last words, and a stray copy from a repeated W1 is not counted by (h) | Very low | Silent clutter | `OVERLAP` rules out a resend's duplicate, and W1 runs once per member |
+| L13 | `ONELINE`'s injected fault exercises only the `new` half, and `VALUES` would not catch another «…» value left in a `new` | Low | None today: «V» is the only value in a `new` | Not one of the four required kinds |
+| L14 | §P goes on past its findings on §A, P-1 to P-3, where template rule 1 says to return to Nathan | Certain | Procedural | Each is disclosed in *Findings on §A* and K-14, and goes to Nathan with this plan |
+| L15 | §P had no *Canon and rulings relied on* | Certain | Procedural | Added at PL4 |
+| DC-L1 | K-4 still says a drain dates the change-history entry with the preparation date unconditionally; after L5's repair that holds only where the format dates an entry, on `main` HDE Governance §9.3.1 | Certain | A risk stated wider than it is; no text sent to Notion | Listed by the checker; the plan's wording is Nathan's opt-in |
+| DC-L2 | The DC-HIST row of *The edits, by rule* summarizes the exception as "canon's own ... stays", looser than the edit's "unless canon requires that exact language there" | Low | The plan states a looser rule than the prompts carry; the text sent governs | Plan text only |
+| DC-L3 | "a record kept as history" has no bound; canon keeps records as history only in PF20 and PF30 | Low: on `main` no other document has a marker to keep | A kept marker, visible in the redlines and the proof log | Not silent |
+| DC-L4 | On a rollover, REC-FIELDS-PF30's "every other byte stays as canon has it" and REC-CHECK's "each updated file" do not name the review copy | Very low | A loud stop, or a review copy Nathan reviews | Rollover only, on his decision; REC-VOL is explicit |
+| DC-L5 | REC-FIELDS-PF30's "The inserted record ... carry no ... placeholder" has no "unless canon requires" clause, and a record entered with its planned state carries HDE CRD Records §7's `Pending` and `Not completed` values | Low | A loud stop | §7 defines those as values |
+| DC-L6 | REC-FIELDS' kept "any change or revision history entry the document's own rules require" could be read to reach an inserted CRD record's own material-change rows, DC-R1's root on the record prompts' side | Low | Misdated rows, or a stop | Not the natural reading, as the checker found; DC-R1's correction would settle the drains' side |
 
 ### Product Owner actions
 
@@ -1227,6 +1253,51 @@ Checked after the repair:
 
 L4, which sits in DR-2's text, is not touched: it is listed, and its repair is Nathan's to opt into.
 
+### Diff check (PL3)
+
+One checker, GTWPE-TW-DOCUMENT-RULES-PLAN-DC, a fresh general-purpose subagent, neither forked nor
+context-inheriting. It checked the repair's diff, `fd14d32..6679e4b`, which Nathan's approval allows once the
+full review has found a required defect. It is the last round his direction and `D26-A` rule 2 allow.
+- **Brief.** Its only brief was `PLAN-DIFFCHECK-BRIEF.md`: 10,724 bytes, sha256
+  `7be65241579c8a87ee33a3c2564ce9aa1e65639da5cd1c1cee7831f21d74010b`. The brief was committed and pushed at
+  `d15bada` before the checker was spawned, at about 13:50Z, and the checker confirmed that sha256.
+- **The run.** It read no prompt body and no Notion page, and wrote nothing. It ran for about 26 minutes, and
+  the harness reported 424,240 subagent tokens.
+- **The capture.** The session captured its `SubagentHandback` message with `capture.py`, as for the review:
+  `PLAN-DIFFCHECK.md`, 25,078 bytes, sha256
+  `2739e934e390a87e064b066ff0ff1c1089f98f1417574d6e4c00626f6de97997`, the message's 25,077 bytes and one final
+  LF. Its first line is `1`, and it carries its `## Canon relied on` block.
+
+**Result: 1 required finding, DC-R1, and 7 listed, DC-L1 to DC-L7.** R-1 and S-1 are fixed, and L5 is fixed for
+the formats it named. The required count fell from 3 to 1, so `D26-A` rule 4's halving test passes. Of the
+round's eight findings, two sit wholly and three partly in text the repair round added.
+- **DC-R1, confirmed by the session against canon on `main`, and open.** DC-HIST has a drain name, in every
+  change-history entry, the version TW-APPLY-10 will derive, and give a dated entry the preparation date.
+  AP-AUTH expects the same. §A names an HDE CRD Records entry's own material-change history (§4.2) among the
+  entries the drains draft. That table's columns are Date, Affected fields, Approved change or deviation,
+  Decision source and Build Notes reference. It has no version, and its Date is the decision's: HDE-CRD-0001's
+  five rows are dated 2026-09-05 to 2026-09-07, in a volume effective 2026-09-07. A drain that updates a PF30
+  record would write a stray version and the preparation date into the row. When TW-APPLY-10 runs the same
+  day, that passes every check; on a later day the package is returned. Its root predates the repair; the
+  clauses "in the target's own entry format" and "where that format dates an entry" are the repair's.
+- **Why it is not repaired.** The cap is reached: Nathan directed one full review and, on a required finding,
+  one check of the repair's diff (`D26-A` rule 2; template rule 8). A repair now would go unchecked. It goes to
+  Nathan open. Applying the correction below, with a check, is his opt-in by his `review_cap` override;
+  approving the plan as it stands accepts DC-R1 with the other open findings (`DISP-001`).
+- **The checker's smallest correction, not applied:**
+  - in DC-HIST, "naming the version TW-APPLY-10 will derive, the baseline version bumped once by the target's
+    established scheme, and, where that format dates an entry, the preparation date as the revision date"
+    becomes "naming, where that format records them, the version TW-APPLY-10 will derive, the baseline version
+    bumped once by the target's established scheme, and the preparation date as the revision date; a date the
+    format gives another meaning, such as an HDE CRD Records material-change row's decision date, keeps that
+    meaning";
+  - in AP-AUTH, "naming the version this plan derives and, where that format dates an entry, the date it
+    derives" becomes "naming, where that format records them, the version and the revision date this plan
+    derives".
+- **DC-L7** asked that every open finding be listed where Nathan's approval accepts it. They now are, under
+  *Open findings, accepted as risks*: DC-R1, the review's L1 to L4 and L6 to L15, and the checker's DC-L1 to
+  DC-L6, each with the reason it is listed.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds every prompt body fetched inline in this mode:
@@ -1256,6 +1327,13 @@ L4, which sits in DR-2's text, is not touched: it is listed, and its repair is N
 - **One side effect of the reviewer's run,** as it reported it, not its own act: the repository's PostToolUse
   hook updated `.git/canon_relied_on_hook.json` after its shell commands, as it does after this session's.
   It reported no output of its own saved to a file by the harness.
+- **The checker's transcript**, the output file the harness gave for its agent ID in this session's tasks
+  directory. `capture.py` read it twice for its one `SubagentHandback` call, at transcript line 356, as for the
+  reviewer's, and wrote `PLAN-DIFFCHECK.md`. The checker fetched no prompt body, so the transcript holds none.
+  It is left to teardown.
+- **One side effect of the checker's run,** as it reported it, not its own act: the repository's hook rewrote
+  `.git/canon_relied_on_hook.json` after its shell commands, as before. It reported no output of its own saved
+  to a file by the harness.
 - **Scratch**, in this session's scratchpad. None holds a prompt body:
   - the §P drafts;
   - `edits.json` and this record as they stood before the dry run's repairs, and the three scripts that made
@@ -1264,4 +1342,48 @@ L4, which sits in DR-2's text, is not touched: it is listed, and its repair is N
   - a copy of this record at `PLANNED`, for P10;
   - `edits.json` and this record as they stood before the repair round, and the scripts that made the repair
     and wrote it into this record;
-  - `capture.py`.
+  - `capture.py`;
+  - this record as it stood before PL4, the script that wrote PL4, and the draft of *Canon and rulings relied
+    on, for `PLAN`*.
+
+### Cost of this mode
+
+- **Time.** From 12:30:32Z on 2026-10-06, when Nathan's approval arrived, to PL4 at about 14:30Z: about
+  2 h on the meter, against the recorded estimate of about 4 h, so under it and under twice it. The dry run
+  took about 23 minutes, the full review about 32, the repair round about 6, and the diff check about 26.
+- **Interaction cost.** §A predicted 7, with three review rounds. This mode's diff check, which the full
+  review's required finding called for under Nathan's direction, is a fourth: 8 so far. X5 records the actual.
+- **Tokens.** Not measured by this session. The harness reported subagent tokens of 548,728 for the reviewer
+  and 424,240 for the checker.
+
+### Canon and rulings relied on, for `PLAN`
+
+- Nathan's approval of 2026-10-06, quoted in `analyze_approved_by`: his Q-1 answer and his ruling on the Last
+  Update Gate; and the request's standing directions.
+- GTWPE-MGMT-10 100526.2, as fetched live in this mode:
+  - from the spine: *Read these*, *What this prompt may change*, *The record*, *Scope freezes at analysis
+    approval*, *Reviews are bounded*, *Reading prompt bodies*, *Boundaries* and *Failure contract*;
+  - `MODE = PLAN` and `MODE = EXECUTE`;
+  - *How each kind of target changes*, *The watched sources* and *Relation to the PE Metaprompt*.
+- The PE Metaprompt 091426.1's general rules, as §A read them, and its recheck of source and control versions
+  before publication (X1.0 (6); P8).
+- The GTWPE decision record at `b1bd769`: `GTWPE-D1`, whose requirement and eight items `edits_check.py`
+  reads.
+- `gcfpe.decision-record.md`: `D21`, `D22` and `D26`.
+- `reviewer-prompt-template.md`, the *ANALYZE and PLAN review brief*; `modification-template.md` 2.1;
+  `notion-write-boundary.md`; `prompt-body-content-policy.md`.
+- Canon on `main` at `b1bd769`:
+  - HDE CRD Records (PF30.1): its front matter, §3.2, §6 and §7, read again in this mode for DR-1 and R-1, and
+    §4.2 with HDE-CRD-0001's material-change history in §8, for DC-R1;
+  - HDE Phased Epics (PF20): its front matter, §1 and §2.6.1, for DR-2 and R-1;
+  - HDE Governance (PF04) §9.1.1, for R-1 and S-1, and §9.3.1, for L5;
+  - HDE CLI-API-Vendor Ref (PF05) §11.1 and the HDE Copy Tonality Guide (PF15)'s change log, for L5;
+  - as §A read them: Technical Writing Best Practices §7 and §15.1, HDE Governance §9.1.6, HDE Build Notes
+    2.29 PF10-CANON-001, 2.30 PF10-CITE-001 and 2.38 PF10-AINEUTRAL-001, and HDE Build Checklist —
+    Distillation §0.3 and §0.6.
+- Nathan's target architecture, `docs/ephemeral/gtwpe.rewrite/GTWPE-TARGET-ARCHITECTURE-20260929.md` on
+  `main`: §4, read again for R-1, and §§5, 8 and 9 with his answers 6 and 8, as §A read them.
+- The GTWPE error ledger, `docs/ephemeral/gtwpe.rewrite/ERRORS.md`: E-035, on counts made by reading, and
+  E-036, on the canon block in a review's return.
+- MODIFICATION-20261005-gtwpe-tw-repository-io, the last TW change, for the selection route's form, the
+  control pages' texts, `ctl_check.py`, `capture.py`'s method and the briefs' form.
