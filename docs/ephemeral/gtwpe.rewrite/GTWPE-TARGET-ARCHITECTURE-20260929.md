@@ -348,3 +348,18 @@ that simple", and then: "I would never use a PF target as a source, that does no
 source is PF10 or a file that is not a PF document, never another PF. The Last Update Gate is `BN` and the PF10
 version used when the source is PF10, and the source's filename alone, with no `BN`, for any other source. This
 replaces answer 6 above, whose second form was `BN` and the source filename. C3 builds the rule in this form.
+
+### Update, 2026-10-06 (PE39): C3 complete
+
+C3 is `COMPLETE` (MODIFICATION-20261006-gtwpe-tw-document-rules, at `55536ad` on amthorn78/glow-hdengine-v2#580).
+TW-ALPHA-20261006.2 is selected: TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10 at
+100626.2, and TW-TRIAGE-10 at 100626.1. TW-APPLY-10 and the record prompts bring every document-control field
+forward from the actual change, the Last Update Gate in Nathan's form (`BN` and the PF10 version for a PF10
+source, the filename alone for any other); no produced document says Draft except where canon requires it;
+TW-DRAIN-20 judges every affected PF09 row on all the evidence; and TW-RECORD-10 and TW-RECORD-20 insert their
+section into a repository copy of PF20 or PF30, each file with its own GTWPE-D1 proof log. The plan went through
+one full review and two diff checks, the second at Nathan's opt-in (DC-R1, a PF30 material-change row's date).
+
+PE39 accepted it against the record and both record checks over all seven GTWPE records (7/7 each), the plan's
+edit file at its approved fingerprint, TW-APPLY-10 and TW-RECORD-20 read live, and the selection page, *HDE TW*,
+the GTWPE catalog, *Alpha 1* and the Operations Hub read live. C4, the Flow Manager, is next when Nathan says so.
