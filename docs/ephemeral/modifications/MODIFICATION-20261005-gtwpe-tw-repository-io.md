@@ -114,8 +114,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-tw-repository-io at 8cd6fcc (2026-10-05). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6), main is still 20d0dd8, and the branch changes only the record. Q-1: option (a). Select the new release in this Modification; the selection page and the notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, and TW runs by Nathan's direct invocations until the Flow Manager (C4). Record in the override block that Nathan waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, because C4 replaces it, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. Q-2: option (a). A correction: the words \"copy or excerpt\" in the request's item 1 were PE39's, not Nathan's; his direction was \"writing prompts do not belong in repo.\" Read item 1 as GTWPE-MGMT-10 100526.2 states it: no body and no copy enters the repository, and no passage longer than an edit's shortest unique anchor, or in ANALYZE the clause at issue. Continue to PLAN: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-05
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-06: \"Nathan approves the successor plan of MODIFICATION-20261005-gtwpe-tw-repository-io at 78a2ed4 (2026-10-06). PE39 checked it: edits-2.json differs from the approved edits.json only in the four re-measured counts (TW-APPLY-10 \"reference\" 7 to 8 and \"report\" 20 to 21, TW-DRAIN-10 \"report\" 20 to 21, TW-DRAIN-20 \"report\" 23 to 22) and its record of the re-measure; edits_check.py passes on it; main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6); main has moved only by ledger commits (#576, and #578 if merged); and the branch changes only docs/ephemeral/. On Nathan's direction, PE39 moved both unselected pages, TW-TRIAGE-10 — Identify PF10 Drain Targets — 100626.1 (3f14590a05eb81cdaa93ccc6bda2e2ad) and TW-DRAIN-10 — Prepare PF Document Redlines — 100626.1 (3f14590a05eb817cb5e6ee7187b38e0c), intact into *04 Archived Prompt Versions* (AI Prompts / Glow Epic-to-Change Migration 082726.1), and read it back at 2026-10-06T02:44:34Z: neither is a child page of HDE TW, whose edit time is unchanged at 2026-10-04T17:10:53.751Z. X1.0 confirms this again before any write, and stops if either is a child of HDE TW. The approval authorizes W1 to W23 from the session that runs this EXECUTE and nothing else in Notion, names the selection of the new TW-ALPHA release, and keeps every risk and override the approved plan accepted. Nathan allows `git fetch origin main` in that session. Proceed to EXECUTE, and report in at most five plain sentences.\""
+plan_approved_date: 2026-10-06
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -1775,6 +1775,29 @@ PO-4 is done (K-14).
   - HDE Build Notes (PF10) 2.29 PF10-CANON-001 and 2.38 PF10-AINEUTRAL-001.
 
   This mode's canon search found no other governing section.
+
+#### Plan approval (PL4), for the successor plan
+
+Nathan approved this successor plan at `78a2ed4` on 2026-10-06; his words are in `plan_approved_by`. PE39
+checked it first:
+- `edits-2.json` differs from `edits.json` only in the four counts measured again and its note of the
+  re-measure, and `edits_check.py` passes on it;
+- both record checks pass all six GTWPE records;
+- `main` has moved only by ledger commits;
+- the branch changes only `docs/ephemeral/`.
+
+On Nathan's direction, PE39 moved both 100626.1 pages, intact, into *04 Archived Prompt Versions* (*AI
+Prompts / Glow Epic-to-Change Migration 082726.1*). PE39 read the move back at 2026-10-06T02:44:34Z: neither
+page is a child page of *HDE TW*, whose edit time is unchanged. X1.0 (4) confirms it again before any write.
+
+What the approval does:
+- **It authorizes** W1 to W23 from the session that runs this `EXECUTE`, and nothing else in Notion. It
+  names the selection of the new TW-ALPHA release.
+- **It keeps** every risk and override the approved plan accepted.
+- **It allows** `git fetch origin main` in that session.
+
+The approval holds at the commit that records it only if that commit's diff from `78a2ed4` is this
+subsection and the approval fields, and both record checks pass.
 
 ## §E — Execution
 
