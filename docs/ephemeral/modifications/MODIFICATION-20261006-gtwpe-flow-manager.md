@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-flow-manager
-status: ANALYZED
+status: PLANNING
 targets: [prompt, rule, notion_control]
 gate_tier: 1
 closure:
@@ -20,6 +20,7 @@ interaction_cost_actual:
 estimate:
   plan: "about 5 h: the Flow Manager's complete body drafted through the PE Metaprompt from this analysis, as a temporary local draft, with the PE's PF03, PF06 and PF10 compatibility check; the handoff table; the catalog texts; §P's steps, readback phrases and the two-sided check of every pass invocation against the TW bodies; a dry run; and one full review by a single reviewer, who reads the draft. Time is the meter the session can read; tokens are not measured"
   execute: "about 2 h, not counting the wait for Nathan's merge: the new page (duplicate, title, the body) read back whole by this session; the handoff table committed and its merge detected on main (X2, X3); the catalog's row, note, design entry and checked-through commit, read back; the record. Time is the meter"
+item_count_at_approval: 9
 reviews:
   - mode: ANALYZE
     kind: DRY_RUN
@@ -100,8 +101,8 @@ request: |
   - No TypeSafe scoring in this work.
   - Report to Nathan in at most five plain sentences, in plain language, ending with exactly what he must approve or decide.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-10-06: \"Nathan approves the analysis of MODIFICATION-20261006-gtwpe-flow-manager at 772ccfb (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all eight GTWPE records (8/8), the request in the front matter equals PE39's message, main is still ad1615d, and the branch changes only the record. Nathan approves the three choices the analysis records: no document is copied ahead of its pass; GTWPE-FLOW-10's body is drafted and reviewed in the session that runs PLAN and is never stored in the repository, PLAN and EXECUTE run in that same session, and Nathan and PE39 read the published page live before the first trial; and the new page is created by duplicating a child page of the GTWPE parent page, retitling it and replacing its content (F-2). Risk 15 is PE39's citation error, logged as ledger E-040: the finding is C2's K-8, not C3's. Continue to PLAN: one dry run and one full review by a single reviewer, who reads the draft body, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
+analyze_approved_date: 2026-10-06
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -840,3 +841,18 @@ No required defect.
 
 **This mode's own cost.** Time: from 2026-10-06T17:23:53Z to A7 at about 18:02Z, about 38 minutes by the
 session's clock. Tokens: not measured by this session.
+
+## §P — Plan
+
+*Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
+
+This session runs the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+100526.2*, fetched live at the start of the mode, edited 2026-10-05T16:36:11.384Z, as at `ANALYZE`.
+
+- **Input:** §A as Nathan approved it at `772ccfb` on 2026-10-06. His words are in `analyze_approved_by`. The
+  mode started at 2026-10-06T18:15:59Z, when his approval arrived.
+- **The branch.** Nathan merged amthorn78/glow-hdengine-v2#581 with the record at `ANALYZED`, at
+  2026-10-06T18:14:05Z (`7d05995`), and PE39's ledger change E-040 and E-041 followed (#582, `601b330`). The
+  furthest copy of the record is therefore on `main`, byte-identical to `772ccfb`'s, and this mode works, as
+  the *Entry contract* says for that case, on a new branch: `docs/20261006-modification-gtwpe-flow-manager`,
+  restarted from `origin/main` at `601b330`, with a new pull request.
