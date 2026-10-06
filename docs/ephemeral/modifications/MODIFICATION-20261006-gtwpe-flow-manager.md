@@ -42,6 +42,11 @@ reviews:
     date: 2026-10-06
     required_open: 1
     outcome: "One checker, GTWPE-FLOW-MANAGER-PLAN-DC, on the repair diff 43150c6..ed964dc and the draft's nine recorded repairs: R-1 and L16 fixed, R-2 fixed at every stop and at B6, L5 fixed with a new defect; 1 required finding, DC-R1 (B3's RUN_NO_CHANGE ending names no harness file that holds a prompt body; D22 condition 5), in text the repair added, and 16 listed. The cap is reached, so DC-R1 goes to Nathan open, with the checker's smallest correction not applied"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-06
+    required_open: 0
+    outcome: "At Nathan's opt-in, past the cap by his review_cap override: one checker, GTWPE-FLOW-MANAGER-PLAN-DC2, on repair round 2's diff 8166328..e417b89 and the draft's three recorded changes. DC-R1 fixed, DC-L9 and DC-L16 closed; no required finding, and 6 listed, DC2-L1 to DC2-L6. The plan returns to Nathan for approval"
 items:
   - id: ITEM-01
     statement: "The Flow Manager, a new prompt GTWPE-FLOW-10 — Run the Technical Writing Flow, that Nathan starts in a new standalone session with an execution prompt and its inputs, and that runs the whole writing flow, itself or through the subagents it judges useful: execution-time triage of the complete supplied context; the run's branch, its one pull request and working copies from docs/pfcanon/ on main; each affected document's passes through the selected TW prompts with Nathan's redlining discipline; the document-control check across the drafts; the cross-document consistency check, whose fixes are new redline-and-apply cycles; the completion standard; and a review-ready pull request. It never merges and never writes docs/pfcanon/."
@@ -996,7 +1001,7 @@ In `docs/ephemeral/modifications/evidence/gtwpe-flow-manager/`, committed with t
 | `gtwpe.handoffs.md` | The handoff table's exact text, which X1.4 copies byte for byte to `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md` |
 | `PLAN-REVIEW-BRIEF.md` | PL3's review brief, committed before the reviewer is spawned |
 | `PLAN-REVIEW.md` | The reviewer's return, captured unedited from its own transcript |
-| `draft-repairs.json` | The repair round's nine changes to the draft, each as its old clause and new text exactly as applied, with the draft's line and character counts before and after. The draft itself is not in the repository |
+| `draft-repairs.json` | The changes the two repair rounds made to the draft, the first round's nine and, under `round_2`, the second's three, each as its old clause and new text exactly as applied, with the draft's line and character counts before and after each round. The draft itself is not in the repository |
 
 ### Values fixed in this plan
 
@@ -1248,6 +1253,12 @@ Approving this plan accepts each of these (`DISP-001`).
 | DC-L14 | `draft-repairs.json` commits clause-length passages of the unpublished body: old clauses of 51 to 192 characters, new texts of 95 to 457 | Certain | Small and visible | The edits-file practice, within `D22`'s "clause at issue" limit |
 | DC-L15 | The reason recorded for keeping L14 listed is arguable: a captured review that differs from the return is a silent outcome on the normal path | Medium | A captured review that differs from the reviewer's return | L14 stays listed, as the reviewer classed it |
 | DC-L16 | **Closed by *Repair round 2 (PL3)*; no longer open.** As found, B1 step 7 also ends `RUN_NO_CHANGE` without naming any harness file (pre-existing) | Medium | Small: the transcript holds at most this prompt's own body | DC-R1's correction placed in B1 step 7 would cover both endings |
+| DC2-L1 | Both `RUN_NO_CHANGE` endings now take B6 step 3's Notion check, and *Resume* does not read the two edit times again, so a run stopped and resumed after an edit of *HDE TW* or the GTWPE parent page stops at B3's ending on every resume (L1's loop) | Low to medium, for runs over several sessions | Loud; the way on is a new run | A loud stop: L1's, reached through the form Nathan directed |
+| DC2-L2 | *Repair round 2 (PL3)* is inexact in four small places | Certain | None for execution | Corrected beside it in *Diff check 2 (PL3)* |
+| DC2-L3 | *Evidence files* and *Harness files* covered only the first repair round | Certain | Small and visible | Brought into line at PL4 |
+| DC2-L4 | The override block waives the review cap in the validator for every mode and round, not for one round | Low | A further round would pass the validator, though it would still show in `reviews` | Recorded; this plan runs none |
+| DC2-L5 | At B3's ending after a redo, B6 step 2 checks superseded files in `passes/`, which a redo cannot cure | Low | One futile redo, then S5; loud | A loud stop |
+| DC2-L6 | A session of the run that ends without a stop, closed by Nathan or by the harness, names no harness file, and no later ending names its files (pre-existing) | Low | Small: `RUN.md` records each read, by pass | Not one of the four required kinds: `D22` binds the session that made the file, which did not stop to report |
 
 ### Product Owner actions
 
@@ -1501,6 +1512,41 @@ Also recorded:
 - **Nothing else is repaired.** The other listed findings stay listed.
 - **The wait.** From PL4 at about 20:15Z to his opt-in at 23:27:10Z, off the meter.
 
+### Diff check 2 (PL3), at Nathan's opt-in
+
+One checker, GTWPE-FLOW-MANAGER-PLAN-DC2, a fresh general-purpose subagent, neither forked nor context-inheriting.
+It checked repair round 2's diff, `8166328..e417b89`, with the draft's three recorded changes, read in place, past
+`D26-A`'s cap of one diff check by Nathan's `review_cap` override.
+- **Brief.** Its only brief was `PLAN-DIFFCHECK-2-BRIEF.md`: 9,962 bytes, sha256
+  `000530102880108173456972d59fcaa3e3865f1ad61e59fb04f4adae570852ed`. It was committed and pushed at `0db95f4`
+  before the checker was spawned, at about 23:31Z, and the checker confirmed that sha256.
+- **The run.** It read the draft whole, in place, and no other prompt body or Notion page, and wrote nothing. It
+  undid both repair rounds in memory from `draft-repairs.json` and reproduced the dry run's P8 counts. It reported
+  one side effect that was not its act, the hook's update of `.git/canon_relied_on_hook.json`, and no harness save.
+  It ran for about 25 minutes, and the harness reported 369,613 subagent tokens.
+- **The capture.** As before: `capture.py`, from the checker's own transcript, at its one `SubagentHandback` call,
+  transcript line 269. `PLAN-DIFFCHECK-2.md` is 17,357 bytes, sha256
+  `7f27ca92cc03ca4fc9f23722f0c85ce582655fd9cfd54741b934679b0a7ae802`, the message's 17,334 characters and one final
+  LF. Its first line is `0`, and it carries its `## Canon relied on` block. In relaying the hand-back to this
+  session, the harness flagged it for naming `.claude/settings.json`, where the checker disclosed the repository's
+  hook. It holds no instruction, and the capture is the checker's own text.
+
+**Result: no required finding, and 6 listed, DC2-L1 to DC2-L6.** DC-R1 is fixed, and DC-L9 and DC-L16 are closed.
+The required count went from 4 to 1 to 0. Four of the six listed findings sit in, or arise through, text the
+repair added, which is `D26-A`'s signal to return to Nathan; his direction returns the plan to him in any case.
+- **Two listed findings correct this record:**
+  - DC2-L2, beside it. *Repair round 2 (PL3)* is inexact in four small places. It says it changed "the draft and
+    §P alone", but the front matter's override block changed too. It says "No step, value or Notion write changed"
+    beside K-3's changed count, which is one of §P's values. B3 restates B1 step 7 in its own grammar, "it takes",
+    "is marked", "returns", not "with the same words". And *Open findings* still opens "Approving this plan
+    accepts each of these" above rows that now say "no longer open", as C3's did. Its table and bullets state each
+    change truly.
+  - DC2-L3, at PL4. *Evidence files* described `draft-repairs.json` as the first round's nine changes, and
+    *Harness files, for `PLAN`* named only the first round's inline scripts. Both now cover the second round too,
+    as Nathan's "bring the plan's own descriptions into line" asks.
+- **DC2-L4.** While the override block stands, the validator checks no review cap in any mode. This plan runs no
+  further round, and any later round would still show in `reviews`.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **Inline fetches, held only in this session's transcript**, which the harness keeps and leaves to its teardown:
@@ -1531,22 +1577,30 @@ Also recorded:
 - **Two side effects of the checker's run**, as it reported them, not its own acts: the hook's update of
   `.git/canon_relied_on_hook.json`, and one harness save of the repair diff, `bjwjueirk.txt`, which holds
   repository text only.
+- **The second checker's transcript**, the output file the harness gave for its agent ID in this session's tasks
+  directory. It holds the draft, which the checker read in place. `capture.py` read it twice for its one
+  `SubagentHandback` call, at transcript line 269, and wrote `PLAN-DIFFCHECK-2.md`. It is left to the harness's
+  teardown.
 - **Other scratch files**, in this session's scratchpad: PF10's difference since `0db3f0e` and a copy of PF06
   from `main` (canon, not prompt bodies); this section's drafts; `capture.py`; the scripts that set the approval
-  and read the transcript; and the inline scripts that applied the draft's nine changes and wrote
-  `draft-repairs.json`, which held the repairs' clauses and kept no copy of the draft.
+  and read the transcript; and the inline scripts that applied the draft's changes in both repair rounds, nine
+  and then three, and wrote `draft-repairs.json`, which held the repairs' clauses and kept no copy of the draft.
 
 ### Cost of this mode
 
-- **Time.** From 18:15:59Z on 2026-10-06, when Nathan's approval arrived, to PL4 at about 20:15Z: about 2 h on
-  the meter, against the recorded estimate of about 5 h, so under it and under twice it. Reading the sources,
-  drafting the body and §P, and the dry run took until the brief was pushed at 18:49:41Z; the full review about
-  38 minutes; the repair round about 5; and the diff check about 27.
+- **Time.** From 18:15:59Z on 2026-10-06, when Nathan's approval arrived, to the first PL4 at about 20:15Z:
+  about 2 h on the meter. Reading the sources, drafting the body and §P, and the dry run took until the brief was
+  pushed at 18:49:41Z; the full review about 38 minutes; the repair round about 5; and the diff check about 27.
+- **The wait for Nathan.** From about 20:15Z to his opt-in at 23:27:10Z, off the meter.
+- **Repair round 2, its check and this PL4.** From 23:27Z to about 23:58Z, about 31 minutes, of which the check
+  took about 25.
+- **On the meter.** About 2 h 30 min in all, against the recorded estimate of about 5 h: under it, and under twice
+  it.
 - **Interaction cost.** §A predicted 7, with three review rounds. The diff check, which the full review's required
-  findings called for under Nathan's direction, is a fourth round: 8 so far. #581's merge at `ANALYZED` is a
-  merge the prediction did not count (P-4). X5 records the actual.
-- **Tokens.** Not measured by this session. The harness reported subagent tokens of 561,602 for the reviewer and
-  417,825 for the checker.
+  findings called for under Nathan's direction, is a fourth round, and the second diff check, on his opt-in, a
+  fifth: 9 so far. #581's merge at `ANALYZED` is a merge the prediction did not count (P-4). X5 records the actual.
+- **Tokens.** Not measured by this session. The harness reported subagent tokens of 561,602 for the reviewer,
+  417,825 for the first checker and 369,613 for the second.
 
 ### Canon and rulings relied on, for `PLAN`
 
