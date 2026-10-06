@@ -64,5 +64,37 @@
    "old": "<td>No eligible document is affected, and `RUN.md` is in the pull request</td>",
    "new": "<td>No eligible document is affected, by triage or by every drain's `no redlines`, and `RUN.md` is in the pull request</td>"
   }
- ]
+ ],
+ "round_2": {
+  "artifact": "The changes of Repair round 2 (PL3), at Nathan's opt-in of 2026-10-06, to the draft of GTWPE-FLOW-10, each exactly as applied: the old clause and its new text. The first round's keys above are as that round left them.",
+  "draft_before": {
+   "lines": 255,
+   "characters": 27497
+  },
+  "draft_after": {
+   "lines": 255,
+   "characters": 27580
+  },
+  "character_delta_check": "27497 + 83 = 27580",
+  "repairs": [
+   {
+    "finding": "DC-R1",
+    "where": "B1 step 7",
+    "old": "7. If no eligible document is affected, `RUN.md` and the pull request say so: mark the pull request ready for review, and return `RUN_NO_CHANGE`.",
+    "new": "7. If no eligible document is affected, take B6 steps 2 to 4; then `RUN.md` and the pull request say so: mark the pull request ready for review, and return `RUN_NO_CHANGE`."
+   },
+   {
+    "finding": "DC-R1",
+    "where": "B3 Drafts",
+    "old": "the run ends as B1 step 7 does: `RUN.md` and the pull request say so, the pull request is marked ready for review, and the run returns `RUN_NO_CHANGE`.",
+    "new": "the run ends as B1 step 7 does: it takes B6 steps 2 to 4; then `RUN.md` and the pull request say so, the pull request is marked ready for review, and the run returns `RUN_NO_CHANGE`."
+   },
+   {
+    "finding": "DC-R1",
+    "where": "RUN.md",
+    "old": "(B6, and every stop)",
+    "new": "(B6 step 4, wherever it runs, and every stop)"
+   }
+  ]
+ }
 }

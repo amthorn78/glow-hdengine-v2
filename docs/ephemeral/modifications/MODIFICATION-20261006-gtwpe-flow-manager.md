@@ -12,9 +12,9 @@ closure:
   state_sharers: []
 readiness: READY
 override:
-  by: ""
-  overrides: []
-  reason: ""
+  by: Nathan
+  overrides: [review_cap]
+  reason: "Nathan, 2026-10-06, opting in to repair DC-R1 of the plan at 8166328: one more round, one check of that repair's diff by a fresh checker who reads the draft, past D26-A's cap of one diff check per mode. His words are in §P, Repair round 2 (PL3)"
 interaction_cost_predicted: 7
 interaction_cost_actual:
 estimate:
@@ -1202,7 +1202,7 @@ Approving this plan accepts each of these (`DISP-001`).
 |---|---|---|---|---|
 | K-1 | P-3's check of the remote does not see a pass push to another existing branch, and B6's Notion check sees only two pages (§A risk 11) | Very low: every TW prompt pushes only to the branch its invocation names | An unauthorized write unseen by the run | §A's wording would stop runs that did nothing wrong whenever another branch moved; the limit is stated in the body |
 | K-2 | B6's Notion check stops a run when another session edits *HDE TW* or the GTWPE parent page during it | Low | A loud stop; Nathan resumes | §A's check, kept as approved; a resume costs little |
-| K-3 | W3 sends a 27,497-character body; a transcription or rendering fault is found only by the readback, which compares by reading | Low | A loud stop at X1.3 (h)(6); Nathan archives the page | `D22` forbids a byte comparison of a body; the readback is read twice, and Nathan and PE39 read the page live before the first trial |
+| K-3 | W3 sends a 27,580-character body; a transcription or rendering fault is found only by the readback, which compares by reading | Low | A loud stop at X1.3 (h)(6); Nathan archives the page | `D22` forbids a byte comparison of a body; the readback is read twice, and Nathan and PE39 read the page live before the first trial |
 | K-4 | CAT-ROW-NEW adds a row by replacing a table's closing lines; no earlier GTWPE write has added a table row | Low | A refused call writes nothing; a malformed table fails X4.2's check | A loud stop with its reverse replacement |
 | K-5 | The reviewed draft's identity before W3 rests on this session alone: no fingerprint binds it, since a body is never hashed (§A risk 1) | Low | A changed draft would be published | Only this session writes the scratchpad; X1.0 (3) checks its structure; the readback and Nathan's live reading follow |
 | K-6 | A run reads each TW prompt's selected version as each pass starts, so a run during a TW release change mixes versions | Low: a TW release changes only through GTWPE-MGMT-10 | `RUN.md` shows two versions of one prompt | Recorded per pass; design v1.2 §6's "a run started under one GTWPE version finishes under it" is not carried by §A |
@@ -1231,7 +1231,7 @@ Approving this plan accepts each of these (`DISP-001`).
 | L20 | F5's "any other failure" omits the body's retries for `PARTIAL_PACKAGE` and for `BLOCKED` with an input the run holds; its first half, F3's missing S4, is met by R-1's repair | Certain | Low; closure is unaffected | Not one of the four required kinds |
 | L21 | The same-date rule drains again every document applied on a later date, though only a format that records a revision date needs it | Medium for runs over several days | The cost of a drain | The safe rule; not one of the four required kinds |
 | L22 | The invocation does not state E-006's bound on what a pass may write; it rests on each TW prompt's output rule and the checks after the pass | Low | A stray write the run does not see | §A's design, with its limits stated (K-1) |
-| DC-R1 | **Required, open** (*Diff check (PL3)*). B3's new ending returns `RUN_NO_CHANGE` after the drains have read TW prompt bodies, and no step names the harness files that hold them (`D22` condition 5; ITEM-07's E-016) | Medium, L5's rating; on that path the omission is certain | Silent; small, since the files are left to the harness's teardown | The cap is reached, and a repair now would go unchecked. Nathan's opt-in, with or without one more check |
+| DC-R1 | **Repaired in *Repair round 2 (PL3)*, at Nathan's opt-in; no longer open.** As found (*Diff check (PL3)*), B3's new ending returns `RUN_NO_CHANGE` after the drains have read TW prompt bodies, and no step names the harness files that hold them (`D22` condition 5; ITEM-07's E-016) | Medium, L5's rating; on that path the omission is certain | Silent; small, since the files are left to the harness's teardown | The cap is reached, and a repair now would go unchecked. Nathan's opt-in, with or without one more check |
 | DC-L1 | S6's row still stops the run on "a difference in the checks after a pass", while check 6 now stops only its document (S4) | Low | The run stops instead of the document, loudly either way | A loud stop |
 | DC-L2 | Nathan's "leave it out", given at a resume, is not among `RUN.md`'s contents, and B1 step 5's boundary binds only the documents triage linked to the change, so check 6 can stop a document again for a decision already given | Low to medium, for runs over several sessions | A repeated loud S4 | A loud stop |
 | DC-L3 | The body does not say that "leave it out" redoes the document from canon and "draft it" keeps the pass's outputs; both follow from *Resume* and *Redo from canon* | Low | A loud stop, or one needless redo | A loud stop |
@@ -1240,20 +1240,20 @@ Approving this plan accepts each of these (`DISP-001`).
 | DC-L6 | §P's P5 does not show the record prompts accepting a boundary, so a record pass that ignores Nathan's "leave it out" meets check 6 | Low, for PF20 or PF30 with a held-back change | Loud | A loud stop |
 | DC-L7 | A stop records what became of each harness file, but leaves deleting a save to B6 step 4 by reference | Low | Disclosed, not silent | Not one of the four required kinds |
 | DC-L8 | A stop at intake, before B1 step 6 creates `RUN.md` and the pull request, has nowhere to record the disclosure (pre-existing) | Low | The return names the reason but no file | Pre-existing; the return is loud |
-| DC-L9 | B3's ending also skips B6 step 3's Notion check and, after a redo, step 2's proof-log check | Medium for step 3, low for step 2 | The harm needs a stray Notion write, very unlikely | DC-R1's correction with "B6 steps 2 to 4" would close it |
+| DC-L9 | **Closed by *Repair round 2 (PL3)*'s fuller correction; no longer open.** As found, B3's ending also skips B6 step 3's Notion check and, after a redo, step 2's proof-log check | Medium for step 3, low for step 2 | The harm needs a stray Notion write, very unlikely | DC-R1's correction with "B6 steps 2 to 4" would close it |
 | DC-L10 | After a redo whose drain returns `no redlines`, B3's ending can hold while the result row's "every drain's `no redlines`" does not | Low | A truthful end state, inexactly worded | Not one of the four required kinds |
 | DC-L11 | L19's and L20's rows lose detail: the `<key>` placeholder in a table cell, and F3 not naming a drain's question | Certain | None for execution | Record text |
 | DC-L12 | *Repair round (PL3)* credits the reviewer with all of R-1's repair, whose document-level S4 is the session's | Certain | A reader may credit the reviewer with the S4 design | Corrected beside it in *Diff check (PL3)* |
 | DC-L13 | *Harness files* named `capture.py` but not the inline scripts that applied the draft's repairs | Certain | None for `D22`: the clauses they handled are in `draft-repairs.json` | Corrected in *Harness files* |
 | DC-L14 | `draft-repairs.json` commits clause-length passages of the unpublished body: old clauses of 51 to 192 characters, new texts of 95 to 457 | Certain | Small and visible | The edits-file practice, within `D22`'s "clause at issue" limit |
 | DC-L15 | The reason recorded for keeping L14 listed is arguable: a captured review that differs from the return is a silent outcome on the normal path | Medium | A captured review that differs from the reviewer's return | L14 stays listed, as the reviewer classed it |
-| DC-L16 | B1 step 7 also ends `RUN_NO_CHANGE` without naming any harness file (pre-existing) | Medium | Small: the transcript holds at most this prompt's own body | DC-R1's correction placed in B1 step 7 would cover both endings |
+| DC-L16 | **Closed by *Repair round 2 (PL3)*; no longer open.** As found, B1 step 7 also ends `RUN_NO_CHANGE` without naming any harness file (pre-existing) | Medium | Small: the transcript holds at most this prompt's own body | DC-R1's correction placed in B1 step 7 would cover both endings |
 
 ### Product Owner actions
 
 | # | Action | How it is verified |
 |---|---|---|
-| PO-1 | Approve this plan, which accepts every open finding, DC-R1 among them (`DISP-001`); or first opt in to DC-R1's correction as *Diff check (PL3)* gives it, with one more check by his `review_cap` override or without one. The approval authorizes W1 to W4 and nothing else in Notion (`notion-write-boundary.md`), made from the session that runs `EXECUTE` of this plan, which is this one (HDE Build Notes, PF10-AINEUTRAL-001) | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
+| PO-1 | Approve this plan, which accepts every open finding (`DISP-001`). The approval authorizes W1 to W4 and nothing else in Notion (`notion-write-boundary.md`), made from the session that runs `EXECUTE` of this plan, which is this one (HDE Build Notes, PF10-AINEUTRAL-001) | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
 | PO-2 | Merge amthorn78/glow-hdengine-v2#583 at X2, with the handoff table and the record at `EXECUTING`: the exception of his merge rule for the pull request the plan opens | X3 detects it by files on `main` |
 | PO-3 | With PE39, read the published page live before the first trial | Theirs; nothing in this Modification waits on it |
 | PO-4 | Merge the record's pull request after X5 when he chooses | Nothing waits on that merge (`D21-C`) |
@@ -1468,6 +1468,38 @@ other signal to stop and return.
     table there states each change truly.
   - DC-L13. *Harness files, for `PLAN`* named `capture.py` but not the inline scripts that applied the draft's
     nine changes and wrote `draft-repairs.json`. It now names them.
+
+### Repair round 2 (PL3), Nathan's opt-in
+
+Nathan's words, 2026-10-06:
+
+> Nathan opts in to repairing DC-R1 of the PLAN of MODIFICATION-20261006-gtwpe-flow-manager at 8166328, overriding review_cap for one more round. PE39 checked the plan: main's modification_validate.py and gtwpe_record_check.py each pass all eight GTWPE records (8/8), main is at 601b330, the branch changes only docs/ephemeral/modifications/, and P-1 holds: Nathan's instruction of 2026-09-25 reads "PF27 and PF30 are updated only when a specification exists" (GTWPE-IMPLEMENTATION-PLAN-v1.0.md; CHECKPOINT.md). The repair: apply the checker's smallest correction from *Diff check (PL3)* in the fuller form its notes give, "B6 steps 2 to 4" in place of "B6 step 4", placed so that both RUN_NO_CHANGE endings, B3's and B1 step 7's, take it, which also closes DC-L9 and DC-L16; and the *RUN.md* change as the checker gives it. Record each change in draft-repairs.json as before, and bring the plan's own descriptions into line. Repair nothing else. Then one check of that repair's diff by a fresh checker who reads the draft, and record the override in the override block. If the check finds no required defect, return the plan for Nathan's approval; if it finds one, stop and report it unrepaired. Report in at most five plain sentences ending with exactly what he must approve.
+
+By this session, from about 23:28Z, in the draft and in §P alone. No step, value or Notion write changed, the
+handoff table and «HT» did not change, and the only evidence file changed is `draft-repairs.json`.
+
+| Finding | Where | Repair |
+|---|---|---|
+| DC-R1, DC-L16 | Draft, B1 step 7 | It now opens "If no eligible document is affected, take B6 steps 2 to 4; then", and goes on as before |
+| DC-R1, DC-L9 | Draft, B3 | Its ending restates B1 step 7 with the same words: "the run ends as B1 step 7 does: it takes B6 steps 2 to 4; then `RUN.md` and the pull request say so", as before |
+| DC-R1 | Draft, *RUN.md* | "(B6 step 4, wherever it runs, and every stop)", as the checker gives it |
+| DC-R1, DC-L9, DC-L16 | *Open findings, accepted as risks* | Their rows now say they are repaired, and no longer open |
+| — | K-3; PO-1 | K-3 names the repaired draft's 27,580 characters; PO-1 no longer offers the opt-in, which Nathan has made |
+
+Also recorded:
+- **The placement.** The checker gave B3's correction as "the run takes B6 step 4, then ends as B1 step 7 does",
+  and the same words in B1 step 7 for DC-L16. With both, B3's ending would take the steps twice: once itself, and
+  once through B1 step 7. So the words go into B1 step 7, which both endings follow, and B3's restatement of B1
+  step 7 carries them. Each ending takes B6 steps 2 to 4 once, before `RUN.md` and the pull request say so.
+- **The record.** A script applied the three changes, each to a clause found once, and `draft-repairs.json`
+  records them under `round_2`, as before: 27,497 characters plus 83 gives 27,580. The draft keeps 255 lines,
+  the twenty headings and the last words, two `«V»` in its first two lines, each GTWPE-D1 phrase once and every
+  absent phrase 0 times, by script. The first round's entries are as that round left them.
+- **`review_cap`.** The `override` block names it for this one round, past `D26-A`'s cap of one diff check.
+- **P-1 holds.** PE39 checked it against Nathan's instruction of 2026-09-25 as GTWPE-IMPLEMENTATION-PLAN-v1.0.md
+  gives it and CHECKPOINT.md quotes it; plan v1.2 §1, which P-1 cites, has the same words.
+- **Nothing else is repaired.** The other listed findings stay listed.
+- **The wait.** From PL4 at about 20:15Z to his opt-in at 23:27:10Z, off the meter.
 
 ### Harness files (`D22` condition 5), for `PLAN`
 
