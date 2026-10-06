@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-tw-repository-io
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -51,27 +51,27 @@ items:
   - id: ITEM-01
     statement: "The TW prompts stay single-homed in Notion: no TW prompt body, copy or excerpt enters the repository, and this change alters where they read and write, not where they live."
     source: "Request item 1; Nathan, 2026-10-05: \"writing prompts do not belong in repo.\""
-    disposition: ""
+    disposition: BLOCKED
   - id: ITEM-02
     statement: "TW-TRIAGE-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10 take PF canon from docs/pfcanon/ on main, not from Google Drive, and take their other inputs as attached files or repository paths, never from Drive or ChatGPT Library."
     source: "Request item 2; HDE Build Notes 2.29 PF10-CANON-001; MODIFICATION-20261005-gtwpe-writing-side §A A.1, its row for the architecture's §2 (inputs), which the request cites"
-    disposition: ""
+    disposition: BLOCKED
   - id: ITEM-03
     statement: "Their outputs go to the repository path their invocation names, under docs/ephemeral/, not to ChatGPT Library or a download, and each stays runnable by Nathan directly or as a pass inside one session."
     source: "Request item 3; HDE Build Notes 2.29 PF10-CANON-001"
-    disposition: ""
+    disposition: BLOCKED
   - id: ITEM-04
     statement: "TW-DRAIN-10, TW-DRAIN-20 and TW-APPLY-10 meet GTWPE-D1 in full: each redlines Markdown file and each final updated PF Markdown file gets its own proof log beside it, named after it, with all eight minimum items, and TW-APPLY-10's proof log states the basis of each applied operation, not only a pointer to it."
     source: "Request item 4; GTWPE-D1 (docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md); MODIFICATION-20261005-gtwpe-writing-side §A A.8"
-    disposition: ""
+    disposition: BLOCKED
   - id: ITEM-05
     statement: "TW-MGMT-10 leaves the TW-ALPHA selection, and GTWPE-MGMT-10 maintains the TW prompts."
     source: "Request item 5"
-    disposition: ""
+    disposition: BLOCKED
   - id: ITEM-06
     statement: "A new TW-ALPHA release selects the changed prompts, with its Current operation on the Glow Technical Writing Ecosystem page."
     source: "Request item 6"
-    disposition: ""
+    disposition: BLOCKED
 parts:
   - id: PART-01
     name: "The six operational TW prompts on repository input and output, with proof logs, and the new TW-ALPHA release"
@@ -1538,3 +1538,197 @@ checks pass.
 - MODIFICATION-20260930-gtwpe-tw-model-advice, the last TW change, for the selection route's form, the
   control pages' texts and `ctl_check.py`. MODIFICATION-20261005-gtwpe-writing-side, for the plan's
   shape.
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+100526.2*, fetched live at the start of the mode, X1.0 (0). The input is §P as Nathan approved it at
+`d81e665` on 2026-10-06, recorded at `f1b19eb` (`plan_approved_by`). The mode started at 2026-10-06T01:35:47Z, at X1.1.
+
+The meter is the clock. The recorded estimate for `EXECUTE` is about 3 h, so the run stops at 6 h from
+X1.1, not counting a wait for Nathan.
+
+**The run stopped at X1.3** (`D26-B`). At 01:38:45Z, TW-DRAIN-10's new page failed check (7) of its
+readback: `report` occurs 19 times, and the plan expects 18. The page is as the edits make it. The
+expected count is wrong, because §A counted 20 hits on the current page, which holds 21 (EX-1, below).
+Nothing was written to Notion after that check. This section is the failure record.
+
+### Values, fixed at X1.1 (2026-10-06T01:35:47Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-10-06 |
+| «PA» | 2026-10-06, `plan_approved_date` |
+| «V» | `100626.1`, fixed at X1.2 by the PE Metaprompt's rule: «D» as `MMDDYY`, then `.1`. No child page of *HDE TW* carries `100626` (X1.0 (4)) |
+| «ID:…» | Fixed at X1.3: «ID:TRIAGE» `3f14590a05eb81cdaa93ccc6bda2e2ad` and «ID:DRAIN-10» `3f14590a05eb817cb5e6ee7187b38e0c`. The other four were never fixed, since the run stopped |
+| «S», «M», «m» | Fixed at X4.1 |
+| «R» | Fixed at X4.3's pre-read |
+
+### X1.2: the preconditions, X1.0 (0) to (8)
+
+All read-only, from 01:35Z to 01:37Z on 2026-10-06. Every one passed, so the run went on to X1.3.
+
+| # | Result |
+|---|---|
+| (0) | GTWPE-MGMT-10 100526.2, fetched live at the mode's start: edited 2026-10-05T16:36:11.384Z |
+| (1) | Each member's current page, fetched live, at §A's edit time: TRIAGE 2026-10-04T13:43:27.279Z, DRAIN-10 14:07:14.620Z, DRAIN-20 14:08:48.149Z, RECORD-10 14:16:53.241Z, RECORD-20 14:20:11.935Z, APPLY-10 16:28:52.435Z. First lines, headings and last words as §P's table |
+| (2) | `edits.json` at «H», `757c6831…b845`; `edits_check.py` exits 0 |
+| (3) | In each member's fetch, by reading, checked by a second reading: every `old` once; each `absent_after` phrase as many times as the member's `old` texts hold it; each check phrase 0 times, `Nathan alone merges` among them |
+| (4) | *HDE TW*, edited 2026-10-04T17:10:53.751Z: 27 child pages, none titled with `100626.1` |
+| (5) | The selection page, 2026-10-05T00:30:29.861Z: SEL-1's heading once, SEL-2's two lines once. *HDE TW*: HDE-OLD once, as its first line. The GTWPE parent page, 2026-10-05T16:37:57.178Z: CAT-OLD once. *Alpha 1*, 2026-10-04T17:10:29.105Z, and the Hub, 2026-10-04T17:11:07.810Z: `ctl_check.py pre` exits 0 on each save, its anchor once, 32 and 139 headings. Each control page is at the edit time the dry run found |
+| (6) | The PE Metaprompt 091426.1: the harness saved its fetch, and a script read its title and edit time alone: 2026-09-23T17:17:22.217Z |
+| (7) | `git fetch origin main` succeeded: `origin/main` is `20d0dd84898b2d26ae7e7122eba16ac640350ba7`, with no commit since `20d0dd8` |
+| (8) | The record holds this plan, with `plan_approved_by` set, at `f1b19eb` |
+
+### X1.3: the new pages, and the stop
+
+TW-TRIAGE-10's new page passed every check. TW-DRAIN-10's new page failed check (7) of its readback, and
+the run stopped there (`D26-B`). Every write was made with `allow_async: false`, and each duplicate was
+populated at its first fetch, so no task was left pending.
+
+| Member | Writes | Checks |
+|---|---|---|
+| TRIAGE | (a) *HDE TW*, as X1.0 (4) fetched it: no child page titled `… — 100626.1`. **W1** duplicated the current page. The copy, «ID:TRIAGE», came back under *HDE TW*, titled `… — 100426.1 (1)`, and (c) was populated at its first fetch, as of 01:37:39Z. **W2** set its title, and **W3** made its 7 edits in one call | (f) passed. (g) The page as of 01:37:51Z, by reading, checked by a second reading: (1) to (10) passed, with the 13 terms at the table's counts after (1, 1, 0, 0, 0, 0, 3, 0, 1, 2, 0, 6 and 1), each hit in a new text or one of §A's exceptions; (11) and (12) do not apply to it. (h) *HDE TW* has exactly one child page with the new title, and it is «ID:TRIAGE»; the current page is unchanged at 2026-10-04T13:43:27.279Z |
+| DRAIN-10 | (a) *HDE TW*, as fetched for TRIAGE's (h): no child page titled `… — 100626.1`. **W4** duplicated the current page. The copy, «ID:DRAIN-10», came back under *HDE TW*, and (c) was populated at its first fetch, as of 01:38:27Z. **W5** set its title, and **W6** made its 19 edits in one call | (f) passed. (g) The page as of 01:38:45.706Z, by reading, checked by a second reading: (1) to (6) and (8) to (12) passed, among them `GTWPE-D1`'s requirement, `separate proof log` and its eight items, and the R3 broad match below. **(7) failed:** `report` occurs 19 times, and the table expects 18. The other twelve terms are at their counts after, and each `report` hit is in a new text or one of §A's exceptions. The run stopped, and (h) did not run |
+
+**The R3 broad match on «ID:DRAIN-10»**, (g)(12). Each hit is listed with its edit or the exception that
+keeps it, by reading, checked by a second reading. Each count is the table's.
+
+| Term | Count | Hits |
+|---|---|---|
+| `pull request` | 2 | DRAIN-10-09 (OUT-A) 2 |
+| `PR` | 0 | None: DRAIN-10-10 (OUT-B) removed the only one |
+| `commit` | 4 | DRAIN-10-07 (CAN-A), DRAIN-10-09 (OUT-A) and DRAIN-10-19 (OUT-E) 1 each; kept, E-RC 1 |
+| `push` | 1 | DRAIN-10-09 (OUT-A) 1 |
+| `merg` | 3 | DRAIN-10-09 (OUT-A) 2; kept, E-RO 1 |
+| `repositor` | 10 | DRAIN-10-09 (OUT-A), DRAIN-10-12 (IN-A), DRAIN-10-17 (PL-C), DRAIN-10-18 (PL-D) and DRAIN-10-19 (OUT-E) 1 each; kept, E-RC 5 |
+
+No hit forbids writing at the invocation's path, committing or pushing there, or opening a pull request.
+
+### Finding EX-1: two of §A's counts before are wrong
+
+These reads are read-only and were made after the stop. A context compaction came between the readback
+and them, so each body was fetched live again first (`D22`). Each count is by reading, checked by a
+second reading.
+- **TW-DRAIN-10.** Its current page, unchanged at 2026-10-04T14:07:14.620Z, holds `report` 21 times, and
+  §A counted 20.
+  - Its edits remove 4 hits and add 2 (`edits.json`): DRAIN-10-15 and DRAIN-10-16 each replace one with
+    one, and DRAIN-10-18 and DRAIN-10-19 each remove one. So the new page should hold 19, and it does.
+  - The table's 18 is §A's 20 less 2. The page is as the edits make it, and the expected count is wrong.
+- **TW-DRAIN-20.** Its current page, unchanged at 2026-10-04T14:08:48.149Z, holds `report` 22 times, and
+  §A counted 23. Its edits also remove 4 hits and add 2, so its new page would hold 20 against the table's
+  21. Its readback would stop the run the same way.
+- **Not read again.** The readbacks confirm TRIAGE's 13 counts before and DRAIN-10's other twelve. No
+  other count before, of DRAIN-20, RECORD-10, RECORD-20 or APPLY-10, has been read again since §A.
+
+This is a wrong plan, found by the check K-5 relies on, where a miscount ends in a loud stop. GTWPE-MGMT-10
+100526.2, *If the plan is wrong*: "A wrong plan returns to `PLAN`." `EXECUTE` never rewrites the plan or
+the analysis, so neither is changed here. The finding goes to Nathan with `DECISION NEEDED`.
+
+### Steps and dispositions
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.1 | — | APPLIED | Status `EXECUTING`; «D» and «PA» fixed at 2026-10-06T01:35:47Z, which started the clock |
+| X1.2 | — | VERIFIED | X1.0 (0) to (8), in the table above, from 01:35Z to 01:37Z; «V» fixed as `100626.1` |
+| X1.3, TRIAGE | PART-01 | VERIFIED | W1 to W3 made, and (f) to (h) passed, above |
+| X1.3, DRAIN-10 | PART-01 | BLOCKED | The failed step. W4 to W6 made, and (f) passed; (g)(7) failed at 01:38:45Z, above, for the cause EX-1 gives. The run stopped here |
+| X1.3, DRAIN-20, RECORD-10, RECORD-20 and APPLY-10 | PART-01 | NOT_RUN | The stop at X1.3, DRAIN-10. W7 to W18 were not made |
+| X2 | — | NOT_RUN | The stop at X1.3. This failure record's commit and push take its place (`D26-B` 1) |
+| X3 | — | NOT_RUN | The stop at X1.3 |
+| X4.1 | — | NOT_RUN | The stop at X1.3. `git fetch origin main` ran only for X1.0 (7) |
+| X4.2 | — | NOT_RUN | The stop at X1.3. W19 was not made |
+| X4.3 to X4.6 | PART-01 | NOT_RUN | The stop at X1.3. W20 to W23 were not made |
+| X5 | — | NOT_RUN | The stop at X1.3. The status stays `EXECUTING` |
+
+### Parts
+
+**PART-01 is `BLOCKED`**, and each of its six items with it, since a part lands whole or not at all. Its
+applied steps are W1 to W6, which made two new pages under *HDE TW* at `100626.1`: «ID:TRIAGE» and
+«ID:DRAIN-10». No other write was made. Neither page is selected or named on any control page, and no
+current page changed (the sweep, below).
+
+The rollback is §P's for X1.3: Nathan archives the two unselected pages (PO-3). It needs no copy of a
+prompt body. Until he has, the Modification stays `EXECUTING`, the freeze holds, and nothing further is
+automated.
+
+### The read-only sweep (`D26-B` 2)
+
+From about 01:43Z to 01:49Z, with no task pending. Each page was read once:
+
+| Page | What it says now |
+|---|---|
+| «ID:TRIAGE» | `TW-TRIAGE-10 — Identify PF10 Drain Targets — 100626.1`, under *HDE TW*, edited 2026-10-06T01:37:51.362Z by W3. Its first two lines are the title and `Prompt Version: 100626.1`; its four headings and last words are the table's |
+| «ID:DRAIN-10» | `TW-DRAIN-10 — Prepare PF Document Redlines — 100626.1`, under *HDE TW*, edited 2026-10-06T01:38:45.706Z by W6. Its first two lines are the title and `Prompt Version: 100626.1`; its eleven headings and last words are the table's. `report` occurs 19 times, by reading, checked by a second reading, as the failed check found |
+| TW-DRAIN-10's and TW-DRAIN-20's current pages | Unchanged at 2026-10-04T14:07:14.620Z and 14:08:48.149Z. Read for EX-1 |
+| *HDE TW* | Unchanged, edited 2026-10-04T17:10:53.751Z; HDE-OLD is still its first line. It has 29 child pages: the 27 of X1.0 (4) and the two new pages, each title once |
+| The selection page | Unchanged, edited 2026-10-05T00:30:29.861Z. It still selects TW-ALPHA-20261004.1, and its rows link the 100426.1 pages. One heading is named `Current operation`, and it has 8 child pages |
+| *Alpha 1* | Unchanged, edited 2026-10-04T17:10:29.105Z. `ctl_check.py pre` exits 0: its anchor once, 32 headings |
+| The Operations Hub | Unchanged, edited 2026-10-04T17:11:07.810Z. `ctl_check.py pre` exits 0: its anchor once, 139 headings |
+| The GTWPE parent page | Unchanged, edited 2026-10-05T16:37:57.178Z. Its checked-through commit is still `31deec4` (CAT-OLD), and it has five child pages |
+| The branch and #575 | Before this record's commit, the branch's head is `f1b19eb`, the approval record. amthorn78/glow-hdengine-v2#575 is open and not merged, against `main` at `20d0dd8` |
+
+### The return (`D26-B` 4)
+
+`IMPLEMENTATION_BLOCKED`, ending `DECISION NEEDED`. The blocker is EX-1, and the owner is Nathan. He
+decides:
+- **The two new pages.** They are unselected, and §P's rollback is that he archives them (PO-3).
+- **The record.** He merges #575, which carries this failure record, when he chooses: the failure-record
+  exception of his merge rule.
+- **The recovery point.** This session's advice is that the plan returns to `PLAN`. A successor section
+  below the dated plan would measure again, by reading and a second reading, every count before that the
+  readback relies on, in all six members, and derive the counts after from them. Nathan would approve it,
+  and `EXECUTE` would start again at X1 (`D26-C`).
+
+### Time on the meter
+
+From X1.1 at 01:35:47Z to the stop at 01:38:45Z took about 3 minutes. The failure path took from about
+01:39Z to about 01:58Z. About 22 minutes in all, against the recorded estimate of about 3 h. Tokens are not
+measured.
+
+### Harness files (`D22` condition 5), for `EXECUTE`
+
+- **This session's transcript** holds, from this mode, each fetched inline:
+  - GTWPE-MGMT-10 100526.2, twice: at the mode's start, and again after the context compaction, before
+    this record relied on it;
+  - the six members' current pages at X1.0, TW-TRIAGE-10's again for its (h), and TW-DRAIN-10's and
+    TW-DRAIN-20's again after the compaction, for EX-1;
+  - the two new pages, each at (c), at (g) and once in the sweep;
+  - *HDE TW* at X1.0, for TRIAGE's (h) and in the sweep; the selection page and the GTWPE parent page at
+    X1.0 and in the sweep.
+
+  No script read the transcript for a body, and every count on a body was made by reading. It is left to
+  teardown.
+- **Harness saves**, each read only by a script that printed what its check needed:
+  - at X1.0: the PE Metaprompt 091426.1, `mcp-Notion-notion-fetch-1791250609282.txt`, for its title and
+    edit time; *Alpha 1*, `toolu_01EhGRHrtTWHmftmJDZvTMKC.json`, and the Operations Hub,
+    `mcp-Notion-notion-fetch-1791250609662.txt`, for `ctl_check.py pre`;
+  - in the sweep: *Alpha 1*, `toolu_01X4ieedv6KaaTMNMaPHroCQ.json`, and the Operations Hub,
+    `mcp-Notion-notion-fetch-1791251180128.txt`, for their title, edit time and `ctl_check.py pre`.
+
+  Nothing was written from a save, hashed or compared. The harness refused this session's `rm` of saves
+  in the earlier modes, so none was tried again: every save is left to its teardown.
+- **Scratch**, in this session's scratchpad. None holds a prompt body:
+  - the progress notes, which are results only;
+  - `ctl_check.py`'s states of *Alpha 1* and the Hub at X1.0 and in the sweep, which are heading lists;
+  - Nathan's approval words as given;
+  - this record as it stood before the failure record.
+
+### Canon and rulings relied on, for `EXECUTE`
+
+- Nathan's plan approval of 2026-10-06, quoted in `plan_approved_by`.
+- GTWPE-MGMT-10 100526.2, as fetched live in this mode:
+  - *Reading prompt bodies*, *Boundaries* and *Failure contract*;
+  - `MODE = EXECUTE`, with *If the plan is wrong*;
+  - *How each kind of target changes*, for a prompt page;
+  - *Result routing*.
+- §P as approved: *The new pages' checks*, X1.0, *The steps*, *Failure path* (`D26-B`), K-5 and PO-3.
+- `gcfpe.decision-record.md`: `D21-C`, `D22` and `D26` (`D26-B`, `D26-C`).
+- `modification-template.md` 2.1, rules 5 and 6; `notion-write-boundary.md`.
+- The GTWPE decision record's `GTWPE-D1`, which (g)(11) checked.
+- On `main` at `20d0dd8`, as §A read them:
+  - HDE Build Notes (PF10) 2.29 PF10-CANON-001 and 2.38 PF10-AINEUTRAL-001;
+  - HDE Governance (PF04) §9.1.6. No write in this mode reached the selection, so the waiver of its
+    readiness was not exercised.
