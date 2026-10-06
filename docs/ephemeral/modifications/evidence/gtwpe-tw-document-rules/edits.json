@@ -1,0 +1,753 @@
+{
+ "modification": "MODIFICATION-20261006-gtwpe-tw-document-rules",
+ "rules": {
+  "anchor": "old_str is `old` exactly, and it matches once in the member's new page as duplicated, whose content is the current version's",
+  "send": "all of a member's edits in one update_content call, in file order; no `old` occurs in another edit's `old`, in any edit's `new`, or in its own `new`, so each still matches once when sent and is absent after",
+  "values": "«V» is fixed at X1.2 and substituted in the identity edits' `new` only; nothing else is substituted",
+  "blocks": "an edit with blocks true adds paragraphs or list items: its `new` holds newlines; every other `old` and `new` is one line",
+  "gate": "Nathan's ruling of 2026-10-06 (MODIFICATION-20261006-gtwpe-tw-document-rules, analyze_approved_by): the Last Update Gate is `BN` and the PF10 version used when the source is PF10, and the source's filename alone, with no `BN`, for any other source; a PF other than PF10 is never a source. Several sources are joined by `; ` in source order, the plan's choice"
+ },
+ "members": {
+  "DRAIN-10": {
+   "code": "TW-DRAIN-10",
+   "title_prefix": "TW-DRAIN-10 — Prepare PF Document Redlines",
+   "page": "3f14590a05eb81319ed0ebb00e14eedf",
+   "edited": "2026-10-06T03:19:43.487Z"
+  },
+  "DRAIN-20": {
+   "code": "TW-DRAIN-20",
+   "title_prefix": "TW-DRAIN-20 — Prepare PF09 Redlines",
+   "page": "3f14590a05eb81fa8c9bd34c9909c48d",
+   "edited": "2026-10-06T03:21:38.944Z"
+  },
+  "RECORD-10": {
+   "code": "TW-RECORD-10",
+   "title_prefix": "TW-RECORD-10 — Create Epic History Section",
+   "page": "3f14590a05eb8103babefccf8a92d748",
+   "edited": "2026-10-06T03:22:55.389Z"
+  },
+  "RECORD-20": {
+   "code": "TW-RECORD-20",
+   "title_prefix": "TW-RECORD-20 — Create CRD History Section",
+   "page": "3f14590a05eb81bc9127e36a85df1040",
+   "edited": "2026-10-06T03:23:58.670Z"
+  },
+  "APPLY-10": {
+   "code": "TW-APPLY-10",
+   "title_prefix": "TW-APPLY-10 — Apply Validated Redlines",
+   "page": "3f14590a05eb8156acaef4053b356625",
+   "edited": "2026-10-06T03:24:55.124Z"
+  }
+ },
+ "gtwpe_d1": {
+  "requirement": "separate proof log",
+  "items": [
+   "The artifact produced",
+   "The source files and inputs used",
+   "The substantive changes made",
+   "The basis for those changes",
+   "Any important constraints, assumptions, or interpretations applied",
+   "Any validation or verification performed",
+   "Any unresolved issues, limitations, or deviations",
+   "Enough identifying information to associate the proof log unambiguously with the correct redlines file or final PF file"
+  ],
+  "bound_new": [
+   "RECORD-10",
+   "RECORD-20"
+  ],
+  "bound_page": [
+   "DRAIN-10",
+   "DRAIN-20",
+   "RECORD-10",
+   "RECORD-20",
+   "APPLY-10"
+  ],
+  "source": "docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md, GTWPE-D1"
+ },
+ "absent_after": {
+  "DRAIN-10": [
+   "100626.1",
+   "narrowly bounded authority",
+   "exact deduplicated source filenames",
+   "for upstream source filenames",
+   "those three document-control fields",
+   "title, status, invocation-tag"
+  ],
+  "DRAIN-20": [
+   "100626.1",
+   "narrowly bounded authority",
+   "exact deduplicated source filenames",
+   "for upstream source filenames",
+   "those three document-control fields",
+   "title, status, invocation-tag",
+   "if the selected source supports it"
+  ],
+  "RECORD-10": [
+   "100626.1",
+   "terminates with its paste-ready section",
+   "for the actual assigned PF20 document or existing volume",
+   "choose final PF insertion/section numbering",
+   "Section-only output",
+   "Deliver only the complete paste-ready",
+   "a full PF document",
+   "processing/application report",
+   "filename/retrieval reference",
+   "section delivery is the normal endpoint",
+   "retain any useful draft"
+  ],
+  "RECORD-20": [
+   "100626.1",
+   "terminates with its paste-ready section",
+   "paste-ready CRD historical record section",
+   "choose final PF insertion/section numbering",
+   "Section-only output",
+   "Deliver only the complete paste-ready",
+   "a full PF document",
+   "processing/application report",
+   "filename/retrieval reference",
+   "section delivery is the normal endpoint",
+   "retain any useful draft",
+   "or open a new one",
+   "a full PF30 artifact",
+   "not permission to create one."
+  ],
+  "APPLY-10": [
+   "100626.1",
+   "only for the revised PF's version",
+   "status or invocation-tag changes",
+   "filenames of upstream sources",
+   "only when it exactly duplicates that document-control version",
+   "header/title/status/invocation-tag",
+   "exact source-file Last Update Gate"
+  ]
+ },
+ "edits": [
+  {
+   "id": "DRAIN-10-01",
+   "member": "DRAIN-10",
+   "rule_key": "ID-1",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the first line, the title line",
+   "old": "— 100626.1",
+   "new": "— «V»",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-10-02",
+   "member": "DRAIN-10",
+   "rule_key": "ID-2",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the second line",
+   "old": "Prompt Version: 100626.1",
+   "new": "Prompt Version: «V»",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-10-03",
+   "member": "DRAIN-10",
+   "rule_key": "DC-AUTH",
+   "item": "ITEM-01",
+   "rule": "R4",
+   "where": "Exact redline contract, the paragraph on Apply's standing authority, its first sentence",
+   "old": "narrowly bounded authority to derive final document-control version, execution date and Last Update Gate under its header contract.",
+   "new": "bounded authority to derive the revised PF's document-control fields under its header contract: the version, the dates, the Last Update Gate, a stale status and internal restatements of the document's own version or date.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-10-04",
+   "member": "DRAIN-10",
+   "rule_key": "DC-SRC",
+   "item": "ITEM-02",
+   "rule": "gate",
+   "where": "Exact redline contract, the same paragraph, the sources preparation supplies",
+   "old": "the exact deduplicated source filenames actually used to create redlines, in source order;",
+   "new": "the identity of each source that justified the update, in source order: the PF10 file and its version, or the source file's filename. A PF document other than PF10 is never a source, though it may be read in support;",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-10-05",
+   "member": "DRAIN-10",
+   "rule_key": "DC-SUB",
+   "item": "ITEM-02",
+   "rule": "gate",
+   "where": "Exact redline contract, the same paragraph, the ban on substituting the redlines file's name",
+   "old": "Do not substitute the redlines artifact's filename for upstream source filenames.",
+   "new": "Do not substitute the redlines artifact's filename for a source.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-10-06",
+   "member": "DRAIN-10",
+   "rule_key": "DC-HIST",
+   "item": "ITEM-01, ITEM-03",
+   "rule": "R4, R5",
+   "where": "Exact redline contract, the paragraph that reserves the control fields for Apply, its first sentence",
+   "old": "Reserve those three document-control fields for Apply's verified metadata plan.",
+   "new": "Reserve the header's document-control fields for Apply's verified metadata plan. When the target's own rules require a change or revision history entry for this change, such as a change log or Doc-Delta entry, prepare it as a content redline naming the version TW-APPLY-10 will derive, the baseline version bumped once by the target's established scheme, and the preparation date as the revision date; the report names it, and TW-APPLY-10 returns an entry that disagrees with the fields it derives. The revised PF carries no `Draft` or similar status language about the document, and no placeholder, TODO, unresolved drafting note, editorial comment or instruction to a future writer, unless the document's own canonical format requires that exact language: prepare the redlines that remove any such marker anywhere in the target, which this rule authorizes as hygiene.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-10-07",
+   "member": "DRAIN-10",
+   "rule_key": "DC-OTHER",
+   "item": "ITEM-03",
+   "rule": "R5",
+   "where": "Exact redline contract, the same paragraph, its rule on other header changes",
+   "old": "All other title, status, invocation-tag or header changes still require",
+   "new": "All other title, invocation-tag or header changes still require",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-01",
+   "member": "DRAIN-20",
+   "rule_key": "ID-1",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the first line, the title line",
+   "old": "— 100626.1",
+   "new": "— «V»",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-02",
+   "member": "DRAIN-20",
+   "rule_key": "ID-2",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the second line",
+   "old": "Prompt Version: 100626.1",
+   "new": "Prompt Version: «V»",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-03",
+   "member": "DRAIN-20",
+   "rule_key": "DC-AUTH",
+   "item": "ITEM-01",
+   "rule": "R4",
+   "where": "Exact redline contract, the paragraph on Apply's standing authority, its first sentence",
+   "old": "narrowly bounded authority to derive final document-control version, execution date and Last Update Gate under its header contract.",
+   "new": "bounded authority to derive the revised PF's document-control fields under its header contract: the version, the dates, the Last Update Gate, a stale status and internal restatements of the document's own version or date.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-04",
+   "member": "DRAIN-20",
+   "rule_key": "DC-SRC",
+   "item": "ITEM-02",
+   "rule": "gate",
+   "where": "Exact redline contract, the same paragraph, the sources preparation supplies",
+   "old": "the exact deduplicated source filenames actually used to create redlines, in source order;",
+   "new": "the identity of each source that justified the update, in source order: the PF10 file and its version, or the source file's filename. A PF document other than PF10 is never a source, though it may be read in support;",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-05",
+   "member": "DRAIN-20",
+   "rule_key": "DC-SUB",
+   "item": "ITEM-02",
+   "rule": "gate",
+   "where": "Exact redline contract, the same paragraph, the ban on substituting the redlines file's name",
+   "old": "Do not substitute the redlines artifact's filename for upstream source filenames.",
+   "new": "Do not substitute the redlines artifact's filename for a source.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-06",
+   "member": "DRAIN-20",
+   "rule_key": "DC-HIST",
+   "item": "ITEM-01, ITEM-03",
+   "rule": "R4, R5",
+   "where": "Exact redline contract, the paragraph that reserves the control fields for Apply, its first sentence",
+   "old": "Reserve those three document-control fields for Apply's verified metadata plan.",
+   "new": "Reserve the header's document-control fields for Apply's verified metadata plan. When the target's own rules require a change or revision history entry for this change, such as a change log or Doc-Delta entry, prepare it as a content redline naming the version TW-APPLY-10 will derive, the baseline version bumped once by the target's established scheme, and the preparation date as the revision date; the report names it, and TW-APPLY-10 returns an entry that disagrees with the fields it derives. The revised PF carries no `Draft` or similar status language about the document, and no placeholder, TODO, unresolved drafting note, editorial comment or instruction to a future writer, unless the document's own canonical format requires that exact language: prepare the redlines that remove any such marker anywhere in the target, which this rule authorizes as hygiene.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-07",
+   "member": "DRAIN-20",
+   "rule_key": "DC-OTHER",
+   "item": "ITEM-03",
+   "rule": "R5",
+   "where": "Exact redline contract, the same paragraph, its rule on other header changes",
+   "old": "All other title, status, invocation-tag or header changes still require",
+   "new": "All other title, invocation-tag or header changes still require",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-08",
+   "member": "DRAIN-20",
+   "rule_key": "PF09-JUDGE",
+   "item": "ITEM-04",
+   "rule": "R6",
+   "where": "PF09 coverage and native semantics, the paragraph after the six dimensions, its first sentence",
+   "old": "Use the current target's status meanings and transition obligations.",
+   "new": "Use the current target's status meanings and transition obligations, and judge every row the supplied change context potentially affects on all the available evidence: update it, leave it open, close it or otherwise change its documented state. Never leave a row open merely because no instruction says to close it, and never close one only because related work was implemented. The resulting PF09 shows the project's current state after the supplied changes, not an accumulation of earlier row states.",
+   "blocks": false
+  },
+  {
+   "id": "DRAIN-20-09",
+   "member": "DRAIN-20",
+   "rule_key": "PF09-EVID",
+   "item": "ITEM-04",
+   "rule": "R6",
+   "where": "PF09 coverage and native semantics, the same paragraph, its last sentence",
+   "old": "if the selected source supports it;",
+   "new": "if the evidence supports it;",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-01",
+   "member": "RECORD-10",
+   "rule_key": "ID-1",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the first line, the title line",
+   "old": "— 100626.1",
+   "new": "— «V»",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-02",
+   "member": "RECORD-10",
+   "rule_key": "ID-2",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the second line",
+   "old": "Prompt Version: 100626.1",
+   "new": "Prompt Version: «V»",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-03",
+   "member": "RECORD-10",
+   "rule_key": "REC-END-PF20",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Coded identity and relationships, the relationship paragraph",
+   "old": "This role terminates with its paste-ready section;",
+   "new": "This role terminates with the updated PF20 file and its proof log;",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-04",
+   "member": "RECORD-10",
+   "rule_key": "REC-PUR-PF20",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Purpose and minimal inputs, its first sentence",
+   "old": "Create one complete historical Epic record section for the actual assigned PF20 document or existing volume.",
+   "new": "Create one complete historical Epic record section and insert it into a copy of the actual assigned PF20 document, as *Output and completion* sets out.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-05",
+   "member": "RECORD-10",
+   "rule_key": "REC-PF10",
+   "item": "ITEM-05",
+   "rule": "R7",
+   "where": "Destination, source roles and record preparation, the PF06, PF10 and PF27 reading sentence",
+   "old": "`PF10-HDE-Build-Notes` lifecycle controls and `PF27-Canon-Plan-Templates` schema sections.",
+   "new": "`PF10-HDE-Build-Notes` lifecycle controls and `PF27-Canon-Plan-Templates` schema sections, and every PF10 change that modifies, clarifies, supersedes or extends the approved specification. Reconcile the two: the specification is the underlying requirement set, the applicable PF10 changes modify it, and the entry records the resulting effective state, never the specification alone or PF10 alone.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-06",
+   "member": "RECORD-10",
+   "rule_key": "REC-PLACE",
+   "item": "ITEM-05",
+   "rule": "R3",
+   "where": "Destination, source roles and record preparation, the identifier and numbering sentence",
+   "old": "or choose final PF insertion/section numbering without governing authority.",
+   "new": "or place and number the entry other than as the target's established record order and heading convention uniquely support.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-07",
+   "member": "RECORD-10",
+   "rule_key": "REC-HEAD",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "the output section's heading",
+   "old": "## Section-only output and completion",
+   "new": "## Output and completion",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-08",
+   "member": "RECORD-10",
+   "rule_key": "REC-OUT-PF20",
+   "item": "ITEM-05",
+   "rule": "R2, R3",
+   "where": "Output and completion, the first paragraph, its first sentence",
+   "old": "Deliver only the complete paste-ready entry/section as one UTF-8 Markdown file at the repository path the invocation names.",
+   "new": "Write the updated PF20 at the repository path the invocation names: the current `PF20-Reference-HDE-Phased-Epics` from `docs/pfcanon/` on `main`, copied byte for byte, with the complete entry inserted once, at the place the target's established record order requires, by an exact insertion. Never regenerate or rewrite the document: every other byte is preserved, and only the document-control fields below change. The entry itself is complete and paste-ready.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-09",
+   "member": "RECORD-10",
+   "rule_key": "REC-FIELDS-PF20",
+   "item": "ITEM-01, ITEM-02, ITEM-03, ITEM-05, ITEM-06",
+   "rule": "R4, R5, R2, GTWPE-D1",
+   "where": "Output and completion, the first paragraph, its last two sentences",
+   "old": "Do not produce a full PF document, an insertion-redline package, a processing/application report or a compulsory TW-APPLY-10 bridge. Nathan handles any later manual insertion through separately authorized work.",
+   "new": "Bring the document-control fields forward from this change, as one set that agrees: the version, bumped once by the document's established scheme; the effective date, set to the actual execution date; any change or revision history entry the document's own rules require; and the Last Update Gate, naming the sources that justified the update, separated by `; `: the approved specification's filename, then, when the entry reconciles an applicable PF10 change, `BN` and the version number of the PF10 file used (for PF10 v13.5, `BN 13.5`). A PF document other than PF10 is never a source, though it may be read in support. The gate records which source the update used; it is not a citation of HDE Build Notes. The updated PF20 carries no `Draft` or similar status language about the document, and no placeholder, TODO, unresolved drafting note, editorial comment or instruction to a future writer, and no stale status.\nBeside the updated PF20, in the same directory, write its separate proof log, the record report, named after it: the updated PF20's file name with `.proof-log` before `.md`. The record report is the separate proof log that documents how the updated PF20 was created. Each proof log must, at minimum, record:\n- The artifact produced\n- The source files and inputs used\n- The substantive changes made\n- The basis for those changes\n- Any important constraints, assumptions, or interpretations applied\n- Any validation or verification performed\n- Any unresolved issues, limitations, or deviations\n- Enough identifying information to associate the proof log unambiguously with the correct redlines file or final PF file\nIt gives another session or reviewer enough evidence to understand what changed, what those changes were based on, how the artifact was produced, and what was verified. It also records the original's identity and version and the commit it was read from, where the entry was inserted, the control fields before and after, and the check that nothing else changed. Do not produce an insertion-redline package or a compulsory TW-APPLY-10 bridge. The updated PF20 is a proposed replacement in the pull request, not canon: publishing it is Nathan's separately authorized work.",
+   "blocks": true
+  },
+  {
+   "id": "RECORD-10-10",
+   "member": "RECORD-10",
+   "rule_key": "REC-PATH",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Output and completion, the second paragraph, what the conversation identifies",
+   "old": "the output's actual filename/retrieval reference",
+   "new": "each output's repository path, with the commit that holds it",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-11",
+   "member": "RECORD-10",
+   "rule_key": "REC-ENDPT-PF20",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Output and completion, the second paragraph, its last sentence",
+   "old": "section delivery is the normal endpoint.",
+   "new": "delivering the updated PF20 and its proof log is the normal endpoint.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-12",
+   "member": "RECORD-10",
+   "rule_key": "REC-CHECK",
+   "item": "ITEM-01, ITEM-03, ITEM-05",
+   "rule": "R3, R4, R5",
+   "where": "Output and completion, the third paragraph, its first sentence, the checks before saving",
+   "old": "and absence of source-administration chatter.",
+   "new": "and absence of source-administration chatter; then check that each updated file differs from its original only by the inserted entry and its control fields, that those fields agree, and that no `Draft` status language, placeholder or TODO remains.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-13",
+   "member": "RECORD-10",
+   "rule_key": "REC-READ",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Output and completion, the third paragraph, the readback",
+   "old": "Read back the saved file fully.",
+   "new": "Read back every saved file fully.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-10-14",
+   "member": "RECORD-10",
+   "rule_key": "REC-BLOCK-PF20",
+   "item": "ITEM-03",
+   "rule": "R5",
+   "where": "Output and completion, the third paragraph, the unresolved-input sentence",
+   "old": "and retain any useful draft as explicitly incomplete; do not deliver it as a complete paste-ready section.",
+   "new": "and write no updated PF20: an incomplete entry is never inserted or delivered.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-01",
+   "member": "RECORD-20",
+   "rule_key": "ID-1",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the first line, the title line",
+   "old": "— 100626.1",
+   "new": "— «V»",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-02",
+   "member": "RECORD-20",
+   "rule_key": "ID-2",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the second line",
+   "old": "Prompt Version: 100626.1",
+   "new": "Prompt Version: «V»",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-03",
+   "member": "RECORD-20",
+   "rule_key": "REC-END-PF30",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Coded identity and relationships, the relationship paragraph",
+   "old": "This role terminates with its paste-ready section;",
+   "new": "This role terminates with the updated PF30 file and its proof log;",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-04",
+   "member": "RECORD-20",
+   "rule_key": "REC-PUR-PF30",
+   "item": "ITEM-05",
+   "rule": "R2, R8",
+   "where": "Purpose and minimal inputs, its first sentence",
+   "old": "Create one complete paste-ready CRD historical record section for the actual PF30 destination volume.",
+   "new": "Create one complete CRD historical record section and insert it into a copy of the PF30 volume it belongs in, as *Output and completion* sets out.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-05",
+   "member": "RECORD-20",
+   "rule_key": "REC-INPUT",
+   "item": "ITEM-07",
+   "rule": "K-12",
+   "where": "Purpose and minimal inputs, its second sentence, the inputs",
+   "old": "relevant supporting material Nathan supplies.",
+   "new": "relevant supporting material Nathan supplies, as attached files or repository paths, never from Google Drive or ChatGPT Library.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-06",
+   "member": "RECORD-20",
+   "rule_key": "REC-MISSING",
+   "item": "ITEM-05",
+   "rule": "R8",
+   "where": "Destination, source roles and record preparation, the first paragraph, its last sentence",
+   "old": "A missing current Markdown volume is a source blocker, not permission to create one.",
+   "new": "A missing current Markdown volume is a source blocker, not permission to create one: only Nathan's rollover decision opens a new volume, as *PF30 schema and native detail* sets out.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-07",
+   "member": "RECORD-20",
+   "rule_key": "REC-PF10",
+   "item": "ITEM-05",
+   "rule": "R7",
+   "where": "Destination, source roles and record preparation, the PF06, PF10 and PF27 reading sentence",
+   "old": "`PF10-HDE-Build-Notes` lifecycle controls and `PF27-Canon-Plan-Templates` schema sections.",
+   "new": "`PF10-HDE-Build-Notes` lifecycle controls and `PF27-Canon-Plan-Templates` schema sections, and every PF10 change that modifies, clarifies, supersedes or extends the approved specification. Reconcile the two: the specification is the underlying requirement set, the applicable PF10 changes modify it, and the entry records the resulting effective state, never the specification alone or PF10 alone.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-08",
+   "member": "RECORD-20",
+   "rule_key": "REC-PLACE",
+   "item": "ITEM-05",
+   "rule": "R3",
+   "where": "Destination, source roles and record preparation, the identifier and numbering sentence",
+   "old": "or choose final PF insertion/section numbering without governing authority.",
+   "new": "or place and number the entry other than as the target's established record order and heading convention uniquely support.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-09",
+   "member": "RECORD-20",
+   "rule_key": "REC-HEAD",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "the output section's heading",
+   "old": "## Section-only output and completion",
+   "new": "## Output and completion",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-10",
+   "member": "RECORD-20",
+   "rule_key": "REC-OUT-PF30",
+   "item": "ITEM-05",
+   "rule": "R2, R3",
+   "where": "Output and completion, the first paragraph, its first sentence",
+   "old": "Deliver only the complete paste-ready entry/section as one UTF-8 Markdown file at the repository path the invocation names.",
+   "new": "Write the updated PF30 volume at the repository path the invocation names: the volume the record belongs in, from `docs/pfcanon/` on `main`, copied byte for byte, with the complete record inserted once, at the place the volume's record order requires, by an exact insertion. Never regenerate or rewrite the document: every other byte is preserved, and only the document-control fields below change. The record itself is complete and paste-ready.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-11",
+   "member": "RECORD-20",
+   "rule_key": "REC-FIELDS-PF30",
+   "item": "ITEM-01, ITEM-02, ITEM-03, ITEM-05, ITEM-06",
+   "rule": "R4, R5, R2, GTWPE-D1",
+   "where": "Output and completion, the first paragraph, its last two sentences",
+   "old": "Do not produce a full PF document, an insertion-redline package, a processing/application report or a compulsory TW-APPLY-10 bridge. Nathan handles any later manual insertion through separately authorized work.",
+   "new": "Bring the document-control fields forward from this change, as one set that agrees: the version, bumped once by the document's established scheme; the effective date, set to the actual execution date; any change or revision history entry the document's own rules require; and the Last Update Gate, naming the sources that justified the update, separated by `; `: the approved specification's filename, then, when the record reconciles an applicable PF10 change, `BN` and the version number of the PF10 file used (for PF10 v13.5, `BN 13.5`). A PF document other than PF10 is never a source, though it may be read in support. The gate records which source the update used; it is not a citation of HDE Build Notes. The updated PF30 carries no `Draft` or similar status language about the document, and no placeholder, TODO, unresolved drafting note, editorial comment or instruction to a future writer, and no stale status, except a new volume's review copy, as *PF30 schema and native detail* sets out.\nBeside each file it writes, in the same directory, write that file's separate proof log, the record report, named after it: the file's name with `.proof-log` before `.md`. The record report is the separate proof log that documents how that file was created. Each proof log must, at minimum, record:\n- The artifact produced\n- The source files and inputs used\n- The substantive changes made\n- The basis for those changes\n- Any important constraints, assumptions, or interpretations applied\n- Any validation or verification performed\n- Any unresolved issues, limitations, or deviations\n- Enough identifying information to associate the proof log unambiguously with the correct redlines file or final PF file\nIt gives another session or reviewer enough evidence to understand what changed, what those changes were based on, how the artifact was produced, and what was verified. It also records the original's identity and version and the commit it was read from, where the record was inserted, the control fields before and after, and the check that nothing else changed. Do not produce an insertion-redline package or a compulsory TW-APPLY-10 bridge. The updated PF30 is a proposed replacement in the pull request, not canon: publishing it is Nathan's separately authorized work.",
+   "blocks": true
+  },
+  {
+   "id": "RECORD-20-12",
+   "member": "RECORD-20",
+   "rule_key": "REC-PATH",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Output and completion, the second paragraph, what the conversation identifies",
+   "old": "the output's actual filename/retrieval reference",
+   "new": "each output's repository path, with the commit that holds it",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-13",
+   "member": "RECORD-20",
+   "rule_key": "REC-ENDPT-PF30",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Output and completion, the second paragraph, its last sentence",
+   "old": "section delivery is the normal endpoint.",
+   "new": "delivering the updated PF30 and its proof log is the normal endpoint.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-14",
+   "member": "RECORD-20",
+   "rule_key": "REC-CHECK",
+   "item": "ITEM-01, ITEM-03, ITEM-05",
+   "rule": "R3, R4, R5",
+   "where": "Output and completion, the third paragraph, its first sentence, the checks before saving",
+   "old": "and absence of source-administration chatter.",
+   "new": "and absence of source-administration chatter; then check that each updated file differs from its original only by the inserted entry and its control fields, that those fields agree, and that no `Draft` status language, placeholder or TODO remains.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-15",
+   "member": "RECORD-20",
+   "rule_key": "REC-READ",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "Output and completion, the third paragraph, the readback",
+   "old": "Read back the saved file fully.",
+   "new": "Read back every saved file fully.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-16",
+   "member": "RECORD-20",
+   "rule_key": "REC-BLOCK-PF30",
+   "item": "ITEM-03",
+   "rule": "R5",
+   "where": "Output and completion, the third paragraph, the unresolved-input sentence",
+   "old": "and retain any useful draft as explicitly incomplete; do not deliver it as a complete paste-ready section.",
+   "new": "and write no updated PF30: an incomplete record is never inserted or delivered.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-17",
+   "member": "RECORD-20",
+   "rule_key": "REC-VOL",
+   "item": "ITEM-05, ITEM-03",
+   "rule": "R8, R5",
+   "where": "PF30 schema and native detail, the first paragraph, its second sentence",
+   "old": "Do not assume a second volume exists or open a new one.",
+   "new": "PF30 is a volume family. A new CRD's record goes in the one volume whose Document status is `Canon` and Volume status `Active`; do not assume a second volume exists. When that volume looks too large to read and reason over reliably, say so in the record report and in the conversation: rollover is Nathan's determination. Open a new volume only when the invocation carries his rollover decision, and then as PF30's rolling-volume rules set it: the next PF30.x volume, in the current volume's established structure with this record as its first, whose review copy carries Document status `Draft` and Volume status `Pending activation` until canonical publication, the only such status this prompt writes; reciprocal *Previous volume* and *Next volume* fields; and, in an updated copy of the prior volume, Volume status `Closed to new CRDs`, with its own control fields brought forward. Check the new volume against those rules, and give each file written its own proof log.",
+   "blocks": false
+  },
+  {
+   "id": "RECORD-20-18",
+   "member": "RECORD-20",
+   "rule_key": "REC-FILES",
+   "item": "ITEM-05",
+   "rule": "R2",
+   "where": "PF30 schema and native detail, the last paragraph, its last sentence",
+   "old": "or produce a full PF30 artifact.",
+   "new": "or write any PF30 file that *Output and completion* and the volume rule above do not name.",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-01",
+   "member": "APPLY-10",
+   "rule_key": "ID-1",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the first line, the title line",
+   "old": "— 100626.1",
+   "new": "— «V»",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-02",
+   "member": "APPLY-10",
+   "rule_key": "ID-2",
+   "item": "identity",
+   "rule": "identity",
+   "where": "the second line",
+   "old": "Prompt Version: 100626.1",
+   "new": "Prompt Version: «V»",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-03",
+   "member": "APPLY-10",
+   "rule_key": "AP-AUTH",
+   "item": "ITEM-01",
+   "rule": "R4",
+   "where": "Deterministic final document-control header, its first sentence",
+   "old": "supplies standing authority only for the revised PF's version, current execution date and Last Update Gate.",
+   "new": "supplies standing authority for every document-control field the revision changes: the version, the dates, the Last Update Gate, a stale status, internal restatements of the document's own version or date, and the change or revision history entry the document's own rules require, which the package carries as a content redline naming the version and date this plan derives.",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-04",
+   "member": "APPLY-10",
+   "rule_key": "AP-AGREE",
+   "item": "ITEM-01, ITEM-03",
+   "rule": "R4, R5",
+   "where": "Deterministic final document-control header, its second sentence, what it does not authorize",
+   "old": "unrelated header cleanup, status or invocation-tag changes.",
+   "new": "unrelated header cleanup or invocation-tag changes. All version, date, change-history and gate values in the revised PF must agree with one another; a disagreement is a blocker returned to the preparer.",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-05",
+   "member": "APPLY-10",
+   "rule_key": "AP-DATE",
+   "item": "ITEM-01",
+   "rule": "R4",
+   "where": "Deterministic final document-control header, the date bullet",
+   "old": "Set the existing effective/date field to the actual application execution date in native format",
+   "new": "Set the existing effective/date field, and any other control date that records this revision, to the actual application execution date in native format",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-06",
+   "member": "APPLY-10",
+   "rule_key": "AP-GATE",
+   "item": "ITEM-02",
+   "rule": "gate",
+   "where": "Deterministic final document-control header, the gate bullet, its first sentence",
+   "old": "Set `Last Update Gate` to the exact deduplicated filenames of upstream sources actually used to create the redlines, in recorded source order.",
+   "new": "Set `Last Update Gate` from the sources that justified the update, as the package records them, deduplicated, in recorded source order and separated by `; `: for PF10, `BN` and the version number of the PF10 file used (for PF10 v13.5, `BN 13.5`); for any other source, its filename alone, without `BN`. A PF document other than PF10 is never a source, though it may be read in support. The gate records which source the update used; it is not a citation of HDE Build Notes.",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-07",
+   "member": "APPLY-10",
+   "rule_key": "AP-REF",
+   "item": "ITEM-01",
+   "rule": "R4",
+   "where": "Deterministic final document-control header, the sentence on a title's embedded version",
+   "old": "Synchronize a front-matter title's embedded version only when it exactly duplicates that document-control version; other title text is protected.",
+   "new": "Synchronize every internal restatement of the document's own version or revision date, such as a front-matter title's embedded version, only when it exactly duplicates the document-control value it restates; other title text is protected.",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-08",
+   "member": "APPLY-10",
+   "rule_key": "AP-STATUS",
+   "item": "ITEM-03",
+   "rule": "R5",
+   "where": "Deterministic final document-control header, the sentence on other header changes",
+   "old": "Other header/title/status/invocation-tag changes need separately explicit authorization and exact validated edits.",
+   "new": "A stale status field takes the value the document's own rules and classification require; a value that cannot be established from them is a blocker. Other header, title or invocation-tag changes need separately explicit authorization and exact validated edits.",
+   "blocks": false
+  },
+  {
+   "id": "APPLY-10-09",
+   "member": "APPLY-10",
+   "rule_key": "AP-VERIFY",
+   "item": "ITEM-01, ITEM-02, ITEM-03",
+   "rule": "R4, R5",
+   "where": "Exact application and preservation, the verification of the metadata plan",
+   "old": "including exactly one version increment, actual date and exact source-file Last Update Gate.",
+   "new": "including exactly one version increment, the actual date, the Last Update Gate in its source form, the change or revision history entry the document's own rules require, and agreement among all of them; and that the revised PF carries no `Draft` or similar status language about the document, no placeholder, TODO, unresolved drafting note, editorial comment or instruction to a future writer, and no stale status, unless the document's own canonical format requires that exact language. Any failure stops application with a diagnostic to the preparer.",
+   "blocks": false
+  }
+ ]
+}
