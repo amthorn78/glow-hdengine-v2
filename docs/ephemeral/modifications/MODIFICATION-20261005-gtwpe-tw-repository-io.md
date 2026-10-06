@@ -1685,7 +1685,7 @@ decides:
 ### Time on the meter
 
 From X1.1 at 01:35:47Z to the stop at 01:38:45Z took about 3 minutes. The failure path took from about
-01:39Z to about 01:58Z. About 22 minutes in all, against the recorded estimate of about 3 h. Tokens are not
+01:39Z to about 01:55Z. About 19 minutes in all, against the recorded estimate of about 3 h. Tokens are not
 measured.
 
 ### Harness files (`D22` condition 5), for `EXECUTE`
