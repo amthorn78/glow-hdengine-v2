@@ -32,6 +32,11 @@ reviews:
     date: 2026-10-06
     required_open: 0
     outcome: "By this session, read-only, before any full review: both record checks exit 0 on a scratch copy at PLANNED; edits_check.py passes, and its eleven injected faults are each caught by their own code; GTWPE-MGMT-10 100526.2 and the five members fetched live after a compaction, at unchanged edit times, every anchor found once and every absent phrase at its expected count, by reading, twice; each passage read with its new text in place, which found three defects in the plan's own new texts (DR-1, a new PF30 volume's review copy, at Pending activation, was to hold the new record, which HDE CRD Records §6 forbids; DR-2, the record prompts' control fields omitted two that ITEM-01 lists; DR-3, an unclear 'returns') and two exceptions missing from the D26-E table (DR-4), all repaired before review, with finding P-3 on §A; the control pages carry their old texts once, at §A's edit times; the PE Metaprompt is unchanged; main is still b1bd769. No required defect open"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-10-06
+    required_open: 3
+    outcome: "One reviewer, GTWPE-TW-DOCUMENT-RULES-PLAN-A, as Nathan directed, on fd14d32: 1 required finding, R-1 (the record prompts' rule and pre-save check that the updated PF20 or PF30 carries no placeholder or TODO cannot be met on files they copy byte for byte, which carry canon's own template placeholders and history), confirmed by the session; 15 listed, L1 to L15, of which the session counts L5 (a change-history entry dated where the target's own format carries no date) as required under D26-A rule 3; and S-1, found by the session while confirming R-1 (the drains' and TW-APPLY-10's exception does not reach a record kept as history), also required. All three repaired; the other fourteen listed findings go to Nathan unrepaired (D26-A rule 4). Record: PLAN-REVIEW.md"
 items:
   - id: ITEM-01
     statement: "TW-APPLY-10 brings every document-control field of the revised PF forward from the actual change, and the fields agree with one another: the version, the dates, the Last Update Gate, the change or revision history the document's own rules require, and version-sensitive references; the drains draft that change-history entry as a content redline."
@@ -808,7 +813,7 @@ In `docs/ephemeral/modifications/evidence/gtwpe-tw-document-rules/`, committed w
 
 | Value | Fixed as |
 |---|---|
-| «H» | `fc3510c82f17b73e33bd08bdf20c5f55ded5ac868e7cc0e090301bdd0fa0bb01`, the sha256 of `edits.json`, 38,960 bytes, as the dry run's repairs left it (*Dry run (PL3)*) |
+| «H» | `54fc3da030aee818efb8d2affe76b1929646c4fd2fce3d9b042445876d6a0364`, the sha256 of `edits.json`, 39,555 bytes, as the repair round left it (*Repair round (PL3)*). The dry run's repairs had left it at `fc3510c8…`, 38,960 bytes |
 
 ### The edits, by rule
 
@@ -820,7 +825,7 @@ reaches (`edits_check.py`'s `SHARED` check).
 | ID-1, ID-2 | identity | The title line's version and `Prompt Version:` become «V» | All five |
 | DC-AUTH | ITEM-01, R4 | TW-APPLY-10's standing authority covers every document-control field the revision changes, not three | The drains |
 | DC-SRC, DC-SUB | ITEM-02 | Preparation supplies each source's identity, the PF10 file and its version or the source file's filename, in source order; another PF is never a source; the redlines file never stands in for one | The drains |
-| DC-HIST | ITEM-01, ITEM-03, R4, R5 | The header's control fields stay Apply's. A change-history entry the target's rules require is prepared as a content redline, naming the version Apply will derive and the preparation date; Apply returns the package to its preparer when it disagrees. The revised PF says nothing of being a draft, and the drain removes any such marker in the target, which the rule authorizes as hygiene | The drains |
+| DC-HIST | ITEM-01, ITEM-03, R4, R5 | The header's control fields stay Apply's. A change-history entry the target's rules require is prepared as a content redline in the target's own entry format, naming the version Apply will derive and, where that format dates an entry, the preparation date; Apply returns the package to its preparer when it disagrees. The revised PF says nothing of being a draft: the drain removes any other such marker in the target, which the rule authorizes as hygiene, and canon's own, as in a template or a record kept as history, stays | The drains |
 | DC-OTHER | ITEM-03, R5 | "status" leaves the list of header changes that need separate authorization, since Apply now corrects a stale status | The drains |
 | PF09-JUDGE, PF09-EVID | ITEM-04, R6 | Every potentially affected row is judged on all the evidence; never left open for lack of an instruction, never closed only because related work shipped; PF09 shows current state. "if the selected source supports it" becomes "if the evidence supports it" | DRAIN-20 |
 | REC-END-PF20, REC-END-PF30 | ITEM-05, R2 | The role ends with the updated PF20 or PF30 file and its proof log | One record prompt each |
@@ -831,18 +836,18 @@ reaches (`edits_check.py`'s `SHARED` check).
 | REC-PLACE | ITEM-05, R3 | The entry is placed and numbered only as the target's established record order and heading convention uniquely support | The record prompts |
 | REC-HEAD | ITEM-05, R2 | *Section-only output and completion* becomes *Output and completion* | The record prompts |
 | REC-OUT-PF20, REC-OUT-PF30 | ITEM-05, R2, R3 | The output: the current file from `docs/pfcanon/` on `main`, copied byte for byte, with the entry inserted once, by an exact insertion, never regenerated | One record prompt each |
-| REC-FIELDS-PF20, REC-FIELDS-PF30 | ITEM-01 to ITEM-03, ITEM-05, ITEM-06 | The control fields brought forward as one set that agrees, as ITEM-01 lists them (the version; the effective date and any other control date that records the revision; internal restatements of the version or date; the change history), the gate in Nathan's form (the specification's filename, then `BN` and the PF10 version when a PF10 change is reconciled); no Draft; beside each file, its separate proof log, the record report, named after it, with GTWPE-D1's eight items in Nathan's words; no redline package; the file is a proposed replacement, not canon | One record prompt each |
+| REC-FIELDS-PF20, REC-FIELDS-PF30 | ITEM-01 to ITEM-03, ITEM-05, ITEM-06 | The control fields brought forward as one set that agrees, as ITEM-01 lists them (the version; the effective date and any other control date that records the revision; internal restatements of the version or date; the change history), the gate in Nathan's form (the specification's filename, then `BN` and the PF10 version when a PF10 change is reconciled); no Draft in the inserted entry or the control fields, and every other byte as canon has it; beside each file, its separate proof log, the record report, named after it, with GTWPE-D1's eight items in Nathan's words; no redline package; the file is a proposed replacement, not canon | One record prompt each |
 | REC-PATH, REC-ENDPT-PF20, REC-ENDPT-PF30 | ITEM-05, R2 | The conversation names each output's repository path and commit; delivering the file and its proof log is the endpoint | The record prompts |
-| REC-CHECK, REC-READ | ITEM-01, ITEM-03, ITEM-05 | Before saving: the file differs from its original only by the entry and its control fields, the fields agree, no Draft marker remains; every saved file is read back | The record prompts |
+| REC-CHECK, REC-READ | ITEM-01, ITEM-03, ITEM-05 | Before saving: the file differs from its original only by the entry and its control fields, the fields agree, and they carry no Draft marker; every saved file is read back | The record prompts |
 | REC-BLOCK-PF20, REC-BLOCK-PF30 | ITEM-03, R5 | An unresolved input writes no updated PF; an incomplete entry is never inserted or delivered | One record prompt each |
 | REC-VOL | ITEM-05, ITEM-03, R8, R5 | PF30 as a volume family: a new CRD's record goes only in the `Canon` and `Active` volume; a split reported when it looks due; a new volume only on Nathan's rollover decision, as PF30's rolling-volume rules set it: the record still goes in the active volume, whose updated copy also takes `Closed to new CRDs` and a *Next volume* field, and the next volume's review copy holds no record yet, a *Previous volume* field, and `Draft` and `Pending activation`, the only such status the prompt writes; the two files take effect together when Nathan publishes them; each file its own proof log | RECORD-20 |
 | REC-FILES | ITEM-05, R2 | "produce a full PF30 artifact" becomes "write any PF30 file that *Output and completion* and the volume rule above do not name" | RECORD-20 |
-| AP-AUTH, AP-AGREE | ITEM-01, ITEM-03, R4, R5 | Standing authority for every document-control field the revision changes; status leaves the excluded list; every version, date, change-history and gate value agrees, or the package returns to the preparer | APPLY-10 |
+| AP-AUTH, AP-AGREE | ITEM-01, ITEM-03, R4, R5 | Standing authority for every document-control field the revision changes, the change-history entry among them, in the document's own entry format and dated only where that format dates one; status leaves the excluded list; every version, date, change-history and gate value agrees, or the package returns to the preparer | APPLY-10 |
 | AP-DATE | ITEM-01, R4 | Any other control date that records the revision takes the execution date too | APPLY-10 |
 | AP-GATE | ITEM-02 | The gate in Nathan's form, from the package's sources | APPLY-10 |
 | AP-REF | ITEM-01, R4 | Every internal restatement of the document's own version or date is synchronized, not only a title's | APPLY-10 |
 | AP-STATUS | ITEM-03, R5 | A stale status takes the value the document's own rules and classification require, or blocks | APPLY-10 |
-| AP-VERIFY | ITEM-01 to ITEM-03 | The verification covers the gate's form, the change-history entry, agreement, and no Draft marker or stale status; any failure stops application | APPLY-10 |
+| AP-VERIFY | ITEM-01 to ITEM-03 | The verification covers the gate's form, the change-history entry, agreement, and no Draft marker or stale status beyond what canon requires there; any failure stops application | APPLY-10 |
 
 Per member: DRAIN-10 7 edits, DRAIN-20 9, RECORD-10 14, RECORD-20 18, APPLY-10 9; 57 in all, 10 of them
 identity edits.
@@ -973,7 +978,7 @@ SEL-1's new text does not contain SEL-2's old text, so each still matches once w
 
 ````
 ## Selected release — «R»
-**Selected: «S».** Authority: MODIFICATION-20261006-gtwpe-tw-document-rules, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». TW-APPLY-10 brings every document-control field of a revised PF forward from the actual change, and the fields agree: the version, the dates, the Last Update Gate, the change history the document's own rules require, a stale status and version-sensitive references; the drains supply each source's identity and draft the change-history entry as a content redline. The Last Update Gate is `BN` and the PF10 version used when the source is PF10, and the source's filename alone for any other source; a PF other than PF10 is never a source. No produced document says Draft or carries placeholders, TODOs, editorial notes or a stale status, except a new PF30 volume's review copy, as HDE CRD Records requires. TW-DRAIN-20 judges every potentially affected PF09 row on all the evidence. TW-RECORD-10 and TW-RECORD-20 insert their one section into a copy of PF20 or of the right PF30 volume at the repository path the invocation names, and write a separate proof log beside each file, as GTWPE-D1 requires; TW-RECORD-20 opens a new PF30 volume only on Nathan's rollover decision. Five rows below are new; TW-TRIAGE-10 is unchanged. Its *Current operation*, directly below this list, replaces the one under TW-ALPHA-20261006.1, which is now historical. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release, and Nathan waived HDE Governance §9.1.6's interacting-skill readiness for TW Flowmaster for it: TW runs by Nathan's direct invocations until the Flow Manager (C4) replaces the Flowmaster, which C6 retires. All old prompt pages remain intact.
+**Selected: «S».** Authority: MODIFICATION-20261006-gtwpe-tw-document-rules, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». TW-APPLY-10 brings every document-control field of a revised PF forward from the actual change, and the fields agree: the version, the dates, the Last Update Gate, the change history the document's own rules require, a stale status and version-sensitive references; the drains supply each source's identity and draft the change-history entry as a content redline. The Last Update Gate is `BN` and the PF10 version used when the source is PF10, and the source's filename alone for any other source; a PF other than PF10 is never a source. No produced document says Draft or carries placeholders, TODOs, editorial notes or a stale status, except where canon requires it, as in a template, a record kept as history or a new PF30 volume's review copy. TW-DRAIN-20 judges every potentially affected PF09 row on all the evidence. TW-RECORD-10 and TW-RECORD-20 insert their one section into a copy of PF20 or of the right PF30 volume at the repository path the invocation names, and write a separate proof log beside each file, as GTWPE-D1 requires; TW-RECORD-20 opens a new PF30 volume only on Nathan's rollover decision. Five rows below are new; TW-TRIAGE-10 is unchanged. Its *Current operation*, directly below this list, replaces the one under TW-ALPHA-20261006.1, which is now historical. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release, and Nathan waived HDE Governance §9.1.6's interacting-skill readiness for TW Flowmaster for it: TW runs by Nathan's direct invocations until the Flow Manager (C4) replaces the Flowmaster, which C6 retires. All old prompt pages remain intact.
 - `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/3f14590a05eb81789e16d978795db77d"/> — PF10 target list only; 100626.1.
 - `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-10»"/> — General PF redlines and proof log, with any change-history redline, or exact no redlines; «V».
 - `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-20»"/> — PF09 redlines and proof log; rows judged on all the evidence; board optional; «V».
@@ -991,7 +996,7 @@ flowchart TD
     S["Create a history section<br/>TW-RECORD-10 or TW-RECORD-20"] -->|Complete| P["Updated PF20 or PF30 and proof log"]
 ```
 Each transition is a Nathan-initiated invocation, made directly or as a pass inside a session he started, or a handoff honored by a separately authorized controller; none is automatic dispatch. Every step reads PF canon from `docs/pfcanon/` on `main` and takes its other inputs as attached files or repository paths. It writes its outputs at the repository path the invocation names under `docs/ephemeral/`, commits and pushes them on the branch the invocation names, and gives each output's repository path in its final response. It never merges, and never writes to Google Drive, ChatGPT Library or `docs/pfcanon/`. A READY package is the redlines file and its proof log, by repository path; for a complete READY package, Nathan invokes TW-APPLY-10 with them. No assessment runs before creation or before application, and no prompt gives model, surface or effort advice: Nathan chooses each session's configuration. TW-TRIAGE-10 stays list-only. TW-RECORD-10 and TW-RECORD-20 insert their one section into a copy of PF20 or of the right PF30 volume and end with that updated file and its proof log, with no Apply step.
-Every revised or updated PF has its document-control fields brought forward from the actual change, as one set that agrees: the version, bumped once; the dates, set to the execution date; the change history the document's own rules require; version-sensitive references; and the Last Update Gate, `BN` and the PF10 version used when the source is PF10, or the source's filename alone for any other source. No produced document says Draft or carries placeholders, TODOs, editorial notes or a stale status, except a new PF30 volume's review copy.
+Every revised or updated PF has its document-control fields brought forward from the actual change, as one set that agrees: the version, bumped once; the dates, set to the execution date; the change history the document's own rules require; version-sensitive references; and the Last Update Gate, `BN` and the PF10 version used when the source is PF10, or the source's filename alone for any other source. No produced document says Draft or carries placeholders, TODOs, editorial notes or a stale status, except where canon requires it, as in a template, a record kept as history or a new PF30 volume's review copy.
 The rules for drains, PF09, package validation and application in the historical operation of TW-ALPHA-20260908.1, below, still apply, except its assessment steps, its model or effort advice, its reading and writing through Google Drive and ChatGPT Library, its Last Update Gate of upstream source filenames, and its paste-ready PF20/PF30 sections.
 Next manual entry: invoke the selected drain prompt, TW-DRAIN-10 for a general PF or TW-DRAIN-20 for PF09, or a record prompt for PF20 or PF30, with the target PF, the incoming sources as attached files or repository paths, the exact selected scope, and the repository path and branch for its outputs. No live task or scope is selected by this note.
 ````
@@ -1001,7 +1006,7 @@ and `## Historical selected release — TW-ALPHA-20261006.1`:
 
 ```
 ## Selected release — «R»
-**Selected: «S».** Authority: MODIFICATION-20261006-gtwpe-tw-document-rules, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». TW-APPLY-10, and the record prompts for their own file, bring every document-control field forward from the actual change, the Last Update Gate as `BN` and the PF10 version used, or the filename of a source other than PF10; no produced document says Draft. TW-DRAIN-20 judges every potentially affected PF09 row on all the evidence. TW-RECORD-10 and TW-RECORD-20 insert their section into a repository copy of PF20 or PF30, with a separate proof log beside each file, as GTWPE-D1 requires. Five rows below are new; TW-TRIAGE-10 is unchanged. The release's *Current operation* is on <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/>. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4). All old prompt pages remain intact.
+**Selected: «S».** Authority: MODIFICATION-20261006-gtwpe-tw-document-rules, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA». TW-APPLY-10, and the record prompts for their own file, bring every document-control field forward from the actual change, the Last Update Gate as `BN` and the PF10 version used, or the filename of a source other than PF10; no produced document says Draft, except where canon requires it. TW-DRAIN-20 judges every potentially affected PF09 row on all the evidence. TW-RECORD-10 and TW-RECORD-20 insert their section into a repository copy of PF20 or PF30, with a separate proof log beside each file, as GTWPE-D1 requires. Five rows below are new; TW-TRIAGE-10 is unchanged. The release's *Current operation* is on <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/>. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations until the Flow Manager (C4). All old prompt pages remain intact.
 - `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/3f14590a05eb81789e16d978795db77d"/> — PF10 target list only; 100626.1.
 - `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-10»"/> — General PF redlines and proof log, with any change-history redline, or exact no redlines; «V».
 - `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-20»"/> — PF09 redlines and proof log; rows judged on all the evidence; board optional; «V».
@@ -1152,6 +1157,76 @@ edit count, value or Notion write changed.
 No required defect is open. Not exercised: any Notion write; the duplication and its polling; how Notion
 renders the new texts (K-5).
 
+### Full review (PL3)
+
+One reviewer, GTWPE-TW-DOCUMENT-RULES-PLAN-A, a fresh general-purpose subagent, neither forked nor
+context-inheriting, as Nathan's approval directs.
+- **Brief.** Its only brief was `PLAN-REVIEW-BRIEF.md`: 13,907 bytes, sha256
+  `97460f5f9d5d6f396d0dfc7cc212b4ddf7dd103b9e9f3e7043b995322fd58bd2`. The brief was committed and pushed at
+  `3a12db1` before the reviewer was spawned, at about 13:09Z, and the reviewer confirmed that sha256 before
+  reviewing.
+- **The run.** It reviewed §P at `fd14d32`. It fetched no prompt body and wrote nothing. It ran for about 32
+  minutes, and the harness reported 548,728 subagent tokens.
+- **The capture.** Its return came back through the harness's `SubagentHandback` call. The session captured
+  that call's `message` with `capture.py`, from the reviewer's own transcript, found by the path the harness
+  gave for its agent ID. The capture is `PLAN-REVIEW.md`: 20,443 bytes, sha256
+  `302b5671ea5c389f331c5cbd30a5f99e93f310941027d0da3d5de0643af24fb6`, the message's 20,442 bytes and one final
+  LF. Its first line, `1`, is its own count of required findings. It carries the `## Canon relied on` block
+  the brief required (ledger E-036).
+
+**Result: 1 required finding, R-1, and 15 listed, L1 to L15.**
+- **R-1, confirmed by the session against canon on `main`.** The record prompts said that the updated PF20 or
+  PF30 "carries no ... placeholder, TODO", and their check before saving that no "placeholder or TODO
+  remains". Yet they copy the file byte for byte. HDE CRD Records (PF30.1) has 46 lines with a backticked
+  `<…>` marker, its §7 record template among them. HDE Phased Epics (PF20) §2.6.1 reads "Date completed: TBD",
+  and its §1 keeps fourteen `\<allocated\>` entries. HDE Governance §9.1.1 says to "Preserve existing
+  PF20/PF30 content and original identities as dated history". Every normal run would meet the contradiction.
+- **S-1, found by the session while confirming R-1, and counted required (`D26-A` rule 3; R4).** The drains'
+  and TW-APPLY-10's no-Draft rule (DC-HIST, AP-VERIFY) excepted only what "the document's own canonical
+  format requires". That does not reach a record kept as history. A drain on PF20, where the record prompts'
+  kept text sends an update of an existing record, would be told to remove §2.6.1's "TBD" silently, and
+  TW-APPLY-10 would stop a drain that kept it.
+- **L5, counted required by the session (`D26-A` rule 3; R1).** DC-HIST had a drain date every change-history
+  entry with the preparation date, and AP-AUTH expected the entry to name the date. HDE CLI-API-Vendor Ref
+  §11.1 sets "One line per version", and its entries, like the HDE Copy Tonality Guide's change log, carry no
+  date. On the normal path for those targets, a drain would add a date their format does not have, or
+  TW-APPLY-10 would stop a package that kept the format.
+
+All three are repaired below (*Repair round (PL3)*). As Nathan directed, a check of the repair's diff follows.
+
+The other fourteen listed findings go to Nathan unrepaired (`D26-A` rule 4; the brief's §5). The session adds
+to four of them:
+- **L9.** The session read the historical operation of TW-ALPHA-20260908.1 in P7's fetch of the selection
+  page. Its Apply sentence names the version, the date and the gate, without "only", and *SECTION* excepts
+  its gate rule. It says nothing of a status, or of a row's status set on instruction. So *SECTION* brings
+  back no superseded rule by reference.
+- **L10** is the pattern ledger E-038 records, which the request leaves to PE39 after C3. It is listed here
+  and not raised again.
+- **L14.** *Findings on §A* records P-1 to P-3, and the plan goes to Nathan with them at PL4, with
+  `DECISION NEEDED`.
+- **L15.** PL4 adds *Canon and rulings relied on, for `PLAN`*, as each mode's section has one.
+
+### Repair round (PL3)
+
+By this session, on R-1, S-1 and L5, from about 13:45Z, in `edits.json`'s new texts and in §P. No anchor,
+member, edit count, value or Notion write changed: only the texts below and the tables that describe them.
+
+| Finding | Where | Repair |
+|---|---|---|
+| R-1 | REC-FIELDS-PF20 and REC-FIELDS-PF30 | "The updated PF20 carries no" becomes "The inserted entry and the control fields carry no", and in TW-RECORD-20 "The inserted record and the control fields carry no". Each sentence now ends "every other byte stays as canon has it, a template's placeholders and earlier records among them". PF30 keeps its review-copy exception |
+| R-1 | REC-CHECK, in both record prompts | "and that no `Draft` status language, placeholder or TODO remains." becomes "and that the inserted entry and those fields carry no `Draft` status language, placeholder or TODO." |
+| R-1 | *SECTION* and its *Current operation* (W17); A1-NEW (W18) | The selection page's two sentences, "No produced document says Draft or carries placeholders, TODOs, editorial notes or a stale status, except a new PF30 volume's review copy", now end "except where canon requires it, as in a template, a record kept as history or a new PF30 volume's review copy". A1-NEW's "no produced document says Draft" adds "except where canon requires it". Otherwise each would state a rule the repaired prompts no longer have |
+| S-1 | DC-HIST, in both drains; AP-VERIFY | "unless the document's own canonical format requires that exact language" becomes "unless canon requires that exact language there, as in a template or a record kept as history": ITEM-03's own "except where canon requires it". The drains remove "any other such marker in the target" |
+| L5 | DC-HIST, in both drains; AP-AUTH | A drain prepares the entry "in the target's own entry format", and dates it with the preparation date only "where that format dates an entry". TW-APPLY-10 expects the date it derives on the same condition |
+
+Checked after the repair:
+- `edits_check.py` passes, and each of its eleven `--inject` faults is still caught by its own code.
+- Each repaired passage was read again with its new text in place, in P3's fetches, made in this mode after
+  the compaction. Each still reads as one sentence of its prompt, and none contradicts kept text.
+- «H» is the repaired file's sha256 (*Values fixed in this plan*).
+
+L4, which sits in DR-2's text, is not touched: it is listed, and its repair is Nathan's to opt into.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds every prompt body fetched inline in this mode:
@@ -1174,9 +1249,19 @@ renders the new texts (K-5).
   Nothing was written from a save, hashed or compared. The harness refused this session's `rm` of a save
   in an earlier mode, so each save is left to its teardown and is not read again. §A's saves were not read
   in this mode.
+- **The reviewer's transcript**, the output file the harness gave for its agent ID in this session's tasks
+  directory. `capture.py` read it twice for its one `SubagentHandback` call, at transcript line 480: first
+  printing only its shape, then writing its message to `PLAN-REVIEW.md`. The reviewer fetched no prompt body
+  (its brief, §1), so the transcript holds none. It is left to teardown.
+- **One side effect of the reviewer's run,** as it reported it, not its own act: the repository's PostToolUse
+  hook updated `.git/canon_relied_on_hook.json` after its shell commands, as it does after this session's.
+  It reported no output of its own saved to a file by the harness.
 - **Scratch**, in this session's scratchpad. None holds a prompt body:
   - the §P drafts;
   - `edits.json` and this record as they stood before the dry run's repairs, and the three scripts that made
     the repairs and wrote the dry run;
   - the two control pages' `ctl_check.py` states, which are their heading lists;
-  - a copy of this record at `PLANNED`, for P10.
+  - a copy of this record at `PLANNED`, for P10;
+  - `edits.json` and this record as they stood before the repair round, and the scripts that made the repair
+    and wrote it into this record;
+  - `capture.py`.
