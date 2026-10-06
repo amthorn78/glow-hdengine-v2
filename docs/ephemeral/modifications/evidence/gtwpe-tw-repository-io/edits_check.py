@@ -20,6 +20,9 @@ X1.0, never by this script. Exit 0 when every check passes; 1 otherwise, naming 
             decision record words them, and edits.json's copy of the items equals the record's
   EXCLUDED  no `new` holds the PE Metaprompt's excluded vocabulary as a whole word (model, effort, reasoning,
             workload, strength, assess, Ultra, Astra, GPT, surface)
+  R3SCAN    for each of the five document prompts (r3_scan, Nathan's opt-in of 2026-10-06): the kept hits it lists
+            for each term are its count before less the `old` texts' hits, never negative, each with a listed
+            exception; and its `new` texts say once that Nathan alone merges. The counts after are printed
 """
 import copy
 import json
@@ -33,7 +36,15 @@ EXCLUDED = [r"\bmodels?\b", r"\beffort\b", r"\breasoning\b", r"\bworkload", r"\b
             r"\bultra\b", r"\bastra\b", r"\bgpt\b", r"\bsurface\b"]
 CHECK_PHRASES = ["GTWPE-MGMT-10", "`docs/pfcanon/` on `main`", "`docs/ephemeral/`", "as a pass", "separate proof log",
                  "`.proof-log` before `.md`", "attached files or repository paths", "attached file or a repository path",
-                 "opened if none is", "stop and ask for it", "by repository path", "Prompt Version: «V»", "— «V»"]
+                 "opened if none is", "stop and ask for it", "by repository path", "Nathan alone merges",
+                 "Prompt Version: «V»", "— «V»"]
+
+
+def r3_hits(term, text):
+    """Hits of one r3_scan term: PR as a whole word, case-sensitive, with PRs; every other term case-insensitive."""
+    if term == "PR":
+        return len(re.findall(r"\bPRs?\b", text))
+    return text.lower().count(term.lower())
 
 
 def record_items(path):
@@ -77,6 +88,10 @@ def inject(doc, fault):
         x = first("OUT-B", "RECORD-20"); x["new"] = x["old"]
     elif fault == "shape":
         e[3]["id"] = e[2]["id"]
+    elif fault == "r3scan":
+        doc["r3_scan"]["kept"]["DRAIN-20"][3][1] = 4
+    elif fault == "merge":
+        x = first("OUT-A", "APPLY-10"); x["new"] = x["new"].replace(" Never merge a pull request: Nathan alone merges.", "")
     else:
         raise SystemExit(f"unknown fault {fault!r}")
 
@@ -161,7 +176,28 @@ def check(doc, items_from_record):
         for w in EXCLUDED:
             if re.search(w, x["new"], re.IGNORECASE):
                 fails.append(f"EXCLUDED: {x['id']}'s new holds {w!r}")
-    return fails, after
+    r3 = doc["r3_scan"]
+    r3_after = {}
+    for m, before in r3["counts_before"].items():
+        mine = [x for x in edits if x["member"] == m]
+        row = []
+        for t, b in zip(r3["terms"], before):
+            gone = sum(r3_hits(t, x["old"]) for x in mine)
+            added = sum(r3_hits(t, x["new"]) for x in mine)
+            kept = [k for k in r3["kept"].get(m, []) if k[0] == t]
+            for k in kept:
+                if k[2] not in r3["exceptions"]:
+                    fails.append(f"R3SCAN: {m}: {t!r} kept under an unknown exception {k[2]!r}")
+            if b - gone < 0:
+                fails.append(f"R3SCAN: {m}: {t!r} occurs {gone} times in the old texts but {b} times in the body")
+            if sum(k[1] for k in kept) != b - gone:
+                fails.append(f"R3SCAN: {m}: {t!r} lists {sum(k[1] for k in kept)} kept hits, but {b} before less {gone} "
+                             f"in the old texts leaves {b - gone}")
+            row.append(b - gone + added)
+        r3_after[m] = row
+        if sum(x["new"].count(r3["merge_phrase"]) for x in mine) != 1:
+            fails.append(f"R3SCAN: {m}'s new texts do not say once that {r3['merge_phrase']}")
+    return fails, after, r3_after
 
 
 def main(argv):
@@ -181,13 +217,16 @@ def main(argv):
         doc = copy.deepcopy(doc)
         inject(doc, fault)
     items = record_items(rec)
-    fails, after = check(doc, items)
+    fails, after, r3_after = check(doc, items)
     print(f"edits: {len(doc['edits'])}; GTWPE-D1 items read from the decision record: {len(items)}")
     olds = sorted(doc["edits"], key=lambda x: len(x["old"]), reverse=True)
     print(f"longest old: {olds[0]['id']} ({olds[0]['rule_key']}), {len(olds[0]['old'])} characters; next: "
           f"{olds[1]['id']} ({olds[1]['rule_key']}), {len(olds[1]['old'])}")
     print("counts after (" + ", ".join(doc["counts_before"]["TERMS"]) + "):")
     for m, row in after.items():
+        print(f"  {m}: {row}")
+    print("r3_scan counts after (" + ", ".join(doc["r3_scan"]["terms"]) + "):")
+    for m, row in r3_after.items():
         print(f"  {m}: {row}")
     print("check phrases, occurrences in each member's new texts:")
     for m in doc["members"]:

@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-tw-repository-io
-status: PLANNED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -13,8 +13,8 @@ closure:
 readiness: NEEDS_RULING
 override:
   by: Nathan
-  overrides: [readiness]
-  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, so the new TW-ALPHA release is selected in this Modification although tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged"
+  overrides: [readiness, review_cap]
+  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, so the new TW-ALPHA release is selected in this Modification although tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged. Nathan, 2026-10-06, opting in to repairing four listed findings of the PLAN review: he directs one more check of the repair's diff by a fresh checker, past D26-A's cap of one diff check per mode, so `review_cap` names it"
 interaction_cost_predicted: 8
 interaction_cost_actual:
 estimate:
@@ -777,6 +777,11 @@ This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 �
     the phrase check finds each one.
   - `edits_check.py`'s `PROOF` check holds those texts to the decision record's wording before anything
     is sent.
+- **Nathan's opt-in of 2026-10-06** (*Repair round 2 (PL3)*):
+  - he opted in to repairing L2 with DC-1, L3, L15 and DC-2 of the reviews;
+  - he accepted every other finding, and K-1 to K-14, as risks;
+  - he recorded K-12 as a candidate for a separate Modification;
+  - he allowed `git fetch origin main` in the session that runs this Modification.
 - **No TW prompt carries model, effort or strength advice, and no TypeSafe scoring.** `edits_check.py`'s
   `EXCLUDED` check holds every new text to the PE's authoring exclusion. Nothing is scored.
 
@@ -829,19 +834,21 @@ In `docs/ephemeral/modifications/evidence/gtwpe-tw-repository-io/`, committed wi
 
 | File | What it is |
 |---|---|
-| `edits.json` | The 94 edits, W3 for each member: for each, its member, rule key, item, rule, where it sits, its anchor (`old`) and its new text; each member's page, title prefix and edit time; `GTWPE-D1`'s requirement and eight items; §A's counts before; and the phrases that must be absent after |
-| `edits_check.py` | The file's consistency check. It reads `edits.json` and the GTWPE decision record only, and writes nothing. It also derives each member's counts after and the check phrases' counts. `--inject` shows that each check fails on its own fault (dry run P2) |
+| `edits.json` | The 94 edits, W3 for each member: for each, its member, rule key, item, rule, where it sits, its anchor (`old`) and its new text; each member's page, title prefix and edit time; `GTWPE-D1`'s requirement and eight items; §A's counts before; the phrases that must be absent after; and the R3 broad match's counts before and kept hits, with their exceptions (`r3_scan`) |
+| `edits_check.py` | The file's consistency check. It reads `edits.json` and the GTWPE decision record only, and writes nothing. It also derives each member's counts after, the check phrases' counts and, for the five document prompts, the R3 broad match's counts after. `--inject` shows that each check fails on its own fault (dry run P2) |
 | `ctl_check.py` | The pre-read and readback of *Alpha 1* and the Operations Hub, whose fetches the harness saves. It is a copy, byte-identical, of `evidence/gtwpe-tw-model-advice/ctl_check.py`, the script the last TW change used for the same two pages, both at sha256 `4e968007698d833dd6d3e50d0fd6ed8daffdbd75e3865f3e1c32c9a1720923c5`. It is copied so that this record does not depend on another record's evidence, which Nathan may prune |
 | `PLAN-REVIEW-BRIEF.md` | PL3's review brief, committed before the reviewer is spawned |
 | `PLAN-REVIEW.md` | The reviewer's return, captured unedited from its own transcript |
 | `PLAN-DIFFCHECK-BRIEF.md` | The brief for the check of the repair's diff, committed before the checker was spawned |
 | `PLAN-DIFFCHECK.md` | The checker's return, captured unedited from its own transcript |
+| `PLAN-DIFFCHECK-2-BRIEF.md` | The brief for the check of the second repair's diff, at Nathan's opt-in, committed before the checker was spawned |
+| `PLAN-DIFFCHECK-2.md` | That checker's return, captured unedited from its own transcript |
 
 ### Values fixed in this plan
 
 | Value | Fixed as |
 |---|---|
-| «H» | `768d9255303185d90f9ac3dffa95b8161ebfc96811de8606ecae6e22aa84d542`, the sha256 of `edits.json`, 44,233 bytes, as the dry run's repairs left it (*Dry run (PL3)*) |
+| «H» | `757c68311e34ec7c3f92b82aa903fcea863b072d8c4354fbd9f05acea416b845`, the sha256 of `edits.json`, 47,254 bytes, as the second repair round left it (*Repair round 2 (PL3)*) |
 
 ### The edits, by rule
 
@@ -862,7 +869,7 @@ it reaches (`edits_check.py`'s `SHARED` check).
 | CAN-G, CAN-H | ITEM-02, R1 | The record's target and schema, and PF20, are resolved in `docs/pfcanon/` on `main` | CAN-G: the record prompts. CAN-H: RECORD-10 |
 | CAN-I | ITEM-02, R1 | Current authoritative PF Markdown remains `docs/pfcanon/` on `main` | APPLY-10 |
 | IN-A, IN-B, IN-C | ITEM-02, R2 | Inputs come as attached files or repository paths, never from Google Drive or ChatGPT Library; APPLY-10's legacy ID fields go | IN-A: the drains. IN-B: RECORD-10. IN-C: APPLY-10 |
-| OUT-A, OUT-B | ITEM-03, R1, R3 | The read-only line and the output route: outputs are written at the repository path the invocation names under `docs/ephemeral/`, and committed and pushed on its branch, which then has one open pull request, opened if none is. A missing path is a missing input, and the prompt stops and asks. The prompt never merges or writes to Drive, ChatGPT Library or `docs/pfcanon/`. "repository mirror" and "create a PR" go | The five document prompts |
+| OUT-A, OUT-B | ITEM-03, R1, R3 | The read-only line and the output route: outputs are written at the repository path the invocation names under `docs/ephemeral/`, and committed and pushed on its branch, which then has one open pull request, opened if none is. A missing path is a missing input, and the prompt stops and asks. The prompt never merges a pull request, since Nathan alone merges, and never writes to Drive, ChatGPT Library or `docs/pfcanon/`. "repository mirror" and "create a PR" go | The five document prompts |
 | OUT-C | ITEM-03, R3 | "a download" becomes "an output file" | The five document prompts |
 | OUT-D | ITEM-03, R3 | The section file goes to the repository path the invocation names | The record prompts |
 | OUT-E | ITEM-03, R3 | The final response gives each output's repository path and commit; nothing is written to Drive or Library | The drains |
@@ -904,11 +911,41 @@ What the readback (X1.3, step g) expects of each new page.
 | Member | Check phrases after, with counts |
 |---|---|
 | TRIAGE | `GTWPE-MGMT-10` 1; `` `docs/pfcanon/` on `main` `` 1; `as a pass` 1 |
-| DRAIN-10 | `GTWPE-MGMT-10` 2; `` `docs/pfcanon/` on `main` `` 3; `` `docs/ephemeral/` `` 1; `as a pass` 2; `separate proof log` 2; `` `.proof-log` before `.md` `` 1; `attached files or repository paths` 1; `opened if none is` 1; `stop and ask for it` 1; `by repository path` 1 |
+| DRAIN-10 | `GTWPE-MGMT-10` 2; `` `docs/pfcanon/` on `main` `` 3; `` `docs/ephemeral/` `` 1; `as a pass` 2; `separate proof log` 2; `` `.proof-log` before `.md` `` 1; `attached files or repository paths` 1; `opened if none is` 1; `stop and ask for it` 1; `by repository path` 1; `Nathan alone merges` 1 |
 | DRAIN-20 | As DRAIN-10, with `` `docs/pfcanon/` on `main` `` 4 |
-| RECORD-10 | `GTWPE-MGMT-10` 2; `` `docs/pfcanon/` on `main` `` 3; `` `docs/ephemeral/` `` 1; `as a pass` 2; `attached file or a repository path` 1; `opened if none is` 1; `stop and ask for it` 1 |
-| RECORD-20 | `GTWPE-MGMT-10` 2; `` `docs/pfcanon/` on `main` `` 2; `` `docs/ephemeral/` `` 1; `as a pass` 2; `opened if none is` 1; `stop and ask for it` 1 |
+| RECORD-10 | `GTWPE-MGMT-10` 2; `` `docs/pfcanon/` on `main` `` 3; `` `docs/ephemeral/` `` 1; `as a pass` 2; `attached file or a repository path` 1; `opened if none is` 1; `stop and ask for it` 1; `Nathan alone merges` 1 |
+| RECORD-20 | `GTWPE-MGMT-10` 2; `` `docs/pfcanon/` on `main` `` 2; `` `docs/ephemeral/` `` 1; `as a pass` 2; `opened if none is` 1; `stop and ask for it` 1; `Nathan alone merges` 1 |
 | APPLY-10 | As DRAIN-10, with `` `docs/pfcanon/` on `main` `` 2 and `by repository path` 0 |
+
+**The R3 broad match** (Nathan's opt-in, L2 with DC-1).
+- **Terms.** On the five document prompts: `pull request`, `PR`, `commit`, `push`, `merge` and `repository`.
+- **How they are matched.** By reading, case-insensitive on the stems `pull request`, `commit`, `push`,
+  `merg` and `repositor`. `PR` is matched as a whole word, case-sensitive, with its plural `PRs`.
+- **Counts before.** Made in the second repair round, by reading the fetches made after the compaction,
+  checked by a second reading (P9).
+- **Counts after.** `edits_check.py` derives them from `edits.json`'s `r3_scan`: the kept hits plus the
+  new texts' hits.
+
+| Member | `pull request` | `PR` | `commit` | `push` | `merg` | `repositor` | Kept hits, with the exception that keeps each |
+|---|---|---|---|---|---|---|---|
+| DRAIN-10 | 2 | 0 | 4 | 1 | 3 | 10 | `commit` 1 and `repositor` 5, E-RC; `merg` 1, E-RO |
+| DRAIN-20 | 2 | 0 | 4 | 1 | 4 | 11 | `commit` 1 and `repositor` 5, E-RC; `merg` 1, E-RO; `merg` 1, E-DN; `repositor` 1, E-EV |
+| RECORD-10 | 2 | 0 | 3 | 1 | 3 | 4 | `commit` 1 and `repositor` 1, E-NF; `merg` 1, E-RO |
+| RECORD-20 | 2 | 0 | 3 | 1 | 3 | 3 | As RECORD-10 |
+| APPLY-10 | 2 | 0 | 3 | 1 | 3 | 8 | `merg` 1, E-RO |
+
+Every other hit is in a new text. The exceptions, as `r3_scan` states them:
+- **E-RC**, the repository-claims rule, in *Intake and source scope*. A statement about the repository's
+  current state rests on reading the repository and recording what was read. It governs claims in a PF's
+  text, not where the prompt writes.
+- **E-RO**, the read-only line's ban on merging, kept after OUT-B. R3 says the same.
+- **E-NF**, the no-invented-facts rule, in *Destination, source roles and record preparation*. The section
+  never invents an inspection, a date, a commit or the like.
+- **E-DN**, the PF09 Done rule. A change merged elsewhere is no evidence that a task is Done.
+- **E-EV**, the PF09 evidence rule, item 5. Old evidence is never passed off as a current inspection of
+  the repository.
+
+None forbids writing at the invocation's path, committing or pushing there, or opening a pull request.
 
 **The current versions' structure.** The new pages keep it, since no edit touches a heading or a page's end.
 
@@ -966,7 +1003,7 @@ Twenty-three Notion writes, W1 to W23. The plan makes no other.
 |---|---|---|---|---|---|---|
 | X1.1 | — | the record | Set the status to `EXECUTING`. Fix «D» and «PA», and record them in §E with the UTC time, which starts the clock | GTWPE-MGMT-10 X1 | The values are in §E before X1.2 | None needed |
 | X1.2 | — | — | The preconditions X1.0 (0) to (8); fix «V» | This plan | Each as X1.0 states it | None needed |
-| X1.3 | PART-01 | `prompt` | For each member in the order TRIAGE, DRAIN-10, DRAIN-20, RECORD-10, RECORD-20, APPLY-10: **(a)** Fetch *HDE TW*: no child page titled `<title prefix> — «V»`. **(b)** **Write 1** (W1, W4, W7, W10, W13, W16): `notion-duplicate-page` on the member's current page; «ID» is the returned ID. **(c)** Fetch «ID» until populated: at most six fetches, the second onwards after a wait of about 20 seconds, run as a background `sleep 20`, since the harness blocks a foreground sleep. Populated means: its first nonblank line is `<title prefix> — 100426.1`; its last heading and last words are the table's; and the fetch reports no truncation or unknown block. **(d)** **Write 2**: `notion-update-page`, `update_properties`, `allow_async: false`: title `<title prefix> — «V»`. **(e)** **Write 3**: `notion-update-page`, `update_content`, `allow_async: false`: the member's edits from `edits.json`, in file order, in one call, each `old_str` and `new_str` printed from the committed file by script, with «V» substituted in its two identity edits | The prompt-page route; ITEM-02 to ITEM-05; this plan's approval (`notion-write-boundary.md`) | **(f)** The call returns an ID different from the current page's; populated by the sixth fetch, with *HDE TW* as parent; otherwise stop (`D26-B`). **(g)** Fetch «ID» whole, into this session's context, and check it. Every count is made by reading and checked by a second reading. (1) The title is exactly `<title prefix> — «V»`; (2) the parent is *HDE TW*; (3) the first two nonblank lines are that title and `Prompt Version: «V»`; (4) each edit's new text is present whole, read against `edits.json`, at the place its `where` names; (5) each `absent_after` phrase occurs 0 times in the page's content, not its title property or the fetch's URLs; (6) each check phrase occurs at its count (*The new pages' checks*); (7) the 13 terms occur at their counts after, and each hit is in a new text or one of §A's exceptions; (8) the headings, in order, are the table's; (9) the page ends with the table's last words; (10) the fetch reports no truncation or unknown block; (11) for DRAIN-10, DRAIN-20 and APPLY-10, `GTWPE-D1`'s requirement, `separate proof log`, and each of its eight minimum items, as `edits.json`'s `gtwpe_d1` words them, occur by phrase. **(h)** Fetch *HDE TW*: exactly one child page carries the new title, and it is «ID»; fetch the current page: its edit time is unchanged. A failed check stops the run (`D26-B`); a hit in (7) that still says what an edit removes is a wrong plan (*If the plan is wrong*) | Before X4, Nathan archives the new pages; the current pages are never touched |
+| X1.3 | PART-01 | `prompt` | For each member in the order TRIAGE, DRAIN-10, DRAIN-20, RECORD-10, RECORD-20, APPLY-10: **(a)** Fetch *HDE TW*: no child page titled `<title prefix> — «V»`. **(b)** **Write 1** (W1, W4, W7, W10, W13, W16): `notion-duplicate-page` on the member's current page; «ID» is the returned ID. **(c)** Fetch «ID» until populated: at most six fetches, the second onwards after a wait of about 20 seconds, run as a background `sleep 20`, since the harness blocks a foreground sleep. Populated means: its first nonblank line is `<title prefix> — 100426.1`; its last heading and last words are the table's; and the fetch reports no truncation or unknown block. **(d)** **Write 2**: `notion-update-page`, `update_properties`, `allow_async: false`: title `<title prefix> — «V»`. **(e)** **Write 3**: `notion-update-page`, `update_content`, `allow_async: false`: the member's edits from `edits.json`, in file order, in one call, each `old_str` and `new_str` printed from the committed file by script, with «V» substituted in its two identity edits | The prompt-page route; ITEM-02 to ITEM-05; this plan's approval (`notion-write-boundary.md`) | **(f)** The call returns an ID different from the current page's; populated by the sixth fetch, with *HDE TW* as parent; otherwise stop (`D26-B`). **(g)** Fetch «ID» whole, into this session's context, and check it. Every count is made by reading and checked by a second reading. (1) The title is exactly `<title prefix> — «V»`; (2) the parent is *HDE TW*; (3) the first two nonblank lines are that title and `Prompt Version: «V»`; (4) each edit's new text is present whole, read against `edits.json`, at the place its `where` names; (5) each `absent_after` phrase occurs 0 times in the page's content, not its title property or the fetch's URLs; (6) each check phrase occurs at its count (*The new pages' checks*); (7) the 13 terms occur at their counts after, and each hit is in a new text or one of §A's exceptions; (8) the headings, in order, are the table's; (9) the page ends with the table's last words; (10) the fetch reports no truncation or unknown block; (11) for DRAIN-10, DRAIN-20 and APPLY-10, `GTWPE-D1`'s requirement, `separate proof log`, and each of its eight minimum items, as `edits.json`'s `gtwpe_d1` words them, occur by phrase; (12) for the five document prompts, the R3 broad match of *The new pages' checks*: by reading, checked by a second reading, each of its six terms at its count after, each hit in a new text or among the kept hits the table lists, and each hit recorded in §E with its edit or the exception that keeps it. A hit that still forbids writing at the invocation's path, committing or pushing there, or opening a pull request stops the run (`D26-E`). **(h)** Fetch *HDE TW*: exactly one child page carries the new title, and it is «ID»; fetch the current page: its edit time is unchanged. A failed check stops the run (`D26-B`); a hit in (7) that still says what an edit removes is a wrong plan (*If the plan is wrong*) | Before X4, Nathan archives the new pages; the current pages are never touched |
 | X2 | — | the record | Commit the record with X1's values and dispositions. Run `gtwpe_record_check.py` and `modification_validate.py` on it at `EXECUTING`; push. No repository file other than the record and its evidence changes, and nothing is installed, so the run goes on to X4 | GTWPE-MGMT-10 X2 ("Otherwise push the record and go on to X4") | Both exit 0; after the push, the branch's blob equals the local file; amthorn78/glow-hdengine-v2#575 is open | — |
 | X3 | — | — | Not applicable: X2 waits for no merge or install. Recorded `NOT_APPLICABLE` with that reason | GTWPE-MGMT-10 X3 | The disposition is in §E | — |
 | X4.1 | — | — | `git fetch origin main`; fix «M», «m» and «S»; `git log --format='%H %cI %s' 20d0dd8..«M»` over *The watched sources*, leaving out this Modification's own files. For each commit, a trigger finding in §E with its `D26-E` search: the change's own terms in 100526.2 as fetched at X1.2 and in `docs/prompt_ecosystem_management/gtwpe/` at «M», each with its count | GTWPE-MGMT-10 X4; §A *Drift check*, which examined through `20d0dd8` | Every commit the log lists has a trigger finding in §E. A change that contradicts the GTWPE is recorded for Nathan and does not stop the run | None needed |
@@ -1118,43 +1155,43 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-9 | The drains carry `GTWPE-D1`'s eighth item word for word, "the correct redlines file or final PF file", although a drain writes only redlines | Certain | A reader sees the final PF named in a drain's list | Nathan's wording kept whole, so that the phrase readback finds it; nothing in a drain writes a final PF |
 | K-10 | The readbacks are heavy: six whole pages and five control pages | High | A compaction during `EXECUTE` | The body's rule covers it: fetch live again, never recover a body from a transcript |
 | K-11 | The merge rule is a statement, not a gate | Low | A branch merged early | Pull requests "cannot gate" (Nathan, 2026-09-28); the rule is Nathan's own |
-| K-12 | TW-RECORD-20 names no route for its inputs, before or after the change. ITEM-02's R2 covers "a record's specification", but §A gave TW-RECORD-20 no input-route passage, because its *Purpose* names none (dry run P7) | Low: Nathan supplies its inputs | A TW-RECORD-20 run accepts a specification Nathan gives it by a reference outside the repository, where the other five prompts would stop | The scope froze at the analysis's approval, and a new passage would widen it. Adding the route is a separate Modification (`spawned_from` this one), Nathan's to order |
+| K-12 | TW-RECORD-20 names no route for its inputs, before or after the change. ITEM-02's R2 covers "a record's specification", but §A gave TW-RECORD-20 no input-route passage, because its *Purpose* names none (dry run P7) | Low: Nathan supplies its inputs | A TW-RECORD-20 run accepts a specification Nathan gives it by a reference outside the repository, where the other five prompts would stop | The scope froze at the analysis's approval, and a new passage would widen it. Adding the route is a separate Modification (`spawned_from` this one), Nathan's to order. Nathan recorded it on 2026-10-06 as a candidate for one |
 | K-13 | CAN-A tells each prompt to record the canon commit it read, as §A's R1 directs for all six; TW-TRIAGE-10 writes nothing, and its result stays a list (dry run P7) | Medium | A TW-TRIAGE-10 run names the commit beside its list, or keeps it internal | Dropping the recording for TW-TRIAGE-10 would rewrite the analysis, which `PLAN` may not. Either outcome is harmless; a change is Nathan's opt-in |
-| K-14 | This session's permission classifier refused `git fetch origin main` in the dry run (P5), although X1.0 (7) and X4.1 need it | Medium | `EXECUTE` stops at X1.0 (7) with nothing written, and returns `IMPLEMENTATION_BLOCKED` | A loud stop before any write. Nathan can allow the command (PO-4); `EXECUTE` then restarts, since nothing was written (`D26-C`) |
+| K-14 | This session's permission classifier refused `git fetch origin main` in the dry run (P5), although X1.0 (7) and X4.1 need it | Medium | `EXECUTE` stops at X1.0 (7) with nothing written, and returns `IMPLEMENTATION_BLOCKED` | A loud stop before any write. Nathan can allow the command (PO-4); `EXECUTE` then restarts, since nothing was written (`D26-C`). He allowed it on 2026-10-06, and the fetch then succeeded (P11) |
 
-**From the reviews,** open and listed (`D26-A`; *Full review (PL3)*, *Diff check (PL3)*). The reviewers'
-own words are in `PLAN-REVIEW.md` and `PLAN-DIFFCHECK.md`. Approving this plan accepts each of these as
-well, unless Nathan opts in to its repair. R-1 and L1 are repaired, and DC-2 is met by this table.
+**From the reviews.**
+- **Repaired.** Nathan opted in on 2026-10-06 to repairing L2 with DC-1, L3, L15 and DC-2 (*Repair round
+  2 (PL3)*). R-1 and L1 were repaired in the first repair round.
+- **Accepted.** He accepted every other finding below as a risk, and approving this plan accepts each
+  (`DISP-001`). The last column gives why each is acceptable.
+- The reviewers' own words are in `PLAN-REVIEW.md` and `PLAN-DIFFCHECK.md`.
 
-| # | Finding | Path; likelihood | Consequence |
-|---|---|---|---|
-| L2 | R3 lifts the bodies' ban on a pull request, but the readback looks for the old rule only by the phrase "create a PR", and no broad term covers a pull request, a commit, a push or a merge | Normal; low | A ban surviving elsewhere in a body would stand beside "opened if none is" and pass every check. The session's reading under DC-1 found none |
-| L3 | "Never merges" rests on kept text after OUT-B's anchor, which no check reads | Normal; low | Without it, a prompt that opens pull requests would have no ban on merging of its own |
-| L4 | §P's statement in *Nathan's directions* of what it quotes is incomplete: the dry run's note quotes a kept sentence of 57 characters, within Q-2's length as §P reads it | Normal; certain; low | An untrue statement in the record |
-| L5 | X5's ITEM-01 check tests where files are, not what they quote | Normal; low | A body passage quoted in §E would leave ITEM-01 `VERIFIED` |
-| L6 | What remains of it: on *Alpha 1* and the Hub, the new paragraphs are checked only for their `--has` values. X4.3 (2) now reads the selection page's paragraph as sent | Normal; low | A dropped or garbled sentence there would pass |
-| L7 | The pre-reads of X4.4 and X4.6 follow X4.3's selection write | Failure; low | A page change after X1.0 fails after the switch, while the notes still name TW-ALPHA-20261004.1: a loud `D26-B` stop |
-| L8 | The checks for «PA» are met by «S» when approval and selection fall on the same UTC day | Normal; medium | A missing «PA» would pass |
-| L9 | X1.0 (3) counts in "each member's fetch", without (g)(5)'s exclusion of the title property | Normal; low | Read literally, the identity anchors occur once more, and the run stops with nothing written |
-| L10 | X1.3 (g), X4.2, X4.3 and X4.5 verify by reading, not by a committed command (K-5) | Normal; procedural | None beyond K-5's |
-| L11 | PL-B and PL-F split a paragraph into list items, with the rest of it on a plain line after the eighth | Normal; low | If Notion folds that line into the item, (g)(4) fails: a loud stop |
-| L12 | «V» is fixed from X1.1's date | Normal; low | A run that crosses 00:00Z makes pages a day after the date their version carries |
-| L13 | Each «ID» reaches the record only at X2 | Failure; low | A crash between Write 1 and Write 2 leaves an unselected copy titled with the old version, which a rerun repeats; the sweep lists it |
-| L14 | X1.0 (7) does not look at the watched paths, and X1.0 (0) not at the catalog's selection | Normal; very low | A change between approval and `EXECUTE` is recorded only after the selection |
-| L15 | PO-1's "made from this session" may not cover a fresh session after K-14's remedy | Failure; low | A careful session asks Nathan |
-| L16 | Six anchors are 100 characters or more: OUT-A 220, PL-F 190, IN-C 150, OUT-E 130, RUN-C 121 and PL-A 100 | Normal; certain; low | More of each body is committed than a span's two ends would commit, though within Q-2 as §P reads it |
-| DC-1 | *Full review (PL3)*'s note on L2 and L3 claims a whole-body reading, on a basis that names only the touched passages | Normal; low | Nathan may take L2 as settled on an unmeasured check. The session has since read the five document prompts whole, twice, in this mode's fetches after the compaction. No kept text forbids a pull request, a commit or a push. The only ban on merging is the read-only line's |
-| DC-3 | The new `--has` of X4.4 and X4.6 is the first live `ctl_check.py` string with an apostrophe and parentheses | Failure; low | If Notion returns either changed, `post` fails after W20 and W21 or W23 have landed: a loud `D26-B` stop, with the selection switched and the notes split. Both pages, as fetched in P4, show apostrophes and parentheses that the last TW change sent, unchanged |
-| DC-4 | The note on L2 and L3 quotes one word of kept text, "merge" | Normal; certain; negligible | §P's statement of what it quotes is incomplete again, as in L4 |
+| # | Finding | Path; likelihood | Consequence | Why accepted, not repaired |
+|---|---|---|---|---|
+| L1 | As repaired, the waiver names tw-flowmaster alone. That flowmaster-validate 3.3.2 needs none, since it reaches the release only through tw-flowmaster, is left to `PLAN-REVIEW.md` | Normal; certain; low | A reader may ask why one of the two skills has no waiver | Every page says that neither skill runs the release, as Nathan directed |
+| L4 | §P's statement in *Nathan's directions* of what it quotes is incomplete: the dry run's note quotes a kept sentence of 57 characters | Normal; certain; low | An untrue statement in the record | The quote is within Q-2's length as §P reads it |
+| L5 | X5's ITEM-01 check tests where files are, not what they quote | Normal; low | A body passage quoted in §E would leave ITEM-01 `VERIFIED` | GTWPE-MGMT-10's own rule on reading bodies still binds the session that runs `EXECUTE` |
+| L6 | On *Alpha 1* and the Hub, the new paragraphs are checked only for their `--has` values | Normal; low | A dropped or garbled sentence there would pass | X4.3 (2) reads the selection page's paragraph as sent, and every page's Q-1 sentence is checked |
+| L7 | The pre-reads of X4.4 and X4.6 follow X4.3's selection write | Failure; low | A page change after X1.0 fails after the switch, while the notes still name TW-ALPHA-20261004.1 | A loud `D26-B` stop; X1.0 (5) reads both pages first |
+| L8 | The checks for «PA» are met by «S» when approval and selection fall on the same UTC day | Normal; medium | A missing «PA» would pass | X4.3 (2) reads the selection page's paragraph as sent, «PA» in it |
+| L9 | X1.0 (3) counts in "each member's fetch", without (g)(5)'s exclusion of the title property | Normal; low | Read literally, the identity anchors occur once more | A loud stop with nothing written; the dry run counted in the content |
+| L10 | X1.3 (g), X4.2, X4.3 and X4.5 verify by reading, not by a committed command (K-5) | Normal; procedural | None beyond K-5's | K-5: each count is checked by a second reading |
+| L11 | PL-B and PL-F split a paragraph into list items, with the rest of it on a plain line after the eighth | Normal; low | If Notion folds that line into the item, (g)(4) fails | A loud stop at X1.3 |
+| L12 | «V» is fixed from X1.1's date | Normal; low | A run that crosses 00:00Z makes pages a day after the date their version carries | Cosmetic |
+| L13 | Each «ID» reaches the record only at X2 | Failure; low | A crash between Write 1 and Write 2 leaves an unselected copy, which a rerun repeats | The sweep lists every copy, and Nathan archives unselected pages |
+| L14 | X1.0 (7) does not look at the watched paths, and X1.0 (0) not at the catalog's selection | Normal; very low | A change between approval and `EXECUTE` is recorded only after the selection | X4.1 records it and returns it to Nathan; nothing is silent |
+| L16 | Six anchors are 100 characters or more: OUT-A 220, PL-F 190, IN-C 150, OUT-E 130, RUN-C 121 and PL-A 100 | Normal; certain; low | More of each body is committed than a span's two ends would commit | Within Q-2 as §P reads it: each is the clause its edit replaces |
+| DC-3 | The new `--has` of X4.4 and X4.6 is the first live `ctl_check.py` string with an apostrophe and parentheses | Failure; low | If Notion returns either changed, `post` fails after W20 and W21 or W23 have landed: a loud `D26-B` stop, with the selection switched and the notes split | Both pages, as fetched in P4, show apostrophes and parentheses that the last TW change sent, unchanged |
+| DC-4 | *Full review (PL3)*'s note on L2 and L3 quoted one word of kept text | Normal; certain; negligible | §P's statement of what it quotes is incomplete again, as in L4 | Five characters, within Q-2 |
 
 ### Product Owner actions
 
 | # | Action | How it is verified |
 |---|---|---|
-| PO-1 | Approve this plan. It authorizes W1 to W23 and nothing else in Notion (`notion-write-boundary.md`), made from this session (HDE Build Notes, PF10-AINEUTRAL-001). It names the selection of the new release on the selection page (X4.3) and the current-release notes on *Alpha 1*, *HDE TW* and the Operations Hub (X4.4 to X4.6) | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
+| PO-1 | Approve this plan. It authorizes W1 to W23 and nothing else in Notion (`notion-write-boundary.md`), made from the session that runs `EXECUTE` of this plan, a restart of it under K-14 included (HDE Build Notes, PF10-AINEUTRAL-001). It names the selection of the new release on the selection page (X4.3) and the current-release notes on *Alpha 1*, *HDE TW* and the Operations Hub (X4.4 to X4.6) | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
 | PO-2 | Merge amthorn78/glow-hdengine-v2#575 when he chooses, after the record is `COMPLETE`, and not before: his rule of 2026-09-29 | Nothing waits on that merge (`D21-C`) |
 | PO-3 | Only after a failure: archive the unselected new pages if the failure came before X4.3; merge #575, carrying the failure record | The read-only sweep, after he acts |
-| PO-4 | If he chooses, before `EXECUTE`: allow `git fetch origin main` in the session that runs it, which this session's permission classifier refused in the dry run (K-14) | X1.0 (7) passes; if it does not, the run stops there with nothing written |
+| PO-4 | Allow `git fetch origin main` in the session that runs `EXECUTE`, which this session's permission classifier refused in the dry run (K-14). Done: Nathan allowed it on 2026-10-06 in the session that runs this Modification | This session's fetch then succeeded (P11); X1.0 (7) checks it again |
 
 ### Explicitly not in scope
 
@@ -1164,6 +1201,8 @@ well, unless Nathan opts in to its repair. R-1 and L1 are repaired, and DC-2 is 
 - Every text of the six bodies outside the 94 edits, the human-readable report wording among it (§A's
   exceptions).
 - Any change to the GTWPE catalog beyond its checked-through commit.
+- K-12, a route for TW-RECORD-20's inputs: a candidate for a separate Modification, as Nathan recorded on
+  2026-10-06.
 
 ### Dry run (PL3)
 
@@ -1182,6 +1221,10 @@ requires, and so was GTWPE-MGMT-10 100526.2 itself.
 | P6 | The PE Metaprompt's general rules, as read in this mode, and X1.0 (6) | Its fetch's save, read by a script for its title and edit time alone: 091426.1, edited 2026-09-23T17:17:22.217Z, unchanged. For «D» = 2026-10-05, «V» is `100526.1`, and no child page of *HDE TW* carries 100526. The identity edits keep the two lines' form; `EXCLUDED` finds no model, surface or effort term; the new texts cite the GTWPE and GTWPE-D1 by name, with no version, page ID or link |
 | P7 | Each passage an edit touches, read whole with its new text in place, by reading, in P3's fetches | 94 edits read. Four defects in this plan's own new texts, repaired below. Two gaps the analysis leaves, listed rather than repaired, since `PLAN` may not widen the scope or rewrite the analysis: K-12 and K-13 |
 | P8 | Every step of *The steps* names a check that could fail, and every value is fixed once (*Values*) | By reading: yes. X3 is `NOT_APPLICABLE` by X2's own rule |
+| P9 | Added in repair round 2: the R3 broad match's counts before. Made by reading the five document prompts' fetches made after the compaction, and checked by a second reading. Each kept hit is given the exception that keeps it | As *The new pages' checks* gives them. No kept hit forbids writing at the invocation's path, committing, pushing or opening a pull request |
+| P10 | Added in repair round 2: `Nathan alone merges` in each member's current version, by reading, twice | 0 in each |
+| P11 | Added in repair round 2: `git fetch origin main`, after Nathan allowed it | It succeeded at 00:41Z on 2026-10-06. `origin/main` is still `20d0dd8`, with no commit since |
+| P12 | Added in repair round 2: `edits_check.py` on the repaired `edits.json`, then each of its twelve `--inject` faults | `PASS`, exit 0, with the counts after and check phrases as *The new pages' checks* gives them, the R3 broad match's among them. Each fault exits 1 and is caught by its own code, 12/12 |
 
 **Repaired in the dry run,** in `edits.json`'s new texts alone, before any review. No anchor, member, edit
 count or passage changed.
@@ -1233,9 +1276,9 @@ context-inheriting, as Nathan's approval directs.
 Both are repaired below (*Repair round (PL3)*). As Nathan directed, a check of the repair's diff follows.
 
 The other fifteen listed findings go to Nathan unrepaired (`D26-A` rule 4). The session adds to three:
-- **L2 and L3.** In P7 the session read each touched passage in place. In the five document prompts, no
-  kept text forbids a pull request, a commit or a push. The read-only line keeps "merge" among its bans
-  after OUT-B, so "never merges" rests on kept text, as L3 says. The readback does not check that ban.
+- **L2 and L3.** In P7 the session read each touched passage in place. That reading shows the read-only
+  line keeping its ban on merging after OUT-B, as L3 says. It measured no whole body for these terms. At
+  Nathan's direction, P9 measured them and the readback now checks them (*Repair round 2 (PL3)*).
 - **L4.** The quoted kept sentence, 57 characters, is within the length Q-2 allows as §P reads it. But
   §P's statement in *Nathan's directions* of what it quotes is no longer complete. Both stay for Nathan's
   opt-in.
@@ -1282,6 +1325,37 @@ review has found a required defect.
   plan goes to Nathan either way.
 - DC-2 asked that the open findings be listed where Nathan's approval accepts them. They now are, under
   *Open findings, accepted as risks*. DC-1, DC-3 and DC-4 stay listed there, with the session's notes.
+
+### Repair round 2 (PL3), Nathan's opt-in
+
+Nathan's words, 2026-10-06:
+
+> Nathan opts in to repairing four listed findings of the PLAN review of MODIFICATION-20261005-gtwpe-tw-repository-io at eb80433 (D26-A rule 4), in one repair round, followed by one check of the repair's diff by a fresh checker: L3 (each output rule's new text also states that the prompt never merges a pull request, since Nathan alone merges, and the readback checks it by phrase on every member whose output rule changes); L2 with DC-1 (the readback runs a broad match on the five document prompts for "pull request", "PR", "commit", "push", "merge" and "repository", records each hit with the exception that keeps it, and stops on a hit that still forbids what R3 now requires; the full review's L2/L3 bullet states only what was measured); L15 (PO-1 authorizes W1 to W23 from the session that runs EXECUTE of this plan, so a restart under K-14 is covered); and DC-2 (§P's accepted risks list, with its reason, every finding Nathan does not opt in to). Every other finding (L1 as repaired, L4 to L14, L16, DC-3, DC-4) and K-1 to K-14 are accepted as risks. K-12, a route for TW-RECORD-20's inputs, is recorded as a candidate for a separate Modification. PE39 checked the plan at eb80433: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6), edits_check.py passes, main is still 20d0dd8, and the branch changes only docs/ephemeral/. On K-14 (PO-4): Nathan allows `git fetch origin main` in the session that runs this Modification. Return to Nathan for plan approval at the repaired commit, in at most five plain sentences ending with exactly what he must approve.
+
+By this session, from about 00:40Z on 2026-10-06, in the record and its evidence alone. No anchor,
+member, edit count, value or Notion write changed.
+
+| Finding | Where | Repair |
+|---|---|---|
+| L3 | OUT-A's new text, in the five document prompts; the check phrases | OUT-A now also says "Never merge a pull request: Nathan alone merges." `Nathan alone merges` is a check phrase at 1 in each of the five, so X1.3 (g)(6) reads it by phrase. It occurs 0 times in each current version (P10) |
+| L2 with DC-1 | *The new pages' checks*; X1.3 (g)(12); `edits.json`'s `r3_scan`; `edits_check.py`'s `R3SCAN` | The broad match on the five document prompts. It was measured by reading (P9), and X1.3 checks it by reading. Each hit is recorded with its edit or exception, and a hit that still forbids what R3 requires is a stop. `R3SCAN` holds the kept hits to the counts before less the anchors' hits, and derives the counts after |
+| DC-1 | *Full review (PL3)*, its bullet on L2 and L3 | It now states only what P7 measured |
+| L15 | PO-1 | The approval authorizes W1 to W23 from the session that runs `EXECUTE` of this plan, a restart under K-14 included |
+| DC-2 | *Open findings, accepted as risks* | Every finding Nathan did not opt in to is listed, with why it is accepted |
+
+Also recorded from his words:
+- **`review_cap`.** The `override` block names it, since his opt-in directs a second check of a repair's
+  diff, past `D26-A`'s cap of one.
+- **PO-4 is done.** The fetch succeeded (P11).
+- **K-12** is recorded as a candidate for a separate Modification.
+
+**What changed in the evidence.**
+- **`edits.json`:** OUT-A's new text, in the five document prompts, and a new key, `r3_scan`. «H» is now
+  `757c68311e34ec7c3f92b82aa903fcea863b072d8c4354fbd9f05acea416b845` (47,254 bytes).
+- **`edits_check.py`:** it gained `R3SCAN`, the check phrase `Nathan alone merges`, and two injections,
+  `r3scan` and `merge`. It is now 12,069 bytes, sha256
+  `c433b46b48ab4d33832dcdb0c080bfb29bf70e45b7cb59b468a4f2de565bcfbe`.
+- The other counts after are unchanged.
 
 ### Harness files (`D22` condition 5), for `PLAN`
 
@@ -1335,6 +1409,8 @@ review has found a required defect.
   - a copy of this record at `PLANNED` for P1;
   - this record as it stood before the repair round;
   - this record as it stood before PL4;
+  - for repair round 2: the copies of `build_edits.py`, `edits.json`, `edits_check.py` and this record as
+    they stood before it, and Nathan's words as given;
   - `capture.py`.
 
 ### Cost of this mode

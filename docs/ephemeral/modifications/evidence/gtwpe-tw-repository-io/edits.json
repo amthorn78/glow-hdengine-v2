@@ -5,7 +5,8 @@
   "send": "all of a member's edits in one update_content call, in file order; no `old` occurs in another edit's `old` or in an earlier edit's `new`, so each still matches once when sent",
   "values": "«V» is fixed at X1.2 and substituted in the identity edits' `new` only; nothing else is substituted",
   "blocks": "an edit with blocks true adds list items: its `new` holds newlines; every other `old` and `new` is one line",
-  "counts": "counts_after = counts_before - occurrences in the member's `old` texts + occurrences in its `new` texts, case-insensitive substring counts; edits_check.py derives them"
+  "counts": "counts_after = counts_before - occurrences in the member's `old` texts + occurrences in its `new` texts, case-insensitive substring counts; edits_check.py derives them",
+  "r3_scan": "for the five document prompts, r3_scan's counts after = its kept hits + the new texts' hits, each kept hit with the exception that keeps it; edits_check.py derives them"
  },
  "members": {
   "TRIAGE": {
@@ -298,6 +299,155 @@
    "downloadable UTF-8 Markdown file"
   ]
  },
+ "r3_scan": {
+  "terms": [
+   "pull request",
+   "PR",
+   "commit",
+   "push",
+   "merg",
+   "repositor"
+  ],
+  "matching": "by reading; case-insensitive on the stem, except PR, which is a whole word, case-sensitive, with its plural PRs",
+  "counts_before": {
+   "DRAIN-10": [
+    0,
+    1,
+    1,
+    0,
+    1,
+    7
+   ],
+   "DRAIN-20": [
+    0,
+    1,
+    1,
+    0,
+    2,
+    8
+   ],
+   "RECORD-10": [
+    0,
+    1,
+    1,
+    0,
+    1,
+    3
+   ],
+   "RECORD-20": [
+    0,
+    1,
+    1,
+    0,
+    1,
+    3
+   ],
+   "APPLY-10": [
+    0,
+    1,
+    0,
+    0,
+    1,
+    2
+   ]
+  },
+  "exceptions": {
+   "E-RC": "the repository-claims rule, in Intake and source scope: a statement about the repository's current state rests on reading the repository and recording what was read. It governs claims in a PF's text, not where the prompt writes",
+   "E-RO": "the read-only line's ban on merging, in Authority and sources, kept after OUT-B: R3 says the same",
+   "E-NF": "the no-invented-facts rule, in Destination, source roles and record preparation: the section never invents an inspection, a date, a commit or the like. It governs what the section says",
+   "E-DN": "the PF09 Done rule, in PF09 coverage and native semantics: a change merged elsewhere is no evidence that a task is Done. It governs a task's status",
+   "E-EV": "the PF09 evidence rule, in PF09 coverage and native semantics, item 5: old evidence is never passed off as a current inspection of the repository. It governs how evidence is stated"
+  },
+  "kept": {
+   "DRAIN-10": [
+    [
+     "commit",
+     1,
+     "E-RC"
+    ],
+    [
+     "merg",
+     1,
+     "E-RO"
+    ],
+    [
+     "repositor",
+     5,
+     "E-RC"
+    ]
+   ],
+   "DRAIN-20": [
+    [
+     "commit",
+     1,
+     "E-RC"
+    ],
+    [
+     "merg",
+     1,
+     "E-RO"
+    ],
+    [
+     "merg",
+     1,
+     "E-DN"
+    ],
+    [
+     "repositor",
+     5,
+     "E-RC"
+    ],
+    [
+     "repositor",
+     1,
+     "E-EV"
+    ]
+   ],
+   "RECORD-10": [
+    [
+     "commit",
+     1,
+     "E-NF"
+    ],
+    [
+     "merg",
+     1,
+     "E-RO"
+    ],
+    [
+     "repositor",
+     1,
+     "E-NF"
+    ]
+   ],
+   "RECORD-20": [
+    [
+     "commit",
+     1,
+     "E-NF"
+    ],
+    [
+     "merg",
+     1,
+     "E-RO"
+    ],
+    [
+     "repositor",
+     1,
+     "E-NF"
+    ]
+   ],
+   "APPLY-10": [
+    [
+     "merg",
+     1,
+     "E-RO"
+    ]
+   ]
+  },
+  "merge_phrase": "Nathan alone merges",
+  "stop": "a hit, in a new text or kept text, that still forbids writing at the invocation's path, committing or pushing there, or opening a pull request stops the run (D26-E)"
+ },
  "edits": [
   {
    "id": "TRIAGE-01",
@@ -472,7 +622,7 @@
    "rule": "R1, R3",
    "where": "Authority and sources, fourth paragraph",
    "old": "All Drive sources and authoritative PFs are read-only. Create only the downloadable Markdown outputs specified below, using the available authorized artifact route, normally ChatGPT Library. Do not write/upload to Drive,",
-   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
+   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. Never merge a pull request: Nathan alone merges. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
    "blocks": false
   },
   {
@@ -681,7 +831,7 @@
    "rule": "R1, R3",
    "where": "Authority and sources, fourth paragraph",
    "old": "All Drive sources and authoritative PFs are read-only. Create only the downloadable Markdown outputs specified below, using the available authorized artifact route, normally ChatGPT Library. Do not write/upload to Drive,",
-   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
+   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. Never merge a pull request: Nathan alone merges. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
    "blocks": false
   },
   {
@@ -912,7 +1062,7 @@
    "rule": "R1, R3",
    "where": "Authority and sources, fourth paragraph",
    "old": "All Drive sources and authoritative PFs are read-only. Create only the downloadable Markdown outputs specified below, using the available authorized artifact route, normally ChatGPT Library. Do not write/upload to Drive,",
-   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
+   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. Never merge a pull request: Nathan alone merges. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
    "blocks": false
   },
   {
@@ -1066,7 +1216,7 @@
    "rule": "R1, R3",
    "where": "Authority and sources, fourth paragraph",
    "old": "All Drive sources and authoritative PFs are read-only. Create only the downloadable Markdown outputs specified below, using the available authorized artifact route, normally ChatGPT Library. Do not write/upload to Drive,",
-   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
+   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. Never merge a pull request: Nathan alone merges. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
    "blocks": false
   },
   {
@@ -1209,7 +1359,7 @@
    "rule": "R1, R3",
    "where": "Authority and sources, fourth paragraph",
    "old": "All Drive sources and authoritative PFs are read-only. Create only the downloadable Markdown outputs specified below, using the available authorized artifact route, normally ChatGPT Library. Do not write/upload to Drive,",
-   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
+   "new": "PF canon in `docs/pfcanon/` and every source are read-only. Write only the Markdown outputs specified below, each at the repository path the invocation names under `docs/ephemeral/`, and commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is. Never merge a pull request: Nathan alone merges. An invocation that names no such path or branch is a missing input: stop and ask for it, and invent none. Do not write to Google Drive or ChatGPT Library or under `docs/pfcanon/`,",
    "blocks": false
   },
   {
