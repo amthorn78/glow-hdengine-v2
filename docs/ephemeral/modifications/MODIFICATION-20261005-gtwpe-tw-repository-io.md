@@ -14,7 +14,7 @@ readiness: NEEDS_RULING
 override:
   by: Nathan
   overrides: [readiness, review_cap]
-  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, so the new TW-ALPHA release is selected in this Modification although tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged. Nathan, 2026-10-06, opting in to repairing four listed findings of the PLAN review: he directs one more check of the repair's diff by a fresh checker, past D26-A's cap of one diff check per mode, so `review_cap` names it"
+  reason: "Nathan, 2026-10-05, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, so the new TW-ALPHA release is selected in this Modification although tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say so. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged. Nathan, 2026-10-06, opting in to repairing four listed findings of the PLAN review: he directs one more check of the repair's diff by a fresh checker, past D26-A's cap of one diff check per mode, so `review_cap` names it. On Nathan's plan approval of 2026-10-06 (DC2-2), the review_cap waiver covers only that one further diff check, which has run; the validator cannot narrow the gate, so this reason does"
 interaction_cost_predicted: 8
 interaction_cost_actual:
 estimate:
@@ -109,8 +109,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-tw-repository-io at 8cd6fcc (2026-10-05). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6), main is still 20d0dd8, and the branch changes only the record. Q-1: option (a). Select the new release in this Modification; the selection page and the notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, and TW runs by Nathan's direct invocations until the Flow Manager (C4). Record in the override block that Nathan waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, because C4 replaces it, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. Q-2: option (a). A correction: the words \"copy or excerpt\" in the request's item 1 were PE39's, not Nathan's; his direction was \"writing prompts do not belong in repo.\" Read item 1 as GTWPE-MGMT-10 100526.2 states it: no body and no copy enters the repository, and no passage longer than an edit's shortest unique anchor, or in ANALYZE the clause at issue. Continue to PLAN: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-05
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-06: \"Nathan approves the plan of MODIFICATION-20261005-gtwpe-tw-repository-io at d81e665 (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6) with the record at PLANNED, edits_check.py passes, main is still 20d0dd8, the branch changes only docs/ephemeral/, and each of the five output rules (TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20, TW-APPLY-10) now carries \"Never merge a pull request: Nathan alone merges.\" The approval authorizes W1 to W23 from the session that runs EXECUTE of this plan and nothing else in Notion, and names the selection of the new TW-ALPHA release. It accepts K-1 to K-14, the findings already accepted (L1 as repaired, L4 to L14, L16, DC-3, DC-4) and DC2-1 to DC2-9 as risks. On DC2-2: the review_cap waiver covers only the one further diff check Nathan directed on 2026-10-06; say so in the override reason when you record this approval. On DC2-8: bring *Cost of this mode* up to date in the same commit. Nathan allows `git fetch origin main` in the session that runs EXECUTE (K-14, PO-4). Proceed to EXECUTE, and report in at most five plain sentences.\""
+plan_approved_date: 2026-10-06
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -1403,6 +1403,31 @@ The `override` names `review_cap` for this round, past `D26-A`'s cap of one.
   section records DC2-7, and *Cost of this mode* records DC2-8.
 - The status was `PLANNING` from repair round 2 until this PL4, and is `PLANNED` again.
 
+### Plan approval (PL4)
+
+Nathan approved the plan at `d81e665` on 2026-10-06; his words are in `plan_approved_by`. PE39 checked
+the plan first:
+- both record checks pass all six GTWPE records at `PLANNED`;
+- `edits_check.py` passes;
+- `main` is still `20d0dd8`;
+- the branch changes only `docs/ephemeral/`;
+- each of the five output rules carries the sentence on merging.
+
+What the approval does:
+- **It authorizes** W1 to W23 from the session that runs `EXECUTE` of this plan, and nothing else in
+  Notion. It names the selection of the new TW-ALPHA release.
+- **It accepts as risks** K-1 to K-14; L1 as repaired, L4 to L14, L16, DC-3 and DC-4; and DC2-1 to
+  DC2-9.
+- **It directs two changes,** made in the commit that records it and nowhere else:
+  - DC2-2: the `override` reason now says that `review_cap` covers only the one further diff check he
+    directed on 2026-10-06;
+  - DC2-8: *Cost of this mode* is brought up to date.
+- **It allows** `git fetch origin main` in the session that runs `EXECUTE` (K-14, PO-4).
+
+The approval holds at the commit that records it only if that commit's diff from `d81e665` is this
+section, those two changes and the approval fields, `edits.json` is unchanged at «H», and both record
+checks pass.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode:
@@ -1478,6 +1503,10 @@ The `override` names `review_cap` for this round, past `D26-A`'s cap of one.
   which the check took about 27.
 - **On the meter.** About 2 h 10 min in all, against the recorded estimate of about 3.5 h, so under it and
   under twice it.
+- **The approval.** The second wait for Nathan, from about 01:15Z to his approval, is off the meter.
+  Recording the approval and the two changes he directed took about 5 minutes, from about 01:33Z.
+- **The mode's total on the meter.** About 2 h 15 min, against the recorded estimate of about 3.5 h:
+  under it, and under twice it (Nathan, DC2-8).
 - **Tokens.** Not measured by this session. The harness reported subagent tokens of 474,419 for the
   reviewer, 370,163 for the checker and 411,727 for the second checker.
 
