@@ -340,3 +340,10 @@ it is not a citation of PF10. Canon agrees: 2.30 PF10-CITE-001's own drain-targe
 search, names none of the PF headers whose gate carries a PF10 or BN version. C3 builds Nathan's gate rule
 (`BN` and the version of the PF file used, or `BN` and the source filename) with no canon change first, and it
 can start when he says so. This replaces the last sentence of the update above.
+
+### Update, 2026-10-06 (PE39): the gate for a source other than PF10
+
+Nathan, 2026-10-06, verbatim: "the gate name for a non PF10 source should just be the filename of the source.
+that simple". So the Last Update Gate is `BN` and the PF10 version used when the source is PF10, and the
+source's filename alone, with no `BN`, for every other source, another PF file included. This narrows answer 6
+above, whose second form was `BN` and the source filename. C3 builds the rule in this form.
