@@ -316,3 +316,19 @@ Last Update Gate rule, and he adds one sentence to PF10 exempting the gate befor
 merged at `ef75b31`): GTWPE-MGMT-10 100526.2 is selected, and it keeps GTWPE-D1 whole through every later change.
 PE39 accepted it against the record on `main`, both record checks, and the catalog and 100526.2 read live. C2, the
 TW prompts on the repository with their proof logs, is next when Nathan says so.
+
+### Update, 2026-10-06 (PE39)
+
+C2 is `COMPLETE` (amthorn78/glow-hdengine-v2#577, merged at `7c18c26`). Its first `EXECUTE` stopped on wrong
+counts in the plan and left a failure record (#575, ledger E-035); the successor plan re-measured them and ran
+clean. TW-ALPHA-20261006.1 is selected: TW-TRIAGE-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and
+TW-APPLY-10 at 100626.1. They stay in Notion; they read PF canon from `docs/pfcanon/` on `main`, write their
+outputs at the repository path each invocation names under `docs/ephemeral/`, and never merge. TW-DRAIN-10,
+TW-DRAIN-20 and TW-APPLY-10 write a separate proof log beside each redlines file and revised PF, with all eight of
+GTWPE-D1's items. TW-MGMT-10 is no longer selected; GTWPE-MGMT-10 maintains the TW prompts. TW Flowmaster 1.3.0
+does not run this release, so TW runs by Nathan's direct invocations until the Flow Manager (C4).
+
+PE39 accepted it against the record on `main` and both record checks over all six GTWPE records (6/6 each), and
+read live in Notion the selection page, *HDE TW*, the GTWPE catalog, *Alpha 1*, the Operations Hub and the three
+prompts that GTWPE-D1 binds. C3, the document rules, comes next when Nathan says so; it needs his one PF10
+sentence exempting the Last Update Gate first.
