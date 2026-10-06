@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-tw-repository-io
-status: EXECUTING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -47,6 +47,11 @@ reviews:
     date: 2026-10-06
     required_open: 0
     outcome: "At Nathan's opt-in of 2026-10-06, past the cap (override: review_cap): one fresh checker, GTWPE-TW-REPOSITORY-IO-PLAN-DC2, on the second repair's diff eb80433..277de01: 0 required; L3, L2 with DC-1, L15 and DC-2 made as Nathan worded them, R-1 and L1 still fixed; 9 listed, DC2-1 to DC2-9, most in text the repair added. To Nathan with every open finding listed in §P. Record: PLAN-DIFFCHECK-2.md"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-10-06
+    required_open: 0
+    outcome: "Successor plan, at Nathan's return of 2026-10-06; by this session, read-only, with no review, as Nathan directed. Every expected count measured again against live fetches: two independent readings, one of each of two fetches, on the six members and three control pages, and a script over the harness saves of Alpha 1 and the Operations Hub. Four counts before differ from §A (DRAIN-10 report 21, DRAIN-20 report 22, APPLY-10 reference 8 and report 21), so four counts after change; everything else as the dated plan states. edits-2.json equals edits.json but for those four counts and a note; edits_check.py passes on it, with its 12 injected faults caught; both record checks exit 0 on a scratch copy at PLANNED. X1.0 (4) fails today: both 100626.1 pages are still live child pages of HDE TW. No required defect"
 items:
   - id: ITEM-01
     statement: "The TW prompts stay single-homed in Notion: no TW prompt body, copy or excerpt enters the repository, and this change alters where they read and write, not where they live."
@@ -109,8 +114,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-05: \"Nathan approves the analysis of MODIFICATION-20261005-gtwpe-tw-repository-io at 8cd6fcc (2026-10-05). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6), main is still 20d0dd8, and the branch changes only the record. Q-1: option (a). Select the new release in this Modification; the selection page and the notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, and TW runs by Nathan's direct invocations until the Flow Manager (C4). Record in the override block that Nathan waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster, because C4 replaces it, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. Q-2: option (a). A correction: the words \"copy or excerpt\" in the request's item 1 were PE39's, not Nathan's; his direction was \"writing prompts do not belong in repo.\" Read item 1 as GTWPE-MGMT-10 100526.2 states it: no body and no copy enters the repository, and no passage longer than an edit's shortest unique anchor, or in ANALYZE the clause at issue. Continue to PLAN: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-05
-plan_approved_by: "Nathan, 2026-10-06: \"Nathan approves the plan of MODIFICATION-20261005-gtwpe-tw-repository-io at d81e665 (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6) with the record at PLANNED, edits_check.py passes, main is still 20d0dd8, the branch changes only docs/ephemeral/, and each of the five output rules (TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20, TW-APPLY-10) now carries \"Never merge a pull request: Nathan alone merges.\" The approval authorizes W1 to W23 from the session that runs EXECUTE of this plan and nothing else in Notion, and names the selection of the new TW-ALPHA release. It accepts K-1 to K-14, the findings already accepted (L1 as repaired, L4 to L14, L16, DC-3, DC-4) and DC2-1 to DC2-9 as risks. On DC2-2: the review_cap waiver covers only the one further diff check Nathan directed on 2026-10-06; say so in the override reason when you record this approval. On DC2-8: bring *Cost of this mode* up to date in the same commit. Nathan allows `git fetch origin main` in the session that runs EXECUTE (K-14, PO-4). Proceed to EXECUTE, and report in at most five plain sentences.\""
-plan_approved_date: 2026-10-06
+plan_approved_by: ""
+plan_approved_date: ""
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -1538,6 +1543,238 @@ checks pass.
 - MODIFICATION-20260930-gtwpe-tw-model-advice, the last TW change, for the selection route's form, the
   control pages' texts and `ctl_check.py`. MODIFICATION-20261005-gtwpe-writing-side, for the plan's
   shape.
+
+### Successor plan of 2026-10-06, after the stop at X1.3
+
+*Written by MODE = PLAN on Nathan's return of 2026-10-06. It sits beside the dated plan above, which is not
+edited. Where the two differ, this section governs. Everything it does not change is as the dated plan
+states.*
+
+This session ran the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+100526.2*, fetched live in this mode (S-P1). The mode started at 2026-10-06T02:10:27Z, on the branch
+`docs/20261006-modification-gtwpe-tw-repository-io`. That branch was opened from `main` at `16d671e`,
+where amthorn78/glow-hdengine-v2#575 had landed this record with §E's failure record.
+
+#### Nathan's decisions, and how this section applies them
+
+Nathan's words, 2026-10-06:
+
+> Nathan's decisions on the stopped EXECUTE of MODIFICATION-20261005-gtwpe-tw-repository-io (failure record on main at 16d671e, #575):
+> 1. The plan returns to PLAN. Write a successor plan beside the approved one, on a new branch from main; the dated plan is not edited.
+> 2. Re-measure every expected count the plan relies on (counts before and after, check phrases, absent phrases and broad-match readings, for all six members and the control pages) against each page as fetched live in this mode. Make each count by a script over the harness's save of that fetch where one exists, which D22 allows; otherwise by two independent readings. Record which method made each count.
+> 3. Change nothing else: the same edits, new texts, Notion writes and control-page texts. If re-measuring shows that anything else must change, stop and return to Nathan before writing it.
+> 4. Run PLAN's dry run on the successor plan. No further review: only expected counts change.
+> 5. Nathan has archived the two unselected pages written at X1.3, TW-TRIAGE-10 — Identify PF10 Drain Targets — 100626.1 (3f14590a05eb81cdaa93ccc6bda2e2ad) and TW-DRAIN-10 — Prepare PF Document Redlines — 100626.1 (3f14590a05eb817cb5e6ee7187b38e0c). The successor plan's preconditions confirm neither is a live child page of HDE TW, and fix «V» by the PE Metaprompt's rule.
+> 6. Stop at Nathan's approval of the successor plan, and report in at most five plain sentences ending with exactly what he must approve.
+
+1. **A successor beside the dated plan, on a new branch from `main`.** The dated plan, §A and §E are not
+   edited.
+2. **Every expected count is measured again**, against each page as fetched live in this mode (*Counts,
+   measured again*).
+   - The harness saved no fetch of a member page, the selection page, *HDE TW* or the GTWPE parent page.
+     So each of their counts was made by two independent readings.
+   - It saved the fetches of *Alpha 1* and the Operations Hub, so a script over each save made their counts.
+3. **Nothing else changes.** `edits-2.json` holds the same 94 edits, new texts, absent phrases and R3 broad
+   match as `edits.json`, and only four counts before differ (S-P3). W1 to W23 and the control texts are the
+   dated plan's.
+4. **PLAN's dry run, and no review** (*Dry run (PL3), for the successor plan*).
+5. **The archived pages and «V».** X1.0 (4) now also confirms that neither 100626.1 page is a child page of
+   *HDE TW*, and «V» is fixed by the PE Metaprompt's rule (*Changes to the plan*). The dry run found both
+   pages still live (S-P6).
+6. **The mode stops at Nathan's approval of this successor plan** (PL4).
+
+**The approval fields.** `plan_approved_by` gates `EXECUTE` of the plan in force, and an empty one blocks
+it. So that only Nathan's approval of this successor plan opens `EXECUTE`, this section clears
+`plan_approved_by` and `plan_approved_date`. They held his approval of the dated plan, recorded at `f1b19eb`,
+which reads:
+
+> Nathan, 2026-10-06: "Nathan approves the plan of MODIFICATION-20261005-gtwpe-tw-repository-io at d81e665 (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all six GTWPE records (6/6) with the record at PLANNED, edits_check.py passes, main is still 20d0dd8, the branch changes only docs/ephemeral/, and each of the five output rules (TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20, TW-APPLY-10) now carries "Never merge a pull request: Nathan alone merges." The approval authorizes W1 to W23 from the session that runs EXECUTE of this plan and nothing else in Notion, and names the selection of the new TW-ALPHA release. It accepts K-1 to K-14, the findings already accepted (L1 as repaired, L4 to L14, L16, DC-3, DC-4) and DC2-1 to DC2-9 as risks. On DC2-2: the review_cap waiver covers only the one further diff check Nathan directed on 2026-10-06; say so in the override reason when you record this approval. On DC2-8: bring *Cost of this mode* up to date in the same commit. Nathan allows `git fetch origin main` in the session that runs EXECUTE (K-14, PO-4). Proceed to EXECUTE, and report in at most five plain sentences."
+
+#### Changes to the plan
+
+| The dated plan | In this successor plan |
+|---|---|
+| `edits.json` at «H», wherever a step names it: X1.0 (2) and (3), X1.3 (e) and (g) | `edits-2.json` at «H2». It is `edits.json` with four counts before replaced and a `remeasured` note added. Its edits are the same, value for value (S-P3) |
+| *The new pages' checks*: the 13 terms' counts after, which X1.3 (g)(7) reads | The table in *Counts, measured again*. Four counts differ: DRAIN-10's and DRAIN-20's `report`, and APPLY-10's `reference` and `report` |
+| X1.0 (4) | *HDE TW*, fetched: no child page carries any of the six new titles, `<title prefix> — «V»`. Neither `3f14590a05eb81cdaa93ccc6bda2e2ad` nor `3f14590a05eb817cb5e6ee7187b38e0c`, the 100626.1 pages that W1 to W6 made, is among its child pages. Either one still listed stops the run with nothing written |
+| X1.0 (5) | The edit times are those this section's dry run found (S-P5) |
+| X1.0 (8) | The record holds this successor plan, with `plan_approved_by` quoting Nathan's approval of it |
+| «PA» | `plan_approved_date`, as Nathan's approval of this successor plan sets it |
+| Everything else | Unchanged: the steps X1.1 to X5 and their checks; the 94 edits and their new texts; W1 to W23; the control texts; the check phrases, absent phrases, R3 broad match and structure in *The new pages' checks*; the failure path; the open findings; the actions; and what is not in scope |
+
+**«V».** The dated rule stands, and it is the PE Metaprompt 091426.1's (S-P7).
+- A revision made on the date of the prompt's current version increments N; any other takes the execution
+  date with `.1`.
+- Each member's current version is 100426.1, so «V» is «D» as `MMDDYY`, then `.1`. On 2026-10-06 that is
+  `100626.1`, the version of the two pages that W1 to W6 made. They never became current versions.
+- Once neither is a child page of *HDE TW*, no title collides. While either is, X1.0 (4) stops the run, since
+  the PE forbids incrementing a version to get round a collision.
+
+#### Values fixed in this successor plan
+
+| Value | Fixed as |
+|---|---|
+| «H2» | `091932f1381c714e22582d7b4e4e76fd34c116e5d1b01a8cb4747ed481c16f4d`, the sha256 of `edits-2.json`, 47,957 bytes |
+
+`edits_check.py` is unchanged, at sha256 `c433b46b48ab4d33832dcdb0c080bfb29bf70e45b7cb59b468a4f2de565bcfbe`.
+`edits.json` stays at «H», as the dated plan's record.
+
+#### Counts, measured again
+
+**How each count was made.**
+- **The six members' current pages.** Each was fetched live twice in this mode, from 02:13Z to 02:20Z, at
+  §A's edit times. The harness saved neither fetch, so each count was made by two independent readings, one
+  of each fetch.
+  - The first reading went through the page section by section.
+  - The second went through each term across the whole page.
+  - The two were compared only when both were done, and they agreed on every count.
+- **What was counted on each member.**
+  - The 13 terms of §A's broad match, case-insensitive on the stem.
+  - For the five document prompts, the six terms of the R3 broad match, each kept hit with the exception that
+    keeps it.
+  - The twelve check phrases that do not hold «V».
+  - Each absent phrase, each edit's anchor, and the headings, first line and last words.
+- **The control pages.** The selection page, *HDE TW* and the GTWPE parent page were each fetched twice and
+  read twice, the same way. The harness saved the fetches of *Alpha 1* and the Operations Hub. So a script over
+  each save made their counts: `ctl_check.py pre`, and a count of release names dated after 2026-10-04.
+- **The counts after.** They cannot be read before the edits exist. `edits_check.py` derives them from the
+  counts before, as measured, and the unchanged edits, as the dated plan did. For TRIAGE and DRAIN-10, X1.3
+  (g) read exactly these counts after on the pages that W1 to W6 made (§E), DRAIN-10's `report` 19 among them.
+
+**The 13 terms: counts before, by member.** Four differ from §A, in bold.
+
+| Member | `Drive` | `PFCanon` | `mirror` | `Library` | `download` | `upload` | `reference` | `retriev` | `attach` | `report` | `TW-MGMT-10` | `session` | `initiat` |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| TRIAGE | 2 | 1 | 1 | 0 | 0 | 0 | 3 | 0 | 1 | 2 | 1 | 5 | 1 |
+| DRAIN-10 | 6 | 1 | 3 | 1 | 3 | 1 | 14 | 8 | 2 | **21** (§A 20) | 2 | 10 | 3 |
+| DRAIN-20 | 6 | 2 | 3 | 1 | 3 | 1 | 15 | 8 | 2 | **22** (§A 23) | 2 | 11 | 2 |
+| RECORD-10 | 4 | 3 | 2 | 1 | 3 | 1 | 11 | 7 | 1 | 8 | 2 | 7 | 2 |
+| RECORD-20 | 4 | 2 | 2 | 1 | 3 | 1 | 7 | 7 | 1 | 8 | 2 | 6 | 2 |
+| APPLY-10 | 5 | 2 | 2 | 2 | 6 | 1 | **8** (§A 7) | 7 | 3 | **21** (§A 20) | 2 | 9 | 3 |
+
+Each of the four differences lies in kept text under one of §A's exceptions, and no hit says what an edit
+removes.
+- **`report`.** Every kept hit is the verb, the preflight's existing report, the save-recovery rules, a legacy
+  package's report, TW-APPLY-10's optional no-change report, or a report that means the same file once the
+  pair is defined. §A gives totals only, so which hit it missed in DRAIN-10 and APPLY-10, or counted twice in
+  DRAIN-20, cannot be told.
+- **APPLY-10's `reference`.** The extra hit is the label of a fileless source, in *Deterministic final
+  document-control header*. It is a generic locator, kept as the drains' fileless-source reference is.
+
+**The 13 terms: counts after**, as `edits_check.py` derives them from `edits-2.json`. X1.3 (g)(7) reads these
+in place of the dated table. The `pfcanon` column counts `docs/pfcanon/`.
+
+| Member | `Drive` | `pfcanon` | `mirror` | `Library` | `download` | `upload` | `reference` | `retriev` | `attach` | `report` | `TW-MGMT-10` | `session` | `initiat` |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| TRIAGE | 1 | 1 | 0 | 0 | 0 | 0 | 3 | 0 | 1 | 2 | 0 | 6 | 1 |
+| DRAIN-10 | 4 | 5 | 1 | 3 | 0 | 0 | 11 | 5 | 3 | **19** | 0 | 12 | 3 |
+| DRAIN-20 | 4 | 6 | 1 | 3 | 0 | 0 | 12 | 5 | 3 | **20** | 0 | 13 | 2 |
+| RECORD-10 | 3 | 5 | 0 | 2 | 0 | 0 | 10 | 7 | 2 | 8 | 0 | 8 | 2 |
+| RECORD-20 | 2 | 4 | 0 | 1 | 0 | 0 | 7 | 7 | 1 | 8 | 0 | 7 | 2 |
+| APPLY-10 | 4 | 4 | 0 | 2 | 0 | 0 | **6** | 5 | 2 | **22** | 0 | 11 | 3 |
+
+**Everything else, measured again, is as the dated plan states it.**
+
+| Count | Result, on both readings |
+|---|---|
+| The R3 broad match: counts before and kept hits | As `r3_scan`, in each of the five document prompts, each kept hit under the exception `r3_scan` gives it. So the counts after are the dated table's |
+| The check phrases | 0 in each current page, `Nathan alone merges` among them. So the counts after are the dated table's |
+| The absent phrases | Each at its count in the member's anchors. `100426.1` occurs twice in every member. `TW-MGMT-10` and `repository mirror` occur twice in each of the five document prompts. `Glow / Core Docs / PFCanon` occurs twice in DRAIN-20, the record prompts and APPLY-10. Every other phrase occurs once |
+| The anchors | Each of the 94 once in its member's page |
+| The structure | Each member's headings, first line and last words as the dated table: 4, 11, 12, 8, 8 and 11 headings |
+| The selection page | Edited 2026-10-05T00:30:29.861Z, as P4 found. SEL-1's heading once; SEL-2's two lines once, as the page's first two lines; one heading named `Current operation`; 14 headings; 8 child pages; no release dated after 2026-10-04 |
+| *HDE TW* | Edited 2026-10-04T17:10:53.751Z, as P4 found. HDE-OLD once, as its first line; 11 headings; 29 child pages: the 27 that P4 found, and the two 100626.1 pages (S-P6) |
+| The GTWPE parent page | Edited 2026-10-05T16:37:57.178Z, as P4 found. CAT-OLD once; 5 headings; 5 child pages |
+| *Alpha 1* and the Operations Hub | Edited 2026-10-04T17:10:29.105Z and 17:11:07.810Z, as P4 found. `ctl_check.py pre` exits 0 on each save: its anchor once, 32 and 139 headings, neither truncated nor with an unknown block. Neither names a release dated after 2026-10-04 |
+
+#### Dry run (PL3), for the successor plan
+
+By this session, read-only, from 02:10Z to about 02:29Z on 2026-10-06. Nathan directed no review, since
+only expected counts change.
+
+| # | Gate | Result |
+|---|---|---|
+| S-P1 | GTWPE-MGMT-10 100526.2 fetched live (X1.0 (0)) | Edited 2026-10-05T16:36:11.384Z, unchanged |
+| S-P2 | `gtwpe_record_check.py` and `modification_validate.py` on a scratch copy of this record at `PLANNED`, with this round in `reviews` | Both exit 0 |
+| S-P3 | `edits-2.json` against `edits.json`, compared as JSON values by a script; then `edits_check.py` on `edits-2.json`, and each of its twelve `--inject` faults | Equal in every key but `counts_before` and the added `remeasured` note. `counts_before` differs in exactly the four cells, and the 94 edits are equal. `PASS`, exit 0, with the counts after above and the dated check phrases and R3 counts. Each fault exits 1 and is caught by its own code, 12/12 |
+| S-P4 | The six members' current pages, each fetched live twice (X1.0 (1) and (3)) | At §A's edit times. Everything as *Counts, measured again* gives it |
+| S-P5 | The control pages (X1.0 (5)) | As *Counts, measured again* gives them, each at the edit time P4 found |
+| S-P6 | X1.0 (4), with this section's addition | **It fails today.** Both 100626.1 pages are still child pages of *HDE TW*. Each, fetched directly, sits under *HDE TW* at the edit time W3 and W6 left, 2026-10-06T01:37:51.362Z and 01:38:45.706Z. A search of live pages finds TW-DRAIN-10's, under *HDE TW*, and a search of archived pages for `100626.1` finds nothing. Until Nathan archives them (PO-3), `EXECUTE` stops at X1.0 with nothing written |
+| S-P7 | X1.0 (6), and «V» | The PE Metaprompt 091426.1 fetched. The harness saved it, and a script printed only its title, its edit time, 2026-09-23T17:17:22.217Z, unchanged, and its version rule's paragraph. «V» is as *Changes to the plan* gives it |
+| S-P8 | X1.0 (7): `git fetch origin main` | `origin/main` is `16d671e`. Since `20d0dd8`, its only commit is amthorn78/glow-hdengine-v2#575, which changes only this Modification's own files, so X4.1 would record no trigger finding for it |
+| S-P9 | Every step still names a check that could fail, and every value is fixed once | By reading: yes. The only values that change are the counts, «H2», «PA» and the preconditions above |
+
+No required defect. One precondition fails today (S-P6), and Nathan's action settles it.
+
+#### Open findings, accepted as risks
+
+As the dated plan lists them: K-1 to K-14, and the reviews' findings it lists. K-5's risk, a miscount by
+reading, has occurred (EX-1).
+- This successor plan measured every count again, by two independent readings of separate live fetches.
+- The readback still counts by reading, as the dated plan's steps do, so a miscount there still ends in a loud
+  stop.
+
+#### Product Owner actions, for the successor plan
+
+| # | Action | How it is verified |
+|---|---|---|
+| PO-1 | Approve this successor plan. Like PO-1 of the dated plan, the approval authorizes W1 to W23 and nothing else in Notion, made from the session that runs `EXECUTE` of this successor plan, and names the selection of the new release | His words go into `plan_approved_by` with the date; the validator refuses `EXECUTING` without them |
+| PO-3 | Archive the two 100626.1 pages, `3f14590a05eb81cdaa93ccc6bda2e2ad` and `3f14590a05eb817cb5e6ee7187b38e0c`. Nathan's decision 5 says he has; S-P6 found both still live | X1.0 (4): neither is among *HDE TW*'s child pages |
+| PO-2 | Merge this branch's pull request after the record is `COMPLETE`, as the dated PO-2 says of #575 | Nothing waits on that merge (`D21-C`) |
+
+PO-4 is done (K-14).
+
+#### Harness files (`D22` condition 5), for the successor plan
+
+- **This session's transcript** holds, from this mode, each fetched inline:
+  - GTWPE-MGMT-10 100526.2, once (S-P1);
+  - each of the six members' current pages, twice;
+  - the selection page, *HDE TW* and the GTWPE parent page, twice each;
+  - the two 100626.1 pages, once each (S-P6).
+
+  No script read the transcript for a body, and every count on a body fetched inline was made by reading. It
+  is left to teardown.
+- **Harness saves**, each read only by a script that printed what its check needed:
+  - the PE Metaprompt 091426.1, `mcp-Notion-notion-fetch-1791252661887.txt`: its title, edit time and version
+    rule's paragraph (S-P7);
+  - *Alpha 1*, `toolu_01FXSUGSogLdWTmNUz9tD9cN.json`, and the Operations Hub,
+    `mcp-Notion-notion-fetch-1791253344050.txt`: `ctl_check.py pre`, and a count of release names dated after
+    2026-10-04.
+
+  Nothing was written from a save, hashed or compared. The harness refused this session's `rm` of saves in
+  earlier modes, so none was tried, and each is left to its teardown.
+- **Two Notion searches**, which return titles and paths, with highlights off (S-P6). No body.
+- **Scratch**, in this session's scratchpad. None holds a prompt body:
+  - the re-measurement notes, which are results only;
+  - Nathan's decisions, as given;
+  - `build_edits2.py`, which wrote `edits-2.json`;
+  - `ctl_check.py`'s states of *Alpha 1* and the Hub, which are heading lists;
+  - this record as it stood before this section.
+
+#### Cost of the successor plan
+
+- **Time.** From 02:10:27Z to this PL4 at about 02:31Z: about 21 minutes. The re-measurement took
+  about 15 minutes, from 02:13Z to 02:27Z.
+- **Against the estimate.** The dated plan's mode took about 2 h 15 min on the meter. With this section,
+  `PLAN` has taken about 2 h 35 min, against the recorded estimate of about 3.5 h: under it, and under
+  twice it.
+- **Tokens.** Not measured.
+
+#### Canon and rulings relied on, for the successor plan
+
+- Nathan's decisions of 2026-10-06, quoted above.
+- GTWPE-MGMT-10 100526.2, as fetched live in this mode:
+  - *The record*: each mode writes only its own section, and approval is a recorded field;
+  - *Reviews are bounded*, *Reading prompt bodies* and *Boundaries*;
+  - `MODE = PLAN`, for a successor section below the dated plan;
+  - `MODE = EXECUTE`, *If the plan is wrong*.
+- The PE Metaprompt 091426.1's version rule, as S-P7 read it.
+- `gcfpe.decision-record.md`: `D21-C`, `D22` and `D26` (`D26-A`, `D26-C`). `modification-template.md` 2.1.
+- On `main` at `16d671e`, unchanged since `20d0dd8`:
+  - HDE Governance (PF04) §9.1.6;
+  - HDE Build Notes (PF10) 2.29 PF10-CANON-001 and 2.38 PF10-AINEUTRAL-001.
+
+  This mode's canon search found no other governing section.
 
 ## §E — Execution
 
