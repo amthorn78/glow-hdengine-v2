@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: PLANNED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -13,8 +13,8 @@ closure:
 readiness: NEEDS_RULING
 override:
   by: Nathan
-  overrides: [readiness]
-  reason: "Nathan, 2026-10-06, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for this release as well, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged"
+  overrides: [readiness, review_cap]
+  reason: "Nathan, 2026-10-06, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for this release as well, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged. Nathan, 2026-10-06, opting in to repairing DC-R1 of the PLAN at 87b6058: he overrides review_cap for one more round, a check of that repair's diff by a fresh checker past D26-A's cap of one diff check per mode, so `review_cap` names it; the waiver covers that one round"
 interaction_cost_predicted: 7
 interaction_cost_actual:
 estimate:
@@ -818,7 +818,7 @@ In `docs/ephemeral/modifications/evidence/gtwpe-tw-document-rules/`, committed w
 
 | Value | Fixed as |
 |---|---|
-| «H» | `54fc3da030aee818efb8d2affe76b1929646c4fd2fce3d9b042445876d6a0364`, the sha256 of `edits.json`, 39,555 bytes, as the repair round left it (*Repair round (PL3)*). The dry run's repairs had left it at `fc3510c8…`, 38,960 bytes |
+| «H» | `395394d128a1dae29b220703a4b6579cc413a293d3491b746faf23ff255029a9`, the sha256 of `edits.json`, 39,797 bytes, as Nathan's opt-in repair left it (*Repair round 2 (PL3)*). The dry run's repairs had left it at `fc3510c8…`, 38,960 bytes, and the first repair round at `54fc3da0…`, 39,555 bytes |
 
 ### The edits, by rule
 
@@ -830,7 +830,7 @@ reaches (`edits_check.py`'s `SHARED` check).
 | ID-1, ID-2 | identity | The title line's version and `Prompt Version:` become «V» | All five |
 | DC-AUTH | ITEM-01, R4 | TW-APPLY-10's standing authority covers every document-control field the revision changes, not three | The drains |
 | DC-SRC, DC-SUB | ITEM-02 | Preparation supplies each source's identity, the PF10 file and its version or the source file's filename, in source order; another PF is never a source; the redlines file never stands in for one | The drains |
-| DC-HIST | ITEM-01, ITEM-03, R4, R5 | The header's control fields stay Apply's. A change-history entry the target's rules require is prepared as a content redline in the target's own entry format, naming the version Apply will derive and, where that format dates an entry, the preparation date; Apply returns the package to its preparer when it disagrees. The revised PF says nothing of being a draft: the drain removes any other such marker in the target, which the rule authorizes as hygiene, and canon's own, as in a template or a record kept as history, stays | The drains |
+| DC-HIST | ITEM-01, ITEM-03, R4, R5 | The header's control fields stay Apply's. A change-history entry the target's rules require is prepared as a content redline in the target's own entry format, naming, where that format records them, the version Apply will derive and the preparation date as the revision date, while a date the format gives another meaning, such as an HDE CRD Records material-change row's decision date, keeps that meaning; Apply returns the package to its preparer when it disagrees. The revised PF says nothing of being a draft: the drain removes any other such marker in the target, which the rule authorizes as hygiene, and canon's own, as in a template or a record kept as history, stays | The drains |
 | DC-OTHER | ITEM-03, R5 | "status" leaves the list of header changes that need separate authorization, since Apply now corrects a stale status | The drains |
 | PF09-JUDGE, PF09-EVID | ITEM-04, R6 | Every potentially affected row is judged on all the evidence; never left open for lack of an instruction, never closed only because related work shipped; PF09 shows current state. "if the selected source supports it" becomes "if the evidence supports it" | DRAIN-20 |
 | REC-END-PF20, REC-END-PF30 | ITEM-05, R2 | The role ends with the updated PF20 or PF30 file and its proof log | One record prompt each |
@@ -847,7 +847,7 @@ reaches (`edits_check.py`'s `SHARED` check).
 | REC-BLOCK-PF20, REC-BLOCK-PF30 | ITEM-03, R5 | An unresolved input writes no updated PF; an incomplete entry is never inserted or delivered | One record prompt each |
 | REC-VOL | ITEM-05, ITEM-03, R8, R5 | PF30 as a volume family: a new CRD's record goes only in the `Canon` and `Active` volume; a split reported when it looks due; a new volume only on Nathan's rollover decision, as PF30's rolling-volume rules set it: the record still goes in the active volume, whose updated copy also takes `Closed to new CRDs` and a *Next volume* field, and the next volume's review copy holds no record yet, a *Previous volume* field, and `Draft` and `Pending activation`, the only such status the prompt writes; the two files take effect together when Nathan publishes them; each file its own proof log | RECORD-20 |
 | REC-FILES | ITEM-05, R2 | "produce a full PF30 artifact" becomes "write any PF30 file that *Output and completion* and the volume rule above do not name" | RECORD-20 |
-| AP-AUTH, AP-AGREE | ITEM-01, ITEM-03, R4, R5 | Standing authority for every document-control field the revision changes, the change-history entry among them, in the document's own entry format and dated only where that format dates one; status leaves the excluded list; every version, date, change-history and gate value agrees, or the package returns to the preparer | APPLY-10 |
+| AP-AUTH, AP-AGREE | ITEM-01, ITEM-03, R4, R5 | Standing authority for every document-control field the revision changes, the change-history entry among them, in the document's own entry format, naming the version and the revision date only where that format records them; status leaves the excluded list; every version, date, change-history and gate value agrees, or the package returns to the preparer | APPLY-10 |
 | AP-DATE | ITEM-01, R4 | Any other control date that records the revision takes the execution date too | APPLY-10 |
 | AP-GATE | ITEM-02 | The gate in Nathan's form, from the package's sources | APPLY-10 |
 | AP-REF | ITEM-01, R4 | Every internal restatement of the document's own version or date is synchronized, not only a title's | APPLY-10 |
@@ -1082,7 +1082,7 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-1 | The GTWPE-D1 readback reads phrases, not meaning (`D14`'s note of 2026-09-23) | Low | A text that keeps the eight phrases while weakening what they ask passes its readback | The review reads for behaviour; the eight items are carried in Nathan's own words |
 | K-2 | `tw-flowmaster` 1.3.0 still drives TW through Drive (§A risk 1) | Low: TW runs by Nathan's direct invocations | A Flowmaster run against the new release stops at the prompts' missing-input rule | Nathan's waiver (Q-1, the `override` block); C4 replaces it, C6 retires it |
 | K-3 | Several sources are joined by `; `, in source order: the plan's choice, since Nathan's rule names one source and the present rule gives no separator | Certain | Nothing reads the gate mechanically today; a later change can choose another separator | The smallest deterministic choice; the present rule's order and deduplication are kept |
-| K-4 | A drain dates the change-history entry it prepares with the preparation date. A package applied on a later day disagrees with Apply's execution date | Medium for direct invocations a day apart; none within one Flow Manager run (C4) | A loud stop: TW-APPLY-10 returns the package to its preparer, which re-dates the entry in a corrected package | The architecture asks that every date match the actual revision and that the fields agree (§5); a later date silently carried would not |
+| K-4 | Where the target's entry format records a revision date, as HDE Governance §9.3.1's does on `main`, a drain dates the change-history entry it prepares with the preparation date; a date the format gives another meaning keeps it. A package applied on a later day disagrees with Apply's execution date | Medium for direct invocations a day apart; none within one Flow Manager run (C4) | A loud stop: TW-APPLY-10 returns the package to its preparer, which re-dates the entry in a corrected package | The architecture asks that every date match the actual revision and that the fields agree (§5); a later date silently carried would not |
 | K-5 | Notion may render sent text differently, such as escaping a character, showing a mention by its title, or shifting italics | Low | A new text read as missing | A miss stops the run loudly; mentions are compared by their links |
 | K-6 | Every check over a body is by reading, with no save to run a command over (ledger E-035) | Low | A misread | Each is checked by a second reading; the readback predicts no counts, so a miscount cannot fail it; a miss is a loud stop |
 | K-7 | No executable check exists for TW, and no live trial has run since 2026-09-08 (§A risk 9) | Medium | A runtime fault in the new rules is found only in use | A live trial is Nathan's, after this Modification; the readbacks check both sides of the changed handoff |
@@ -1094,7 +1094,7 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-13 | The gate's example, `BN 13.5` for PF10 v13.5, names today's PF10 version | Certain | The example ages as PF10 moves | It shows the form, as an example; the rule is the PF10 version used |
 | K-14 | §A's findings P-1 to P-3 | Certain | Three inexact statements in the frozen analysis | None changes the scope, an item or a member; *Findings on §A* records each |
 | K-15 | The merge rule is a statement, not a gate | Low | A branch merged early | Pull requests "cannot gate" (Nathan, 2026-09-28); the rule is Nathan's own |
-| DC-R1 | **Required, open at the review cap.** DC-HIST has a drain name the version TW-APPLY-10 will derive in every change-history entry, and give a dated entry the preparation date; AP-AUTH expects the same. An HDE CRD Records §4.2 material-change row, which §A names among the entries the drains draft, has no version column, and its Date is the decision's (*Diff check (PL3)*) | Low: drains on PF30 records are rare; certain on that path | A drain updating a PF30 record writes a stray version and the preparation date into the row, which passes every check when TW-APPLY-10 runs the same day; on a later day its package is returned | The cap is reached (`D26-A` rule 2; Nathan's direction). The checker's smallest correction is in *Diff check (PL3)*. Applying it, with a check, is Nathan's opt-in by his `review_cap` override; approving the plan as it stands accepts DC-R1 |
+| DC-R1 | **Repaired in *Repair round 2 (PL3)*, at Nathan's opt-in; no longer open.** As found, DC-HIST had a drain name the version TW-APPLY-10 will derive in every change-history entry, and give a dated entry the preparation date; AP-AUTH expected the same. An HDE CRD Records §4.2 material-change row, which §A names among the entries the drains draft, has no version column, and its Date is the decision's (*Diff check (PL3)*) | Not low, as Nathan's opt-in corrects: every update to an existing CRD record goes through a drain, and each material change adds a row, so it was the normal path for PF30 record updates | A drain updating a PF30 record would have written a stray version and the preparation date into the row | Repaired: the checker's smallest correction, applied exactly, at Nathan's opt-in by his `review_cap` override |
 | L1 | After a rollover, the pull request proposes PF30.1 at `Closed to new CRDs` holding a CRD registered in that same version, and the next volume at `Pending activation`: no volume is `Active` until Nathan publishes the review copy | Low: only Nathan decides a rollover | A careful run may stop on §6's "no new CRD may be registered", or he reviews the proposal | A loud stop or a reviewed proposal. DR-1 follows §A's R8 and HDE CRD Records §6, and the record report says the two files take effect together |
 | L2 | On a rollover, the review copy's version, effective date and gate are left to judgement (§6 sets the version suffix "when that volume is created"), and REC-ENDPT-PF30 names one file and one proof log where a rollover writes two of each | Low | A judgement in a copy Nathan reviews (K-11) | Not one of the four required kinds |
 | L3 | REC-MISSING's "only Nathan's rollover decision opens a new volume" could be read as letting a rollover stand in for a missing active volume | Low | REC-VOL still puts the record in the active volume, so such a run ends at a blocker | A loud stop |
@@ -1109,7 +1109,7 @@ Approving this plan accepts each of these (`DISP-001`).
 | L13 | `ONELINE`'s injected fault exercises only the `new` half, and `VALUES` would not catch another «…» value left in a `new` | Low | None today: «V» is the only value in a `new` | Not one of the four required kinds |
 | L14 | §P goes on past its findings on §A, P-1 to P-3, where template rule 1 says to return to Nathan | Certain | Procedural | Each is disclosed in *Findings on §A* and K-14, and goes to Nathan with this plan |
 | L15 | §P had no *Canon and rulings relied on* | Certain | Procedural | Added at PL4 |
-| DC-L1 | K-4 still says a drain dates the change-history entry with the preparation date unconditionally; after L5's repair that holds only where the format dates an entry, on `main` HDE Governance §9.3.1 | Certain | A risk stated wider than it is; no text sent to Notion | Listed by the checker; the plan's wording is Nathan's opt-in |
+| DC-L1 | **Repaired in *Repair round 2 (PL3)*, at Nathan's opt-in; no longer open.** K-4 said that a drain dates the change-history entry with the preparation date, unconditionally. It now states the condition, as the repaired DC-HIST does | Certain | None now | Repaired at Nathan's direction |
 | DC-L2 | The DC-HIST row of *The edits, by rule* summarizes the exception as "canon's own ... stays", looser than the edit's "unless canon requires that exact language there" | Low | The plan states a looser rule than the prompts carry; the text sent governs | Plan text only |
 | DC-L3 | "a record kept as history" has no bound; canon keeps records as history only in PF20 and PF30 | Low: on `main` no other document has a marker to keep | A kept marker, visible in the redlines and the proof log | Not silent |
 | DC-L4 | On a rollover, REC-FIELDS-PF30's "every other byte stays as canon has it" and REC-CHECK's "each updated file" do not name the review copy | Very low | A loud stop, or a review copy Nathan reviews | Rollover only, on his decision; REC-VOL is explicit |
@@ -1297,6 +1297,37 @@ round's eight findings, two sit wholly and three partly in text the repair round
 - **DC-L7** asked that every open finding be listed where Nathan's approval accepts it. They now are, under
   *Open findings, accepted as risks*: DC-R1, the review's L1 to L4 and L6 to L15, and the checker's DC-L1 to
   DC-L6, each with the reason it is listed.
+
+### Repair round 2 (PL3), Nathan's opt-in
+
+Nathan's words, 2026-10-06:
+
+> Nathan opts in to repairing DC-R1 of the PLAN of MODIFICATION-20261006-gtwpe-tw-document-rules at 87b6058, overriding review_cap for one more round. PE39 checked the plan: main's modification_validate.py and gtwpe_record_check.py each pass all seven GTWPE records (7/7), edits_check.py passes on edits.json at «H» 54fc3da0…6a0364, main is still b1bd769, the branch changes only docs/ephemeral/, the gate texts carry Nathan's ruling of 2026-10-06, and DC-R1 holds against HDE CRD Records §4.2 on main. DC-R1 is not low-likelihood: §A says every update to an existing CRD record goes through a drain, and each material change adds a material-change row, so it is the normal path for PF30 record updates. The repair: apply the diff checker's smallest correction to DC-HIST in both drains and to AP-AUTH exactly as *Diff check (PL3)* gives it, and bring the plan's own descriptions of those texts (the DC-HIST and AP-AUTH rows, K-4 and DC-L1) into line with it. Repair nothing else. Then one check of that repair's diff by a fresh checker, and record the override in the override block. If the check finds no required defect, return the plan for Nathan's approval; if it finds one, stop and report it unrepaired. Report in at most five plain sentences ending with exactly what he must approve.
+
+By this session, from about 16:02Z, in `edits.json`'s new texts and in §P alone. No anchor, member, edit
+count, value or Notion write changed.
+
+| Finding | Where | Repair |
+|---|---|---|
+| DC-R1 | DC-HIST, in both drains; AP-AUTH | The checker's smallest correction, applied exactly as *Diff check (PL3)* gives it. A script took both strings from that section and checked them against the checker's captured return, `PLAN-DIFFCHECK.md`, before applying them |
+| DC-R1 | *The edits, by rule*: the DC-HIST and AP-AUTH rows | Each now describes the repaired text: the version and the revision date are named only where the entry's format records them, and a date the format gives another meaning, such as an HDE CRD Records material-change row's decision date, keeps that meaning |
+| DC-L1 | K-4 | K-4 now states its condition: a drain dates the entry with the preparation date where the target's format records a revision date, as HDE Governance §9.3.1's does on `main` |
+| DC-R1, DC-L1 | *Open findings, accepted as risks* | Both rows now say they are repaired and no longer open. DC-R1's row carries the likelihood as Nathan's opt-in corrects it |
+
+Also recorded from his words:
+- **`review_cap`.** The `override` block names it for this one round, past `D26-A`'s cap of one diff check.
+- **DC-R1's likelihood.** It is not low: every update to an existing CRD record goes through a drain, and each
+  material change adds a row, so it was the normal path for PF30 record updates.
+- **Nothing else is repaired.** AP-AGREE's "version, date, change-history and gate values", which the checker
+  offered to make explicit with "of this revision", is unchanged. So is every other open finding.
+
+**What changed in the evidence.** `edits.json`: the new text of DC-HIST in both drains and of AP-AUTH. «H» is
+now `395394d128a1dae29b220703a4b6579cc413a293d3491b746faf23ff255029a9` (39,797 bytes). `edits_check.py` is
+unchanged; it passes, and each of its eleven `--inject` faults is still caught by its own code. Each repaired
+passage was read again with its new text in place, in P3's fetches: each still reads as one sentence of its
+prompt.
+
+The status is `PLANNING` from this repair round until the check of its diff returns.
 
 ### Harness files (`D22` condition 5), for `PLAN`
 
