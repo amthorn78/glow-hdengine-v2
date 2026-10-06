@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: PLANNED
+status: EXECUTING
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -1494,3 +1494,89 @@ the approval fields, `edits.json` is unchanged at «H», and both record checks 
   E-036, on the canon block in a review's return.
 - MODIFICATION-20261005-gtwpe-tw-repository-io, the last TW change, for the selection route's form, the
   control pages' texts, `ctl_check.py`, `capture.py`'s method and the briefs' form.
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session runs `EXECUTE` as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE — 100526.2*,
+fetched live at the start of the mode, X1.0 (0). The input is §P as Nathan approved it at `201844c` on
+2026-10-06, recorded at `4e7f01d` (`plan_approved_by`). The mode started at 2026-10-06T16:37:07Z, at X1.1.
+
+The meter is the clock. The recorded estimate for `EXECUTE` is about 3 h, so the run stops at 6 h from X1.1, not
+counting a wait for Nathan.
+
+### Values, fixed at X1.1 (2026-10-06T16:37:07Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-10-06 |
+| «PA» | 2026-10-06, `plan_approved_date` |
+| «V» | `100626.2`, fixed at X1.2 by the PE Metaprompt's version rule: each member's current version, `100626.1`, is of «D», so N is incremented on the same date. No child page of *HDE TW* carries a new title (X1.0 (4)) |
+| «ID:…» | Fixed at X1.3 |
+| «S», «M», «m» | Fixed at X4.1 |
+| «R» | Fixed at X4.3's pre-read |
+
+### X1.2: the preconditions, X1.0 (0) to (8)
+
+All read-only, from 16:37Z to 16:39:19Z on 2026-10-06. Every one passed, so the run goes on to X1.3. The harness
+saved no fetch of a member page, so each member's checks were made by reading and checked by a second reading,
+the first anchor by anchor and the second section by section.
+
+| # | Result |
+|---|---|
+| (0) | GTWPE-MGMT-10 100526.2, fetched live at the mode's start: edited 2026-10-05T16:36:11.384Z |
+| (1) | Each member's current page, fetched live, at §A's edit time: DRAIN-10 2026-10-06T03:19:43.487Z, DRAIN-20 03:21:38.944Z, RECORD-10 03:22:55.389Z, RECORD-20 03:23:58.670Z, APPLY-10 03:24:55.124Z. Each is a child page of *HDE TW*; its first line is `<title prefix> — 100626.1`, and its headings (11, 12, 8, 8 and 11) and last words are *The new pages' checks*' before the edits. No fetch reported truncation or an unknown block |
+| (2) | `edits.json`'s sha256 is «H», `395394d1…5029a9`, and `edits_check.py` exits 0 on it |
+| (3) | In each member's fetch, by reading, checked by a second reading: each of its `old` texts once (7, 9, 14, 18 and 9); `100626.1` twice in each, in the two identity lines; every other `absent_after` phrase once |
+| (4) | *HDE TW*, edited 2026-10-06T03:31:27.379Z: 33 child pages, none titled with `100626.2` |
+| (5) | The control pages, each at the edit time the dry run found. The selection page, 03:30:15.790Z: SEL-1's heading once, the page's only `Current operation` heading, and SEL-2's two lines once, as its first two lines. *HDE TW*: HDE-OLD once, as its first line. The GTWPE parent page, 03:29:32.421Z: CAT-OLD once. *Alpha 1*, 03:30:55.483Z, and the Hub, 03:31:55.832Z: `ctl_check.py pre` exits 0 on each save, its anchor once, 33 and 140 headings, each heading list identical to the dry run's |
+| (6) | The PE Metaprompt 091426.1: the harness saved its fetch, and `save_meta.py` read its title and edit time alone: 2026-09-23T17:17:22.217Z |
+| (7) | `git fetch origin main` exited 0: `origin/main` is `b1bd7699243395a708a1d49a82df7e0b61efcccb`, with no commit since §A's `b1bd769` |
+| (8) | The record holds this plan, with `plan_approved_by` quoting Nathan's approval, at `4e7f01d` |
+
+### X1.3: the five new pages, W1 to W15
+
+From 16:38Z on 2026-10-06. Every write was made with `allow_async: false` and returned at once, with no task
+left pending. No harness save held a member page: each fetch came back inline, and each check in (g) and (h)
+was made by reading, checked by a second reading.
+
+A context compaction fell between DRAIN-10's first readback fetch, at 16:39:57Z, and the record of its checks.
+As `D22` requires, GTWPE-MGMT-10 100526.2 was fetched live again at 16:41:42Z, unchanged at
+2026-10-05T16:36:11.384Z, and the new page at 16:42:01Z, unchanged at 16:39:55.231Z. Both readings of (g) were
+made on that second fetch, and no check relies on the first.
+
+| Member | Writes | Checks |
+|---|---|---|
+| DRAIN-10 | (a) *HDE TW* as X1.2 (4) fetched it at 16:38:18Z: no child page with the new title, and no write between that fetch and W1. **W1**, at 16:39:31Z, duplicated the current page; «ID:DRAIN-10» is `3f14590a05eb819f8390f5b92fc4c8ab`. (c) Populated at its first fetch, 16:39:37Z, as of 16:39:32.803Z, titled `… — 100626.1 (1)`. **W2** set its title, and **W3** made its 7 edits in one call | (f) passed. (g) As of 16:39:55.231Z: (1) to (9) passed; (10) below. (h) *HDE TW*, at 16:43Z: 34 child pages, exactly one with the new title, «ID:DRAIN-10»; the current page is unchanged at 03:19:43.487Z |
+| DRAIN-20 | (a) *HDE TW*, as fetched for DRAIN-10's (h). **W4**, at 16:45Z, duplicated the current page; «ID:DRAIN-20» is `3f14590a05eb81a58043d304b7452801`. (c) Populated at its first fetch, as of 16:45:16.178Z, titled `… — 100626.1 (1)`. **W5** set its title, and **W6** made its 9 edits in one call | (f) passed. (g) As of 16:45:43.111Z: (1) to (9) passed; (10) below. (h) *HDE TW*: 35 child pages, exactly one with the new title, «ID:DRAIN-20»; the current page is unchanged at 03:21:38.944Z |
+| RECORD-10 | (a) *HDE TW*, as fetched for DRAIN-20's (h). **W7**, at 16:47Z, duplicated the current page; «ID:RECORD-10» is `3f14590a05eb81d399a7c3ab1fd6fb66`. (c) Populated at its first fetch, as of 16:47:04.681Z, titled `… — 100626.1 (1)`. **W8** set its title, and **W9** made its 14 edits in one call | (f) passed. (g) As of 16:47:37.162Z: (1) to (9) passed; (10) below. (h) *HDE TW*: 36 child pages, exactly one with the new title, «ID:RECORD-10»; the current page is unchanged at 03:22:55.389Z |
+| RECORD-20 | (a) *HDE TW*, as fetched for RECORD-10's (h). **W10**, at 16:48Z, duplicated the current page; «ID:RECORD-20» is `3f14590a05eb81eaaf0cedac0de274b9`. (c) Populated at its first fetch, as of 16:48:38.122Z, titled `… — 100626.1 (1)`. **W11** set its title, and **W12** made its 18 edits in one call | (f) passed. (g) As of 16:49:11.220Z: (1) to (9) passed; (10) below. (h) *HDE TW*: 37 child pages, exactly one with the new title, «ID:RECORD-20»; the current page is unchanged at 03:23:58.670Z |
+| APPLY-10 | (a) *HDE TW*, as fetched for RECORD-20's (h). **W13**, at 16:50Z, duplicated the current page; «ID:APPLY-10» is `3f14590a05eb81daa3cfee9956585cd5`. (c) Populated at its first fetch, as of 16:50:27.040Z, titled `… — 100626.1 (1)`. **W14** set its title, and **W15** made its 9 edits in one call | (f) passed. (g) As of 16:50:52.240Z: (1) to (9) passed; (10) below. (h) *HDE TW*: 38 child pages, exactly one with the new title, «ID:APPLY-10»; the current page is unchanged at 03:24:55.124Z |
+
+On every new page, each edit's new text is present at the place its `where` names, each `old` and each
+`absent_after` phrase occurs 0 times, the headings and last words are *The new pages' checks*', and
+`GTWPE-D1`'s requirement, `separate proof log`, and its eight items occur by phrase. Each member's W3 sent
+exactly the payload printed from `edits.json` at «H»: a script compared the `content_updates` of this
+session's own `update_content` call to each page, read from its transcript's tool-call inputs and never from a
+tool result, with that payload, and printed only counts and `True` (*Harness files*, under X5).
+
+**The `D26-E` broad match**, (g)(10). Each hit with its edit or the exception that keeps it, by reading, the
+first reading check by check and the second section by section. An edit is named by its number in the
+member's edits in `edits.json` (`-06` is `DRAIN-10-06` in DRAIN-10's row). No kept hit says what an edit
+removes.
+
+| Member | Hits |
+|---|---|
+| DRAIN-10 | `filename` 8: -04 1, -05 1; kept: output file names 1, a filename that does not prove access 2, a fileless source's provenance 1, the proof log's input and output filenames 1, filename-only claims in a handoff 1. `draft` 2: -06 2 |
+| DRAIN-20 | `filename` 9: as DRAIN-10, with DRAIN-20's historical PF09 filenames 1 more. `draft` 2: -06 2. `close` 5: -08 3; kept: the evidence rule 1, unrelated rows 1. `closure`, read with it since the exceptions name product closure, 5: kept, product closure 5 |
+| RECORD-10 | `paste` 1: -08 1. `full PF` 0. `report` 9: -09 2; kept: the preflight 1, the save-recovery rules 6. `draft` 3: -09 2, -12 1. `filename` 3: -09 1; kept: access 1, output file names 1 |
+| RECORD-20 | `paste` 1: -10 1. `full PF` 0. `report` 11: -11 2, -17 2; kept: the preflight 1, the save-recovery rules 6. `draft` 4: -11 2, -14 1, -17 1. `filename` 4: -11 1; kept: a filename saying Approved 1, access 1, output file names 1. `volume` 35: -04 1, -06 2, -10 3, -11 1, -17 17, -18 1; kept: the assigned target or its parts 6, the duplicate check 2, the current volume 1, the ban on inventing volumes 1 |
+| APPLY-10 | `filename` 6: -06 1; kept: access and identity proof 3, output file names 1, the kept ban on substituting the redlines file's name 1. `draft` 2: -09 2. `status` 5: -03 1, -08 1, -09 2; kept: `status` in a schema or ownership question 1 |
+
+The two readings agree on every count but one. On DRAIN-10 the first reading found 7 `filename` hits and the
+second 8: the first missed the hit in *Intake and source scope*, in the sentence that says a filename is not
+inspection. A third reading of that passage confirmed it; it is kept text, on the current page too, kept as a
+filename that does not prove access, as on DRAIN-20.
+
+X1.1, X1.2 and X1.3 are `VERIFIED`: W1 to W15 are made and read back, and no other Notion write was made.
