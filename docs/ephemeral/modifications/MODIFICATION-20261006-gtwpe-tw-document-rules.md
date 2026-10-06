@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: ANALYZED
+status: PLANNING
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -12,14 +12,15 @@ closure:
   state_sharers: [TW-APPLY-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20]
 readiness: NEEDS_RULING
 override:
-  by: ""
-  overrides: []
-  reason: ""
+  by: Nathan
+  overrides: [readiness]
+  reason: "Nathan, 2026-10-06, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for this release as well, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged"
 interaction_cost_predicted: 7
 interaction_cost_actual:
 estimate:
   plan: "about 4 h: §P for 31 passages and 10 identity lines in five members (anchors, new texts, phrase and absence checks), the selection page's three writes with a new Current operation, the three current-release notes and the catalog's checked-through commit; a dry run that reads the five bodies again, and one full review by a single reviewer. Time is the meter the session can read; tokens are not measured"
   execute: "about 3 h, not counting any wait for Nathan: five new versions (duplicate, title, edits), each read back whole by this session; the selection's three writes, the three notes and the catalog, each read back; the record. Time is the meter"
+item_count_at_approval: 8
 reviews:
   - mode: ANALYZE
     kind: DRY_RUN
@@ -97,8 +98,8 @@ request: |
   - No TypeSafe scoring in this work.
   - Report to Nathan in at most five plain sentences, in plain language, ending with exactly what he must approve or decide.
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-10-06: \"Nathan approves the analysis of MODIFICATION-20261006-gtwpe-tw-document-rules at f8bbb6c (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all seven GTWPE records (7/7), the request in the front matter equals PE39's message, main is still b1bd769, and the branch changes only the record. Q-1: option (a). Nathan waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for this release as well, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it, and the override block records the waiver. The Last Update Gate (ITEM-02 and risk 3): Nathan ruled on 2026-10-06, verbatim, \"the gate name for a non PF10 source should just be the filename of the source. that simple\", and \"I would never use a PF target as a source, that does not make sense.\" So a change's source is PF10 or a file that is not a PF document, never another PF. The gate is BN and the PF10 version used when the source is PF10, and the source's filename alone, with no BN, for any other source. PLAN builds the rule in this form, where the analysis says BN and the source filename, and risk 3 falls away. The ruling is recorded in the architecture record's update of 2026-10-06, \"the gate for a source other than PF10\", in amthorn78/glow-hdengine-v2#579. Continue to PLAN: one dry run and one full review by a single reviewer, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
+analyze_approved_date: 2026-10-06
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -677,3 +678,12 @@ No required defect.
 - **Rulings:** GTWPE-D1; `D21`, `D22` and `D26` (`gcfpe.decision-record.md`); Nathan's target architecture,
   §§4, 5, 8 and 9, his answers 6 and 8, and his directions of 2026-09-29; his ruling of 2026-10-06 on the
   gate; C1's approved §A (A.1, A.4 to A.8); and C2's override, for Q-1.
+
+## §P — Plan
+
+*Written by MODE = PLAN. Requires analyze_approved_by. Frozen once approved.*
+
+This session runs the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE —
+100526.2*, fetched live at the start of the mode, edited 2026-10-05T16:36:11.384Z, as at `ANALYZE`. The mode
+started at 2026-10-06T12:30:32Z, when Nathan's approval of the analysis at `f8bbb6c` arrived; it is in the
+front matter, verbatim. `main` is at `b1bd769`. The plan is being written; it follows below.
