@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261005-gtwpe-tw-repository-io
-status: PLANNING
+status: PLANNED
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -37,6 +37,11 @@ reviews:
     date: 2026-10-05
     required_open: 2
     outcome: "One reviewer, GTWPE-TW-REPOSITORY-IO-PLAN-A, as Nathan directed, on 29fe341: 1 required finding, R-1 (HDE-NEW and HUB-NEW omit flowmaster-validate 3.3.2 and the direct-invocation sentence of Nathan's Q-1 answer), confirmed by the session; 16 listed, L1 to L16, of which the session counts L1 (the waiver stated wider than Nathan's words, on the selection page and in the override block) as required under D26-A rule 3. Both repaired; L2 to L16 to Nathan unrepaired (D26-A rule 4). Record: PLAN-REVIEW.md"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-06
+    required_open: 0
+    outcome: "One checker, GTWPE-TW-REPOSITORY-IO-PLAN-DC, on the repair's diff 29fe341..2eff7ae, as Nathan's approval allows: 0 required; R-1 and L1 fixed with no new defect; 4 listed, DC-1 to DC-4, three in text the repair added. Required findings fell from 2 to 0, and the cap is reached: to Nathan with every open finding listed in §P. Record: PLAN-DIFFCHECK.md"
 items:
   - id: ITEM-01
     statement: "The TW prompts stay single-homed in Notion: no TW prompt body, copy or excerpt enters the repository, and this change alters where they read and write, not where they live."
@@ -829,6 +834,8 @@ In `docs/ephemeral/modifications/evidence/gtwpe-tw-repository-io/`, committed wi
 | `ctl_check.py` | The pre-read and readback of *Alpha 1* and the Operations Hub, whose fetches the harness saves. It is a copy, byte-identical, of `evidence/gtwpe-tw-model-advice/ctl_check.py`, the script the last TW change used for the same two pages, both at sha256 `4e968007698d833dd6d3e50d0fd6ed8daffdbd75e3865f3e1c32c9a1720923c5`. It is copied so that this record does not depend on another record's evidence, which Nathan may prune |
 | `PLAN-REVIEW-BRIEF.md` | PL3's review brief, committed before the reviewer is spawned |
 | `PLAN-REVIEW.md` | The reviewer's return, captured unedited from its own transcript |
+| `PLAN-DIFFCHECK-BRIEF.md` | The brief for the check of the repair's diff, committed before the checker was spawned |
+| `PLAN-DIFFCHECK.md` | The checker's return, captured unedited from its own transcript |
 
 ### Values fixed in this plan
 
@@ -1115,6 +1122,31 @@ Approving this plan accepts each of these (`DISP-001`).
 | K-13 | CAN-A tells each prompt to record the canon commit it read, as §A's R1 directs for all six; TW-TRIAGE-10 writes nothing, and its result stays a list (dry run P7) | Medium | A TW-TRIAGE-10 run names the commit beside its list, or keeps it internal | Dropping the recording for TW-TRIAGE-10 would rewrite the analysis, which `PLAN` may not. Either outcome is harmless; a change is Nathan's opt-in |
 | K-14 | This session's permission classifier refused `git fetch origin main` in the dry run (P5), although X1.0 (7) and X4.1 need it | Medium | `EXECUTE` stops at X1.0 (7) with nothing written, and returns `IMPLEMENTATION_BLOCKED` | A loud stop before any write. Nathan can allow the command (PO-4); `EXECUTE` then restarts, since nothing was written (`D26-C`) |
 
+**From the reviews,** open and listed (`D26-A`; *Full review (PL3)*, *Diff check (PL3)*). The reviewers'
+own words are in `PLAN-REVIEW.md` and `PLAN-DIFFCHECK.md`. Approving this plan accepts each of these as
+well, unless Nathan opts in to its repair. R-1 and L1 are repaired, and DC-2 is met by this table.
+
+| # | Finding | Path; likelihood | Consequence |
+|---|---|---|---|
+| L2 | R3 lifts the bodies' ban on a pull request, but the readback looks for the old rule only by the phrase "create a PR", and no broad term covers a pull request, a commit, a push or a merge | Normal; low | A ban surviving elsewhere in a body would stand beside "opened if none is" and pass every check. The session's reading under DC-1 found none |
+| L3 | "Never merges" rests on kept text after OUT-B's anchor, which no check reads | Normal; low | Without it, a prompt that opens pull requests would have no ban on merging of its own |
+| L4 | §P's statement in *Nathan's directions* of what it quotes is incomplete: the dry run's note quotes a kept sentence of 57 characters, within Q-2's length as §P reads it | Normal; certain; low | An untrue statement in the record |
+| L5 | X5's ITEM-01 check tests where files are, not what they quote | Normal; low | A body passage quoted in §E would leave ITEM-01 `VERIFIED` |
+| L6 | What remains of it: on *Alpha 1* and the Hub, the new paragraphs are checked only for their `--has` values. X4.3 (2) now reads the selection page's paragraph as sent | Normal; low | A dropped or garbled sentence there would pass |
+| L7 | The pre-reads of X4.4 and X4.6 follow X4.3's selection write | Failure; low | A page change after X1.0 fails after the switch, while the notes still name TW-ALPHA-20261004.1: a loud `D26-B` stop |
+| L8 | The checks for «PA» are met by «S» when approval and selection fall on the same UTC day | Normal; medium | A missing «PA» would pass |
+| L9 | X1.0 (3) counts in "each member's fetch", without (g)(5)'s exclusion of the title property | Normal; low | Read literally, the identity anchors occur once more, and the run stops with nothing written |
+| L10 | X1.3 (g), X4.2, X4.3 and X4.5 verify by reading, not by a committed command (K-5) | Normal; procedural | None beyond K-5's |
+| L11 | PL-B and PL-F split a paragraph into list items, with the rest of it on a plain line after the eighth | Normal; low | If Notion folds that line into the item, (g)(4) fails: a loud stop |
+| L12 | «V» is fixed from X1.1's date | Normal; low | A run that crosses 00:00Z makes pages a day after the date their version carries |
+| L13 | Each «ID» reaches the record only at X2 | Failure; low | A crash between Write 1 and Write 2 leaves an unselected copy titled with the old version, which a rerun repeats; the sweep lists it |
+| L14 | X1.0 (7) does not look at the watched paths, and X1.0 (0) not at the catalog's selection | Normal; very low | A change between approval and `EXECUTE` is recorded only after the selection |
+| L15 | PO-1's "made from this session" may not cover a fresh session after K-14's remedy | Failure; low | A careful session asks Nathan |
+| L16 | Six anchors are 100 characters or more: OUT-A 220, PL-F 190, IN-C 150, OUT-E 130, RUN-C 121 and PL-A 100 | Normal; certain; low | More of each body is committed than a span's two ends would commit, though within Q-2 as §P reads it |
+| DC-1 | *Full review (PL3)*'s note on L2 and L3 claims a whole-body reading, on a basis that names only the touched passages | Normal; low | Nathan may take L2 as settled on an unmeasured check. The session has since read the five document prompts whole, twice, in this mode's fetches after the compaction. No kept text forbids a pull request, a commit or a push. The only ban on merging is the read-only line's |
+| DC-3 | The new `--has` of X4.4 and X4.6 is the first live `ctl_check.py` string with an apostrophe and parentheses | Failure; low | If Notion returns either changed, `post` fails after W20 and W21 or W23 have landed: a loud `D26-B` stop, with the selection switched and the notes split. Both pages, as fetched in P4, show apostrophes and parentheses that the last TW change sent, unchanged |
+| DC-4 | The note on L2 and L3 quotes one word of kept text, "merge" | Normal; certain; negligible | §P's statement of what it quotes is incomplete again, as in L4 |
+
 ### Product Owner actions
 
 | # | Action | How it is verified |
@@ -1226,6 +1258,31 @@ stands. No anchor, value or Notion write changed; only the texts and readbacks b
 | R-1 | The readbacks of X4.3 to X4.6 | X4.4 and X4.6 add that sentence as a `--has`. X4.3 (2) reads the new release's paragraph as sent, with its sentence on the two skills. X4.5 reads HDE-NEW's sentence as sent |
 | L1 | The `override` block; *SECTION* (W20); *Nathan's directions* | The waiver is "for tw-flowmaster", as Nathan worded it, and on the selection page "for TW Flowmaster". Each text still says that neither skill runs the release |
 
+### Diff check (PL3)
+
+One checker, GTWPE-TW-REPOSITORY-IO-PLAN-DC, a fresh general-purpose subagent, neither forked nor
+context-inheriting. It checked the repair's diff, `29fe341..2eff7ae`, which Nathan's approval allows once the full
+review has found a required defect.
+- **Brief.** Its only brief was `PLAN-DIFFCHECK-BRIEF.md`: 8,947 bytes, sha256
+  `90dc0c181ab4e1682d09b475ecd3973857fe96159c84a1c68d39f10fecf2fffb`. The brief was committed and
+  pushed at `87fedd3` before the checker was spawned, at about 23:56Z, and the checker confirmed that
+  sha256. Its spawn prompt also asked it to give its canon under a line reading "Canon relied on" alone,
+  the form the repository's hook parses.
+- **The run.** It read no prompt body and no Notion page, and wrote nothing. It ran for about 20
+  minutes, and the harness reported 370,163 subagent tokens.
+- **The capture.** The session captured its `SubagentHandback` message with `capture.py`, as for the
+  review: `PLAN-DIFFCHECK.md`, 11,934 bytes, sha256
+  `f7f9c0f86f6ef0765cd76e5e940189001556f4d1b02bcf821652e220de60ebfa`, the message's 11,933 bytes and
+  one final LF. Its first line is `0`.
+
+**Result: 0 required findings and 4 listed, DC-1 to DC-4.**
+- R-1 and L1 are fixed, with no new defect. The required count fell from 2 to 0.
+- Three of the four listed findings sit in text the repair round added. That is the second signal of the
+  stop rule (*Reviews are bounded*, rule 4). With no required finding open, and the cap reached, the
+  plan goes to Nathan either way.
+- DC-2 asked that the open findings be listed where Nathan's approval accepts them. They now are, under
+  *Open findings, accepted as risks*. DC-1, DC-3 and DC-4 stay listed there, with the session's notes.
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **This session's transcript** holds, from this mode:
@@ -1248,6 +1305,15 @@ stands. No anchor, value or Notion write changed; only the texts and readbacks b
     has not read it, and it is left to teardown;
   - the repository's PostToolUse hook updated `.git/canon_relied_on_hook.json` after the reviewer's
     shell commands, as it does after this session's.
+- **The checker's transcript**, the output file the harness gave for its agent ID in this session's tasks
+  directory. `capture.py` read it twice for its one `SubagentHandback` call, at transcript line 345, as
+  for the reviewer's, and wrote `PLAN-DIFFCHECK.md`. The checker fetched no prompt body, so the
+  transcript holds none. It is left to teardown.
+- **Two side effects of the checker's run,** as it reported them, neither its own act:
+  - the harness saved one oversized output of the checker's, the repair's diff, as
+    `tool-results/bv1pyo47e.txt`. That is repository text, no prompt body. The checker read it whole;
+    the session has not read it, and it is left to teardown;
+  - the repository's hook ran after the checker's shell commands, as after the reviewer's.
 - **Harness saves**, each read only by a script that printed what its check needed:
   - the PE Metaprompt 091426.1, twice. `mcp-Notion-notion-fetch-1791240338462.txt` was read for its
     general rules in four slices, content characters 0 to 13,600, 13,550 to 27,720, 55,300 to 66,520 and
@@ -1268,7 +1334,17 @@ stands. No anchor, value or Notion write changed; only the texts and readbacks b
   - the dry run's notes, which are results only;
   - a copy of this record at `PLANNED` for P1;
   - this record as it stood before the repair round;
+  - this record as it stood before PL4;
   - `capture.py`.
+
+### Cost of this mode
+
+- **Time.** From 22:44:34Z on 2026-10-05, when the approval was recorded, to PL4 at about 00:20Z on
+  2026-10-06: about 1 h 35 min, with no wait for Nathan in between. The recorded estimate was about
+  3.5 h, so this is under it, and under twice it. The full review took about 32 minutes and the diff
+  check about 20.
+- **Tokens.** Not measured by this session. The reviewer reported 474,419 subagent tokens and the checker
+  370,163.
 
 ### Canon and rulings relied on, for `PLAN`
 
