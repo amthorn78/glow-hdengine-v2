@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -16,7 +16,7 @@ override:
   overrides: [readiness, review_cap]
   reason: "Nathan, 2026-10-06, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for this release as well, because C4 replaces the skill, C6 retires it, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged. Nathan, 2026-10-06, opting in to repairing DC-R1 of the PLAN at 87b6058: he overrides review_cap for one more round, a check of that repair's diff by a fresh checker past D26-A's cap of one diff check per mode, so `review_cap` names it; the waiver covers that one round"
 interaction_cost_predicted: 7
-interaction_cost_actual:
+interaction_cost_actual: 11
 estimate:
   plan: "about 4 h: §P for 31 passages and 10 identity lines in five members (anchors, new texts, phrase and absence checks), the selection page's three writes with a new Current operation, the three current-release notes and the catalog's checked-through commit; a dry run that reads the five bodies again, and one full review by a single reviewer. Time is the meter the session can read; tokens are not measured"
   execute: "about 3 h, not counting any wait for Nathan: five new versions (duplicate, title, edits), each read back whole by this session; the selection's three writes, the three notes and the catalog, each read back; the record. Time is the meter"
@@ -51,35 +51,35 @@ items:
   - id: ITEM-01
     statement: "TW-APPLY-10 brings every document-control field of the revised PF forward from the actual change, and the fields agree with one another: the version, the dates, the Last Update Gate, the change or revision history the document's own rules require, and version-sensitive references; the drains draft that change-history entry as a content redline."
     source: "Request item 1; MODIFICATION-20261005-gtwpe-writing-side §A A.4 R4; target architecture §5"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-02
     statement: "TW-APPLY-10 and the drains derive the Last Update Gate from the actual source the update used, by Nathan's rule (answer 6), which replaces the current rule; it needs no PF10 change, and the analysis records that the C1 approval's check for a PF10 sentence no longer applies, which closes ledger E-039."
     source: "Request item 2; Nathan's answer 6 and his ruling of 2026-10-06, in the target architecture record; ledger E-039"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "No document the TW prompts produce says Draft or carries placeholders, TODOs, editorial notes or a stale status, except where canon requires it: a new PF30 volume's review copy."
     source: "Request item 3; MODIFICATION-20261005-gtwpe-writing-side §A A.4 R5; target architecture §4; HDE CRD Records §6"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-04
     statement: "TW-DRAIN-20 judges every potentially affected PF09 row on all the evidence, never leaves a row open for lack of an instruction, never closes one only because related work shipped, and the resulting PF09 shows the project's current state."
     source: "Request item 4; MODIFICATION-20261005-gtwpe-writing-side §A A.4 R6; target architecture §8"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-05
     statement: "TW-RECORD-10 and TW-RECORD-20 write their one section into a copy of the PF at the repository path the invocation names, by an exact insertion, with a report, set that document's control fields as ITEM-01 does, and reconcile the original specification with every applicable PF10 change; TW-RECORD-20 treats PF30 as a volume family, and TW-RECORD-10 keeps PF20's single structure."
     source: "Request item 5; MODIFICATION-20261005-gtwpe-writing-side §A A.4 R2, R3, R7 and R8, and A.6 (E-010); target architecture §9; Nathan's answer 8; HDE CRD Records §6"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-06
     statement: "Once TW-RECORD-10 and TW-RECORD-20 write an updated PF20 or PF30 Markdown file, each writes a separate proof log beside that file, named after it, with all eight minimum items of GTWPE-D1."
     source: "Request item 6; GTWPE-D1 (docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md); MODIFICATION-20261005-gtwpe-writing-side §A A.8"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-07
     statement: "TW-RECORD-20 takes its inputs as attached files or repository paths, never from Google Drive or ChatGPT Library (K-12)."
     source: "Request item 7; MODIFICATION-20261005-gtwpe-tw-repository-io K-12; HDE Build Notes 2.29 PF10-CANON-001"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-08
     statement: "A new TW-ALPHA release selects the changed prompts, with its Current operation on the Glow Technical Writing Ecosystem page."
     source: "Request item 8"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     name: "The TW prompts' document rules: five new versions and the new TW-ALPHA release"
@@ -1580,3 +1580,160 @@ inspection. A third reading of that passage confirmed it; it is kept text, on th
 filename that does not prove access, as on DRAIN-20.
 
 X1.1, X1.2 and X1.3 are `VERIFIED`: W1 to W15 are made and read back, and no other Notion write was made.
+
+### Values fixed after X1.1
+
+| Value | Fixed as |
+|---|---|
+| «ID:DRAIN-10» | `3f14590a05eb819f8390f5b92fc4c8ab`, at W1 |
+| «ID:DRAIN-20» | `3f14590a05eb81a58043d304b7452801`, at W4 |
+| «ID:RECORD-10» | `3f14590a05eb81d399a7c3ab1fd6fb66`, at W7 |
+| «ID:RECORD-20» | `3f14590a05eb81eaaf0cedac0de274b9`, at W10 |
+| «ID:APPLY-10» | `3f14590a05eb81daa3cfee9956585cd5`, at W13 |
+| «S» | 2026-10-06, at X4.1 |
+| «M», «m» | `b1bd7699243395a708a1d49a82df7e0b61efcccb`, `b1bd769`, at X4.1 |
+| «R» | `TW-ALPHA-20261006.2`, at X4.3's pre-read: the selection page names only `TW-ALPHA-20261006.1` for that date |
+
+### Steps and dispositions, X1.1 to X5
+
+| Step | Part | Disposition | Evidence |
+|---|---|---|---|
+| X1.1 | — | VERIFIED | At 16:37:07Z: status `EXECUTING`; «D» and «PA» fixed (*Values, fixed at X1.1*) |
+| X1.2 | — | VERIFIED | X1.0 (0) to (8) passed; «V» fixed as `100626.2` (*X1.2*) |
+| X1.3 | PART-01 | VERIFIED | W1 to W15; each new page read back whole, every check passing (*X1.3*) |
+| X2 | — | VERIFIED | The record with X1's values and dispositions committed at `357ff98`; `gtwpe_record_check.py` and `modification_validate.py` each exit 0 at `EXECUTING` (1/1); pushed, and the branch's blob, `dfd461a`, equals the local file; amthorn78/glow-hdengine-v2#580 open, with its head at `357ff98`. No repository file other than the record and its evidence changed, and nothing is installed, so the run went on to X4 |
+| X3 | — | NOT_APPLICABLE | X2 waited for no merge or install (X2's own rule) |
+| X4.1 | — | VERIFIED | At 16:52:50Z: `git fetch origin main` exited 0; «M» `b1bd7699243395a708a1d49a82df7e0b61efcccb`, «m» `b1bd769`, «S» 2026-10-06. The range `b1bd769..«M»` holds no commit, so `git log` over *The watched sources*, as GTWPE-MGMT-10 100526.2 lists them in its fetch at 16:41:42Z, lists nothing. No trigger finding |
+| X4.2 | — | VERIFIED | Pre-read at 16:53Z: the GTWPE parent page, edited 2026-10-06T03:29:32.421Z; CAT-OLD once, by reading; 5 headings; 5 child pages. **W16**, `allow_async: false`, returned at once. Readback, edited 16:53:37.871Z, by reading, checked by a second reading: CAT-NEW present and CAT-OLD absent; the members table, the lineage pins, the *Approved design* entry, the headings and the child pages as the pre-read showed them |
+| X4.3 | PART-01 | VERIFIED | Pre-read at 16:54Z: the selection page, edited 2026-10-06T03:30:15.790Z; «R» fixed from it; SEL-1's and SEL-2's old texts once each; `Selected release — TW-ALPHA-20261006.2` absent; 16 headings; 8 child pages. **W17**, SEL-1 then SEL-2 in one call, returned at once. Readback, edited 16:54:30.403Z, by reading, checked by a second reading: (1) to (7) passed. The page has 18 headings: the pre-read's 16, two of them renamed, and the new section's two at the top, exactly one of them `Current operation`. Its 8 child pages and the rest of the page are as the pre-read showed them |
+| X4.4 | PART-01 | VERIFIED | Pre-read: *Alpha 1*; `ctl_check.py pre` exits 0 on its save (edited 2026-10-06T03:30:55.483Z, the anchor once, 33 headings, the list X1.0 (5) recorded). **W18** returned at once. Readback: `ctl_check.py post` exits 0 on the new save, edited 16:55:33.748Z, all 14 checks `PASS` (34 headings) |
+| X4.5 | PART-01 | VERIFIED | Pre-read at 16:56Z: *HDE TW*, edited 2026-10-06T03:31:27.379Z; HDE-OLD once, as its first line; 12 headings; 38 child pages, the five new ones among them. **W19** returned at once. Readback, edited 16:56:13.452Z, by reading, checked by a second reading: the page begins with HDE-NEW, with «R», «V», «PA» and its sentence on TW Flowmaster and flowmaster-validate as sent; 13 headings, the new one directly above the renamed one; the same 38 child pages |
+| X4.6 | PART-01 | VERIFIED | Pre-read: the Operations Hub; `ctl_check.py pre` exits 0 on its save (edited 2026-10-06T03:31:55.832Z, the anchor once, 140 headings, the list X1.0 (5) recorded). **W20** returned at once. Readback: `ctl_check.py post` exits 0 on the new save, edited 16:56:55.793Z, all 10 checks `PASS` (141 headings) |
+| X5 | — | VERIFIED | ITEM-01 to ITEM-08 `VERIFIED` (*Items*). `interaction_cost_actual` 11 against 7, the author, checker and acceptor, and the clock, below. Status `COMPLETE`; both record checks exit 0 at `COMPLETE`; the record committed and pushed, and the pushed blob read back against the local file. The branch is kept, since X2 waited for no merge |
+
+Each of W16 to W20 sent exactly the payload printed by script from *The control texts* with the values above
+substituted, as `ctl_sent_check.py` showed on this session's own tool-call inputs (*Harness files*).
+
+### Items
+
+Each edit named below passed X1.3 (g)(4) and (5) on its page.
+
+| Item | Disposition | Evidence |
+|---|---|---|
+| ITEM-01 | VERIFIED | 13 edits: DC-AUTH, DC-HIST, REC-FIELDS-PF20, REC-FIELDS-PF30, REC-CHECK, AP-AUTH, AP-AGREE, AP-DATE, AP-REF and AP-VERIFY |
+| ITEM-02 | VERIFIED | 8 edits: DC-SRC, DC-SUB, REC-FIELDS-PF20, REC-FIELDS-PF30, AP-GATE and AP-VERIFY. §A records that the C1 approval's check for a PF10 sentence no longer applies, which closes ledger E-039 |
+| ITEM-03 | VERIFIED | 14 edits: DC-HIST, DC-OTHER, REC-FIELDS-PF20, REC-FIELDS-PF30, REC-CHECK, REC-BLOCK-PF20, REC-BLOCK-PF30, REC-VOL, AP-AGREE, AP-STATUS and AP-VERIFY |
+| ITEM-04 | VERIFIED | 2 edits on TW-DRAIN-20: PF09-JUDGE and PF09-EVID |
+| ITEM-05 | VERIFIED | 25 edits on the record prompts: REC-END, REC-PUR, REC-PF10, REC-PLACE, REC-HEAD, REC-OUT, REC-FIELDS, REC-PATH, REC-ENDPT, REC-CHECK and REC-READ, with REC-MISSING, REC-VOL and REC-FILES on TW-RECORD-20 |
+| ITEM-06 | VERIFIED | REC-FIELDS-PF20 and REC-FIELDS-PF30, and on both record prompts `GTWPE-D1`'s requirement and its eight items by phrase, X1.3 (g)(9) |
+| ITEM-07 | VERIFIED | REC-INPUT on TW-RECORD-20 |
+| ITEM-08 | VERIFIED | TW-ALPHA-20261006.2 is selected on the *Glow Technical Writing Ecosystem* page, with its *Current operation* (X4.3); *Alpha 1*, *HDE TW* and the Operations Hub name it (X4.4 to X4.6) |
+
+### Parts
+
+**PART-01 landed whole.** The five new pages sit under *HDE TW* at 100626.2 with their 57 edits, each read back
+whole, and TW-ALPHA-20261006.2 selects them with TW-TRIAGE-10 at 100626.1. The current-release notes and the
+catalog's checked-through commit are written and read back. The five 100626.1 pages are unchanged and no longer
+selected.
+
+### Findings from this `EXECUTE`
+
+- **A compaction in X1.3.** The session's context was compacted between DRAIN-10's first readback fetch and the
+  record of its checks. GTWPE-MGMT-10 100526.2 and the new page were fetched live again before any check relied
+  on them (`D22`). The times of DRAIN-10's earlier steps were recovered by a script over the session's own
+  transcript that printed no body (*Harness files*). Recorded, not a stop.
+- **DRAIN-10's (a)** used X1.2 (4)'s fetch of *HDE TW*, made 73 seconds before W1 with no write between, rather
+  than a fetch of its own. Its check, no child page with the new title, held on that fetch, and (h) found
+  exactly one after W1. Recorded, not a stop.
+- **One count needed a third reading:** DRAIN-10's `filename` broad match (*X1.3*). The second reading did what
+  it is there for.
+- **DRAIN-20's `close`.** The plan's exceptions name product closure, so `closure` was read with `close` and
+  counted beside it (*X1.3*).
+- **A mention shown by title.** HDE-NEW sends the GTWPE parent page's mention without a title, and Notion shows
+  it with one. It is compared by its link, as *The control texts* say (K-5).
+
+Every check passed at its first attempt, and no write was repeated.
+
+### Harness files (`D22` condition 5), for `EXECUTE`
+
+- **This session's transcript** holds, from this mode:
+  - GTWPE-MGMT-10 100526.2, fetched inline at X1.0 (0) and again at 16:41:42Z, after the compaction;
+  - the five members' current pages, fetched inline at X1.2 (1) and again at each (h);
+  - the five new pages, each fetched inline at (c) and at (g); DRAIN-10's at (g) twice, the second after the
+    compaction;
+  - the control pages, which are page state, not bodies: *HDE TW*, at X1.0 (4), at each (h), and at X4.5's
+    pre-read and readback; the selection page and the GTWPE parent page, at X1.0 (5) and at X4.3's and X4.2's
+    pre-reads and readbacks.
+
+  Three scripts read the transcript, each for the check in hand and printing only what that check needs:
+  - `tx_calls.py`, for DRAIN-10's X1.3 times after the compaction: tool names, page IDs, commands and times,
+    and for each fetch only its title, its as-of time and its edit time;
+  - `sent_check.py` and `ctl_sent_check.py`: the `content_updates` of this session's own update calls, read
+    from their tool-call inputs, compared with the payloads printed from `edits.json` and from *The control
+    texts*, printing counts and `True` or `False`.
+
+  No script printed or stored a body. The transcript is left to teardown.
+- **Harness saves**, each read by a script for the check in hand only:
+  - the PE Metaprompt 091426.1, `mcp-Notion-notion-fetch-1791304652291.txt` (X1.0 (6)), by `save_meta.py`, for
+    its title and edit time;
+  - *Alpha 1*: `toolu_013xCKGGBi9mCQ3FXhRm1Uwd.json` (X1.0 (5)), `toolu_013DYXrWarvMF91K2AY7W7JT.json` (X4.4's
+    pre-read) and `toolu_01VnG7h6YzjMbeF8Lf2vFFRA.json` (its readback), by `ctl_check.py` only;
+  - the Hub: `mcp-Notion-notion-fetch-1791304715455.txt` (X1.0 (5)), `mcp-Notion-notion-fetch-1791305794395.txt`
+    (X4.6's pre-read) and `mcp-Notion-notion-fetch-1791305824407.txt` (its readback), by `ctl_check.py` only.
+
+  The harness refused this session's `rm` on its tool-results directory in an earlier mode, so these saves
+  are left to its teardown, not deleted, and not read again.
+- **No body in the repository or in scratch.** Each member's edits were printed by script from `edits.json`
+  at «H», and each control text from this record's *The control texts*, which hold no body beyond the anchors.
+
+### Canon and rulings relied on, for `EXECUTE`
+
+- Nathan's approval of the plan, quoted in `plan_approved_by`, and of the analysis, with his Q-1 waiver and his
+  ruling on the gate, quoted in `analyze_approved_by`.
+- GTWPE-MGMT-10 100526.2, fetched live at X1.0 (0) and again after the compaction: `MODE = EXECUTE`, *How each
+  kind of target changes*, *The watched sources*, *Reading prompt bodies*, *Boundaries*, *Failure contract* and
+  *Result routing*.
+- The PE Metaprompt 091426.1's version rule, for «V», and its recheck of source and control versions before a
+  selection change (X1.0 (6)).
+- On `main` at `b1bd769`, read again in this mode:
+  - HDE Governance (PF04) §9.1.6: the readback of each changed published body and its required links, and the
+    actual author, checker and acceptor below; its interacting-skill readiness for TW Flowmaster is waived by
+    Nathan (`override`);
+  - HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, rules 2 and 3: the Notion writes were made from this
+    session, and the surface confers no permission; their authority is the approved plan.
+- `D22`, `D26-B` and `D26-C` as GTWPE-MGMT-10 states them; `notion-write-boundary.md` and `GTWPE-D1`, as `PLAN`
+  read them.
+- `AGENTS.md`: the canon-first rule, and its evidence-attribution and exit-code rules for the checks recorded
+  here.
+
+### Author, checker and acceptor (HDE Governance §9.1.6)
+
+| Part | Author | Checker | Acceptor |
+|---|---|---|---|
+| PART-01 | This GTWPE-MGMT-10 session, through the PE Metaprompt's general rules | GTWPE-TW-DOCUMENT-RULES-PLAN-A, a fresh reviewer, and the checkers GTWPE-TW-DOCUMENT-RULES-PLAN-DC and GTWPE-TW-DOCUMENT-RULES-PLAN-DC2, on the edits and control texts before they were sent; this session's readback of every write after (X1.3 (g) and (h), X4.2 to X4.6), with `ctl_check.py` on *Alpha 1* and the Hub | Nathan, by his approvals of the analysis and the plan; PE39 checks the result for him |
+
+### Interaction cost, actual against predicted
+
+Predicted 7. Actual 11:
+- 3 rulings: Q-1; Nathan's ruling on the gate for a source other than PF10, given with his analysis approval;
+  and his opt-in to repairing DC-R1, which overrode `review_cap`;
+- the 2 fixed round trips;
+- 5 review rounds: `ANALYZE`'s dry run; `PLAN`'s dry run, full review and two diff checks;
+- no skill review or install;
+- 1 merge: amthorn78/glow-hdengine-v2#580, the record's, still to come.
+
+The difference has three causes. Nathan's gate ruling settled §A's risk 3, which §A had not put to him as a
+question. The full review's required finding R-1 brought the first diff check, under his direction. That
+check's DC-R1 brought his opt-in and the second diff check.
+
+The clock: this `EXECUTE` ran from 16:37:07Z to about 17:00Z on 2026-10-06, against an estimate of about 3 h,
+so under it. Tokens: not measured by this session.
+
+### Remaining Product Owner actions
+
+- Merge amthorn78/glow-hdengine-v2#580 when he chooses. The record is `COMPLETE`, so his rule allows it, and
+  nothing waits on that merge (`D21-C`).
+- The open findings stay accepted as risks (`DISP-001`). C4 to C6 wait for their own Modifications, and E-038
+  is PE39's.
+
+**Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with no trigger finding from X4.1. `NOTHING NEEDED`.
