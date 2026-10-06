@@ -332,3 +332,11 @@ PE39 accepted it against the record on `main` and both record checks over all si
 read live in Notion the selection page, *HDE TW*, the GTWPE catalog, *Alpha 1*, the Operations Hub and the three
 prompts that GTWPE-D1 binds. C3, the document rules, comes next when Nathan says so; it needs his one PF10
 sentence exempting the Last Update Gate first.
+
+### Update, 2026-10-06 (PE39): no PF10 sentence for the Last Update Gate
+
+Nathan ruled that the Last Update Gate needs no PF10 sentence: the gate records the source an update used, and
+it is not a citation of PF10. Canon agrees: 2.30 PF10-CITE-001's own drain-target list, built from a line-level
+search, names none of the PF headers whose gate carries a PF10 or BN version. C3 builds Nathan's gate rule
+(`BN` and the version of the PF file used, or `BN` and the source filename) with no canon change first, and it
+can start when he says so. This replaces the last sentence of the update above.
