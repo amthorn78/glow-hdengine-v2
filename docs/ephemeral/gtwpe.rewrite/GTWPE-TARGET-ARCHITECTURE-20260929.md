@@ -344,6 +344,7 @@ can start when he says so. This replaces the last sentence of the update above.
 ### Update, 2026-10-06 (PE39): the gate for a source other than PF10
 
 Nathan, 2026-10-06, verbatim: "the gate name for a non PF10 source should just be the filename of the source.
-that simple". So the Last Update Gate is `BN` and the PF10 version used when the source is PF10, and the
-source's filename alone, with no `BN`, for every other source, another PF file included. This narrows answer 6
-above, whose second form was `BN` and the source filename. C3 builds the rule in this form.
+that simple", and then: "I would never use a PF target as a source, that does not make sense." So a change's
+source is PF10 or a file that is not a PF document, never another PF. The Last Update Gate is `BN` and the PF10
+version used when the source is PF10, and the source's filename alone, with no `BN`, for any other source. This
+replaces answer 6 above, whose second form was `BN` and the source filename. C3 builds the rule in this form.
