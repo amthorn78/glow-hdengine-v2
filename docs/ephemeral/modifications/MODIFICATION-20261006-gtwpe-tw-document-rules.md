@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-tw-document-rules
-status: ANALYZING
+status: ANALYZED
 targets: [prompt, notion_control]
 gate_tier: 2
 closure:
@@ -20,7 +20,12 @@ interaction_cost_actual:
 estimate:
   plan: "about 4 h: §P for 31 passages and 10 identity lines in five members (anchors, new texts, phrase and absence checks), the selection page's three writes with a new Current operation, the three current-release notes and the catalog's checked-through commit; a dry run that reads the five bodies again, and one full review by a single reviewer. Time is the meter the session can read; tokens are not measured"
   execute: "about 3 h, not counting any wait for Nathan: five new versions (duplicate, title, edits), each read back whole by this session; the selection's three writes, the three notes and the catalog, each read back; the record. Time is the meter"
-reviews: []
+reviews:
+  - mode: ANALYZE
+    kind: DRY_RUN
+    date: 2026-10-06
+    required_open: 0
+    outcome: "By this session, read-only: both record checks exit 0 on a scratch copy at ANALYZED; the front matter and every table parse, and the request is verbatim; A0 reproduces at b1bd769; the new titles and release label are free; a second, independent reading of a second fetch of the six bodies corrected two counts (version in TW-DRAIN-10, 23 to 24, and in TW-DRAIN-20, 24 to 25, both a kept exception) and confirmed every passage; the record tools need no change. No required defect. No full review"
 items:
   - id: ITEM-01
     statement: "TW-APPLY-10 brings every document-control field of the revised PF forward from the actual change, and the fields agree with one another: the version, the dates, the Last Update Gate, the change or revision history the document's own rules require, and version-sensitive references; the drains draft that change-history entry as a content redline."
@@ -146,8 +151,9 @@ request amthorn78/glow-hdengine-v2#580.
   - Searched with `git grep` for `Last Update Gate`, `Invocation tag`, `Draft`, `status`, `history`,
     `change log`, `volume`, `rollover` and the PF09 status values.
   - Read in full: Technical Writing Best Practices §3, §7, §14 and §15.1; HDE Governance §9.1.1, §9.1.6,
-    §9.2 and §9.3; HDE Build Notes 2.29 PF10-CANON-001 and 2.30 PF10-CITE-001; HDE CRD Records §0 to §4.2
-    and §6 to §7; HDE Phased Epics' front matter and §0; HDE Build Checklist — Distillation §0.3 and §0.6.
+    §9.2 and §9.3; HDE Build Notes 2.29 PF10-CANON-001, 2.30 PF10-CITE-001 and 2.38 PF10-AINEUTRAL-001;
+    HDE CRD Records §0 to §3.3, §4.2, §6 and §7; HDE Phased Epics' front matter and §0; HDE Build Checklist
+    — Distillation §0.3 and §0.6.
 - **Notion, read-only.** The GTWPE parent page and catalog; the selection page, *Alpha 1*, *HDE TW* and the
   Operations Hub; the six TW members (*The members, read live*); the lineage sources (A0).
 
@@ -202,8 +208,8 @@ time equals the readback time C2 recorded at X1.3, so no member has changed sinc
   and on `main` the update of 2026-10-06 still says C3 needs the sentence first.
 - **Canon agrees.** HDE Build Notes 2.30 PF10-CITE-001's drain-target table names HDE Governance §0.2 and
   sections of the Build Checklist and the Mechanics Guide, but no document's front matter, though seventeen
-  PF headers carry a gate of `BN` or `PF10` and a version, and three more a filename naming a PF10 version. Technical Writing Best Practices §15.1 treats the
-  gate as a document-control value.
+  PF headers carry a gate of `BN` or `PF10` and a version, and three more a filename naming a PF10 version.
+  Technical Writing Best Practices §15.1 treats the gate as a document-control value.
 - **E-039.** This closes ledger row E-039, which #579 adds. The ledger is not this record's to edit, so
   closing the row is PE39's.
 
@@ -248,8 +254,8 @@ them. `PLAN` writes the exact texts.
   cannot establish is a blocker.
 - **The one exception** is what canon requires: a new PF30 volume's review copy carries Document status
   `Draft` and Volume status `Pending activation` (HDE CRD Records §6). Only TW-RECORD-20 writes one.
-- **The drains** account for any such marker in their target as a hygiene redline. Nathan's §4 is the
-  authorization TW-DRAIN-10's *General PF preparation* requires for hygiene.
+- **The drains** account for any such marker in their target as a hygiene redline. Nathan's architecture §4
+  is the authorization TW-DRAIN-10's *General PF preparation* requires for hygiene.
 - **TW-RECORD-10 and TW-RECORD-20** meet the same rule in their file (ITEM-05). TW-TRIAGE-10 writes no
   document.
 
@@ -370,8 +376,9 @@ No combined proof log is defined: no prompt writes both artifact types.
 
 **Method: broad match minus permitted exceptions, by reading.**
 - Each body came back inline and whole, with no truncation flag, and was read in context.
-- Each count below was made by reading that fetch. The A6 dry run checks each by a second reading of a
-  second fetch (the request's standing direction; ledger E-035). No command counted over a body.
+- Each count below was made by reading one fetch, then checked by a second, independent reading of a
+  second fetch at A6 (the request's standing direction; ledger E-035). The second reading corrected two
+  counts (*Dry run (A6)*, D5). No command counted over a body.
 - Matches are case-insensitive, at the start of a word: `version` not inside "conversion"; `date`, `gate`,
   `history` and `done` as words, so not "update", "validate", "gateway" or "historical".
 - The broad terms, by rule, over the members each rule reaches:
@@ -417,8 +424,8 @@ No combined proof log is defined: no prompt writes both artifact types.
 | Member | `version` | `date` | `history` | `header` | `gate` | `draft` | `status` | `placeholder` | `clos` | `open` | `done` |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | TW-TRIAGE-10 | 9 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | — | — | — |
-| TW-DRAIN-10 | 23 | 2 | 1 | 6 | 3 | 0 | 5 | 2 | — | — | — |
-| TW-DRAIN-20 | 24 | 3 | 1 | 6 | 3 | 0 | 19 | 2 | 7 | 3 | 3 |
+| TW-DRAIN-10 | 24 | 2 | 1 | 6 | 3 | 0 | 5 | 2 | — | — | — |
+| TW-DRAIN-20 | 25 | 3 | 1 | 6 | 3 | 0 | 19 | 2 | 7 | 3 | 3 |
 | TW-RECORD-10 | 12 | 2 | 5 | 0 | 3 | 1 | 5 | 0 | — | — | — |
 | TW-RECORD-20 | 13 | 1 | 3 | 0 | 4 | 1 | 9 | 0 | — | — | — |
 | TW-APPLY-10 | 24 | 11 | 0 | 9 | 6 | 0 | 3 | 0 | — | — | — |
@@ -435,8 +442,8 @@ ITEM-05 to ITEM-07, in the record prompts:
 | Member | Hits | In passages | Kept as exceptions | Passages in scope |
 |---|---|---|---|---|
 | TW-TRIAGE-10 | 11 | 0 | 11 | 0 |
-| TW-DRAIN-10 | 42 | 12 | 30 | 4 |
-| TW-DRAIN-20 | 71 | 21 | 50 | 5 |
+| TW-DRAIN-10 | 43 | 12 | 31 | 4 |
+| TW-DRAIN-20 | 72 | 21 | 51 | 5 |
 | TW-RECORD-10 | 75 | 31 | 44 | 7 |
 | TW-RECORD-20 | 89 | 36 | 53 | 8 |
 | TW-APPLY-10 | 53 | 20 | 33 | 7 |
@@ -549,9 +556,9 @@ still apply.
    sets it; the prior volume's revised file changes only its Volume status and *Next volume* fields. Each has
    its own proof log. Rollover is rare and always Nathan's decision.
 7. **Placement of the inserted section.** PF30 orders records by CRD ID (§3.2). PF20 keeps its records last,
-   under §2, numbered 2.2 to 2.25, and two of them, 2.23 and 2.24, carry the same HDE-EPIC038 record. The record prompts'
-   existing rule decides placement: the target's established convention "only where uniquely supported",
-   otherwise an exact input blocker; and "leave unrelated history intact".
+   under §2, numbered 2.2 to 2.25, and two of them, 2.23 and 2.24, carry the same HDE-EPIC038 record. The
+   record prompts' existing rule decides placement: the target's established convention "only where uniquely
+   supported", otherwise an exact input blocker; and "leave unrelated history intact".
 8. **PF20's size.** PF20 is 952,515 bytes, about 317,000 tokens at ledger E-013's 3.0 bytes a token. The
    record prompts already require reading the whole target; C3 does not change that. A session that cannot
    hold it stops, and C4's capacity stop (S1) is the general answer.
@@ -613,3 +620,60 @@ item's scope is measured.
   spans both sides of a handoff.
 
 The estimate is in the front matter. Time is the meter, and twice the estimate is where the session stops.
+
+### Dry run (A6)
+
+Every normal-path gate and readback of this mode, read-only, by this session. No full review ran.
+
+| # | Gate or readback | Result |
+|---|---|---|
+| D1 | Both record checks on a scratch copy at `ANALYZED`: `modification_validate.py` and `gtwpe_record_check.py` | Both exit 0 |
+| D2 | The front matter parses (PyYAML), its `request` equals PE39's message, and every table in the record has one column count in every row, by script | Parses; the request is verbatim; every table consistent |
+| D3 | A0 reproduced: `git fetch origin main`; `origin/main`; `git log 1dec848..origin/main` over *The watched sources* | Still `b1bd769`; no commit |
+| D4 | The new titles and the new release label are free | *HDE TW* (edited 2026-10-06T03:31:27.379Z) lists no member version after 100626.1, and the selection page (edited 03:30:15.790Z) names no release after TW-ALPHA-20261006.1 |
+| D5 | The scope counts, by a second, independent reading of a second fetch of each of the six bodies, each at the edit time in *The members, read live* | Two counts corrected: `version` in TW-DRAIN-10, 23 to 24, and in TW-DRAIN-20, 24 to 25, both "versionless role name" in the handoff, a kept exception. Every other count, and every passage, confirmed |
+| D6 | The record tools need no change for this Modification | By reading at `b1bd769`: `TARGETS` holds `prompt` and `notion_control`, and the record check needs only the subsections this record has |
+
+No required defect.
+
+### Harness files (`D22` condition 5)
+
+- **Inline fetches, held only in this session's transcript**, which the harness keeps and leaves to its
+  teardown:
+  - GTWPE-MGMT-10 100526.2, once, after the compaction;
+  - the six TW bodies at 100626.1, twice each: the scope's first reading and A6's second;
+  - GCFPE-MGMT-10's proposed body and `091426.1`, fetched at A0 for their edit times;
+  - the control pages: the GTWPE parent page, the selection page and *HDE TW*.
+- **Harness saves, each read by a script that printed only what the check needed:**
+  - the PE Metaprompt `091426.1` fetch, `mcp-Notion-notion-fetch-1791285895858.txt`: its title, edit time
+    and path;
+  - the register, `mcp-Notion-notion-fetch-1791285896481.txt`: its edit time and the two rows of *Current
+    selection* that name GCFPE-MGMT-10 and the PE Metaprompt;
+  - *Alpha 1*, `toolu_01Nr7BUZDpK3eaAjyoD9HJgW.json`, and the Operations Hub,
+    `mcp-Notion-notion-fetch-1791286201813.txt`, both control pages: each one's edit time, headings, term
+    counts and current TW release section.
+
+  Earlier in this session the harness refused `rm` on its tool-results directory ("Session Transcript
+  Tampering"), as `D22`'s refinement of 2026-09-23 foresees. So each save is left to its teardown and not read
+  again. No save was hashed or compared as a body's identity.
+- **The session transcript.** After the compaction, A1's verbatim copy of the request needed PE39's message,
+  which only the transcript held. A script read it once and printed only the user's typed message that held
+  "run C3", and its timestamp, never a tool result. The request was saved from it to `c3_request.txt` in the
+  scratchpad.
+- **Scratch files**, in this session's scratchpad: copies of canon from `main` (not prompt bodies); the
+  scripts `user_request.py`, `save_meta.py` and `ctl_section.py`; the request; drafts of this section; and a
+  scratch copy of this record for the dry run.
+
+### Canon and rulings relied on
+
+- **`AGENTS.md`:** the canon-first rule; canon is read-only; the CI-exempt paths; the pull request's headings.
+- **Technical Writing Best Practices** §3, §7, §14 and §15.1.
+- **HDE Governance** §9.1.1, §9.1.6, §9.2 and §9.3.
+- **HDE Build Notes** 2.29 PF10-CANON-001, 2.30 PF10-CITE-001 and 2.38 PF10-AINEUTRAL-001.
+- **HDE CRD Records** §0 to §3.3, §4.2, §6 and §7.
+- **HDE Phased Epics:** its front matter and §0.
+- **HDE Build Checklist — Distillation** §0.3 and §0.6.
+- **HDE CLI-API-Vendor Ref** §11.1 and **HDE Schemas and Artifacts** §9, by their headings.
+- **Rulings:** GTWPE-D1; `D21`, `D22` and `D26` (`gcfpe.decision-record.md`); Nathan's target architecture,
+  §§4, 5, 8 and 9, his answers 6 and 8, and his directions of 2026-09-29; his ruling of 2026-10-06 on the
+  gate; C1's approved §A (A.1, A.4 to A.8); and C2's override, for Q-1.
