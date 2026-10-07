@@ -381,3 +381,7 @@ text `RUN.md` (ledger E-042, accepted), and the plan took one extra review round
 the record on `main` and both record checks (8/8), the handoff table at its approved fingerprint, the page read
 live, and the catalog read live. Nathan's first live trial with a hand-written execution prompt is now possible;
 C5, the Change Manager, and C6, adoption, remain.
+
+On Nathan's authorization, PE39 then brought five Notion pages up to date with C4 on 2026-10-07: the current TW
+notes on *HDE TW*, the selection page, *Alpha 1* and the Operations Hub, and the Notion copy of this architecture
+(status line, Last Update Gate rule, stop signals). Each was read back (ledger E-041, fixed).
