@@ -123,8 +123,8 @@ request: |
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-06: \"Nathan approves the analysis of MODIFICATION-20261006-gtwpe-flow-manager at 772ccfb (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all eight GTWPE records (8/8), the request in the front matter equals PE39's message, main is still ad1615d, and the branch changes only the record. Nathan approves the three choices the analysis records: no document is copied ahead of its pass; GTWPE-FLOW-10's body is drafted and reviewed in the session that runs PLAN and is never stored in the repository, PLAN and EXECUTE run in that same session, and Nathan and PE39 read the published page live before the first trial; and the new page is created by duplicating a child page of the GTWPE parent page, retitling it and replacing its content (F-2). Risk 15 is PE39's citation error, logged as ledger E-040: the finding is C2's K-8, not C3's. Continue to PLAN: one dry run and one full review by a single reviewer, who reads the draft body, and a second reviewer or a diff check only if that review finds a required defect. Stop at Nathan's plan approval, and report in at most five plain sentences ending with exactly what he must approve.\""
 analyze_approved_date: 2026-10-06
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-06: \"Nathan approves the plan of MODIFICATION-20261006-gtwpe-flow-manager at 7d25f1e (2026-10-06). PE39 checked it: main's modification_validate.py and gtwpe_record_check.py each pass all eight GTWPE records (8/8); the handoff table in the evidence directory is at «HT» 61aee2ae…4c2bef; between 8166328 and 7d25f1e the draft changed only by the three DC-R1 repairs recorded in draft-repairs.json (B1 step 7, B3's ending and the RUN.md line), each as the opt-in directed; main is still 601b330, and the branch changes only docs/ephemeral/modifications/. The approval accepts every finding listed under *Open findings, accepted as risks* (DISP-001), DC2-L1 to DC2-L6 among them. It authorizes W1 to W4 from this session's EXECUTE and nothing else in Notion, and keeps every risk and override the plan records. Nathan will merge amthorn78/glow-hdengine-v2#583 at X2 when asked, and allows `git fetch origin main` in this session. Proceed to EXECUTE, and report in at most five plain sentences.\""
+plan_approved_date: 2026-10-06
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -1546,6 +1546,26 @@ repair added, which is `D26-A`'s signal to return to Nathan; his direction retur
     as Nathan's "bring the plan's own descriptions into line" asks.
 - **DC2-L4.** While the override block stands, the validator checks no review cap in any mode. This plan runs no
   further round, and any later round would still show in `reviews`.
+
+### Plan approval (PL4)
+
+Nathan approved the plan at `7d25f1e`; his words are in `plan_approved_by`. They date the approval 2026-10-06,
+the date the record uses; his message reached this session at 2026-10-07T00:00:55Z. PE39 checked the plan first:
+- `main`'s `modification_validate.py` and `gtwpe_record_check.py` each pass all eight GTWPE records;
+- the handoff table in the evidence directory is at «HT», `61aee2ae…4c2bef`;
+- between `8166328` and `7d25f1e` the draft changed only by the three DC-R1 repairs that `draft-repairs.json`
+  records under `round_2`, each as the opt-in directed;
+- `main` is still `601b330`, and the branch changes only `docs/ephemeral/modifications/`.
+
+What the approval does:
+- **It authorizes** W1 to W4 from this session's `EXECUTE`, and nothing else in Notion.
+- **It accepts as risks** every finding listed under *Open findings, accepted as risks* (`DISP-001`), DC2-L1 to
+  DC2-L6 among them, and keeps every risk and override the plan records.
+- **It allows** `git fetch origin main` in this session, and says that Nathan will merge
+  amthorn78/glow-hdengine-v2#583 at X2 when asked (PO-2).
+
+The approval holds at the commit that records it only if that commit's diff from `7d25f1e` is this section and
+the approval fields, and both record checks pass.
 
 ### Harness files (`D22` condition 5), for `PLAN`
 
