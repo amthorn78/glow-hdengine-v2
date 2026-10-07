@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261007-gtwpe-tw-flow-rulings
-status: PLANNED
+status: EXECUTING
 targets: [prompt, rule, notion_control]
 gate_tier: 2
 closure:
@@ -105,8 +105,8 @@ request: |-
 requested_by: Nathan
 analyze_approved_by: "Nathan, 2026-10-07: \"Nathan approves the analysis of MODIFICATION-20261007-gtwpe-tw-flow-rulings at b4219de (2026-10-07). ITEM-07 stays. S-1 to S-8 are accepted, including S-7 for PF10 changes to PF20 and PF30, which sets aside the architecture's §9 sentence \"The agent must not update PF20 or PF30 from PF10 alone\" for those changes (DC-L2). DC-L1: a drain's `no redlines` return stays exactly as it is, and the equivalence location stays inside the drain. Q-1: (a), waive HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for the new TW-ALPHA release.\""
 analyze_approved_date: 2026-10-07
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan, 2026-10-07: \"Nathan approves the plan of MODIFICATION-20261007-gtwpe-tw-flow-rulings at 90b40c4 (2026-10-07), accepting the open findings K-1 to K-25 and K-28 and the listed findings in §P. It authorizes the Notion writes W1 to W29 and no others. Go on to EXECUTE.\""
+plan_approved_date: 2026-10-07
 supersedes: ""
 spawned_from: ""
 shares_package_with: []
@@ -2169,3 +2169,28 @@ repair, HDE Governance §9.1.1's *Historical drainage* and HDE CRD Records §3.2
 | The PE Metaprompt 091426.1, its general rules | The authoring control (*Nathan's directions*), read again for the repair round |
 | MODIFICATION-20260930-gtwpe-tw-model-advice, its permitted exceptions | TW-TRIAGE-10's bans on model advice, kept as "prohibitions that stop a prompt producing or acting on model advice" (*Repair round (PL3)*) |
 | GTWPE-MGMT-10 100526.2, *Reviews are bounded* and *The record* | The review, its repair and the one check of the repair's diff; a dated record corrected by a successor, not in place |
+
+## §E — Execution
+
+*Written by MODE = EXECUTE. Requires plan_approved_by.*
+
+This session runs `EXECUTE` as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 — Manage the GTWPE — 100526.2*,
+fetched live at the start of the mode, X1.0 (0). The input is §P as Nathan approved it at `90b40c4` on 2026-10-07;
+his words are in `plan_approved_by`. The mode started at 2026-10-07T16:45:24Z, at X1.1, which starts the clock. The
+session's harness named another branch, `claude/brave-brown-ai4ysd`; nothing is pushed there, since this
+Modification's record and its pull request, amthorn78/glow-hdengine-v2#590, are on
+`docs/20261007-modification-gtwpe-tw-flow-rulings`, the branch the approved plan names (X2).
+
+The meter is the clock. The recorded estimate for `EXECUTE` is about 5 h, not counting the waits for Nathan's
+merges, so the run stops at 10 h from X1.1.
+
+### Values, fixed at X1.1 (2026-10-07T16:45:24Z)
+
+| Value | Fixed as |
+|---|---|
+| «D» | 2026-10-07 |
+| «PA» | 2026-10-07, `plan_approved_date` |
+| «V», «VF» | Fixed at X1.2 |
+| «ID:…» | Fixed at X1.3 |
+| «M», «m» | Fixed at X3 |
+| «S», «R» | Fixed at X4.1 and X4.3 |
