@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261007-gtwpe-tw-flow-rulings
-status: PLANNING
+status: PLANNED
 targets: [prompt, rule, notion_control]
 gate_tier: 2
 closure:
@@ -47,6 +47,11 @@ reviews:
     date: 2026-10-07
     required_open: 8
     outcome: "Two fresh reviewers, GTWPE-TW-FLOW-RULINGS-PLAN-A and -B, each handed only its committed brief's path, on 1f73053: A 4 required and 25 listed, B 3 required and 28 listed. The session confirmed the five distinct required findings and three listed ones as required (A's L1, A's L10, B's L6), and refuted A's L8 and L9: 8 distinct required defects, RQ-1 to RQ-8 (the hold-back limited to PF10 changes; no account of a change's part that cannot drain; TW-APPLY-10 without the files-only refusal; the handoff table's 'carried unchanged'; a held-back change counted represented; GTWPE-D2 to GTWPE-D4 crediting the analysis's approval with the plan's readings; B5's reviewer briefed in the session's words; naming the prompt, and files given alone, at intake), each repaired in §P (Repair round (PL3)). The listed findings stay listed, each with its reason"
+  - mode: PLAN
+    kind: DIFF_CHECK
+    date: 2026-10-07
+    required_open: 2
+    outcome: "One fresh checker, GTWPE-TW-FLOW-RULINGS-PLAN-DC, handed only its committed brief's path, on the repair diff 1f73053..9fefe96: RQ-1 to RQ-8 each fixed, RQ-1 and RQ-2 each with a new defect in the repair's own text. 2 required, both confirmed by the session: DC-R1, S4's cell still stops a triage file that names PF20 or PF30 in a reason; DC-R2, the record prompts' role, output and gate lines still name only PF10 changes. 12 listed, one refuted. Required defects went from 8 to 2, both in the last repair's text (D26-A rule 5's second signal), and the cap is reached (rule 2), so §P goes to Nathan with DC-R1 and DC-R2 open, as K-26 and K-27, each with its one-clause correction"
 items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
@@ -1585,6 +1590,8 @@ in *Listed findings, accepted as risks (PL3)*, each with its reason, and are acc
 | K-23 | §A's DC-L3, DC-L5, DC-L6, DC-L7 and DC-L8, and A's L11 (the catalog's *Approved design* entry) | As §A states | As §A states | Approved with the analysis; A's L11 stays Nathan's opt-in |
 | K-24 | Before the first compaction, this mode followed GTWPE-MGMT-10 and drafted three members' edits without a live fetch in its own context; and it read the PE Metaprompt's general rules, its authoring control, only then, though DR-1 to DR-5 were written after (*Harness files*, the lapse; A's L23, B's L20) | Certain | None found: the approval recorded at `PLANNING` follows the procedure as fetched at 12:39Z; every anchor of the three members was checked against its live page; and the general rules, read again from a fetch at 14:29Z, found no text of this plan that breaks them (*Repair round (PL3)*) | Disclosed. The plan relies only on the checks made after the fetches, and `EXECUTE`'s X1.0 fetches every page again before any write |
 | K-25 | A proof log that names a held-back change, as S-HOLD and the record prompts ask, could be read by check 6 as taking that change as a basis | Low | A loud S4 stop for that document | The proof log names it as held back, which is not a basis; a loud stop |
+| K-26 | DC-R1: S4's *When* cell (G-FLOW-10-E47) still stops a triage file that "names an ineligible document", while B1 step 5 stops only one that names it "to route", and the triage file names PF20 or the PF30 family in a reason when no specification is given (*Diff check (PL3)*) | Medium: every run without a specification while HDE Build Notes 2.14 waits for PF30, wherever the Flow Manager applies S4's cell as written | `RUN_STOPPED` (S4) where the run should go on; loud, but no decision file clears it | Found by the mode's one check of the repair's diff, after which `D26-A` rules 2 and 5 return the plan to Nathan unrepaired. The correction is one clause, "to route", stated in *Diff check (PL3)*; ordering it is his (PO-6) |
+| K-27 | DC-R2: TW-RECORD-10's and TW-RECORD-20's role line, output contract and Last Update Gate (E09, E14, E15) still name only the record and PF10 changes, while their E10 makes "each other change, from PF10 or another source" (*Diff check (PL3)*) | Low as a path; certain as text | A record pass may leave out a change from another source, and `RUN.md` would show the document drained or the change represented: silent | As K-26: the three corrections are stated in *Diff check (PL3)*; ordering them is his (PO-6) |
 
 ### Product Owner actions
 
@@ -1595,6 +1602,7 @@ in *Listed findings, accepted as risks (PL3)*, each with its reason, and are acc
 | PO-3 | Merge the record's pull request after X5, when he chooses | Nothing waits on that merge (`D21-C`) |
 | PO-4 | Only after a failure: archive the unselected new pages, or a copy a failed W1 left; merge the pull request carrying the failure record | The read-only sweep, after he acts |
 | PO-5 | After X4, authorize or have PE40 make the changes outside the route that the change leaves stale: N-1, the Operations Hub callout's last sentence; N-2, the architecture page's status line and "resume with `RESUME <run-id>`", and the repository architecture record's status; N-3, the ledger rows §A names, with E-033 and E-042 (DC-L5) | His; nothing in this Modification waits on it |
+| PO-6 | Before approving, decide DC-R1 and DC-R2 (K-26, K-27): order their corrections, as *Diff check (PL3)* states them, as a repair of this plan, with his `review_cap` override if he wants that repair checked; or accept them with the plan | His words in the record. A repair is entered in `reviews` and returns the plan to him; accepting them is his approval of the plan as it stands |
 
 ### Explicitly not in scope
 
@@ -1894,10 +1902,87 @@ place:
 | B5's reviewer, a subagent | Its brief as a committed file, by path only | B5 step 1 writes, commits and pushes `review/<NN>-brief.md` before the reviewer starts; *Authority and limits* and the `review/` cell name it |
 | Nathan, starting a run (F1) | "Files given alone mean `RUN`", and naming the prompt is not an input | E06, E07 and E45; S2 stops anything else |
 
+### Diff check (PL3)
+
+- **The checker.** One fresh general-purpose subagent, GTWPE-TW-FLOW-RULINGS-PLAN-DC, neither forked nor
+  context-inheriting, handed nothing but its brief's repository path: `PLAN-DIFFCHECK-BRIEF.md`, 12,631 bytes,
+  committed and pushed at `c72afb6` at 15:05:54Z, before it was spawned, at 15:06Z. It confirmed the brief's
+  sha256, `28b97bbd8e41b5442fb1b15104b15f3549301bd2f70775ec0d5538eeec8f1a96`, and that `c72afb6` adds only the
+  brief to `9fefe96`. This is the one check of the repair's diff that `D26-A` rule 2 allows.
+- **The run.** It read the record at `9fefe96` and the repair diff over `1f73053..9fefe96`, ran `edits_check.py`
+  and its eleven faults, read no Notion page or prompt body, and wrote nothing. By the harness's completion notice
+  it ran for about 44 minutes, with 128 tool calls and 559,942 subagent tokens. The side effects it reported were
+  not its acts: the harness saved one oversized output of its, about 30 KB of the record's repair diff, which holds
+  no prompt body and which it did not open; and the repository's PostToolUse hook updated
+  `.git/canon_relied_on_hook.json`.
+- **The capture.** `capture.py` read its own transcript, found by the path the harness gave for its agent ID
+  (`a1c1631065d0f0c17`), first printing only the call's shape (one `SubagentHandback` call, at transcript line 694,
+  24,542 characters), then writing its message unedited with one final LF, at 15:52Z:
+  `PLAN-DIFFCHECK.md`, 24,620 bytes, sha256 `a6b87b25e2cd54cd73affe5cf87912dfd583a26eafe20609221264431391a770`;
+  first line `2`. It carries the `## Canon relied on` block the brief required, and closes `DECISION NEEDED`.
+
+**Result: 2 required, DC-R1 and DC-R2; 12 listed.** Its listed findings are DC-L1 to DC-L12 in its return; below
+they are PDC-L1 to PDC-L12, to keep them apart from §A's DC-L1 to DC-L8, which Nathan ruled on. It found RQ-1 to
+RQ-8 each fixed where *Repair round (PL3)* says, RQ-1 and RQ-2 each with a new defect in the repair's own text.
+The session tested both required findings against the committed text, by script over `edits.json` at `9fefe96`,
+and confirmed them:
+
+- **DC-R1** (R1, the normal path; the stop is loud). RQ-2's repair narrowed B1 step 5's stop to a triage file that
+  "names an ineligible document to route" (G-FLOW-10-E40), and F11's check to "every document it names to route
+  eligible", because the triage file now names PF20 or the PF30 family in a reason when no specification is given
+  (TRIAGE-10-E11, E14). S4's *When* cell, which the same round rewrote for RQ-1 (G-FLOW-10-E47), still stops a
+  triage file that "names an ineligible document". "Ineligible" stands in those two new texts only, one with "to
+  route" and one without. HDE Build Notes 2.14 binds PF30 ("PF27 and PF30 adopt the same terms on their next
+  revision"), so in every run without a specification the triage file names PF30 in 2.14's reason, and a Flow
+  Manager that applies S4's cell as written stops the run where it should go on. **Smallest correction:** in
+  G-FLOW-10-E47's new text, "or names an ineligible document;" becomes "or names an ineligible document to route;".
+- **DC-R2** (R2, a silent inconsistency in two prompt bodies; also R4). RQ-1's repair widened what a record pass
+  makes to "each other change, from PF10 or another source, that bears on" its document (RECORD-10-E10,
+  RECORD-20-E10), as G-FLOW-10-E14, E15 and E18, GTWPE-D4 and *SECTION* now say. The same prompts' role line,
+  output contract and Last Update Gate still name only the record and PF10 changes: E09, "an Epic's record and the
+  PF10 changes that bear on PF20" (TW-RECORD-20: "a CRD's record and the PF10 changes that bear on the volume");
+  E14, "and each applicable PF10 change at the passage it bears on"; and E15, "when the update carries or
+  reconciles an applicable PF10 change", with no form for another source. Each of E09, E14 and E15 says "PF10
+  change", and none says "from PF10 or another source". A record pass given a change from a source other than PF10
+  may then leave it out, and `RUN.md` would show the document drained, or on `no changes` the change represented.
+  **Smallest correction,** in both record prompts: E09's "the PF10 changes that bear on PF20" (TW-RECORD-20: "on
+  the volume") becomes "each other change, from PF10 or another source, that bears on PF20" (or "on the volume");
+  E14's "and each applicable PF10 change at the passage it bears on" becomes "and each other change the sources
+  require, from PF10 or another source, at the passage it bears on"; and E15 names another source by its filename
+  alone, as *SECTION*'s last-update rule does.
+
+**Refuted: PDC-L11.** The first save's third range was printed as `lines[291:353]`, counted from 0 and ending
+before 353: lines 291 to 352 counted from 0, which are 292 to 353 counted from 1, as *Harness files* now gives
+them. The save's text has 353 lines.
+
+**Corrections, recorded here and not made in place:**
+
+- *Full review (PL3)* says the harness's completion notices gave no token count. They did: 647,816 subagent
+  tokens for A and 629,535 for B. The session's first search looked for another tag.
+- PDC-L12: RQ-5 sits partly in DR-1's text too, since DR-1 changed G-FLOW-10-E36. Four of the eight then sit
+  partly in DR-1's text, still not most, so *The stop rules*' conclusion holds.
+
+**The trend and the stop** (`D26-A` rules 2 and 5, as GTWPE-MGMT-10 states them). Distinct confirmed required
+defects went from 8 to 2, which halves. Both sit in text the last repair added, as do ten of the twelve listed
+findings in whole or in part: rule 5's second signal. And this was the mode's one check of the repair's diff,
+after which rule 2 sends the output to Nathan. So DC-R1 and DC-R2 are not repaired here: a repair now would be
+text no check has read. They stay open, as K-26 and K-27, each with its correction above; repairing them is
+Nathan's to order (PO-6), and a check of that repair needs his `review_cap` override.
+
+**Checks at PL4,** on the record at `PLANNED` with this round in `reviews`: both record checks exit 0, and
+all 18 tables in §P are even. Of 242 quoted spans in §P, 162 are
+found by script in the repository or this record's evidence; 1 is Nathan's approval with an elision; 33 are kept
+clauses of a prompt body or the PE Metaprompt, each found by reading in this round's fetches; 1 quotes the dry run;
+3 are wordings no text holds yet, the two corrections this section proposes and the phrase PDC-L7 finds missing;
+and 42 are not quotations: 21 spans between two
+quotations, 12 mention links and 9 diagram labels.
+
 ### Listed findings, accepted as risks (PL3)
 
-Not repaired, by `D26-A` rule 3; each goes to Nathan with its reason, and repairing one is his opt-in. Where both
-reviewers found the same thing, it is listed once. Approving this plan accepts each (`DISP-001`).
+Not repaired, by `D26-A` rule 4; each goes to Nathan with its reason, and repairing one is his opt-in. Where both
+reviewers found the same thing, it is listed once; the check of the repair's diff adds PDC-L1 to PDC-L12, PDC-L11
+refuted. Its two required findings, DC-R1 and DC-R2, are K-26 and K-27. Approving this plan accepts each
+(`DISP-001`).
 
 | Finding | Reason it stays listed |
 |---|---|
@@ -1927,6 +2012,17 @@ reviewers found the same thing, it is listed once. Approving this plan accepts e
 | B's L18: S1 is not sized for the triage pass, which reads PF10, 489,946 bytes, every source and the target owners' content | Loud S1 stop; S1 sizes any pass by what it must read. Medium in a small context |
 | B's L19: a failure after X1.4's commit and before X3, or W25 landing and W26 failing, leaves mismatched selections | `D26-B`'s return names each applied step, and the steps carry the rollbacks: X1.4's restore commit, the catalog's reverse replacements. Low |
 | B's L22: §P carries on past P-1 to P-5, where GTWPE-MGMT-10's *The record* says to return | K-18; each goes to Nathan with this plan |
+| PDC-L1: GTWPE-D3's provenance does not name *What the plan settles*' endings, from which its last bullet's stop comes | Provenance only: the sentence names the plan's approval, which covers it. Low |
+| PDC-L2: B's L11's reason above says the proof log names each change held back, but the exact no-change exit writes no proof log (K-11), so in a direct invocation a held-back change, now any change of an epic or a CRD not shown closed, can be named nowhere | Fixing it touches the drains' exact no-change exit, which DC-L1 keeps as it is; Nathan's to rule. Low to medium for a direct drain given PF10 alone |
+| PDC-L3: a CRD's own record, made while its other changes are held back, names them as affected canon and drainage targets (HDE CRD Records §4.1), which check 6 could read as taking a held-back change as a basis | Loud: a stop for PF30 (S4), in K-25's family. Low to medium, for an in-flight CRD |
+| PDC-L4: nothing says whether a material update to a CRD's record, carried by a PF10 change of that unclosed CRD, is part of the CRD's own record, which RECORD-20-E10 never holds back | The update waits, listed in `RUN.md`. Low |
+| PDC-L5: GTWPE-D3 and GTWPE-D4 rest the CRD-record exception on HDE CRD Records §3.2, the side of E-010 that HDE Governance §9.1.1 contradicts | Nothing is decided: the record prompts make a CRD's record as before, and GTWPE-D4 leaves E-010 to Nathan. Low |
+| PDC-L6: a resume given as `RUN.md` and a decision file without `RESUME` starts a new run, since files given alone mean `RUN` | Visible: a new pull request, while the stopped run stays stopped; the resume line carries `RESUME`. Low |
+| PDC-L7: TRIAGE-10-E03 and B1 step 6 route "each document the file names", without "among a change's documents", now that a reason can name PF20 or PF30 | E16's "not routed" and E40's "to route" keep them apart; at worst a loud stop at the record pass. Low |
+| PDC-L8: *SECTION*'s second paragraph says a `no redlines` or `no changes` is the answer that "a change" is represented, without RQ-5's "not held back" | Its next sentence says a held-back change waits, and the prompts carry RQ-5. Low; a control page's wording |
+| PDC-L9: with 2.14's PF30 part counted, every run without a specification that drafts nothing ends `RUN_STOPPED`, and its resume cannot clear the stop; K-8 names only a change whose home is PF10 | S-4's rule, as GTWPE-D3 states it: loud every time, naming the change. Certain with today's PF10 |
+| PDC-L10: *Excerpts*' list of where §P quotes a body leaves out *The new pages' checks* | A record's wording; *Checks after the repair* counts the 33 kept clauses wherever they sit. None |
+| PDC-L12: *The stop rules* place RQ-5 in text older than the dry run's repair, though DR-1 changed E36 | Corrected in *Diff check (PL3)*; the conclusion holds. None |
 
 ### Harness files (`D22` condition 5), for `PLAN`
 
@@ -1976,15 +2072,17 @@ reviewers found the same thing, it is listed once. Approving this plan accepts e
   alone, printing only its time and length, and saved it to `analyze_approval.txt` in the scratchpad, from which
   `analyze_approved_by` was built. Three more scripts read it to make this list exact, printing only the time and
   page name of each Notion fetch of the day, and the time, tool and description of each call before the
-  compaction; none printed a tool result. After the second compaction, three more did so for this list and for
-  *Full review (PL3)*: one printed only this session's own commands that named the first two saves, which showed
-  how their lines had been counted; one only the time, tool and label of each call since 13:20Z; and one only the
-  PLAN reviewers' agent IDs, durations and tool-call counts from the harness's completion notices. None printed a
-  tool result's text. These are reads outside the checks `D22` names, made for its condition 5, and disclosed here.
-- **The reviewers' transcripts**, `subagents/agent-a176a826705fc17cd.jsonl` (A) and
-  `subagents/agent-ac43851bfb186d0cc.jsonl` (B) in this session's harness directory, each opened only by
-  `capture.py`, for its own return, at 14:23Z and 14:25Z, and again at 14:48Z for the handback call's shape and the
-  first and last timestamps. Neither holds a prompt body: neither reviewer fetched one.
+  compaction; none printed a tool result. After the second compaction, four more did so for this list, for *Full
+  review (PL3)* and for *Diff check (PL3)*: one printed only this session's own commands that named the first two
+  saves, which showed how their lines had been counted; one only the time, tool and label of each call since
+  13:20Z; one only the PLAN reviewers' agent IDs, durations and tool-call counts from the harness's completion
+  notices; and one only those notices' token counts, which the first search had missed. None printed a tool
+  result's text. These are reads outside the checks `D22` names, made for its condition 5, and disclosed here.
+- **The reviewers' and the checker's transcripts**, `subagents/agent-a176a826705fc17cd.jsonl` (A),
+  `subagents/agent-ac43851bfb186d0cc.jsonl` (B) and `subagents/agent-a1c1631065d0f0c17.jsonl` (the check of the
+  repair's diff), in this session's harness directory, each opened only by `capture.py`, for its own return: A's
+  and B's at 14:23Z and 14:25Z, and again at 14:48Z for the handback call's shape and the first and last
+  timestamps; the checker's at 15:52Z. None holds a prompt body: none of them fetched one.
 - **Scratch files**, in this session's scratchpad, none holding a prompt body: `build_p.py`, which builds this
   record; `edits_build.py`, `edits_shared.py`, `edits_tw.py` and `edits_gtwpe.py`, which build `edits.json`, and
   their backups; the drafts of this section and of the two repository files and the control texts; `plan_design.md`,
@@ -1996,10 +2094,11 @@ reviewers found the same thing, it is listed once. Approving this plan accepts e
 
 ### Cost of this mode
 
-On the meter, from 12:17:03Z: about 2.8 h to the repair's commit, against the estimate of about 10 h. Tokens are not measured: the
-session's meter shows none it can read without opening a file that holds a body.
+On the meter, from 12:17:03Z: about 3.7 h to PL4, against the estimate of about 10 h. The session's own tokens are not
+measured: its meter shows none it can read without opening a file that holds a body. The harness's completion
+notices give its subagents' tokens: 647,816 for reviewer A, 629,535 for reviewer B and 559,942 for the checker.
 
-- **Review rounds so far:** the dry run and the full review; the check of the repair's diff follows.
+- **Review rounds so far:** three, as §A predicted: the dry run, the full review by two reviewers, and the one check of the repair's diff. A repair of DC-R1 and DC-R2 that Nathan orders would add a round, and a check of it another (PO-6).
 - **The prediction** stands at 11 (§A, *Readiness and interaction cost*); `EXECUTE` adds its merge at X2 and the
   record's merge after X5, both counted there.
 
