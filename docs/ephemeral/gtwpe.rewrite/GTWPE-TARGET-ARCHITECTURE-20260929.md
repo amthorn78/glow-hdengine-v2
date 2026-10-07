@@ -363,3 +363,21 @@ one full review and two diff checks, the second at Nathan's opt-in (DC-R1, a PF3
 PE39 accepted it against the record and both record checks over all seven GTWPE records (7/7 each), the plan's
 edit file at its approved fingerprint, TW-APPLY-10 and TW-RECORD-20 read live, and the selection page, *HDE TW*,
 the GTWPE catalog, *Alpha 1* and the Operations Hub read live. C4, the Flow Manager, is next when Nathan says so.
+
+### Update, 2026-10-07 (PE39): C4 complete
+
+C4 is `COMPLETE` (MODIFICATION-20261006-gtwpe-flow-manager, on `main` at `0cc934c`, amthorn78/glow-hdengine-v2#586).
+The Flow Manager is published: *GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1*
+(`3f24590a05eb81798286d600250655d6`), a child of the GTWPE parent page, and the GTWPE catalog lists it. Nathan
+starts it in a new session with an execution prompt (`RUN` or `RESUME <run-id>`, the change, its sources and the
+governing specification). It runs the selected TW prompts as passes, one writing pass at a time, on the run's own
+branch and pull request under `docs/ephemeral/gtwpe.runs/<run-id>/`; it checks document control, consistency and
+completion across the drafts; it stops cleanly on six signals and resumes by `RESUME <run-id>`; and it never
+merges or writes canon or Notion. Each working copy is made by the pass that changes it, from canon. The GTWPE
+handoff table is `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, which replaces design v1.2 §6.
+
+Two things differ from the plan, each on Nathan's ruling: the published page carries two Notion links on the plain
+text `RUN.md` (ledger E-042, accepted), and the plan took one extra review round (DC-R1). PE39 accepted C4 against
+the record on `main` and both record checks (8/8), the handoff table at its approved fingerprint, the page read
+live, and the catalog read live. Nathan's first live trial with a hand-written execution prompt is now possible;
+C5, the Change Manager, and C6, adoption, remain.
