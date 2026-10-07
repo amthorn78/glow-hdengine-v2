@@ -14,7 +14,7 @@ readiness: READY
 override:
   by: Nathan
   overrides: [review_cap]
-  reason: "Nathan, 2026-10-06, opting in to repair DC-R1 of the plan at 8166328: one more round, one check of that repair's diff by a fresh checker who reads the draft, past D26-A's cap of one diff check per mode. His words are in §P, Repair round 2 (PL3)"
+  reason: "Nathan, 2026-10-06, opting in to repair DC-R1 of the plan at 8166328: one more round, one check of that repair's diff by a fresh checker who reads the draft, past D26-A's cap of one diff check per mode. His words are in §P, Repair round 2 (PL3). Then Nathan, 2026-10-07, accepting the published page GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1 (3f24590a05eb81798286d600250655d6) as it stands, with Notion's two links on the plain-text RUN.md, overriding X1.3 (h) check (6) of the approved plan, so that EXECUTE resumes at X1.3 (i). That check is a step of the plan, not a policy gate the validator names, so it is recorded here and not in overrides. His words are in §E, Resumed at X1.3 (i)"
 interaction_cost_predicted: 7
 interaction_cost_actual:
 estimate:
@@ -51,39 +51,39 @@ items:
   - id: ITEM-01
     statement: "The Flow Manager, a new prompt GTWPE-FLOW-10 — Run the Technical Writing Flow, that Nathan starts in a new standalone session with an execution prompt and its inputs, and that runs the whole writing flow, itself or through the subagents it judges useful: execution-time triage of the complete supplied context; the run's branch, its one pull request and working copies from docs/pfcanon/ on main; each affected document's passes through the selected TW prompts with Nathan's redlining discipline; the document-control check across the drafts; the cross-document consistency check, whose fixes are new redline-and-apply cycles; the completion standard; and a review-ready pull request. It never merges and never writes docs/pfcanon/."
     source: "Request item 1; MODIFICATION-20261005-gtwpe-writing-side §A A.2, A.4 (R1, R3, R4, R9, R12 to R15) and A.5's C4 row; target architecture §§1 to 3, 10 and 11, and Nathan's answers 2 and 3"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-02
     statement: "The run's layout: docs/ephemeral/gtwpe.runs/<run-id>/ with its drafts folder and RUN.md, on the run's own branch, settled against the proof log each TW prompt writes beside its artifact."
     source: "Request item 2; MODIFICATION-20261005-gtwpe-writing-side §A A.4; MODIFICATION-20261005-gtwpe-tw-repository-io §A risk 5 and §P K-8"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "Stop and resume: the clean boundaries, the stop signals S1 to S6, RUN.md, and resume by RESUME <run-id>, with S1 sizing each pass, PF20 included, and with a run resumed on a later day never tripping TW-APPLY-10's check of a change-history entry its drain dated earlier."
     source: "Request item 3; MODIFICATION-20261005-gtwpe-writing-side §A R18 and *The stop, designed*; MODIFICATION-20261006-gtwpe-tw-document-rules §P K-4 and K-10; Nathan's direction of 2026-09-29 on stopping"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-04
     statement: "The Flow Manager's input: the execution prompt's contract, which Nathan writes by hand until C5's Change Manager produces it, and which no execution prompt can use to override GTWPE-D1, the stop rule or canon's read-only status."
     source: "Request item 4; MODIFICATION-20261005-gtwpe-writing-side §A A.5's C5 row, A.8 and R12; Nathan's answers 2 and 5"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-05
     statement: "Eligibility and routing: the canon PF documents and PF03, with PF09, PF20 and PF30 routed to their own prompts; PF10 a source only; PF27 changed only when a specification exists."
     source: "Request item 5; MODIFICATION-20261005-gtwpe-writing-side §A R10 and R11; Nathan's rulings of 2026-09-28 (design v1.2 §8.7) and his instruction of 2026-09-25 (plan v1.2 §1); ledger E-020"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-06
     statement: "GTWPE-D1 in a run: the Flow Manager writes neither artifact itself, every artifact in a run comes from a pass with its own proof log, and a run with an artifact and no proof log is not complete."
     source: "Request item 6; GTWPE-D1 (docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md); MODIFICATION-20261005-gtwpe-writing-side §A A.8 and S5"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-07
     statement: "The ledger items carried to C4: E-006, what a subagent may write, checked after each pass; E-016, harness files disclosed in the run report; and E-022, the Flow Manager's reads of TW prompt bodies, under D22."
     source: "Request item 7; MODIFICATION-20261005-gtwpe-writing-side §A A.6; ledger E-006, E-016 and E-022"
-    disposition: BLOCKED
+    disposition: VERIFIED
   - id: ITEM-08
     statement: "The Flow Manager's handoffs are recorded in docs/prompt_ecosystem_management/gtwpe/, as the GTWPE handoff table GTWPE-MGMT-10 reads for closure."
     source: "Request item 8, first half; MODIFICATION-20261005-gtwpe-writing-side §A A.5's C4 row; GTWPE-MGMT-10 100526.2, *Read these* and the record's closure row"
-    disposition: BLOCKED
+    disposition: APPLIED
   - id: ITEM-09
     statement: "GTWPE-MGMT-10 can maintain the new prompt from the moment it lands, before C6 has the catalog select every member."
     source: "Request item 8, second half; MODIFICATION-20261005-gtwpe-writing-side §A A.5's C4 and C6 rows; the GTWPE catalog's members note"
-    disposition: BLOCKED
+    disposition: ""
 parts:
   - id: PART-01
     name: "GTWPE-FLOW-10: its first page, its handoff table and its catalog row"
@@ -1877,3 +1877,80 @@ prediction Nathan's decision on the way on and the merge of #583 with this recor
 - He decides the way on. The recovery point is `PLAN`: the draft repaired by F-E1's smallest correction, with
   whatever check of that repair he directs, then a new `EXECUTE` from X1.1. He may instead accept the page as it
   stands, by an `override`, and `EXECUTE` resumes at X1.3 (i).
+
+### Resumed at X1.3 (i), on Nathan's acceptance of the published page
+
+Nathan's words, relayed on 2026-10-07 and received at 01:48:48Z:
+
+> Nathan accepts the published page GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1 (3f24590a05eb81798286d600250655d6) as it stands, overriding X1.3 (h) check (6), on 2026-10-07. His words: "I don't think we need to go back to plan for this, the agents will be smart enough to get around this." The two differences from the reviewed draft are Notion's links on the plain-text RUN.md, in the heading of the section RUN.md and in the run directory table's cell; the text still reads RUN.md. PE39 read the page live at its edit time 2026-10-07T00:09:42.961Z and found those two links and the page otherwise as the record's readback describes: the title, the parent, no icon, the 20 headings, the eight proof-log items and the last words. Do not archive the page. Record the override in the override block, and F-E1's correction (RUN.md as inline code in both places, and a check for bare file names outside inline code) as a candidate for the prompt's next version through GTWPE-MGMT-10. Nathan merged amthorn78/glow-hdengine-v2#583 with the failure record (f28262b on main). Resume EXECUTE at X1.3 (i) in this session, on a branch restarted from origin/main, and continue through X1.4, X2 (Nathan merges that branch's pull request with the handoff table when asked), X3, X4 and X5, under the approved plan and its authorization of W4. Report in at most five plain sentences.
+
+What it does:
+- **It accepts the published page** «ID» as it stands, with Notion's two links on the plain-text `RUN.md`, and so
+  overrides X1.3 (h)'s check (6) for this page. The override block records it in its `reason`. The check is a step
+  of the approved plan, not one of the policy gates the validator names in `OVERRIDABLE`, and a name outside that
+  list fails both record checks, so `overrides` stays `[review_cap]`.
+- **It keeps the page.** «ID» is not archived, and PO-5 does not apply.
+- **It records F-E1's correction** as a candidate for GTWPE-FLOW-10's next version, through GTWPE-MGMT-10 (*Candidate
+  for GTWPE-FLOW-10's next version*, below).
+- **It resumes `EXECUTE` at X1.3 (i)**, in this session, on the branch restarted from `origin/main`, through X1.4; X2,
+  where Nathan merges this branch's pull request with the handoff table when asked; X3, X4 and X5, under the
+  approved plan and its authorization of W4.
+
+The failure record above is the dated record of the stop, and it stands as written. PART-01 is no longer `BLOCKED`.
+
+**The resume.** At 01:49:55Z, `git fetch origin main` exited 0: `origin/main` is
+`f28262b7235a64e97cf0130ca12b0b5b1235ad55`, amthorn78/glow-hdengine-v2#583 merged as one commit at
+2026-10-07T01:46:12Z. The merge was detected by files on `main` (`D26-C`): the record's blob there, `e0d2d1c`, is the
+blob of the branch's last commit, `7640212`. The remote branch was deleted at the merge, and
+`docs/20261006-modification-gtwpe-flow-manager` was restarted from `origin/main` at `f28262b`. The resume point is
+Nathan's: X1.3 (i).
+
+| Step | Result |
+|---|---|
+| (i) | At about 01:51Z, by reading, checked by a second reading. The GTWPE parent page, edited 2026-10-06T16:53:37.871Z: six child pages, exactly one of them titled «T», and it is «ID»; the other five are those X1.0 (4) recorded. The architecture page: edited 2026-10-05T16:16:17.223Z, X1.0 (5)'s time. «ID», fetched beside them: edited 2026-10-07T00:09:42.961Z, unchanged since W3 and the state Nathan accepted; titled «T», under the GTWPE parent page, with no icon. Pass |
+| (j) | At 01:52:26Z, `rm` of the draft and the send file exited 0 |
+
+### Candidate for GTWPE-FLOW-10's next version (recorded, not taken)
+
+- **F-E1's correction**, as Nathan directed on 2026-10-07: in GTWPE-FLOW-10's next version, `RUN.md` as inline code
+  in the heading of the section *RUN.md* and in the run directory table's cell, and, among that change's checks of
+  the new page, a check for bare file names outside inline code. It is made through GTWPE-MGMT-10, as a Modification
+  of its own, by the prompt-page route: a new versioned sibling duplicated from «ID», which needs no copy of a body.
+
+### Harness files after the resume (`D22` condition 5)
+
+- **This session's transcript** also holds «ID», fetched inline at (i), beside the GTWPE parent page and the
+  architecture page, which hold no prompt body. It is left to the harness's teardown.
+- **The transcript, read by a script once:** `get_approval.py` read it for Nathan's acceptance, printed only the
+  message's timestamp and length, and saved the message to `c4/c4_accept.txt` in the scratchpad.
+- **The draft and the send file** were deleted at (j). No body is left in the scratchpad.
+
+### X1.4: the handoff table
+
+At 01:54Z, `cp` copied `docs/ephemeral/modifications/evidence/gtwpe-flow-manager/gtwpe.handoffs.md` to
+`docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, committed with this record at `b1e54dc`.
+- Its sha256 is «HT», `61aee2ae…4c2bef`, at 7,557 bytes, in the working tree and in the commit.
+- `git diff --name-only origin/main...HEAD` lists this record and the new file, and nothing else.
+- The `D26-E` search, `git grep -n -i -e 'handoff table' -e 'design v1.2 §6' -- docs/prompt_ecosystem_management/`,
+  finds two hits, both in the new file: its title, at line 10, and line 17, which says it replaces design v1.2's §6
+  table. No other file under `docs/prompt_ecosystem_management/` names design §6 as the GTWPE's handoff table.
+
+### Steps and dispositions after the resume
+
+| Step | Part | Disposition | Evidence |
+|---|---|---|---|
+| X1.3 | PART-01 | VERIFIED | W1, W2 and W3 applied; (a) to (g) passed; (h): ten checks passed, and check (6), with the eighth heading in check (5), stands by Nathan's override of 2026-10-07; (i) passed, and (j) done (*Resumed at X1.3 (i)*) |
+| X1.4 | PART-01 | VERIFIED | The handoff table at `b1e54dc`, its three checks passed (*X1.4*) |
+
+X2 commits this record and pushes the branch; X2 to X5 are recorded at X5. The front matter carries each item's
+current state: ITEM-01 to ITEM-07 `VERIFIED`, by X1.3 (h) with Nathan's override; ITEM-08 `APPLIED`, and `VERIFIED`
+once X3 finds the handoff table on `main`; ITEM-09 open until X4.2.
+
+### Findings after the resume
+
+- **F-E4. X2's pull request is a new one.** amthorn78/glow-hdengine-v2#583 was merged with the failure record, so the
+  plan's "Update #583's title and description" falls to the restarted branch's own pull request, as P-4 recorded
+  for #581.
+- **F-E5. The override block names only the validator's policy gates.** Nathan's override of a plan check has no
+  name in `OVERRIDABLE`, so the block records it in its `reason` alone. A later GTWPE-MGMT-10 repair may give the
+  override of a plan step a place of its own: recorded, not taken.
