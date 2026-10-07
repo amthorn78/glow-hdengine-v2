@@ -2,12 +2,14 @@
 artifact_type: SCORER_ACCEPTANCE_RESULTS
 artifact_version: "1.0"
 created_date: 2026-10-07
-status: "v7 ACCEPTED; hd-v2 NOT ACCEPTED (6 of 7) — Nathan's decision under the pre-registered rule"
+status: "WITHDRAWN 2026-10-07 (does not match the cloud interface); as tested: v7 passed its gates, hd-v2 6 of 7"
 author: PE39 (`session_01CHFdeCiw98MgmvoYznRE76`)
 pre_registration: TYPESAFE-LADDER-PREREGISTRATION-20261007.md, commit 3041eed
 ---
 
 # TypeSafe reasoning-strength ladder: acceptance results for v7 and hd-v2
+
+> **Withdrawn, 2026-10-07: v7 and hd-v2 do not match the cloud interface.** Nathan's screenshot of the cloud interface shows effort as one slider per model, from Faster to Smarter, with Ultracode as its top stop, above Max. This record took the Claude Code documentation's line that ultracode is a switch combining with every level, and built both requests on it. As a result they read cells, such as "medium with ultracode", that the cloud interface cannot select. The results below stand as a record of what was tested; they do not put either request in force. v6 and hd-v1 stay in force until a corrected request is accepted. The installed Claude Code's fallback cloud picker (surface `ccr`) lists Low, Medium, High, Extra and Max for both models, and the interface adds Ultracode above Max.
 
 ## Outcome
 
