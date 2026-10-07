@@ -1,0 +1,19 @@
+== hd-v2 cases, run 1
+PASS HA1 Record a delivered report: Opus 5.5 at low | effort 0.00 {'low': 1.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.0, 'max': 0.0} | P(ultra) 0.05 | P(Fable) 0.01
+PASS HA2 Two named one-line fixes: Opus 5.5 at medium | effort 1.00 {'low': 0.0, 'medium': 1.0, 'high': 0.0, 'extra high': 0.0, 'max': 0.0} | P(ultra) 0.12 | P(Fable) 0.00
+PASS HA3 Repair four named defects: Opus 5.5 at high | effort 1.99 {'low': 0.0, 'medium': 0.03, 'high': 0.95, 'extra high': 0.02, 'max': 0.0} | P(ultra) 0.16 | P(Fable) 0.00
+PASS HA4 First parent-child composite: Fable 5.1 at max | effort 3.99 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.0, 'max': 1.0} | P(ultra) 0.17 | P(Fable) 0.99
+PASS HA5 Claim audit of the first six reports: Opus 5.5 at max with ultracode | effort 3.60 {'low': 0.0, 'medium': 0.06, 'high': 0.03, 'extra high': 0.14, 'max': 0.77} | P(ultra) 0.79 | P(Fable) 0.15
+PASS HA6 Standard single-person reading: Opus 5.5 at extra high | effort 3.00 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 1.0, 'max': 0.0} | P(ultra) 0.15 | P(Fable) 0.01
+FAIL HA7 Entry-by-entry glossary check: Opus 5.5 at high with ultracode | effort 1.80 {'low': 0.0, 'medium': 0.54, 'high': 0.2, 'extra high': 0.16, 'max': 0.1} | P(ultra) 0.62 | P(Fable) 0.02 | MISS: level high not in ['extra high', 'max']
+Gate A: 6/7 cases pass (need 7) -> FAIL
+Part C (noise, reported): same cell on 7/7; max |d effort score| 0.16; max |d P(ultracode)| 0.02; max |d P(Fable)| 0.03; run 2 cases passing: 6/7
+== Jobs J0 to J6 (reported)
+  J0 General: a typical three-report request: Opus 5.5 at extra high | effort 3.00 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.99, 'max': 0.01} | P(ultra) 0.33 | P(Fable) 0.00
+  J1 Controller: routine production run: Opus 5.5 at extra high | effort 2.96 {'low': 0.01, 'medium': 0.01, 'high': 0.0, 'extra high': 0.98, 'max': 0.0} | P(ultra) 0.12 | P(Fable) 0.00
+  J2 Controller: first live production run here: Opus 5.5 at max | effort 3.99 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.0, 'max': 1.0} | P(ultra) 0.14 | P(Fable) 0.23
+  J3 Author: romantic composite, type already produced: Opus 5.5 at extra high | effort 3.00 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 1.0, 'max': 0.0} | P(ultra) 0.16 | P(Fable) 0.01
+  J4 Author: first single-person reading on this platform: Opus 5.5 at max | effort 3.58 {'low': 0.0, 'medium': 0.0, 'high': 0.01, 'extra high': 0.4, 'max': 0.59} | P(ultra) 0.13 | P(Fable) 0.24
+  J5 Author: focused answer to two questions: Opus 5.5 at high | effort 2.04 {'low': 0.0, 'medium': 0.0, 'high': 0.95, 'extra high': 0.05, 'max': 0.0} | P(ultra) 0.12 | P(Fable) 0.02
+  J6 QA: formatting check by the same author: Opus 5.5 at medium | effort 1.00 {'low': 0.0, 'medium': 1.0, 'high': 0.0, 'extra high': 0.0, 'max': 0.0} | P(ultra) 0.12 | P(Fable) 0.00
+OVERALL: NOT ACCEPTED {'A': False}
