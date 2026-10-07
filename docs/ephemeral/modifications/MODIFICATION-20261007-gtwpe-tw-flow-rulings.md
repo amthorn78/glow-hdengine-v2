@@ -10,15 +10,15 @@ closure:
   upstream: [GTWPE-FLOW-10, TW-APPLY-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20, TW-TRIAGE-10]
   downstream: [GTWPE-FLOW-10, GTWPE-MGMT-10, TW-APPLY-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20, TW-TRIAGE-10]
   state_sharers: [TW-DRAIN-10, TW-DRAIN-20]
-readiness: READY
+readiness: NEEDS_RULING
 override:
   by: ""
   overrides: []
   reason: ""
-interaction_cost_predicted: 9
+interaction_cost_predicted: 11
 interaction_cost_actual:
 estimate:
-  plan: "about 9 h, not counting waits for Nathan: the edits to eight bodies, as anchors and new texts, authored through the PE Metaprompt from this analysis, with each passage counted twice; the decision record's three entries and the handoff table's rows; the selection page's three writes, the three current-release notes and the catalog rows; and PLAN's dry run, with its two-sided check of every invocation against the bodies it reaches, one full review and at most one diff check. Tokens are not measured"
+  plan: "about 10 h, not counting waits for Nathan: the edits to eight bodies, as anchors and new texts, authored through the PE Metaprompt from this analysis, with each passage counted twice; the decision record's three entries and the handoff table's rows; the selection page's three writes, the three current-release notes and the catalog rows; and PLAN's dry run, with its two-sided check of every invocation against the bodies it reaches, one full review and at most one diff check. Tokens are not measured"
   execute: "about 5 h, not counting the waits for Nathan's merges: eight new pages, each duplicated, titled, edited and read back whole; the decision record and the handoff table committed, and their merge detected on main (X2, X3); the selection writes and the three notes, read back; the catalog (X4); and the record at COMPLETE (X5). Tokens are not measured"
 reviews:
   - mode: ANALYZE
@@ -26,6 +26,11 @@ reviews:
     date: 2026-10-07
     required_open: 0
     outcome: "By this session, read-only, before any full review: both record checks exit 0 on a scratch copy at ANALYZED; the front matter and every table parse, and the request is verbatim; A0 reproduces at 128836a; every member and control page is unchanged. It found and corrected, before the review: two scope counts (GTWPE-FLOW-10 has 20 sections; TW-DRAIN-20's ruling 1 reach is 9), two unstated exceptions, four quotations (66 of 66 repository quotations now found, and every Notion quotation by a second reading), F9 missing from the tier 2 list, and the D26-E search not yet run over gtwpe/. None left open"
+  - mode: ANALYZE
+    kind: FULL
+    date: 2026-10-07
+    required_open: 7
+    outcome: "Two fresh reviewers, GTWPE-TW-FLOW-RULINGS-ANALYZE-A and -B, each handed only its committed brief's path, on cc6b923: A 1 required and 22 listed, B 3 required and 20 listed. The session confirmed all four required findings, and three listed ones as required under the fixed rubric's R1: 7 distinct required defects, RQ-1 to RQ-7 (S-6 narrowed his PF20 and PF30 rule; canon's closure timing; the Flowmaster waiver for the new release; triage closing an addendum; ITEM-01's sentence counts; pinned PF versions; known-wrong text left in two re-versioned members), each repaired in §A. The listed findings stay listed, each with its reason"
 items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
@@ -234,12 +239,13 @@ that governs the GTWPE across changes lives ("they outlive any one change or rel
 first, and a ruling is recorded before it is applied (`ecosystem-change-management.md` §2, step 1). So the
 change adds, in his words, verbatim, with what follows from each, as GTWPE-D1 is written:
 
-- **GTWPE-D2**, inputs: ruling 1, both sentences.
-- **GTWPE-D3**, PF10 drainage: ruling 2's two sentences, and E-044's and E-052's "all pf docs should be updated
+- **GTWPE-D2**, inputs: ruling 1, both of its quotations, whole.
+- **GTWPE-D3**, PF10 drainage: ruling 2, both of its quotations, whole, the second being ITEM-04's "part of this
+  run is to have a prompt evaluate the drain targets."; and E-044's and E-052's "all pf docs should be updated
   based on context and scope, not whether or not the addenda specify a drain target."
-- **GTWPE-D4**, PF20 and PF30: ruling 3's two sentences, E-046's and E-052's "If there is a spec involved, those
-  docs are updated. if not, then not. its basic.", and E-053's "PF30 and PF20 DON't need the redliner. They
-  should not need that step. They never have."
+- **GTWPE-D4**, PF20 and PF30: ruling 3, both of its quotations, whole; E-046's and E-052's "If there is a spec
+  involved, those docs are updated. if not, then not. its basic."; and E-053's "PF30 and PF20 DON't need the
+  redliner. They should not need that step. They never have."
 
 Recording them there binds C5 and C6 as well: the Change Manager writes the Flow Manager's execution prompt, so
 GTWPE-D2 governs C5's output.
@@ -288,7 +294,8 @@ inputs to a run, since the execution prompt it was given about is his. So: a res
 change, a PF30 rollover) is a file the resume names; and what a pass needs about the run itself, its branch and
 pull request, it reads from `RUN.md`. A run or pass given anything beyond the prompt to run and its files stops
 at intake and names what it was given, as GTWPE-FLOW-10 already stops on an execution prompt that asks for what
-it rules out. The plan sets the exact forms.
+it rules out. A PF document is named by its directory and versionless name, which canon asks of every prompt
+and which still names one file on `main` (risk 14). The plan sets the exact forms.
 
 **"make sure this is clear in the operations hub."** The Hub's current TW section is on GTWPE-MGMT-10's route (the
 current-release note on each page that names TW's current release), so the new note there states the rule and
@@ -314,17 +321,26 @@ cites GTWPE-D2. The callout at the Hub's top is outside the route, and its last 
   item". That fits the rule, per document.
 - **Canon bears on timing, not on whether.** HDE Build Notes keeps an addendum authoritative "until the guidance
   is formally reviewed and drained into the relevant permanent PF document" (*Precedence, versioning, and
-  scope* §1), and removes drained guidance when it is formally revised (§7). The Change Process Guide's
-  *Post-QA documentation drainage ordering (normative)* puts drainage "only after all QA tasks for the epic are
-  complete", which is GTWPE-FLOW-10's B1 step 5 hold-back. Nathan's 2026-09-28 ruling "No, pF10 will NEVER be a
-  merge target, EVER>" stands, as `CHECKPOINT.md` §8 records it.
+  scope* §1), and removes drained guidance when it is formally revised (§7). Drainage comes after the change's
+  QA, by the Change Process Guide's *Post-QA documentation drainage ordering (normative)* ("only after all QA
+  tasks for the epic are complete"), and after its closure decision: "The runtime flow completes required
+  QA/reporting and the Isis closure decision before its manual PF10 drainage" (HDE Governance §2.0.19,
+  *Post-closure maintenance ordering*; §9.1.5). GTWPE-FLOW-10's B1 step 5 holds a change back only until its
+  epic's QA is recorded complete, which is short of canon: a PF10 change that belongs to an epic or a CRD is
+  drafted only once the run's files show that change closed, and is otherwise held back and accounted for.
+  Nathan's 2026-09-28 ruling "No, pF10 will NEVER be a merge target, EVER>" stands, as `CHECKPOINT.md` §8
+  records it.
 
 What follows, for the plan: in a run with a PF10 source, every addendum is accounted for in `RUN.md` and the
-pull request: the documents it drains into; where it is already represented, by the triage pass's reading or a
-drain's verified `no redlines`; or why it cannot drain in this run (held back by canon's post-QA ordering, a PF20 or PF30 part with no specification, or a home that is no
-eligible document, such as PF10 itself). No run ends `RUN_NO_CHANGE` or `RUN_REVIEW_READY` with an addendum
-unaccounted for, and `RUN_NO_CHANGE` remains only for a run in which every addendum is shown already
-represented, or which has no PF10 source and changes no document.
+pull request: the documents it drains into; where it is already represented, as a pass that read the document
+shows it, by a drain's verified `no redlines` with its exact equivalence location, or by the record pass for PF20
+or PF30, for each document the addendum bears on; or why it cannot drain in this run (held back until its
+change's closure, by canon's ordering; a PF20 or PF30 part with no specification in the run; or a home that is
+no eligible document, such as PF10 itself). The triage pass's reading routes an addendum's documents to their
+passes and never closes an addendum by itself, as B1 step 4 already says of triage: "When unsure, route it: a
+drain's verified `no redlines` is the authoritative answer that it is not affected." No run ends `RUN_NO_CHANGE`
+or `RUN_REVIEW_READY` with an addendum unaccounted for, and `RUN_NO_CHANGE` remains only for a run in which every
+addendum is shown already represented, or which has no PF10 source and changes no document.
 
 #### ITEM-04. A triage prompt in the run
 
@@ -343,7 +359,9 @@ represented, or which has no PF10 source and changes no document.
      PF10 never a target.
   2. **No target.** Its no-target result, against ITEM-03.
   3. **A bare list.** One bullet per target basename cannot show that every addendum is accounted for. Its
-     return names, for each addendum, the documents it drains into, or why none in this run (ITEM-03).
+     return names, for each addendum, the documents it bears on, which the run routes to their passes, or why
+     none in this run (ITEM-03). It never closes an addendum as already represented: only a pass that reads the
+     document can show that.
   4. **PF10 only.** "The incoming source is `PF10-HDE-Build-Notes`; do not generalize this alpha to other source
      types." Against the architecture's execution-time triage "against these inputs" (§2) and its full-context
      rule (§7), and Nathan's "based on context and scope": it evaluates the drain targets against every source
@@ -358,9 +376,12 @@ represented, or which has no PF10 source and changes no document.
 
 - **The authorization gate.** GTWPE-FLOW-10's PF20 and PF30 rows run the record prompts "only with Nathan's
   authorization of that record", and F1 and F7 carry it. Confirmed, as E-046's PE40 check found. Nathan's rule
-  replaces it: with a specification in the run's inputs, the run updates PF20 for an Epic Specification
-  (TW-RECORD-10) or PF30 for a CRD Specification (TW-RECORD-20); without one, neither. That Epic history is PF20's
-  and CRD history PF30's is the documents' own scope (HDE Phased Epics §0; HDE CRD Records §1).
+  replaces it: "If there is a spec involved, those docs are updated. if not, then not." With any specification
+  among the run's inputs, PF20 and PF30 are both updated, each through its own prompt, TW-RECORD-10 and
+  TW-RECORD-20, on the run's context and scope; without one, neither. What each takes is set by its own scope
+  (HDE Phased Epics §0; HDE CRD Records §1): an Epic Specification's record goes in PF20 and a CRD
+  Specification's in PF30, and each document takes the PF10 changes that bear on it (S-7). Canon sets when an
+  epic's record may go in PF20 (*Canon*, below).
 - **The redliner on PF30.** GTWPE-FLOW-10 sends "A change to an existing record: TW-DRAIN-10, then TW-APPLY-10".
   Against E-053's ruling. Confirmed.
 - **The record prompts refuse updates.** Both: "An existing record is not permission to create a duplicate or
@@ -378,18 +399,30 @@ represented, or which has no PF10 source and changes no document.
   change to its document, one pass makes them all; the plan settles what of this stop remains.
 - **Addendum changes to PF20 and PF30.** HDE Build Notes 2.14 says "PF27 and PF30 adopt the same terms on their
   next revision", and PF30.1 uses "CRD Plan" 15 times on 14 lines (`grep -o`, by command). A PF30 revision is TW-RECORD-20's,
-  since PF30 never goes to the redliner (E-053). So when a run revises a PF30 volume, TW-RECORD-20 also carries
-  each applicable PF10 change that bears on that volume in context and scope (ITEM-03), beyond its one record.
-  When no CRD Specification is in the run, PF30 is not revised, and the run accounts for such an addendum as
+  since PF30 never goes to the redliner (E-053). So TW-RECORD-20 carries each applicable PF10 change that bears on
+  a PF30 volume in context and scope (ITEM-03), beside any record it adds, and TW-RECORD-10 does the same for
+  PF20. When no specification is in the run, neither is revised, and the run accounts for such an addendum as
   waiting for one (ITEM-03).
-- **Canon.** HDE Governance §9.1.1, *Historical drainage*, reserves PF20 and PF30 additions to "a separately
-  authorized historical drainage action". Nathan rejected arguing his rule from it ("this is meaningless
-  distinction", E-054), and his rule governs the GTWPE. Read for the canon-first rule only: it conflicts with no
-  canon, since the run Nathan starts with a specification is such an action. E-010, canon's own conflict on PF20
-  and PF30 records, stays his.
-- **The first live run** (HDE Build Notes and the HDE-EPIC040 Specification, as PE40-INIT names them): an Epic
-  Specification, so PF20 is updated through TW-RECORD-10, and HDE Phased Epics has no HDE-EPIC040 record yet
-  (`git grep -c HDE-EPIC040` is 0), so the record is new; no CRD Specification, so PF30 is not revised.
+- **Canon.** Nathan's rule is stated from his words, not argued from canon ("this is meaningless distinction",
+  E-054). Read for the canon-first rule only: HDE Governance §9.1.1 makes PF20 and PF30 historical homes that
+  "The active workflow MUST NOT create, update or synchronize", reserves additions to "a separately authorized
+  historical drainage action", and asks to "Preserve existing PF20/PF30 content and original identities as dated
+  history"; its table and §9.1.5 put PF10 drainage after closure, as maintenance an authorized manual operator
+  does. A run Nathan starts is that maintenance, not the active workflow, and S-7's update of an existing CRD
+  record keeps its earlier rows and its identity, as HDE CRD Records §4.2 asks. Canon also sets when: PF20 takes
+  an epic's record "only once, at epic close", and "In-flight epics MUST NOT be added" (Plan Templates §2,
+  *Historical-only posture (normative)*; Change Process Guide §1.1.2, §3.5.1 and §6.3). So PF20 takes an Epic
+  Specification's record only when the run's files show the epic closed; otherwise that part waits, accounted
+  for as ITEM-03 says, and TW-RECORD-10 keeps its rule that the epic's completed or historical posture is
+  established from the evidence it is given, which is a file. E-010, canon's own conflict on PF20 and PF30
+  records, stays open and his.
+- **The first live run** (HDE Build Notes and the HDE-EPIC040 Specification, as PE40-INIT names them): a
+  specification is involved, so PF20 and PF30 are both updated. PF20 takes HDE-EPIC040's record, which is new
+  (`git grep -c HDE-EPIC040` over HDE Phased Epics is 0), and the PF10 changes that bear on PF20; PF30 takes the
+  PF10 changes that bear on it, such as 2.14's terms, and no new record, since no CRD Specification is in the
+  run. HDE-EPIC040 was closed on 2026-09-29 by `docs/ephemeral/HDE-EPIC040-CL-E-10-closure-decision-v1.2.md`
+  (`CLOSE`). HDE Build Notes records its QA verdict ("It is not closure") and not that decision, so the decision
+  must be among the run's inputs; without it, HDE-EPIC040's PF20 record and its PF10 changes wait.
 
 #### ITEM-06. PF09
 
@@ -430,6 +463,17 @@ Product Owner's determination; GTWPE-FLOW-10 stops for it (S4), which stays, wit
 as an HDE CRD Records material-change row's decision date", written for the PF30 drain route ITEM-05 removes;
 it goes with that route.
 
+Found wrong against the live sources in GTWPE-MGMT-10, which ITEM-07 gives a new version, and fixed there under
+ITEM-08: "until G5", in the six places E-033 lists (*Native purpose*; two rows of *What this prompt may change*;
+*Notion writes*; the `prompt` and `notion_control` entries of the `targets` row), where the approved order of
+changes has no G5 and adoption is C6, so the bound becomes the adoption change, as E-033 proposes; the selection
+route's "lists the eight members", where TW-ALPHA has six (C3's F-1); and its two pointers to the design
+package's §6 handoff table (*Read these*; the `closure` row of *The record*), which C4 replaced with
+`docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`. Likewise in GTWPE-FLOW-10, which ITEM-02 to ITEM-05
+give a new version: the two links to `http://RUN.md` that Notion made of plain `RUN.md` at its publication
+(E-042), which the ledger keeps as "a candidate for the prompt's next version", written as inline code, with the
+check for bare file names that its finding F-E1 proposes.
+
 ### What the analysis settles, for Nathan's approval
 
 Each follows from his words and the canon cited; none is his own words, so each is listed for his approval.
@@ -439,9 +483,9 @@ Each follows from his words and the canon cited; none is his own words, so each 
 | S-1 | Ruling 1 covers Nathan's own inputs to a run. A resume, a decision at a stop and a rollover decision reach a run as files; a run or pass given anything beyond the prompt to run and its files stops at intake and names it | Ruling 1; GTWPE-FLOW-10's existing intake stop |
 | S-2 | Attached files stay allowed beside repository paths | Answer 2 |
 | S-3 | No selected boundary anywhere: every pass reads every source whole | Ruling 1; E-044 |
-| S-4 | Every addendum accounted for; `RUN_NO_CHANGE` only as ITEM-03 states | Ruling 2; E-044's ruling; HDE Build Notes front matter §1 and §7; the Change Process Guide's post-QA ordering |
+| S-4 | Every addendum accounted for, and counted as already represented only on a pass's verified finding for each document it bears on; a change held back until its epic or CRD is shown closed; `RUN_NO_CHANGE` only as ITEM-03 states | Ruling 2; E-044's ruling; HDE Build Notes front matter §1 and §7; the Change Process Guide's post-QA ordering; HDE Governance §2.0.19 and §9.1.5; GTWPE-FLOW-10's B1 step 4 |
 | S-5 | TW-TRIAGE-10 is the run's triage pass, evaluating every source; it stays optional for a direct invocation | Ruling 2; architecture §2 and §7 |
-| S-6 | Epic Specification → PF20 through TW-RECORD-10; CRD Specification → PF30 through TW-RECORD-20 | Ruling 3; HDE Phased Epics §0; HDE CRD Records §1 |
+| S-6 | With any specification among the run's inputs, PF20 and PF30 are both updated, each through its own prompt, on the run's context and scope: the specification's record in the document whose scope it is, an epic's only once its closure is among the run's files, and each document's applicable PF10 changes. Without a specification, neither | Ruling 3; E-046's and E-052's ruling; HDE Phased Epics §0; HDE CRD Records §1; Plan Templates §2; Change Process Guide §1.1.2, §3.5.1 and §6.3 |
 | S-7 | The record prompts make every change to their document in a run: an existing record's update, and the PF10 changes that bear on the document in context and scope, such as 2.14's terms for PF30 | E-053's ruling; E-044's ruling; HDE Build Notes 2.14; HDE CRD Records §4.2 and §6; HDE Phased Epics *Drain posture* |
 | S-8 | GTWPE-MGMT-10's own request is files only (ITEM-07) | Ruling 1; E-048 |
 
@@ -449,8 +493,8 @@ Each follows from his words and the canon cited; none is his own words, so each 
 
 | Surface | Route (*How each kind of target changes*) | Items |
 |---|---|---|
-| GTWPE-FLOW-10 | A new versioned sibling under the GTWPE parent page; the catalog selects it at X4 | 02, 03, 04, 05 |
-| GTWPE-MGMT-10 | A new versioned sibling under the GTWPE parent page; the catalog selects it at X4 | 07 |
+| GTWPE-FLOW-10 | A new versioned sibling under the GTWPE parent page; the catalog selects it at X4 | 02, 03, 04, 05, 08 |
+| GTWPE-MGMT-10 | A new versioned sibling under the GTWPE parent page; the catalog selects it at X4 | 07, 08 |
 | TW-TRIAGE-10 | A new versioned sibling under *HDE TW*, selected by a new TW-ALPHA release | 02, 03, 04 |
 | TW-DRAIN-10, TW-DRAIN-20 | The same | 02, 05 |
 | TW-RECORD-10, TW-RECORD-20 | The same | 02, 05 |
@@ -488,8 +532,8 @@ so splitting them would split a rule (the `D12` error) and put one page's edits 
 
 | Member or interface | Disposition | Reason |
 |---|---|---|
-| GTWPE-MGMT-10 | Affected | ITEM-07 |
-| GTWPE-FLOW-10 | Affected | ITEM-02 to ITEM-05 |
+| GTWPE-MGMT-10 | Affected | ITEM-07; ITEM-08, its own wrong text (*Everything else the check covered*) |
+| GTWPE-FLOW-10 | Affected | ITEM-02 to ITEM-05; ITEM-08, the two `RUN.md` links (E-042) |
 | TW-TRIAGE-10 | Affected | ITEM-02 to ITEM-04 |
 | TW-DRAIN-10, TW-DRAIN-20 | Affected | ITEM-02; ITEM-05's PF30 clause |
 | TW-RECORD-10, TW-RECORD-20 | Affected | ITEM-02, ITEM-05 |
@@ -501,7 +545,7 @@ so splitting them would split a rule (the `D12` error) and put one page's edits 
 | `gtwpe_record_check.py`; `modification_validate.py`, `modification-template.md`, `reviewer-prompt-template.md` | Unaffected | The record format and its checks are unchanged; the last three are shared GCFPE controls, outside this prompt's route |
 | The selection page; *HDE TW*, *Alpha 1*, the Operations Hub | Affected | The selection writes and the current-release notes |
 | The architecture page and record | Unaffected by the route; left stale | Outside the route (*Pages outside the route*) |
-| `tw-flowmaster` 1.3.0, `flowmaster-validate` 3.3.2 | Unaffected | They do not run this release (the selection page), and C6 retires the Flowmaster |
+| `tw-flowmaster` 1.3.0, `flowmaster-validate` 3.3.2 | Affected | Skills that interact with the TW-ALPHA selection and have not run its releases since C2. HDE Governance §9.1.6 reconciles interacting skills in one coherent successor selection, and Nathan waived that for TW Flowmaster one release at a time (C2's and C3's `override`). The new release needs his decision again (Q-1) |
 | `glow-write-boundary`, the GTWPE exception | Unaffected | No write boundary changes: a run still writes only under `docs/ephemeral/` |
 | `typesafe-scoring`, `hd-typesafe-scoring` | Outside the GTWPE | E-043 (*Intake*) |
 | The PE Metaprompt 091426.1 | Unaffected | Used by `PLAN` to author, under GTWPE-MGMT-10's workarounds |
@@ -515,8 +559,8 @@ so splitting them would split a rule (the `D12` error) and put one page's edits 
 | TW-TRIAGE-10 | Neither, before and after: its triage is a return, not an artifact | Nothing to keep |
 | TW-DRAIN-10, TW-DRAIN-20 | The redlines file and its separate proof log, before and after | The proof-log paragraph, its eight minimum items and "named after it" are not edited; ITEM-02's edits are in intake and handoff text |
 | TW-APPLY-10 | The revised PF and its separate proof log, before and after | The same |
-| TW-RECORD-10 | The updated PF20 and its proof log, before; after, also for an existing record's update | The proof log and its eight items are kept; what it "also records" (where the entry went, the control fields before and after, that nothing else changed) is extended to an update |
-| TW-RECORD-20 | The updated PF30 volume, and on a rollover the next volume's review copy, each with its proof log; after, also for an update | The same; one proof log per file, as now |
+| TW-RECORD-10 | The updated PF20 and its proof log, before; after, also for an existing record's update and for the PF10 changes it carries | The proof log and its eight items are kept; what it "also records" (where the entry went, the control fields before and after, that nothing else changed) is extended to every change it makes |
+| TW-RECORD-20 | The updated PF30 volume, and on a rollover the next volume's review copy, each with its proof log; after, also for an existing record's update and for the PF10 changes it carries, with or without a new record | The same; one proof log per file, as now |
 
 ### Scope, and how it was measured (`SCOPE-001`)
 
@@ -549,6 +593,14 @@ its own, counted as one):
 | TW-RECORD-20 | 9 | 5, one light: *Authority and sources* (light); *Turn preflight*; *Output identity*; *Destination, source roles and record preparation*; *PF30 schema and native detail* | 0 | 5, one light: identity (its title); *Purpose and minimal inputs*; *Destination, source roles and record preparation*; *Output and completion*; *PF30 schema and native detail* (light: an update's volume) |
 | TW-APPLY-10 | 12 | 8, two of them light: *Authority and sources* (light); *Turn preflight*; *Output identity*; *Intake and preparation-state verification*; *Deterministic final document-control header*; *Exact application and preservation* (the no-change report); *Invalidity, failure and return* (light: "ask Nathan to identify it"); *Diagnostic handoff* | 0 | 0 |
 | GTWPE-MGMT-10 | 24 | 3: *Entry contract*; *Reviews are bounded* (the brief a reviewer is handed); *One session, and workers by workload* | 0 | 0 |
+
+**ITEM-08's fixes in GTWPE-MGMT-10,** by reading its fetch after this session's context was compacted, each count
+equal to an earlier reading of the same version, edited 2026-10-05T16:36:11.384Z: "G5" six times, in *Native
+purpose*, *What this prompt may change* and *The record* (E-033's six); "§6" twice, in *Read these* and *The
+record* (C4's dry run, D5); "eight members" once, in *How each kind of target changes* (C3's F-1). Five sections,
+none of them among ruling 1's three. In GTWPE-FLOW-10, by reading its third fetch: the two `RUN.md` links, in the
+heading of *RUN.md* and in the table of *The run's branch, pull request and directory*, E-042's "exactly those two
+links"; both sections are among ruling 1's or ruling 2's already.
 
 The plan measures each passage's exact anchor and count, by two independent readings where no save exists (ledger
 E-035's lesson), and runs `D26-E`'s search for surviving old text on each new page.
@@ -596,10 +648,13 @@ take every change to PF20 and PF30, and the entry takes only files. The new rele
 3. **A stop becomes heavier to resume.** A decision at a stop is a file the resume names (S-1).
 4. **An addendum with no eligible home,** such as one whose only home is PF10 itself, cannot drain, since PF10 is
    never a target; the run reports it (S-4) rather than leave it silently.
-5. **Held-back addenda** wait for their epic's QA, by canon's post-QA ordering; the run accounts for them.
-6. **TW-RECORD-20's role widens** from inserting one section to every change a run makes to its volume (S-7),
-   beyond Nathan's "they only get one SECTION" of 2026-09-29. His "DON't need the redliner" of 2026-10-07 is the
-   later word.
+5. **Held-back addenda** wait for their epic's or CRD's closure, by canon's ordering (ITEM-03), and the run
+   accounts for them. A run's files must include each closure decision it relies on, as the first live run shows
+   (ITEM-05).
+6. **The record prompts' role widens** from inserting one section to every change a run makes to their document
+   (S-7), beyond Nathan's "they only get one SECTION" of 2026-09-29. His words of 2026-10-07 require it: PF30
+   "must be updated" in the first run, which has no CRD record to add, so its update there can only be the PF10
+   changes that bear on it; and "They should not need that step" keeps the redliner out.
 7. **The record prompts' titles** ("Create Epic History Section", "Create CRD History Section") no longer describe an update; the plan decides
    whether a title changes, and if it does, every page naming it takes the new title.
 8. **TW-TRIAGE-10 stops being list-only:** its return carries each addendum's targets (ITEM-04). The selection page
@@ -616,10 +671,16 @@ take every change to PF20 and PF30, and the entry takes only files. The new rele
     C1's §A A.6 found them moot. The ledger is PE40's to keep (*Pages outside the route*).
 13. **This mode's own reviewers** are handed only their committed brief's filename (ruling 1). The brief's content
     is the template's, which GTWPE-MGMT-10 requires.
-14. **Versioned filenames.** An execution prompt is a one-off run input and may name a PF document by its
-    versioned path; the run resolves it on `main` and records its blob, and stops if that file is no longer there
-    (S2). The durable bodies keep naming PF documents without a version, as HDE Build Notes 2.14's reference
-    posture and HDE Governance §9.1.6's reference rule ask; `PLAN` sets each invocation's form within both.
+14. **Versioned filenames.** HDE Build Notes 2.14 says "Do not pin a PF file version in a prompt", and HDE
+    Governance §9.1.6 asks a temporary handoff prompt, as well as a durable body, for "the controlled directory,
+    versionless document name and appropriate section", while it keeps "exact source binding in run artifacts".
+    So an execution prompt, and every invocation, names a PF document by its directory and versionless name, such
+    as `PF10-HDE-Build-Notes` in `docs/pfcanon/`, which still names one file on `main`; the run resolves it there
+    and records the file and its blob in `RUN.md`. Nathan asked for the first run "using the latest PF10". Every
+    other file is named by its repository path.
+15. **The TW Flowmaster skill (Q-1).** `tw-flowmaster` 1.3.0 and `flowmaster-validate` 3.3.2 have not run the
+    TW-ALPHA releases since C2, and a Flowmaster run against the new release would stop loudly rather than
+    produce a wrong result, as for C3's (its risk 1). Nathan's waivers covered C2's and C3's releases only.
 
 ### Defect classes matched (`ecosystem-change-management.md` §4)
 
@@ -632,11 +693,6 @@ take every change to PF20 and PF30, and the entry takes only files. The new rele
 
 ### Candidates for separate Modifications (recorded, not taken)
 
-- **E-042:** `RUN.md` as inline code on GTWPE-FLOW-10, and a check for bare file names. This Modification makes
-  GTWPE-FLOW-10's next version, so Nathan may add it at approval.
-- **E-033:** GTWPE-MGMT-10's "until G5", six places; **C3's F-1:** its route's "lists the eight members", where
-  TW-ALPHA has six; and its two pointers to the design package's §6 handoff table, which moved in C4. GTWPE-MGMT-10 gets a new
-  version here, so Nathan may add these at approval.
 - **E-035's candidate:** counts over a body by script where a save exists.
 - **Ruling 1 in the GCFPE.** The Operations Hub's *Prompt ecosystem worker output standard* lets a GCFPE handoff
   carry "the minimum context it needs". If "at every phase" reaches the GCFPE, that is GCFPE-MGMT-10's to change.
@@ -653,23 +709,35 @@ For Nathan to authorize, or PE40 to do, after X4, as E-041 was done:
 
 ### Open questions for the Product Owner
 
-None. S-1 to S-8 are settled from his words and canon, and his approval accepts them.
+**Q-1. The TW Flowmaster skill, for this release (risk 15).**
+- **(a) Waive HDE Governance §9.1.6's interacting-skill readiness for `tw-flowmaster` again, for this
+  release.** Recommended. The grounds are C2's and C3's: GTWPE-FLOW-10 now runs the TW prompts as passes, C6
+  retires the skill, and a Flowmaster run stops loudly rather than producing a wrong result. The selection page
+  and the three notes say that `tw-flowmaster` 1.3.0 and `flowmaster-validate` 3.3.2 do not run the new release,
+  and the `override` block records the waiver.
+- **(b) Update `tw-flowmaster`, with any `flowmaster-validate` assertion that pins its wording, in this
+  Modification.** It adds the `skill` target, a skill review cycle and Nathan's install.
+
+S-1 to S-8 are settled from his words and canon, and his approval accepts them.
 
 ### Readiness and interaction cost
 
-`READY`. No item waits on another item's execution, every surface's scope is measured, and no ruling is open.
+`NEEDS_RULING`, for Q-1. It is advice, not a refusal. No item waits on another item's execution, and every
+surface's scope is measured.
 
-    interaction_cost = 0 open rulings + 2 + 5 review rounds + 0 skill review cycles + 0 installs + 2 merges = 9
+    interaction_cost = 1 open ruling + 2 + 6 review rounds + 0 skill review cycles + 0 installs + 2 merges = 11
 
-- **Review rounds:** this mode's dry run and one full review by two reviewers; `PLAN`'s dry run, one full review
-  and one check of a repair's diff, if needed.
+- **Review rounds:** this mode's dry run, its full review by two reviewers, and one check of the repair's diff;
+  `PLAN`'s dry run, one full review and one check of a repair's diff.
+- **Q-1's option (b)** would add a skill review cycle and an install, making 13.
 - **Merges:** the branch's pull request at X2, which carries the decision record and the handoff table; then the
   record's pull request after X5.
 - **Splitting saves nothing:** the items share GTWPE-FLOW-10, the handoff table and the selection. Moving ITEM-07
   to a run of its own would add two approvals, two review rounds and a merge.
-- **Calibration:** C2 to C4 predicted 8, 7 and 7 and cost 14, 11 and 13.
+- **Calibration:** C2 to C4 predicted 8, 7 and 7 and cost 14, 11 and 13, each above its prediction by rulings,
+  diff checks and extra merges; on that record this one may cost more than 11.
 
-**The estimate,** in the front matter: `PLAN` about 9 h and `EXECUTE` about 5 h, not counting waits for Nathan.
+**The estimate,** in the front matter: `PLAN` about 10 h and `EXECUTE` about 5 h, not counting waits for Nathan.
 Time is the meter the session can read; tokens are not measured. Twice the estimate is where the session stops.
 
 ### Dry run (A6)
@@ -690,6 +758,99 @@ found was corrected in this section before the review, and the table says what e
 | D9 | The record's lists, against each other and against the bodies | *Per part*'s tier 2 list of changed handoffs left out F9, which *What changes* names; added. The `PLAN` and `EXECUTE` input, a Modification ID, was matched by ruling 1's terms and not listed as an exception; it names the record's file, and the exceptions now say so |
 
 No required defect is left open.
+
+### Full review (A6)
+
+- **The reviewers.** Two fresh general-purpose subagents, GTWPE-TW-FLOW-RULINGS-ANALYZE-A and -B, neither
+  forked nor context-inheriting, as the template sets. Each was handed nothing but its brief's repository path
+  (ruling 1; risk 13): `ANALYZE-REVIEW-A-BRIEF.md` and `ANALYZE-REVIEW-B-BRIEF.md` in
+  `docs/ephemeral/modifications/evidence/gtwpe-tw-flow-rulings/`, committed and pushed at `024425c` before
+  either was spawned, at 05:51Z. Each confirmed its brief's sha256 at that commit (A `15fb79b2…`, B `ae6a9c56…`),
+  and that `024425c` adds only the two briefs to `cc6b923`.
+- **The runs.** Each reviewed §A at `cc6b923`, read no Notion page and wrote nothing. A ran for about 39 minutes
+  and B for about 37; the harness reported 605,411 and 558,319 subagent tokens. B reported one side effect that
+  was not its act: the harness saved one oversized output of its, a grep of `ERRORS.md`, which holds no prompt
+  body (*Harness files*).
+- **The captures.** Each return came back through the harness's `SubagentHandback` call. `capture.py` read each
+  reviewer's own transcript, found by the path the harness gave for its agent ID, twice: first printing only the
+  call's shape (one call each: A's at transcript line 585, 20,623 characters; B's at line 596, 22,599 characters),
+  then writing its message, with one final LF:
+  - `ANALYZE-REVIEW-A.md`: 20,708 bytes, sha256 `416ad54b534b956746400e71e5d4f7d1f949d0abe802c25ef57e71b4d98ff5ea`;
+    first line `1`.
+  - `ANALYZE-REVIEW-B.md`: 22,653 bytes, sha256 `6b58d32138173e4b9459fb61d18b4c8d44eb514f0e3fb83d017c45c83156e65b`;
+    first line `3`.
+
+  Each carries the `## Canon relied on` block the brief required.
+
+**Result: A, 1 required and 22 listed; B, 3 required and 20 listed.** The session tested each required finding
+against its source and confirmed all four, and it confirmed three listed findings as required under the fixed
+rubric's R1. The round closes with 7 distinct required defects, each repaired in this section:
+
+- **RQ-1** (B's R-1, with A's L1). S-6 narrowed "If there is a spec involved, those docs are updated" by type of
+  specification, so the first live run would have left PF30 untouched, against ruling 3's "PF20 and PF30 must be
+  updated as part of this". Confirmed against PE40-INIT's ruling 3 and ledger E-046 and E-052. Repaired in
+  ITEM-05 (*The authorization gate*, *Addendum changes*, *The first live run*), S-6, risk 6 and *GTWPE-D1, prompt
+  by prompt*.
+- **RQ-2** (A's R-1, with B's L5, which the session confirmed as required). Canon's timing was missing: PF20
+  takes an epic's record "only once, at epic close" (Plan Templates §2; Change Process Guide §1.1.2, §3.5.1 and
+  §6.3), and PF10 drainage follows the Isis closure decision (HDE Governance §2.0.19 and §9.1.5). §A said the PF20
+  rule "conflicts with no canon" and gave the post-QA ordering alone. Confirmed by reading those sections on
+  `main`. Repaired in ITEM-03 (the canon bullet and what follows from it), ITEM-05 (*Canon*, which now cites
+  §9.1.1 in full, as B's L6 asked, and *The first live run*, which needs HDE-EPIC040's closure decision among its
+  files), S-4, S-6, risk 5 and the canon table.
+- **RQ-3** (B's R-2). The new TW-ALPHA release needs Nathan's decision on `tw-flowmaster`'s readiness, as C2's
+  and C3's did. Confirmed against their `override` blocks and Q-1s, and C4's disposition. Repaired in *Member
+  dispositions*, risk 15, Q-1, readiness (`NEEDS_RULING`) and the interaction cost.
+- **RQ-4** (B's R-3, with A's L5). The triage pass's reading alone could count an addendum as already
+  represented. Confirmed against E-044's ruling and GTWPE-FLOW-10's own B1 step 4. Repaired in ITEM-03's
+  accounting, ITEM-04's repair 3 and S-4.
+- **RQ-5** (B's L13 and A's L17, confirmed as required). ITEM-01's "both sentences" and "two sentences" would
+  leave ruling 2's third sentence, the basis of ITEM-04, out of GTWPE-D3. Repaired in ITEM-01.
+- **RQ-6** (B's L8 and A's L14, confirmed as required). Risk 14 let an execution prompt pin a PF version, but
+  HDE Build Notes 2.14 and HDE Governance §9.1.6 cover temporary prompts too. Confirmed by reading both. Repaired
+  in risk 14 and ITEM-02.
+- **RQ-7** (A's L13, confirmed as required). ITEM-08 says what is found wrong is fixed, yet §A left E-033's
+  "until G5" and C3's F-1 in GTWPE-MGMT-10, which this Modification re-versions, as candidates; the same held
+  for E-042's two links in GTWPE-FLOW-10. Repaired in *Everything else the check covered*, *What changes*,
+  *Member dispositions*, *Scope* and *Candidates*.
+
+After the repair, the session ran D1, D2 and D6 again: both record checks exit 0, on the record at `ANALYZING` and
+on a scratch copy at `ANALYZED`; the front matter parses, the request is verbatim and all 16 tables are even; and
+83 of 83 repository quotations are found, the repair's own included.
+
+### Listed findings, accepted as risks (A6)
+
+Not repaired, by `D26-A` rule 4; each goes to Nathan with its reason, and repairing one is his opt-in. Where
+both reviewers found the same thing, it is listed once.
+
+| Finding | Reason it stays listed |
+|---|---|
+| A's L2, B's L7: S-7 against "they only get one SECTION"; the record prompts' drift control | RQ-1's repair derives S-7 from his words of 2026-10-07 (risk 6), and the record prompts' check that nothing else changed now covers every change they make. `PLAN` makes that check exact |
+| A's L3: ITEM-07 as an open question | §A states that ITEM-07 differs from PE40's check and that dropping it leaves the rest unchanged; his approval decides it |
+| A's L4: files only do not stop a facilitator's interpretation arriving as a file | A failure path. `PLAN` can carry the Intake's rule, that the request is Nathan's words where the files record them, into the entry contract, within ITEM-07 |
+| A's L6: no accounting reason for a superseded addendum | Low. `PLAN` sets the accounting list |
+| A's L7, B's L11: the triage pass's return is inline | Loud: `PLAN` makes the return a file or names it as an exception |
+| A's L8, B's L1: ITEM-02's table omits passages *Scope* counts | *Scope* is the complete measure, and `PLAN`'s anchors and `D26-E` search work from it |
+| A's L9, B's L4: the handoff rows F3, F5, F6 and F9 and the *Common rules* | `PLAN` settles each row against both sides, as tier 2 requires |
+| A's L10: TW-TRIAGE-10's ruling 3 sections against its items | Low; the dispositions at `EXECUTE` |
+| A's L11: the catalog's *Approved design* entry names C1's §A and design v1.2, which these rulings reverse in part | Low to moderate. The decision record governs; X4 could add a pointer to GTWPE-D2 to GTWPE-D4 if Nathan opts in |
+| A's L12, B's L15: the PF27 gate's and C5's reversals of C1's approved §A are not rows of the S table | §A states both (ITEM-03; ITEM-04's *C5*), and the return to Nathan names them |
+| A's L15, B's L18: the predicted cost | Now 11, with Q-1 and this mode's diff check; the calibration bullet says it may cost more |
+| A's L16, B's L14: the Intake's table maps not every word of his | Low; no item changes |
+| A's L18: the H13 exception admits any text in an approval | Low; `D21` requires his approval quoted |
+| A's L19: ruling 2's reach omits GTWPE-FLOW-10's B6 and its pull-request text | Low; `PLAN`'s counts |
+| A's L20: a PF20 pass may not fit (PF20 and PF10 read whole) | Likelihood unknown, and S1 stops loudly; `PLAN` tests S1 for a record pass |
+| A's L21, B's L19: *Member dispositions* omits `glow-artifact-storage`, `glow-workspace-currency`, the GCFPE register and the Flow Index | Low; none changes |
+| A's L22: ITEM-02's "clear in the Operations Hub" and the stale callout N-1 | N-1 is outside the route; the return asks Nathan to authorize it with X4 |
+| B's L2: "All six TW prompts" includes TW-TRIAGE-10, which has no *Turn preflight* | Loud at `PLAN`'s anchors |
+| B's L3: `closure.state_sharers` leaves out the record prompts and TW-APPLY-10, which share `PARTIAL_PACKAGE` (C3) | No effect: every member the closure names changes here |
+| B's L6: S-7 against E-010, which stays his | RQ-2's repair cites §9.1.1 whole; S-7's update keeps a record's earlier rows and identity. The canon conflict stays his |
+| B's L9: S-3 reaches direct invocations | S-3 is listed for his approval as a reading |
+| B's L10: without a selected boundary, "leave it out" needs a form | Loud; S-1's decision file carries it, and `PLAN` sets the form |
+| B's L12: a run in which every addendum waits and nothing is drafted has no stated result | Low; `PLAN` states it |
+| B's L16: *Scope*'s `git grep` count for the decision record and the checker used only some of ruling 1's terms | With all of them, by `git grep` again: five lines in the decision record and seven ignoring case, the extra ones its own name, "decision record", and a title, "the Change Process Guide"; and two lines in the checker, four ignoring case. None is text the rulings contradict |
+| B's L17: PART-01 has no `name` | Neither validator checks it |
+| B's L20: no FUNC-001 match | `PLAN`'s `D26-E` search states the functional test: does anything make a run or pass take, or a handoff carry, more than the prompt to run and files |
 
 ### Harness files (`D22` condition 5)
 
@@ -717,13 +878,18 @@ No required defect is left open.
 
   No save was hashed or compared as a body's identity. The harness refused this session's `rm` of the saves
   ("Session Transcript Tampering"), so they are left to its teardown and never read again (`D22` condition 4).
-- **A save that holds no prompt body:** `bz21dfdmt.txt`, an oversized command output of HDE Governance §9.1.
+- **Saves that hold no prompt body:** `bz21dfdmt.txt`, an oversized command output of HDE Governance §9.1; and
+  `b0hdnp35v.txt`, reviewer B's oversized grep of `ERRORS.md`, which the session did not open.
+- **The reviewers' transcripts**, the output files the harness gave for their agent IDs in this session's tasks
+  directory. They hold no prompt body: neither reviewer read a Notion page. `capture.py` read each twice for its
+  one `SubagentHandback` call, first printing only the call's shape, then writing its message to
+  `ANALYZE-REVIEW-A.md` or `ANALYZE-REVIEW-B.md`. They are left to the harness's teardown.
 - **The session transcript.** A1's verbatim copy of the request needed Nathan's message, which only the
   transcript held. A script read it once, for that message alone, and saved it to `request.txt` in the
   scratchpad.
 - **Scratch files**, in this session's scratchpad, none holding a prompt body: `request.txt`; `build_a1.py`
-  and `build_a.py`, which build this record; the drafts of its body; `dry/quotes_repo.py`, D6's check; and the
-  scratch copies of this record for the dry run.
+  and `build_a.py`, which build this record; the drafts of its body; `dry/quotes_repo.py`, D6's check, run again
+  after the repair; `capture.py`; the briefs' source; and the scratch copies of this record for the dry run.
 
 ### Canon and rulings relied on
 
@@ -731,13 +897,16 @@ Canon read from `docs/pfcanon/` on `main` at `128836a`, cited by title and secti
 
 | Source | Used for |
 |---|---|
-| **HDE Governance** §9.1.6 | Every other member given a disposition with a reason; affected producers and consumers reconciled in one coherent successor selection, an edited subgroup not ready while a counterpart is incompatible (the one part); author, checker and acceptor recorded at `EXECUTE`; management prompt bodies single-homed in Notion; external references by versionless document name (risk 14) |
-| **HDE Governance** §9.1.1, *Historical drainage* | Read for ITEM-05 only, and not argued from (E-054) |
+| **HDE Governance** §9.1.6 | Every other member given a disposition with a reason; affected producers, consumers and interacting skills reconciled in one coherent successor selection, an edited subgroup not ready while a counterpart is incompatible (the one part; Q-1); author, checker and acceptor recorded at `EXECUTE`; management prompt bodies single-homed in Notion; external references, in durable bodies and in temporary handoff prompts, by controlled directory and versionless document name, with exact source binding kept in run artifacts (risk 14) |
+| **HDE Governance** §9.1.1, with *Historical drainage* | PF20 and PF30 are historical homes the active workflow does not update; only a separately authorized historical drainage action adds to them; existing content and identities are preserved as dated history; PF10 drainage after closure is an authorized manual operator's. Read for ITEM-05's canon check only, and not argued from (E-054) |
+| **HDE Governance** §2.0.19, *Post-closure maintenance ordering*, and §9.1.5 | PF10 drainage follows the Isis closure decision (ITEM-03, S-4) |
 | **HDE Build Notes**, *Precedence, versioning, and scope* §1, §2 and §5 to §9 | An addendum governs until drained; drained guidance leaves at formal revision; every addendum is searched (ITEM-03) |
-| **HDE Build Notes** 2.14 | PF27 and PF30 adopt the terms on their next revision (ITEM-05, S-7); the reference posture, by name and section, no pinned version (this record; risk 14) |
+| **HDE Build Notes** 2.14 | PF27 and PF30 adopt the terms on their next revision (ITEM-05, S-7); the reference posture, "Do not pin a PF file version in a prompt" (this record; risk 14) |
+| **HDE Build Notes** 2.37 | HDE-EPIC040's QA verdict, which "is not closure" (ITEM-05, the first live run) |
 | **HDE Build Notes** 2.29 | Canon from `docs/pfcanon/` on `main`; change-process documents in `docs/ephemeral/`; the canon search before any analysis |
 | **HDE Build Notes** 2.38 | No provider or product is required; the surface that writes Notion confers no permission (`EXECUTE`'s writes) |
-| **Change Process Guide**, *Post-QA documentation drainage ordering (normative)* | A held-back addendum drains after its epic's QA (ITEM-03) |
+| **Change Process Guide**, *Post-QA documentation drainage ordering (normative)* | Drainage after the change's QA (ITEM-03) |
+| **Change Process Guide** §1.1.2, §3.5.1 and §6.3; **Plan Templates** §2, *Historical-only posture (normative)* | PF20 takes an epic's record only once, at epic close, and never an in-flight epic's (ITEM-05, S-6) |
 | **HDE CRD Records** §1, §2, §4.2 and §6 | CRD history is PF30's; an existing record is updated in place with one appended row; a closed volume still takes updates; rollover is the Product Owner's (ITEM-05) |
 | **HDE Phased Epics** §0, *Drain posture* | Epic history is PF20's; prior records are not mass-edited (ITEM-05) |
 | Nathan's rulings of 2026-09-28, `CHECKPOINT.md` §8 | Eligibility: PF03 and the Canon-titled documents; PF20 and PF30 through their own prompts; PF10 never a target (ITEM-03, ITEM-04) |
@@ -748,6 +917,7 @@ Canon read from `docs/pfcanon/` on `main` at `128836a`, cited by title and secti
 | `AGENTS.md` | The canon-first rule; PF canon read-only; the pull request's headings |
 
 **Canon is silent** on how a technical-writing prompt's inputs and handoffs are given: no PF document governs the
-GTWPE's flow, and a search for `execution prompt` finds nothing. On drainage it sets the timing (post-QA
-ordering) and keeps an addendum authoritative until drained, without saying which run drains it. Nathan's
+GTWPE's flow, and a search for `execution prompt` finds nothing. On drainage it sets the timing (after the change's QA
+and its closure decision) and keeps an addendum authoritative until drained, without saying which run drains
+it. Nathan's
 rulings govern there. This record uses PF03's omission marker, `[OMITTED]`, in quotations.
