@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261006-gtwpe-flow-manager
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, rule, notion_control]
 gate_tier: 1
 closure:
@@ -16,7 +16,7 @@ override:
   overrides: [review_cap]
   reason: "Nathan, 2026-10-06, opting in to repair DC-R1 of the plan at 8166328: one more round, one check of that repair's diff by a fresh checker who reads the draft, past D26-A's cap of one diff check per mode. His words are in §P, Repair round 2 (PL3). Then Nathan, 2026-10-07, accepting the published page GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1 (3f24590a05eb81798286d600250655d6) as it stands, with Notion's two links on the plain-text RUN.md, overriding X1.3 (h) check (6) of the approved plan, so that EXECUTE resumes at X1.3 (i). That check is a step of the plan, not a policy gate the validator names, so it is recorded here and not in overrides. His words are in §E, Resumed at X1.3 (i)"
 interaction_cost_predicted: 7
-interaction_cost_actual:
+interaction_cost_actual: 13
 estimate:
   plan: "about 5 h: the Flow Manager's complete body drafted through the PE Metaprompt from this analysis, as a temporary local draft, with the PE's PF03, PF06 and PF10 compatibility check; the handoff table; the catalog texts; §P's steps, readback phrases and the two-sided check of every pass invocation against the TW bodies; a dry run; and one full review by a single reviewer, who reads the draft. Time is the meter the session can read; tokens are not measured"
   execute: "about 2 h, not counting the wait for Nathan's merge: the new page (duplicate, title, the body) read back whole by this session; the handoff table committed and its merge detected on main (X2, X3); the catalog's row, note, design entry and checked-through commit, read back; the record. Time is the meter"
@@ -79,11 +79,11 @@ items:
   - id: ITEM-08
     statement: "The Flow Manager's handoffs are recorded in docs/prompt_ecosystem_management/gtwpe/, as the GTWPE handoff table GTWPE-MGMT-10 reads for closure."
     source: "Request item 8, first half; MODIFICATION-20261005-gtwpe-writing-side §A A.5's C4 row; GTWPE-MGMT-10 100526.2, *Read these* and the record's closure row"
-    disposition: APPLIED
+    disposition: VERIFIED
   - id: ITEM-09
     statement: "GTWPE-MGMT-10 can maintain the new prompt from the moment it lands, before C6 has the catalog select every member."
     source: "Request item 8, second half; MODIFICATION-20261005-gtwpe-writing-side §A A.5's C4 and C6 rows; the GTWPE catalog's members note"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     name: "GTWPE-FLOW-10: its first page, its handoff table and its catalog row"
@@ -1954,3 +1954,138 @@ once X3 finds the handoff table on `main`; ITEM-09 open until X4.2.
 - **F-E5. The override block names only the validator's policy gates.** Nathan's override of a plan check has no
   name in `OVERRIDABLE`, so the block records it in its `reason` alone. A later GTWPE-MGMT-10 repair may give the
   override of a plan step a place of its own: recorded, not taken.
+
+### X3: the merge, detected on `main`
+
+At 01:58:27Z, `git fetch origin main` exited 0: `origin/main` is `fa0eed0037be0177115479d00f166eb0ec5234f0`, PE39's
+ledger entry E-042 (#584, `docs/ephemeral/gtwpe.rewrite/ERRORS.md` only), after amthorn78/glow-hdengine-v2#585,
+merged as one commit, `b65e918`, at 2026-10-07T01:56:06Z.
+- The merge was detected by files, never by a commit subject (`D26-C`): `git rev-parse origin/main:<path>` equals
+  the blob of the branch's last commit, `89877e1`, for the handoff table, the record and each of the eight evidence
+  files.
+- «M» is `b65e9181e0e5d349ddb236de817e7b85a32f00e1`, by `git log -1 --format=%H origin/main --
+  docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, and «m» is `b65e918`.
+- Both record checks exit 0 (1/1) on the record as `main` holds it, in a copy taken with `git show`.
+
+### X4.1: the drift check
+
+«S» is 2026-10-07, at 01:58:48Z. `git log --format='%H %cI %s' ad1615d..«M»` over *The watched sources*, as
+GTWPE-MGMT-10 100526.2 lists them in its fetch at X1.0 (0), leaving out this Modification's own file,
+`docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, lists no commit. The range holds four commits, #581, #582,
+#583 and #585: the first three change `docs/ephemeral/` only, and #585 changes `docs/ephemeral/` and the own file.
+**No trigger finding**, so no `D26-E` search is owed, and the lineage pins stay as they are.
+
+### X4.2: the catalog, W4
+
+| Step | Result |
+|---|---|
+| Pre-read | At about 01:59Z, the GTWPE parent page, edited 2026-10-06T16:53:37.871Z: CAT-ROW, CAT-NOTE, CAT-DESIGN and CAT-COMMIT once each, by reading, checked by a second reading; its five headings, `Catalog`, `Members`, `Lineage pins`, `Checked-through commit` and `Approved design`; its six child pages, the five X1.0 (4) recorded and «ID»; and the members table's one row, GTWPE-MGMT-10 at 100526.2 |
+| The texts | `w4_texts.py` printed the four replacements from *The catalog texts* in the record as `main` holds it, with «T», «V», «ID», «S», «M» and «m» substituted and no `«…»` left. They were sent as printed |
+| **W4** | `update_content`, `allow_async: false`, the four replacements in one call, in the order CAT-ROW, CAT-NOTE, CAT-DESIGN, CAT-COMMIT. It returned success at once, with no task |
+| Readback | Fetched again, edited 2026-10-07T01:59:25.993Z, by reading, checked by a second reading: (1) the members table has two rows, GTWPE-MGMT-10's as the pre-read showed it and below it GTWPE-FLOW-10's, its page cell in the rendered form *The catalog texts* gives; (2) CAT-NOTE-NEW, CAT-DESIGN-NEW and CAT-COMMIT-NEW are present as sent, and CAT-NOTE, CAT-COMMIT and the one-row table absent; (3) `§6` and `handoff` occur only in CAT-DESIGN-NEW; (4) the page's opening paragraph, the catalog's own opening, the lineage pins, the *Recorded on 2026-09-29* paragraph, the five headings and the six child pages are as the pre-read showed them. Pass |
+
+The catalog now lists GTWPE-FLOW-10 at 100726.1, as the approved plan names it, so the mode ends without
+`PROMOTION_CHECKPOINT_REQUIRED`.
+
+### Values fixed after the resume
+
+| Value | Fixed as |
+|---|---|
+| «M», «m» | `b65e9181e0e5d349ddb236de817e7b85a32f00e1`, `b65e918`, at X3 |
+| «S» | 2026-10-07, at X4.1 |
+
+### Steps and dispositions, X1.1 to X5
+
+| Step | Part | Disposition | Evidence |
+|---|---|---|---|
+| X1.1 | — | VERIFIED | At 00:05:32Z: status `EXECUTING`; «D» fixed (*Values, fixed at X1.1*) |
+| X1.2 | — | VERIFIED | X1.0 (0) to (8) passed; «V» and «T» fixed (*X1.2*) |
+| X1.3 | PART-01 | VERIFIED | W1, W2 and W3; (a) to (g) passed; (h): ten checks passed, and check (6), with the eighth heading in check (5), stands by Nathan's override of 2026-10-07; (i) passed, and (j) done (*X1.3*; *Resumed at X1.3 (i)*) |
+| X1.4 | PART-01 | VERIFIED | The handoff table at `b1e54dc`, its three checks passed (*X1.4*) |
+| X2 | — | VERIFIED | The record with X1's values and dispositions at `89877e1`; both record checks exit 0 at `EXECUTING` (1/1); pushed, and the branch's blob of each changed file equals the local file; amthorn78/glow-hdengine-v2#585, the branch's one open pull request, in #583's place (F-E4) |
+| X3 | — | VERIFIED | The merge detected by files on `main`; «M» fixed; both record checks exit 0 on `main`'s copy (*X3*) |
+| X4.1 | — | VERIFIED | No trigger finding (*X4.1*) |
+| X4.2 | PART-01 | VERIFIED | W4, read back (*X4.2*) |
+| X5 | — | VERIFIED | Every step's and item's disposition; `interaction_cost_actual`; the author, checker and acceptor; the clock. Status `COMPLETE`; both record checks exit 0 at `COMPLETE`; the branch restarted from `origin/main`, since X2 waited for a merge; the record committed and pushed, its pushed blob read back against the local file, and its pull request opened |
+
+This table succeeds the failure record's *Steps and dispositions* and *Steps and dispositions after the resume*,
+above, which are dated records of the run at their times.
+
+### Items, at X5
+
+| Item | Disposition | Evidence |
+|---|---|---|
+| ITEM-01 to ITEM-07 | VERIFIED | X1.3 (h), with check (6) by Nathan's override, and (i): the page, read back whole, carries each where *The new page* places it |
+| ITEM-08 | VERIFIED | X1.4 and X3: the handoff table on `main` at «M», sha256 «HT» |
+| ITEM-09 | VERIFIED | X4.2: the catalog's GTWPE-FLOW-10 row and members note, read back |
+
+### Parts, at X5
+
+**PART-01 landed whole.** GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1 is «ID», a child page of the
+GTWPE parent page. Its body is the reviewed draft except for Notion's two links on the plain-text `RUN.md`, which
+Nathan accepted. The GTWPE handoff table is on `main`, and the catalog lists GTWPE-FLOW-10 with its row, note, design
+entry and checked-through commit, all read back. The architecture page is unchanged.
+
+### Artifacts produced
+
+| Artifact | Where | Read back |
+|---|---|---|
+| GTWPE-FLOW-10 100726.1 | Notion, «ID», under the GTWPE parent page | Whole, at X1.3 (h) and at the sweep; its edit time and place at (i) |
+| The GTWPE handoff table | `docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, on `main` at «M» | sha256 «HT» at X1.4; its blob on `main` at X3 |
+| The catalog's four texts | Notion, the *Catalog* section of the GTWPE parent page | X4.2's readback |
+| This record | `docs/ephemeral/modifications/MODIFICATION-20261006-gtwpe-flow-manager.md` | Its pushed blob, against the local file |
+
+### Author, checker and acceptor (HDE Governance §9.1.6)
+
+| Part | Author | Checker | Acceptor |
+|---|---|---|---|
+| PART-01 | This GTWPE-MGMT-10 session, through the PE Metaprompt's general rules: the body, the handoff table and the catalog texts | Before publication, GTWPE-FLOW-MANAGER-PLAN-A, a fresh reviewer, and the checkers GTWPE-FLOW-MANAGER-PLAN-DC and GTWPE-FLOW-MANAGER-PLAN-DC2, each of whom read the draft. After it, this session's readback of every write (X1.3 (h) and (i), X4.2), and PE39's live read of the published page | Nathan, by his approvals of the analysis and the plan and his acceptance of the published page on 2026-10-07; PE39 checks the result for him |
+
+### Harness files (`D22` condition 5), for X3 to X5
+
+- **This session's transcript** holds the GTWPE parent page, fetched inline at X4.2's pre-read and readback. It holds
+  no prompt body, and no prompt body was read in X3 to X5.
+- **Scratch files**, in `c4/x/`: `w4_texts.py`, which printed W4's texts from the record as `main` holds it;
+  `w4_payload.json`, the four replacements, catalog text only; and `main/`, the record's copy from `main` for X3's
+  checks.
+
+### Canon and rulings relied on, for X3 to X5
+
+- GTWPE-MGMT-10 100526.2, as fetched at X1.0 (0): `MODE = EXECUTE` X3 to X5, *The watched sources*, *How each kind of
+  target changes* for the catalog, and *Result routing*.
+- HDE Governance (PF04) §9.1.6, as read in this mode: the readback of the changed catalog, and the actual author,
+  checker and acceptor.
+- HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, rule 3: W4 was made from this session under the plan's authority.
+- `D21-C` and `D26-C`; Nathan's approval of the plan and its authorization of W4; his directions of 2026-10-07.
+
+### Interaction cost, actual against predicted
+
+Predicted 7. Actual 13:
+- 2 rulings: Nathan's opt-in to repairing DC-R1, which overrode `review_cap`; and his acceptance of the published
+  page, which overrode X1.3 (h)'s check (6);
+- the 2 fixed round trips;
+- 5 review rounds: `ANALYZE`'s dry run; `PLAN`'s dry run, full review and two diff checks;
+- no skill review or install;
+- 4 merges: #581, at `ANALYZED`; #583, with the failure record; #585, with the handoff table, at X2; and the
+  record's, still to come.
+
+The difference has four causes. #581 was merged at `ANALYZED` (P-4). The full review's required findings brought the
+first diff check, under Nathan's direction. DC-R1 brought his opt-in and the second diff check. The readback's stop
+at X1.3 (h) brought the failure record's merge and his acceptance of the page.
+
+### Clock
+
+`EXECUTE` ran from 00:05:32Z to the stop at about 00:18Z, and from the resume at 01:49:55Z to this record at about
+02:05Z: about 35 minutes on the meter, against the estimate of about 2 h, so under it. The waits for Nathan's
+decision, from about 00:18Z to 01:48:48Z, and for his merge of #585 are off the meter. Tokens are not measured by this
+session.
+
+### Remaining Product Owner actions
+
+- Merge the record's pull request when he chooses. The record is `COMPLETE`, so his rule allows it, and nothing waits
+  on that merge (`D21-C`).
+- F-E1's correction waits for a Modification of its own, through GTWPE-MGMT-10 (*Candidate for GTWPE-FLOW-10's next
+  version*). F-E5, and §A's N-1 and N-2, are recorded for Nathan and PE39. The open findings stay accepted as risks
+  (`DISP-001`).
+
+**Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with no trigger finding from X4.1. `NOTHING NEEDED`.
