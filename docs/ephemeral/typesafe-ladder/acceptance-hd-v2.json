@@ -1,0 +1,160 @@
+{
+ "version": "hd-v2",
+ "part_a": [
+  {
+   "label": "HA1 Record a delivered report",
+   "session": "controller",
+   "action": "Record the delivery date and Google Doc link of a 40-page reading that has already passed acceptance, publication and QA, in the run log and on the client's Notion page; nothing later depends on this step.",
+   "expect_level": [
+    "low"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "hd_v1_expectation": {
+    "rung": [
+     "low"
+    ],
+    "model": "Opus 5.5"
+   }
+  },
+  {
+   "label": "HA2 Two named one-line fixes",
+   "session": "repair",
+   "action": "Correct one misspelled gate name and one wrong table caption in an accepted 40-page reading, each named by section and line; the deterministic mechanical and structure checks re-run before the report is republished.",
+   "expect_level": [
+    "medium"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "hd_v1_expectation": {
+    "rung": [
+     "medium"
+    ],
+    "model": "Opus 5.5"
+   }
+  },
+  {
+   "label": "HA3 Repair four named defects",
+   "session": "repair",
+   "action": "Repair a 40-page reading written on the accepted template against four defects named at acceptance, each with its section, the failed requirement and the evidence; acceptance re-runs every check before the report can be published, and a QA pass follows.",
+   "expect_level": [
+    "high",
+    "extra high"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "hd_v1_expectation": {
+    "rung": [
+     "high",
+     "extra high"
+    ],
+    "model": "Opus 5.5"
+   }
+  },
+  {
+   "label": "HA4 First parent-child composite",
+   "session": "author",
+   "action": "Write the first parent-child composite reading produced on this platform, for paying clients, from a complete packet: both charts, the relationship ledger, a long prompt, a new template version and reference works read passage by passage; later parent-child reports will copy its structure, and the acceptance checks test mechanics and structure, not the interpretation.",
+   "expect_level": [
+    "max"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Fable 5.1",
+   "hd_v1_expectation": {
+    "rung": [
+     "max"
+    ],
+    "model": "Fable 5.1"
+   }
+  },
+  {
+   "label": "HA5 Claim audit of the first six reports",
+   "session": "QA",
+   "action": "Before the first production reports produced on this platform reach clients, check every claim in six 40-page readings against their chart data and the cited reference passages, section by section; any single reader would miss claims spread across 240 pages.",
+   "expect_level": [
+    "extra high",
+    "max"
+   ],
+   "expect_ultracode": true,
+   "expect_model": null,
+   "hd_v1_expectation": {
+    "rung": [
+     "ultracode"
+    ],
+    "model": null
+   }
+  },
+  {
+   "label": "HA6 Standard single-person reading",
+   "session": "author",
+   "action": "Write a standard 40-page single-person reading for a new client from a complete packet on the accepted template, a report type already produced here many times; acceptance checks and a QA pass follow.",
+   "expect_level": [
+    "high",
+    "extra high"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "hd_v1_expectation": {
+    "rung": [
+     "high",
+     "extra high"
+    ],
+    "model": "Opus 5.5"
+   }
+  },
+  {
+   "label": "HA7 Entry-by-entry glossary check",
+   "session": "QA",
+   "action": "Before the new 64-gate glossary replaces the old one, check each gate entry against the three reference works it cites, entry by entry.",
+   "expect_level": [
+    "extra high",
+    "max"
+   ],
+   "expect_ultracode": true,
+   "expect_model": null,
+   "hd_v1_expectation": null,
+   "note": "added at pre-registration review so that the ultracode-on test does not rest on one case"
+  }
+ ],
+ "jobs": [
+  {
+   "label": "J0 General: a typical three-report request",
+   "session": "general",
+   "action": "Run the full Human Design reading production process on this platform for a typical request of three reports for paying clients, two single-person readings and one romantic composite, all report types already produced here: intake, live chart and geocoding calls, three authors in parallel, acceptance checks, native Google Doc publication, same-author QA and filing."
+  },
+  {
+   "label": "J1 Controller: routine production run",
+   "session": "controller",
+   "action": "Run the controller session for a routine production request of three reports on accepted templates: intake, live chart and geocoding calls with real keys, dispatching three authors, deterministic acceptance checks, publishing native Google Docs with chart images, dispatching QA and filing records, over about 90 minutes."
+  },
+  {
+   "label": "J2 Controller: first live production run here",
+   "session": "controller",
+   "action": "Run the controller session for the first live production request on this platform for paying clients: new adapters, the first live chart and geocoding calls with real keys from here, three authors, acceptance checks, the first native Google Doc publication with chart images, QA and filing."
+  },
+  {
+   "label": "J3 Author: romantic composite, type already produced",
+   "session": "author",
+   "action": "Write a 50-page romantic composite reading for two paying clients from a complete packet (both charts, the relationship ledger, the prompt, the accepted template and reference works read passage by passage), a report type already produced here; acceptance checks and a same-author QA pass follow."
+  },
+  {
+   "label": "J4 Author: first single-person reading on this platform",
+   "session": "author",
+   "action": "Write the first single-person reading produced on this platform, for a paying client, from a complete packet on the accepted template carried over from the previous platform; acceptance checks test mechanics and structure, and a same-author QA pass follows."
+  },
+  {
+   "label": "J5 Author: focused answer to two questions",
+   "session": "author",
+   "action": "Write a 5-page focused answer to a returning client's two specific questions from their accepted chart and earlier full reading, on the accepted component template; acceptance checks and a QA pass follow."
+  },
+  {
+   "label": "J6 QA: formatting check by the same author",
+   "session": "QA",
+   "action": "Check a published 40-page reading's Google Doc against its accepted Markdown source with the written formatting checklist, as the same author in the same session; a deterministic Markdown-to-Doc comparison also runs and gates release."
+  }
+ ],
+ "gates": {
+  "A": "hd-v2 is accepted when all seven cases meet every stated expectation (level in the set; ultracode where stated; model where stated). HA1 to HA4 and HA6 carry hd-v1's accepted level sets and models; HA5's level set keeps hd-v1's stakes judgement (it sat above max there). If any fails, one revision (hd-v2.1) is allowed, run on the same cases and marked as fitted to them; if it also fails, Nathan decides.",
+  "J": "The seven job texts J0 to J6 are re-read and reported, not gated."
+ }
+}
