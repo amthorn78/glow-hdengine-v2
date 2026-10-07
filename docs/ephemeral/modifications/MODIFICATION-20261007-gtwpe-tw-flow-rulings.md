@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261007-gtwpe-tw-flow-rulings
-status: EXECUTING
+status: COMPLETE
 targets: [prompt, rule, notion_control]
 gate_tier: 2
 closure:
@@ -16,7 +16,7 @@ override:
   overrides: [readiness]
   reason: "Nathan, 2026-10-07, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for the new TW-ALPHA release. The grounds are those of §A's Q-1, option (a): GTWPE-FLOW-10 runs the TW prompts as passes, C6 retires the skill, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged."
 interaction_cost_predicted: 11
-interaction_cost_actual:
+interaction_cost_actual: 13
 estimate:
   plan: "about 10 h, not counting waits for Nathan: the edits to eight bodies, as anchors and new texts, authored through the PE Metaprompt from this analysis, with each passage counted twice; the decision record's three entries and the handoff table's rows; the selection page's three writes, the three current-release notes and the catalog rows; and PLAN's dry run, with its two-sided check of every invocation against the bodies it reaches, one full review and at most one diff check. Tokens are not measured"
   execute: "about 5 h, not counting the waits for Nathan's merges: eight new pages, each duplicated, titled, edited and read back whole; the decision record and the handoff table committed, and their merge detected on main (X2, X3); the selection writes and the three notes, read back; the catalog (X4); and the record at COMPLETE (X5). Tokens are not measured"
@@ -61,35 +61,35 @@ items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
     source: "PE40-INIT-20261007.md, Nathan's rulings 1 to 3 (ruling 1: \"this needs to be explicitly documented\"); ERRORS.md E-044, E-045, E-046, E-052 and E-053, Nathan's words in each; ecosystem-change-management.md §2 step 1"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-02
     statement: "The only inputs to a GTWPE run, and to each of its handoffs, are files, attached or given by filename or repository path; no other context passes, at any phase, and this is clear in the Operations Hub."
     source: "PE40-INIT-20261007.md, Nathan's ruling 1; ERRORS.md E-045; GTWPE-TARGET-ARCHITECTURE-20260929.md, Nathan's answer 2"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-03
     statement: "Every PF10 addendum in a run's sources is drained, whether or not it states a drain target, and every PF document is updated on its context and scope."
     source: "PE40-INIT-20261007.md, Nathan's ruling 2; ERRORS.md E-044 and E-052, Nathan's rulings"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-04
     statement: "Part of the run is a prompt that evaluates the drain targets."
     source: "PE40-INIT-20261007.md, Nathan's ruling 2; ERRORS.md E-051"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-05
     statement: "PF20 and PF30 are updated as part of the run whenever a specification is involved, and not otherwise, each through its own special prompt and never through the redliner."
     source: "PE40-INIT-20261007.md, Nathan's ruling 3; ERRORS.md E-046, E-052 and E-053, Nathan's rulings; GTWPE-TARGET-ARCHITECTURE-20260929.md §6 and *Redlining discipline*"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-06
     statement: "The PF09 documents are assigned the right prompts."
     source: "PE40-INIT-20261007.md, Nathan's ruling 4; ERRORS.md E-047"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-07
     statement: "GTWPE-MGMT-10 takes its own request as the files that record it, with no other context in the handoff."
     source: "PE40-INIT-20261007.md, Nathan's ruling 1 (\"you may not pass arbitrary context in handoffs\"; \"this is very important at every phase\"); ERRORS.md E-048"
-    disposition: ""
+    disposition: VERIFIED
   - id: ITEM-08
     statement: "Every GTWPE member, including everything C1 to C4 published, is checked against Nathan's words and the live sources, and what is found wrong is fixed."
     source: "PE40-INIT-20261007.md, Nathan's ruling 5 and *Read this first*; ERRORS.md E-048"
-    disposition: ""
+    disposition: VERIFIED
 parts:
   - id: PART-01
     items: [ITEM-01, ITEM-02, ITEM-03, ITEM-04, ITEM-05, ITEM-06, ITEM-07, ITEM-08]
@@ -2323,3 +2323,185 @@ nothing selects them, and W25 to W29 move the selection only after the merge.
   that prints edits from the committed `edits.json`.
 
 The clock at this commit is about 25 minutes from X1.1.
+
+### X2, as it landed
+
+After the commit above, `961329f`, `git diff --name-only origin/main...HEAD` listed the 20 paths *X1.4* names, and
+both record checks exited 0 on the record as committed. The push, `695da6c..961329f`, succeeded, and the branch's blob
+of each changed file equalled the local file: the record `c65eb76f`, the decision record `1c65c853`, the handoff
+table `6f61a85b`. amthorn78/glow-hdengine-v2#590's title and description were updated at about 17:06Z, and it was the
+branch's one pull request, open. The session returned `PRODUCT_OWNER_ACTION_PENDING` for Nathan's merge, ending
+`IN FLIGHT`. Nathan merged #590, and told this session so at about 18:26Z.
+
+### Values fixed after the merge
+
+| Value | Fixed as |
+|---|---|
+| «M», «m» | `017a8e5c0077c8232c691ec4f4e5df1626fbc147`, `017a8e5`, at X3 |
+| «S» | 2026-10-07, at X4.1 |
+| «R» | TW-ALPHA-20261007.1, at X4.3's pre-read: the selection page names no release dated 2026-10-07 |
+
+### X3: the merge, by files on `main`
+
+At 18:26:00Z, `git fetch origin main` exited 0: `origin/main` moved from `128836a` to `017a8e5`. For each of the 20
+paths the branch changed, `git rev-parse origin/main:<path>` equals the branch's blob at `961329f`: 20 equal, 0
+different. The remote branch had been deleted after the merge, so the comparison read the branch's last fetched head,
+`961329f`, the commit the push left. «M» is `git log -1 --format=%H origin/main --` the two `gtwpe/` files:
+`017a8e5c0077c8232c691ec4f4e5df1626fbc147`. The local branch was restarted from `origin/main` (X5), and the record
+there equals `main`'s blob. On it, `gtwpe_record_check.py` and `modification_validate.py` each exit 0, 1/1.
+
+### X4.1: the drift check
+
+GTWPE-MGMT-10 100526.2 was fetched live again at 18:26:46Z, since this session's earlier read of it was lost to a
+context compaction (*Reading prompt bodies*): still at 2026-10-05T16:36:11.384Z. Its *The watched sources* list:
+`docs/pfcanon/PF03-*`, `PF04-*`, `PF06-*`, `PF10-*`, `PF20-*`, `PF27-*` and `PF30.*`; `AGENTS.md`; and in
+`docs/prompt_ecosystem_management/`, `gcfpe.decision-record.md`, `modification-template.md`,
+`modification_validate.py`, `reviewer-prompt-template.md`, `ecosystem-change-management.md`,
+`execution-and-delegation-model.md`, `notion-write-boundary.md`, `prompt-body-content-policy.md` and the `gtwpe/`
+directory.
+
+«S» is 2026-10-07. `git log --format='%H %cI %s' 128836a..017a8e5c0077c8232c691ec4f4e5df1626fbc147` over that list,
+at 18:26:56Z, lists one commit, `017a8e5`, the merge of #590, and its only watched paths are this Modification's two
+`gtwpe/` files. Left out as this Modification's own, nothing remains. `128836a..017a8e5` holds no other commit.
+**No trigger finding.** Nothing is re-pinned, and the checked-through commit moves to «M» (X4.2).
+
+### X4.2 to X4.6: the control writes, W25 to W29
+
+Each pre-read was made just before its write, and each write was sent with `allow_async: false` and returned the
+page's ID and no async task. Every check passed. Times are the transcript's.
+
+| Step | Write | Page | Pre-read | Sent | Readback |
+|---|---|---|---|---|---|
+| X4.2 | W25, five replacements in the plan's order | The GTWPE parent page, `3ea4590a05eb818c915bdfd3d150c44b` | 18:27:44Z: edited 2026-10-07T01:59:25.993Z; CAT-FLOW, CAT-FLOW-PAGE, CAT-MGMT, CAT-MGMT-PAGE and CAT-COMMIT once each; 5 headings, *Catalog*, *Members*, *Lineage pins*, *Checked-through commit* and *Approved design*; 8 child pages: GTWPE-MGMT-10 at 092926.1, 092926.2, 100526.1, 100526.2 and 100726.1, the target architecture page, and GTWPE-FLOW-10 at 100726.1 and 100726.2 | 18:28:06Z | As of 18:28:07.304Z: (1) GTWPE-MGMT-10's row at `100726.1` in its title and version cells and GTWPE-FLOW-10's at `100726.2`, each page cell in the rendered form *The control texts* gives; (2) CAT-COMMIT's new text present as sent, the five old texts absent; (3) the opening paragraph, the catalog's opening, the members note, the lineage pins, the *Recorded on 2026-09-29* paragraph, the *Approved design* entry, the five headings and the 8 child pages as the pre-read showed them |
+| X4.3 | W26, SEL-1 then SEL-2 | The selection page, `3d44590a05eb8171ab6ff4dab33b00ef` | 18:28:23Z: edited 2026-10-07T02:12:01.288Z; «R» fixed; SEL-1 once, the page's only `### Current operation`; SEL-2 once, its first two lines; `Selected release — TW-ALPHA-20261007.1` absent; 18 headings; 8 child pages: *Alpha 1* and TW-MGMT-10 at 090726.1, 090726.2, 090726.3, 090826.1, 090826.2, 092926.1 and 100426.1 | 18:29:10Z | As of 18:29:11.162Z: (1) the new status line first; (2) `## Selected release — TW-ALPHA-20261007.1`, its paragraph as sent with «S», «PA» and the sentence on TW Flowmaster and flowmaster-validate, and its six rows, each linking its «ID» and ending `; 100726.1.`; (3) `### Current operation`, with the diagram and the six paragraphs as sent; (4) `## Historical selected release — TW-ALPHA-20261006.2`, with `### Historical operation — TW-ALPHA-20261006.2` within it; (5) one heading named `Current operation`; (6) 20 headings, the pre-read's with the new section's two added at the top and the two renamed; (7) the 8 child pages as the pre-read showed them, and nothing else changed |
+| X4.4 | W27, A1-OLD to A1-NEW | *Alpha 1*, `3d44590a05eb81fe991ff0114cb43029` | 18:29:33Z, saved by the harness: `ctl_check.py pre` exits 0; edited 2026-10-07T02:11:56.963Z; its anchor once; 34 headings | 18:29:56Z | 18:30:00Z, saved: `ctl_check.py post` with the plan's arguments, values substituted, exits 0, 14 of 14 `PASS`: the new heading once, the renamed one once and directly after it, the anchor gone, 35 headings, the three texts, and the six rows each linking its «ID» at `100726.1`. 1 child page, as before |
+| X4.5 | W28, HDE-OLD to HDE-NEW | *HDE TW*, `3c74590a05eb8176baf8cb59f1631f3c` | 18:30:16Z: edited 2026-10-07T02:12:11.957Z; HDE-OLD once, as its first line; 13 headings; 44 child pages, the six new TW pages among them | 18:30:36Z | As of 18:30:37.610Z: the page begins with HDE-NEW, with «R», «V», «PA», the Flow Manager's «ID» and its sentence on TW Flowmaster and flowmaster-validate as sent; 14 headings, the pre-read's with HDE-NEW's added above the renamed one; the 44 child pages as the pre-read showed them |
+| X4.6 | W29, HUB-OLD to HUB-NEW | The Operations Hub, `3ce4590a05eb814f8892f88ff8539308` | 18:30:48Z, saved: `ctl_check.py pre` exits 0; edited 2026-10-07T04:23:05.337Z; its anchor once; 141 headings | 18:31:11Z | 18:31:15Z, saved: `ctl_check.py post` with the plan's arguments, values substituted, exits 0, 13 of 13 `PASS`: the new heading once, the renamed one once and directly after it, the anchor gone, 142 headings, and the eight texts. 14 child pages, as before |
+
+Each pre-read and readback of the parent page, the selection page and *HDE TW* came back inline and was checked by
+reading, checked by a second reading. A script over each *Alpha 1* and Hub save also counted the old heading once as
+text, its historical form 0 times and «R» 0 times before the write, and the Flow Manager's «ID» once after it. The
+texts sent were printed from this record's *The control texts* as `main` holds it, by a script in the scratchpad,
+with the values substituted and nothing else changed.
+
+### X5: dispositions
+
+**ITEM-06's reading.** At 18:31:43Z the session fetched «ID:TRIAGE-10» again, read-only, still at
+2026-10-07T16:50:52.555Z: its routing sentence sends "a PF09 phase file to TW-DRAIN-20", and its step 4 routes PF09
+to the applicable phase files. GTWPE-FLOW-10's PF09 row, read in the fetch of «ID:FLOW-10» at 17:02Z, routes "Each
+PF09 phase document" to "TW-DRAIN-20, then TW-APPLY-10". Both read back as §A's ITEM-06 describes them.
+
+### Steps and dispositions, X1.1 to X5
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.1 | — | VERIFIED | `695da6c`: the status, `plan_approved_by`, «D», «PA» and the start time in §E before X1.2 |
+| X1.2 | — | VERIFIED | *X1.2*: X1.0 (0) to (8) passed; «V» and «VF» fixed |
+| X1.3 | PART-01 | VERIFIED | *X1.3*: W1 to W24, the eight new pages, (f) to (h) passed |
+| X1.4 | PART-01 | VERIFIED | *X1.4*: the two files at «HD» and «HT»; the 20 paths; the `D26-E` search with no hit |
+| X2 | — | VERIFIED | *X2, as it landed*: both checks exit 0 at `EXECUTING`; pushed, the branch's blobs equal the local files; #590 the branch's one pull request |
+| X3 | — | VERIFIED | *X3*: 20 of 20 blobs equal on `main`; «M» fixed; both checks exit 0 on `main`'s copy |
+| X4.1 | — | VERIFIED | *X4.1*: no trigger finding |
+| X4.2 | PART-01 | VERIFIED | W25, read back |
+| X4.3 | PART-01 | VERIFIED | W26, read back |
+| X4.4 | PART-01 | VERIFIED | W27, `ctl_check.py post` 14 of 14 |
+| X4.5 | PART-01 | VERIFIED | W28, read back |
+| X4.6 | PART-01 | VERIFIED | W29, `ctl_check.py post` 13 of 13 |
+| X5 | — | VERIFIED | Every step's and item's disposition; `interaction_cost_actual`; the author, checker and acceptor; the clock. Status `COMPLETE`; both record checks exit 0 at `COMPLETE`; the branch restarted from `origin/main`, since X2 waited for a merge; the record committed and pushed, its pushed blob read back against the local file, `git diff --stat origin/main...HEAD` listing only the record, and its pull request opened |
+
+This table succeeds *The steps so far*, above, which is a dated record of the run at X2.
+
+### Items, at X5
+
+| Item | Disposition | Evidence |
+|---|---|---|
+| ITEM-01 | VERIFIED | X1.4 and X3: the decision record 1.1 on `main` at «M», sha256 «HD» |
+| ITEM-02 | VERIFIED | Every edit carrying it passed (g)(4) and (5) on its page (X1.3); its handoff rows in the handoff table at «HT», on `main` (X1.4, X3); X4.6 passed |
+| ITEM-03, ITEM-04, ITEM-05, ITEM-07, ITEM-08 | VERIFIED | Every edit carrying each passed (g)(4) and (5) on its page (X1.3); their handoff rows on `main` (X1.4, X3) |
+| ITEM-06 | VERIFIED | No edit; GTWPE-FLOW-10's PF09 row and TW-TRIAGE-10's routing sentence read back as §A describes them (*X5: dispositions*) |
+
+### Parts, at X5
+
+**PART-01 landed whole.** The eight new prompt pages exist, each read back whole. The decision record 1.1 and the
+handoff table 1.1 are on `main` at «M». The catalog selects GTWPE-MGMT-10 100726.1 and GTWPE-FLOW-10 100726.2. The
+selection page selects TW-ALPHA-20261007.1, with the six TW prompts at 100726.1. *Alpha 1*, *HDE TW* and the
+Operations Hub carry its current-release note. Every write was read back. No current prompt page was edited, and none
+was archived.
+
+### Artifacts produced
+
+| Artifact | Where | Read back |
+|---|---|---|
+| TW-TRIAGE-10, TW-DRAIN-10, TW-DRAIN-20, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10 at 100726.1 | Notion, «ID:TRIAGE-10» to «ID:APPLY-10», under *HDE TW* | Whole, at X1.3 (g); «ID:RECORD-10» and «ID:RECORD-20» again at 17:04Z, and «ID:TRIAGE-10» at 18:31Z |
+| GTWPE-FLOW-10 100726.2 and GTWPE-MGMT-10 100726.1 | Notion, «ID:FLOW-10» and «ID:MGMT-10», under the GTWPE parent page | Whole, at X1.3 (g); «ID:FLOW-10» again at 17:02Z |
+| The GTWPE decision record 1.1 and handoff table 1.1 | `docs/prompt_ecosystem_management/gtwpe/`, on `main` at «M» | sha256 at X1.4; their blobs on `main` at X3 |
+| The catalog's five texts | Notion, the GTWPE parent page | X4.2's readback |
+| TW-ALPHA-20261007.1's selection | Notion, the selection page | X4.3's readback |
+| The current-release notes | Notion, *Alpha 1*, *HDE TW* and the Operations Hub | X4.4 to X4.6's readbacks |
+| This record | `docs/ephemeral/modifications/MODIFICATION-20261007-gtwpe-tw-flow-rulings.md` | Its pushed blob, against the local file |
+
+### Author, checker and acceptor (HDE Governance §9.1.6)
+
+| Part | Author | Checker | Acceptor |
+|---|---|---|---|
+| PART-01 | The GTWPE-MGMT-10 sessions that ran `ANALYZE` and `PLAN`, through the PE Metaprompt's general rules: the 205 edits in `edits.json`, the decision record and handoff table 1.1, and the control texts. This session ran `EXECUTE` and made W1 to W29 | Before publication, the fresh reviewers GTWPE-TW-FLOW-RULINGS-ANALYZE-A and -B, the checker -ANALYZE-DC, the reviewers -PLAN-A and -B and the checker -PLAN-DC, each independent of the author, with `edits_check.py`. No reviewer checked the repair Nathan ordered (PO-6; K-28). After publication, this session's readback of every write (X1.3 (f) to (h), X4.2 to X4.6) and `ctl_check.py`, which is not independent of the session that wrote | Nathan, by his approvals of the analysis and the plan and his merge of #590 |
+
+### Harness files (`D22` condition 5), for X3 to X5
+
+- **This session's transcript** holds, inline: GTWPE-MGMT-10 100526.2, fetched at 18:26:46Z for X4.1; the GTWPE
+  parent page, the selection page and *HDE TW*, at their pre-reads and readbacks; and «ID:TRIAGE-10», fetched at
+  18:31:43Z for ITEM-06. It is left to the harness's teardown.
+- **Harness saves**, control pages and no prompt body, each read by `ctl_check.py` and a script that counted its
+  headings and texts, and left to the teardown as X4.4 says:
+  - *Alpha 1*: `toolu_01KMiX3ryu6DzePQSTo4rffK.json`, the pre-read, and `toolu_01SZq6tzbXpJE12ZCbr5KqEq.json`, the
+    readback.
+  - The Operations Hub: `mcp-Notion-notion-fetch-1791397850459.txt`, the pre-read, and
+    `mcp-Notion-notion-fetch-1791397877036.txt`, the readback.
+- **Scratch files**: `ctl.py`, which printed each control write's texts from this record as `main` holds it; the
+  four write payloads it printed, control text only; and the log of results, which quotes no body. No prompt body
+  was written to a file.
+
+### Canon and rulings relied on, for `EXECUTE`
+
+- GTWPE-MGMT-10 100526.2, fetched live at the mode's start and again at 18:26:46Z: *The record*, *Reading prompt
+  bodies*, *Boundaries*, `MODE = EXECUTE`, *How each kind of target changes*, *The watched sources* and *Result
+  routing*.
+- HDE Governance (PF04) §9.1.6, read on `main` at X5: the readback of changed published bodies and links, and the
+  actual author, checker and acceptor, with independence where the governing contract requires it.
+- HDE Build Notes (PF10) 2.38 PF10-AINEUTRAL-001, rules 2 and 3, read on `main` at X5: the Notion writes were made
+  from this session under the plan's authority, and the surface confers no permission.
+- `D21-C`, `D22`, `D26-B`, `D26-C` and `D26-E`; Nathan's approval of the plan and its authorization of W1 to W29 and
+  no others.
+
+### Interaction cost, actual against predicted
+
+Predicted 11. Actual 13:
+- 2 rulings: Q-1, at `ANALYZE`; and DC-R1 and DC-R2, which Nathan decided at PO-6;
+- the 2 fixed round trips, the approvals of the analysis and the plan;
+- 7 review rounds: `ANALYZE`'s dry run, full review and diff check; `PLAN`'s dry run, full review and diff check; and
+  the round in `reviews` for the repair Nathan ordered at PO-6;
+- no skill review cycle or install;
+- 2 merges: #590, at X2; and the record's, still to come.
+
+The difference, 2, is PO-6: the diff check's two required findings sat in the repair's own text, so they went to
+Nathan, whose decision is one more ruling, and the repair he ordered is one more round in `reviews`.
+
+### Clock
+
+`EXECUTE` ran from X1.1 at 16:45:24Z to X2's return at about 17:07Z, and from Nathan's word of the merge at about
+18:26Z to this record at about 18:36Z: about 32 minutes on the meter, against the estimate of about 5 h, so well
+under it. The wait for his merge, from about 17:07Z to 18:26Z, is off the meter. Tokens are not measured by this
+session.
+
+### Remaining Product Owner actions
+
+- PO-3: merge the record's pull request when he chooses. The record is `COMPLETE`, so his rule allows it, and nothing
+  waits on that merge (`D21-C`).
+- PO-5: authorize, or have PE40 make, the changes outside the route that this change leaves stale. N-1, the Operations
+  Hub's red callout, whose last sentence says GTWPE-FLOW-10 100726.1 "still asks for more than filenames; that fix is
+  open". N-2, the architecture page's status line of 2026-10-07 and its "resume with `RESUME <run-id>`", and the
+  repository architecture record's status. N-3, the ledger: E-044 to E-048, E-051 to E-053, the stale rows in risk
+  12, and E-033 and E-042 (DC-L5). Nothing in this Modification waits on them.
+- The open findings stay accepted as risks (`DISP-001`). The first live run is Nathan's to start.
+
+**Return:** `ECOSYSTEM_CHANGE_COMPLETE`, with no trigger finding from X4.1. `DECISION NEEDED`: PO-5, N-1 to N-3.
