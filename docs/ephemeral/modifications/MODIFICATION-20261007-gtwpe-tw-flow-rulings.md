@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261007-gtwpe-tw-flow-rulings
-status: ANALYZING
+status: ANALYZED
 targets: [prompt, rule, notion_control]
 gate_tier: 2
 closure:
@@ -31,6 +31,11 @@ reviews:
     date: 2026-10-07
     required_open: 7
     outcome: "Two fresh reviewers, GTWPE-TW-FLOW-RULINGS-ANALYZE-A and -B, each handed only its committed brief's path, on cc6b923: A 1 required and 22 listed, B 3 required and 20 listed. The session confirmed all four required findings, and three listed ones as required under the fixed rubric's R1: 7 distinct required defects, RQ-1 to RQ-7 (S-6 narrowed his PF20 and PF30 rule; canon's closure timing; the Flowmaster waiver for the new release; triage closing an addendum; ITEM-01's sentence counts; pinned PF versions; known-wrong text left in two re-versioned members), each repaired in §A. The listed findings stay listed, each with its reason"
+  - mode: ANALYZE
+    kind: DIFF_CHECK
+    date: 2026-10-07
+    required_open: 0
+    outcome: "One fresh checker, GTWPE-TW-FLOW-RULINGS-ANALYZE-DC, handed only its committed brief's path, on the repair diff cc6b923..a14fcf3: no required defect, RQ-1 to RQ-7 each fixed; 8 listed, DC-L1 to DC-L8, six of them in the repair's own text (D26-A rule 5's second signal), and DC-L4 refuted by the session. Required defects went from 7 to 0. The cap is reached, so §A goes to Nathan with every open finding listed"
 items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
@@ -818,10 +823,33 @@ After the repair, the session ran D1, D2 and D6 again: both record checks exit 0
 on a scratch copy at `ANALYZED`; the front matter parses, the request is verbatim and all 16 tables are even; and
 83 of 83 repository quotations are found, the repair's own included.
 
+### Diff check (A6)
+
+- **The checker.** One fresh general-purpose subagent, GTWPE-TW-FLOW-RULINGS-ANALYZE-DC, neither forked nor
+  context-inheriting, handed nothing but its brief's repository path, `ANALYZE-DIFFCHECK-BRIEF.md`, committed and
+  pushed at `798b4c3` before it was spawned, at 06:45Z. It confirmed the brief's sha256,
+  `6e8adccf0b4f1a5f05fccdc38e7254050021df83b7ce1d864f805809138d512d`, and that `798b4c3` adds only the brief to
+  `a14fcf3`. This is the one check of the repair's diff that `D26-A` rule 2 allows.
+- **The run.** It read the record at `a14fcf3` whole and the repair diff over `cc6b923..a14fcf3`, read no Notion
+  page and wrote nothing. It ran for about 36 minutes, and the harness reported 513,405 subagent tokens. The
+  harness saved one oversized output of its, a grep of `ERRORS.md`'s row headings, which holds no prompt body
+  (*Harness files*).
+- **The capture.** `capture.py` read its transcript, found by the path the harness gave for its agent ID, twice,
+  as for the reviewers (one `SubagentHandback` call, at transcript line 607, 16,977 characters), and wrote
+  `ANALYZE-DIFFCHECK.md`: 17,052 bytes, sha256 `99785e02d394c61badc4ea12120e87313b031e61d0aa1109b54b0e3b7d12260c`;
+  first line `0`.
+
+**Result: no required defect; RQ-1 to RQ-7 each fixed where *Full review (A6)* says; 8 listed, DC-L1 to DC-L8.**
+The count of distinct confirmed required defects went from 7 to 0. Six of the eight listed findings sit in text
+the repair added, which is `D26-A` rule 5's second stop signal; the cap is reached in any case, so §A goes to
+Nathan with every open finding listed. The session refuted one: DC-L4 says ITEM-03's new quotation of GTWPE-FLOW-10's
+B1 step 4 could not be checked, and the session found it verbatim in its third fetch of that body, read after the
+repair.
+
 ### Listed findings, accepted as risks (A6)
 
 Not repaired, by `D26-A` rule 4; each goes to Nathan with its reason, and repairing one is his opt-in. Where
-both reviewers found the same thing, it is listed once.
+two rounds found the same thing, it is listed once.
 
 | Finding | Reason it stays listed |
 |---|---|
@@ -851,6 +879,14 @@ both reviewers found the same thing, it is listed once.
 | B's L16: *Scope*'s `git grep` count for the decision record and the checker used only some of ruling 1's terms | With all of them, by `git grep` again: five lines in the decision record and seven ignoring case, the extra ones its own name, "decision record", and a title, "the Change Process Guide"; and two lines in the checker, four ignoring case. None is text the rulings contradict |
 | B's L17: PART-01 has no `name` | Neither validator checks it |
 | B's L20: no FUNC-001 match | `PLAN`'s `D26-E` search states the functional test: does anything make a run or pass take, or a handoff carry, more than the prompt to run and files |
+| DC-L1: ITEM-03 counts an addendum as already represented on "a drain's verified `no redlines` with its exact equivalence location", but a drain's no-change return is exactly `no redlines`, and F3 and F8 do not change | The location is the basis of the drain's own verified coverage, which its rules already require; a return that names it in a file would change F3 and F8, which §A did not measure. Certain to need settling at `PLAN`, which would stop and return loudly. A one-line repair, at Nathan's opt-in |
+| DC-L2: S-6 and the first live run update PF30 from PF10 changes alone, against architecture §9's "The agent must not update PF20 or PF30 from PF10 alone", which §A does not name, and *Everything else* still lists §9 as unchanged | Nathan's ruling in E-052, given on 2.14's change to PF30 itself, supports the update, and risk 6 states it. Naming §9 beside risk 6 and taking it off the unchanged list is a one-line repair, at his opt-in |
+| DC-L3: "A run Nathan starts is that maintenance" does not hold for a CRD Specification's record of an in-flight CRD | Low. Its canon timing is E-010's open conflict, which stays his |
+| DC-L4: the new quotation of GTWPE-FLOW-10's B1 step 4 is unverified | Refuted by the session: verbatim in its third fetch of that body |
+| DC-L5: N-3 omits E-033 and E-042, which ITEM-08 now fixes, and the Intake still files E-033 among the rows not taken | Outside the route; the return names both for N-3 |
+| DC-L6: risk 14's versionless name departs from answer 2's letter; its 2.14 quotation stops before "artifact, plan, ledger, report, or addendum"; a lettered PF10 set is several files | Low; `PLAN` sets the forms, with a loud stop at intake at worst |
+| DC-L7: the closure hold-back is presented as canon's requirement, though §2.0.19's bullet also says "preparation does not prove physical drainage" | The stricter reading errs toward waiting, visibly; low |
+| DC-L8: the triage pass alone still decides which documents an addendum bears on | Nathan's design, triage at execution time (architecture §2), with B1 step 4's "route it" when unsure |
 
 ### Harness files (`D22` condition 5)
 
@@ -884,6 +920,10 @@ both reviewers found the same thing, it is listed once.
   directory. They hold no prompt body: neither reviewer read a Notion page. `capture.py` read each twice for its
   one `SubagentHandback` call, first printing only the call's shape, then writing its message to
   `ANALYZE-REVIEW-A.md` or `ANALYZE-REVIEW-B.md`. They are left to the harness's teardown.
+- **The checker's transcript**, the output file the harness gave for its agent ID in this session's tasks
+  directory. It holds no prompt body. `capture.py` read it twice for its one `SubagentHandback` call and wrote
+  `ANALYZE-DIFFCHECK.md`. Its run left one harness save, `bhytaqauy.txt`, a grep of `ERRORS.md`'s row headings,
+  which holds no prompt body and which the session did not open. Both are left to the harness's teardown.
 - **The session transcript.** A1's verbatim copy of the request needed Nathan's message, which only the
   transcript held. A script read it once, for that message alone, and saved it to `request.txt` in the
   scratchpad.
