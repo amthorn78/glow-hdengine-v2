@@ -1924,3 +1924,33 @@ Nathan's: X1.3 (i).
 - **The transcript, read by a script once:** `get_approval.py` read it for Nathan's acceptance, printed only the
   message's timestamp and length, and saved the message to `c4/c4_accept.txt` in the scratchpad.
 - **The draft and the send file** were deleted at (j). No body is left in the scratchpad.
+
+### X1.4: the handoff table
+
+At 01:54Z, `cp` copied `docs/ephemeral/modifications/evidence/gtwpe-flow-manager/gtwpe.handoffs.md` to
+`docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`, committed with this record at `b1e54dc`.
+- Its sha256 is «HT», `61aee2ae…4c2bef`, at 7,557 bytes, in the working tree and in the commit.
+- `git diff --name-only origin/main...HEAD` lists this record and the new file, and nothing else.
+- The `D26-E` search, `git grep -n -i -e 'handoff table' -e 'design v1.2 §6' -- docs/prompt_ecosystem_management/`,
+  finds two hits, both in the new file: its title, at line 10, and line 17, which says it replaces design v1.2's §6
+  table. No other file under `docs/prompt_ecosystem_management/` names design §6 as the GTWPE's handoff table.
+
+### Steps and dispositions after the resume
+
+| Step | Part | Disposition | Evidence |
+|---|---|---|---|
+| X1.3 | PART-01 | VERIFIED | W1, W2 and W3 applied; (a) to (g) passed; (h): ten checks passed, and check (6), with the eighth heading in check (5), stands by Nathan's override of 2026-10-07; (i) passed, and (j) done (*Resumed at X1.3 (i)*) |
+| X1.4 | PART-01 | VERIFIED | The handoff table at `b1e54dc`, its three checks passed (*X1.4*) |
+
+X2 commits this record and pushes the branch; X2 to X5 are recorded at X5. The front matter carries each item's
+current state: ITEM-01 to ITEM-07 `VERIFIED`, by X1.3 (h) with Nathan's override; ITEM-08 `APPLIED`, and `VERIFIED`
+once X3 finds the handoff table on `main`; ITEM-09 open until X4.2.
+
+### Findings after the resume
+
+- **F-E4. X2's pull request is a new one.** amthorn78/glow-hdengine-v2#583 was merged with the failure record, so the
+  plan's "Update #583's title and description" falls to the restarted branch's own pull request, as P-4 recorded
+  for #581.
+- **F-E5. The override block names only the validator's policy gates.** Nathan's override of a plan check has no
+  name in `OVERRIDABLE`, so the block records it in its `reason` alone. A later GTWPE-MGMT-10 repair may give the
+  override of a plan step a place of its own: recorded, not taken.
