@@ -3,7 +3,7 @@ artifact_type: GCFPE_MODIFICATION_RECORD
 format: "2.1"
 ecosystem: GTWPE
 modification_id: MODIFICATION-20261007-gtwpe-tw-flow-rulings
-status: ANALYZED
+status: PLANNING
 targets: [prompt, rule, notion_control]
 gate_tier: 2
 closure:
@@ -12,14 +12,15 @@ closure:
   state_sharers: [TW-DRAIN-10, TW-DRAIN-20]
 readiness: NEEDS_RULING
 override:
-  by: ""
-  overrides: []
-  reason: ""
+  by: Nathan
+  overrides: [readiness]
+  reason: "Nathan, 2026-10-07, approving the analysis (Q-1, option (a)): he waives HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for the new TW-ALPHA release. The grounds are those of §A's Q-1, option (a): GTWPE-FLOW-10 runs the TW prompts as passes, C6 retires the skill, and a Flowmaster run against the new release stops loudly rather than producing a wrong result. The selection page and the three notes say that tw-flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run it. The validator's vocabulary has no narrower gate, so `readiness` names it; the record's readiness field is ANALYZE's advice and is unchanged."
 interaction_cost_predicted: 11
 interaction_cost_actual:
 estimate:
   plan: "about 10 h, not counting waits for Nathan: the edits to eight bodies, as anchors and new texts, authored through the PE Metaprompt from this analysis, with each passage counted twice; the decision record's three entries and the handoff table's rows; the selection page's three writes, the three current-release notes and the catalog rows; and PLAN's dry run, with its two-sided check of every invocation against the bodies it reaches, one full review and at most one diff check. Tokens are not measured"
   execute: "about 5 h, not counting the waits for Nathan's merges: eight new pages, each duplicated, titled, edited and read back whole; the decision record and the handoff table committed, and their merge detected on main (X2, X3); the selection writes and the three notes, read back; the catalog (X4); and the record at COMPLETE (X5). Tokens are not measured"
+item_count_at_approval: 8
 reviews:
   - mode: ANALYZE
     kind: DRY_RUN
@@ -82,8 +83,8 @@ request: |-
   - docs/ephemeral/gtwpe.rewrite/ERRORS.md
   - docs/ephemeral/gtwpe.rewrite/GTWPE-TARGET-ARCHITECTURE-20260929.md
 requested_by: Nathan
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan, 2026-10-07: \"Nathan approves the analysis of MODIFICATION-20261007-gtwpe-tw-flow-rulings at b4219de (2026-10-07). ITEM-07 stays. S-1 to S-8 are accepted, including S-7 for PF10 changes to PF20 and PF30, which sets aside the architecture's §9 sentence \"The agent must not update PF20 or PF30 from PF10 alone\" for those changes (DC-L2). DC-L1: a drain's `no redlines` return stays exactly as it is, and the equivalence location stays inside the drain. Q-1: (a), waive HDE Governance §9.1.6's interacting-skill readiness for tw-flowmaster for the new TW-ALPHA release.\""
+analyze_approved_date: 2026-10-07
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
