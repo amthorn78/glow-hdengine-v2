@@ -42,6 +42,11 @@ reviews:
     date: 2026-10-07
     required_open: 0
     outcome: "By this session, read-only, after the context compaction at 12:39Z and before any full review: edits_check.py PASS on 200 edits, each of its eleven injected faults caught by its own code; every member and control page fetched again and unchanged; every anchor once in its page, by reading checked by a second reading; the two-sided check of every pass against GTWPE-FLOW-10's new invocation; the simulated readbacks of Alpha 1 and the Hub PASS; the repository files' D26-E search clean; both record checks exit 0 on a scratch copy at PLANNED. It found and repaired, before the review: the run's account, widened from every PF10 change to every change (DR-1), and four smaller defects (DR-2 to DR-5). None left open"
+  - mode: PLAN
+    kind: FULL
+    date: 2026-10-07
+    required_open: 8
+    outcome: "Two fresh reviewers, GTWPE-TW-FLOW-RULINGS-PLAN-A and -B, each handed only its committed brief's path, on 1f73053: A 4 required and 25 listed, B 3 required and 28 listed. The session confirmed the five distinct required findings and three listed ones as required (A's L1, A's L10, B's L6), and refuted A's L8 and L9: 8 distinct required defects, RQ-1 to RQ-8 (the hold-back limited to PF10 changes; no account of a change's part that cannot drain; TW-APPLY-10 without the files-only refusal; the handoff table's 'carried unchanged'; a held-back change counted represented; GTWPE-D2 to GTWPE-D4 crediting the analysis's approval with the plan's readings; B5's reviewer briefed in the session's words; naming the prompt, and files given alone, at intake), each repaired in §P (Repair round (PL3)). The listed findings stay listed, each with its reason"
 items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
@@ -976,7 +981,9 @@ This session runs the mode as a GTWPE-MGMT-10 session, following *GTWPE-MGMT-10 
 fetched live at 12:39Z, after this session's context was compacted: edited 2026-10-05T16:36:11.384Z, as at
 `ANALYZE`. The mode's first steps, before the compaction, followed it as this session last read it at `ANALYZE`,
 without a fetch of its own; *Harness files* records that lapse, and every step this plan relies on was made or
-checked after the fetch.
+checked after the fetch. The context was compacted again at about 14:30Z, during PL3's repair; GTWPE-MGMT-10 was
+fetched live again at 14:49Z, unchanged, before the repair round was recorded, and the repair's new anchors were
+checked against GTWPE-FLOW-10 and TW-APPLY-10 fetched live at 14:38Z (*Repair round (PL3)*).
 
 - **Input:** §A as Nathan approved it at `b4219de` on 2026-10-07. His words are in `analyze_approved_by`,
   committed and pushed at `0da4fd3` with the status `PLANNING`, `item_count_at_approval` and the `override`
@@ -985,7 +992,9 @@ checked after the fetch.
   general rules with GTWPE-MGMT-10's workarounds (*Relation to the PE Metaprompt*): mode *Ecosystem Update*;
   only the approved edits and each member's two identity lines change; new versions by the execution date;
   references stay versionless; no runtime-selection, configuration or workload text is added; everything outside
-  the approved edits is kept. Its GCFPE overlay does not apply and was not read.
+  the approved edits is kept. Its GCFPE overlay does not apply; of it, only its last line was read, at the edge of
+  a range. Its general rules were read again after the second compaction, and the texts this plan wrote after the
+  first one were checked against them (*Repair round (PL3)*).
 - **`main`** is at `128836a`, as §A examined it (`git fetch origin main`, 13:00Z).
 
 ### Nathan's directions, and how this plan applies them
@@ -995,8 +1004,8 @@ checked after the fetch.
     workers nothing but their committed brief's path (G-MGMT-10-E03, E04, E06, E07, E15 and E16).
   - "S-1 to S-8 are accepted, including S-7 for PF10 changes to PF20 and PF30, which sets aside the
     architecture's §9 sentence ... for those changes (DC-L2)": TW-RECORD-10 and TW-RECORD-20 carry each PF10
-    change that bears on their document, with or without a record (*The edits, by rule*, R4), and GTWPE-D4
-    records his words.
+    change that bears on their document, a held-back one aside, with or without a record (*The edits, by rule*,
+    R4), and GTWPE-D4 records his words.
   - "DC-L1: a drain's `no redlines` return stays exactly as it is, and the equivalence location stays inside
     the drain": no edit touches a drain's no-change exit, and F3 still carries the exact `no redlines`. The
     equivalence location stays in the drain's own accounting. GTWPE-D3 records his words.
@@ -1013,7 +1022,8 @@ checked after the fetch.
   read first and a ruling is not relitigated (GTWPE-MGMT-10, *Read these; do not restate them*).
 - **Ruling 5, "I have to believe everything is wrong now".** Every edit was checked against the bodies read live
   in this mode after the compaction, all eight of them, and against Nathan's words, not against C1 to C4's
-  records. That reading found what §A missed (*Findings on §A*).
+  records. That reading found what §A missed (*Findings on §A*). The repair round's new anchors were checked the
+  same way, against GTWPE-FLOW-10 and TW-APPLY-10 fetched live at 14:38Z.
 - **The meter is time.** The estimate is about 10 h for `PLAN` and about 5 h for `EXECUTE`, not counting waits for
   Nathan. This mode stops at 20 h on the meter from 12:17:03Z, and `EXECUTE` at 10 h from X1.1.
 - **GTWPE-D1.** Every new page that writes a redlines file or a final PF file is read back for GTWPE-D1's
@@ -1025,8 +1035,9 @@ checked after the fetch.
   `edits.json` is the exact text its edit replaces or removes, cut to the clause at issue. Where an edit removes
   a passage whole, its anchor is that passage: the longest are S-WHOLE, 643 characters in each drain, the
   drains' paragraph of selection rules; G-FLOW-10-E40, 556, B1 step 5's hold-back by selected boundary; and
-  TRIAGE-10-E14, 476, its list-only output. Apart from the anchors, §P names each body only by its headings,
-  first line and last words.
+  TRIAGE-10-E14, 476, its list-only output. Apart from the anchors, §P quotes a body only where a check reads a
+  kept clause, each quotation a clause long: about ten in *The two-sided check*, and a few in *Findings on §A* and
+  *Repair round (PL3)*. It names each body otherwise by its headings, first line and last words.
 
 ### Findings on §A (recorded, not edited)
 
@@ -1034,17 +1045,17 @@ checked after the fetch.
 that the plan cannot follow exactly. None adds an item, a member, a target or a Notion write; each goes to Nathan
 with this plan, and his approval of it accepts the plan's answer.
 
-- **P-1. A held-back change and the drains.** §A says "the drains already account for each change they are given
-  ... That fits the rule, per document" (ITEM-03), and gives the drains and the record prompts ITEM-02 and
-  ITEM-05 only (*Member dispositions*). But GTWPE-FLOW-10 kept a held-back PF10 change out of a pass by a
-  selected boundary ("His decision to leave it out is a selected boundary that excludes the change"), which S-3
-  removes. A pass that reads PF10 whole has no other way to know which changes wait, so on the normal path a
-  document that a held-back change and another change both bear on would be drafted with the held-back change,
-  and after-pass check 6 would stop it every time. The plan gives the drains (S-HOLD) and the record prompts
-  (their purpose edits) canon's timing as one more accounting disposition: a PF10 change that belongs to an epic
-  or a CRD the files given do not show closed is held back, as the triage file reports it, is not drafted, and is
-  named in any proof log the pass writes. This applies ITEM-03, which S-4 approved, in the members §A already
-  changes; check 6 stays as the run's own check.
+- **P-1. A held-back change and the drains.** §A says "the drains already account for each change they are given ...
+  That fits the rule, per document" (ITEM-03), and gives the drains and the record prompts ITEM-02 and ITEM-05 only
+  (*Member dispositions*). But GTWPE-FLOW-10 kept a held-back PF10 change out of a pass by a selected boundary ("His
+  decision to leave it out is a selected boundary that excludes the change"), which S-3 removes. A pass that reads
+  PF10 whole has no other way to know which changes wait, so on the normal path a document that a held-back change
+  and another change both bear on would be drafted with the held-back change, and after-pass check 6 would stop it
+  every time. The plan gives the drains (S-HOLD) and the record prompts (their purpose edits) canon's timing as one
+  more accounting disposition: a change, from PF10 or another source, that belongs to an epic or a CRD the files
+  given do not show closed is held back, as the triage file reports it, is not drafted, and is named in any proof
+  log the pass writes; a CRD's own PF30 record is not held back. This applies ITEM-03, which S-4 approved, in the
+  members §A already changes; check 6 stays as the run's own check.
 - **P-2. F8 changes.** §A's *Scope* lists F8 among the rows not reached. Under S-7 a record pass can find nothing to
   change, and a missing-evidence question now stops it only when nothing else changes, so the record prompts gain
   the exact `no changes` result and F8 carries it, as F3 carries `no redlines`. The record prompts' own sides
@@ -1069,19 +1080,24 @@ with this plan, and his approval of it accepts the plan's answer.
 §A left these to `PLAN`.
 
 - **The triage file.** TW-TRIAGE-10 writes one Markdown file, `triage.md`, in its pass directory,
-  `passes/triage/01-tw-triage-10/`: the files it read, each by repository path and commit; then, for each PF10
-  change in source order, its identity, the epic or CRD it belongs to and whether the files show that change
-  closed, and either the eligible documents it bears on or why it cannot drain in this run (no eligible home,
-  such as PF10 itself; or PF20 or the PF30 family with no specification among the files). It is neither of
+  `passes/triage/01-tw-triage-10/`: the files it read, each by repository path and commit; then, for each change
+  in source order, each PF10 addendum among them, its identity and source, the epic or CRD it belongs to and
+  whether the files show that change closed, the eligible documents it bears on, and, for any part of it that
+  cannot drain in this run, the reason (no eligible home, such as PF10 itself; or PF20 or the PF30 family, named,
+  with no specification among the files). It is neither of
   GTWPE-D1's artifact types, so it has no proof log. A superseded change is accounted for like any other, by the
   documents its subject bears on, and its pass applies PF10's own precedence (A's L6).
+- **The hold-back** (RQ-1). GTWPE-FLOW-10 holds back each change, from PF10 or another source, that belongs to an
+  epic or a CRD the run's files do not show closed, as canon's drainage ordering requires (GTWPE-D3). A CRD's own
+  PF30 record is not held back: HDE CRD Records §3.2 enters it when the CRD is registered, and TW-RECORD-20 makes
+  it from the CRD's approval evidence.
 - **The routing.** GTWPE-FLOW-10 routes each document the triage file names for a change not held back, and,
   whenever the run has a governing specification, PF20 and each PF30 volume, except PF20 when the Epic's record
   waits and nothing else bears on it. A routed document's pass decides whether it is affected.
-- **The endings.** A run that drafts nothing ends `RUN_NO_CHANGE` only when every PF10 change is shown already
-  represented, or the run has no PF10 source and changes no document; otherwise it ends `RUN_STOPPED` (S4),
-  naming each change that cannot drain in this run and why (B's L12). A run with drafts ends `RUN_REVIEW_READY`
-  with every change's account in `RUN.md` and the pull request.
+- **The endings.** A run that drafts nothing ends `RUN_NO_CHANGE` only when every change in its account is shown
+  already represented, with no part left to drain, or the account holds no change; otherwise it ends `RUN_STOPPED`
+  (S4), naming each change, or part of one, that cannot drain in this run and why (B's L12). A run with drafts ends
+  `RUN_REVIEW_READY` with every change's account in `RUN.md` and the pull request.
 - **A decision is a file** (B's L10). A decision a stop asked for, a PF30 rollover and a closure decision are
   files; a resume gives `RESUME`, the run's `RUN.md` and decision files only. A new closure decision is a new
   source, so it starts a new run, which keeps a resumed run's sources unchanged.
@@ -1143,13 +1159,15 @@ In `docs/ephemeral/modifications/evidence/gtwpe-tw-flow-rulings/`, committed wit
 
 | File | What it is |
 |---|---|
-| `edits.json` | The 200 edits, each member's W3: its ID, item, rule, shared key, its anchor (`old`) and its new text; each member's page, current version, edit time, new title and parent; the phrases that must be absent after; the value rule for «V» |
+| `edits.json` | The 205 edits, each member's W3: its ID, item, rule, shared key, its anchor (`old`) and its new text; each member's page, current version, edit time, new title and parent; the phrases that must be absent after; the value rule for «V» |
 | `edits_check.py` | The file's consistency check. It reads `edits.json` and the GTWPE decision record only, and writes nothing. Its checks are `SHAPE`, `ONELINE`, `DIFFER`, `VALUES`, `SHARED`, `OVERLAP`, `ABSENT`, `PROOF`, `EXCLUDED`, `SELECT` and `BARE`; `--inject` shows that each fails on its own fault (dry run P1) |
 | `gtwpe.decision-record.md` | The decision record's new version, 1.1: GTWPE-D1 unchanged, and GTWPE-D2 to GTWPE-D4 added. X1.4 copies it byte for byte to `docs/prompt_ecosystem_management/gtwpe/` |
 | `gtwpe.handoffs.md` | The handoff table's new version, 1.1. X1.4 copies it the same way |
 | `ctl_check.py` | The pre-read and readback of *Alpha 1* and the Operations Hub, whose fetches the harness saves. A byte-identical copy of `evidence/gtwpe-tw-document-rules/ctl_check.py`, sha256 `4e968007698d833dd6d3e50d0fd6ed8daffdbd75e3865f3e1c32c9a1720923c5`, copied so that this record does not depend on another record's evidence |
 | `PLAN-REVIEW-A-BRIEF.md`, `PLAN-REVIEW-B-BRIEF.md` | PL3's review briefs, committed before either reviewer is spawned |
 | `PLAN-REVIEW-A.md`, `PLAN-REVIEW-B.md` | The reviewers' returns, captured unedited from their own transcripts |
+| `PLAN-DIFFCHECK-BRIEF.md` | The brief of PL3's one check of the repair's diff, committed before the checker is spawned |
+| `PLAN-DIFFCHECK.md` | The checker's return, captured unedited from its own transcript |
 
 ### The edits, by rule
 
@@ -1179,7 +1197,7 @@ ITEM-06 has no edit of its own (§A, ITEM-06).
 | S-INTAKE | R1 | The inputs are files only; the target by its directory and versionless name; an input that is not a file is not taken; a missing identity is a stop that names the file or fact | The drains |
 | S-WHOLE, S-PF10, S-LEDGER, S-DEPS, S-DEPS-2 | R1 | Every incoming source read whole, with no selection; PF10 read through EOF, with no supplied version hint; the change ledger, dependencies and blocked changes over every incoming source | The drains |
 | S-FILELESS | R1 | The fileless-input provenance and the selection boundaries go | The drains |
-| S-HOLD | R2 | A fifth accounting disposition, held back: a PF10 change of an epic or a CRD the files do not show closed, as the triage file reports it, is not drafted, and any proof log names it with the closure it waits for (P-1) | The drains |
+| S-HOLD | R2 | A fifth accounting disposition, held back: a change, from PF10 or another source, of an epic or a CRD the files do not show closed, as the triage file reports it, is not drafted, and any proof log names it with the closure it waits for (P-1; RQ-1) | The drains |
 | S-HEADER-AUTH | R1 | Nathan's authorization of another header change is given as a file | The drains |
 | S-CRD-DATE | R4 | The example of a PF30 material-change row's date goes with the PF30 drain route | The drains |
 | S-AGREE, S-READY, S-NOCHANGE, S-BLOCKED, S-PROOF-SCOPE, S-REBASE | R1 | Selection drops out of the outcomes, the agreement of the two files, the proof log's scope line and the rebase rule | The drains |
@@ -1191,11 +1209,11 @@ ITEM-06 has no edit of its own (§A, ITEM-06).
 
 | Member | Edits | What they do |
 |---|---|---|
-| GTWPE-FLOW-10 (51) | E01, E02 | Identity, to «VF» |
-| | E03, E06 to E12, E17, E19, E26 to E29, E31, E33, E45, E46, E48, E49, E51 (R1) | The operator note, the configuration line and the execution prompt's items 1 to 5: `RUN` or `RESUME` and files, PF documents by directory and versionless name, decisions as files, and nothing else, with the stop at intake for anything else; the rollover decision as a file; the slug from the specification's or first source's file name, and the run-name stop gone; the invocation: its pass directory, the target by versionless name with its base blob in `RUN.md`, every source whole with no boundary, the run's `RUN.md` for the branch and pull request; TW-APPLY-10's line without the selected scope; S2 and S4; *Resume* by `RUN.md` and decision files; the return's resume line |
-| | E04, E13, E24, E25, E36 to E38, E40 to E44, E47, E50 (R2) | *Purpose*: every change the files carry; the PF27 gate gone; `RUN.md`'s account of every change and each held-back change's closure; *Its return*: `no redlines` or `no changes` shows each routed change already represented; check 6 without the direction to draft; B1 steps 5 to 7 and B3's ending: the triage's account, the hold-back by closure with routing, and the endings; B6's pull-request account; S4's cell; the `RUN_NO_CHANGE` row |
+| GTWPE-FLOW-10 (55) | E01, E02 | Identity, to «VF» |
+| | E03, E06 to E12, E17, E19, E26 to E29, E31, E33, E45, E46, E48, E49, E51 to E55 (R1) | The operator note, the configuration line and the execution prompt's items 1 to 5: `RUN` or `RESUME` and files, files alone meaning `RUN`, and naming the prompt not an input (RQ-8), PF documents by directory and versionless name, decisions as files, and nothing else, with the stop at intake for anything else; the rollover decision as a file; the slug from the specification's or first source's file name, and the run-name stop gone; the invocation: its pass directory, the target by versionless name with its base blob in `RUN.md`, every source whole with no boundary, the run's `RUN.md` for the branch and pull request; TW-APPLY-10's line without the selected scope; S2 and S4; *Resume* by `RUN.md` and decision files; the return's resume line; B5's reviewer handed only its committed brief's path, and the `review/` cell and *Authority* naming the briefs (E52 to E55, RQ-7, appended after E51 so that no earlier ID moves) |
+| | E04, E13, E24, E25, E36 to E38, E40 to E44, E47, E50 (R2) | *Purpose*: every change the files carry; the PF27 gate gone; `RUN.md`'s account of every change and each held-back change's closure; *Its return*: `no redlines` or `no changes` shows each change not held back that the triage file names for the document already represented (RQ-5); check 6 without the direction to draft, for any held-back change; B1 steps 5 to 7 and B3's ending: the triage's account, with the reason for any part of a change that cannot drain (RQ-2), the hold-back by closure of every change, a CRD's own record aside (RQ-1), with routing and each routed document's base blob in `RUN.md`, and the endings; B6's pull-request account; S4's cell; the `RUN_NO_CHANGE` row |
 | | E05, E21, E22, E30, E32, E39 (R3) | *Purpose* names the triage pass; its pass directory, key and `triage.md`; its invocation line; B1 step 4 creates the branch, directory, `RUN.md` and pull request before the triage pass, which needs them |
-| | E14 to E16, E18, E34, E35 (R4) | The PF20 and PF30 rows: TW-RECORD-10 and TW-RECORD-20 whenever the run has a governing specification, every change each document takes, no authorization, and no redliner for PF30; the one-pass-chain rule; the record pass's inputs |
+| | E14 to E16, E18, E34, E35 (R4) | The PF20 and PF30 rows: TW-RECORD-10 and TW-RECORD-20 whenever the run has a governing specification, every change not held back that each document takes, no authorization, and no redliner for PF30; the one-pass-chain rule; the record pass's inputs |
 | | E20, E23 (R7) | The two `RUN.md` links become inline code |
 | GTWPE-MGMT-10 (17) | E01, E02 | Identity, to «V» |
 | | E03, E04, E06, E07, E15, E16 (R6, ITEM-07) | The operator note and the entry contract: the request is the files that record it, and Nathan's words in them are the request; a request given otherwise is not taken; reviewers and workers are handed only their committed brief's path |
@@ -1203,23 +1221,23 @@ ITEM-06 has no edit of its own (§A, ITEM-06).
 | | E08, E14 (R6, ITEM-08) | The two pointers to the design package's §6 table name `gtwpe.handoffs.md` |
 | | E17 (R6, ITEM-08) | "lists the eight members" becomes "lists every member" (C3's F-1) |
 | TW-TRIAGE-10 (14) | E01, E02 | Identity, to «V» |
-| | E03 to E05, E07, E11, E12 (R3) | It writes the triage file and returns its path; it accounts for every change, each PF10 addendum among them, against every source the invocation gives, PF10 only when it is among them; the eligible documents as Nathan's rulings of 2026-09-28 set them, PF20 and the PF30 family only with a specification; "When unsure, name the document" |
+| | E03 to E05, E07, E11, E12 (R3) | It writes the triage file and returns its path; it accounts for every change, each PF10 addendum among them, against every source the invocation gives, PF10 only when it is among them; the eligible documents as Nathan's rulings of 2026-09-28 set them, PF20 and the PF30 family only with a specification, and otherwise named in the reason a part of a change cannot drain (RQ-2); "When unsure, name the document" |
 | | E06, E08 (R1) | It writes only the triage file, on the branch the invocation names or `RUN.md` gives; files only; the supplied version hint goes |
-| | E09, E10, E13, E14 (R2) | Every change in PF10, each addendum, whether or not it names a drain target, and every change another source carries; never closes a change as represented; the triage file's check and form |
+| | E09, E10, E13, E14 (R2) | Every change in PF10, each addendum, whether or not it names a drain target, and every change another source carries; never closes a change as represented; the triage file's check and form: each change's documents, and the reason for any part that cannot drain (RQ-2) |
 | TW-DRAIN-10 (28) | E01, E02 | Identity, to «V» |
 | | E27, E28 (R1) | "selected changes" and "exact selected-source or Nathan authorization" go |
 | TW-DRAIN-20 (29) | E01, E02 | Identity, to «V» |
 | | E27 to E29 (R1) | "selected sources", "selected prompt/source" and "unless the selected source authorizes" go |
 | TW-RECORD-10 (21) | E01, E02 | Identity and title, *Update Epic History* |
-| | E09 to E21 (R4, R2) | Every change PF20 takes: an Epic Specification's record, inserted or updated in place, only on the Epic's completed posture, given as a file; each PF10 change that bears on PF20, held-back ones aside (P-1); the gate names the specification only when the update makes or changes a record; the comparison before saving; the `no changes` exit; the proof log and the check that nothing else changed cover every change |
+| | E09 to E21 (R4, R2) | Every change PF20 takes: an Epic Specification's record, inserted or updated in place, only on the Epic's completed posture, given as a file; each other change, from PF10 or another source, that bears on PF20, held-back ones aside (P-1; RQ-1); the gate names the specification only when the update makes or changes a record; the comparison before saving; the `no changes` exit; the proof log and the check that nothing else changed cover every change |
 | TW-RECORD-20 (22) | E01, E02 | Identity and title, *Update CRD History* |
-| | E09 to E21 (R4, R2) | As TW-RECORD-10 for a PF30 volume: a CRD Specification's record in the volume it belongs in, updated in place as HDE CRD Records §4.2 requires; the CRD checks only for a CRD Specification; the written volume is the one the changes bear on |
+| | E09 to E21 (R4, R2) | As TW-RECORD-10 for a PF30 volume: a CRD Specification's record in the volume it belongs in, updated in place as HDE CRD Records §4.2 requires; the CRD checks only for a CRD Specification; a CRD's own record never held back (RQ-1); the written volume is the one the changes bear on |
 | | E22 (R1) | The rollover decision is among the files given |
-| TW-APPLY-10 (18) | E01, E02 | Identity, to «V» |
-| | E08 to E18 (R1) | Selection drops out of intake, baseline match and the report; no supplied target version; no fileless source; the no-change report's evidence as files; an unknown origin is a stop that Nathan answers with a file; the diagnostic handoff gives the diagnostic's path and an invocation with files only |
+| TW-APPLY-10 (19) | E01, E02 | Identity, to «V» |
+| | E08 to E19 (R1) | Selection drops out of intake, baseline match and the report; no supplied target version; no fileless source; the no-change report's evidence as files; an unknown origin is a stop that Nathan answers with a file; the diagnostic handoff gives the diagnostic's path and an invocation with files only; E19, appended after E18, an input given as anything but a file is not taken, Nathan's request of a no-change report aside (RQ-3) |
 
-In all, GTWPE-FLOW-10 51, GTWPE-MGMT-10 17, TW-TRIAGE-10 14, TW-DRAIN-10 28, TW-DRAIN-20 29, TW-RECORD-10 21,
-TW-RECORD-20 22 and TW-APPLY-10 18: 200 edits, 16 of them identity edits.
+In all, GTWPE-FLOW-10 55, GTWPE-MGMT-10 17, TW-TRIAGE-10 14, TW-DRAIN-10 28, TW-DRAIN-20 29, TW-RECORD-10 21,
+TW-RECORD-20 22 and TW-APPLY-10 19: 205 edits, 16 of them identity edits.
 
 ### §A's passages, and how the plan meets each
 
@@ -1231,6 +1249,7 @@ TW-RECORD-20 22 and TW-APPLY-10 18: 200 edits, 16 of them identity edits.
 | GTWPE-FLOW-10: *Passes*, items 3 to 7, the by-prompt lines, check 6 | E26 to E35, E37, E38 |
 | GTWPE-FLOW-10: B1 steps 4 and 5, B1 step 7, B3, B6 step 5 | E39 to E44 |
 | GTWPE-FLOW-10: S2, S4, *Resume*, *Results* and the return | E45 to E51 |
+| GTWPE-FLOW-10: *B5* and *Redo from canon* (§A's *Scope*, ruling 1) | E52 to E55: B5's reviewer is handed only its committed brief's path, and *Authority* and the `review/` cell name the briefs. *Redo from canon* gives a pass the finding as a file, `review/<NN>-consistency.md`, through E29's sources; no edit there |
 | GTWPE-FLOW-10: no triage prompt (ITEM-04); every addendum (ITEM-03) | E04, E05, E21, E22, E24, E25, E30, E32, E36, E39 to E44, E47, E50 |
 | GTWPE-FLOW-10: the two `RUN.md` links (ITEM-08) | E20, E23 |
 | The six TW prompts: *Turn preflight* item 3 and *Output identity* | S-PREFLIGHT-3 and S-OUTPUT-ID in five; TW-TRIAGE-10 has neither (B's L2) and is met by its own E06 and E07 |
@@ -1239,7 +1258,7 @@ TW-RECORD-20 22 and TW-APPLY-10 18: 200 edits, 16 of them identity edits.
 | TW-TRIAGE-10: step 1's supplied version, step 3's "selected"; eligibility, no target, a bare list, PF10 only, optional (ITEM-04's five points) | E08, E11; E11, E04, E14, E05 and E07; **kept**: "optional routing help" stays true of a direct invocation, which E04 says |
 | TW-RECORD-10: inputs, posture, destination, the existing-record refusal, the output check | E09 to E21, S-DEST, S-SUPPORT |
 | TW-RECORD-20: destination, schema, the existing-record refusal, the output check | E09 to E22, S-DEST, S-SUPPORT |
-| TW-APPLY-10: the target version, fileless sources, the no-change report, the diagnostic handoff | E11, E12, E13, E17; E08 and E10, in the *Intake* section *Scope* counts; E09, E14 to E16 and E18 (P-5) |
+| TW-APPLY-10: the target version, fileless sources, the no-change report, the diagnostic handoff | E11, E12, E13, E17; E08 and E10, in the *Intake* section *Scope* counts; E09, E14 to E16 and E18 (P-5); E19, the refusal of an input that is not a file (RQ-3) |
 | GTWPE-MGMT-10: the entry contract, the brief a reviewer is handed, workers (ITEM-07) | G-MGMT-10-E03, E04, E06, E07, E15, E16 |
 | GTWPE-MGMT-10: "until G5", the §6 pointers, "the eight members" (ITEM-08) | E05, E08 to E14, E17 |
 | `gtwpe.handoffs.md`: F1, F2, F4, F7 and H11; F3, F5, F6 and F9 lightly; the common rule; the triage pass's rows and node | The evidence file `gtwpe.handoffs.md`, with F8 (P-2) |
@@ -1381,7 +1400,7 @@ new text does not contain SEL-2's old text, so each still matches once when sent
 
 ````
 ## Selected release — «R»
-**Selected: «S».** Authority: MODIFICATION-20261007-gtwpe-tw-flow-rulings, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA», applying his rulings of 2026-10-07, which `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md` records as GTWPE-D2 to GTWPE-D4. Every TW prompt takes its inputs as files only, attached or by repository path, with a PF document named by its directory and versionless name; nothing narrows a source, every source is read whole, and every handoff carries files only (GTWPE-D2). TW-TRIAGE-10 accounts for every change in the files it is given, each PF10 addendum among them, against every source, and writes that account as one triage file: in a run of the Flow Manager it is the triage pass, and invoked directly it stays optional routing help (GTWPE-D3). A PF10 change that belongs to an epic or a CRD the files do not show closed is held back, and no pass drafts it. TW-RECORD-10 and TW-RECORD-20 make every change a run makes to PF20 or to a PF30 volume: the specification's record, inserted once or an existing record updated in place, and each PF10 change that bears on the document; PF20 takes an Epic's record only when the files show the Epic closed; each ends with the updated file and its proof log, or exactly `no changes`; and neither document goes to a redliner (GTWPE-D4). Every row below is new. Its *Current operation*, directly below this list, replaces the one under TW-ALPHA-20261006.2, which is now historical. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release, and Nathan waived HDE Governance §9.1.6's interacting-skill readiness for TW Flowmaster for it: TW runs by Nathan's direct invocations or through the Flow Manager, <mention-page url="https://app.notion.com/p/«ID:FLOW-10»"/>, which runs these prompts as passes, and C6 retires the Flowmaster. All old prompt pages remain intact.
+**Selected: «S».** Authority: MODIFICATION-20261007-gtwpe-tw-flow-rulings, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA», applying his rulings of 2026-10-07, which `docs/prompt_ecosystem_management/gtwpe/gtwpe.decision-record.md` records as GTWPE-D2 to GTWPE-D4. Every TW prompt takes its inputs as files only, attached or by repository path, with a PF document named by its directory and versionless name; nothing narrows a source, every source is read whole, and every handoff carries files only (GTWPE-D2). TW-TRIAGE-10 accounts for every change in the files it is given, each PF10 addendum among them, against every source, and writes that account as one triage file: in a run of the Flow Manager it is the triage pass, and invoked directly it stays optional routing help (GTWPE-D3). A change, from PF10 or another source, that belongs to an epic or a CRD the files do not show closed is held back, and no pass drafts it; a CRD's own PF30 record is not held back. TW-RECORD-10 and TW-RECORD-20 make every change a run makes to PF20 or to a PF30 volume: the specification's record, inserted once or an existing record updated in place, and each other change not held back that bears on the document; PF20 takes an Epic's record only when the files show the Epic closed; each ends with the updated file and its proof log, or exactly `no changes`; and neither document goes to a redliner (GTWPE-D4). Every row below is new. Its *Current operation*, directly below this list, replaces the one under TW-ALPHA-20261006.2, which is now historical. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release, and Nathan waived HDE Governance §9.1.6's interacting-skill readiness for TW Flowmaster for it: TW runs by Nathan's direct invocations or through the Flow Manager, <mention-page url="https://app.notion.com/p/«ID:FLOW-10»"/>, which runs these prompts as passes, and C6 retires the Flowmaster. All old prompt pages remain intact.
 - `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/«ID:TRIAGE-10»"/> — Accounts for every change, each PF10 addendum among them, in one triage file; the Flow Manager's triage pass; «V».
 - `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-10»"/> — General PF redlines and proof log, with any change-history redline, or exact no redlines; files only; «V».
 - `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-20»"/> — PF09 redlines and proof log; rows judged on all the evidence; board optional; files only; «V».
@@ -1406,8 +1425,8 @@ flowchart TD
     F -->|Review-ready pull request, or a stop| N
 ```
 Nathan starts a run by giving GTWPE-FLOW-10 an execution prompt with files only: `RUN` and the run's files, or `RESUME` and the run's `RUN.md` (GTWPE-D2). The Flow Manager runs each TW prompt as a pass inside that session and gives each pass only the prompt to run and files: its pass directory, its target by its directory and versionless name, its sources by repository path, where to write, and the run's `RUN.md`. Nathan may also invoke any TW prompt directly, with files only. Every step reads PF canon from `docs/pfcanon/` on `main`, takes its other inputs as attached files or repository paths and reads each whole, writes its outputs at the repository path the invocation names under `docs/ephemeral/`, commits and pushes them on the branch the invocation names, or that the run's `RUN.md` gives, and gives each output's repository path in its final response. It never merges, and never writes to Google Drive, ChatGPT Library or `docs/pfcanon/`. No assessment runs before creation or before application, and no prompt gives model, surface or effort advice: Nathan chooses each session's configuration.
-Every change is accounted for, each PF10 addendum among them (GTWPE-D3). The triage pass evaluates the drain targets against every source and writes one triage file: for each change, the epic or CRD it belongs to and whether the files show that change closed, and the eligible documents it bears on or why it cannot drain in this run. Each routed document's pass decides whether it is affected: a drain's verified `no redlines`, or a record pass's `no changes`, is the authoritative answer that a change is already represented there. A change that belongs to an epic or a CRD the run's files do not show closed waits for that closure, and the run lists it. The eligible documents are PF03, every PF document with `Canon` in its title, and `PF20-Reference-HDE-Phased-Epics`; PF10 is never a target. Each PF09 phase file goes to TW-DRAIN-20 and every other general document to TW-DRAIN-10, each then to TW-APPLY-10.
-Whenever the run has a specification, PF20 and PF30 are both updated, each through its own prompt and never through a redliner (GTWPE-D4): TW-RECORD-10 makes every change PF20 takes, and TW-RECORD-20 every change a PF30 volume takes, the specification's record and each PF10 change that bears on the document, and each ends with the updated file and its proof log, or exactly `no changes`, with no Apply step. PF20 takes an Epic's record only when the run's files show the Epic closed. Without a specification, neither is updated, and the PF10 changes that bear on them wait for one.
+Every change is accounted for, each PF10 addendum among them (GTWPE-D3). The triage pass evaluates the drain targets against every source and writes one triage file: for each change, the epic or CRD it belongs to and whether the files show that change closed, the eligible documents it bears on, and why any part of it cannot drain in this run. Each routed document's pass decides whether it is affected: a drain's verified `no redlines`, or a record pass's `no changes`, is the authoritative answer that a change is already represented there. A change that belongs to an epic or a CRD the run's files do not show closed waits for that closure, and the run lists it; a CRD's own PF30 record does not wait. The eligible documents are PF03, every PF document with `Canon` in its title, and `PF20-Reference-HDE-Phased-Epics`; PF10 is never a target. Each PF09 phase file goes to TW-DRAIN-20 and every other general document to TW-DRAIN-10, each then to TW-APPLY-10.
+Whenever the run has a specification, PF20 and PF30 are both updated, each through its own prompt and never through a redliner (GTWPE-D4): TW-RECORD-10 makes every change PF20 takes, and TW-RECORD-20 every change a PF30 volume takes, the specification's record and each other change not held back that bears on the document, and each ends with the updated file and its proof log, or exactly `no changes`, with no Apply step. PF20 takes an Epic's record only when the run's files show the Epic closed. Without a specification, neither is updated, and the part of each change that bears on them waits for one.
 Every revised or updated PF has its document-control fields brought forward from the actual change, as one set that agrees: the version, bumped once; the dates, set to the execution date; the change history the document's own rules require; version-sensitive references; and the Last Update Gate, `BN` and the PF10 version used when the source is PF10, or the source's filename alone for any other source. No produced document says Draft or carries placeholders, TODOs, editorial notes or a stale status, except where canon requires it, as in a template, a record kept as history or a new PF30 volume's review copy.
 The rules for drains, PF09, package validation and application in the historical operation of TW-ALPHA-20260908.1, below, still apply, except its assessment steps, its model or effort advice, its reading and writing through Google Drive and ChatGPT Library, its Last Update Gate of upstream source filenames, its paste-ready PF20/PF30 sections, and its selected scope: every source is now read whole.
 Next manual entry: start GTWPE-FLOW-10 with an execution prompt that gives `RUN` and the run's files; or invoke a TW prompt directly with files only: its target by its directory and versionless name, each source as an attached file or a repository path, and the repository path and branch for its outputs. No live task or scope is selected by this note.
@@ -1418,7 +1437,7 @@ and `## Historical selected release — TW-ALPHA-20261006.2`:
 
 ```
 ## Selected release — «R»
-**Selected: «S».** Authority: MODIFICATION-20261007-gtwpe-tw-flow-rulings, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA», applying his rulings of 2026-10-07 (GTWPE-D2 to GTWPE-D4). Every TW prompt takes files only and reads every source whole; TW-TRIAGE-10 accounts for every change, each PF10 addendum among them, in one triage file, as the Flow Manager's triage pass; a PF10 change of an epic or a CRD the files do not show closed is held back; and TW-RECORD-10 and TW-RECORD-20 make every change PF20 or a PF30 volume takes whenever a specification is involved, or return exactly `no changes`, with a separate proof log beside each file, as GTWPE-D1 requires. Every row below is new. The release's *Current operation* is on <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/>. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations or through the Flow Manager, <mention-page url="https://app.notion.com/p/«ID:FLOW-10»"/>, which runs these prompts as passes. All old prompt pages remain intact.
+**Selected: «S».** Authority: MODIFICATION-20261007-gtwpe-tw-flow-rulings, run through GTWPE-MGMT-10 on Nathan's plan approval of «PA», applying his rulings of 2026-10-07 (GTWPE-D2 to GTWPE-D4). Every TW prompt takes files only and reads every source whole; TW-TRIAGE-10 accounts for every change, each PF10 addendum among them, in one triage file, as the Flow Manager's triage pass; a change, from PF10 or another source, of an epic or a CRD the files do not show closed is held back, a CRD's own PF30 record aside; and TW-RECORD-10 and TW-RECORD-20 make every change PF20 or a PF30 volume takes whenever a specification is involved, or return exactly `no changes`, with a separate proof log beside each file, as GTWPE-D1 requires. Every row below is new. The release's *Current operation* is on <mention-page url="https://app.notion.com/p/3d44590a05eb8171ab6ff4dab33b00ef"/>. TW Flowmaster 1.3.0 and flowmaster-validate 3.3.2 do not run this release: TW runs by Nathan's direct invocations or through the Flow Manager, <mention-page url="https://app.notion.com/p/«ID:FLOW-10»"/>, which runs these prompts as passes. All old prompt pages remain intact.
 - `TW-TRIAGE-10` — <mention-page url="https://app.notion.com/p/«ID:TRIAGE-10»"/> — Accounts for every change, each PF10 addendum among them, in one triage file; the Flow Manager's triage pass; «V».
 - `TW-DRAIN-10` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-10»"/> — General PF redlines and proof log, with any change-history redline, or exact no redlines; files only; «V».
 - `TW-DRAIN-20` — <mention-page url="https://app.notion.com/p/«ID:DRAIN-20»"/> — PF09 redlines and proof log; rows judged on all the evidence; board optional; files only; «V».
@@ -1536,7 +1555,8 @@ Approving this plan accepts each of these (`DISP-001`). §A's risks and listed f
 analysis, stand where this plan does not settle them; this plan settles A's L6 (a superseded change), A's L7 and
 B's L11 (the triage pass's return is a file), A's L9 and B's L4 (each handoff row against both sides), B's L10 (a
 decision's form is a file), B's L12 (the stated result of a run in which every change waits) and B's L20 (the
-functional test is `D26-E`'s table above). DC-L1 and DC-L2 Nathan ruled on.
+functional test is `D26-E`'s table above). DC-L1 and DC-L2 Nathan ruled on. The PL3 reviews' listed findings are
+in *Listed findings, accepted as risks (PL3)*, each with its reason, and are accepted with these.
 
 | # | Finding | Likelihood | Consequence | Why listed, not repaired |
 |---|---|---|---|---|
@@ -1563,7 +1583,7 @@ functional test is `D26-E`'s table above). DC-L1 and DC-L2 Nathan ruled on.
 | K-21 | The PE Metaprompt's handoff content rule ("current status, relevant decisions, constraints, unresolved items") is set aside for the TW prompts' handoffs | Certain | A handoff carries less than the PE asks; the facts are in the files it names | Nathan's ruling governs (*Nathan's directions*) |
 | K-22 | F10 and F11 sit after F1, out of numeric order | Certain | Cosmetic | The order a run takes them |
 | K-23 | §A's DC-L3, DC-L5, DC-L6, DC-L7 and DC-L8, and A's L11 (the catalog's *Approved design* entry) | As §A states | As §A states | Approved with the analysis; A's L11 stays Nathan's opt-in |
-| K-24 | Before the compaction, this mode followed GTWPE-MGMT-10 and drafted three members' edits without a live fetch in its own context (*Harness files*, the lapse) | Certain | None found: the approval recorded at `PLANNING` follows the procedure as fetched at 12:39Z, and every anchor of the three members was checked against its live page | Disclosed. The plan relies only on the checks made after the fetches, and `EXECUTE`'s X1.0 fetches every page again before any write |
+| K-24 | Before the first compaction, this mode followed GTWPE-MGMT-10 and drafted three members' edits without a live fetch in its own context; and it read the PE Metaprompt's general rules, its authoring control, only then, though DR-1 to DR-5 were written after (*Harness files*, the lapse; A's L23, B's L20) | Certain | None found: the approval recorded at `PLANNING` follows the procedure as fetched at 12:39Z; every anchor of the three members was checked against its live page; and the general rules, read again from a fetch at 14:29Z, found no text of this plan that breaks them (*Repair round (PL3)*) | Disclosed. The plan relies only on the checks made after the fetches, and `EXECUTE`'s X1.0 fetches every page again before any write |
 | K-25 | A proof log that names a held-back change, as S-HOLD and the record prompts ask, could be read by check 6 as taking that change as a basis | Low | A loud S4 stop for that document | The proof log names it as held back, which is not a basis; a loud stop |
 
 ### Product Owner actions
@@ -1590,9 +1610,9 @@ functional test is `D26-E`'s table above). DC-L1 and DC-L2 Nathan ruled on.
 
 | Value | Fixed as |
 |---|---|
-| «H» | `1a55ca03d39eb90aa153b85d35ceae29d82710e9f114d5d7bf782938910c0185`, the sha256 of `edits.json`, 111,376 bytes, as committed with this section |
-| «HD» | `939913d8011687142a7f9188c4bee871249dc56e8239d221e25950802c925607`, the sha256 of the evidence copy of `gtwpe.decision-record.md`, 14,046 bytes |
-| «HT» | `420ae3ea083fbbdb03a954953ec65bd29b2d43de0a3af91e925f770d000a05c7`, the sha256 of the evidence copy of `gtwpe.handoffs.md`, 10,360 bytes |
+| «H» | `a8dff863d27886b3b918eeee94f6c004790449aa8dc8ecc2d048838212e67116`, the sha256 of `edits.json`, 114,342 bytes, as committed with this section |
+| «HD» | `d7fad191f04b4923c2c0e03b03f44e1ee074eacab5b8c61bf1feaefbd968f44b`, the sha256 of the evidence copy of `gtwpe.decision-record.md`, 15,231 bytes |
+| «HT» | `13eb81de042f66bcb667cc97bd42d658ff2169201b52e62c0d4af4a663980aa4`, the sha256 of the evidence copy of `gtwpe.handoffs.md`, 10,515 bytes |
 
 ### Dry run (PL3)
 
@@ -1683,69 +1703,320 @@ Every line the new texts add to an invocation is one a prompt's intake reads: th
 and the originating preparer), the target by versionless name, the triage file (the hold-back), and the run's
 `RUN.md` (the branch and its one pull request).
 
+### Full review (PL3)
+
+- **The reviewers.** Two fresh general-purpose subagents, GTWPE-TW-FLOW-RULINGS-PLAN-A and -B, neither forked
+  nor context-inheriting, as the template sets. Each was handed nothing but its brief's repository path (ruling
+  1): `PLAN-REVIEW-A-BRIEF.md` and `PLAN-REVIEW-B-BRIEF.md` in
+  `docs/ephemeral/modifications/evidence/gtwpe-tw-flow-rulings/`, 13,242 bytes each, committed and pushed at
+  `f77a77b` at 13:30:43Z, before either was spawned, at 13:30:51Z and 13:30:52Z. Each confirmed its brief's sha256
+  at that commit (A `154caacf…`, B `e811945c…`), and that `f77a77b` adds only the two briefs to `1f73053`.
+- **The runs.** Each reviewed §P at `1f73053`, with §A and every evidence file, read no Notion page or prompt body,
+  and wrote nothing. By the harness's completion notices, A ran for about 52 minutes with 113 tool calls and B for
+  about 54 with 109; the notices give no token count, so tokens are not measured. The side effects they reported
+  were not their acts: the repository's PostToolUse hook updated `.git/canon_relied_on_hook.json` (A), and the
+  harness saved one oversized output of A's, a grep of `ERRORS.md`, which holds no prompt body. B also ran the two
+  record checks, in check mode, beyond its brief's named tools; they write nothing.
+- **The captures.** Each return came back through the harness's `SubagentHandback` call. `capture.py` read each
+  reviewer's own transcript, found by the path the harness gave for its agent ID (A `a176a826705fc17cd`, B
+  `ac43851bfb186d0cc`), and wrote its message unedited, with one final LF: A's at 14:23Z, after printing the
+  call's shape alone; B's at 14:25Z, directly, since the script writes only when the transcript holds exactly one
+  handback call. Both shapes were printed again at 14:48Z for this record: one call each, A's at transcript line
+  547, 25,223 characters, and B's at line 591, 26,246 characters.
+  - `PLAN-REVIEW-A.md`: 25,303 bytes, sha256 `13ec7d87ddf22c74b9cf8e43d04c140ce28899b012c4b2f4331b224e4cee5534`;
+    first line `4`.
+  - `PLAN-REVIEW-B.md`: 26,313 bytes, sha256 `85f78cc274e6dbed8d5460afb5f1980a73c709ece8786e67485d4490ccd1e5a8`;
+    first line `3`.
+
+  Each carries the `## Canon relied on` block the brief required, and each closes as the brief allows (`IN
+  FLIGHT`).
+
+**Result: A, 4 required and 25 listed; B, 3 required and 28 listed.** The session tested each required finding
+against its source and confirmed all of them, which come to five distinct defects. It confirmed three listed
+findings as required under the fixed rubric, R1 to R4 (A's L1, A's L10 and B's L6), and refuted two (A's L8 and
+L9). The round closes with 8 distinct required defects, each repaired in *Repair round (PL3)*:
+
+- **RQ-1** (A's R-1, with B's RQ-B2, which it settles the other way). The hold-back covered PF10 changes only,
+  while DR-1 made the run account for and route every change. A specification's change of an epic or a CRD the
+  files do not show closed would have been drafted and applied, silently. Confirmed against the Change Process
+  Guide's *Post-QA documentation drainage ordering (normative)*, HDE Governance §2.0.19 and §9.1.1's *Historical
+  drainage* ("a Specification or Plan alone does not supersede canon"), read again on `main` at 14:40Z. B's
+  one-word correction would have brought the selection page down to the narrower rule; the session took A's, which
+  canon supports, and kept a CRD's own PF30 record outside the hold-back, as TW-RECORD-20 already treats it: HDE
+  CRD Records §3.2 enters "the initial PF30 record" when the CRD is registered, and §4.2 updates it in place. So
+  the record prompts make a CRD's record as before, and E-010's open conflict stays where it was. B's L17, that no
+  step records a routed document's base blob in `RUN.md`, and B's L28, E18 without "not held back", are repaired
+  in the same texts.
+- **RQ-2** (A's R-2 = B's RQ-B3). The triage file gave each change its documents or the reason it cannot drain,
+  never both. Without a specification, the PF20 or PF30 part of a change that also bears on a general document
+  got no account, and the change could be counted drained. Confirmed with HDE Build Notes 2.14, which binds PF27
+  and PF30 ("PF27 and PF30 adopt the same terms on their next revision"). *What the plan settles*' endings, A's L2
+  and B's L1, are repaired with it.
+- **RQ-3** (A's R-3). TW-APPLY-10 alone had no files-only refusal, though GTWPE-D2, *SECTION*, HUB-NEW and P5 say
+  every TW prompt has one. Confirmed by script over `edits.json`, and against TW-APPLY-10 fetched live at 14:38Z:
+  its sentence "They come as attached files or repository paths, never from Google Drive or ChatGPT Library" says
+  where its files come from, not what it refuses.
+- **RQ-4** (A's R-4 = B's L2). The handoff table 1.1 still said rows H11 to H13 are "carried unchanged", though it
+  changes H11. Confirmed by `diff` against `main`.
+- **RQ-5** (A's L1 = B's L16, confirmed as R4). E36 and F8 counted "each change the triage file routed to" a
+  document as already represented when it returned `no redlines` or `no changes`. The triage file names documents
+  for every change, held-back ones included, and a drain holds those back and drafts nothing, so a run could
+  return `RUN_NO_CHANGE` while a change waited: a wrong result code, silent but for `RUN.md`'s list.
+- **RQ-6** (B's RQ-B1 = A's L3). GTWPE-D2 to GTWPE-D4 credited Nathan's approval of the analysis with
+  consequences only this plan adds: P-2's `no changes`, P-3's "a path on a branch", P-4's mode, DR-1's account and
+  the triage file's settlement. Confirmed against `analyze_approved_by`, which names none of them. B's L27, the
+  second quotation in GTWPE-D2 attributed to the ledger as well, is repaired with it: that sentence is in
+  PE40-INIT alone.
+- **RQ-7** (A's L10, confirmed as R3). B5 briefed a fresh reviewer subagent in the session's own words, "briefed
+  to write nothing", with no committed brief, while ruling 1, as GTWPE-D2 applies it, hands every reviewer nothing
+  but its brief's path. §A's *Scope* counts B5 among ruling 1's sections, and no edit reached it. Confirmed against
+  GTWPE-FLOW-10 fetched live again at 14:38Z.
+- **RQ-8** (B's L6, confirmed as R1). E06, E12 and E45 stopped "an execution prompt that gives anything beyond
+  `RUN` or `RESUME` and files", with no exception for naming the prompt to run, which GTWPE-D2 excepts, and
+  nothing said what a message of file names alone means, which is what ruling 1 describes. Every run starts by
+  naming the prompt (its operator note: "Start this prompt in a new session with an execution prompt"), so on the
+  normal path a literal reading stops at intake.
+
+**Refuted.** A's L8: C4's ITEM-04 gave the sentence before E06's anchor as "every other instruction in it is read
+within those limits". GTWPE-FLOW-10 as fetched at 14:38Z has no such sentence: the paragraph's sentence before
+the configuration line ends "or the route each document takes". A's L9: a B5 finding on a PF20 or PF30 draft
+would go through the redliner. *Redo from canon* runs "its drain on the same sources, with the finding as
+supporting material, then TW-APPLY-10; or its record pass again, with the finding", so a record document goes back
+through its own pass.
+
+**The stop rules** (`D26-A` rule 4, as GTWPE-MGMT-10 states them). This is the mode's first full review, so there
+is no earlier round for the required defects to halve from. Of the eight, RQ-1, RQ-2 and RQ-6 sit partly in
+DR-1's text; RQ-3, RQ-4, RQ-5, RQ-7 and RQ-8 sit in text older than the dry run's repair, so most of the round's
+findings do not sit in the last repair's text. Time was about 2.1 h on the meter, against the estimate of about
+10 h. So the session repairs, then makes the one check of the repair's diff that rule 2 allows, and runs no
+second full review.
+
+### Repair round (PL3)
+
+By this session, from 14:31Z to 15:03Z on 2026-10-07, after its context's second compaction, on the record
+at `f77a77b`. Every new or changed anchor was checked against its page fetched live in this round, GTWPE-FLOW-10
+and TW-APPLY-10 at 14:38Z; every other anchor is unchanged and was checked at P3. Every changed passage was read
+whole with its new text in place, as P4 reads them, on those two pages and on TW-TRIAGE-10, both drains and both
+record prompts, fetched live at 14:57Z for that reading. All seven were unchanged since `edits.json`'s edit times.
+
+**The PE Metaprompt's general rules, read again** (A's L23, B's L20). Fetched at 14:29Z, just before the
+compaction, and read from the harness's save at 14:31Z to 14:33Z, by script: 091426.1, edited
+2026-09-23T17:17:22.217Z, as at A0; its headings, and its general rules, the same lines the first read printed.
+Every text this plan wrote after the first compaction, the edits as DR-1 to DR-5 and this round leave them, the
+control texts and the two repository files, was checked against them:
+
+- *Identity and Notion publication*: new versions by its rule for `MMDDYY.N` (*Values*); each new page a
+  duplicate under its parent after a title check, and read back whole (X1.3 (a), (g), (h)); no existing prompt
+  page updated; source and control versions checked again just before the writes (X1.0).
+- *Authoring and validation exclusion*: no new text adds a runtime-selection, internal-processing,
+  operator-access or workload field (`EXCLUDED`, and this round's reading). TW-TRIAGE-10's bans on appending model
+  advice and on "a mandatory model-assessment stage" stay in its new texts (E03, E04, E14): they are among the
+  permitted exceptions of MODIFICATION-20260930-gtwpe-tw-model-advice, "prohibitions that stop a prompt producing
+  or acting on model advice". Its handoff content rule is set aside for the TW prompts by ruling 1 (*Nathan's
+  directions*; K-21).
+- *Standards and preservation*: native roles, labels and final sentinels outside the edits are kept (*The new
+  pages' checks*); no subject-matter canon is copied into a prompt, since the hold-back's reason is one clause and
+  canon owns its timing; and a change is closed only when the files show it closed, as the rule "Do not infer
+  closure from implementation, partial evidence" requires, so missing closure evidence holds a change back.
+- *Source acquisition and completeness*: every Notion source fetched by its exact ID and read whole.
+- The general rule to return to design when a change alters payload flows: this Modification is the GTWPE's
+  design route. Its analysis and this plan, with the handoff table and its diagram (`gtwpe.handoffs.md` 1.1), go to
+  Nathan for approval before any page is written, and the plan holds edits, not replacement bodies.
+- *Authoring and quality control* item 7, producer-consumer contracts in both directions: P5, and its successor
+  below for the rows this round changes.
+
+No text of this plan breaks them. The reading also found two inexact statements in *Harness files*, corrected
+there: the first fetch's header was read, each line cut to 300 characters, and its line ranges were counted from 0.
+
+**The repairs**
+
+| # | Texts changed |
+|---|---|
+| RQ-1 | S-HOLD (DRAIN-10-E15, DRAIN-20-E15): "A change, from PF10 or another source, is held back when"; RECORD-10-E10 and RECORD-20-E10: "each other change, from PF10 or another source", and in RECORD-20-E10 "A CRD's own record is never held back: it is made from the CRD's approval evidence."; G-FLOW-10-E14, E15 and E18: "each other change not held back"; E25; E37, its anchor widened to "a PF10 change that `RUN.md` holds back, unless Nathan has directed that change drafted."; E41: every change held back, with the CRD-record exception and "Record in `RUN.md` each routed document's canon path, its base blob and its route, and commit and push" (B's L17); E47; F3, F8; GTWPE-D3's *Canon sets the timing*, with §9.1.1's *Historical drainage* and HDE CRD Records §3.2; GTWPE-D4's third and fourth bullets; *SECTION*'s three paragraphs on the hold-back and the record prompts; A1-NEW; P-1; *What the plan settles*, a new *The hold-back* bullet |
+| RQ-2 | TRIAGE-10-E04, E11 (without a specification, PF20 or the PF30 family named in a part's reason, never among a change's documents) and E14; G-FLOW-10-E24, E40 ("names an ineligible document to route"), E42, E43, E44, E46 and E50 ("with no part left to drain"); F11; GTWPE-D3's first and last bullets; GTWPE-D4's first bullet; *SECTION*'s second and third paragraphs; *What the plan settles*: the triage file and the endings (A's L2, B's L1) |
+| RQ-3 | APPLY-10-E19, new, after E18: its anchor is the intake sentence "They come as attached files or repository paths, never from Google Drive or ChatGPT Library."; its new text keeps that sentence with "only" and adds "and, apart from Nathan's request of a no-change report, an input given as anything but a file is not taken: stop and name it", so that the anchor is absent after (`OVERLAP`) |
+| RQ-4 | `gtwpe.handoffs.md`'s opening: "Rows H11 to H13, GTWPE-MGMT-10's, are carried; H11 takes files only from version 1.1 (GTWPE-D2)." |
+| RQ-5 | G-FLOW-10-E36: "each change not held back that the triage file names for it is already represented there"; F8 the same |
+| RQ-6 | GTWPE-D2 to GTWPE-D4: each names both approvals, the plan's consequences by label (GTWPE-D2: P-3, P-4 and its reading of the handoff rule; GTWPE-D3: DR-1, P-2, the triage file's settlement, RQ-1 and RQ-2; GTWPE-D4: P-2, RQ-1 and RQ-2), and both approval fields. GTWPE-D2's second quotation is attributed to PE40-INIT alone (B's L27) |
+| RQ-7 | G-FLOW-10-E52 to E55, new, after E51: *Authority and limits* names "the review briefs"; the `review/` cell holds "Each consistency review's brief, as `<NN>-brief.md`, and its return, captured unedited as `<NN>-consistency.md`"; B5 step 1 writes the brief to `review/<NN>-brief.md`, commits and pushes it, and starts the reviewer with nothing but its path (GTWPE-D2); step 4's reviewer is "briefed as step 1 says". *Proof logs (GTWPE-D1)* is not edited: its list of what the Flow Manager writes that is not an artifact leaves the briefs out, and a brief is neither of GTWPE-D1's artifact types |
+| RQ-8 | G-FLOW-10-E06 and E45: "anything beyond naming this prompt, `RUN` or `RESUME`, and files"; E07 adds "Files given alone mean `RUN`, and naming this prompt to start it is not an input."; F1 the same |
+
+The new edits are appended after each member's last, so that no earlier ID moves: 205 edits, GTWPE-FLOW-10 55
+and TW-APPLY-10 19. G-FLOW-10-E37's, E52's and E55's anchors are each the shortest that is unique and absent from
+its own new text, as PL1 asks.
+
+**Record corrections, which change no step:**
+
+- K-24 and *Harness files*: the PE Metaprompt's general rules were read only before the first compaction (A's
+  L23, B's L20); the first fetch's header was read; the line ranges given were counted from 0. Each is now stated,
+  with this round's reads. On B's L20's second point: this mode tried no deletion of a save, since the harness
+  refused the same action at `ANALYZE`, and `D22` condition 4 leaves a save it will not delete to its teardown.
+- *Excerpts* (B's L26): §P quotes kept clauses where a check reads them, about ten in *The two-sided check*.
+- The intro and the authoring-control bullet: the second compaction, this round's fetches, and the one overlay
+  line read.
+- *Nathan's directions*, *Evidence files*, *The edits, by rule* and *§A's passages*, for the counts and texts
+  above.
+
+**Corrections to the dated dry run,** recorded here and not made in it, since a dated record is not corrected in
+place:
+
+- DR-1 credits "any other file or collection of source material that contains the change context" to answer 2;
+  the words are answer 5's (A's L4, B's L27).
+- P8 simulated the *Alpha 1* and Hub readbacks at 13:13Z on A1-NEW and HUB-NEW as they stood before DR-1 changed
+  them at 13:18Z, so it did not test the texts committed at `1f73053`. This round found it when its simulated copy
+  no longer held the committed text. It was run again at 14:47Z on the repaired texts, from the dry run's own
+  simulated copies, never a harness save: `ctl_check.py post` with the plan's own arguments exits 0, every check
+  `PASS`, 14 on *Alpha 1* and 13 on the Hub; with one row's version wrong, that row fails, exit 1.
+- P9's "Every handoff row has 8 cells" counted the parts a row splits into on its bars. Each row has the header's
+  six columns, and still does.
+
+**Checks after the repair**
+
+| Check | Result |
+|---|---|
+| `edits_check.py` on `edits.json`; then each of its eleven `--inject` faults | `PASS`, exit 0: 205 edits over eight members; the eight GTWPE-D1 items read from the decision record. Each fault exits 1 under its own code, 11 of 11 |
+| The six new or widened anchors, in the fetches of 14:38Z, by reading, checked by a second reading | G-FLOW-10-E37's, E52's, E53's, E54's and E55's, and APPLY-10-E19's, each once; none in another edit's anchor, and none overlapping one in its page. Both pages unchanged since `edits.json`'s edit times |
+| Each changed passage, read whole with its new text in place, on the seven pages fetched in this round | Each reads as one rule with its neighbours. S-HOLD, the record prompts' hold-back sentence, B1 step 6, check 6 and S4 now hold back the same changes. One wording was tightened in the reading: B5 step 1's new text became two sentences, so that "It reads every change" plainly means the reviewer |
+| The two-sided check, for the rows this round changes (below) | Every requirement met, every return consumed |
+| The control texts | SEL-1 and CAT-FLOW still go first; no new text holds a later old text of its call. A1-NEW's and HUB-NEW's readbacks, simulated: as above |
+| The repository files: X1.4's `D26-E` search on a scratch copy of `docs/prompt_ecosystem_management/gtwpe/` with the new files; every quotation in the new entries against its source; each table row's columns | X1.4's search finds no hit, where the same search on `main` finds 5 lines. All 11 block quotations and 5 inline ones in GTWPE-D2 to GTWPE-D4 are found verbatim in their sources, by script, whitespace collapsed. All 14 handoff rows have the header's six columns |
+| Both record checks, on a scratch copy of the record at `PLANNED` with this round in `reviews`; every table in §P even; every quotation in §P against its source | Both exit 0, on the record at `PLANNING` and on a scratch copy at `PLANNED`; the front matter parses; all 18 tables in §P are even. Of 218 quoted spans in §P, 148 are found by script in the repository or this record's evidence; 1 is Nathan's approval with an elision; 33 are kept clauses of a prompt body or the PE Metaprompt, each found by reading in this round's fetches; 1 quotes the dry run; and 35 are not quotations: 14 spans between two quotations, 12 mention links and 9 diagram labels |
+
+**The two-sided check, for the rows this round changes,** quoted from the new texts:
+
+| Prompt or party | It requires or returns | GTWPE-FLOW-10's new texts meet it in |
+|---|---|---|
+| All six | "an input given as anything but a file is not taken", TW-APPLY-10's own now among them, its no-change report's request aside | E26: "it gives only the prompt to run and files"; a run never requests a no-change report |
+| The drains, the record prompts | A change, from PF10 or another source, is held back "as the triage file reports it when one is given" | Item 5: the triage file among every pass's sources once written; B1 step 6 holds back the same changes, from every source |
+| TW-RECORD-20 | "A CRD's own record is never held back: it is made from the CRD's approval evidence" | B1 step 6: "a CRD Specification's own PF30 record does not wait"; its by-prompt line carries the approval evidence |
+| TW-TRIAGE-10 | Each change's eligible documents, and the reason for any part that cannot drain, PF20 or the PF30 family named only in a reason when no specification is among the files | B1 step 5 records both; its stop is for "an ineligible document to route"; B1 step 7 and B3 name each change, or part of one, that cannot drain |
+| The drains, the record prompts | Exactly `no redlines` or `no changes` | *Its return*: "each change not held back that the triage file names for it is already represented there", so a held-back change is never counted represented |
+| B5's reviewer, a subagent | Its brief as a committed file, by path only | B5 step 1 writes, commits and pushes `review/<NN>-brief.md` before the reviewer starts; *Authority and limits* and the `review/` cell name it |
+| Nathan, starting a run (F1) | "Files given alone mean `RUN`", and naming the prompt is not an input | E06, E07 and E45; S2 stops anything else |
+
+### Listed findings, accepted as risks (PL3)
+
+Not repaired, by `D26-A` rule 3; each goes to Nathan with its reason, and repairing one is his opt-in. Where both
+reviewers found the same thing, it is listed once. Approving this plan accepts each (`DISP-001`).
+
+| Finding | Reason it stays listed |
+|---|---|
+| A's L4, B's L27: DR-1 credits the "change context" sentence to answer 2, not answer 5 | The dry run is dated; *Repair round (PL3)* corrects it, and no prompt or repository text cites it |
+| A's L5: no unit for counting a specification's changes, so the Flow Manager and the triage pass may count differently | Loud: B1 step 5 stops (S4). The Flow Manager records the triage file's account as the run's; the first live run, with HDE-EPIC040's Specification, will show the unit |
+| A's L6, B's L24: F2's "selected version, page and edit time" and "that it runs as a pass inside the session Nathan started" are not among GTWPE-D2's exceptions; the *Common rules*' "Every handoff passes the prompt to run and files" reads onto the returns; *SECTION*'s resume names no decision files | The version, page and edit time are the Flow Manager's own reads of its selection, which GTWPE-D2 excepts; the launch mode is each TW prompt's own kept rule. A pass that refuses either stops loudly at intake. The returns carry outcomes and paths. Low |
+| A's L7, B's L4: TW-APPLY-10 keeps "Other header, title or invocation-tag changes need separately explicit authorization and exact validated edits" | The `D26-E` exceptions "a source's authorization" and the header contract's standing authority keep it, and no run asks for such a change. Low |
+| A's L11, B's L9: an Epic Specification without its closure decision, with nothing else for PF20: RECORD-10-E20 names the missing evidence, and the run stops (S4), which K-10 and P5 do not say | Loud, naming the closure decision it needs; low to medium on the first live run only if that decision is left out |
+| A's L12, B's L8: RECORD-20 speaks of "the volume the changes bear on" and "any PF30 volume", while each pass has one volume | PF30.1 is the only volume today; with a second, the checks after a pass stop a write to a volume it was not given (S6). Low |
+| A's L13, B's L7: GTWPE-FLOW-10's "governing specification" against TW-TRIAGE-10's and GTWPE-D4's "a specification among the files" | Loud: B1 step 5 stops on PF20 or PF30 named to route without a governing specification. Low |
+| A's L14, B's L23 (second): HUB-NEW's "no … authorization or other context" for GTWPE-MGMT-10, and G-MGMT-10-E03's "its subject, given only as files", against its mode, Modification ID and approvals | GTWPE-D2, which HUB-NEW cites, lists those exceptions. A strict reading stops loudly. Low |
+| A's L15, B's L23 (first): G-MGMT-10-E06 makes "Nathan's words in those files" the request, and a `RUN.md` alone holds none | Loud: `ANALYZE` names the files it needs. Low to medium; Nathan carries H11 and adds his words as a file |
+| A's L16, B's L21: the PE Metaprompt's handoff rule is set aside on ruling 1 and GTWPE-D2, not in *Relation to the PE Metaprompt* | GTWPE-MGMT-10 reads the decision record first and does not relitigate a ruling; recording it there is a new edit, at Nathan's opt-in. Low |
+| A's L17: the triage file and decision files are among every pass's sources, and nothing says they are not sources for TW-APPLY-10's Last Update Gate | The gate names "the sources that justified the update", and neither file carries a change; a uniform misreading would show at B4 or in Nathan's review. Low |
+| A's L18: GTWPE-FLOW-10 grows by a net 3,256 characters with this round's edits, to about 30,800, near the harness's save threshold, while X1.3 (g) reads the page whole into context | If the harness saves the fetch, the readback reads the save within its check, as `D22` allows, and §E names it. Medium; no wrong result |
+| A's L19: on `RESUME`, an attached decision file has no commit step | Loud: a pass given a path its branch lacks stops (S2). Low |
+| A's L20: a run stopped because a change cannot drain still returns a resume line | One futile resume, which the same stop ends. Low |
+| A's L21: `closure.state_sharers` leaves out the record prompts, which now share `no changes` | No effect: every member the closure names changes in this Modification |
+| A's L22, B's L25: `edits_check.py`'s word lists are narrow, `OVERLAP` cannot see anchors that overlap in a body, and TRIAGE-10-E03 and E14 keep "model advice" | No new text uses a gap, by both reviewers' reading and this round's; the model-advice bans are the permitted exceptions above; X1.3 (g) reads each page whole. Low |
+| A's L24, B's L13: the readback's `D26-E` table drops some of §A's ruling 1 terms | The absence checks by phrase cover every removed passage, and the whole-page readback reads the rest. Low |
+| A's L25, B's L3, B's L14: TW-TRIAGE-10 keeps its title; *The edits, by rule* defines no R5; the record prompts' E09 to E21 are labelled "(R4, R2)" where `edits.json` tags R4, so X5 sets ITEM-03 without their hold-back text | The title is the role's stable name; the rest is bookkeeping, and the hold-back text is verified at X5 under ITEM-05. Low |
+| B's L5: APPLY-10-E11 removes "an explicit authorized target version when supplied" | Each target's own scheme increments; a non-incremental version would need a new rule. Low |
+| B's L10: *What the plan settles* says a new closure decision starts a new run, while E48 and E49 let a resume add a decision file | Either way the change stays held back until a run's triage file shows it closed, and `RUN.md` lists it. Low; loud, or K-7 |
+| B's L11: S-HOLD and the record prompts' hold-back bind direct invocations too, where the prompt judges closure itself | It applies canon's timing wherever a change drains, and the proof log names each change it holds back. Medium; Nathan's opt-in to limit it to runs |
+| B's L12: K-11's reason rests on DC-L1, which covers only the drains' `no redlines`; the record prompts' exact `no changes` is P-2's | K-11's consequence holds for both, and Nathan's approval of this plan accepts P-2. Low |
+| B's L15: X5 marks ITEM-06 `VERIFIED` by a PF09-row reading that *The new pages' checks* does not set | Both passages it reads are kept text, read in the whole-page readback. Low; bookkeeping |
+| B's L18: S1 is not sized for the triage pass, which reads PF10, 489,946 bytes, every source and the target owners' content | Loud S1 stop; S1 sizes any pass by what it must read. Medium in a small context |
+| B's L19: a failure after X1.4's commit and before X3, or W25 landing and W26 failing, leaves mismatched selections | `D26-B`'s return names each applied step, and the steps carry the rollbacks: X1.4's restore commit, the catalog's reverse replacements. Low |
+| B's L22: §P carries on past P-1 to P-5, where GTWPE-MGMT-10's *The record* says to return | K-18; each goes to Nathan with this plan |
+
 ### Harness files (`D22` condition 5), for `PLAN`
 
 - **Inline fetches, held only in this session's transcript**, which the harness keeps and leaves to its teardown:
-  - Before the compaction, 12:22Z to 12:38Z: TW-TRIAGE-10, TW-DRAIN-10, TW-RECORD-10, TW-RECORD-20 and TW-APPLY-10,
-    to write their edits, and *HDE TW*.
+  - Before the first compaction, 12:22Z to 12:38Z: TW-TRIAGE-10, TW-DRAIN-10, TW-RECORD-10, TW-RECORD-20 and
+    TW-APPLY-10, to write their edits, and *HDE TW*.
   - After it, 12:39Z to 12:57Z: GTWPE-MGMT-10 100526.2 first, before any later step relied on it (*Reading prompt
     bodies*); then GTWPE-FLOW-10, the selection page, *HDE TW*, the GTWPE parent page, and the six TW prompts again,
     for the edits' checks and this dry run's readings.
+  - After the second compaction, at about 14:30Z: GTWPE-FLOW-10 and TW-APPLY-10 at 14:38Z, for the repair's new
+    anchors; GTWPE-MGMT-10 100526.2 at 14:49Z, before the repair round was recorded; and TW-TRIAGE-10, TW-DRAIN-10,
+    TW-DRAIN-20, TW-RECORD-10 and TW-RECORD-20 at 14:57Z, to read each changed passage in place. Each was at
+    `edits.json`'s edit time, and GTWPE-MGMT-10 at 2026-10-05T16:36:11.384Z.
 - **A lapse, disclosed.** GTWPE-MGMT-10, GTWPE-FLOW-10 and TW-DRAIN-20 were not fetched in this mode before the
-  compaction. The mode's first steps, recording Nathan's approval at `PLANNING` (`0da4fd3`), followed GTWPE-MGMT-10
-  as this session last read it at `ANALYZE`, at 05:40Z, in an earlier context; and the first drafts of the edits to
-  GTWPE-FLOW-10, GTWPE-MGMT-10 and TW-DRAIN-20 were written from what the context then held, §A's quotations of
-  the clauses at issue and the summary of the earlier context, not from a fetch. That is short of the body's rule
-  to fetch a body live again before any step relies on it (`D22`). After the compaction each was fetched live, the
-  recorded approval was checked against the procedure, and every one of their anchors against its page (P3); this
-  plan relies on those checks alone (K-24).
+  first compaction. The mode's first steps, recording Nathan's approval at `PLANNING` (`0da4fd3`), followed
+  GTWPE-MGMT-10 as this session last read it at `ANALYZE`, at 05:40Z, in an earlier context; and the first drafts of
+  the edits to GTWPE-FLOW-10, GTWPE-MGMT-10 and TW-DRAIN-20 were written from what the context then held, §A's
+  quotations of the clauses at issue and the summary of the earlier context, not from a fetch. That is short of the
+  body's rule to fetch a body live again before any step relies on it (`D22`). After the first compaction each was
+  fetched live, the recorded approval was checked against the procedure, and every one of their anchors against its
+  page (P3); this plan relies on those checks alone (K-24). The PE Metaprompt's general rules, the authoring
+  control, were likewise read only before the first compaction, though DR-1 to DR-5 were written after it (A's L23,
+  B's L20). They were read again from a third fetch, and the texts written after the first compaction were checked
+  against them (*Repair round (PL3)*).
 - **Harness saves**, each read by a script that printed only what its check needed:
-  - `mcp-Notion-notion-fetch-1791375678741.txt`, the PE Metaprompt 091426.1, before the compaction: its general
-    rules, by line range (lines 36 to 128, 173 to 207 and 291 to 353). Its header and the GCFPE overlay's lines were
+  - `mcp-Notion-notion-fetch-1791375678741.txt`, the PE Metaprompt 091426.1, at 12:21Z, before the first
+    compaction: its headings; its general rules, lines 37 to 129, 174 to 208 and 292 to 353 of the saved text,
+    counted from 1 (this list first gave them counted from 0, as 36 to 128, 173 to 207 and 291 to 353); and its
+    header, lines 1 to 36, each cut to 300 characters, which this list first said was not read. Its GCFPE overlay was
     not read.
-  - `mcp-Notion-notion-fetch-1791378222316.txt`, the PE Metaprompt again, after the compaction: its title and edit
-    time (P10), and its line 194 with the heading above it, the handoff rule this plan sets aside for the TW prompts.
+  - `mcp-Notion-notion-fetch-1791378222316.txt`, the PE Metaprompt again, after the first compaction: its title and
+    edit time (P10), and the one line of its content that holds `NEXT_PROMPT_HANDOFF`, the handoff rule this plan
+    sets aside for the TW prompts, printed in two parts, with the heading above it.
+  - `mcp-Notion-notion-fetch-1791383347141.txt`, the PE Metaprompt a third time, fetched at 14:29Z, just before the
+    second compaction, and read after it, at 14:31Z to 14:33Z: its title, version and edit time; its headings; its
+    general rules, the first read's lines with each range starting one line earlier, so that the GCFPE overlay's last
+    line was read too; and, from its header, only the lines naming its title and version.
   - `toolu_01B28zThuQnQ6jdTAk55JYnZ.json`, *Alpha 1*, and `mcp-Notion-notion-fetch-1791377489504.txt`, the
     Operations Hub, both control pages: their edit times, flags, heading counts and current TW sections, printed by
     `ctl_section.py`, a scratch script; `ctl_check.py pre` on each (P7); and `sim_ctl.py`, which read each to write a
     simulated copy, `sim_alpha1.json` and `sim_hub.json`, in the scratchpad (P8).
 
-  No save was hashed or compared as a body's identity. This session did not try `rm` on these saves: the harness
-  refused it for the saves of `ANALYZE` ("Session Transcript Tampering"), so they are left to its teardown and never
-  read again (`D22` condition 4).
+  No save was hashed or compared as a body's identity. This mode tried no `rm` on these saves: the harness refused
+  it for the saves of `ANALYZE` ("Session Transcript Tampering"), a refused action is not retried, and `D22`
+  condition 4 leaves a save the harness will not delete to its teardown. None is read again.
 - **The session transcript.** `approval_extract.py`, a scratch script, read it once for Nathan's approval message
   alone, printing only its time and length, and saved it to `analyze_approval.txt` in the scratchpad, from which
   `analyze_approved_by` was built. Three more scripts read it to make this list exact, printing only the time and
   page name of each Notion fetch of the day, and the time, tool and description of each call before the
-  compaction; none printed a tool result. That is a read outside the checks `D22` names, made for its condition 5,
-  and disclosed here.
+  compaction; none printed a tool result. After the second compaction, three more did so for this list and for
+  *Full review (PL3)*: one printed only this session's own commands that named the first two saves, which showed
+  how their lines had been counted; one only the time, tool and label of each call since 13:20Z; and one only the
+  PLAN reviewers' agent IDs, durations and tool-call counts from the harness's completion notices. None printed a
+  tool result's text. These are reads outside the checks `D22` names, made for its condition 5, and disclosed here.
+- **The reviewers' transcripts**, `subagents/agent-a176a826705fc17cd.jsonl` (A) and
+  `subagents/agent-ac43851bfb186d0cc.jsonl` (B) in this session's harness directory, each opened only by
+  `capture.py`, for its own return, at 14:23Z and 14:25Z, and again at 14:48Z for the handback call's shape and the
+  first and last timestamps. Neither holds a prompt body: neither reviewer fetched one.
 - **Scratch files**, in this session's scratchpad, none holding a prompt body: `build_p.py`, which builds this
   record; `edits_build.py`, `edits_shared.py`, `edits_tw.py` and `edits_gtwpe.py`, which build `edits.json`, and
   their backups; the drafts of this section and of the two repository files and the control texts; `plan_design.md`,
-  the plan's working notes; `ctl_section.py`; and the dry run's directory, with `sim_ctl.py`, its two simulated
-  saves and a copy of `docs/prompt_ecosystem_management/gtwpe/` with the new files in place.
+  the plan's working notes; `ctl_section.py`; the dry run's directory, with `sim_ctl.py`, its two simulated saves
+  and a copy of `docs/prompt_ecosystem_management/gtwpe/` with the new files in place; and, for the repair round,
+  `pe_rules.py`, which prints a range of a save's lines; `resim_rq.py`, which wrote the repaired simulated copies
+  from the dry run's own, and those copies; `review_pl3.md`, its sections; and `pre_rq/`, the copies of every file
+  it changed, as they stood before it.
 
 ### Cost of this mode
 
-On the meter, from 12:17:03Z: about 1.2 h to the full review to PL4, against the estimate of about 10 h. Tokens are not measured: the
+On the meter, from 12:17:03Z: about 2.8 h to the repair's commit, against the estimate of about 10 h. Tokens are not measured: the
 session's meter shows none it can read without opening a file that holds a body.
 
-- **Review rounds so far:** the dry run; the full review follows.
+- **Review rounds so far:** the dry run and the full review; the check of the repair's diff follows.
 - **The prediction** stands at 11 (§A, *Readiness and interaction cost*); `EXECUTE` adds its merge at X2 and the
   record's merge after X5, both counted there.
 
 ### Canon and rulings relied on, for `PLAN`
 
 Canon read from `docs/pfcanon/` on `main` at `128836a`, unchanged since `fffadb5`, cited by title and section. Each
-was read whole at `ANALYZE`, in this session; the drainage-ordering passages were read again here.
+was read whole at `ANALYZE`, in this session; the drainage-ordering passages were read again here, and, for the
+repair, HDE Governance §9.1.1's *Historical drainage* and HDE CRD Records §3.2 and §4.2, at 14:40Z.
 
 | Source | Used for |
 |---|---|
 | **HDE Governance** §9.1.6 | Every changed member's disposition and the one coherent successor selection; the TW Flowmaster waiver for the new release (Q-1, `override`); external references by controlled directory and versionless name (execution prompt item 2, item 4, S-INTAKE) |
-| **HDE Governance** §2.0.19, *Post-closure maintenance ordering*, and §9.1.5; **Change Process Guide**, *Post-QA documentation drainage ordering (normative)* | The hold-back: a PF10 change drains only after its QA and its closure decision (B1 step 6; S-HOLD; the record prompts; GTWPE-D3) |
+| **HDE Governance** §2.0.19, *Post-closure maintenance ordering*, §9.1.1, *Historical drainage* ("a Specification or Plan alone does not supersede canon"), and §9.1.5; **Change Process Guide**, *Post-QA documentation drainage ordering (normative)* | The hold-back: a change, from PF10 or another source, drains only after its QA and its closure decision (B1 step 6; S-HOLD; the record prompts; GTWPE-D3; RQ-1) |
 | **HDE Governance** §9.1.1 | PF20 and PF30 as historical homes, added to by a separately authorized historical drainage action, which a run Nathan starts is (GTWPE-D4) |
 | **Change Process Guide** §1.1.2, §3.5.1 and §6.3; **Plan Templates** §2, *Historical-only posture (normative)* | PF20 takes an epic's record only at epic close (the PF20 row; B1 step 6; TW-RECORD-10; GTWPE-D4) |
 | **HDE CRD Records** §1, §4.2 and §6 | A CRD's record in PF30, updated in place with one appended row; a closed volume still takes updates; rollover is the Product Owner's (TW-RECORD-20) |
+| **HDE CRD Records** §3.2 | "the initial PF30 record is entered" when the CRD is registered, and later updates modify the same entry: a CRD's own record is never held back (RQ-1; GTWPE-D3, GTWPE-D4) |
 | **HDE Phased Epics** §0, *Drain posture* | An epic's record in PF20; prior records not mass-edited (TW-RECORD-10) |
 | **HDE Build Notes** 2.14 | Versionless references in a prompt (the PE's rule; execution prompt item 2); PF27 and PF30 adopt its terms on their next revision (TW-RECORD-20; the first live run) |
 | **HDE Build Notes** 2.38 | No provider or product is required; the surface that writes Notion confers no permission (PO-1) |
@@ -1756,3 +2027,6 @@ was read whole at `ANALYZE`, in this session; the drainage-ordering passages wer
 | GTWPE-D1 (`gtwpe.decision-record.md`) | Kept whole by every changed prompt (*The new pages' checks*) |
 | `gcfpe.decision-record.md` `D21`, `D22`, `D26` | One Modification in one part; reading bodies and harness files; the bounded review and `D26-E`'s search |
 | `AGENTS.md` | The canon-first rule; PF canon read-only; the pull request's headings |
+| The PE Metaprompt 091426.1, its general rules | The authoring control (*Nathan's directions*), read again for the repair round |
+| MODIFICATION-20260930-gtwpe-tw-model-advice, its permitted exceptions | TW-TRIAGE-10's bans on model advice, kept as "prohibitions that stop a prompt producing or acting on model advice" (*Repair round (PL3)*) |
+| GTWPE-MGMT-10 100526.2, *Reviews are bounded* and *The record* | The review, its repair and the one check of the repair's diff; a dated record corrected by a successor, not in place |

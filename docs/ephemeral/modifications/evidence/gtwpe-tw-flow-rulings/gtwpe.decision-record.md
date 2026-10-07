@@ -70,7 +70,7 @@ Nathan, 2026-10-07, verbatim (`docs/ephemeral/gtwpe.rewrite/PE40-INIT-20261007.m
 
 > the only inputs should be the filenames. Any other context will corrupt the run. this needs to be explicitly documented. you may not pass arbitrary context in handoffs
 
-And:
+And, in `PE40-INIT-20261007.md` alone:
 
 > make sure this is clear in the operations hub. this is very important at every phase.
 
@@ -101,9 +101,10 @@ What follows from it:
 - **"at every phase".** It binds every GTWPE prompt, and every prompt, request and handoff written for a
   GTWPE run or Modification. The Operations Hub's current TW section states it.
 
-Nathan accepted these consequences on 2026-10-07, when he approved the analysis of
-MODIFICATION-20261007-gtwpe-tw-flow-rulings (its S-1, S-2, S-3 and S-8, and ITEM-07); his words are in
-that record's `analyze_approved_by`.
+Nathan accepted these consequences when he approved the analysis of
+MODIFICATION-20261007-gtwpe-tw-flow-rulings on 2026-10-07 (its S-1, S-2, S-3 and S-8, and ITEM-07) and then
+its plan (its P-3 and P-4, and its reading of the PE Metaprompt's handoff rule); his words are in that
+record's `analyze_approved_by` and `plan_approved_by`.
 
 **Canon relied on:** on `main` at `128836a`, HDE Build Notes 2.14 ("Do not pin a PF file version in a
 prompt") and HDE Governance §9.1.6 (a document named by its controlled directory and versionless name, the
@@ -130,38 +131,43 @@ And, approving the analysis of MODIFICATION-20261007-gtwpe-tw-flow-rulings on 20
 
 What follows from it:
 
-- **Every addendum is accounted for.** In a run with a PF10 source, `RUN.md` and the run's pull request
-  give each PF10 change its account: the documents it drains into; where it is already represented, for
-  each document it bears on; or why it cannot drain in this run.
+- **Every addendum is accounted for.** `RUN.md` and the run's pull request give every change in the run
+  its account, each PF10 addendum among them: the documents it drains into, or where it is already
+  represented, for each document it bears on; and, for any part of it that cannot drain in this run, why.
 - **A change is already represented only on a pass's verified finding, never on the triage's.** That is
   shown by a drain's verified `no redlines`, whose exact equivalence location stays inside the drain, the
   return itself unchanged, or by a record pass's verified `no changes`, for each document the change bears
   on.
 - **The triage pass.** TW-TRIAGE-10 is the run's triage pass. GTWPE-FLOW-10 runs it, and it evaluates
   the drain targets against every source the run has, the specification included, and writes its account
-  of every change, each PF10 addendum among them, as one triage file. That file is neither of GTWPE-D1's two artifact types. Invoked directly, the prompt
-  stays optional routing help.
+  of every change, each PF10 addendum among them, as one triage file. That file is neither of GTWPE-D1's
+  two artifact types. Invoked directly, the prompt stays optional routing help.
 - **No document is gated on a drain target or a specification, PF20 and PF30 aside.** Every eligible
   document is updated on context and scope, PF27 among them. PF20 and PF30 keep their own rule
   (GTWPE-D4).
-- **Canon sets the timing.** A PF10 change that belongs to an epic or a CRD drains only after that change's
-  QA and its closure decision (the Change Process Guide's *Post-QA documentation drainage ordering
-  (normative)*; HDE Governance §2.0.19 and §9.1.5). A run whose files do not show that change closed
-  holds it back, with the closure it waits for, and every pass leaves it undrafted. The closure decision
-  reaches a run as a file (GTWPE-D2).
+- **Canon sets the timing.** A change that belongs to an epic or a CRD, from PF10 or from another source
+  such as its specification, drains only after that change's QA and its closure decision (the Change
+  Process Guide's *Post-QA documentation drainage ordering (normative)*; HDE Governance §2.0.19, §9.1.1's
+  *Historical drainage*, "a Specification or Plan alone does not supersede canon", and §9.1.5). A run
+  whose files do not show that change closed holds it back, with the closure it waits for, and every pass
+  leaves it undrafted. A CRD's own record in PF30 is not held back: HDE CRD Records §3.2 enters it when
+  the CRD is registered and updates it in place (GTWPE-D4). The closure decision reaches a run as a file
+  (GTWPE-D2).
 - **PF10 is never a target** (Nathan, 2026-09-28: "No, pF10 will NEVER be a merge target, EVER>"). A
   change whose only home is PF10 is accounted for as one that cannot drain.
 - **`RUN_NO_CHANGE` only** when every change in the run's account, each PF10 change among them, is shown
-  already represented, or the account holds no change. A run that drafts nothing while a change cannot drain
-  in it ends stopped, naming each such change and why.
+  already represented, with no part left to drain, or the account holds no change. A run that drafts nothing
+  while a change, or part of one, cannot drain in it ends stopped, naming each and why.
 
-Nathan accepted these consequences on 2026-10-07, when he approved the analysis of
-MODIFICATION-20261007-gtwpe-tw-flow-rulings (its S-4 and S-5).
+Nathan accepted these consequences when he approved the analysis of
+MODIFICATION-20261007-gtwpe-tw-flow-rulings on 2026-10-07 (its S-4 and S-5) and then its plan (its DR-1, its
+P-2, its settlement of the triage file, and its repairs RQ-1 and RQ-2); his words are in that record's
+`analyze_approved_by` and `plan_approved_by`.
 
 **Canon relied on:** on `main` at `128836a`, HDE Build Notes, *Precedence, versioning, and scope* (an
 addendum governs until it is drained; drained guidance leaves at formal revision); the Change Process
 Guide, *Post-QA documentation drainage ordering (normative)*; HDE Governance §2.0.19, *Post-closure
-maintenance ordering*, and §9.1.5.
+maintenance ordering*, §9.1.1, *Historical drainage*, and §9.1.5; HDE CRD Records §3.2.
 
 ## GTWPE-D4 — PF20 and PF30 are updated whenever a specification is involved, through their own prompts
 
@@ -187,7 +193,7 @@ What follows from it:
 
 - **With a specification, both; without one, neither.** Whenever a run's inputs include a specification,
   PF20 and PF30 are both updated, each through its own prompt, on the run's context and scope. Without
-  one, neither is, and each PF10 change that bears on them is accounted for as waiting for one
+  one, neither is, and the part of each change that bears on them is accounted for as waiting for one
   (GTWPE-D3). No authorization input exists for either (GTWPE-D2).
 - **Only their own prompts.** TW-RECORD-10 updates PF20, and TW-RECORD-20 the PF30 family. Neither document
   goes through the redliner, TW-DRAIN-10 and TW-APPLY-10.
@@ -195,10 +201,13 @@ What follows from it:
   document whose scope it is (HDE Phased Epics §0; HDE CRD Records §1): inserted once, or an existing
   record updated in place, a CRD's as HDE CRD Records §4.2 requires and an epic's within HDE Phased Epics'
   *Drain posture*. Each PF10 change that bears on the document in context and scope goes in too, such as
-  HDE Build Notes 2.14's terms for PF30, as Nathan's approval of S-7 sets out.
+  HDE Build Notes 2.14's terms for PF30, as Nathan's approval of S-7 sets out, and so does any other change
+  a source carries that bears on it; a held-back change waits (GTWPE-D3).
 - **An epic's record waits for its closure.** PF20 takes an Epic Specification's record only when the run's
   files show the epic closed (Plan Templates §2, *Historical-only posture (normative)*; Change Process
-  Guide §1.1.2, §3.5.1 and §6.3). Until then that record waits, accounted for (GTWPE-D3).
+  Guide §1.1.2, §3.5.1 and §6.3). Until then that record waits, accounted for (GTWPE-D3). A CRD's record
+  does not wait: HDE CRD Records §3.2 enters a CRD's record when the CRD is registered and updates it in
+  place, and TW-RECORD-20 makes it from the CRD's approval evidence.
 - **A record prompt's no-change result** is exactly `no changes`, after it has read the document and
   every source whole.
 - **Canon.** HDE Governance §9.1.1 keeps PF20 and PF30 as historical homes that the active workflow does
@@ -207,9 +216,11 @@ What follows from it:
   earlier rows and its identity. The canon conflict on PF20 and PF30 records that ledger E-010 records
   stays Nathan's.
 
-Nathan accepted these consequences on 2026-10-07, when he approved the analysis of
-MODIFICATION-20261007-gtwpe-tw-flow-rulings (its S-6 and S-7).
+Nathan accepted these consequences when he approved the analysis of
+MODIFICATION-20261007-gtwpe-tw-flow-rulings on 2026-10-07 (its S-6 and S-7) and then its plan (its P-2,
+and its repairs RQ-1 and RQ-2); his words are in that record's `analyze_approved_by` and
+`plan_approved_by`.
 
 **Canon relied on:** on `main` at `128836a`, HDE Governance §9.1.1, with *Historical drainage*; Plan
 Templates §2, *Historical-only posture (normative)*; the Change Process Guide §1.1.2, §3.5.1 and §6.3; HDE
-CRD Records §1, §4.2 and §6; HDE Phased Epics §0 and *Drain posture*; HDE Build Notes 2.14.
+CRD Records §1, §3.2, §4.2 and §6; HDE Phased Epics §0 and *Drain posture*; HDE Build Notes 2.14.
