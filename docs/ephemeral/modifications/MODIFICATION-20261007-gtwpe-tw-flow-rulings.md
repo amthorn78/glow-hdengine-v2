@@ -51,7 +51,7 @@ reviews:
     kind: DIFF_CHECK
     date: 2026-10-07
     required_open: 2
-    outcome: "One fresh checker, GTWPE-TW-FLOW-RULINGS-PLAN-DC, handed only its committed brief's path, on the repair diff 1f73053..9fefe96: RQ-1 to RQ-8 each fixed, RQ-1 and RQ-2 each with a new defect in the repair's own text. 2 required, both confirmed by the session: DC-R1, S4's cell still stops a triage file that names PF20 or PF30 in a reason; DC-R2, the record prompts' role, output and gate lines still name only PF10 changes. 12 listed, one refuted. Required defects went from 8 to 2, both in the last repair's text (D26-A rule 5's second signal), and the cap is reached (rule 2), so §P goes to Nathan with DC-R1 and DC-R2 open, as K-26 and K-27, each with its one-clause correction"
+    outcome: "One fresh checker, GTWPE-TW-FLOW-RULINGS-PLAN-DC, handed only its committed brief's path, on the repair diff 1f73053..9fefe96: RQ-1 to RQ-8 each fixed, RQ-1 and RQ-2 each with a new defect in the repair's own text. 2 required, both confirmed by the session: DC-R1, S4's cell still stops a triage file that names PF20 or PF30 in a reason; DC-R2, the record prompts' role, output and gate lines still name only PF10 changes. 12 listed, one refuted. Required defects went from 8 to 2, both in the last repair's text (D26-A rule 5's second signal), and the cap is reached (rule 2), so §P goes to Nathan with DC-R1 and DC-R2 open, as K-26 and K-27, each with its correction stated"
 items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
