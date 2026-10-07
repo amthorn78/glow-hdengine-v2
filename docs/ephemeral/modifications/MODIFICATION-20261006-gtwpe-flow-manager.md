@@ -1872,8 +1872,8 @@ prediction Nathan's decision on the way on and the merge of #583 with this recor
 `IMPLEMENTATION_BLOCKED`, ending `DECISION NEEDED`. The blocker is X1.3 (h)(6), the two links; its owner is Nathan.
 - He archives «ID», `GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1`, `3f24590a05eb81798286d600250655d6`
   (PO-5).
-- He merges amthorn78/glow-hdengine-v2#583, which now carries this failure record and no other change: the
-  failure-record exception of his merge rule (PO-5).
+- He merges amthorn78/glow-hdengine-v2#583, which carries the record, with this failure record, and its evidence
+  under `docs/ephemeral/modifications/`, and no other file: the failure-record exception of his merge rule (PO-5).
 - He decides the way on. The recovery point is `PLAN`: the draft repaired by F-E1's smallest correction, with
   whatever check of that repair he directs, then a new `EXECUTE` from X1.1. He may instead accept the page as it
   stands, by an `override`, and `EXECUTE` resumes at X1.3 (i).
