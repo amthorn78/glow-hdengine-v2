@@ -1,0 +1,100 @@
+{
+ "artifact": "The repairs of Repair round (PL3) to the draft of GTWPE-FLOW-10, each exactly as applied: the old clause and its new text. The draft itself is not in the repository.",
+ "draft_before": {
+  "lines": 253,
+  "characters": 26553
+ },
+ "draft_after": {
+  "lines": 255,
+  "characters": 27497
+ },
+ "character_delta_check": "26553 + 944 = 27497",
+ "repairs": [
+  {
+   "finding": "R-1",
+   "where": "B1 step 5",
+   "old": "Without that direction, each document such a change bears on stops (S4) for his decision: to draft the change, or to leave it out.",
+   "new": "Without that direction, each document such a change bears on stops (S4) for his decision: to draft the change, or to leave it out. His decision to leave it out is a selected boundary that excludes the change, and every invocation for those documents carries it."
+  },
+  {
+   "finding": "R-1",
+   "where": "Passes, invocation item 5",
+   "old": "the selected boundary only where the execution prompt sets one; and any supporting material,",
+   "new": "the selected boundary only where the execution prompt or Nathan's decision sets one; and any supporting material,"
+  },
+  {
+   "finding": "R-1",
+   "where": "Passes, after each pass",
+   "old": "5. Each redlines file or draft the pass wrote has its proof log beside it, named after it.\nA difference is a stop (S6). These checks see git and the pull request only;",
+   "new": "5. Each redlines file or draft the pass wrote has its proof log beside it, named after it.\n6. No redlines file, draft or proof log the pass wrote takes as a basis a PF10 change that `RUN.md` holds back, unless Nathan has directed that change drafted.\nA difference in checks 1 to 5 is a stop (S6). A pass that took a held-back change as a basis stops its document (S4), as B1 step 5 does. These checks see git, the pull request and the pass's own files only;"
+  },
+  {
+   "finding": "R-1",
+   "where": "Stop and resume, S4's row",
+   "old": "a question a pass asks; a held-back PF10 change; a PF30 rollover",
+   "new": "a question a pass asks; a held-back PF10 change, or a pass that took one as a basis; a PF30 rollover"
+  },
+  {
+   "finding": "R-2",
+   "where": "Stop and resume, On any stop",
+   "old": "write in `RUN.md` what is done, what is not, the signal and the exact resume point; say in the pull request's description",
+   "new": "write in `RUN.md` what is done, what is not, the signal and the exact resume point, and, as B6 step 4 does, the harness files this session holds that carry a prompt body, and what became of each; say in the pull request's description"
+  },
+  {
+   "finding": "R-2",
+   "where": "B6 step 4",
+   "old": "4. Name in `RUN.md` every file the session's harness keeps that holds a prompt body: the session's transcript,",
+   "new": "4. Name in `RUN.md`, beside those it records for the run's earlier sessions, every file the session's harness keeps that holds a prompt body: the session's transcript,"
+  },
+  {
+   "finding": "R-2",
+   "where": "RUN.md",
+   "old": "- the harness files and the prompt-body reads (B6).",
+   "new": "- the harness files and the prompt-body reads of every session of the run (B6, and every stop)."
+  },
+  {
+   "finding": "L5",
+   "where": "B3 Drafts",
+   "old": "Each `READY` package goes through TW-APPLY-10, and each record document through TW-RECORD-10 or TW-RECORD-20 (*Passes*). The result is a complete draft and its proof log in `pf-canon-drafts/`.",
+   "new": "Each `READY` package goes through TW-APPLY-10, and each record document through TW-RECORD-10 or TW-RECORD-20 (*Passes*). The result is a complete draft and its proof log in `pf-canon-drafts/`.\nIf no routed document has a draft and none has stopped, the run ends as B1 step 7 does: `RUN.md` and the pull request say so, the pull request is marked ready for review, and the run returns `RUN_NO_CHANGE`."
+  },
+  {
+   "finding": "L5",
+   "where": "Results, RUN_NO_CHANGE's row",
+   "old": "<td>No eligible document is affected, and `RUN.md` is in the pull request</td>",
+   "new": "<td>No eligible document is affected, by triage or by every drain's `no redlines`, and `RUN.md` is in the pull request</td>"
+  }
+ ],
+ "round_2": {
+  "artifact": "The changes of Repair round 2 (PL3), at Nathan's opt-in of 2026-10-06, to the draft of GTWPE-FLOW-10, each exactly as applied: the old clause and its new text. The first round's keys above are as that round left them.",
+  "draft_before": {
+   "lines": 255,
+   "characters": 27497
+  },
+  "draft_after": {
+   "lines": 255,
+   "characters": 27580
+  },
+  "character_delta_check": "27497 + 83 = 27580",
+  "repairs": [
+   {
+    "finding": "DC-R1",
+    "where": "B1 step 7",
+    "old": "7. If no eligible document is affected, `RUN.md` and the pull request say so: mark the pull request ready for review, and return `RUN_NO_CHANGE`.",
+    "new": "7. If no eligible document is affected, take B6 steps 2 to 4; then `RUN.md` and the pull request say so: mark the pull request ready for review, and return `RUN_NO_CHANGE`."
+   },
+   {
+    "finding": "DC-R1",
+    "where": "B3 Drafts",
+    "old": "the run ends as B1 step 7 does: `RUN.md` and the pull request say so, the pull request is marked ready for review, and the run returns `RUN_NO_CHANGE`.",
+    "new": "the run ends as B1 step 7 does: it takes B6 steps 2 to 4; then `RUN.md` and the pull request say so, the pull request is marked ready for review, and the run returns `RUN_NO_CHANGE`."
+   },
+   {
+    "finding": "DC-R1",
+    "where": "RUN.md",
+    "old": "(B6, and every stop)",
+    "new": "(B6 step 4, wherever it runs, and every stop)"
+   }
+  ]
+ }
+}
