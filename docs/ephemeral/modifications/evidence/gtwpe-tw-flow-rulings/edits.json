@@ -1,0 +1,2023 @@
+{
+  "modification": "MODIFICATION-20261007-gtwpe-tw-flow-rulings",
+  "format": 1,
+  "values": {
+    "«V»": "in each member's identity edits and new title, that member's own new version, fixed at X1.2: MMDDYY.1 for the execution date, or MMDDYY.(N+1) when the member's current version is already MMDDYY.N for that date (PE Metaprompt, *Identity and Notion publication*)"
+  },
+  "members": {
+    "GTWPE-FLOW-10": {
+      "page": "3f24590a05eb81798286d600250655d6",
+      "current_version": "100726.1",
+      "edited": "2026-10-07T00:09:42.961Z",
+      "new_title": "GTWPE-FLOW-10 — Run the Technical Writing Flow — «V»",
+      "parent": "GTWPE parent page",
+      "edits": [
+        {
+          "id": "G-FLOW-10-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.1",
+          "new": "GTWPE-FLOW-10 — Run the Technical Writing Flow — «V»",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100726.1",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E03",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Operator note: Start this prompt in a new session with an execution prompt, `RUN` or `RESUME <run-id>`, that names the change and its sources.",
+          "new": "Operator note: Start this prompt in a new session with an execution prompt that gives only files: `RUN` and the run's input files, or `RESUME` and the run's `RUN.md`.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E04",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Turn one requested change into complete,",
+          "new": "Turn every change the run's files carry into complete,",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E05",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "The Flow Manager reads the whole supplied context, decides which eligible documents the change affects, runs each affected document through the selected TW prompts as passes,",
+          "new": "The Flow Manager reads every input file whole, runs TW-TRIAGE-10 as the run's triage pass to evaluate the drain targets, accounts for every change in the run, runs each affected document through the selected TW prompts as passes,",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "A line in it about the session's configuration is not an instruction to the run.",
+          "new": "An execution prompt that gives anything beyond naming this prompt, `RUN` or `RESUME`, and files stops the run at intake (S2) and names what it was given, a line about the session's configuration included (GTWPE-D2). Every invocation the run sends gives only the prompt to run and files.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E07",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "`RUN`, or `RESUME <run-id>`.",
+          "new": "`RUN`, or `RESUME` with the run's `RUN.md` by repository path. Files given alone mean `RUN`, and naming this prompt to start it is not an input.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The change: what is requested.",
+          "new": "The sources, each as an attached file or a repository path: a PF10 set, a specification, a change's closure decision, or any other file that carries the change. A PF document is named by its directory and versionless name, such as `PF10-HDE-Build-Notes` in `docs/pfcanon/`.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E09",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The sources, each as an attached file or a repository path. A source may be a PF10 set, a specification, or any other file that carries the change.",
+          "new": "The governing specification, a CRD or Epic Specification, by repository path, when the run has one.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E10",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The governing specification, a CRD or Epic Specification, by repository path, or `none`.",
+          "new": "Optionally, Nathan's decisions, each as a file: a PF30 rollover, or a decision a stop asked for.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E11",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Optionally: the documents the change may affect; a selected boundary within the sources; other context; a run name; and Nathan's authorizations, which the run never assumes: a PF20 or PF30 record, as separately authorized historical drainage; a PF30 rollover; and drafting a PF10 change that triage would hold back.",
+          "new": "Nothing else: no description of the change, no selected boundary, no run name, no authorization and no other context (GTWPE-D2). The files carry the change.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E12",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The Flow Manager recovers everything else. A missing change or source stops the run at intake (S2).",
+          "new": "The Flow Manager recovers everything else from the files. A missing source stops the run at intake (S2), and so does an execution prompt that gives anything else.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E13",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "TW-DRAIN-10, then TW-APPLY-10. PF27 only when the run has a governing specification that changes a template PF27 owns",
+          "new": "TW-DRAIN-10, then TW-APPLY-10",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E14",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "TW-RECORD-10, with the run's Epic Specification: one section, only with Nathan's authorization of that record",
+          "new": "TW-RECORD-10, whenever the run has a governing specification: every change PF20 takes, an Epic Specification's record only when the run's files show the Epic closed, and each other change not held back that bears on PF20",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E15",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Only when the run has a governing specification. A new CRD record: TW-RECORD-20, with the run's CRD Specification: one section, only with Nathan's authorization of that record. A change to an existing record: TW-DRAIN-10, then TW-APPLY-10",
+          "new": "TW-RECORD-20, whenever the run has a governing specification: every change the volume takes, a CRD Specification's record, new or updated in place, and each other change not held back that bears on the volume",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E16",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "One pass chain per document per run. A document that would need two, such as a new record and a change to an existing record in one PF30 volume, or two records in PF20, is a stop for that document (S4).",
+          "new": "One pass chain per document per run: a record pass makes every change its document takes, and a document that would still need two is a stop for that document (S4). Without a governing specification, PF20 and the PF30 family are not routed, and each change that bears on them is accounted for as waiting for one.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E17",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "A new PF30 volume opens only on Nathan's rollover decision in the execution prompt.",
+          "new": "A new PF30 volume opens only on Nathan's rollover decision, given as a file the execution prompt names.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E18",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "A record pass is given the approved specification and every applicable PF10 change, so that its section records their reconciled effect.",
+          "new": "A record pass is given the approved specification, the triage file and every source, so that its record reconciles their effect and its document takes each other change not held back that bears on it.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E19",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "taken from the execution prompt's run name or else from the change. A run name already in use on the remote, as a branch or a run directory, is a stop (S4); a slug the Flow Manager chose is changed until nothing uses it.",
+          "new": "taken from the governing specification's file name, or else from the first source's. A slug already in use on the remote, as a branch or a run directory, is changed until nothing uses it.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E20",
+          "item": "ITEM-08",
+          "rule": "R7",
+          "shared": null,
+          "old": "The run record ([*RUN.md*](http://RUN.md))",
+          "new": "The run record (*`RUN.md`*)",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E21",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "One directory per pass: a drain's redlines file and its proof log, or a TW-APPLY-10 diagnostic;",
+          "new": "One directory per pass: the triage pass's triage file, a drain's redlines file and its proof log, or a TW-APPLY-10 diagnostic;",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E22",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "`<key>` is the target's canon file name without its version token and `.md`, lowercased, with spaces as hyphens.",
+          "new": "`<key>` is the target's canon file name without its version token and `.md`, lowercased, with spaces as hyphens, and `triage` for the triage pass.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E23",
+          "item": "ITEM-08",
+          "rule": "R7",
+          "shared": null,
+          "old": "## [RUN.md](http://RUN.md)",
+          "new": "## `RUN.md`",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E24",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "for each eligible document, the triage decision and its reason;",
+          "new": "the triage file's path, and for each change its account: the documents it drains into or where it is already represented, and why any part of it cannot drain in this run;",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E25",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "each held-back PF10 change, and why;",
+          "new": "each held-back change, and the closure it waits for;",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E26",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "**What every invocation carries.** It is the pass's whole brief, in plain language:",
+          "new": "**What every invocation carries.** It is the pass's whole brief, and it gives only the prompt to run and files (GTWPE-D2):",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E27",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The pass identity `<run-id>/<key>/<NN>-<prompt>`, which is its run identity and its originating preparer.",
+          "new": "Its pass directory, `passes/<key>/<NN>-<prompt>/` in the run directory, whose path is its run identity and its originating preparer.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E28",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The target: its canon path in `docs/pfcanon/` and its base blob.",
+          "new": "The target, by its directory and versionless name in `docs/pfcanon/`; `RUN.md` records its base blob, which the check before the pass confirms.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E29",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The sources, by repository path: the run's inputs, PF10 by its path on `main` where it is a source, and the governing specification or `none`; the selected boundary only where the execution prompt or Nathan's decision sets one; and any supporting material, such as an Apply diagnostic or a finding (*Redo from canon*).",
+          "new": "The sources, by repository path: the run's inputs, PF10 by its directory and versionless name where it is a source, the governing specification when the run has one, the triage file once the triage pass has written it, and any supporting file, such as an Apply diagnostic, a review's finding (*Redo from canon*) or a decision Nathan gave as a file. A pass reads every source whole.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E30",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Where to write: for a drain, its pass directory;",
+          "new": "Where to write: for the triage pass, `triage.md` in its pass directory; for a drain, its pass directory;",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E31",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The run's branch, and its open pull request.",
+          "new": "The run's `RUN.md`, by repository path, which gives the run's branch and its open pull request.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E32",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "**By prompt, it also carries:**",
+          "new": "**By prompt, each invocation also carries:**\n- TW-TRIAGE-10, the triage pass: no target, and every input file among its sources.",
+          "blocks": true
+        },
+        {
+          "id": "G-FLOW-10-E33",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "the `READY` redlines file and its proof log, by repository path, with the selected scope and the drain's producer validation status and source-file header provenance.",
+          "new": "the `READY` redlines file and its proof log, by repository path; the proof log carries the drain's producer validation status and source-file header provenance.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E34",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "TW-RECORD-10: the approved Epic specification, the evidence of the Epic's completed or historical posture that PF20 requires, every applicable PF10 change, and Nathan's authorization of the record.",
+          "new": "TW-RECORD-10: the approved specification and, when it is an Epic's, the Epic's closure decision or other evidence of its completed or historical posture, as a file.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E35",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "TW-RECORD-20: the approved CRD specification and its approval evidence, every applicable PF10 change, and Nathan's authorization of the record; with his rollover decision, also that decision,",
+          "new": "TW-RECORD-20: the approved specification and, when it is a CRD's, its approval evidence; with his rollover decision, also that decision's file,",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E36",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "`no redlines`: the document is not affected. `RUN.md` records it.",
+          "new": "The triage pass's triage file, by its repository path: B1 step 5 takes its account; an error the triage pass returns instead stops the run (S4).\n- `no redlines`, from a drain, or `no changes`, from a record pass: the document is not affected, and each change not held back that the triage file names for it is already represented there. `RUN.md` records it.",
+          "blocks": true
+        },
+        {
+          "id": "G-FLOW-10-E37",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "a PF10 change that `RUN.md` holds back, unless Nathan has directed that change drafted.",
+          "new": "a change that `RUN.md` holds back.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E38",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "A pass that took a held-back change as a basis stops its document (S4), as B1 step 5 does.",
+          "new": "A pass that took a held-back change as a basis stops its document (S4).",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E39",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Triage. For each eligible document, decide whether the change may affect it, by reading its scope and ownership and the passages the change bears on. A search hit or a matching heading is not enough. A document the execution prompt names is checked, not assumed. When unsure, route it: a drain's verified `no redlines` is the authoritative answer that it is not affected.",
+          "new": "Create the branch and the run directory. Write `inputs/execution-prompt.md`, the execution prompt as Nathan gave it, each attached input under `inputs/`, and `RUN.md`. Commit and push. Open the run's pull request as a draft, record it in `RUN.md`, and commit and push.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E40",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Hold back, as the Change Process Guide's post-QA drain ordering requires, each PF10 change that belongs to an epic whose QA tasks PF10 does not record as complete: list it in `RUN.md` and the pull request, and do not draft it, unless the execution prompt carries Nathan's direction to draft it. Without that direction, each document such a change bears on stops (S4) for his decision: to draft the change, or to leave it out. His decision to leave it out is a selected boundary that excludes the change, and every invocation for those documents carries it.",
+          "new": "Triage. Run TW-TRIAGE-10 as the run's triage pass (*Passes*), and record in `RUN.md` the account its triage file gives each change, each PF10 addendum among them: the documents it bears on, and why any part of it cannot drain in this run. A triage file that leaves a change unaccounted for, omits a source it was given, or names an ineligible document to route is a stop (S4), and so is an error the triage pass returns.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E41",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Create the branch and the run directory. Write `inputs/execution-prompt.md`, the execution prompt as Nathan gave it, each attached input under `inputs/`, and `RUN.md` with the triage. Commit and push. Open the run's pull request as a draft, record it in `RUN.md`, and commit and push.",
+          "new": "Hold back each change, from PF10 or another source, that belongs to an epic or a CRD that the run's files do not show closed, since canon drains a change only after its QA and its closure decision: list it in `RUN.md` and the pull request with the closure it waits for, and do not draft it. An Epic Specification's PF20 record waits in the same way for the Epic's closure decision; a CRD Specification's own PF30 record does not wait, since TW-RECORD-20 makes it from the CRD's approval evidence. Then route each document the triage file names for a change not held back, and, whenever the run has a governing specification, PF20 and each PF30 volume, as *Eligibility and routing* routes them, except PF20 when the Epic's record waits and the triage file names PF20 for no change that is not held back. Record in `RUN.md` each routed document's canon path, its base blob and its route, and commit and push. A routed document's pass decides whether it is affected: a drain's verified `no redlines`, or a record pass's `no changes`, is the authoritative answer that it is not.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E42",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "If no eligible document is affected, take B6 steps 2 to 4; then `RUN.md` and the pull request say so: mark the pull request ready for review, and return `RUN_NO_CHANGE`.",
+          "new": "If no document is routed, take B6 steps 2 to 4, and write the account of every change in `RUN.md` and the pull request. When the triage file accounts for no change, mark the pull request ready for review and return `RUN_NO_CHANGE`; otherwise the run ends stopped (S4), naming each change, or part of one, that cannot drain in this run and why.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E43",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "If no routed document has a draft and none has stopped, the run ends as B1 step 7 does: it takes B6 steps 2 to 4; then `RUN.md` and the pull request say so, the pull request is marked ready for review, and the run returns `RUN_NO_CHANGE`.",
+          "new": "If no routed document has a draft and none has stopped, the run ends as B1 step 7 does: it takes B6 steps 2 to 4 and writes the account of every change in `RUN.md` and the pull request; then it returns `RUN_NO_CHANGE`, with the pull request marked ready for review, when every change the triage file accounts for is shown already represented, with no part left to drain, and otherwise it ends stopped (S4), naming each change, or part of one, that cannot drain in this run and why.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E44",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "every routed document left undrafted, and every PF10 change held back, with the reason;",
+          "new": "every routed document left undrafted, with the reason; the account of every change, as `RUN.md` gives it: the documents it drained into or where it is already represented, and why any part of it could not drain in this run, such as a closure it waits for;",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E45",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "A missing change or source; an input or source that cannot be read completely; an input that is a prompt body",
+          "new": "A missing source; an input or source that cannot be read completely; an input that is a prompt body; an execution prompt that gives anything beyond naming this prompt, `RUN` or `RESUME`, and files",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E46",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "The document; the run, when the execution prompt asks for anything *Authority and limits* rules out, a run name is in use, a canon source changes, or a resume changes the change or its sources",
+          "new": "The document; the run, when the execution prompt asks for anything *Authority and limits* rules out, a canon source changes, a resume changes the run's sources, the triage pass fails B1 step 5, or a run with no draft leaves a change, or part of one, that cannot drain in this run (B1 step 7)",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E47",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "A canon conflict; a question a pass asks; a held-back PF10 change, or a pass that took one as a basis; a PF30 rollover without his decision; an ineligible target the execution prompt names; a document that would need two pass chains;",
+          "new": "A canon conflict; a question a pass asks; a pass that took a held-back change as a basis; a PF30 rollover without his decision; a triage pass's error, or a triage file that leaves a change unaccounted for, omits a source it was given, or names an ineligible document to route; a document that would need two pass chains;",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E48",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "**Resume.** Nathan starts a new session with this prompt and the same execution prompt, with `RESUME <run-id>` in place of `RUN`, and any decision he is giving.",
+          "new": "**Resume.** Nathan starts a new session with this prompt and an execution prompt that gives `RESUME` and the run's `RUN.md` by repository path, with each decision he is giving as a file.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E49",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "A resume that changes the change, its sources or its governing specification is a stop (S4): that is a new run.",
+          "new": "A resume that changes the run's sources or its governing specification, other than by adding a decision file, is a stop (S4): that is a new run.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E50",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "No eligible document is affected, by triage or by every drain's `no redlines`, and `RUN.md` is in the pull request",
+          "new": "Every change the triage file accounts for is shown already represented, with no part left to drain, by the passes' `no redlines` or `no changes`, or it accounts for none; `RUN.md`, with the account of every change, is in the pull request",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E51",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "the pull request, each document's outcome, and, when the run stopped, the populated resume line.",
+          "new": "the pull request, each document's outcome, and, when the run stopped, the populated resume line, which gives only `RESUME` and the run's `RUN.md`.",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E52",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "writes `RUN.md`, the inputs, the captured",
+          "new": "writes `RUN.md`, the inputs, the review briefs, the captured",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E53",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Each consistency review's return, captured unedited",
+          "new": "Each consistency review's brief, as `<NN>-brief.md`, and its return, captured unedited as `<NN>-consistency.md`",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E54",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Start a fresh reviewer subagent, briefed to write nothing.",
+          "new": "Write the reviewer's brief to `review/<NN>-brief.md`, saying that the reviewer writes nothing, and commit and push it. Start a fresh reviewer subagent, handed nothing but that file's repository path (GTWPE-D2).",
+          "blocks": false
+        },
+        {
+          "id": "G-FLOW-10-E55",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "a fresh reviewer reviews once more",
+          "new": "a fresh reviewer, briefed as step 1 says, reviews once more",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "only with Nathan's authorization of that record",
+        "PF27 only when",
+        "A run name already in use",
+        "RESUME <run-id>",
+        "The change: what is requested",
+        "a selected boundary within the sources",
+        "http://RUN.md",
+        "unless Nathan has directed that change drafted",
+        "or `none`",
+        "a run name is in use",
+        "the selected scope",
+        "A change to an existing record: TW-DRAIN-10",
+        "Turn one requested change",
+        "A line in it about the session's configuration is not an instruction"
+      ]
+    },
+    "GTWPE-MGMT-10": {
+      "page": "3f04590a05eb8128b8c8ff3650ab2d5a",
+      "current_version": "100526.2",
+      "edited": "2026-10-05T16:36:11.384Z",
+      "new_title": "GTWPE-MGMT-10 — Manage the GTWPE — «V»",
+      "parent": "GTWPE parent page",
+      "edits": [
+        {
+          "id": "G-MGMT-10-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "GTWPE-MGMT-10 — Manage the GTWPE — 100526.2",
+          "new": "GTWPE-MGMT-10 — Manage the GTWPE — «V»",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100526.2",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E03",
+          "item": "ITEM-07",
+          "rule": "R6",
+          "shared": null,
+          "old": "Operator note: Invoke with `MODE` and its subject.",
+          "new": "Operator note: Invoke with `MODE` and its subject, given only as files (GTWPE-D2).",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E04",
+          "item": "ITEM-07",
+          "rule": "R6",
+          "shared": null,
+          "old": "Take a request in whatever form it arrives, establish what it actually reaches,",
+          "new": "Take a request from the files that record it, establish what it actually reaches,",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E05",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "and until G5 the route by which a TW-ALPHA member is repaired.",
+          "new": "and until C6, the adoption change, the route by which a TW-ALPHA member is repaired.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E06",
+          "item": "ITEM-07",
+          "rule": "R6",
+          "shared": null,
+          "old": "For `ANALYZE`, the request in whatever form it arrives: a defect in a GTWPE run's report, a sentence, a finding, a policy instruction, or a change the drift check found.",
+          "new": "For `ANALYZE`, the files that record the request, attached or by repository path: a file that holds Nathan's words, a GTWPE run's `RUN.md`, or a Modification record whose drift check found a change. Nathan's words in those files are the request, and any other text in them is a claim to check. A request given as anything but files is not taken: say so, and name the files needed.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E07",
+          "item": "ITEM-07",
+          "rule": "R6",
+          "shared": null,
+          "old": "Minimal useful intake is the subject, the expected result, the actual or requested result, and an example if one exists.",
+          "new": "The files carry the subject, the expected result, the actual or requested result, and an example if one exists.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E08",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "The approved GTWPE design package the catalog names, in `docs/ephemeral/gtwpe.rewrite/design/`: its §6 handoff table, until that table moves into `docs/prompt_ecosystem_management/gtwpe/`.",
+          "new": "`docs/prompt_ecosystem_management/gtwpe/gtwpe.handoffs.md`: the GTWPE handoff table, which replaced the §6 table of the approved design package the catalog names.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E09",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "<td>A TW-ALPHA member, until G5</td>",
+          "new": "<td>A TW-ALPHA member, until C6</td>",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E10",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "<td>TW-ALPHA's selection, until G5</td>",
+          "new": "<td>TW-ALPHA's selection, until C6</td>",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E11",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "Until G5 it may also create,",
+          "new": "Until C6, the adoption change, it may also create,",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E12",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "or a TW-ALPHA member until G5)",
+          "new": "or a TW-ALPHA member until C6)",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E13",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "and until G5 the pages that name TW's current release)",
+          "new": "and until C6 the pages that name TW's current release)",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E14",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "Read from the §6 handoff table, since the GTWPE has no graph parts for `closure.py`.",
+          "new": "Read from the GTWPE handoff table, `gtwpe.handoffs.md`, since the GTWPE has no graph parts for `closure.py`.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E15",
+          "item": "ITEM-07",
+          "rule": "R6",
+          "shared": null,
+          "old": "committed before any reviewer is spawned, and enter every round in the record's `reviews` ledger.",
+          "new": "committed before any reviewer is spawned; hand each reviewer nothing but that brief's repository path (GTWPE-D2), and enter every round in the record's `reviews` ledger.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E16",
+          "item": "ITEM-07",
+          "rule": "R6",
+          "shared": null,
+          "old": "A worker writes nothing, and its brief says so. Most Modifications need no worker.",
+          "new": "A worker is handed nothing but its committed brief's repository path (GTWPE-D2); it writes nothing, and its brief says so. Most Modifications need no worker.",
+          "blocks": false
+        },
+        {
+          "id": "G-MGMT-10-E17",
+          "item": "ITEM-08",
+          "rule": "R6",
+          "shared": null,
+          "old": "lists the eight members with only the changed rows new",
+          "new": "lists every member with only the changed rows new",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "until G5",
+        "Until G5",
+        "the eight members",
+        "§6 handoff table",
+        "in whatever form it arrives",
+        "Minimal useful intake"
+      ]
+    },
+    "TW-TRIAGE-10": {
+      "page": "3f14590a05eb81789e16d978795db77d",
+      "current_version": "100626.1",
+      "edited": "2026-10-06T03:18:14.556Z",
+      "new_title": "TW-TRIAGE-10 — Identify PF10 Drain Targets — «V»",
+      "parent": "HDE TW",
+      "edits": [
+        {
+          "id": "TRIAGE-10-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "TW-TRIAGE-10 — Identify PF10 Drain Targets — 100626.1",
+          "new": "TW-TRIAGE-10 — Identify PF10 Drain Targets — «V»",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100626.1",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E03",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Return PF target identities to Nathan. Nathan may use that list to invoke TW-DRAIN-10 for a general PF or TW-DRAIN-20 for the dedicated PF09 specialization; do not append prompt routing or model advice to the list-only result.",
+          "new": "Return the repository path of the triage file this prompt writes. In a run, GTWPE-FLOW-10 runs this prompt as its triage pass and routes each document the file names: a general PF to TW-DRAIN-10, a PF09 phase file to TW-DRAIN-20, PF20 to TW-RECORD-10 and a PF30 volume to TW-RECORD-20; invoked directly, Nathan may do the same. Do not append prompt routing or model advice to the file.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E04",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Identify the current PF targets requiring drainage from the current PF10 Build Notes. Return only a simple list of actual target basenames, or one concise supported no-target/error result. Nathan normally invokes this prompt in a standalone session. Do not produce redlines, a detailed triage report, an artifact, a mandatory model-assessment stage or an automatic session handoff. This prompt is optional routing help; Nathan may invoke any document worker directly.",
+          "new": "Account for every change in the sources it is given: every PF10 change, each addendum among them, and every change another source carries. For each, give the eligible documents it bears on, and why any part of it cannot drain in this run. Every PF10 addendum needs draining, whether or not it names a drain target, so none is left unaccounted for. Write that account as one triage file and return its path, or return one concise error naming a decisive missing source or fact. Do not produce redlines, a revised PF, a mandatory model-assessment stage or an automatic session handoff. Invoked directly, this prompt is optional routing help, and Nathan may invoke any document worker directly; in a run, it is the run's triage pass.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E05",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "The incoming source is `PF10-HDE-Build-Notes`; do not generalize this alpha to other source types.",
+          "new": "The sources are the files the invocation gives: `PF10-HDE-Build-Notes` when it is among them, and any specification or other file that carries a change. Read each whole, and evaluate the drain targets against all of them.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Do not edit, publish, renumber or insert into PFs, create files, change repositories/PRs, run QA/production, adopt skills, create a Flowmaster/gateway, create another session or send messages.",
+          "new": "Write only the triage file, at the repository path the invocation names under `docs/ephemeral/`, and commit and push it on the branch the invocation names, or that the run record it names, `RUN.md`, gives; that branch then has one open pull request, opened if none is. Never merge a pull request: Nathan alone merges. An invocation that names no such path or branch is a missing input: stop and name it. The inputs are files only; an input given as anything but a file is not taken. Do not edit, publish, renumber or insert into PFs, run QA/production, adopt skills, create a Flowmaster/gateway, create another session or send messages.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E07",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Resolve the actual current PF10 Markdown identity and",
+          "new": "When PF10 is among the sources, resolve the actual current PF10 Markdown identity and",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "version. Accept an explicitly supplied legacy `PF10_BUILD_NOTES_VERSION` only as an exact identity to verify. Do not select",
+          "new": "version, from the file the invocation names. Do not select",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E09",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Identify every current PF10 change that may require documentation drainage, preserving its source-defined status, timing and scope.",
+          "new": "Identify every change in the current PF10, each addendum included, whether or not it names a drain target, and every change each other source carries, preserving its source-defined status, timing and scope, and the epic or CRD it belongs to, if any, with whether the files given show that change closed.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E10",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Read the exact target owners and relevant current content sufficiently to establish ownership and whether the change is already represented; a search hit or matching heading is not enough.",
+          "new": "Read the exact target owners and relevant current content sufficiently to establish ownership; a search hit or matching heading is not enough. Only the pass that reads a document shows whether a change is already represented there: route the document, and never close a change as represented.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E11",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Determine eligible destinations from current documented ownership and scope, including Reference documents where relevant. A title containing Canon is not an eligibility rule. Do not route all PFs by default. Exclude a target when the selected current PF10 requirements are already represented there or outside its ownership, based on actual inspected content. Keep this supporting reasoning internal to preserve list-only output.",
+          "new": "The eligible documents are PF03, every PF document with `Canon` in its title, each PF09 phase file, `PF20-Reference-HDE-Phased-Epics` and the PF30 family; PF10, and every other file in `docs/pfcanon/`, is never a target. PF20 and the PF30 family are eligible only when a specification is among the files given; without one, the part of a change that bears on either cannot drain in this run, and the triage file names that document in its reason, not among the change's eligible documents. Determine each change's documents from their documented ownership and scope, against every source; do not route all PFs by default. Exclude a document only when the change is outside its ownership, based on actual inspected content. When unsure, name the document: its pass decides.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E12",
+          "item": "ITEM-04",
+          "rule": "R3",
+          "shared": null,
+          "old": "Route PF09 to the actual applicable phase file(s) only when current PF10 and phase-owner evidence justifies it.",
+          "new": "Route PF09 to the actual applicable phase file(s) only when the sources and phase-owner evidence justify it.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E13",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Verify the final deduplicated list against actual current target identities. A required unresolved source/ownership conflict yields the concise error result, not an unqualified partial target list.",
+          "new": "Verify the triage file against actual current target identities: every change accounted for, and each document named once for each change. A required unresolved source/ownership conflict yields the concise error result, not a partial account.",
+          "blocks": false
+        },
+        {
+          "id": "TRIAGE-10-E14",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": null,
+          "old": "Return only one bullet per actual current PF target basename requiring drain, without heading, rationale, report, attachment or appended model advice. If none require drain after complete supported assessment, return one concise sentence stating that no PF target requires drain for the inspected PF10 version. If a decisive source or ownership fact is unavailable, return one concise error identifying it. This list never executes a drain or chooses a new session for Nathan.",
+          "new": "Write the triage file as one Markdown file: the files read, each by repository path and the commit it was read at; then, for each change in source order, its identity and source, the epic or CRD it belongs to, if any, and whether the files given show that change closed; the eligible documents it bears on, by canon file name without its version; and, for any part of it that cannot drain in this run, the reason: no eligible home, such as PF10 itself; or PF20 or the PF30 family, named, with no specification among the files. It carries no appended model advice. The final response gives the triage file's repository path, with the commit that holds it, and nothing else. If a decisive source or ownership fact is unavailable, return one concise error identifying it and write no file. The triage file never executes a drain or chooses a new session for Nathan.",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "no-target",
+        "PF10_BUILD_NOTES_VERSION",
+        "A title containing Canon is not an eligibility rule",
+        "do not generalize this alpha",
+        "list-only result",
+        "including Reference documents where relevant",
+        "selected current PF10 requirements"
+      ]
+    },
+    "TW-DRAIN-10": {
+      "page": "3f14590a05eb819f8390f5b92fc4c8ab",
+      "current_version": "100626.2",
+      "edited": "2026-10-06T16:39:55.231Z",
+      "new_title": "TW-DRAIN-10 — Prepare PF Document Redlines — «V»",
+      "parent": "HDE TW",
+      "edits": [
+        {
+          "id": "DRAIN-10-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "TW-DRAIN-10 — Prepare PF Document Redlines — 100626.2",
+          "new": "TW-DRAIN-10 — Prepare PF Document Redlines — «V»",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100626.2",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E03",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BRANCH",
+          "old": "commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is.",
+          "new": "commit and push them on the branch the invocation names, or that the run record it names, `RUN.md`, gives; that branch then has one open pull request, opened if none is.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E04",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DIRECTIVE",
+          "old": "Resolve a material conflict through the explicit current Nathan directive and applicable current PF controls; do not silently choose a convenient source.",
+          "new": "Resolve a material conflict through Nathan's explicit decision, given as a file, and applicable current PF controls; do not silently choose a convenient source.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E05",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-3",
+          "old": "Whole incoming source or Nathan's exact selected boundary; preserve an unchanged resumed run's boundary.",
+          "new": "The whole of every incoming source, with nothing narrowing it.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-OUTPUT-ID",
+          "old": "Before writing, establish distinguishable actual output filenames from the target/source version, exact selection and run identity. A short readable selection label with a recorded deterministic boundary fingerprint is suitable. Two different selections or intentionally distinct runs against the same source version must have different identities.",
+          "new": "Before writing, establish distinguishable actual output filenames from the target/source version and run identity. Two intentionally distinct runs against the same source version must have different identities.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E07",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-5",
+          "old": "Confirm exact prompt/version, target baseline, source selection, package identities where present, and capabilities.",
+          "new": "Confirm exact prompt/version, target baseline, source identities, package identities where present, and capabilities.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-INTAKE",
+          "old": "Minimal operator input is the assigned target PF and the incoming source, supplied as attached files or repository paths, never from Google Drive or ChatGPT Library. Nathan may optionally select agendas/sections and provide relevant supporting material. Infer only uniquely supported target/volume/source identities. Ask one focused question only when an essential choice, identity or selected boundary cannot be established.",
+          "new": "The inputs are files only: the assigned target PF, by its directory and versionless name in `docs/pfcanon/`, and each incoming source, as an attached file or a repository path, never from Google Drive or ChatGPT Library; any supporting material is a file too. An input given as anything but a file is not taken: stop and name it. Infer only uniquely supported target/volume/source identities. When an essential identity cannot be established from the files, stop and name the missing file or fact.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E09",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-WHOLE",
+          "old": "Read the entire incoming logical source by default. Accept explicit selections in any supported source as exact section IDs, headings, ranges, several disjoint units, or an unambiguous natural-language request. Resolve the selection against the exact source version and read every selected unit in full, including nested content. Do not silently narrow whole-source work to fit context. Do not require reading or inventorying every unselected section merely to describe a bounded selection. Establish selected-unit boundaries with sufficient source identity and neighboring boundary evidence; never call unselected content reviewed or drained.",
+          "new": "Read every incoming logical source whole; no selection narrows it. Do not silently narrow whole-source work to fit context.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E10",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PF10",
+          "old": "A supplied legacy `PF10_BUILD_NOTES_VERSION` is an explicit identity hint to verify, not authority to substitute an unrelated version. Whole-PF10 work covers the actual body through EOF even if its index is stale. Selected PF10 work covers every chosen agenda/unit completely without compulsory unselected inventory.",
+          "new": "PF10 work covers the actual body through EOF even if its index is stale.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E11",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-LEDGER",
+          "old": "Build an internal change ledger for the selected boundary.",
+          "new": "Build an internal change ledger for every incoming source.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E12",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DEPS",
+          "old": "Identify blocking dependencies outside the selection. Read supporting material as necessary to resolve an ownership/meaning/precedence question and label that as supporting reading, not drainage of the unselected source.",
+          "new": "Identify blocking dependencies outside the incoming sources. Read supporting material as necessary to resolve an ownership/meaning/precedence question and label that as supporting reading, not drainage.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E13",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DEPS-2",
+          "old": "identify the exact dependency and needed Nathan decision/input. Do not emit an application-ready subset while a required selected change remains blocked.",
+          "new": "identify the exact dependency and the decision or file needed from Nathan. Do not emit an application-ready subset while a required change remains blocked.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E14",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-FILELESS",
+          "old": "Do not substitute the redlines artifact's filename for a source. Record selection boundaries separately. For genuinely fileless input, retain the actual supplied title and conversation/source reference explicitly as fileless provenance; resolve an ambiguous source name rather than inventing a filename.",
+          "new": "Do not substitute the redlines artifact's filename for a source, and resolve an ambiguous source name rather than inventing a filename.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E15",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": "S-HOLD",
+          "old": "with supporting reason/destination if established, or a blocking unresolved item.",
+          "new": "with supporting reason/destination if established, held back, or a blocking unresolved item. A change, from PF10 or another source, is held back when it belongs to an epic or a CRD that the files given do not show closed, as the triage file reports it when one is given: canon drains it only after its QA and its closure decision, so it is not drafted, and any proof log this prompt writes names it with the closure it waits for.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E16",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-HEADER-AUTH",
+          "old": "All other title, invocation-tag or header changes still require explicit Nathan or applicable source authorization and exact validated edits.",
+          "new": "All other title, invocation-tag or header changes still require Nathan's explicit authorization, given as a file, or applicable source authorization, and exact validated edits.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E17",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": "S-CRD-DATE",
+          "old": "; a date the format gives another meaning, such as an HDE CRD Records material-change row's decision date, keeps that meaning;",
+          "new": "; a date the format gives another meaning keeps that meaning;",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E18",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-AGREE",
+          "old": "Both files agree on original/source identities, selection, actual originating preparer/session, run identity and preparation outcome.",
+          "new": "Both files agree on original/source identities, actual originating preparer/session, run identity and preparation outcome.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E19",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-READY",
+          "old": "`READY` requires complete target/selected-source reading, every identified selected change accounted,",
+          "new": "`READY` requires complete target and source reading, every identified change accounted,",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E20",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-NOCHANGE",
+          "old": "`NO_CHANGE` requires complete assigned-target reading, complete selected-task coverage,",
+          "new": "`NO_CHANGE` requires complete assigned-target reading, complete coverage of every incoming source,",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E21",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BLOCKED",
+          "old": "`BLOCKED` identifies all unresolved selected changes/dependencies",
+          "new": "`BLOCKED` identifies all unresolved changes/dependencies",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E22",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PROOF-SCOPE",
+          "old": "whole or exact selected incoming boundary;",
+          "new": "the incoming sources, each read whole;",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E23",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-NEXT",
+          "old": "Carry exact original, the completed redlines file and its proof log by repository path, selected scope, producer validation status and source-file header provenance.",
+          "new": "Carry the exact original, the completed redlines file and its proof log, each by repository path and nothing else; the proof log records the producer validation status and the source-file header provenance.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E24",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-REBASE",
+          "old": "reconcile changed baseline/selection with distinguishable preparation identity, never silent rebase.",
+          "new": "reconcile a changed baseline with distinguishable preparation identity, never silent rebase.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E25",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-HANDOFF-1",
+          "old": "Include: actual source prompt/version and source files/references; target and exact whole/selected scope; redline preparation/save status; applicable source, validation and launch gates; known risks/anomalies or none observed; next owner/session and exact next action.",
+          "new": "Include: the redline preparation and save status; each output's repository path, with the commit that holds it; and the next owner and the prompt to run. Everything else the next step needs is in those files: the proof log records the sources, validation, gates and any risks or anomalies.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E26",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-HANDOFF-2",
+          "old": "Include a populated copyable invocation using the next prompt's native ordinary-language inputs and actual accessible references. Resolve the next selected version from the TW catalog; use its versionless role name and verified Notion directory as locator, retaining exact selected identity as runtime provenance. Supply actual attachments or usable references, not placeholders or filename-only claims.",
+          "new": "Include a populated copyable invocation that names the next prompt by its versionless role name and verified Notion directory, with its selected version resolved from the TW catalog, and gives its inputs as files only: each by repository path or as an attachment, with no other context.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E27",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Map selected changes to the target's actual section ownership.",
+          "new": "Map the incoming changes to the target's actual section ownership.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-10-E28",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Any hygiene or deletion still needs exact selected-source or Nathan authorization.",
+          "new": "Any hygiene or deletion still needs exact source authorization, or Nathan's, given as a file.",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "Nathan's exact selected boundary",
+        "Nathan may optionally select",
+        "genuinely fileless",
+        "filename-only claims",
+        "selected scope",
+        "exact selection",
+        "PF10_BUILD_NOTES_VERSION",
+        "HDE CRD Records material-change row",
+        "selected boundary",
+        "explicit current Nathan directive",
+        "explicit Nathan or applicable source authorization"
+      ]
+    },
+    "TW-DRAIN-20": {
+      "page": "3f14590a05eb81a58043d304b7452801",
+      "current_version": "100626.2",
+      "edited": "2026-10-06T16:45:43.111Z",
+      "new_title": "TW-DRAIN-20 — Prepare PF09 Redlines — «V»",
+      "parent": "HDE TW",
+      "edits": [
+        {
+          "id": "DRAIN-20-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "TW-DRAIN-20 — Prepare PF09 Redlines — 100626.2",
+          "new": "TW-DRAIN-20 — Prepare PF09 Redlines — «V»",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100626.2",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E03",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BRANCH",
+          "old": "commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is.",
+          "new": "commit and push them on the branch the invocation names, or that the run record it names, `RUN.md`, gives; that branch then has one open pull request, opened if none is.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E04",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DIRECTIVE",
+          "old": "Resolve a material conflict through the explicit current Nathan directive and applicable current PF controls; do not silently choose a convenient source.",
+          "new": "Resolve a material conflict through Nathan's explicit decision, given as a file, and applicable current PF controls; do not silently choose a convenient source.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E05",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-3",
+          "old": "Whole incoming source or Nathan's exact selected boundary; preserve an unchanged resumed run's boundary.",
+          "new": "The whole of every incoming source, with nothing narrowing it.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-OUTPUT-ID",
+          "old": "Before writing, establish distinguishable actual output filenames from the target/source version, exact selection and run identity. A short readable selection label with a recorded deterministic boundary fingerprint is suitable. Two different selections or intentionally distinct runs against the same source version must have different identities.",
+          "new": "Before writing, establish distinguishable actual output filenames from the target/source version and run identity. Two intentionally distinct runs against the same source version must have different identities.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E07",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-5",
+          "old": "Confirm exact prompt/version, target baseline, source selection, package identities where present, and capabilities.",
+          "new": "Confirm exact prompt/version, target baseline, source identities, package identities where present, and capabilities.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-INTAKE",
+          "old": "Minimal operator input is the assigned target PF and the incoming source, supplied as attached files or repository paths, never from Google Drive or ChatGPT Library. Nathan may optionally select agendas/sections and provide relevant supporting material. Infer only uniquely supported target/volume/source identities. Ask one focused question only when an essential choice, identity or selected boundary cannot be established.",
+          "new": "The inputs are files only: the assigned target PF, by its directory and versionless name in `docs/pfcanon/`, and each incoming source, as an attached file or a repository path, never from Google Drive or ChatGPT Library; any supporting material is a file too. An input given as anything but a file is not taken: stop and name it. Infer only uniquely supported target/volume/source identities. When an essential identity cannot be established from the files, stop and name the missing file or fact.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E09",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-WHOLE",
+          "old": "Read the entire incoming logical source by default. Accept explicit selections in any supported source as exact section IDs, headings, ranges, several disjoint units, or an unambiguous natural-language request. Resolve the selection against the exact source version and read every selected unit in full, including nested content. Do not silently narrow whole-source work to fit context. Do not require reading or inventorying every unselected section merely to describe a bounded selection. Establish selected-unit boundaries with sufficient source identity and neighboring boundary evidence; never call unselected content reviewed or drained.",
+          "new": "Read every incoming logical source whole; no selection narrows it. Do not silently narrow whole-source work to fit context.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E10",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PF10",
+          "old": "A supplied legacy `PF10_BUILD_NOTES_VERSION` is an explicit identity hint to verify, not authority to substitute an unrelated version. Whole-PF10 work covers the actual body through EOF even if its index is stale. Selected PF10 work covers every chosen agenda/unit completely without compulsory unselected inventory.",
+          "new": "PF10 work covers the actual body through EOF even if its index is stale.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E11",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-LEDGER",
+          "old": "Build an internal change ledger for the selected boundary.",
+          "new": "Build an internal change ledger for every incoming source.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E12",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DEPS",
+          "old": "Identify blocking dependencies outside the selection. Read supporting material as necessary to resolve an ownership/meaning/precedence question and label that as supporting reading, not drainage of the unselected source.",
+          "new": "Identify blocking dependencies outside the incoming sources. Read supporting material as necessary to resolve an ownership/meaning/precedence question and label that as supporting reading, not drainage.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E13",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DEPS-2",
+          "old": "identify the exact dependency and needed Nathan decision/input. Do not emit an application-ready subset while a required selected change remains blocked.",
+          "new": "identify the exact dependency and the decision or file needed from Nathan. Do not emit an application-ready subset while a required change remains blocked.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E14",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-FILELESS",
+          "old": "Do not substitute the redlines artifact's filename for a source. Record selection boundaries separately. For genuinely fileless input, retain the actual supplied title and conversation/source reference explicitly as fileless provenance; resolve an ambiguous source name rather than inventing a filename.",
+          "new": "Do not substitute the redlines artifact's filename for a source, and resolve an ambiguous source name rather than inventing a filename.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E15",
+          "item": "ITEM-03",
+          "rule": "R2",
+          "shared": "S-HOLD",
+          "old": "with supporting reason/destination if established, or a blocking unresolved item.",
+          "new": "with supporting reason/destination if established, held back, or a blocking unresolved item. A change, from PF10 or another source, is held back when it belongs to an epic or a CRD that the files given do not show closed, as the triage file reports it when one is given: canon drains it only after its QA and its closure decision, so it is not drafted, and any proof log this prompt writes names it with the closure it waits for.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E16",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-HEADER-AUTH",
+          "old": "All other title, invocation-tag or header changes still require explicit Nathan or applicable source authorization and exact validated edits.",
+          "new": "All other title, invocation-tag or header changes still require Nathan's explicit authorization, given as a file, or applicable source authorization, and exact validated edits.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E17",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": "S-CRD-DATE",
+          "old": "; a date the format gives another meaning, such as an HDE CRD Records material-change row's decision date, keeps that meaning;",
+          "new": "; a date the format gives another meaning keeps that meaning;",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E18",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-AGREE",
+          "old": "Both files agree on original/source identities, selection, actual originating preparer/session, run identity and preparation outcome.",
+          "new": "Both files agree on original/source identities, actual originating preparer/session, run identity and preparation outcome.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E19",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-READY",
+          "old": "`READY` requires complete target/selected-source reading, every identified selected change accounted,",
+          "new": "`READY` requires complete target and source reading, every identified change accounted,",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E20",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-NOCHANGE",
+          "old": "`NO_CHANGE` requires complete assigned-target reading, complete selected-task coverage,",
+          "new": "`NO_CHANGE` requires complete assigned-target reading, complete coverage of every incoming source,",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E21",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BLOCKED",
+          "old": "`BLOCKED` identifies all unresolved selected changes/dependencies",
+          "new": "`BLOCKED` identifies all unresolved changes/dependencies",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E22",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PROOF-SCOPE",
+          "old": "whole or exact selected incoming boundary;",
+          "new": "the incoming sources, each read whole;",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E23",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-NEXT",
+          "old": "Carry exact original, the completed redlines file and its proof log by repository path, selected scope, producer validation status and source-file header provenance.",
+          "new": "Carry the exact original, the completed redlines file and its proof log, each by repository path and nothing else; the proof log records the producer validation status and the source-file header provenance.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E24",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-REBASE",
+          "old": "reconcile changed baseline/selection with distinguishable preparation identity, never silent rebase.",
+          "new": "reconcile a changed baseline with distinguishable preparation identity, never silent rebase.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E25",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-HANDOFF-1",
+          "old": "Include: actual source prompt/version and source files/references; target and exact whole/selected scope; redline preparation/save status; applicable source, validation and launch gates; known risks/anomalies or none observed; next owner/session and exact next action.",
+          "new": "Include: the redline preparation and save status; each output's repository path, with the commit that holds it; and the next owner and the prompt to run. Everything else the next step needs is in those files: the proof log records the sources, validation, gates and any risks or anomalies.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E26",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-HANDOFF-2",
+          "old": "Include a populated copyable invocation using the next prompt's native ordinary-language inputs and actual accessible references. Resolve the next selected version from the TW catalog; use its versionless role name and verified Notion directory as locator, retaining exact selected identity as runtime provenance. Supply actual attachments or usable references, not placeholders or filename-only claims.",
+          "new": "Include a populated copyable invocation that names the next prompt by its versionless role name and verified Notion directory, with its selected version resolved from the TW catalog, and gives its inputs as files only: each by repository path or as an attachment, with no other context.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E27",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Use the actual PF09 schema, assigned phase, selected sources and applicable PF context.",
+          "new": "Use the actual PF09 schema, assigned phase, incoming sources and applicable PF context.",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E28",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Infer necessary descriptive details from selected prompt/source and current PF context where reasonable;",
+          "new": "Infer necessary descriptive details from the incoming sources and current PF context where reasonable;",
+          "blocks": false
+        },
+        {
+          "id": "DRAIN-20-E29",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "unless the selected source authorizes a precise change",
+          "new": "unless a source authorizes a precise change",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "Nathan's exact selected boundary",
+        "Nathan may optionally select",
+        "genuinely fileless",
+        "filename-only claims",
+        "selected scope",
+        "exact selection",
+        "PF10_BUILD_NOTES_VERSION",
+        "HDE CRD Records material-change row",
+        "selected boundary",
+        "selected sources",
+        "selected prompt/source",
+        "explicit current Nathan directive",
+        "unless the selected source authorizes",
+        "explicit Nathan or applicable source authorization"
+      ]
+    },
+    "TW-RECORD-10": {
+      "page": "3f14590a05eb81d399a7c3ab1fd6fb66",
+      "current_version": "100626.2",
+      "edited": "2026-10-06T16:47:37.162Z",
+      "new_title": "TW-RECORD-10 — Update Epic History — «V»",
+      "parent": "HDE TW",
+      "edits": [
+        {
+          "id": "RECORD-10-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "TW-RECORD-10 — Create Epic History Section — 100626.2",
+          "new": "TW-RECORD-10 — Update Epic History — «V»",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100626.2",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E03",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BRANCH",
+          "old": "commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is.",
+          "new": "commit and push them on the branch the invocation names, or that the run record it names, `RUN.md`, gives; that branch then has one open pull request, opened if none is.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E04",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DIRECTIVE",
+          "old": "Resolve a material conflict through the explicit current Nathan directive and applicable current PF controls; do not silently choose a convenient source.",
+          "new": "Resolve a material conflict through Nathan's explicit decision, given as a file, and applicable current PF controls; do not silently choose a convenient source.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E05",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-3",
+          "old": "Whole incoming source or Nathan's exact selected boundary; preserve an unchanged resumed run's boundary.",
+          "new": "The whole of every incoming source, with nothing narrowing it.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-OUTPUT-ID",
+          "old": "Before writing, establish distinguishable actual output filenames from the target/source version, exact selection and run identity. A short readable selection label with a recorded deterministic boundary fingerprint is suitable. Two different selections or intentionally distinct runs against the same source version must have different identities.",
+          "new": "Before writing, establish distinguishable actual output filenames from the target/source version and run identity. Two intentionally distinct runs against the same source version must have different identities.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E07",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DEST",
+          "old": "If several real volumes leave placement ambiguous, ask Nathan for the destination.",
+          "new": "If several real volumes leave placement ambiguous, stop and name them: the destination is Nathan's to give, as a file.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-SUPPORT",
+          "old": "Read the entire approved specification and every supplied supporting input used for the requested entry, preserving exact versions, controlled identifiers and actual approval evidence. Resolve any Nathan-selected supporting section in full and state its actual boundary outside the insertion text.",
+          "new": "Read the entire approved specification and every other source file, each whole, preserving exact versions, controlled identifiers and actual approval evidence.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E09",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Nathan supplies the approved Epic specification and required supporting inputs for the actual PF20 destination. This role terminates with the updated PF20 file and its proof log; TW-RECORD-20 separately serves CRD history in PF30.",
+          "new": "Its inputs are files: the approved specification, the other sources, and, for an Epic's record, the evidence of the Epic's completed or historical posture. This role makes every change a run makes to PF20, an Epic's record and each other change, from PF10 or another source, that bears on PF20, and terminates with the updated PF20 file and its proof log, or with the exact no-change result; TW-RECORD-20 separately serves CRD history in PF30.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E10",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Create one complete historical Epic record section and insert it into a copy of the actual assigned PF20 document, as *Output and completion* sets out. Minimal inputs are the approved Epic specification and the relevant additional material Nathan supplies, with an exact Epic identity and target when not uniquely resolvable.",
+          "new": "Make every change the sources require in a copy of the actual assigned PF20 document, as *Output and completion* sets out: when the specification is an Epic's, its complete historical record, inserted once when the Epic has none and updated in place when it has one; and each other change, from PF10 or another source, that bears on PF20 in context and scope, except a held-back one. A change is held back when it belongs to an epic or a CRD that the files given do not show closed, as the triage file reports it when one is given: canon drains it only after its QA and its closure decision, so it is not made, and any proof log this prompt writes names it with the closure it waits for. The inputs are files only: the approved specification and the other sources, as attached files or repository paths, from which the Epic identity and target are resolved; an input given as anything but a file is not taken.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E11",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "establish that actual completed/historical posture from supplied evidence or an explicit attributable Nathan statement.",
+          "new": "establish that actual completed/historical posture from the evidence given as files, such as the Epic's closure decision.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E12",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "If that decisive posture is absent, ask for the actual historical/completion evidence needed for the entry; do not invent completion or create an in-flight record.",
+          "new": "If that decisive posture is absent, insert or update no Epic record and name the missing evidence file in the proof log; make the other changes the sources require, and do not invent completion or create an in-flight record.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E13",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "An existing record is not permission to create a duplicate or silently revise it through this creation role. Identify the actual existing entry and ask for the specific bounded update when necessary; Nathan may invoke the appropriate drain for such work.",
+          "new": "An existing record is never duplicated: update it in place, as far as the document's own drain posture allows, and record each change in the proof log.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E14",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "with the complete entry inserted once, at the place the target's established record order requires, by an exact insertion. Never regenerate or rewrite the document: every other byte is preserved, and only the document-control fields below change.",
+          "new": "with each change made by an exact edit: the complete entry inserted once, at the place the target's established record order requires, or the existing entry updated in place, and each other change the sources require, from PF10 or another source, at the passage it bears on. Never regenerate or rewrite the document: every other byte is preserved, and only those changes and the document-control fields below change.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E15",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "the approved specification's filename, then, when the entry reconciles an applicable PF10 change,",
+          "new": "the approved specification's filename when the update makes or changes a record, then, for each other source whose change the update carries, its filename alone, then, when the update carries or reconciles an applicable PF10 change,",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E16",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Before saving, compare the complete section with the specification, actual historical evidence and target/schema;",
+          "new": "Before saving, compare the record's complete section, when the update makes or changes one, with the specification, actual historical evidence and target/schema, and each other change with the source it carries;",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E17",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "The inserted entry and the control fields carry no `Draft`",
+          "new": "The changes and the control fields carry no `Draft`",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E18",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Beside the updated PF20, in the same directory, write its separate proof log",
+          "new": "When the sources require no change to PF20, return exactly `no changes` as the entire final response and write no file; complete reading of the document and of every source is required first, and missing evidence or incomplete reading is never `no changes`.\nOtherwise, beside the updated PF20, in the same directory, write its separate proof log",
+          "blocks": true
+        },
+        {
+          "id": "RECORD-10-E19",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "where the entry was inserted, the control fields before and after, and the check that nothing else changed.",
+          "new": "each change and where it was made, the control fields before and after, and the check that nothing else changed.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E20",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "If source/approval/destination or decisive historical posture remains unresolved, identify the exact missing input in the conversation and write no updated PF20: an incomplete entry is never inserted or delivered.",
+          "new": "If source, approval or destination remains unresolved, or the decisive historical posture does while the sources require no other change, identify the exact missing input in the conversation and write no updated PF20: an incomplete entry is never inserted or delivered.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-10-E21",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "then check that each updated file differs from its original only by the inserted entry and its control fields, that those fields agree, and that the inserted entry and those fields carry no `Draft` status language, placeholder or TODO.",
+          "new": "then check that each updated file differs from its original only by the changes its proof log lists and its control fields, that those fields agree, and that the changes and those fields carry no `Draft` status language, placeholder or TODO.",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "Nathan's exact selected boundary",
+        "exact selection",
+        "Nathan-selected supporting section",
+        "ask Nathan for the destination",
+        "the appropriate drain",
+        "explicit attributable Nathan statement",
+        "Create Epic History Section",
+        "explicit current Nathan directive"
+      ]
+    },
+    "TW-RECORD-20": {
+      "page": "3f14590a05eb81eaaf0cedac0de274b9",
+      "current_version": "100626.2",
+      "edited": "2026-10-06T16:49:11.220Z",
+      "new_title": "TW-RECORD-20 — Update CRD History — «V»",
+      "parent": "HDE TW",
+      "edits": [
+        {
+          "id": "RECORD-20-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "TW-RECORD-20 — Create CRD History Section — 100626.2",
+          "new": "TW-RECORD-20 — Update CRD History — «V»",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100626.2",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E03",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BRANCH",
+          "old": "commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is.",
+          "new": "commit and push them on the branch the invocation names, or that the run record it names, `RUN.md`, gives; that branch then has one open pull request, opened if none is.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E04",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DIRECTIVE",
+          "old": "Resolve a material conflict through the explicit current Nathan directive and applicable current PF controls; do not silently choose a convenient source.",
+          "new": "Resolve a material conflict through Nathan's explicit decision, given as a file, and applicable current PF controls; do not silently choose a convenient source.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E05",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-3",
+          "old": "Whole incoming source or Nathan's exact selected boundary; preserve an unchanged resumed run's boundary.",
+          "new": "The whole of every incoming source, with nothing narrowing it.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-OUTPUT-ID",
+          "old": "Before writing, establish distinguishable actual output filenames from the target/source version, exact selection and run identity. A short readable selection label with a recorded deterministic boundary fingerprint is suitable. Two different selections or intentionally distinct runs against the same source version must have different identities.",
+          "new": "Before writing, establish distinguishable actual output filenames from the target/source version and run identity. Two intentionally distinct runs against the same source version must have different identities.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E07",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DEST",
+          "old": "If several real volumes leave placement ambiguous, ask Nathan for the destination.",
+          "new": "If several real volumes leave placement ambiguous, stop and name them: the destination is Nathan's to give, as a file.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-SUPPORT",
+          "old": "Read the entire approved specification and every supplied supporting input used for the requested entry, preserving exact versions, controlled identifiers and actual approval evidence. Resolve any Nathan-selected supporting section in full and state its actual boundary outside the insertion text.",
+          "new": "Read the entire approved specification and every other source file, each whole, preserving exact versions, controlled identifiers and actual approval evidence.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E09",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Nathan supplies the approved CRD specification, actual approval evidence and required supporting inputs for PF30. This role terminates with the updated PF30 file and its proof log; TW-RECORD-10 separately serves Epic history in PF20.",
+          "new": "Its inputs are files: the approved specification, the other sources, and, for a CRD's record, the CRD's actual approval evidence. This role makes every change a run makes to a PF30 volume, a CRD's record and each other change, from PF10 or another source, that bears on the volume, and terminates with the updated PF30 file and its proof log, or with the exact no-change result; TW-RECORD-10 separately serves Epic history in PF20.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E10",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Create one complete CRD historical record section and insert it into a copy of the PF30 volume it belongs in, as *Output and completion* sets out. Accept the approved CRD specification, its actual specification-approval evidence and relevant supporting material Nathan supplies, as attached files or repository paths, never from Google Drive or ChatGPT Library.",
+          "new": "Make every change the sources require in a copy of the PF30 volume they bear on, as *Output and completion* sets out: when the specification is a CRD's, its complete historical record, inserted once in the volume it belongs in when the CRD has none and updated in place when it has one; and each other change, from PF10 or another source, that bears on that volume in context and scope, except a held-back one. A change is held back when it belongs to an epic or a CRD that the files given do not show closed, as the triage file reports it when one is given: canon drains it only after its QA and its closure decision, so it is not made, and any proof log this prompt writes names it with the closure it waits for. A CRD's own record is never held back: it is made from the CRD's approval evidence. The inputs are files only: the approved specification, the CRD's actual specification-approval evidence when the specification is a CRD's, and the other sources, as attached files or repository paths, never from Google Drive or ChatGPT Library; an input given as anything but a file is not taken.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E11",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Verify the controlled CRD identifier, specification version, actual approval owner/decision and their agreement.",
+          "new": "When the specification is a CRD's, verify the controlled CRD identifier, specification version, actual approval owner/decision and their agreement.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E12",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "An existing record is not permission to create a duplicate or silently revise it through this creation role. Identify the actual existing entry and ask for the specific bounded update when necessary; Nathan may invoke the appropriate drain for such work.",
+          "new": "An existing record is never duplicated: update it in place, in the volume that holds it, as the volume's own rules for a material change require, and record each change in the proof log.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E13",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Write the updated PF30 volume at the repository path the invocation names: the volume the record belongs in, from",
+          "new": "Write the updated PF30 volume at the repository path the invocation names: the volume the changes bear on, the one the record belongs in when there is one, from",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E14",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "with the complete record inserted once, at the place the volume's record order requires, by an exact insertion. Never regenerate or rewrite the document: every other byte is preserved, and only the document-control fields below change.",
+          "new": "with each change made by an exact edit: the complete record inserted once, at the place the volume's record order requires, or the existing record updated in place, and each other change the sources require, from PF10 or another source, at the passage it bears on. Never regenerate or rewrite the document: every other byte is preserved, and only those changes and the document-control fields below change.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E15",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "the approved specification's filename, then, when the record reconciles an applicable PF10 change,",
+          "new": "the approved specification's filename when the update makes or changes a record, then, for each other source whose change the update carries, its filename alone, then, when the update carries or reconciles an applicable PF10 change,",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E16",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Before saving, compare the complete section with the specification, actual historical evidence and target/schema;",
+          "new": "Before saving, compare the record's complete section, when the update makes or changes one, with the specification, actual historical evidence and target/schema, and each other change with the source it carries;",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E17",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "The inserted record and the control fields carry no `Draft`",
+          "new": "The changes and the control fields carry no `Draft`",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E18",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "Beside each file it writes, in the same directory, write that file's separate proof log",
+          "new": "When the sources require no change to any PF30 volume, return exactly `no changes` as the entire final response and write no file; complete reading of the volume and of every source is required first, and missing evidence or incomplete reading is never `no changes`.\nOtherwise, beside each file it writes, in the same directory, write that file's separate proof log",
+          "blocks": true
+        },
+        {
+          "id": "RECORD-20-E19",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "where the record was inserted, the control fields before and after, and the check that nothing else changed.",
+          "new": "each change and where it was made, the control fields before and after, and the check that nothing else changed.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E20",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "If source/approval/destination or decisive historical posture remains unresolved, identify the exact missing input in the conversation and write no updated PF30: an incomplete record is never inserted or delivered.",
+          "new": "If source, approval or destination remains unresolved, or the decisive historical posture does while the sources require no other change, identify the exact missing input in the conversation and write no updated PF30: an incomplete record is never inserted or delivered.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E21",
+          "item": "ITEM-05",
+          "rule": "R4",
+          "shared": null,
+          "old": "then check that each updated file differs from its original only by the inserted entry and its control fields, that those fields agree, and that the inserted entry and those fields carry no `Draft` status language, placeholder or TODO.",
+          "new": "then check that each updated file differs from its original only by the changes its proof log lists and its control fields, that those fields agree, and that the changes and those fields carry no `Draft` status language, placeholder or TODO.",
+          "blocks": false
+        },
+        {
+          "id": "RECORD-20-E22",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Open a new volume only when the invocation carries his rollover decision,",
+          "new": "Open a new volume only when his rollover decision is among the files given,",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "Nathan's exact selected boundary",
+        "exact selection",
+        "Nathan-selected supporting section",
+        "ask Nathan for the destination",
+        "the appropriate drain",
+        "the invocation carries his rollover decision",
+        "Create CRD History Section",
+        "explicit current Nathan directive"
+      ]
+    },
+    "TW-APPLY-10": {
+      "page": "3f14590a05eb81daa3cfee9956585cd5",
+      "current_version": "100626.2",
+      "edited": "2026-10-06T16:50:52.240Z",
+      "new_title": "TW-APPLY-10 — Apply Validated Redlines — «V»",
+      "parent": "HDE TW",
+      "edits": [
+        {
+          "id": "APPLY-10-E01",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "TW-APPLY-10 — Apply Validated Redlines — 100626.2",
+          "new": "TW-APPLY-10 — Apply Validated Redlines — «V»",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E02",
+          "item": "ID",
+          "rule": "ID",
+          "shared": null,
+          "old": "Prompt Version: 100626.2",
+          "new": "Prompt Version: «V»",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E03",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-BRANCH",
+          "old": "commit and push them on the branch the invocation names; that branch then has one open pull request, opened if none is.",
+          "new": "commit and push them on the branch the invocation names, or that the run record it names, `RUN.md`, gives; that branch then has one open pull request, opened if none is.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E04",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-DIRECTIVE",
+          "old": "Resolve a material conflict through the explicit current Nathan directive and applicable current PF controls; do not silently choose a convenient source.",
+          "new": "Resolve a material conflict through Nathan's explicit decision, given as a file, and applicable current PF controls; do not silently choose a convenient source.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E05",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-3",
+          "old": "Whole incoming source or Nathan's exact selected boundary; preserve an unchanged resumed run's boundary.",
+          "new": "The whole of every incoming source, with nothing narrowing it.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E06",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-OUTPUT-ID",
+          "old": "Before writing, establish distinguishable actual output filenames from the target/source version, exact selection and run identity. A short readable selection label with a recorded deterministic boundary fingerprint is suitable. Two different selections or intentionally distinct runs against the same source version must have different identities.",
+          "new": "Before writing, establish distinguishable actual output filenames from the target/source version and run identity. Two intentionally distinct runs against the same source version must have different identities.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E07",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": "S-PREFLIGHT-5",
+          "old": "Confirm exact prompt/version, target baseline, source selection, package identities where present, and capabilities.",
+          "new": "Confirm exact prompt/version, target baseline, source identities, package identities where present, and capabilities.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E08",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "incoming-source version and whole/exact selected boundary,",
+          "new": "incoming-source versions,",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E09",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "with no blocking selected change/dependency",
+          "new": "with no blocking change/dependency",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E10",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Match the exact original baseline and selected scope to the preparer's evidence.",
+          "new": "Match the exact original baseline and the incoming sources to the preparer's evidence.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E11",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Bump the original internal version once using the target's established scheme: an explicit authorized target version when supplied and valid; otherwise increment",
+          "new": "Bump the original internal version once using the target's established scheme: increment",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E12",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "For explicitly fileless sources retain verified source name/reference labeled fileless; unresolved source identity blocks this metadata step.",
+          "new": "Unresolved source identity blocks this metadata step.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E13",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "accept the exact terminal drain response together with accessible original/source identities, actual selected scope and retained complete coverage evidence from that originating run.",
+          "new": "accept the exact terminal drain response together with accessible original/source identities and retained complete coverage evidence from that originating run, each as a file.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E14",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "repository paths, selected incoming scope, preparer and run identity,",
+          "new": "repository paths, the incoming sources, preparer and run identity,",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E15",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "fingerprint representation, affected selection, actual originating preparer/session",
+          "new": "fingerprint representation, affected sources, actual originating preparer/session",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E16",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "state the missing preparer provenance and ask Nathan to identify it;",
+          "new": "state the missing preparer provenance and stop: Nathan identifies it, as a file;",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E17",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "Put the diagnostic handoff in the final response: actual source/preparer and same session, original/package identities, task selection, failing IDs/counts, zero-applied/unchanged-PF posture, violated gate, precise repair, and populated invocation returning to that preparer. Name the verified diagnostic by its repository path.",
+          "new": "Put the diagnostic handoff in the final response: the verified diagnostic's repository path, with the commit that holds it; the zero-applied/unchanged-PF posture; and a populated invocation returning to that preparer that gives its inputs as files only: the diagnostic, the package and the original, each by repository path. The diagnostic itself carries the actual preparer, the failing IDs and counts, the violated gate and the precise repair.",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E18",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "If origin is unknown, ask for that identity;",
+          "new": "If origin is unknown, name the missing preparer provenance;",
+          "blocks": false
+        },
+        {
+          "id": "APPLY-10-E19",
+          "item": "ITEM-02",
+          "rule": "R1",
+          "shared": null,
+          "old": "They come as attached files or repository paths, never from Google Drive or ChatGPT Library.",
+          "new": "They come only as attached files or repository paths, never from Google Drive or ChatGPT Library, and, apart from Nathan's request of a no-change report, an input given as anything but a file is not taken: stop and name it.",
+          "blocks": false
+        }
+      ],
+      "absent_after": [
+        "Nathan's exact selected boundary",
+        "exact selection",
+        "selected boundary",
+        "explicitly fileless",
+        "explicit authorized target version",
+        "task selection",
+        "actual selected scope",
+        "explicit current Nathan directive",
+        "blocking selected change",
+        "selected incoming scope",
+        "affected selection",
+        "ask Nathan to identify it",
+        "ask for that identity"
+      ]
+    }
+  }
+}
