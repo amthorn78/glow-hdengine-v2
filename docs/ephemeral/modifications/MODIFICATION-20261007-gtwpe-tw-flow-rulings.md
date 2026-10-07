@@ -52,6 +52,11 @@ reviews:
     date: 2026-10-07
     required_open: 2
     outcome: "One fresh checker, GTWPE-TW-FLOW-RULINGS-PLAN-DC, handed only its committed brief's path, on the repair diff 1f73053..9fefe96: RQ-1 to RQ-8 each fixed, RQ-1 and RQ-2 each with a new defect in the repair's own text. 2 required, both confirmed by the session: DC-R1, S4's cell still stops a triage file that names PF20 or PF30 in a reason; DC-R2, the record prompts' role, output and gate lines still name only PF10 changes. 12 listed, one refuted. Required defects went from 8 to 2, both in the last repair's text (D26-A rule 5's second signal), and the cap is reached (rule 2), so §P goes to Nathan with DC-R1 and DC-R2 open, as K-26 and K-27, each with its correction stated"
+  - mode: PLAN
+    kind: DRY_RUN
+    date: 2026-10-07
+    required_open: 0
+    outcome: "On Nathan's order of 2026-10-07 (PO-6), with no review_cap override: DC-R1 and DC-R2 corrected as Diff check (PL3) states them, in seven new texts of edits.json (G-FLOW-10-E47; RECORD-10 and RECORD-20 E09, E14, E15), no anchor changed. The session's checks run again, read-only: edits_check.py PASS on 205 edits with 11 of 11 faults caught, each changed passage read in place, the two-sided check for the touched rows, both record checks exit 0. No reviewer checked the repair (K-28). None left open"
 items:
   - id: ITEM-01
     statement: "Nathan's rulings of 2026-10-07 on a run's inputs, on PF10 drainage and on PF20 and PF30 are explicitly documented, in his words, in the GTWPE decision record."
@@ -1234,7 +1239,7 @@ ITEM-06 has no edit of its own (§A, ITEM-06).
 | TW-DRAIN-20 (29) | E01, E02 | Identity, to «V» |
 | | E27 to E29 (R1) | "selected sources", "selected prompt/source" and "unless the selected source authorizes" go |
 | TW-RECORD-10 (21) | E01, E02 | Identity and title, *Update Epic History* |
-| | E09 to E21 (R4, R2) | Every change PF20 takes: an Epic Specification's record, inserted or updated in place, only on the Epic's completed posture, given as a file; each other change, from PF10 or another source, that bears on PF20, held-back ones aside (P-1; RQ-1); the gate names the specification only when the update makes or changes a record; the comparison before saving; the `no changes` exit; the proof log and the check that nothing else changed cover every change |
+| | E09 to E21 (R4, R2) | Every change PF20 takes: an Epic Specification's record, inserted or updated in place, only on the Epic's completed posture, given as a file; each other change, from PF10 or another source, that bears on PF20, held-back ones aside (P-1; RQ-1); the role line and the output contract name every such change, and the gate names the specification only when the update makes or changes a record, and each other source by its filename (PO-6); the comparison before saving; the `no changes` exit; the proof log and the check that nothing else changed cover every change |
 | TW-RECORD-20 (22) | E01, E02 | Identity and title, *Update CRD History* |
 | | E09 to E21 (R4, R2) | As TW-RECORD-10 for a PF30 volume: a CRD Specification's record in the volume it belongs in, updated in place as HDE CRD Records §4.2 requires; the CRD checks only for a CRD Specification; a CRD's own record never held back (RQ-1); the written volume is the one the changes bear on |
 | | E22 (R1) | The rollover decision is among the files given |
@@ -1590,8 +1595,9 @@ in *Listed findings, accepted as risks (PL3)*, each with its reason, and are acc
 | K-23 | §A's DC-L3, DC-L5, DC-L6, DC-L7 and DC-L8, and A's L11 (the catalog's *Approved design* entry) | As §A states | As §A states | Approved with the analysis; A's L11 stays Nathan's opt-in |
 | K-24 | Before the first compaction, this mode followed GTWPE-MGMT-10 and drafted three members' edits without a live fetch in its own context; and it read the PE Metaprompt's general rules, its authoring control, only then, though DR-1 to DR-5 were written after (*Harness files*, the lapse; A's L23, B's L20) | Certain | None found: the approval recorded at `PLANNING` follows the procedure as fetched at 12:39Z; every anchor of the three members was checked against its live page; and the general rules, read again from a fetch at 14:29Z, found no text of this plan that breaks them (*Repair round (PL3)*) | Disclosed. The plan relies only on the checks made after the fetches, and `EXECUTE`'s X1.0 fetches every page again before any write |
 | K-25 | A proof log that names a held-back change, as S-HOLD and the record prompts ask, could be read by check 6 as taking that change as a basis | Low | A loud S4 stop for that document | The proof log names it as held back, which is not a basis; a loud stop |
-| K-26 | DC-R1: S4's *When* cell (G-FLOW-10-E47) still stops a triage file that "names an ineligible document", while B1 step 5 stops only one that names it "to route", and the triage file names PF20 or the PF30 family in a reason when no specification is given (*Diff check (PL3)*) | Medium: every run without a specification while HDE Build Notes 2.14 waits for PF30, wherever the Flow Manager applies S4's cell as written | `RUN_STOPPED` (S4) where the run should go on; loud, but no decision file clears it | Found by the mode's one check of the repair's diff, after which `D26-A` rules 2 and 5 return the plan to Nathan unrepaired. The correction is one clause, "to route", stated in *Diff check (PL3)*; ordering it is his (PO-6) |
-| K-27 | DC-R2: TW-RECORD-10's and TW-RECORD-20's role line, output contract and Last Update Gate (E09, E14, E15) still name only the record and PF10 changes, while their E10 makes "each other change, from PF10 or another source" (*Diff check (PL3)*) | Low as a path; certain as text | A record pass may leave out a change from another source, and `RUN.md` would show the document drained or the change represented: silent | As K-26: the three corrections are stated in *Diff check (PL3)*; ordering them is his (PO-6) |
+| K-26 | DC-R1: S4's *When* cell (G-FLOW-10-E47) still stops a triage file that "names an ineligible document", while B1 step 5 stops only one that names it "to route", and the triage file names PF20 or the PF30 family in a reason when no specification is given (*Diff check (PL3)*) | Medium: every run without a specification while HDE Build Notes 2.14 waits for PF30, wherever the Flow Manager applies S4's cell as written | `RUN_STOPPED` (S4) where the run should go on; loud, but no decision file clears it | Not open: repaired on Nathan's order of 2026-10-07 (PO-6), as *Diff check (PL3)* stated it (*Nathan's decision on DC-R1 and DC-R2*); K-28 |
+| K-27 | DC-R2: TW-RECORD-10's and TW-RECORD-20's role line, output contract and Last Update Gate (E09, E14, E15) still name only the record and PF10 changes, while their E10 makes "each other change, from PF10 or another source" (*Diff check (PL3)*) | Low as a path; certain as text | A record pass may leave out a change from another source, and `RUN.md` would show the document drained or the change represented: silent | Not open: repaired as K-26 was |
+| K-28 | The corrections of DC-R1 and DC-R2 had no independent check: Nathan ordered them without a `review_cap` override (PO-6), so `D26-A` rule 2's cap stands | Low: seven new texts changed, each by the clause *Diff check (PL3)* stated, with no anchor moved | A defect in the seven texts would be found only by the session's own checks or at `EXECUTE`'s readbacks, which read each page whole | Nathan's ruling; a self-check is not independent validation, so it is listed |
 
 ### Product Owner actions
 
@@ -1602,7 +1608,7 @@ in *Listed findings, accepted as risks (PL3)*, each with its reason, and are acc
 | PO-3 | Merge the record's pull request after X5, when he chooses | Nothing waits on that merge (`D21-C`) |
 | PO-4 | Only after a failure: archive the unselected new pages, or a copy a failed W1 left; merge the pull request carrying the failure record | The read-only sweep, after he acts |
 | PO-5 | After X4, authorize or have PE40 make the changes outside the route that the change leaves stale: N-1, the Operations Hub callout's last sentence; N-2, the architecture page's status line and "resume with `RESUME <run-id>`", and the repository architecture record's status; N-3, the ledger rows §A names, with E-033 and E-042 (DC-L5) | His; nothing in this Modification waits on it |
-| PO-6 | Before approving, decide DC-R1 and DC-R2 (K-26, K-27): order their corrections, as *Diff check (PL3)* states them, as a repair of this plan, with his `review_cap` override if he wants that repair checked; or accept them with the plan | His words in the record. A repair is entered in `reviews` and returns the plan to him; accepting them is his approval of the plan as it stands |
+| PO-6 | Decide DC-R1 and DC-R2 (K-26, K-27): done. Nathan ordered both corrections as *Diff check (PL3)* states them, with no `review_cap` override, on 2026-10-07 | His words in *Nathan's decision on DC-R1 and DC-R2 (PO-6)*; the repair's checks there; the round in `reviews` |
 
 ### Explicitly not in scope
 
@@ -1618,7 +1624,7 @@ in *Listed findings, accepted as risks (PL3)*, each with its reason, and are acc
 
 | Value | Fixed as |
 |---|---|
-| «H» | `a8dff863d27886b3b918eeee94f6c004790449aa8dc8ecc2d048838212e67116`, the sha256 of `edits.json`, 114,342 bytes, as committed with this section |
+| «H» | `eed54794bc34ea4e00c3b47720dc306375dbef5b69169efa472855f4d24f276f`, the sha256 of `edits.json`, 114,657 bytes, as committed with this section |
 | «HD» | `d7fad191f04b4923c2c0e03b03f44e1ee074eacab5b8c61bf1feaefbd968f44b`, the sha256 of the evidence copy of `gtwpe.decision-record.md`, 15,231 bytes |
 | «HT» | `13eb81de042f66bcb667cc97bd42d658ff2169201b52e62c0d4af4a663980aa4`, the sha256 of the evidence copy of `gtwpe.handoffs.md`, 10,515 bytes |
 
@@ -1977,6 +1983,39 @@ clauses of a prompt body or the PE Metaprompt, each found by reading in this rou
 and 42 are not quotations: 21 spans between two
 quotations, 12 mention links and 9 diagram labels.
 
+### Nathan's decision on DC-R1 and DC-R2 (PO-6), and the repair it orders
+
+A successor to *Diff check (PL3)*, which stays as written. Nathan, 2026-10-07, on the plan at `ec91f04`, verbatim:
+
+> Nathan, PO-6: make both corrections, K-26 (DC-R1) and K-27 (DC-R2), as Diff check (PL3) states them, rerun the checks, and bring the plan back for approval. No review_cap override.
+
+It is not an approval of the plan: `plan_approved_by` stays empty, and the plan comes back to him at `PLANNED`.
+Without the override, no reviewer checks this repair (`D26-A` rule 2's cap stands); the session's own checks
+below are the only ones, and K-28 lists that.
+
+**The corrections, as *Diff check (PL3)* states them,** made by this session at 16:33Z, in `edits.json`'s new texts
+only; no anchor changed, and no edit was added or removed:
+
+| Finding | Edit | New text now |
+|---|---|---|
+| DC-R1 | G-FLOW-10-E47, S4's *When* cell | "or names an ineligible document to route;" |
+| DC-R2 | RECORD-10-E09, RECORD-20-E09, the role line | "an Epic's record and each other change, from PF10 or another source, that bears on PF20"; TW-RECORD-20: "a CRD's record and each other change, from PF10 or another source, that bears on the volume" |
+| DC-R2 | RECORD-10-E14, RECORD-20-E14, the output contract | "and each other change the sources require, from PF10 or another source, at the passage it bears on" |
+| DC-R2 | RECORD-10-E15, RECORD-20-E15, the Last Update Gate | "then, for each other source whose change the update carries, its filename alone, then, when the update carries or reconciles an applicable PF10 change," |
+
+**The checks, run again:**
+
+| Check | Result |
+|---|---|
+| `edits_check.py` on `edits.json`; then each of its eleven `--inject` faults | `PASS`, exit 0: 205 edits over eight members, the eight GTWPE-D1 items read from the decision record. Each fault exits 1 under its own code, 11 of 11 |
+| `edits.json` against its version at `ec91f04`, by script | Seven new texts changed, the seven above; no anchor and no other edit changed. "names an ineligible document" now stands only with "to route", in E40 and E47 |
+| Each changed passage, read whole with its new text in place, in the fetches of 14:38Z (GTWPE-FLOW-10) and 14:57Z (both record prompts), held in this session's context with no compaction since | Each reads as one rule: S4's cell and B1 step 5 stop the same triage file; each record prompt's role line, purpose, output contract and gate now name the same changes. E15 stays before the kept "`BN` and the version number of the PF10 file used" |
+| The two-sided check, for the rows the corrections touch | B1 step 5, S4 and F11 agree on "to route". A record pass given a change from another source makes it (E09, E10, E14) and names that source in the gate by its filename alone (E15), as *SECTION*'s last-update rule and B4's check 3 have it |
+| The two `gtwpe/` files and the control texts | Unchanged: GTWPE-D4 and *SECTION* already state the wider rule, and «HD» and «HT» stand |
+| Both record checks, on the record at `PLANNED` with this round in `reviews`; every table in §P; every quotation in §P | Both exit 0, at `PLANNED`; all 20 tables in §P are even. Of 249 quoted spans in §P, 170 are found by script in the repository or this record's evidence; 1 is Nathan's approval with an elision; 34 are kept clauses of a prompt body or the PE Metaprompt, each found by reading in this mode's fetches after the second compaction; 1 quotes the dry run; 1 is the phrase PDC-L7 finds missing; and 42 are not quotations: 21 spans between two quotations, 12 mention links and 9 diagram labels |
+
+«H» is the corrected `edits.json`'s sha256 (*Values fixed in this plan*). K-26 and K-27 are closed by this repair.
+
 ### Listed findings, accepted as risks (PL3)
 
 Not repaired, by `D26-A` rule 4; each goes to Nathan with its reason, and repairing one is his opt-in. Where both
@@ -2094,13 +2133,14 @@ refuted. Its two required findings, DC-R1 and DC-R2, are K-26 and K-27. Approvin
 
 ### Cost of this mode
 
-On the meter, from 12:17:03Z: about 3.7 h to PL4, against the estimate of about 10 h. The session's own tokens are not
+On the meter, from 12:17:03Z: about 3.8 h to this return, not counting the wait for Nathan's decision on PO-6, against the estimate of about 10 h. The session's own tokens are not
 measured: its meter shows none it can read without opening a file that holds a body. The harness's completion
 notices give its subagents' tokens: 647,816 for reviewer A, 629,535 for reviewer B and 559,942 for the checker.
 
-- **Review rounds so far:** three, as §A predicted: the dry run, the full review by two reviewers, and the one check of the repair's diff. A repair of DC-R1 and DC-R2 that Nathan orders would add a round, and a check of it another (PO-6).
-- **The prediction** stands at 11 (§A, *Readiness and interaction cost*); `EXECUTE` adds its merge at X2 and the
-  record's merge after X5, both counted there.
+- **Review rounds so far:** four: the dry run, the full review by two reviewers, the one check of the repair's diff, and the session's checks of the repair Nathan ordered (PO-6).
+- **The prediction** was 11 (§A, *Readiness and interaction cost*), with three `PLAN` rounds. Nathan's ordered
+  repair adds a fourth, as `D26-A` rule 4 prices a repair he opts in to, so `PLAN` runs one above it. `EXECUTE`
+  adds its merge at X2 and the record's merge after X5, both counted there.
 
 ### Canon and rulings relied on, for `PLAN`
 

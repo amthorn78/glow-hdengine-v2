@@ -432,7 +432,7 @@
           "rule": "R2",
           "shared": null,
           "old": "A canon conflict; a question a pass asks; a held-back PF10 change, or a pass that took one as a basis; a PF30 rollover without his decision; an ineligible target the execution prompt names; a document that would need two pass chains;",
-          "new": "A canon conflict; a question a pass asks; a pass that took a held-back change as a basis; a PF30 rollover without his decision; a triage pass's error, or a triage file that leaves a change unaccounted for, omits a source it was given, or names an ineligible document; a document that would need two pass chains;",
+          "new": "A canon conflict; a question a pass asks; a pass that took a held-back change as a basis; a PF30 rollover without his decision; a triage pass's error, or a triage file that leaves a change unaccounted for, omits a source it was given, or names an ineligible document to route; a document that would need two pass chains;",
           "blocks": false
         },
         {
@@ -1484,7 +1484,7 @@
           "rule": "R4",
           "shared": null,
           "old": "Nathan supplies the approved Epic specification and required supporting inputs for the actual PF20 destination. This role terminates with the updated PF20 file and its proof log; TW-RECORD-20 separately serves CRD history in PF30.",
-          "new": "Its inputs are files: the approved specification, the other sources, and, for an Epic's record, the evidence of the Epic's completed or historical posture. This role makes every change a run makes to PF20, an Epic's record and the PF10 changes that bear on PF20, and terminates with the updated PF20 file and its proof log, or with the exact no-change result; TW-RECORD-20 separately serves CRD history in PF30.",
+          "new": "Its inputs are files: the approved specification, the other sources, and, for an Epic's record, the evidence of the Epic's completed or historical posture. This role makes every change a run makes to PF20, an Epic's record and each other change, from PF10 or another source, that bears on PF20, and terminates with the updated PF20 file and its proof log, or with the exact no-change result; TW-RECORD-20 separately serves CRD history in PF30.",
           "blocks": false
         },
         {
@@ -1529,7 +1529,7 @@
           "rule": "R4",
           "shared": null,
           "old": "with the complete entry inserted once, at the place the target's established record order requires, by an exact insertion. Never regenerate or rewrite the document: every other byte is preserved, and only the document-control fields below change.",
-          "new": "with each change made by an exact edit: the complete entry inserted once, at the place the target's established record order requires, or the existing entry updated in place, and each applicable PF10 change at the passage it bears on. Never regenerate or rewrite the document: every other byte is preserved, and only those changes and the document-control fields below change.",
+          "new": "with each change made by an exact edit: the complete entry inserted once, at the place the target's established record order requires, or the existing entry updated in place, and each other change the sources require, from PF10 or another source, at the passage it bears on. Never regenerate or rewrite the document: every other byte is preserved, and only those changes and the document-control fields below change.",
           "blocks": false
         },
         {
@@ -1538,7 +1538,7 @@
           "rule": "R4",
           "shared": null,
           "old": "the approved specification's filename, then, when the entry reconciles an applicable PF10 change,",
-          "new": "the approved specification's filename when the update makes or changes a record, then, when the update carries or reconciles an applicable PF10 change,",
+          "new": "the approved specification's filename when the update makes or changes a record, then, for each other source whose change the update carries, its filename alone, then, when the update carries or reconciles an applicable PF10 change,",
           "blocks": false
         },
         {
@@ -1692,7 +1692,7 @@
           "rule": "R4",
           "shared": null,
           "old": "Nathan supplies the approved CRD specification, actual approval evidence and required supporting inputs for PF30. This role terminates with the updated PF30 file and its proof log; TW-RECORD-10 separately serves Epic history in PF20.",
-          "new": "Its inputs are files: the approved specification, the other sources, and, for a CRD's record, the CRD's actual approval evidence. This role makes every change a run makes to a PF30 volume, a CRD's record and the PF10 changes that bear on the volume, and terminates with the updated PF30 file and its proof log, or with the exact no-change result; TW-RECORD-10 separately serves Epic history in PF20.",
+          "new": "Its inputs are files: the approved specification, the other sources, and, for a CRD's record, the CRD's actual approval evidence. This role makes every change a run makes to a PF30 volume, a CRD's record and each other change, from PF10 or another source, that bears on the volume, and terminates with the updated PF30 file and its proof log, or with the exact no-change result; TW-RECORD-10 separately serves Epic history in PF20.",
           "blocks": false
         },
         {
@@ -1737,7 +1737,7 @@
           "rule": "R4",
           "shared": null,
           "old": "with the complete record inserted once, at the place the volume's record order requires, by an exact insertion. Never regenerate or rewrite the document: every other byte is preserved, and only the document-control fields below change.",
-          "new": "with each change made by an exact edit: the complete record inserted once, at the place the volume's record order requires, or the existing record updated in place, and each applicable PF10 change at the passage it bears on. Never regenerate or rewrite the document: every other byte is preserved, and only those changes and the document-control fields below change.",
+          "new": "with each change made by an exact edit: the complete record inserted once, at the place the volume's record order requires, or the existing record updated in place, and each other change the sources require, from PF10 or another source, at the passage it bears on. Never regenerate or rewrite the document: every other byte is preserved, and only those changes and the document-control fields below change.",
           "blocks": false
         },
         {
@@ -1746,7 +1746,7 @@
           "rule": "R4",
           "shared": null,
           "old": "the approved specification's filename, then, when the record reconciles an applicable PF10 change,",
-          "new": "the approved specification's filename when the update makes or changes a record, then, when the update carries or reconciles an applicable PF10 change,",
+          "new": "the approved specification's filename when the update makes or changes a record, then, for each other source whose change the update carries, its filename alone, then, when the update carries or reconciles an applicable PF10 change,",
           "blocks": false
         },
         {
