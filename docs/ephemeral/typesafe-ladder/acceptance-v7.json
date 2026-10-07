@@ -1,0 +1,615 @@
+{
+ "version": "v7",
+ "part_a": [
+  {
+   "label": "A1 Record given results",
+   "action": "Paste the build number and the reviewer's one-word verdict, both already given, into the release notes table.",
+   "expect_level": [
+    "low"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "note": ""
+  },
+  {
+   "label": "A2 One documented setting",
+   "action": "Change one setting in one configuration file exactly as the issue spells it out, then run the existing tests and report the result.",
+   "expect_level": [
+    "low",
+    "medium"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "note": ""
+  },
+  {
+   "label": "A3 Listed repairs on a reviewed client",
+   "action": "Mobile app sync client, already reviewed once: the reviewer listed four defects with their locations; repair each one and prove it with a new test, then hand back for a final review before merge.",
+   "expect_level": [
+    "high",
+    "extra high"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "note": ""
+  },
+  {
+   "label": "A4 Check of a follow-up commit",
+   "action": "Data pipeline already reviewed once: check the follow-up commit that claims to repair three listed defects, confirming that each repair is real and covered by a test, before it is merged.",
+   "expect_level": [
+    "high",
+    "extra high"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "note": ""
+  },
+  {
+   "label": "A5 First look at a large new system",
+   "action": "Look over a newly written job scheduler of about 9,000 lines that nothing has examined yet; the billing and notification systems will be built on top of it.",
+   "expect_level": [
+    "max"
+   ],
+   "expect_ultracode": null,
+   "expect_model": "Fable 5.1",
+   "note": "ultracode undecided by the request text (one system, but large); the model Choice names this case under most_capable_model"
+  },
+  {
+   "label": "A6 First live run on real cards",
+   "action": "Switch the new refund code on for real customers' cards at the payment processor for the first time; it has only ever run against test fixtures.",
+   "expect_level": [
+    "max"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Fable 5.1",
+   "note": "the model Choice names a first run of new code against a live external service under most_capable_model; the Noul false list names a live run carried out step by step"
+  },
+  {
+   "label": "A7 Endpoint-by-endpoint check",
+   "action": "Before the public beta, check each of the 62 REST endpoints in the published API reference against its route handler, parameters and error codes, endpoint by endpoint.",
+   "expect_level": [
+    "high",
+    "extra high",
+    "max"
+   ],
+   "expect_ultracode": true,
+   "expect_model": null,
+   "note": ""
+  },
+  {
+   "label": "A8 Mechanical conversion of many modules",
+   "action": "Convert the 240 test modules from unittest classes to plain pytest functions following the migration note, and confirm that each module's tests still collect and pass.",
+   "expect_level": [
+    "low",
+    "medium",
+    "high"
+   ],
+   "expect_ultracode": true,
+   "expect_model": "Opus 5.5",
+   "note": "tests that ultracode can be read below the top levels"
+  },
+  {
+   "label": "A9 Cause that two fixes missed",
+   "action": "A scheduler sometimes runs the same nightly invoice twice, and two fixes already deployed did not stop it; find the underlying cause.",
+   "expect_level": [
+    "max"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Fable 5.1",
+   "note": ""
+  },
+  {
+   "label": "A10 Licence survey of many packages",
+   "action": "Gather the open-source licence of each of the 180 third-party packages in the lockfile from its own repository and flag any that forbid commercial use.",
+   "expect_level": [
+    "low",
+    "medium",
+    "high"
+   ],
+   "expect_ultracode": true,
+   "expect_model": "Opus 5.5",
+   "note": ""
+  },
+  {
+   "label": "A11 Conflicting legal sources",
+   "action": "Advise whether the app may keep users' location history, weighing two national privacy laws and a platform policy that disagree; no lawyer reviews the answer.",
+   "expect_level": [
+    "extra high",
+    "max"
+   ],
+   "expect_ultracode": false,
+   "expect_model": null,
+   "note": "out-of-frame generalisation case: not a coding session"
+  },
+  {
+   "label": "A12 Name suggestions",
+   "action": "Suggest five possible names for a new profile feature for the team to choose from.",
+   "expect_level": [
+    "low",
+    "medium"
+   ],
+   "expect_ultracode": false,
+   "expect_model": "Opus 5.5",
+   "note": "out-of-frame generalisation case: not a coding session"
+  }
+ ],
+ "part_b": [
+  {
+   "label": "M02-C1 correction session (PR18 review findings)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "02bb58be9065443d26f4671d0a6f6a7527dc98f5ed1db3e3a46b8c4fcc277e0b",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "M02-I1 implementation session (PR18)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": true,
+   "action_sha256": "03a9473da70b03a0b83600d782f4203f1136fadb649bdc4ea2da0c3a4cf8d27e",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "M02 delta review of PR18's final head (5e3fb2f against ccebd1b)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "82f67d854e57729051234a023a3c40abfcc201d7174c6a3d3a0fd96733a3b82c",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "M02 exact-head code and security review (PR18 @ ccebd1b)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "5b08eae2cbb260b5e1f6ab75e9380b79fd08542b196545c4c459db31165609ac",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-I1 exact-head code and security review (code head 9ff600f)",
+   "pick_cell": "Opus 5.5 at max",
+   "pick_model": "Opus 5.5",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "max"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": true,
+   "action_sha256": "004b314b239455d57d7ab03dd66014b1188e09ac0a11b43261a357f9521c38d6",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-I1 implementation session (Stream sandbox harness and bypass matrix)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": true,
+   "action_sha256": "2c835cb6051b1f1d4f3961728c81841ad264cd3978e5c087b22a61bca3b06b07",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-I2a revocation and safety, live",
+   "pick_cell": "Opus 5.5 at max",
+   "pick_model": "Opus 5.5",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "max"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": true,
+   "action_sha256": "d5803e078b9a83914c1154bbbc74fa11adb681d4c009ed2917e7ac955122739c",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C2 second offline correction pass on the harness",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "8411edb0447b653e47673043b8134b9af7ee4126cdce8dc5005a671137970440",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1 flake fix exact-head review (code head 8b8b1bd)",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "1fcb8ebac37955466d73f7b43038ddf09e585cfd00b53c842bd96f0eaf1dba5c",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C3 third offline correction pass on the harness",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "f4e3baddad2e8520a936071b07db7768cbeb8838e685188f1cdbd6c6c70f0de3",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C2 exact-head review (merge commit 63e922f)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "b24ffc97576e0d1b0ecffc8b1b99c442592746ab91bc875afa68d33933f4269d",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C3 exact-head review (merge commit 8c1a8c0)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "cee85e3a061d0bb90f42bf4627fae5aee49de63e3dcc24e3fe9adf81e06cb44a",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C1 offline correction pass on the I1 harness",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": true,
+   "action_sha256": "0962f247a0df099d2499243df698523b34ea7138a1491d2c40f97b2cc02db01a",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-I2a exact-head review (merge commit 6a51dae)",
+   "pick_cell": "Fable 5.1 at extra high",
+   "pick_model": "Fable 5.1",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": true,
+   "action_sha256": "3ff3fbfc656fae2c38b39d799fbc1460f2e029f11c0c6740127042106c335002",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C1 exact-head review (merge commit e85bba0)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "0b4aed3714096a70bd6ac67fc941f987dcba306e6cf72e7e7c66e8b1208f6bb8",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-I2b implementation (revision 2; revision 1 read by DM-05)",
+   "pick_cell": "Fable 5.1 at extra high",
+   "pick_model": "Fable 5.1",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": true,
+   "action_sha256": "15087e84c8add46118f9bbbe231c7ac51124a8b505b900a5937cee9859e3833c",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-I2b exact-head review (merge commit 55b2238)",
+   "pick_cell": "Fable 5.1 at max",
+   "pick_model": "Fable 5.1",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "max"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": false,
+   "action_sha256": "b54194c35b2fa5a6c6dc392f3fb9879d208adbff7edcb18857a743ef69564902",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "App Manager 4 (manager session, created by App Manager 3)",
+   "pick_cell": "Fable 5.1 at extra high",
+   "pick_model": "Fable 5.1",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": true,
+   "action_sha256": "4c6075b7abf43a9edb25c61d11aaa05d31a3fb02e1c96277ef1e56fa007162ff",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C4 fourth offline correction pass on the harness",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "01a99744c33dc8e85318f95f3b7e2766807fcf55872257b88ea3be1f910f89ad",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C5 fifth offline correction pass on the harness",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "c0a4153e4a384ba32ffcdca4caac72949c7cbf270cc407179056311d59ac4fdf",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.1-C5 exact-head review (C5's head 1a5f58a)",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "ac84ac950087c83c0295cc92cbe5154d6f3268572bfef085af68967c0346ef3b",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.DB implementation (revision 1)",
+   "pick_cell": "Fable 5.1 at ultracode",
+   "pick_model": "Fable 5.1",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "extra high",
+    "max"
+   ],
+   "pick_ultracode": true,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": true,
+   "note": "Nathan's words: 'Fable Max Ultracode'. Level run: max per his words; extra high if launched with --effort ultracode or on Claude Code before v2.1.284. The v7 Noul false list names a plan-driven implementation, so v7 may read ultracode off here; reported only.",
+   "action_sha256": "60946c78250b4c8dfd38abff9228b2d12b634469f029e4e388db401596b6b1a1",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.DB exact-head review",
+   "pick_cell": "Fable 5.1 at max",
+   "pick_model": "Fable 5.1",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "max"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": false,
+   "action_sha256": "3ed0a32c36f8d3267ede5f77736b37fd9949c72f662d929cb028be24bcd91de1",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.DB-C1 correction pass",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "96e1831e12644dbf52a2d9726a3405f0822749ae86d347e88d8bdba47a33a734",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.DB-C1 exact-head review, revision 2",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "e822caaa11b8d86b717aedd60f07ce33cd4a54a144708e9fa4d1cbde746951d2",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.DB-C2 exact-head review",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "e10de9168540c3147c3854c73102f7c3ac7471f3973293eae0e1f75096b22fe1",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.2 Stage A implementation",
+   "pick_cell": "Opus 5.5 at extra high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "3274d60ced3657c6d09e824c2d4d67f6f21343f4e18d2db49a7c222b7e084744",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.2 Stage A exact-head review",
+   "pick_cell": "Fable 5.1 at max",
+   "pick_model": "Fable 5.1",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "max"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": false,
+   "action_sha256": "8c4940b518d880bbdaa221f70165ac3d2851c8e9c0ee6054f04c137d55b82d90",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.2 Stage B1 implementation",
+   "pick_cell": "Fable 5.1 at extra high",
+   "pick_model": "Fable 5.1",
+   "pick_level": "extra high",
+   "pick_level_exact_set": [
+    "extra high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Fable 5.1 at extra high",
+   "override_of_v6": false,
+   "action_sha256": "dc8ab41d78e0a2e99a63166cd10e11b1ba1ce8cc7e269c60798e99b1ef37a50f",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.2 Stage B1 exact-head review",
+   "pick_cell": "Fable 5.1 at max",
+   "pick_model": "Fable 5.1",
+   "pick_level": "max",
+   "pick_level_exact_set": [
+    "max"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": false,
+   "v6_cell": "Fable 5.1 at max",
+   "override_of_v6": false,
+   "action_sha256": "19a552ca7bbd52c6ccd0140c1273abf672561623f136f5fddc2328a2b890b12b",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  },
+  {
+   "label": "P06.2 Stage B1-C1 correction",
+   "pick_cell": "Opus 5.5 at high",
+   "pick_model": "Opus 5.5",
+   "pick_level": "high",
+   "pick_level_exact_set": [
+    "high"
+   ],
+   "pick_ultracode": false,
+   "ultracode_gated": true,
+   "v6_cell": "Opus 5.5 at high",
+   "override_of_v6": false,
+   "action_sha256": "eed69a93ac9f52e34a77929bd987492f23a331438038651c1a30471f9bd13cd9",
+   "action_source": "Notes of this Step's row in the Notion uses table collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e ('Action sent ...'); private, not published here"
+  }
+ ],
+ "gates": {
+  "A": "At least 11 of the 12 cases meet every stated expectation (level in the set; ultracode where stated; model where stated); every case expecting ultracode on (A7, A8, A10) reads on; every case expecting Fable 5.1 (A5, A6, A9) reads Fable 5.1.",
+  "B_effort": "The level equals Nathan's picked level on at least 24 of the 31 texts (for the P06.DB implementation, extra high or max counts as equal), and is within one level on at least 30 of 31.",
+  "B_model": "The model equals Nathan's pick on at least 26 of 31, including at least 6 of his 9 Fable 5.1 picks and at least 18 of his 22 Opus 5.5 picks.",
+  "B_ultracode": "Ultracode reads off on at least 19 of the 20 texts the request's ultracode 'false' list plainly covers (ultracode_gated true: listed correction passes, reviews of one correction or change, and plan-driven implementations). The other 11 texts, including the P06.DB implementation that Nathan ran with ultracode, are reported, not gated.",
+  "B_report": "The 9 texts where Nathan's pick differed from the v6 reading he saw (override_of_v6 true) are reported separately. Part B tests agreement with picks Nathan made after seeing v6 readings; it is a no-regression check, not proof of correctness.",
+  "C": "Part A is read twice; the largest run-to-run differences in effort score, P(ultracode) and P(Fable 5.1), and how many cells changed, are reported, not gated.",
+  "overall": "v7 is accepted when gates A, B_effort, B_model and B_ultracode all pass on run 1. If any fails, one revision (v7.1) is allowed, run on the same cases and marked as fitted to them; if v7.1 also fails, Nathan decides."
+ },
+ "part_b_texts_note": "The 31 action texts come from Nathan's private Notion uses table and are not published in this public repository. Each row carries the SHA-256 of the exact UTF-8 text sent; the run verifies every text against it before sending."
+}

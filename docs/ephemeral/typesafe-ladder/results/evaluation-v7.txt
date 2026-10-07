@@ -1,0 +1,73 @@
+== v7 cases, run 1
+PASS A1 Record given results: Opus 5.5 at low | effort 0.01 {'low': 0.99, 'medium': 0.01, 'high': 0.0, 'extra high': 0.0, 'max': 0.0} | P(ultra) 0.03 | P(Fable) 0.00
+PASS A2 One documented setting: Opus 5.5 at medium | effort 0.97 {'low': 0.05, 'medium': 0.93, 'high': 0.01, 'extra high': 0.0, 'max': 0.0} | P(ultra) 0.04 | P(Fable) 0.01
+PASS A3 Listed repairs on a reviewed client: Opus 5.5 at high | effort 1.90 {'low': 0.0, 'medium': 0.11, 'high': 0.88, 'extra high': 0.01, 'max': 0.0} | P(ultra) 0.09 | P(Fable) 0.00
+PASS A4 Check of a follow-up commit: Opus 5.5 at high | effort 2.02 {'low': 0.0, 'medium': 0.05, 'high': 0.88, 'extra high': 0.07, 'max': 0.0} | P(ultra) 0.09 | P(Fable) 0.00
+PASS A5 First look at a large new system: Fable 5.1 at max | effort 3.99 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.0, 'max': 1.0} | P(ultra) 0.39 | P(Fable) 0.97
+PASS A6 First live run on real cards: Fable 5.1 at max | effort 4.00 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.0, 'max': 1.0} | P(ultra) 0.10 | P(Fable) 0.99
+PASS A7 Endpoint-by-endpoint check: Opus 5.5 at extra high with ultracode | effort 2.96 {'low': 0.0, 'medium': 0.02, 'high': 0.3, 'extra high': 0.37, 'max': 0.31} | P(ultra) 0.77 | P(Fable) 0.09
+PASS A8 Mechanical conversion of many modules: Opus 5.5 at high with ultracode | effort 1.80 {'low': 0.01, 'medium': 0.45, 'high': 0.27, 'extra high': 0.26, 'max': 0.01} | P(ultra) 0.75 | P(Fable) 0.03
+PASS A9 Cause that two fixes missed: Fable 5.1 at max | effort 3.96 {'low': 0.0, 'medium': 0.0, 'high': 0.01, 'extra high': 0.01, 'max': 0.98} | P(ultra) 0.15 | P(Fable) 0.99
+PASS A10 Licence survey of many packages: Opus 5.5 at high with ultracode | effort 2.43 {'low': 0.06, 'medium': 0.13, 'high': 0.31, 'extra high': 0.32, 'max': 0.18} | P(ultra) 0.83 | P(Fable) 0.05
+PASS A11 Conflicting legal sources: Opus 5.5 at extra high | effort 3.25 {'low': 0.0, 'medium': 0.01, 'high': 0.05, 'extra high': 0.61, 'max': 0.33} | P(ultra) 0.12 | P(Fable) 0.33
+PASS A12 Name suggestions: Opus 5.5 at low | effort 0.16 {'low': 0.85, 'medium': 0.14, 'high': 0.01, 'extra high': 0.0, 'max': 0.0} | P(ultra) 0.10 | P(Fable) 0.04
+Gate A: 12/12 cases pass (need 11); ultracode-on cases all on: True (A7, A8, A10); Fable cases all Fable: True (A5, A6, A9) -> PASS
+Part C (noise, reported): same cell on 11/12; max |d effort score| 0.23; max |d P(ultracode)| 0.01; max |d P(Fable)| 0.03; run 2 cases passing: 11/12
+== Part B: 31 recorded texts with Nathan's picks
+  [gated-off] M02-C1 correction session (PR18 review findings)           pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.57 {'low': 0.0, 'medium': 0.01, 'high': 0.46, 'extra high': 0.48, 'max': 0.05} | P(ultra) 0.09 | P(Fable) 0.13
+  [gated-off] M02-I1 implementation session (PR18)                       pick Opus 5.5 at extra high   | v7 Opus 5.5 at high | effort 1.88 {'low': 0.0, 'medium': 0.27, 'high': 0.59, 'extra high': 0.13, 'max': 0.01} | P(ultra) 0.10 | P(Fable) 0.03
+  [gated-off] M02 delta review of PR18's final head (5e3fb2f against cce pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 3.03 {'low': 0.0, 'medium': 0.0, 'high': 0.01, 'extra high': 0.96, 'max': 0.03} | P(ultra) 0.15 | P(Fable) 0.31
+  [gated-off] M02 exact-head code and security review (PR18 @ ccebd1b)   pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 3.29 {'low': 0.0, 'medium': 0.0, 'high': 0.1, 'extra high': 0.5, 'max': 0.4} | P(ultra) 0.20 | P(Fable) 0.33
+  [override ] P06.1-I1 exact-head code and security review (code head 9f pick Opus 5.5 at max          | v7 Fable 5.1 at max | effort 3.99 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.01, 'max': 0.99} | P(ultra) 0.23 | P(Fable) 0.97
+  [override ] P06.1-I1 implementation session (Stream sandbox harness an pick Opus 5.5 at extra high   | v7 Fable 5.1 at max | effort 3.97 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.02, 'max': 0.98} | P(ultra) 0.15 | P(Fable) 0.97
+  [override ] P06.1-I2a revocation and safety, live                      pick Opus 5.5 at max          | v7 Fable 5.1 at max | effort 3.98 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.01, 'max': 0.99} | P(ultra) 0.13 | P(Fable) 0.93
+  [gated-off] P06.1-C2 second offline correction pass on the harness     pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.18 {'low': 0.0, 'medium': 0.05, 'high': 0.72, 'extra high': 0.23, 'max': 0.0} | P(ultra) 0.06 | P(Fable) 0.01
+  [gated-off] P06.1 flake fix exact-head review (code head 8b8b1bd)      pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.10 {'low': 0.0, 'medium': 0.12, 'high': 0.66, 'extra high': 0.22, 'max': 0.0} | P(ultra) 0.06 | P(Fable) 0.04
+  [gated-off] P06.1-C3 third offline correction pass on the harness      pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.27 {'low': 0.0, 'medium': 0.04, 'high': 0.65, 'extra high': 0.31, 'max': 0.0} | P(ultra) 0.07 | P(Fable) 0.01
+  [gated-off] P06.1-C2 exact-head review (merge commit 63e922f)          pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.70 {'low': 0.0, 'medium': 0.01, 'high': 0.29, 'extra high': 0.7, 'max': 0.0} | P(ultra) 0.08 | P(Fable) 0.03
+  [gated-off] P06.1-C3 exact-head review (merge commit 8c1a8c0)          pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.68 {'low': 0.0, 'medium': 0.01, 'high': 0.31, 'extra high': 0.67, 'max': 0.01} | P(ultra) 0.07 | P(Fable) 0.02
+  [gated-off] P06.1-C1 offline correction pass on the I1 harness         pick Opus 5.5 at extra high   | v7 Opus 5.5 at high | effort 2.20 {'low': 0.0, 'medium': 0.03, 'high': 0.74, 'extra high': 0.23, 'max': 0.0} | P(ultra) 0.08 | P(Fable) 0.01
+  [override ] P06.1-I2a exact-head review (merge commit 6a51dae)         pick Fable 5.1 at extra high  | v7 Fable 5.1 at max | effort 3.90 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.09, 'max': 0.91} | P(ultra) 0.12 | P(Fable) 0.69
+  [gated-off] P06.1-C1 exact-head review (merge commit e85bba0)          pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.58 {'low': 0.0, 'medium': 0.01, 'high': 0.41, 'extra high': 0.57, 'max': 0.01} | P(ultra) 0.10 | P(Fable) 0.02
+  [override ] P06.1-I2b implementation (revision 2; revision 1 read by D pick Fable 5.1 at extra high  | v7 Fable 5.1 at max | effort 3.99 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.0, 'max': 1.0} | P(ultra) 0.12 | P(Fable) 0.99
+  [reported ] P06.1-I2b exact-head review (merge commit 55b2238)         pick Fable 5.1 at max         | v7 Fable 5.1 at max | effort 3.71 {'low': 0.0, 'medium': 0.0, 'high': 0.01, 'extra high': 0.27, 'max': 0.72} | P(ultra) 0.12 | P(Fable) 0.54
+  [override ] App Manager 4 (manager session, created by App Manager 3)  pick Fable 5.1 at extra high  | v7 Opus 5.5 at extra high | effort 2.88 {'low': 0.0, 'medium': 0.01, 'high': 0.21, 'extra high': 0.67, 'max': 0.11} | P(ultra) 0.12 | P(Fable) 0.30
+  [gated-off] P06.1-C4 fourth offline correction pass on the harness     pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.07 {'low': 0.0, 'medium': 0.07, 'high': 0.79, 'extra high': 0.14, 'max': 0.0} | P(ultra) 0.09 | P(Fable) 0.01
+  [gated-off] P06.1-C5 fifth offline correction pass on the harness      pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.00 {'low': 0.0, 'medium': 0.06, 'high': 0.88, 'extra high': 0.06, 'max': 0.0} | P(ultra) 0.06 | P(Fable) 0.00
+  [gated-off] P06.1-C5 exact-head review (C5's head 1a5f58a)             pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.94 {'low': 0.0, 'medium': 0.0, 'high': 0.1, 'extra high': 0.85, 'max': 0.05} | P(ultra) 0.09 | P(Fable) 0.10
+  [override ] P06.DB implementation (revision 1)                         pick Fable 5.1 at ultracode   | v7 Fable 5.1 at max | effort 3.67 {'low': 0.0, 'medium': 0.0, 'high': 0.03, 'extra high': 0.27, 'max': 0.7} | P(ultra) 0.13 | P(Fable) 0.88
+  [reported ] P06.DB exact-head review                                   pick Fable 5.1 at max         | v7 Fable 5.1 at max | effort 3.96 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.02, 'max': 0.98} | P(ultra) 0.31 | P(Fable) 0.95
+  [gated-off] P06.DB-C1 correction pass                                  pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.13 {'low': 0.0, 'medium': 0.03, 'high': 0.81, 'extra high': 0.16, 'max': 0.0} | P(ultra) 0.07 | P(Fable) 0.01
+  [gated-off] P06.DB-C1 exact-head review, revision 2                    pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.69 {'low': 0.0, 'medium': 0.02, 'high': 0.28, 'extra high': 0.7, 'max': 0.0} | P(ultra) 0.08 | P(Fable) 0.02
+  [gated-off] P06.DB-C2 exact-head review                                pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 2.74 {'low': 0.0, 'medium': 0.01, 'high': 0.28, 'extra high': 0.67, 'max': 0.04} | P(ultra) 0.10 | P(Fable) 0.06
+  [gated-off] P06.2 Stage A implementation                               pick Opus 5.5 at extra high   | v7 Opus 5.5 at extra high | effort 3.37 {'low': 0.0, 'medium': 0.0, 'high': 0.01, 'extra high': 0.6, 'max': 0.39} | P(ultra) 0.11 | P(Fable) 0.49
+  [reported ] P06.2 Stage A exact-head review                            pick Fable 5.1 at max         | v7 Fable 5.1 at max | effort 3.96 {'low': 0.0, 'medium': 0.0, 'high': 0.01, 'extra high': 0.02, 'max': 0.97} | P(ultra) 0.12 | P(Fable) 0.98
+  [gated-off] P06.2 Stage B1 implementation                              pick Fable 5.1 at extra high  | v7 Fable 5.1 at extra high | effort 3.02 {'low': 0.0, 'medium': 0.0, 'high': 0.04, 'extra high': 0.89, 'max': 0.07} | P(ultra) 0.09 | P(Fable) 0.55
+  [reported ] P06.2 Stage B1 exact-head review                           pick Fable 5.1 at max         | v7 Fable 5.1 at max | effort 3.64 {'low': 0.0, 'medium': 0.0, 'high': 0.0, 'extra high': 0.35, 'max': 0.65} | P(ultra) 0.12 | P(Fable) 0.96
+  [gated-off] P06.2 Stage B1-C1 correction                               pick Opus 5.5 at high         | v7 Opus 5.5 at high | effort 2.04 {'low': 0.0, 'medium': 0.09, 'high': 0.78, 'extra high': 0.13, 'max': 0.0} | P(ultra) 0.07 | P(Fable) 0.01
+Gate B_effort: exact 26/31 (need 24), within one level 31/31 (need 30) -> PASS
+Gate B_model: same model 27/31 (need 26); Fable picks 8/9 (need 6); Opus picks 19/22 (need 18) -> PASS
+Gate B_ultracode: off on 20/20 gated texts (need 19) -> PASS
+Reported, not gated: ultracode on the other texts
+  P06.1-I1 exact-head code and security review (code head 9f pick Opus 5.5 at max          | P(ultra) 0.23 | off
+  P06.1-I1 implementation session (Stream sandbox harness an pick Opus 5.5 at extra high   | P(ultra) 0.15 | off
+  P06.1-I2a revocation and safety, live                      pick Opus 5.5 at max          | P(ultra) 0.13 | off
+  P06.1-I2a exact-head review (merge commit 6a51dae)         pick Fable 5.1 at extra high  | P(ultra) 0.12 | off
+  P06.1-I2b implementation (revision 2; revision 1 read by D pick Fable 5.1 at extra high  | P(ultra) 0.12 | off
+  P06.1-I2b exact-head review (merge commit 55b2238)         pick Fable 5.1 at max         | P(ultra) 0.12 | off
+  App Manager 4 (manager session, created by App Manager 3)  pick Fable 5.1 at extra high  | P(ultra) 0.12 | off
+  P06.DB implementation (revision 1)                         pick Fable 5.1 at ultracode   | P(ultra) 0.13 | off
+  P06.DB exact-head review                                   pick Fable 5.1 at max         | P(ultra) 0.31 | off
+  P06.2 Stage A exact-head review                            pick Fable 5.1 at max         | P(ultra) 0.12 | off
+  P06.2 Stage B1 exact-head review                           pick Fable 5.1 at max         | P(ultra) 0.12 | off
+Reported, not gated: the 9 texts where Nathan overrode the v6 reading
+  M02-I1 implementation session (PR18)                       v6 Opus 5.5 at high         pick Opus 5.5 at extra high   v7 Opus 5.5 at high
+  P06.1-I1 exact-head code and security review (code head 9f v6 Fable 5.1 at max         pick Opus 5.5 at max          v7 Fable 5.1 at max
+  P06.1-I1 implementation session (Stream sandbox harness an v6 Fable 5.1 at max         pick Opus 5.5 at extra high   v7 Fable 5.1 at max
+  P06.1-I2a revocation and safety, live                      v6 Fable 5.1 at max         pick Opus 5.5 at max          v7 Fable 5.1 at max
+  P06.1-C1 offline correction pass on the I1 harness         v6 Opus 5.5 at high         pick Opus 5.5 at extra high   v7 Opus 5.5 at high
+  P06.1-I2a exact-head review (merge commit 6a51dae)         v6 Fable 5.1 at max         pick Fable 5.1 at extra high  v7 Fable 5.1 at max
+  P06.1-I2b implementation (revision 2; revision 1 read by D v6 Fable 5.1 at max         pick Fable 5.1 at extra high  v7 Fable 5.1 at max
+  App Manager 4 (manager session, created by App Manager 3)  v6 Opus 5.5 at extra high   pick Fable 5.1 at extra high  v7 Opus 5.5 at extra high
+  P06.DB implementation (revision 1)                         v6 Fable 5.1 at max         pick Fable 5.1 at ultracode   v7 Fable 5.1 at max
+OVERALL: ACCEPTED {'A': True, 'B_effort': True, 'B_model': True, 'B_ultracode': True}

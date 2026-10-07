@@ -1,0 +1,74 @@
+[
+ {
+  "label": "GTWPE-FLOW-10 first live run: HDE-EPIC040 drain",
+  "version": "v7",
+  "session": "implementation",
+  "action": "First live run of a new documentation-workflow prompt in a fresh session: from an approved 65 KB epic specification and about 30 addenda for that epic in a 490 KB build-notes file, it decides which of 22 eligible governance documents the change affects (the addenda name at least five drain targets, three of them 580 to 660 KB), then runs a written drain-then-apply procedure on each affected document as a separate unit with its own proof log, a fresh-reviewer cross-document consistency check and per-document completion checks. It writes only review drafts to its own branch and pull request, makes no live calls to external providers, and the Product Owner reviews the drafts before anything becomes canon.",
+  "sent_utc": "2026-10-07T03:33:19Z",
+  "latency_s": 0.63,
+  "response_model": "jev-1.13.0",
+  "usage": {
+   "input_tokens": 4376,
+   "output_tokens": 73
+  },
+  "effort_score": 3.07,
+  "effort_confidence": 0.49,
+  "level_probabilities": {
+   "low": 0.0,
+   "medium": 0.01,
+   "high": 0.25,
+   "extra high": 0.4,
+   "max": 0.34
+  },
+  "level": "extra high",
+  "modal_level": "extra high",
+  "runner_up_level": "max",
+  "effort_boundary": true,
+  "p_ultracode": 0.46,
+  "ultracode": false,
+  "ultracode_near_tie": true,
+  "model_probabilities": {
+   "Fable 5.1": 0.32,
+   "Opus 5.5": 0.68
+  },
+  "model_confidence": 0.36,
+  "model": "Opus 5.5",
+  "model_near_tie": false,
+  "rung": "extra high",
+  "cell": "Opus 5.5 at extra high",
+  "rung_probabilities": {
+   "low": 0.0,
+   "low with ultracode": 0.0,
+   "medium": 0.01,
+   "medium with ultracode": 0.0,
+   "high": 0.14,
+   "high with ultracode": 0.12,
+   "extra high": 0.22,
+   "extra high with ultracode": 0.18,
+   "max": 0.18,
+   "max with ultracode": 0.16
+  },
+  "cell_probabilities": {
+   "Opus 5.5 at low": 0.0,
+   "Opus 5.5 at low with ultracode": 0.0,
+   "Opus 5.5 at medium": 0.004,
+   "Opus 5.5 at medium with ultracode": 0.003,
+   "Opus 5.5 at high": 0.092,
+   "Opus 5.5 at high with ultracode": 0.078,
+   "Opus 5.5 at extra high": 0.147,
+   "Opus 5.5 at extra high with ultracode": 0.125,
+   "Opus 5.5 at max": 0.125,
+   "Opus 5.5 at max with ultracode": 0.106,
+   "Fable 5.1 at low": 0.0,
+   "Fable 5.1 at low with ultracode": 0.0,
+   "Fable 5.1 at medium": 0.002,
+   "Fable 5.1 at medium with ultracode": 0.001,
+   "Fable 5.1 at high": 0.043,
+   "Fable 5.1 at high with ultracode": 0.037,
+   "Fable 5.1 at extra high": 0.069,
+   "Fable 5.1 at extra high with ultracode": 0.059,
+   "Fable 5.1 at max": 0.059,
+   "Fable 5.1 at max with ultracode": 0.05
+  }
+ }
+]
