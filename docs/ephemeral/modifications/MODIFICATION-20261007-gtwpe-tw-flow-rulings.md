@@ -2194,3 +2194,132 @@ merges, so the run stops at 10 h from X1.1.
 | «ID:…» | Fixed at X1.3 |
 | «M», «m» | Fixed at X3 |
 | «S», «R» | Fixed at X4.1 and X4.3 |
+
+### X1.2: the preconditions, X1.0 (0) to (8)
+
+All read-only, from about 16:43Z to 16:52Z on 2026-10-07. Every one passed, so the run goes on to X1.3. The eight
+members, *HDE TW*, the GTWPE parent page and the selection page came back inline, and each check on them was made by
+reading, checked by a second reading: the first reading anchor by anchor against `edits.json`, printed by script, and
+the second section by section through the page. The harness saved the fetches of *Alpha 1*, the Operations Hub and
+the PE Metaprompt, and a script read each (*Harness files*).
+
+| # | Result |
+|---|---|
+| (0) | GTWPE-MGMT-10 100526.2, `3f04590a05eb8128b8c8ff3650ab2d5a`, fetched live at the mode's start, about 16:43Z: edited 2026-10-05T16:36:11.384Z |
+| (1) | Each member's current page, fetched live: its edit time is `edits.json`'s `edited`; its first line is its current title; its headings and last words are *The new pages' checks*' headings before the edits and its last words before. TW-TRIAGE-10 2026-10-06T03:18:14.556Z, 4 headings; TW-DRAIN-10 2026-10-06T16:39:55.231Z, 11; TW-DRAIN-20 2026-10-06T16:45:43.111Z, 12; TW-RECORD-10 2026-10-06T16:47:37.162Z, 8; TW-RECORD-20 2026-10-06T16:49:11.220Z, 8; TW-APPLY-10 2026-10-06T16:50:52.240Z, 11; GTWPE-FLOW-10 2026-10-07T00:09:42.961Z, 20, with `## [RUN.md](http://RUN.md)` as its eighth; GTWPE-MGMT-10, the fetch of (0), 24. Each page's last words are those the table gives, or, for TW-TRIAGE-10, "This list never executes a drain or chooses a new session for Nathan."; no fetch reported a truncation or an unknown block |
+| (2) | `edits.json`: sha256 «H» `eed54794…f24f276f`, 114,657 bytes; `edits_check.py` exits 0, `PASS`, 205 edits over eight members, the eight GTWPE-D1 items read from the decision record. The evidence copies of `gtwpe.decision-record.md` and `gtwpe.handoffs.md`: sha256 «HD» `d7fad191…bd968f44b` and «HT» `13eb81de…4a663980aa4`. `ctl_check.py`: sha256 `4e968007…1720923c5`, as §P gives it |
+| (3) | In each member's fetch, every `old` of that member occurs once in the page's content: 14, 28, 29, 21, 22, 19, 55 and 17, 205 in all. Each `absent_after` phrase occurs exactly as many times as the member's `old` texts hold it, a count printed from `edits.json` by script: GTWPE-FLOW-10's "only with Nathan's authorization of that record" 2, `RESUME <run-id>` 3, `http://RUN.md` 2 and "or `none`" 2; GTWPE-MGMT-10's "until G5" 5, "§6 handoff table" 2 and "in whatever form it arrives" 2; the drains' "selected scope" 2 and "selected boundary" 3; TW-APPLY-10's "selected boundary" 2; every other phrase 1 |
+| (4) | *HDE TW*, `3c74590a05eb8176baf8cb59f1631f3c`, edited 2026-10-07T02:12:11.957Z: 38 child pages, none titled with a new TW title at `100726.1`. The GTWPE parent page, `3ea4590a05eb818c915bdfd3d150c44b`, edited 2026-10-07T01:59:25.993Z: 6 child pages, none titled `GTWPE-FLOW-10 — Run the Technical Writing Flow — 100726.2` or `GTWPE-MGMT-10 — Manage the GTWPE — 100726.1` |
+| (5) | The selection page, `3d44590a05eb8171ab6ff4dab33b00ef`, edited 2026-10-07T02:12:01.288Z: SEL-1 once, the page's only `### Current operation`; SEL-2's two lines once, as its first two lines; no release dated 2026-10-07 or later; 18 headings; 8 child pages. *HDE TW*: HDE-OLD once, as its first line; 13 headings. The GTWPE parent page: CAT-FLOW, CAT-FLOW-PAGE, CAT-MGMT, CAT-MGMT-PAGE and CAT-COMMIT once each; 5 headings. *Alpha 1*, `3d44590a05eb81fe991ff0114cb43029`: `ctl_check.py pre` exits 0, edited 2026-10-07T02:11:56.963Z, its anchor once, 34 headings, neither truncated nor with an unknown block. The Operations Hub, `3ce4590a05eb814f8892f88ff8539308`: `ctl_check.py pre` exits 0, edited 2026-10-07T04:23:05.337Z, its anchor once, 141 headings. A script over each save also counted A1-OLD and HUB-OLD once each as text, and each one's historical heading 0 times. Each page is at the edit time the dry run found |
+| (6) | The PE Metaprompt 091426.1, `3db4590a05eb8174be35d9e35acb3f77`: the harness saved its fetch, and a script read its title and edit time alone, 2026-09-23T17:17:22.217Z. The save was then deleted with `rm` (exit 0) |
+| (7) | `git fetch origin main` exited 0: `origin/main` is `128836aef7d45ae9f8c8118d2c5ab025d5ec634a`, as at `PLAN` |
+| (8) | The record holds this plan, with `plan_approved_by` quoting Nathan's approval, committed and pushed at `695da6c` |
+
+«V» is `100726.1`: «D» is 2026-10-07, and no current version of the six TW prompts or GTWPE-MGMT-10 is dated
+2026-10-07. «VF» is `100726.2`, since GTWPE-FLOW-10's current version is `100726.1`.
+
+### X1.3: the new pages, W1 to W24
+
+From 16:50:19Z to 16:58:57Z on 2026-10-07, by the transcript's times, the eight members in the plan's order, each
+through (a) to (h). Every write was sent with `allow_async: false` and returned the page's ID and no async task. Each
+member's W3 sent its edits from the committed `edits.json` in file order, printed by a script in the scratchpad that
+substitutes «V», or «VF» for GTWPE-FLOW-10, in the two identity edits and nowhere else. Each copy was populated at its
+first fetch, so no wait was needed: its title property was the current title with ` (1)` added, its first line
+and its last heading and last words were the current page's, and its parent was the member's. Every check of (f), (g) and (h) passed, so the run went on to X1.4.
+
+| Member | Writes | «ID» | Duplicated | Read back as of | (g) | (h) |
+|---|---|---|---|---|---|---|
+| TW-TRIAGE-10 | W1, W2, W3 | `3f24590a05eb8129b8e5e8328f9a3c3d` | 16:50:22Z | 16:50:52.555Z | (1) to (8) and (10) pass; 14 edits; 4 headings. (9) does not apply: TW-TRIAGE-10 writes neither artifact | *HDE TW*: 39 child pages, one with the new title, «ID»; the current page still at 2026-10-06T03:18:14.556Z |
+| TW-DRAIN-10 | W4, W5, W6 | `3f24590a05eb81fc872ad0003ac03086` | 16:51:26Z | 16:51:55.853Z | (1) to (10) pass; 28 edits; 11 headings; (9) `separate proof log` and the eight items | 40; one, «ID»; 2026-10-06T16:39:55.231Z |
+| TW-DRAIN-20 | W7, W8, W9 | `3f24590a05eb817cb631ed1879f69645` | 16:52:44Z | 16:53:15.145Z | (1) to (10) pass; 29 edits; 12 headings | 41; one, «ID»; 2026-10-06T16:45:43.111Z |
+| TW-RECORD-10 | W10, W11, W12 | `3f24590a05eb812aab82d6029d683b6d` | 16:53:40Z | 16:54:07.182Z | (1) to (10) pass; 21 edits, E18's new text in two blocks; 8 headings | 42; one, «ID»; 2026-10-06T16:47:37.162Z |
+| TW-RECORD-20 | W13, W14, W15 | `3f24590a05eb81ec87dcce58ffcf30bf` | 16:54:42Z | 16:55:09.922Z | (1) to (10) pass; 22 edits; 8 headings | 43; one, «ID»; 2026-10-06T16:49:11.220Z |
+| TW-APPLY-10 | W16, W17, W18 | `3f24590a05eb81258bf4efbc9ca20b2c` | 16:55:34Z | 16:55:56.174Z | (1) to (10) pass; 19 edits; 11 headings | 44; one, «ID»; 2026-10-06T16:50:52.240Z |
+| GTWPE-FLOW-10 | W19, W20, W21 | `3f24590a05eb813aa28ed6da399447d0` | 16:56:41Z | 16:57:35.129Z | (1) to (11) pass; 55 edits; 20 headings, the eighth `` ## `RUN.md` ``; `http://RUN.md` 0 times | The GTWPE parent page: 7 child pages, one with the new title, «ID»; the current page still at 2026-10-07T00:09:42.961Z |
+| GTWPE-MGMT-10 | W22, W23, W24 | `3f24590a05eb812ea59ffd31915a09ca` | 16:58:18Z | 16:58:37.152Z | (1) to (10) pass; 17 edits; 24 headings; (9) the guard sentence and the readback clause once each | 8; one, «ID»; 2026-10-05T16:36:11.384Z |
+
+*HDE TW* went from 38 child pages to 44, and the GTWPE parent page from 6 to 8. Each new page's title is the
+member's new title from `edits.json`: the six TW titles and GTWPE-MGMT-10's at `100726.1`, and GTWPE-FLOW-10's at
+`100726.2`.
+
+**(10), the `D26-E` broad match, hit by hit.** No hit still says what an edit removes.
+
+| Member | Hits, and the exception or new text that keeps each |
+|---|---|
+| TW-TRIAGE-10 | `select` 2: "exact selected versions", a release selection, and "Do not select by search rank", a choice of version. `context` 1: "fit available context", reading context. `optional` 1: "optional routing help", for a direct invocation (S-5). `boundary`, `ask` (only inside "task"), `request`, `authoriz`, `fileless`, `supplied`, `RUN_NO_CHANGE`, `not affected` and `PF27`: 0 |
+| TW-DRAIN-10 | `select` 5: "selected versions" and "the selected TW-DRAIN-20 contract", release selections; "documented current selection", identity; two in new texts. `boundary` 6: a launch and session boundary, an edit boundary, and a section's boundary in four locators. `context` 1: reading context. `ask` 1: "stop and ask for it", a stop that names a missing path or branch. `authoriz`: "separately authorized controller", "PF03 cannot authorize", "authorized target change", "the rule authorizes hygiene", "separately authorized header redline" and "authorized wording", each a source's authorization or standing authority, none saying that an authorization other than a file is an input; two in new texts. `supplied` 2: "Supplied original-baseline artifacts" and "supplied evidence", files. `request` and `fileless`: 0 |
+| TW-DRAIN-20 | As TW-DRAIN-10, and also: `context`, "applicable PF context" and "authorized source context", the context read from the sources, "the supplied change context", Nathan's term (TW-DRAIN-20), and "current PF context" in a new text; `authoriz`, "Supporting reads ... do not authorize" and "authorized source context", and "unless a source authorizes" in a new text; `supplied`, "supplied change context" and "after the supplied changes", the files' changes |
+| TW-RECORD-10 | `select` 3: a release selection, a documented selection, and "select a newer specification", a choice of version. `context` 1, in a new text. `ask`: "stop and ask for it" and "without asking again", stops that name a missing file. `request`: the requested record, the record the files name, not a non-file input. `authoriz`: "PF03 cannot authorize", and "Nathan's separately authorized work", the ban on separately authorized publication. `supplied`: "Supplied original-baseline", "the actual supplied disposition", "a supplied controlled identifier" and "when supplied", files. `creation`: "section creation", in the preflight's list of task kinds, and "successful creation is not source insertion". `insert` and `existing`: each in a new text, or kept as the duplicate check, the inserted text or the insertion's authority for a new record. `boundary` and `appropriate drain`: 0. `fileless`: 0, by a second fetch at 17:04Z (*The record's own lapse*) |
+| TW-RECORD-20 | As TW-RECORD-10, `fileless` included, and also `request`: "request that fact", answered as a file |
+| TW-APPLY-10 | `select`: a release selection; its heading *Purpose and selection boundary*; "another ecosystem's selected application prompt"; a documented selection; "select a newer original", a choice of version. `boundary`: a launch and session boundary; the heading; a section's boundary in four locators. `ask`: "stop and ask for it"; "Ask the preparer" and "Ask the actual preparer", a return to the preparer. `request`: Nathan's request of a no-change report, in a new text, and "explicitly requests", a mode (P-4); "a precise recovery request", which names the missing file; "the requested honest report" (P-4). `authoriz`: "separately authorized controller"; standing authority; "does not authorize live PF edits"; "duplicate authorization"; "explicitly authorized bytes"; "separately explicit authorization", listed as A's L7 and accepted; "PF03 cannot authorize". `supplied`: "Supplied original-baseline", "supplied legacy package" and "supplied redline", files. `context` and `fileless`: 0 |
+| GTWPE-FLOW-10 | `select`: the selected TW prompts; "selected version and page", twice; the TW selection; "no selected boundary", in a new text. `boundary`: the six boundaries, a clean boundary, each and every boundary, "stops at a clean boundary", all a clean boundary of a run; "no selected boundary", in a new text. `context`: "no other context", in a new text; reading context, five times by the second fetch, where the readback's log gave four, each kept alike; "all relevant source context" (B6). `authoriz`: "a stop ..., not an authorization", and "no authorization", in a new text. `RUN_NO_CHANGE`, `not affected` and `optional`: each in a new text. `PF27`: 0. `appropriate drain`, `creation`, `insert` and `existing`: 0, by a second fetch at 17:02Z (*The record's own lapse*, below) |
+| GTWPE-MGMT-10 | `whatever form`, `G5` and `eight`: 0. `§6` 1, in a new text. `brief`: "review briefs", "Brief each", *ANALYZE and PLAN review brief*, "the brief's instruction" and a skill review briefed by its template, all `D26`'s review brief, and two in new texts. `select`: release selections alone. `boundary`: the heading *Boundaries*. `context`: reading context alone |
+
+**(a), one fetch for two steps.** For TW-TRIAGE-10 and GTWPE-FLOW-10, the parent was fetched just before the
+duplication, at 16:50:19Z and 16:56:22Z. For the other six, (a) read the fetch of the parent made at the previous
+member's (h), 11 to 16 seconds before the duplication, with no write between them: one fetch served both steps.
+
+**W5 and W6, sent together.** TW-DRAIN-10's title and content writes were sent in one message, so their order was
+not guaranteed by how they were sent. The transcript shows W5 returning at 16:51:36Z, before W6 was issued at
+16:51:55Z, so they ran in the plan's order; and the two touch the title property and the content separately. Every
+later write was sent alone, after the one before it returned.
+
+**The record's own lapse, disclosed.** When this section was written, the scratch log of the readbacks named no
+result for GTWPE-FLOW-10's `appropriate drain`, `creation`, `insert` or `existing`, nor for the record prompts'
+`fileless`, terms *The new pages' checks* sets for them. Rather than record a check the transcript does not show, the
+session fetched those three new pages again, read-only: «ID:FLOW-10» at 17:02Z, still at 16:57:35.129Z under
+the GTWPE parent page, and «ID:RECORD-10» and «ID:RECORD-20» at 17:04Z, still at 16:54:07.182Z and
+16:55:09.922Z under *HDE TW*. Each was read for its terms and checked by a second reading, section by section: none
+occurs.
+
+### X1.4: the procedure files
+
+At about 16:59Z, `cp` of the evidence copies of `gtwpe.decision-record.md` and `gtwpe.handoffs.md` to
+`docs/prompt_ecosystem_management/gtwpe/`. Their sha256 are «HD» `d7fad191…bd968f44b` and «HT»
+`13eb81de…4a663980aa4`. The `D26-E` search the plan gives, `git grep -n -F` of `a selected boundary`,
+`RESUME <run-id>`, ``or `none` ``, `authorization of the record`, `the selected scope` and
+`A defect in the run report` over `docs/prompt_ecosystem_management/gtwpe/`, run on the working tree, finds no hit
+(exit 1); the same search on `origin/main` finds 5 lines, all in the `gtwpe.handoffs.md` the new file replaces. After
+X2's commit, `git diff --name-only origin/main...HEAD` lists the record, its 17 evidence files under
+`docs/ephemeral/modifications/evidence/gtwpe-tw-flow-rulings/` and the two `gtwpe/` files, 20 paths and no other.
+
+### X2: the commit and the pull request
+
+This section, with X1's values and dispositions, and the two `gtwpe/` files are committed together, and the commit
+is pushed to `docs/20261007-modification-gtwpe-tw-flow-rulings`. Before the push, `gtwpe_record_check.py` and
+`modification_validate.py` each exit 0 on the record as committed, at `EXECUTING`. The push, each changed file's
+blob on the branch, and the update of amthorn78/glow-hdengine-v2#590 are recorded at X3, since this commit cannot
+record its own push.
+
+### The steps so far
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X1.1 | — | VERIFIED | `695da6c`: the status, `plan_approved_by`, «D», «PA» and the start time in §E before X1.2 |
+| X1.2 | — | VERIFIED | *X1.2*, every precondition passed |
+| X1.3 | PART-01 | VERIFIED | *X1.3*, W1 to W24, the eight new pages, each read back |
+| X1.4 | PART-01 | VERIFIED | *X1.4* |
+| X2 | — | In progress at this commit | Its push and pull request are recorded at X3 |
+| X3 to X5 | PART-01 | Not yet run | They wait for Nathan's merge of amthorn78/glow-hdengine-v2#590; no stop has occurred |
+
+The items' dispositions are set at X5, as §P gives them. PART-01 has not landed yet: the eight new pages exist and
+nothing selects them, and W25 to W29 move the selection only after the merge.
+
+### Harness files (`D22` condition 5), for `EXECUTE`, to X2
+
+- **Inline fetches, held only in this session's transcript**, left to the harness's teardown: GTWPE-MGMT-10 100526.2
+  at 16:44Z; the seven other members' current pages from 16:45Z to 16:47Z; *HDE TW*, the GTWPE parent page and the
+  selection page at 16:48Z; in X1.3, from 16:50Z to 16:58Z, each new page as duplicated and as read back, each
+  parent, and each current page again; «ID:FLOW-10» again at 17:02Z; and «ID:RECORD-10» and «ID:RECORD-20»
+  again at 17:04Z.
+- **Harness saves**, each read by a script that printed only what its check needed:
+  - `toolu_01W7PMS3v2nqz6UShLV2t3Qd.json`, *Alpha 1*, at 16:48Z: read by `ctl_check.py pre`. A control page, not a
+    prompt body; left to the harness's teardown.
+  - `mcp-Notion-notion-fetch-1791391738794.txt`, the Operations Hub, at 16:48Z: read by `ctl_check.py pre`, and by
+    a script counting HUB-OLD and its historical heading. A control page; left to the teardown.
+  - `mcp-Notion-notion-fetch-1791391754746.txt`, the PE Metaprompt 091426.1, at 16:49Z: its title and edit time
+    alone, then deleted with `rm` (exit 0).
+- **No prompt body was written to a file.** The scratchpad holds a log of results, which quotes no body, and a script
+  that prints edits from the committed `edits.json`.
+
+The clock at this commit is about 25 minutes from X1.1.
