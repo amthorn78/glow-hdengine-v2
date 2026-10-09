@@ -9,7 +9,7 @@
 - Intake commit (`origin/main`): `e7265a090ad0cc8de5f36de2f19481216aa3d073`, fetched 2026-10-09T10:17:36Z. Intake UTC date: 2026-10-09.
 - Branch: `docs/20261009-gtwpe-run-hde-epic040-specification-approved`, made from the intake commit.
 - Run directory: `docs/ephemeral/gtwpe.runs/gtwpe-20261009-hde-epic040-specification-approved/`.
-- Pull request: not yet opened (B1 step 4).
+- Pull request: amthorn78/glow-hdengine-v2#595, `https://github.com/amthorn78/glow-hdengine-v2/pull/595`, opened as a draft at B1 step 4.
 - Slug: the governing specification's file name gives `hde-epic040-specification`, which the remote already uses for the branch `docs/20261009-gtwpe-run-hde-epic040-specification` and its run directory `gtwpe-20261009-hde-epic040-specification` (an earlier run with the same execution prompt, pull request amthorn78/glow-hdengine-v2#594). The slug was changed to `hde-epic040-specification-approved`, also taken from the file name, which no branch or run directory on any of the 15 remote branches used at intake. Nothing from the earlier run is an input to this one.
 - Controller: the skill TW Flowmaster 1.3.0 loaded at the start of this session. The TW selection states that TW Flowmaster 1.3.0 does not run this release, so this run follows GTWPE-FLOW-10 alone and uses none of that skill's session machinery.
 
@@ -67,7 +67,7 @@ None yet.
 
 ## Boundaries
 
-- B1 Scope: in progress. Steps 1 to 3 done; step 4 in progress.
+- B1 Scope: in progress. Steps 1 to 4 done (branch, run directory, `RUN.md`, inputs and draft pull request); step 5, the triage pass, is next.
 
 ## Harness files and prompt-body reads
 
