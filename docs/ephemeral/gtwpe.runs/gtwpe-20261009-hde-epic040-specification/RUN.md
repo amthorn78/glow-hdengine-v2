@@ -7,7 +7,7 @@
 - Run directory: `docs/ephemeral/gtwpe.runs/gtwpe-20261009-hde-epic040-specification/`
 - Branch: `docs/20261009-gtwpe-run-hde-epic040-specification`
 - Intake commit (`origin/main`): `0c4dddece401c457b2429ddc9cb8f2e819b4a943`
-- Pull request: (draft, recorded below once opened)
+- Pull request: #594 — `https://github.com/amthorn78/glow-hdengine-v2/pull/594` (draft, opened at B1)
 
 ## Notion edit times read at B1
 - `AI Prompts / HDE TW` (`3c74590a05eb8176baf8cb59f1631f3c`): `2026-10-07T18:30:00.000Z`
