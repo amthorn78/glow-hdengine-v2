@@ -2,19 +2,19 @@
 
 **Title:** PF23-Canon-Reality-Audits
 
-**Version:** v1.2.1
+**Version:** v1.2.2
 
 **Status:** Canon
 
-**Effective date:** 2026-09-27
+**Effective date:** 2026-10-09
 
-**Last Update Gate:** HDE-EPIC040
+**Last Update Gate:** BN 13.5
 
 ---
 
 **Intent & scope \[Required-Now\]**
 
-These audits are **Codex review passes run by the Product Owner at the closure of each epic** to compare what actually shipped (code, evidence, repo layout) with what PF-Canon and the epic plan said should exist. Their purpose is to:
+These audits are **read-only repository review passes run by the Product Owner at the closure of each epic**, regardless of which executing agent performs them. They compare what actually shipped (code, evidence, repo layout) with what PF-Canon and the epic plan said should exist. Their purpose is to:
 
 * Highlight any **gaps between reality and expectation** (missing evidence, drift from PF docs, unrecorded behavior, or unclosed issues).
 

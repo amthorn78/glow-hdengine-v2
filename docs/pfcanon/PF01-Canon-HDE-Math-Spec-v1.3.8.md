@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.3.7
+**Version:** v1.3.8
 
 **Status:** Canon
 
-**Effective date:** 2026-08-25
+**Effective date:** 2026-10-09
 
-**Last Update Gate:** BN 12.8.9
+**Last Update Gate:** BN 13.5; HDE-EPIC040-specification-v1.1-approved.md; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md
 
 ## **0.2 Change policy**
 
@@ -76,7 +76,7 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
 * **Public Reader v1 (bands-only, single “harmony”) — \[Required-Now\]**  
     
   * **Required contract.** The public envelope emits one category `{"id":"harmony","band": <Cool|Open|Warm|Glow>}` plus `eligible`, `meta:{engine_tag,invocation_tag}`, `release_id`, and `idempotence_hash`. Bytes are canonical JSON (UTF-8, sorted keys, compact, exactly one trailing `\n`). `idempotence_hash` is computed over the canonical preimage; **AB↔BA** and **two-run** identity are required (see §3.2 and §3.4).  
-  * **Static implementation posture.** The pinned runtime emits the six-key envelope and computes the preimage hash, but it defaults `eligible` to `true`, retains the `harmony` item when `eligible == false`, and is not accepted by the checked-in success schema because that schema's category enum omits `harmony`. The schema and emitter also still permit `prompt`. These are implementation gaps; they do not weaken the public contract.  
+  * **Static implementation posture.** The inspected runtime requires an explicit eligibility value and emits `[]` when it is false. The v1 success schema admits `harmony`, closes the six-key envelope and `{id,band}` items, and excludes `prompt`. These static definitions do not establish execution or acceptance.
   * **Evidence routing (titles-only).** Reader v1 emitter and canonical serializer; Reader/CLI sidecar parity; idempotence/preimage recompute. Evidence families and paths are owned by the Evidence Catalog in **PF12-Canon-HDE-Schemas-and-Artifacts**.  
   * **Scope note.** Transport/CLI specifics (headers, 304/HEAD, validators) live in **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (titles-only).
 
@@ -109,14 +109,14 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
   * Acceptance tokens such as `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK` are mapped to evidence families owned by **PF12-Canon-HDE-Schemas-and-Artifacts** and acceptance semantics owned elsewhere. Their definitions do **not** introduce new math or an alternative determinism contract, and their presence does not establish a PASS.
 
 
-* **Canonical Magic-10 (10 categories; scores→bands) — \[Required-Now\] (implementation gap; Reader projection remains harmony-only)**  
+* **Canonical Magic-10 (10 categories; scores→bands) — \[Required-Now\]**  
     
   * **Closed matrix.** Every eligible pair evaluation produces exactly one intrinsic integer score and band for each of the ten IDs in the frozen order governed by `catalog/magic10.json`; no partial, harmony-only, duplicate, defaulted, or eleventh result is conforming.  
   * **Human Design grounding.** Governed pair signals determine score magnitude. Person identifiers establish identity and canonical pair order only. Viewer preferences belong to sampler/ranker weighting and do not alter intrinsic compatibility scores or bands.  
   * **AB↔BA neutrality.** Validated normalized charts are ordered by ASCII `person_uid`; the canonical pair-signal map and deterministic reduction in §5.2 are order-neutral.  
   * **Deterministic scoring and banding.** Each category score is an integer in `0..100` produced by the half-unit reduction in §5.2, then mapped through the single global inclusive maxima `[24,49,74,100]` in §5.3.  
-  * **Public projection.** Reader v1 exposes only the `harmony` band from the complete canonical matrix. It does not expose scores or the other nine categories.  
-  * **Static implementation posture.** The pinned repository contains three noncanonical or transitional scorer surfaces and no complete ten-category implementation in `engine.core.core`; exact upstream mechanics for every governed pair signal are also not found. These are explicit implementation gaps.
+  * **Public projection.** Reader v1 exposes only the `harmony` band. Reader v2 exposes all ten bands in the governed Magic-10 order (§2.5). Both project the complete canonical matrix and expose no scores or narratives.
+  * **Static implementation posture.** The inspected `engine.core.core` contains the pure ten-category computation, and the Reader runtime accepts its band projection. **HDE Build Notes** records the accepted delivery; current code presence alone establishes neither complete upstream conformance nor a PASS.
 
 
 * **Feature extractors (EM / Hanging Gates / Dominance–Compromise / Throat adjacency / …) — \[Required-Now\]**  
@@ -132,7 +132,7 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
   * **Posture.** Presets, alternative weights or scoring profiles, and the ungoverned advanced token-aggregation design are **Future-Promotion**. No current governed Presets catalog, Feature Registry, or token-aggregation contract exists.  
   * **Promotion boundary.** Promotion requires complete governed schemas and paths, fully populated fixed-point values, one fail-closed evaluation order, and pure-compute integration through the canonical Engine Core. No example identity, default, weight, cap, floor, correction, or stage is executable authority.  
   * **Current matrix unaffected.** Future-Promotion does not defer or narrow the Required-Now intrinsic ten-category matrix in §5.2 or its band mapping in §5.3. Viewer preferences remain sampler/ranker inputs.  
-  * **Public rule.** A future preset must not silently widen Reader v1; the public projection remains numeric-free and harmony-only unless a separately authorized version change says otherwise.
+  * **Public rule.** A future preset cannot widen either Reader covenant or expose configuration. Reader v1 remains harmony-only; Reader v2 follows §2.5. Both remain numeric-free. Approval of v2 does not promote presets or aggregation math.
 
 
 * **Reader transport — proof surfaces & ops (titles-only routing)**  
@@ -140,12 +140,12 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
   * **Endpoint Catalog (JSON success) — \[Required-Now\].** A7 success-endpoint evidence is an externally owned proof family. Its records, paths, Index/Mirror bindings, and production procedure are governed outside PF01; this section preserves only the titles-only routing boundary.  
   * **Dev harness — \[Required-Now\].** A dev/test capture surface exists, but the pinned code defaults a missing `APP_ENV` to `dev`; strict refusal outside explicit `APP_ENV=dev` remains an implementation gap. Transport details belong in **HDE-CLI-API-Vendor-Ref**.  
   * **/internal/version (ops endpoint) — \[Required-Now\].** Ops-only identity surface; acceptance in **HDE-Governance §10.5**.  
-  * **Production public Reader endpoint — \[Speculative\].** Future public surface; conditional delivery/headers owned in **HDE-CLI-API-Vendor Ref**/**HDE-Governance**.
+  * **Production public Reader — \[Required-Now\].** Version selection, production routing and delivery behavior are owned in **HDE-CLI-API-Vendor Ref**/**HDE-Governance**. The public projections are constrained by §§2.1–2.2 and §2.5.
 
 
 * **Serializer/emitter — single shared entrypoint — \[Required-Now\]**  
     
-  * **One emitter for public bytes.** Reader and any CLI Reader-byte sidecar MUST call the same presenter/emitter; **no ad-hoc serializers**. Canonical JSON: UTF-8, sorted keys, compact, exactly one LF; arrays-as-sets (dedupe \+ ASCII sort).  
+  * **One emitter for public bytes.** Reader and any designated CLI Reader-byte sidecar MUST call the same presenter/emitter; **no ad-hoc serializers**. Canonical JSON: UTF-8, sorted keys, compact, exactly one LF. Arrays-as-sets use their governed normalization; Reader v2 categories preserve the governed ordered sequence (§2.5). The existing CLI Reader-byte sidecar remains v1.
   * **Determinism & parity.** A shared emitter is required for Reader-byte parity, AB↔BA identity, and two-run identity. In the pinned repository, `showcompat` stdout emits a distinct compat payload while `--dump-reader` writes the Reader envelope; stdout equality is not statically established.  
   * **Evidence.** Grep-guard, shared-emitter symbol proof, and Reader-sidecar parity fixtures are Evidence Catalog families owned by **PF12-Canon-HDE-Schemas-and-Artifacts**.
 
@@ -160,20 +160,20 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
 
 * **Retired contract: prompt and uncertainty — prohibited**  
     
-  * **Scope.** Public Reader v1 is required to be narrative-free; `prompt` and `uncertainty` are prohibited by §§2.1–2.2 and Appendix D. Repository conformance must be established separately.  
-  * **Acceptance requirement.** Success bodies MUST pass the governing schema without `prompt`; error bodies remain typed and LF-terminated; Reader-sidecar parity goldens remain bands-only. The pinned schema and emitter do not yet conform.
+  * **Scope.** Public Reader v1 and v2 are narrative-free; `prompt` and `uncertainty` are prohibited by §§2.1–2.2, §2.5 and Appendix D.
+  * **Acceptance requirement.** Success bodies MUST pass the governing versioned schema without `prompt`; error bodies use the owned `error_v1` reference and canonical LF discipline; the existing CLI Reader-sidecar parity remains v1 and bands-only. The inspected schemas and presenter exclude the retired category fields; static inspection does not establish acceptance.
 
 **Routing (no duplication).** Transport/CLI specifics are referenced by title in **HDE-CLI-API-Vendor Ref**; operational acceptance (A7, internal-ops exception, evidence policy) is in **HDE-Governance**. Canonical JSON & manifest/mirror rules live in **PF12-Canon-HDE-Schemas-and-Artifacts**.
 
 ---
 
-# 2\. Product Covenant & Public Contract (Reader v1) \[Required-Now\]
+# 2\. Product Covenant & Public Contract (Reader v1 and v2) \[Required-Now\]
 
 ## **2.1 Success payload (six keys; numeric-free) \[Required-Now\]**
 
 **Normative rule.** The Reader v1 public success body is a numeric-free JSON object containing exactly six top-level keys. No additional public fields are allowed. All serialization uses canonical JSON (**PF12-Canon-HDE-Schemas-and-Artifacts** §4: UTF-8 without BOM, sorted keys, compact, exactly one trailing `\n`; arrays treated as sets are deduplicated and ASCII-sorted).
 
-**Static implementation posture.** The pinned emitter constructs the six-key envelope and canonical preimage. The checked-in schema does not conform: its category enum omits `harmony`, it still permits `prompt`, and its success branch does not enforce the exact six-key field closure. This is an implementation gap; the normative covenant remains unchanged.
+**Static implementation posture.** The inspected runtime and presenter construct the v1 six-key envelope and five-key preimage, enforce the public category-item keys, and emit no categories for ineligible pairs. The inspected v1 success schema closes the six top-level keys, admits only `harmony` in eligible v1 output, and excludes `prompt`. Static definitions do not prove execution or acceptance.
 
 **Required keys (success) — exactly these six**
 
@@ -214,7 +214,7 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
 * The public `categories` array in Reader v1 is **bands-only** and **numeric-free**.  
 * If `eligible == true`: `categories` **MUST** contain **exactly one** item `{"id":"harmony","band":"Cool"|"Open"|"Warm"|"Glow"}`.  
 * If `eligible == false`: `categories` **MUST** be `[]`.  
-* No other public categories are allowed in v1. Exposure of the full Magic-10 set is a future, versioned change (PF-01 remains math-only; the public surface is constrained here).
+* No other public categories are allowed in v1. The separately approved Reader v2 projection is defined in §2.5; it does not alter the v1 covenant.
 
 ### **Sorting & uniqueness**
 
@@ -241,30 +241,15 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
 4. **No extras:** every `categories[*]` has **only** `id` and `band`.  
 5. **Uniqueness:** **no duplicate `id` values** (trivial in v1).
 
-**Static implementation posture.** The pinned runtime always constructs one `harmony` category even when the supplied `eligible` value is false. The required `eligible == false` ⇒ `categories: []` behavior is not implemented at the pinned commit.
+**Static implementation posture.** The inspected runtime emits one validated `harmony` item for eligible v1 output and `[]` for ineligible output. The presenter and success schema reject extra category fields. These static facts do not establish the acceptance gates above.
 
 ## **2.3 Errors (shape/pointers) \[Required-Now\]**
 
-### **Typed public error object (no PII; bounded numeric exception)**
+Reader v1 and v2 failures use the governed `error_v1` contract. Its exact schema, token/message pairs, status mapping and failure projection are owned by **HDE-CLI-API-Vendor-Ref**, **HDE-Governance** and **PF12-Canon-HDE-Schemas-and-Artifacts**. PF01 does not define a second error shape or taxonomy. The former PF01 minimum-field shape and optional retry-field exception are superseded by that owned reference.
 
-* **Shape (minimum):** the public error body is a typed JSON object with:  
-  * `ok: false`  
-  * `code: "<token>"` — short, machine-readable error token  
-  * `error: "<non-PII message>"` — human-readable, non-secret message  
-* **Optional field (when applicable):**  
-  * `retry_after_ms: <integer >= 0>` — present only when a rate-limit or backoff condition applies  
-* **No additional public fields** (no narratives, no keys, no numerics beyond `retry_after_ms`).
+Invalid or missing input MUST fail closed and MUST NOT be converted to an ineligible success. Public failure projection exposes no PII, secrets, Gate payloads, internal diagnostics, scores or narrative output. Error bytes use the same canonical JSON and single-LF discipline as success; this does not turn an error into a Reader success envelope or change its identity recipe.
 
-### **Hygiene and guardrails**
-
-* **No PII or secrets** in error messages; keep messages succinct and generic.  
-* **Determinism:** error bodies are serialized by the same canonical path as success (**PF12-Canon-HDE-Schemas-and-Artifacts** §4): UTF-8, sorted keys, compact separators, exactly one trailing LF.
-
-**Static implementation posture.** The pinned `error_envelope` also emits `schema` and can emit `details`; neither field is permitted by this Reader error contract. Repository conformance remains an implementation gap.
-
-### **Pointers (transport & status live elsewhere)**
-
-* **Transport ownership:** HTTP status mapping, headers, conditional delivery, caching, and streams/exit codes are owned by **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** and are referenced here by title only.
+**Static implementation posture.** The inspected Reader failure function calls `error_envelope` without diagnostics and emits the governed `error_v1` fields; both inspected Reader schemas admit that error branch. The shared helper can add `details` for other callers, which does not authorize diagnostics on Reader failures. This corroborates the recorded error-schema correction in **HDE Build Notes**; it does not establish execution, transport acceptance or deployment.
 
 ---
 
@@ -279,7 +264,7 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
 * **Categories:** primary order by the frozen Magic-10 rank (see **PF12-Canon-HDE-Schemas-and-Artifacts §2.6**), tie-break by `id` (ASCII).  
 * **Stable-on-equality:** when primary keys compare equal, apply a canonical secondary key so the order is **total and stable** across runs.
 
-**Set semantics (arrays-as-sets).** Any array that represents a set **MUST** be deduplicated and ASCII-sorted before hashing/compare (see **PF12-Canon-HDE-Schemas-and-Artifacts §4**). Non-canonical or duplicate elements **fail validation**.
+**Set semantics (arrays-as-sets).** Any array that represents a set **MUST** use its owning deduplication and ASCII-sort contract before hashing/compare (see **PF12-Canon-HDE-Schemas-and-Artifacts §4**). Non-canonical or duplicate elements **fail validation**. Reader v2 `categories` is an ordered array, not an array-as-set: preserve the governed sequence in §2.5 without deduplication or ASCII reordering. Duplicate, missing or out-of-order v2 items fail closed.
 
 **Channel rejection posture.** At the PF01 computation boundary, channel identifiers MUST already be canonical zero-padded `NN-NN` with the lower Gate first; reversed, duplicate, unknown, or unparsable stored values fail validation. An upstream ingestion surface may map a reversed alias such as `34-20` to `20-34` only when its owning contract explicitly authorizes that alias before the value reaches this boundary. Invalid tokens are not coerced here.
 
@@ -296,6 +281,22 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
 
 **EPIC017 D4 proof (informative).**  
 EPIC017’s “deterministic tie-break and total-order module” deliverable, as recorded in **HDE Phased Epics Map**, is associated with comparator code and evidence intended to cover IDs, channels, categories, arrays-as-sets, antisymmetry, transitivity, totality, AB↔BA identity, and two-run identity. Static repository inspection confirms comparator definitions but does not establish execution or PASS. EPIC017 does **not** alter the ordering rules or arrays-as-sets behavior in this spec. Any future change to comparator policy or set semantics remains a PF01 math change and must follow the usual release-id and evidence requirements.
+
+---
+
+## 2.5 Reader v2 public projection \[Required-Now\]
+
+**Versioned covenant.** Reader v2 is a separate public projection of the same complete canonical Magic-10 result. Reader v1 remains exactly as defined in §§2.1–2.2. V2 introduces no score, formula, response profile, cap, rounding, band threshold, eligibility predicate or intrinsic identity change.
+
+**Success envelope.** The body contains exactly the six top-level keys `reader_version`, `eligible`, `categories`, `meta`, `release_id` and `idempotence_hash`. `reader_version` is exactly `"v2"`. `eligible` is the §4 boolean; `meta` is exactly `{engine_tag,invocation_tag}` with the same non-empty string contract as v1; both hashes retain the lowercase 64-hex contract in §3. No extra top-level or metadata fields are allowed.
+
+**Eligible projection.** When `eligible == true`, `categories` MUST contain exactly one `{id,band}` item for every governed Magic-10 identifier, in the exact frozen iteration order of `catalog/magic10.json` owned by **PF12-Canon-HDE-Schemas-and-Artifacts**. Every band is the corresponding result of the complete canonical matrix and is one of `Cool`, `Open`, `Warm` or `Glow`. This ten-item array is ordered, not a set: do not ASCII-sort, deduplicate, omit, duplicate, default-fill, substitute `harmony`, or rescore through viewer preferences. An incomplete or invalid result fails closed rather than producing a partial success.
+
+**Ineligible projection.** When `eligible == false`, `categories` MUST be `[]`. The eligibility predicate and invalid-input refusal are unchanged from §4; ineligibility does not authorize a numeric, narrative or substitute result.
+
+**Privacy and identity.** Category items contain only `id` and `band`. Scores, percentages, counts, weights, prompts, uncertainty, personal/shared keys and other narrative fields remain prohibited. The five-key preimage in §3.2 contains the selected `"v2"` version and this exact ordered category array, excludes `idempotence_hash`, and uses the same canonical serialization/hash/final-emission recipe as v1. AB↔BA and two-run identity apply within the selected Reader version (§3.4).
+
+**Routing.** This section defines the public projection only. Version selection, requests, production routes, transport, conditional delivery and the shared `error_v1` reference remain in **HDE-CLI-API-Vendor-Ref**/**HDE-Governance**; schemas, the catalog sequence and evidence bindings remain in **PF12-Canon-HDE-Schemas-and-Artifacts**. Existing CLI Reader-byte parity stays v1. Approval of v2 creates no CLI flag, v2 CLI parity family, preset promotion or public numeric exception.
 
 ---
 
@@ -333,7 +334,7 @@ EPIC017’s “deterministic tie-break and total-order module” deliverable, as
 
 **Scope & coupling**
 
-* `release_id` is included in the Reader v1 success body and participates in acceptance checks (see §2, §3.4; Governance A-gates by title).  
+* `release_id` is included in Reader v1 and v2 success bodies and participates in their five-key preimages and acceptance checks (see §2, §3.4; Governance A-gates by title).
 * **Pins.** All recomputation runs with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. Only the selected pack and its canonical manifest affect the value.  
 * **Acyclic release graph.** The required dependency direction is `tracked source -> canonical manifest -> release_id -> external attestation`. No generated attestation may feed back into tracked source or become an input to `release_id`.
 
@@ -343,7 +344,7 @@ EPIC017’s “deterministic tie-break and total-order module” deliverable, as
 * **Provenance:** evidence (titles/paths only) includes the canonical manifest artifact and the computed `release_id`.  
 * **Determinism:** recomputing over the same pack yields the same `release_id` (two-run identity).
 
-**Static implementation posture.** The pinned runtime validates and hashes the canonical packaged manifest. The pinned manifest has eight entries, omits required topology and complete Magic-10 narrative inputs named by the current PF12 minimum, and therefore does not establish manifest conformance or a PASS. Its inclusion of adapter and migration bytes is consistent with PF12 ownership of the complete release surface and disproves only the former PF01 math-only membership claim.
+**Static implementation posture.** The inspected runtime validates and hashes the canonical packaged manifest. The inspected manifest records version `1.3.0` and 45 members, including the Reader v2 schema and the corrected v1 schema; **HDE Build Notes** records the successive release cuts. These facts replace the earlier eight-member observation. Full member integrity, manifest conformance, deployment and acceptance are not established by this bounded static inspection.
 
 **Acceptance gates (titles-only)**  
 `RELEASE_ID_FROM_MANIFEST_OK`, `RELEASE_ID_RECOMPUTE_OK`, `MANIFEST_SHA256_HEX64_OK`, `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`.
@@ -352,15 +353,15 @@ EPIC017’s “deterministic tie-break and total-order module” deliverable, as
 
 ## **3.2 idempotence\_hash: preimage recipe (sha256 over canonical preimage) \[Required-Now\]**
 
-**Definition (normative).** `idempotence_hash` is the lowercase 64-hex SHA-256 of the canonical preimage of the Reader v1 success envelope. It proves that the published bytes arise from a single, canonical representation.
+**Definition (normative).** `idempotence_hash` is the lowercase 64-hex SHA-256 of the canonical five-key preimage of the selected Reader v1 or v2 success envelope. It proves that the published bytes arise from a single, canonical representation.
 
 ### **Canonical preimage (success case)**
 
 Build an object with exactly five keys (no others), each already normalized per this spec and **PF12-Canon-HDE-Schemas-and-Artifacts**:
 
-1. `reader_version` : `"v1"`  
+1. `reader_version` : `"v1"` or `"v2"`, exactly the selected success-envelope version  
 2. `eligible` : `<boolean>`  
-3. `categories` : `[{"id","band"}]` — public policy per §2.2 (v1 exposes one item `{"id":"harmony","band":<Cool|Open|Warm|Glow>}` when `eligible == true`; `[]` when `eligible == false`; numeric-free)  
+3. `categories` : `[{"id","band"}]` — §2.2 for v1 (one `harmony` item when eligible); §2.5 for v2 (all ten items in the exact governed order when eligible); `[]` when ineligible in either version; always numeric-free  
 4. `meta` : `{"engine_tag","invocation_tag"}` — titles-only references to **PF12-Canon-HDE-Schemas-and-Artifacts** (invocation tag is the short form; no other fields in public `meta`)  
 5. `release_id` : `<hex64>` — as defined in §3.1
 
@@ -370,7 +371,7 @@ Do not include `idempotence_hash` in the preimage.
 
 ### **Canonical serialization (preimage & final)**
 
-Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays that represent sets are deduplicated and ASCII-sorted. All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
+Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF. Arrays that represent sets use their owning normalization; Reader v2 `categories` preserves the exact governed ordered sequence (§2.5) and is never ASCII-reordered or deduplicated. All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 ### **Emission algorithm (success)**
 
@@ -383,7 +384,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 * **Deterministic & stable.** Any preimage byte change (field value, order, band, `release_id`) changes `idempotence_hash`. Canonicalization removes non-semantic whitespace/key-order differences.  
 * **AB↔BA identity.** Pair inputs are normalized (this spec’s composite rules; **PF12-Canon-HDE-Schemas-and-Artifacts** topology normalization), so AB and BA produce identical `preimage_bytes` and the same `idempotence_hash`.  
 * **Two-run identity.** Re-emitting the same logical object yields byte-identical preimage and final bodies.  
-* **Reader↔CLI parity.** For identical inputs and environment, a CLI Reader-byte sidecar and Reader MUST emit byte-identical success bodies and the same `idempotence_hash`. The general `showcompat` stdout payload is a different admin/compat surface and is not Reader bytes.
+* **Reader↔CLI parity (v1).** For identical inputs and environment, the existing CLI Reader-byte sidecar and Reader v1 MUST emit byte-identical success bodies and the same `idempotence_hash`. General `showcompat` stdout is a different admin/compat surface. Reader v2 approval does not create a v2 CLI parity surface or family.
 
 ### **Validation (binary)**
 
@@ -394,7 +395,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 **Non-goals / routing.** `idempotence_hash` is not an HTTP transport token; ETag/conditional semantics live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** (titles only).  
 **Tokens:** see **HDE-Governance §2.0**.
 
-**Static implementation posture.** The pinned presenter implements the five-key preimage, canonical hash, and final emission sequence. Complete public conformance remains blocked in code by the ineligible-category and `prompt` gaps identified in §§2.1–2.2; static inspection does not establish the acceptance tokens above.
+**Static implementation posture.** The inspected presenter has separate v1 and v2 preimage builders and one shared hash/final-emission function. The v2 builder preserves the governed category sequence; both exclude `idempotence_hash` from the preimage and reject extra category fields. The inspected runtime supplies the version-specific eligible or empty projection. These static definitions do not establish the acceptance tokens above.
 
 ---
 
@@ -433,14 +434,14 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 
 ### **Definition (normative)**
 
-* **Two-run identity.** Serializing the same logical success envelope twice (same inputs, same environment, same `invocation_tag`, same `release_id`) **MUST** produce byte-identical public bytes.  
-* **AB↔BA parity.** For a given pair of **normalized** inputs, swapping input order (AB vs BA) **MUST** produce byte-identical public bytes.
+* **Two-run identity.** Serializing the same logical success envelope twice (same inputs, selected Reader version, environment, `invocation_tag` and `release_id`) **MUST** produce byte-identical public bytes.  
+* **AB↔BA parity.** For a given pair of **normalized** inputs and the same selected Reader version, swapping input order (AB vs BA) **MUST** produce byte-identical public bytes.  
 
 ### **How it is achieved (concept)**
 
 * **Canonical preimage → hash → final** (see §3.2). Identical preimages yield identical `idempotence_hash` and final bytes.  
 * **Pair normalization.** Inputs are normalized **before** any computation (see topology normalization in PF12-Canon-HDE-Schemas-and-Artifacts), guaranteeing order-neutrality for scores, bands, and envelope.  
-* **Single emitter.** One canonical JSON emitter shared across Reader and CLI (UTF-8, sorted keys, compact, exactly one LF) eliminates serializer drift across surfaces.  
+* **Single emitter.** The canonical presenter/emitter and JSON recipe (UTF-8, sorted keys, compact, exactly one LF) serve both Reader versions. Existing corresponding CLI Reader-byte parity remains v1. V2 category order is preserved before serialization (§2.5).  
 * **Environment pins.** All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 ### **Evidence families (titles-only)**
@@ -457,7 +458,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 * **AB↔BA parity.** Given inputs A,B and B,A, the emitted bytes are bit-for-bit identical; confirm by byte-compare and equal `idempotence_hash`.  
 * **Serializer invariants.** Outputs are UTF-8, sorted keys, compact separators, exactly one LF, no BOM/ANSI, and schema-valid in both success and error modes.
 
-**Static implementation posture.** The pinned canonical serializer and Reader presenter are deterministic by inspection, and the CLI can write Reader bytes through `--dump-reader`. General `showcompat` stdout emits a different compat object; the checked-in Reader schema and ineligible behavior are nonconforming; and static files do not prove any test or acceptance PASS.
+**Static implementation posture.** The inspected Reader runtime and presenter contain the versioned projections and shared preimage/hash/final-emission recipe. The inspected CLI `--dump-reader` call uses the default v1 projection; general `showcompat` stdout remains a different compat object. Static definitions do not prove byte parity, test passage or acceptance.
 
 **Non-goals / routing.** Header matrices, conditional delivery, caching/writers policy, and CLI stream rules are not duplicated here; see **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (titles only).
 
@@ -500,7 +501,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 
 ## 4.4 Public behavior
 
-* **If `eligible == true`:** the public `categories` array **MUST** comply with §2.2 (v1 Alpha: exactly one item `{id:"harmony", band:…}`; numeric-free).  
+* **If `eligible == true`:** the public `categories` array **MUST** comply with the selected version: §2.2 for v1 (exactly one `harmony` band item), or §2.5 for v2 (all ten band items in the exact governed order); numeric-free in both.  
     
 * **If `eligible == false`:** the public `categories` array **MUST** be `[]`. No numerics or narrative fields appear in either case.  
     
@@ -516,7 +517,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
     
 * **Determinism checks:** AB↔BA parity and two-run identity are satisfied for the eligibility boolean.  
     
-* **Schema coupling:** the success envelope reflects eligibility as per §2.1; the value participates in the **preimage** for `idempotence_hash` (see §3.2).  
+* **Schema coupling:** the success envelope reflects eligibility under §2.1 for v1 or §2.5 for v2; the value participates in the **preimage** for `idempotence_hash` (see §3.2).  
     
 * **Minimum true fixture.** Two valid normalized charts with distinct valid UIDs, closed Gate membership, and the same active `release_id` produce `eligible:true`, including when no Channel is completed across the pair.  
     
@@ -531,11 +532,11 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 
 ## 4.7 Emission rule (binary) \[Required-Now\]
 
-* **Eligible ⇒** **emit categories** per §2.2 (v1 Alpha: exactly one item `{id:"harmony", band:…}`; numeric-free).  
+* **Eligible ⇒** **emit categories** per the selected version: §2.2 for v1 (exactly one `harmony` band item), or §2.5 for v2 (all ten band items in the exact governed order); numeric-free in both.  
     
 * **Ineligible ⇒** **`categories: []`** (empty array). No numerics, no narrative fields.
 
-**Static implementation posture.** No Reader eligibility decision function implementing this contract was found in the pinned repository. `engine.runtime.public` accepts a caller-supplied boolean, defaults it to `true`, and emits `harmony` even when false. The sampler has a separate candidate-pool predicate and MUST NOT be reused as Reader pair-computability. This is an explicit implementation gap, not a change to the Required-Now contract.
+**Static implementation posture.** The inspected `engine.compat.compute` validates normalized parties and decides self-pair eligibility before intrinsic computation. The inspected Reader runtime requires an explicit eligibility result and emits the version-specific categories or `[]`. A sampler candidate-pool predicate remains a separate concern and MUST NOT substitute for Reader pair-computability. Code presence does not establish current-row readiness, deployment or acceptance.
 
 # 5\. Magic-10 Framework (closed IDs, scoring→bands) \[Required-Now\]
 
@@ -546,7 +547,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 **Use and exposure**
 
 * **Canonical internal math:** the canonical Engine Core consumes the complete closed set for the intrinsic scoring and band matrix in §§5.2–5.3. Every eligible pair requires all ten results atomically.  
-* **Public surface (v1):** Reader v1 is **bands-only & numeric-free** and projects only `{"id":"harmony","band":…}` from the complete canonical matrix (see **§2.2**). Public exposure of all ten categories remains a future, versioned change.
+* **Public surfaces:** Reader v1 is **bands-only & numeric-free** and projects only `{"id":"harmony","band":…}` (§2.2). Reader v2 projects the complete ten-category band array in the governed order (§2.5), with no scores or narratives. Both use the same complete canonical matrix.  
 
 **Ordering and uniqueness**
 
@@ -820,7 +821,7 @@ Any modification to the signal domain, pair preimage, pair-key version, category
 
 ### **5.2.9 Routing (no transport bytes here)**
 
-Math only. Public presentation remains the §2 harmony-only, numeric-free projection; transport bytes live in their owning transport canon. `engine.core.core` is the canonical compatibility behavior home. The pinned `engine.compat.ts_v0` path is transitional, `engine.compat.compute` is admin-only, and `engine.magic10.calculators` is transitional. No pinned `engine.core.core` function implements this complete recipe; this is an explicit implementation gap.
+Math only. Reader v1 remains the harmony-only, numeric-free projection; Reader v2 follows §2.5. Transport bytes live in their owning transport canon. `engine.core.core` remains the canonical compatibility behavior home. The inspected core contains the ten-category integer computation; `engine.compat.compute` validates parties and invokes that core before projection. Transitional helpers do not create an alternative mathematical authority, and static definitions do not establish acceptance.
 
 ## **5.3 Band mapping (global inclusive maxima)**
 
@@ -978,7 +979,7 @@ To produce `release_id`, use the single canonical manifest at `catalog/manifest.
 
 For a governed non-JSON artifact, canonical bytes are its literal file bytes unless its owner defines another exact byte contract.
 
-**Static implementation posture.** The pinned manifest is canonical and the runtime hashes it, but the manifest has eight entries and omits current PF12-required topology and complete Magic-10 narrative members. Its bytes and runtime definition do not establish complete manifest conformance, validation PASS, deployment, or acceptance.
+**Static implementation posture.** The inspected canonical manifest records release version `1.3.0` with 45 members, including both Reader schemas. Its bytes replace the earlier eight-entry observation; full member integrity and manifest conformance require their owning validation. Static manifest presence and hashing do not establish deployment or acceptance.
 
 ### **5.4.4 Change policy (what forces a new `release_id`)**
 
@@ -1008,11 +1009,11 @@ Pure source reformatting that produces identical governed canonical bytes does n
 * **Member integrity.** Each manifest member's governed bytes match its recorded `sha256` and `size`.  
 * **No self-listing and safe paths.** Manifest membership and paths satisfy the PF12 contract.  
 * **Evidence boundary.** Evidence updates and acceptance claims are verified in their owning canon; static artifact presence alone does not establish PASS.  
-* **Current gap.** The pinned manifest does not yet demonstrate required closure for PF01 topology, complete Magic-10, constants, and direct-Motor→Throat inputs.
+* **Current verification limit.** The inspected manifest contains the versioned Reader schema members, but this bounded documentation inspection does not execute or establish every closure, member-integrity or release-acceptance predicate.  
 
 ### **5.4.7 Backwards-compatibility posture**
 
-Changing governed pack bytes does not by itself change the Reader v1 public covenant. Reader v1 remains bands-only, numeric-free, and harmony-only unless a separately authorized public-contract version change widens it. Any future public exposure of the full ten-category matrix requires coordinated versioning without changing the current canonical calculation domain.
+Changing governed pack bytes does not by itself change either Reader public covenant. Reader v1 remains bands-only, numeric-free and harmony-only. The separately approved Reader v2 projection exposes all ten bands under §2.5; it does not change the canonical calculation domain, permit numerics or promote future configuration.
 
 ### **5.4.8 Routing (no transport bytes here)**
 
@@ -1021,7 +1022,7 @@ PF01 defines math input significance and release coupling. **PF12-Canon-HDE-Sche
 ## **5.5 Privacy posture (no percent/numerics on public) \[Required-Now\]**
 
 **Principle (normative).**  
-The public Reader v1 surface is **numeric-free**. No scores, percentages, counters, or derived numeric indicators may appear in public success bodies. Public items are **exactly** `{id, band}` (see §2.2); all other quantitative signals remain **internal**.
+The public Reader v1 and v2 surfaces are **numeric-free**. No scores, percentages, counters, or derived numeric indicators may appear in public success bodies. Public items are **exactly** `{id, band}` (v1: §2.2; v2: §2.5); all other quantitative signals remain **internal**.
 
 ### **5.5.1 Allowed vs. disallowed (public success)**
 
@@ -1052,11 +1053,11 @@ The public Reader v1 surface is **numeric-free**. No scores, percentages, counte
 
 ### **5.5.4 Validation (binary)**
 
-* **Schema gate requirement:** the public success schema MUST reject any numeric fields beyond the six-key covenant (for example, `score` or `score_pct`). The pinned schema does not fully enforce the covenant and remains an implementation gap.  
+* **Schema gate requirement:** each versioned public success schema MUST reject fields outside its six-key covenant and `{id,band}` items, including `score` and `score_pct`. The inspected v1 and v2 schemas close those fields; static inspection does not establish schema-validation PASS.  
     
 * **Golden proof requirement:** governed public goldens and grep-guards cover `categories[*]` containing only `{id, band}` and top-level keys matching the six-key covenant. Static files alone do not establish PASS.  
     
-* **Parity checks:** a CLI Reader-byte sidecar and Reader body MUST be byte-identical under this numeric-free policy. General `showcompat` stdout is an admin/compat payload and is not Reader bytes.
+* **Parity checks (v1):** the existing CLI Reader-byte sidecar and Reader v1 body MUST be byte-identical under this numeric-free policy. General `showcompat` stdout is an admin/compat payload and is not Reader bytes. Reader v2 approval creates no additional CLI parity family.  
 
 ### **5.5.5 Change control**
 
@@ -1064,8 +1065,7 @@ The public Reader v1 surface is **numeric-free**. No scores, percentages, counte
     
 * Until such a change is approved and versioned, the **numeric-free** public covenant stands.
 
->   
-> Note: Internal math exists; public exposure of the full 10-item array is **Reader v2** (future).
+Reader v2 exposes the full ten-item **band** array under §2.5. That approved projection preserves the numeric-free covenant and does not promote public scores or future math.
 
 ## **5.6 Resonance posture (SR/XR; α; hysteresis) \[Required-Now\]**
 
@@ -1163,6 +1163,31 @@ Unmatched hanging Gates, same-end hanging Gates, one unmatched half, and Gate re
 * **De-duplication.** A canonical Channel contributes at most once to the five-state vector and at most once to any configured signal row.  
 * **Canonical `channel_id`.** The Channel Catalog identity is `"<lowGate>-<highGate>"`, with numeric endpoints in ascending order and zero-padded to two digits (`01..64`). Example: Gates `{8,1}` resolve to `"01-08"`.  
 * **Sorting.** Channel-state rows and the derived EM Channel list must be duplicate-free and ASCII-sorted by canonical `channel_id`.
+
+### Complete endpoint conformance table
+
+For this table only, `A` and `B` identify the two input members; each two-bit pattern records ownership of the Channel's lower then higher endpoint Gate. These are exhaustive presence patterns, not scores or a serialized Gate mask. The `Full owner` column identifies the full-Channel member before normalization; only `dominance` and `compromise` emit an owner, encoded as `member_lo` or `member_hi` after numeric Gate-mask ordering. All other states omit the owner field.
+
+| Case | A endpoints | B endpoints | State | Full owner |
+| --- | --- | --- | --- | --- |
+| CS-01 | `00` | `00` | `none` | absent |
+| CS-02 | `00` | `10` | `none` | absent |
+| CS-03 | `00` | `01` | `none` | absent |
+| CS-04 | `00` | `11` | `dominance` | B |
+| CS-05 | `10` | `00` | `none` | absent |
+| CS-06 | `10` | `10` | `none` | absent |
+| CS-07 | `10` | `01` | `electromagnetic` | absent |
+| CS-08 | `10` | `11` | `compromise` | B |
+| CS-09 | `01` | `00` | `none` | absent |
+| CS-10 | `01` | `10` | `electromagnetic` | absent |
+| CS-11 | `01` | `01` | `none` | absent |
+| CS-12 | `01` | `11` | `compromise` | B |
+| CS-13 | `11` | `00` | `dominance` | A |
+| CS-14 | `11` | `10` | `compromise` | A |
+| CS-15 | `11` | `01` | `compromise` | A |
+| CS-16 | `11` | `11` | `companionship` | absent |
+
+The table applies the existing priority exactly once per Channel. Swapping A and B preserves the state and the normalized full-owner identity. Same-end or unmatched hanging Gates contribute nothing independently; reciprocal opposite hanging Gates produce one electromagnetic Channel identity through the same classifier (§6.2). Full Channel catalog facts remain owned by **PF12-Canon-HDE-Schemas-and-Artifacts**. This conformance table adds no response profile, weight, cap, threshold or category formula.
 
 ### **Throat flags (normative)**
 
@@ -1771,7 +1796,7 @@ Until all prerequisites are governed, no label, example, orphan file, empty cell
 * **PF12 — HDE-Schemas & Artifacts.** Owns exact catalog and artifact paths, schemas or executable validation contracts, manifest membership, migration, release identity, and governed artifact contracts.  
 * **PF02 — HDE-Architecture.** Owns component wiring, pure-compute boundaries, and single-home integration. It does not own formulas or artifact schemas.  
 * **Engine Core boundary.** Any promoted computation runs through the canonical pure Engine Core with normalized configuration injected as input.  
-* **Reader v1 boundary.** Reader v1 remains numeric-free and emits only `harmony`. That output is a projection from the complete canonical ten-category matrix; promotion cannot silently expose presets, scores, weights, tokens, other category bands, EM/HG records, or configuration details.
+* **Reader public boundary.** Reader v1 remains numeric-free and emits only `harmony`; Reader v2 exposes the ordered ten-band projection (§2.5). Both project the same complete canonical matrix. Promotion cannot silently expose presets, scores, weights, tokens, EM/HG records, configuration details or any additional public fields.
 
 ## **7.5 Promotion and change control**
 
@@ -1819,7 +1844,7 @@ Changing a promoted fold, priority or shadowing rule, magnitude, sign, bonus, da
 
 PF01 owns preset and aggregation mathematics if promoted. PF12 owns exact catalog paths, schemas, manifest membership, release-identity artifacts, and Evidence Catalog bindings. PF02 owns component wiring and the single-home boundary, not mathematical contracts.
 
-Final category scores map to bands only through §5.3; this section does not define a second mapping or threshold table. Reader v1 remains numeric-free and emits only the `harmony` band as a projection from the complete canonical ten-category matrix. Promotion does not silently widen public output. Transport, HTTP, CLI stream, harness, and operational behavior remain in their owning documents.
+Final category scores map to bands only through §5.3; this section does not define a second mapping or threshold table. Reader v1 remains numeric-free and emits only the `harmony` band; Reader v2 follows the ordered ten-band projection in §2.5. Both project the complete canonical matrix. Promotion does not silently widen either covenant. Transport, HTTP, CLI stream, harness, and operational behavior remain in their owning documents.
 
 # **9\. Validation**
 
@@ -1984,7 +2009,7 @@ Expected behavior:
 * Engine Core, the intrinsic cache, and the narrative router are not called;  
 * no `pair_key`, signal vector, category matrix, personal key, or shared key exists;  
 * Reader categories are exactly `[]`;  
-* canonical Reader preimage bytes hash to `8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15`;  
+* canonical **Reader v1** preimage bytes hash to `8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15`;  
 * two runs and the vacuous AB/BA reversal produce byte-identical Reader success bodies;  
 * the condition is not converted into an error.
 
@@ -2012,8 +2037,8 @@ Expected orientation and surface behavior:
 * the first UUID is `lo` and the second is `hi` by the `(gate_mask, canonical_person_id)` tuple;  
 * with a router stub returning `m10.test.personal.lo_to_hi`, `m10.test.personal.hi_to_lo`, and common shared key `m10.test.shared.equal_mask`, those values occupy `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and `shared_key` respectively;  
 * reversing request order produces byte-identical `magic10_compat_result.v1` bytes and the same caller-to-key mapping;  
-* Reader emits `eligible: true` and exactly `[{"id":"harmony","band":"Cool"}]`;  
-* canonical Reader preimage bytes hash to `ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e`;  
+* **Reader v1** emits `eligible: true` and exactly `[{"id":"harmony","band":"Cool"}]`; Reader v2 projects all ten Cool bands in the governed order under §2.5;  
+* canonical **Reader v1** preimage bytes hash to `ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e`;  
 * the Reader hash is independently computed and is not assigned from `pair_key`.
 
 ## **9.6 Pack closure and release identity**
@@ -2053,7 +2078,7 @@ Expected orientation and surface behavior:
 
 * **Two-run identity:** canonicalizing the same logical object twice produces byte-identical bytes, including the single trailing LF.  
 * **AB↔BA identity:** normalized inputs and deterministically ordered arrays and sets produce identical bytes for AB and BA (§3.4).  
-* **Reader↔CLI parity requirement:** corresponding Reader-envelope bytes from both surfaces must be byte-equal for the same inputs; shared canonicalization alone does not establish logical-envelope or stream parity.  
+* **Reader↔CLI parity requirement (v1):** corresponding Reader v1 and existing CLI Reader-envelope bytes must be byte-equal for the same inputs; shared canonicalization alone does not establish logical-envelope or stream parity. Reader v2 uses the same canonical recipe and creates no additional CLI parity family.  
 * **Environment pins:** byte checks run with `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
 
 ### **Validation gates (binary)**
@@ -2102,7 +2127,7 @@ Expected orientation and surface behavior:
 
 ### **10.2.4 Acceptance and validation (binary)**
 
-* **Reader↔CLI parity.** For identical inputs and environment, the Reader response body and corresponding CLI Reader-envelope bytes are byte-identical. Compat/admin stdout is a different surface and is not substituted for this proof.  
+* **Reader↔CLI parity (v1).** For identical inputs and environment, the Reader v1 response body and existing corresponding CLI Reader-envelope bytes are byte-identical. Compat/admin stdout is a different surface and is not substituted for this proof; v2 creates no additional CLI parity surface.  
 * **Idempotence re-check.** Remove `idempotence_hash`, re-serialize the preimage with the unified emitter, hash it, and reproduce the published digest (§3.2).  
 * **LF discipline.** Both Reader-envelope surfaces produce exactly one trailing LF and no BOM or ANSI bytes.  
 * **AB↔BA parity and two-run identity.** Public Reader-envelope bytes are bit-identical for AB versus BA and across two runs (§3).  
@@ -2128,11 +2153,11 @@ This section does not restate HTTP transport, conditional delivery, caching, or 
 ### **10.3.1 Acceptance gates (must all pass)**
 
 * **Canonical encoding.** Bytes are UTF-8, BOM/ANSI-free, use sorted keys and compact separators, and end with exactly one LF (`\n`).  
-* **Six-key success.** Success bodies contain exactly the six top-level keys (`reader_version`, `eligible`, `categories`, `meta`, `release_id`, `idempotence_hash`) and no extras (§2.1).  
-* **Public shape.** `categories[*]` are exactly `{id, band}` with `band ∈ {Cool,Open,Warm,Glow}`; no `prompt`, `personal_key`, `shared_key`, `score`, or other field is permitted (§§2.1–2.2).  
+* **Six-key success.** Success bodies contain exactly the six top-level keys (`reader_version`, `eligible`, `categories`, `meta`, `release_id`, `idempotence_hash`) and no extras (v1: §2.1; v2: §2.5).  
+* **Public shape.** `categories[*]` are exactly `{id, band}` with `band ∈ {Cool,Open,Warm,Glow}` and obey the selected version’s count/order policy (§§2.1–2.2, §2.5); no `prompt`, `personal_key`, `shared_key`, `score`, or other field is permitted.  
 * **Preimage re-check.** Removing `idempotence_hash`, re-serializing the five-key preimage with the canonical emitter, and hashing reproduces the published digest (§3.2).  
 * **Parity and identity:**  
-  * corresponding Reader and CLI Reader-envelope bytes are identical for identical inputs and environment;  
+  * corresponding Reader v1 and existing CLI Reader-envelope bytes are identical for identical inputs and environment;  
   * AB and BA bytes are bit-identical after pair normalization; and  
   * two serializations with the same inputs are byte-identical (§3.4).
 
@@ -2140,14 +2165,14 @@ This section does not restate HTTP transport, conditional delivery, caching, or 
 
 Maintain reproducible, private-data-free proof for canonical schema and LF discipline, public AB↔BA goldens, idempotence coupling, single-emitter call-path inspection, corresponding Reader/CLI Reader-envelope parity, and two-run identity. PF12 is the single home for exact artifact-family names, physical paths, Human Index rows, Machine Mirror records, hashes, sizes, and path proofs; this section does not maintain a parallel path list.
 
-The pinned repository contains serializer, presenter, schema, test, golden, script, and identity-related files, but the inspected bytes do not establish complete current acceptance: the named CLI schema/LF test is absent, the Reader goldens retain retired fields, the schema and presenter still permit `prompt`, and the checked-in identity marker is a historical or construction-time record rather than proof that the final required validation ran and passed.
+The inspected runtime, presenter and Reader schemas contain the versioned projection, canonical preimage/hash/final-emission definitions, closed success shapes and shared `error_v1` branch. **HDE Build Notes** records the accepted implementation and error-schema correction; those are attributed delivery records, not a current test run. Static artifacts or an identity marker alone do not establish complete current acceptance. PF12 remains the owner of governed evidence families and their currency.
 
 ### **10.3.3 CI hygiene (fail-fast)**
 
 * **Grep-guards:** forbid ad hoc `json.dumps(` and local public canonicalizers; allow only the governed presenter emitter and its canonical serializer dependency.  
 * **Single-LF check:** assert exactly one trailing LF on success and error bodies.  
 * **Schema and shape:** validate the six-key success object, `{id,band}` items only, closed IDs and enums, and the prohibited-field set.  
-* **Parity and identity:** compare AB/BA and two-run bytes and compare corresponding Reader and CLI Reader-envelope bytes.
+* **Parity and identity:** compare AB/BA and two-run bytes within each selected Reader version, and compare the existing corresponding Reader v1 and CLI Reader-envelope bytes.  
 
 ### **10.3.4 Failure posture (binary)**
 
@@ -2206,21 +2231,21 @@ These pointers describe static repository state at the pinned validation snapsho
 
 * **Current Reader runtime:** `engine/runtime/public.py`  
     
-  * Builds the current single-`harmony` Reader envelope, computes that band separately through `engine/compat/ts_v0.py`, and calls `presenter/reader_v1/emitter.py`.  
-  * The function defaults an externally supplied `eligible` value to true and constructs a `harmony` category even when `eligible` is false. Those bytes do not satisfy the complete eligibility and empty-category requirements merely because they are serializable.
+  * Requires the eligibility result and validated band projection from its caller; it does not calculate a type-derived band. Reader v1 emits one `harmony` item when eligible, Reader v2 emits the exact ordered ten-item projection, and both emit `[]` when ineligible.  
+  * The two versioned projections call the canonical presenter/emitter. Static definitions do not establish handler reachability, production readiness or acceptance.
 
 
 * **Presenter and serializer chain:** `presenter/reader_v1/emitter.py` → `engine/presenter/emitter.py` → `engine/serializer/canon.py` → `engine/stable/sercanon.py`  
     
   * The chain constructs the canonical preimage, computes `sha256`, and emits the final LF-terminated object.  
-  * `presenter/reader_v1/emitter.py` still carries through optional `prompt`; remove that carry-through so `categories[*]` are exactly `{id, band}` (§§2.1–2.2).
+  * `presenter/reader_v1/emitter.py` contains both versioned preimage builders and rejects any category fields beyond `id` and `band`; the v2 builder preserves the governed sequence and shares the final hash/emission function.
 
 
-* **Ten-category compat internals:** `engine/compat/{compute,categories,thresholds,ordering}.py`  
+* **Ten-category computation and projection:** `engine/core/core.py`, `engine/compat/compute.py`, and `engine/runtime/public.py`  
     
-  * This is a separate internal/admin hash-and-binary-float scoring path; it is not the source of the current public Reader `harmony` band and does not implement the canonical §5 Human Design-grounded matrix.  
-  * `engine/compat/categories.py` maintains a heat-first order that differs from the harmony-first frozen order in `catalog/magic10.json`. Ordered consumers must use the governed order.  
-  * Reader v1 still emits only the `harmony` projection; full public Magic-10 exposure requires an authorized versioned contract (§2.2).
+  * The inspected core defines the pure integer ten-category calculation. The compute boundary validates parties, decides eligibility before intrinsic evaluation, invokes the canonical core and retains intrinsic identity separately from the Reader hash.  
+  * The legacy `engine/compat/categories.py` constant is heat-first; it does not change the governed harmony-first order of `catalog/magic10.json`. Ordered Reader v2 consumers must use that governed sequence.  
+  * Reader v1 remains the `harmony` projection; Reader v2 follows §2.5. These pointers do not authorize a second scoring home or establish implementation acceptance.
 
 
 * **Viewer preferences:** `engine/validation/viewer_prefs.py`  
@@ -2236,10 +2261,10 @@ These pointers describe static repository state at the pinned validation snapsho
   * Harness presence does not prove Reader/CLI byte parity or transport acceptance.
 
 
-* **Public success schema:** `schemas/reader.v1.schema.json`  
+* **Versioned Reader schemas:** `schemas/reader.v1.schema.json` and `schemas/reader.v2.schema.json`  
     
-  * The inspected schema permits optional `category.prompt` and lists legacy `*_leader` category IDs rather than the current `harmony` ID. Align it to the exact six-key success covenant and `{id,band}` item contract in §§2.1–2.2.  
-  * Typed errors remain governed by §2.3 and use the canonical single-LF emitter.
+  * The inspected success branches close the six-key covenant and `{id,band}` items. V1 admits one eligible `harmony` item or an empty ineligible array; v2 admits the ordered ten-item projection or an empty ineligible array.  
+  * Both inspected schemas admit the shared `error_v1` branch referenced in §2.3. Shape definitions do not establish validation PASS, transport acceptance or deployment.
 
 
 * **CLI surfaces:** `engine/cli/main.py` and `scripts/hd_cli.py`  
@@ -2250,14 +2275,14 @@ These pointers describe static repository state at the pinned validation snapsho
 
 * **Evidence posture:**  
     
-  * The expected CLI schema/LF test path is not present in the inspected repository. Existing Reader goldens contain retired fields, and the checked-in identity marker records a deterministic predicate rather than complete final validation.  
+  * **HDE Build Notes** records the accepted delivery and corrected Reader error schema. Delivery, OPS, documentation, QA and closure remain distinct proof classes; historical records do not establish live current-row readiness or current evidence-family currency.
   * Scripts, tests, schemas, goldens, logs, and identity files establish only their checked-in contents. PF12 governs exact evidence-family and path bindings; executed PASS evidence is separate.
 
 
 * **CI hygiene (required validation):**  
     
   * Grep-guard public paths against direct `json.dumps(`, hand-built Reader envelopes, and multiple public canonicalizers; allow only the governed presenter-emitter chain (§10.2).  
-  * Validate AB↔BA bytes, two-run identity, single-LF discipline, schema and shape, frozen category order, idempotence coupling, and corresponding Reader/CLI Reader-envelope parity (§§3.4, 9, 10.3).
+  * Validate AB↔BA bytes and two-run identity within each selected Reader version, single-LF discipline, schema and shape, the governed v2 category order, idempotence coupling, and the existing corresponding Reader v1/CLI Reader-envelope parity (§§3.4, 9, 10.3).
 
 Transport, HTTP, conditional delivery, caching, writer behavior, and generic CLI stream policy are not restated here; they remain in their owning interface and governance documents.
 
@@ -2279,7 +2304,7 @@ Transport, HTTP, conditional delivery, caching, writer behavior, and generic CLI
 
 * **Pair normalization (AB↔BA).** Before any computation, derive a **pair key** and reorder inputs to a canonical **(min, max)** by the **ASCII comparator**. All downstream math **MUST** consume the **normalized pair** only.  
     
-* **Array → set semantics.** When an array represents a set (e.g., unique **category `id`s**, token IDs, channel IDs), **deduplicate by identity key**, then **sort deterministically (ASCII)** before use/serialization.  
+* **Array → set semantics.** When an array represents a set (e.g., token IDs or channel IDs), apply its owning deduplication and deterministic ASCII-sort contract before use/serialization. Reader v1’s single-category policy remains §2.2; Reader v2 `categories` is the governed ordered array in §2.5 and MUST NOT be set-sorted, deduplicated or repaired. Invalid v2 sequences fail closed.  
     
 * **Deterministic fold.** If the same token/ID appears more than once, apply the **commutative, associative fold** declared in the catalog (e.g., **max**, bounded sum) so evaluation order **cannot** affect the outcome.  
     

@@ -3,10 +3,10 @@
 ## 0.1 Document Control
 
 **Title:** PF17-Canon-HDE-Narratives-Guide  
-**Version:** v1.5.3  
+**Version:** v1.5.4  
 **Status:** Canon  
-**Effective** **date**: 2026-08-25  
-**Last Update Gate:** BN 12.8.9  
+**Effective** **date**: 2026-10-09  
+**Last Update Gate:** BN 13.5  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -17,7 +17,7 @@
 
 * **Deterministic composer contract.** Inputs, outputs, ranked whole-paragraph selection, suppression outcomes, shared symmetry, directional swap covariance, two-run identity, and hard lints. *(Tests/linters live in HDE-Mechanics Guide; acceptance wiring lives in the applicable phase document in the HDE-Build Checklist series — titles only.)*  
 * **Narrative packs & identity linkage.** What exists and how it is referenced (**pack\_sha**, freeze-pack/manifest coupling), not byte-for-byte schemas. *(Schemas/manifest listing live in HDE-Schemas & Artifacts.)*  
-* **Surfaces (policy level).** Reader v1 is narrative-free; Aux Narrative and CLI admin preview exist and are routed by title to their single homes (HDE-CLI-API-Vendor-Ref and HDE-Governance).  
+* **Surfaces (policy level).** Reader v1 and Reader v2 are narrative-free; Aux Narrative and CLI admin preview exist and are routed by title to their single homes (HDE-CLI-API-Vendor-Ref and HDE-Governance).  
 * **Evidence/Doc-Delta hooks.** Names of acceptance markers and cross-doc requirements; **same-PR** human `docs/evidence/INDEX.json` \+ hash sentinel ↔ machine `artifacts/evidence_index.jsonl` parity, canonical JSONL, unknown-key rejection, ASCII field order, sort-before-write, **single mirror file**, mirror checksum, and **proof\_anchor** discipline are owned in HDE-Schemas & Artifacts and Epic-Process-Guide and referenced here by title.
 
 **A7 proof surfaces.** A7 proofs run **only** on a **Catalog JSON success** route (Endpoint Catalog is internal-only and env-gated per entry); `/internal/version` is excluded. Evidence comprises:
@@ -97,11 +97,11 @@ This guide defines the **what/why** of narrative composition; enforcement and te
 
 ### Purpose
 
-Specify a **deterministic, LLM-free** layer that converts validated mechanics results and a validated narrative pack view into one short, human-readable paragraph for the **Aux narrative surface** and **CLI admin preview**, while leaving **Reader v1 unchanged and narrative-free**. The composer is a **pure function** with **two-run identity**, symmetric shared behavior, and directional swap covariance; its result is emitted through the **single shared presenter/emitter**. The concrete bytes/serializer contract is routed by title to **HDE-CLI-API-Vendor-Ref**, **HDE-Schemas & Artifacts**, and **HDE Architecture**.
+Specify a **deterministic, LLM-free** layer that converts validated mechanics results and a validated narrative pack view into one short, human-readable paragraph for the **Aux narrative surface** and **CLI admin preview**, while leaving **Reader v1 unchanged and narrative-free** and keeping **Reader v2 narrative-free**. The composer is a **pure function** with **two-run identity**, symmetric shared behavior, and directional swap covariance; its result is emitted through the **single shared presenter/emitter**. The concrete bytes/serializer contract is routed by title to **HDE-CLI-API-Vendor-Ref**, **HDE-Schemas & Artifacts**, and **HDE Architecture**.
 
 ### Non-Goals
 
-* **No change to Reader v1 public contract.** Reader success remains **bands-only (numeric-free)**; no narrative text appears on Reader v1. (Style/tone live in **HDE-Copy Tonality**.)  
+* **No change to Reader v1 public contract.** Reader success remains **bands-only (numeric-free)**; no narrative text appears on Reader v1. Reader v2 also remains **bands-only (numeric-free)** and carries no prompt, narrative key, or narrative text. (Style/tone live in **HDE-Copy Tonality**.)  
     
 * **No transport or payload bytes here.** A7 validators, ops posture, and rate-limits live in **HDE-Governance**; public and CLI/Aux endpoint shapes & payload bytes live in **HDE-CLI-API-Vendor-Ref**. Success proofs are **Catalog-driven** and run only on **Endpoint-Catalog (JSON-success)** routes; the Catalog is **internal-only** and **env-gated** (capture a **headers-only env-gate** proof). `/internal/version` is ops-only.  
     
@@ -183,7 +183,7 @@ This section defines terms and posture used in PF17. Transport and payload bytes
 * **Suppressed.** Deterministic outcome under valid identity when content is withheld because coverage is missing, an applicable governed `suppression_map` rule blocks every candidate, request validation fails outside identity, or the selected candidate is not lint-valid. Aux returns **200 with an empty body and no ETag**; a policy header may be present.  
 * **Pre-composition identity error.** Missing, malformed, or mismatched `release_id` or `pack_sha` fails before the Text/Suppressed union as `ERR_NARRATIVE_IDENTITY_INVALID`. It does not fabricate or echo composer provenance.
 
-**Public posture (numeric-free).** Reader v1 remains bands-only and narrative-free; narratives appear only via Aux and admin CLI preview.
+**Public posture (numeric-free).** Reader v1 and Reader v2 remain bands-only and narrative-free; narratives appear only via Aux and admin CLI preview.
 
 **Byte discipline (route-only).** Narrative text must contain **no CR**; LF normalization is enforced by acceptance. Runtime hashing/ETag normalization is owned by HDE-Governance and HDE-CLI-API-Vendor-Ref; file artifacts remain LF-terminated. PF17 stays contract-free and routes specifics by title.
 
@@ -522,7 +522,7 @@ Each trigger resolves to `missing_narrative_key` internally and returns the Supp
 
 **Can-emit coupling (no render needed).** Visibility uses the same explicit `CanEmitRequest`, immutable pack view, identity preflight, candidate eligibility, and governed suppression state as composition. It does not render or transform text.
 
-**Reader posture.** Reader v1 remains numeric-free and carries no narrative text; base Reader eligibility remains separate from narrative visibility.
+**Reader posture.** Reader v1 and Reader v2 remain numeric-free and carry no narrative text; base Reader eligibility remains separate from narrative visibility.
 
 **Evidence & logging.** Logs are keys-only and never include narrative text. Valid-identity Suppressed results retain `composition_id` and `pack_sha`; invalid-identity errors retain neither. Governed evidence updates follow HDE-Schemas & Artifacts and Epic-Process-Guide.
 
@@ -991,7 +991,7 @@ Missing, unsupported, duplicate, partial, or identity-invalid state must not be 
 ## **5.1 Reader v1 Posture — bands-only; narrative-free**
 
 **Posture (unchanged).**  
-Reader v1 public JSON remains numeric-free (bands-only) and contains no narrative text. Narrative text appears only on the Aux narrative surface and in admin CLI preview.
+Reader v1 and Reader v2 public JSON remain numeric-free (bands-only) and contain no prompt, narrative key, or narrative text. Narrative text appears only on the Aux narrative surface and in admin CLI preview.
 
 **Numeric-output gate.** Numeric public output requires a separately approved PF05, PF17, schema, and narrative change.
 
@@ -1000,16 +1000,16 @@ This guide does not restate payload shapes or header matrices; it links by title
 **Band-change dependency.** A band change requires review of the affected PF05, PF17, PF18, schema, and copy contracts before public activation.
 
 **Implications.**  
-Reader v1 keeps its existing public contract (six-key, numeric-free success body). Any narrative-related exposure continues to route through Aux/CLI, not Reader v1.
+Reader v1 keeps its existing public contract (six-key, numeric-free success body). Any narrative-related exposure continues to route through Aux/CLI; neither Reader v1 nor Reader v2 carries narratives.
 
-**Public expansion gate.** Full ten-category public exposure requires a separate versioned PF05, schema, narrative, and product decision.
+**Public expansion gate.** The separately approved versioned contract for full ten-category public exposure is Reader v2. Its category exposure adds no narrative surface or composer behavior. The existing composer, `can_emit`, Aux, CLI admin preview, and pack semantics remain unchanged. Reader v2 payload bytes, version selection, and transport are owned by **PF05-Canon-HDE-CLI-API-Vendor-Ref**; this guide does not restate them.
 
 **A7 proof surface (route-only).**  
 When Reader success routes are proven, proofs run only on a cataloged JSON success route (Endpoint Catalog, PF05). The Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof. `/internal/version` is ops-only and not A7-eligible.
 
 **Routing (titles-only).**
 
-* PF05 — CLI/API: declare Reader v1 narrative-free and define Aux/CLI behaviors.  
+* PF05-Canon-HDE-CLI-API-Vendor-Ref: define Reader v1/v2 public bytes and the existing Aux/CLI behaviors.  
     
 * PF04 — Governance: A7 (ETag/HEAD/304; writers/errors; ops exclusion).  
     
@@ -1052,7 +1052,7 @@ On the cataloged route, proofs satisfy:
 * Encoding-invariance of identity (ETag) and effective Content-Length across accepted encodings.
 
 **Reader posture (for clarity).**  
-Reader v1 remains bands-only and narrative-free; Aux/CLI are the narrative surfaces. (Routing: PF01/PF05.)
+Reader v1 and Reader v2 remain bands-only and narrative-free; Aux/CLI are the narrative surfaces. (Routing: PF01/PF05.)
 
 **Acceptance (names-only; enforcement lives in PF04/PF09/PF14).**
 
@@ -1081,7 +1081,7 @@ Aux evidence captures exactly **two** header snapshots: `aux_text_200.snap` and 
     
 * **Flags (titles-only).** Use a preview flag such as `--show-narrative` and an output option such as `--admin-out <path>` for sidecars. Names, shapes, and stdout/sidecar guarantees are defined in PF05 — CLI/API (not restated here).  
     
-* **Admin-only.** Access to narrative preview is restricted to authorized/admin contexts; public Reader v1 remains narrative-free. Narrative preview **must** use the same emitter as Aux and emit LF-terminated bytes.  
+* **Admin-only.** Access to narrative preview is restricted to authorized/admin contexts; public Reader v1 and Reader v2 remain narrative-free. Narrative preview **must** use the same emitter as Aux and emit LF-terminated bytes.  
     
 * **Suppression parity.** When the composer returns suppressed, the CLI preview mirrors suppression (no narrative text). Transport details remain governed in PF04/PF05.
 
@@ -1278,7 +1278,7 @@ These conditions are future-promotion prerequisites. They do not create a curren
 
 ### **8.1 Access control & privacy — admin-only preview; no PII in artifacts \[Canon\]**
 
-**Admin scope.** Narrative preview is **restricted to authorized/admin** contexts; public **Reader v1 remains narrative-free** (bands-only). Preview endpoints **must not** appear on public Reader surfaces.  
+**Admin scope.** Narrative preview is **restricted to authorized/admin** contexts; public **Reader v1 and Reader v2 remain narrative-free** (bands-only). Preview endpoints **must not** appear on public Reader surfaces.  
 **Ids-only artifacts.** Never include rendered narrative **text** or **PII** in logs, sidecars, evidence, or acceptance outputs. Preview artifacts **MUST** contain **ids only** (e.g., `composition_id`, `fragment_ids[]`, `pack_sha`, optional `release_id`) for audit traceability — **no user data**.  
 **Suppression parity.** If composition yields **suppressed**, **CLI preview mirrors suppression** (no text body). Aux/HTTP transport posture (200 empty, no ETag when suppressed) is governed in PF04/PF05.  
 **Acceptance (names-only).** `ADMIN_PREVIEW_GUARD_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`.

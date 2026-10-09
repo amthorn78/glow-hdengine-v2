@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
-**Version:** v2.4.5
+**Version:** v2.4.6
 
 **Status:** Canon  
-**Effective date:** 2026-08-25
+**Effective date:** 2026-10-09
 
-**Last Update Gate:** BN 12.8.9
+**Last Update Gate:** BN 13.5; HDE-EPIC040-specification-v1.1-approved.md; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -41,9 +41,9 @@ PF02 honors the single-home rule for:
     
 * the BodyGraph cache — the persistent store for Engine inputs (DB; not owned here in detail)
 
-**Supersession rule (PF10 addenda).**
+**Supersession rule (HDE Build Notes).**
 
-Where PF10 includes multiple numbered addenda on the same topic, the later number supersedes earlier guidance. Reference PF10 addenda by **addendum number \+ addendum title** (do not anchor to PF10 file versions or PF10 section numbers). PF02 reflects the latest position and routes work to canonical homes by title only (no version numbers).
+HDE Build Notes governs only the points its active, non-superseded guidance explicitly covers. A higher-numbered addendum controls overlapping scope or scope it explicitly supersedes; earlier guidance remains authoritative for distinct scope. PF02 reflects the effective position and references **HDE Build Notes** by document title only, without addendum numbers, addendum titles, section numbers, or file-version locators. When HDE Build Notes is silent on a PF02-owned point, PF02 governs.
 
 **Contract-free.**  
 PF02 never carries headers, payload schemas, status matrices, exit codes, SLAs, or acceptance tables. It describes wiring and flows only; bytes, tokens, and schemas are always owned by other PF documents.
@@ -97,7 +97,7 @@ Policies, manifest shape, and the Evidence Index/mirror live in HDE-Schemas & Ar
 
 **PR-first posture.**
 
-Epic-Process-Guide governs PR-first cadence. CodEx opens the PR automatically (one PR per epic/slice). Doc-Delta, Appendix D (human), the human Evidence Index (`docs/evidence/INDEX.json`), and the machine mirror (`artifacts/evidence_index.jsonl`) must update in the same PR whenever proofs/artifacts change. When the machine mirror changes, its governed companion files (`artifacts/evidence_index.jsonl.sha256` and `artifacts/evidence_index.jsonl.path_proof.txt`) MUST update in that same PR.
+Epic-Process-Guide governs PR-first cadence. The executing agent opens the PR automatically (one PR per epic/slice). Doc-Delta, Appendix D (human), the human Evidence Index (`docs/evidence/INDEX.json`), and the machine mirror (`artifacts/evidence_index.jsonl`) must update in the same PR whenever proofs/artifacts change. When the machine mirror changes, its governed companion files (`artifacts/evidence_index.jsonl.sha256` and `artifacts/evidence_index.jsonl.path_proof.txt`) MUST update in that same PR.
 
 **Doc-Delta artifacts (EPIC024; fixed paths).**  
 For EPIC024, Doc-Delta capture uses two fixed-path artifacts:
@@ -201,7 +201,7 @@ Within `engine/`, the sampler core module and Engine Core module are single home
 
 * **Sampler core module** (names-only). A pure-compute module under `engine/` that owns sampler/ranker behavior: pool formation, eligibility, ordering, and sampling decisions. It does not import transport, CLI, HTTP, evidence tooling, or environment.  
     
-* **Engine Core module** (names-only). A pure-compute module under `engine/` that owns neutral and directional compatibility metrics, AB↔BA parity, and the normalized result structure consumed by Presenter and evidence tooling. It does not import transport, CLI, HTTP, evidence tooling, or environment.
+* **Engine Core module** (names-only). A pure-compute module under `engine/` that owns intrinsic Gate-based compatibility computation, AB↔BA neutrality, and the complete ordered ten-category score-and-band result. Person identity, viewer preferences, directional narrative routing, eligibility decisions, and surface serialization are outside intrinsic computation. It does not import transport, CLI, HTTP, evidence tooling, or environment.
 
 All runtime surfaces and offline pipelines that need sampler or Engine Core behavior must call these modules in-process; they MUST NOT reimplement sampling or compat logic.
 
@@ -322,9 +322,11 @@ Architecture remains contract-free.
 
 * The canonical sampler behavior lives in a single module under the `engine/` tree, referred to here as the **sampler core module** (currently `engine.sampler.core`). It owns sampler/ranker behavior: pool formation, eligibility, ordering, and sampling decisions.  
     
-* The canonical Engine Core behavior lives at `engine.core.core`, with `engine.core.core.compute_core` as its canonical entrypoint. It owns the core compatibility computation: neutral and directional metrics, category-framework and per-channel mechanics integration, AB↔BA parity, and the normalized result structure consumed by Presenter and evidence tooling.
+* The canonical Engine Core behavior lives at `engine.core.core`, with `engine.core.core.compute_core(member_a, member_b, mechanics_bundle, release_id)` as its four-argument entrypoint. It consumes two normalized Gate members and one injected immutable admitted mechanics bundle with its release identity, and returns one complete intrinsic result. It does not accept precomputed scores, caller-selected configurations, or an alternate scoring authority.
 
-Current repository discrepancy: at repository commit `5ef911fec556a6c24bda8196b085f43c2da02150`, checked-in runtime public, HTTP compat, and CLI paths use `engine.compat.ts_v0` or `engine.compat.compute` rather than `engine.core.core.compute_core`. This does not change the canonical single-home requirement or claim that migration has occurred.
+**Admitted-release boundary [Required-Now].** Bundle loading and release admission occur outside pure Engine Core. Admission binds the manifest-derived release identity to the pinned release metadata and complete member cut, validates captured member bytes and executable-source equivalence, and supplies immutable typed registries and mechanics to the caller. Invalid or incomplete admission fails closed before intrinsic computation; it does not activate, repair, or promote a release. Freeze-Pack membership, canonical bytes and schemas remain owned by **HDE-Schemas & Artifacts**; loader and admission mechanics remain owned by **HDE-Mechanics Guide**.
+
+**Current repository behavior [Implemented].** At repository commit `e7265a090ad0cc8de5f36de2f19481216aa3d073`, Reader and `hdctl showcompat` use `engine.compat.compute.evaluate_pair` as the application boundary. It decides eligibility before core, intrinsic-cache or narrative-router access, loads the admitted bundle outside the core, invokes the four-argument `engine.core.core.compute_core`, and augments the complete result without rescoring. `engine.config.registry_loader.load_active_mechanics_bundle` supplies the immutable admitted bundle. This inspected wiring supersedes the earlier unmigrated-core observation for these consumers; it does not establish other surfaces' runtime behavior, distribution completeness, deployment, or release activation.
 
 **Behavior-only boundary.**
 
@@ -366,7 +368,7 @@ Only the presenter’s emitter entrypoint MAY serialize public bytes. All other 
 
 ### **Routing (titles only)**
 
-Concrete guard checks and scripts live in **HDE-Mechanics Guide**, and process/PR workflow (CodEx staging, PR-first merging, repo-docs/Evidence Index updates) lives in **Epic-Process-Guide**.
+Concrete guard checks and scripts live in **HDE-Mechanics Guide**, and process/PR workflow (executing-agent staging, PR-first merging, repo-docs/Evidence Index updates) lives in **Epic-Process-Guide**.
 
 ---
 
@@ -401,10 +403,11 @@ It remains **contract-free** and routes bytes and schemas by **title only**.
    Adapter/CLI calls Engine functions in-process.  
      
    * Engine modules (including `engine.core.core` and `engine.sampler.core`) run pure: **no I/O, clocks, environment reads, randomness, or import-time side effects**.  
-   * They accept **normalized data structures** and return **normalized results** (including pair normalization for AB↔BA neutrality).  
+   * They accept **normalized data structures** and return **normalized results**. Intrinsic compatibility is AB↔BA neutral and independent of person identity, viewer preferences and narrative orientation.  
    * Side effects are forbidden.  
-   * **Magic-10 pure Engine Core flow:** `BodyGraph Gates -> Channel states -> signal wire values -> category scores -> bands -> surface projection`.  
-   * Adapter, HTTP handlers, CLI, Presenter, and narrative layers MAY validate, call, or project this result. They MUST NOT calculate, weight, round, band, or rescore independently.
+   * **Magic-10 pure Engine Core flow:** `BodyGraph Gates -> Channel states -> signal wire values -> category scores -> bands`. Surface projection follows outside the core.  
+   * The application caller resolves and validates both complete inputs and decides eligibility before Engine Core, intrinsic-cache access or narrative routing. A valid self-pair produces no intrinsic result; malformed or inconsistent inputs fail closed rather than becoming an ordinary ineligible pair.  
+   * Adapter, HTTP handlers, CLI, Presenter, and narrative layers MAY validate, call, augment, or project the complete result. They MUST NOT calculate, weight, round, band, or rescore independently.
 
    
 
@@ -498,7 +501,7 @@ For mirrored compat surfaces:
 
 * Output must be non-empty canonical JSON.  
 * `showcompat` stdout is a compat payload (admin/test surface) and may include numeric scores and weights.  
-* Reader v1 bytes are the numeric-free public success envelope and are emitted by the Reader success route. When the CLI emits Reader v1 bytes for parity, it does so via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
+* Reader v1 and Reader v2 are bands-only, numeric-free public projections over the same complete intrinsic result. Reader v1 semantics remain unchanged. Reader v2 exposes the complete ordered ten-category band matrix through the same production Reader route; it adds no narrative text or internal scores. The CLI's dedicated Reader dump remains Reader v1 for parity (titles-only; see **HDE-CLI-API-Vendor-Ref**).
 * Byte identity for “Reader↔CLI parity” refers to the Reader 200 body vs the CLI’s dumped Reader v1 bytes for the same normalized inputs (single-emitter rule). It does not refer to `showcompat` stdout.  
 * Public, birth-facing, or no-user compat proof paths MUST NOT require caller-provided `person_uid`, `user_id`, or app user ID. If strict compatibility compute still needs internal metadata, a sanctioned resolver or adapter boundary MAY derive deterministic internal metadata before Engine Core compute; this does not make that metadata a public, birth-facing, or caller-supplied input.  
 * Fixture-only `person_uid` injection is an internal-compute proof class only; it is not sufficient architecture proof for live no-user or birth-facing behavior.  
@@ -549,7 +552,7 @@ Concrete header matrices, status tables, and validator implementations live in *
 
 **Public envelope construction & schemas.**
 
-* The public envelope (six-key **Reader v1** envelope, bands-only, numeric-free) and its schema live in **HDE-CLI-API-Vendor-Ref** and **HDE-Schemas & Artifacts**. When the CLI emits Reader v1 bytes for parity, it does so via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
+* Reader v1 and Reader v2 public envelopes, their canonical serialization, idempotence preimages and schemas live in **HDE-CLI-API-Vendor-Ref**, **HDE-Math-Spec**, and **HDE-Schemas & Artifacts**. Reader v1 and its CLI dump/parity contract remain unchanged; Reader v2 uses the same Presenter emitter over the complete intrinsic result. PF02 owns wiring and projection boundaries only.  
     
 * PF02 treats them as contract surfaces and refers to them by title only.
 
@@ -795,78 +798,52 @@ See §2.2 for the high-level Reader/CLI → Engine Core → Presenter flow and �
 ## **3.2 Reader v1 \[Required-Now\] (public success route)**
 
 **Intent.**  
-A public Reader surface on the adapter that uses the same canonical emitter path as the CLI. It exposes the six-key public envelope for client apps without duplicating computation or serialization logic.
+Public Reader v1 and Reader v2 use the same adapter-owned production route, application evaluation boundary and canonical Presenter emitter. Their public projections are bands-only, numeric-free and narrative-free; computation and serialization have no per-version alternate home.
 
-**Responsibilities (conceptual).**
+**Responsibilities (conceptual) [Required-Now].**
 
-* Accept normalized inputs or references and perform lightweight structural checks before calling the Engine in-proc.  
-    
-* Return the public envelope via the canonical emitter (no narratives, no internal fields, no side effects).  
-    
-* Maintain CLI↔Reader byte parity for identical inputs and environment; parity is a requirement (bytes owned elsewhere).  
-    
-* Obey A7 success-route posture (routing notes below).  
-    
-* Use DB-backed BodyGraphs for compat computation, following the BodyGraph lifecycle (no inline vendor I/O on Reader 200).
+* Accept only the governed party references and version selection, validate them at the application boundary, and resolve both complete BodyGraph projections read-only from the canonical current-row store. Reader performs no write, request-time vendor call, arbitrary identity conversion or silent fallback.
+* Decide eligibility before Engine Core, intrinsic-cache access or narrative routing. A valid self-pair produces the governed ineligible public projection without an intrinsic result; malformed or inconsistent projections fail closed under the owning error contract.
+* For an eligible pair, call the admitted-release consumer path in §2.1 and project its complete result without recalculation, reweighting, rounding, banding or rescoring.
+* Reader v1 retains its existing harmony-only public projection and CLI-dump byte-parity obligation. Reader v2 projects all ten category bands in the canonical order; it does not expose numeric scores, signals, weights, narratives or internal identities. Reader v2 does not change the Reader v1 CLI dump contract.
+* Emit both versions through the same governed Presenter emitter. Envelope fields, ordering, idempotence preimages, serialization, error bytes and transport policy remain in their owning PF documents.
 
-**Current repository behavior \[Implemented\].**  
-At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the checked-in adapter defines `/reader`, emits through the shared Reader emitter, gates non-dev `APP_ENV` values while treating an absent `APP_ENV` as `dev`, and loads local chart files. The Endpoint Catalog classifies `GET /reader` and `HEAD /reader` as internal `dev_harness` routes with `APP_ENV=dev`.
+**Current repository behavior [Implemented].**  
+At repository commit `e7265a090ad0cc8de5f36de2f19481216aa3d073`, `adapter/factory.py` mounts the production Reader blueprint under `/api`. `adapter/http_reader.py` implements `POST /api/reader` with Reader v1 or Reader v2 selection, read-only current-row BodyGraph resolution, `engine.compat.compute.evaluate_pair`, and the shared Reader presenter. The presenter delegates canonical byte emission to the existing emitter; version selection does not create a second calculator or serializer.
 
-**Current repository discrepancy.**  
-The checked-in Reader is a dev fixture surface, not the required public DB-backed Reader. Its handler reads caller-supplied local chart paths and does not implement the DB-backed BodyGraph lifecycle required above.
+**Dev fixture surface [Implemented].**  
+The same baseline retains env-gated `GET /reader?v=1` as a local-chart dev/proof surface. It does not expose Reader v2. `POST /reader` remains a refusal stub, not an alias of the production Reader. Dev fixture and production DB-backed Reader proof classes remain distinct.
 
 **Static inspection cannot establish.**  
-Static repository bytes do not establish runtime reachability, deployment, or production enablement for the Reader surface.
+Inspected wiring does not establish runtime reachability, deployment, production enablement, live current-row readiness, or successful live DB-backed Reader v1/v2 calls. The supplied exceptional EPIC040 closure does not discharge the deferred current-row/live Reader proof, constitute an ordinary close pack, or authorize activation, deployment or PF09 status movement.
 
 **Non-goals.**
 
-* No alternate serializers, payload shaping, or per-surface formatters.  
-    
-* No direct vendor/network calls on the public success route.
+* No alternate serializers, payload shaping, per-surface formatters, or public numeric/internal results.
+* No direct vendor/network acquisition, writes, or new persistence surface on the public Reader request path.
 
-**Reader route posture (route-only).**
+**Reader route posture (route-only) [Required-Now].**
 
-* **Canonical route:** `GET /reader` is the canonical Reader route for the v1 Reader success surface.  
-* **Governed proof-surface role:** `/reader` is the governed Reader success-proof surface when it is the selected cataloged Reader success route for the target environment. Co-location with dev or internal routes in the same adapter module does not make `/reader` a dev-harness-only route class.  
-* **Version selection:** Reader v1 is selected via query parameter `v=1` on the Reader route; the route path does not change for v1 selection.  
-* **Optional `/api` mount alias:** when the Reader blueprint is mounted under an `/api` prefix in a given runtime configuration, `/api/reader` is an alias of the same Reader surface (not a distinct contract or separate proof surface).  
-* **No invented reader-proof path:** there is no `/api/reader-proof/v1` route. Treat references to that path as drift and correct them to the canonical Reader route (`/reader`, or `/api/reader` only when that is the configured mount).  
-* **Proof-surface selection:** any proof that depends on a Reader success route must reference the actual reachable Reader route for the target environment. Do not invent alternate proof routes or second designation carriers. When an Endpoint Catalog is used, select the proof route from catalog entries that correspond to real mounted routes; if that inventory is missing an explicit governed-surface designation, treat the gap as documentation drift to correct at the inventory home rather than inventing a second mechanism in Architecture or QA.  
-* **Scope note:** this posture records canonical Reader surface routing for planning and QA, preserves the existing Reader success surface, and does not introduce new routes, new flags, or writer-side surfaces.
+* **Production route:** `POST /api/reader`, with version selection on the same path for Reader v1 or Reader v2. Production POST transport remains non-conditional under **HDE-CLI-API-Vendor-Ref**; adding Reader v2 creates no route, writer surface or alternate emission path.
+* **Dev route:** `GET /reader?v=1` remains the separate env-gated Reader v1 fixture surface. It is not a production POST alias, live DB proof, or Reader v2 proof.
+* **No invented reader-proof path:** there is no `/api/reader-proof/v1` route.
+* **Proof-surface selection:** select the actual reachable route and version for the target environment. Where an Endpoint Catalog is required, use entries corresponding to the real mounted routes and the required proof class. Missing inventory designation is drift at the inventory home, not authority to invent another route or designation carrier in Architecture.
 
 **A7 proof surface (route-only; titles-only).**
 
-* **Cataloged route only.**  
-    
-* Reader success proofs run only on a cataloged JSON success route named in the Endpoint Catalog (HDE-CLI-API-Vendor-Ref). The Catalog’s single home is `docs/ENDPOINTS_CATALOG.json` (+ `.sha256` sidecar). The `.sha256` sidecar must reference `docs/ENDPOINTS_CATALOG.json` for repo-root verification. Proofs target a route listed there; `/internal/version` remains excluded. When the selected cataloged proof route is `/reader`, `/reader` is the governed Reader success-proof surface for that scope, env gated to dev (`APP_ENV=dev`), and A7-eligible. This does not classify `/reader` as a dev-only conjunction or preview route. Env-gate proof is mandatory (headers-only).  
-    
-* **Catalog posture.**  
-  The Endpoint Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod. Capture a headers-only env-gate proof.  
-    
-* **A7 invariants to satisfy.**  
-  Require:  
-    
-  * `Vary: Authorization, Accept-Encoding`  
-      
-  * Encoding invariance of identity (ETag) and effective `Content-Length` across accepted encodings  
-      
-  * HEAD 200 validator parity with `Content-Type == GET` and `Content-Length == len(identity 200 body)`  
-      
-  * 304 only after prior 200, with no body and omitting both `Content-Type` and `Content-Length`
-
-
-* **Ops exclusion.**  
-  `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.
+* A7 proofs run only on an A7-eligible cataloged JSON success route, selected through the Endpoint Catalog owned by **HDE-CLI-API-Vendor-Ref**. Adding Reader v2 to the production POST route does not confer GET/HEAD conditional proof semantics on that route.
+* Catalog and non-prod env-gate obligations remain in force. Non-prod entries must be unreachable in production and require the governed headers-only env-gate proof. A dev Reader fixture proof supplements its selected scope; it does not prove production current-row behavior.
+* A7 validator, conditional-delivery and encoding-invariance obligations remain governed by **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**. PF02 does not duplicate their header matrices.
+* `/internal/version` remains excluded from A7 proofs. PF02 does not define its access-control posture.
 
 **Routing (titles-only).**
 
-* Field definitions, examples, conditional delivery, and parity proofs → **HDE-CLI-API-Vendor-Ref**  
-    
-* A7 acceptance policy and tokens → **HDE-Governance**  
-    
-* Canonical JSON policy, pack/manifest, and machine mirror discipline → **HDE-Schemas & Artifacts**
+* Request/response fields, version selection, error envelopes, transport and Reader v1 parity proofs → **HDE-CLI-API-Vendor-Ref**
+* Eligibility, complete intrinsic result, category order and idempotence semantics → **HDE-Math-Spec**
+* Public schemas, pack/manifest and evidence-index/mirror discipline → **HDE-Schemas & Artifacts**
+* A7 acceptance policy and tokens → **HDE-Governance**
 
-Reader’s public success route uses the same Engine Core \+ Presenter flow as compat v1. **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** own success envelope bytes and A7 posture by title, and Reader obtains BodyGraphs via the DB-backed lifecycle described in §2.4.
+Reader's public success route uses the same admitted Engine Core result and Presenter flow for both versions. The read-only production Reader consumes the DB-backed BodyGraph lifecycle in §2.4; acquisition and refresh stay outside its request path.
 
 ---
 
@@ -920,7 +897,7 @@ At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the selected Re
 The selected factory registers the Reader blueprint without an environment-specific unmount. The dev route handlers enforce a request-time gate, but static repository bytes do not establish that the routes are never mounted in production or that any route is runtime-reachable.
 
 **Required architecture \[Required-Now\].**  
-Sample harness uses the same Presenter emitter and Engine Core behaviour as compat v1. Dev-only conjunction preview endpoints emit canonical JSON bytes; rails are closed by default unless explicitly opened. Sample harness is never used for A7 proofs; see §2.4 and §5 for compat flow and evidence-plane details.
+Sample harness uses the same Presenter emitter and Engine Core behaviour as compat v1. Dev-only conjunction preview endpoints emit canonical JSON bytes and use the real admitted manifest-derived release identity. Their resolver seam is dev-only and absent by default; it does not create a production Reader input or fallback. Rails are closed by default unless explicitly opened. Sample harness is never used for A7 proofs; see §2.4 and §5 for compat flow and evidence-plane details.
 
 **Routing (titles-only).**
 
@@ -1099,7 +1076,7 @@ Record, at the architectural level, how the Reader runs in dev/QA environments a
 
 ### **3.8.1 Dev/QA Reader availability**
 
-* Reader v1 is exposed through the adapter process as one of the runtime surfaces named in this section. It uses the single canonical Presenter emitter and never hand-crafts public JSON.  
+* Production Reader v1 and Reader v2 are exposed through the adapter-owned production route; the separate dev fixture route remains Reader v1. All use the single canonical Presenter emitter and never hand-craft public JSON.  
     
 * In any dev/QA console that plans to exercise Reader or other HTTP runtime surfaces, the adapter/Reader process **must** be started explicitly using the canonical start command and environment described in **Glow Infrastructure** and the **HDE-Mechanics Guide**. Live QA **must not** rely on guessing hostnames or ports.  
     
@@ -1123,7 +1100,7 @@ Static repository bytes do not establish that any dev/QA service is running or r
 
 For epics whose D-goals involve Reader/HTTP behaviour, compat behaviour, or dev sampler behaviour, Live QA uses canonical entrypoints only:
 
-* **Reader v1** (public success route) for HTTP-level compat envelopes.  
+* **Reader v1 or Reader v2** on the production success route for the selected HTTP-level public projection. The separate Reader v1 fixture route supplies only its dev proof class.
 * **Compat CLI surfaces** (as described in **HDE-CLI-API-Vendor-Ref**) for terminal-based compat flows. CLI stdout may be an admin/test compat payload (for example `showcompat`). When Reader-identical bytes are required for parity proofs, the CLI emits Reader v1 bytes via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
 * **Controlled no-user vendor smoke (CLI proof class).** A PO-run `showcompat` vendor smoke is a CLI proof class through the vendor seam. For architecture purposes, it is not an HTTP Reader run, not a hosted-service proof, and not a new public route. If a future smoke changes from CLI vendor execution to an HD Engine HTTP service call, the target classification changes and must be grounded in the infrastructure home before execution. Concrete command flags, environment variables, credentials, and evidence outputs are routed by title to the owning CLI/API, infrastructure, QA, and build-checklist homes.  
 * **Repo-local script launcher surface (names-only).** `scripts/hdctl.py` is a repo-local launcher over the same CLI family and is used for subcommand help and invocation flows such as `bg:resolve`. Architecture treats this launcher as part of the existing emitter-backed CLI entrypoint family, not as a second serializer, second contract, or distinct runtime surface.  
@@ -1153,9 +1130,9 @@ For epics whose D-goals include live vendor behaviour or Reader/HTTP behaviour, 
 
 Reader and CLI surfaces are **peers** with respect to the single-emitter rule: both call the same Presenter emitter symbol. PF02 does not define which surface satisfies any particular D-goal; that choice and its evidence requirements are owned by **HDE-Phased Epics**, the **Glow QA Guide**, and **HDE-Governance**.
 
-**Production-affecting architecture classification.** When an epic affects deployed behavior, public or app-facing behavior, runtime request/response behavior, Engine compute, vendor ingest, external integration, DB persistence/retrieval, app/engine integration, or secret/environment binding, PF02 classifies the affected flow as production-affecting for QA planning. Production-affecting architecture requires live validation of at least one relevant production-facing boundary or an explicit authorized exemption.
+**Production-affecting architecture classification.** When work touches production-functional surfaces, including deployed behavior, public or app-facing behavior, runtime request/response behavior, Engine compute, vendor ingest, external integration, DB persistence/retrieval, app/engine integration, or secret/environment binding, PF02 classifies the affected flow as production-affecting for QA planning. Every such QA Plan MUST include at least one bounded live-vendor open-rails test using synthetic data only, with `SAFE_MODE=0` and `ALLOW_NETWORK=1`. Fixtures, mocks, static inspection, closed-rails replay, and DB-backed or deployed non-vendor behavior do not substitute for this vendor test; the earlier exemption alternative does not satisfy this scope.
 
-PF02 owns this architecture classification only. Exact Live QA steps, open-rails evidence shape, exemption handling, PASS/FAIL semantics, and closeout proof rules live in Glow QA Guide, HDE-Governance, Epic-Process-Guide, HDE-Schemas & Artifacts, and Plan Templates by title.
+The plan identifies the relevant vendor flow, authorized live target, bounded request scope, secret-safety posture, captured evidence, and what the test proves and does not prove. This is a QA-plan approval-readiness condition, not execution authorization or a QA/closure verdict. Role, session, credential, rails and mutation permissions remain unchanged. PF02 owns architecture-level classification and surface selection only; exact test steps, evidence shape, PASS/FAIL semantics and closeout proof rules remain in **Glow QA Guide**, **HDE-Governance**, **Epic-Process-Guide**, **HDE-Schemas & Artifacts**, and **Plan Templates** by title.
 
 ### **3.8.4 Discovery vs guessing**
 
@@ -1296,7 +1273,7 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
       
   * Idempotence preimage and AB↔BA parity are preserved by construction.  
       
-  * Compat v1, Reader v1, dev sampler harnesses, and offline determinism/evidence pipelines all route through the same Engine Core and sampler core modules; no surface is allowed to fork or reimplement core math. Differences are in rails, environment, and evidence policy only (owned in other PF docs by title).
+  * Compat v1, Reader v1, Reader v2, dev sampler harnesses, and offline determinism/evidence pipelines call the same Engine Core and sampler core modules where applicable; no surface is allowed to fork or reimplement core math. Public Reader versions project the same complete intrinsic result without rescoring. Rails, environment and evidence policy remain owned in other PF documents by title.
 
 **Adapter → BodyGraph source (env-aware).**  
 **Prod:** request path **does not** call vendor; BodyGraph comes from **DB**; refresh is **out-of-band** (policy by title).  
@@ -1373,7 +1350,7 @@ Architecture records ownership and posture; concrete bytes and repository paths 
     
 * **Evidence bundles and bundle manifests** (textual, typically JSON/JSONL) under governed paths (for example, `artifacts/**`, `docs/evidence/**`, `audit/**`) that group related evidence members and enumerate them by logical artifact key, hash, and size. Architecture treats bundles and manifests as governed artifacts in their own right; PF02 routes all schema/field details by title to other PF documents and stays contract-free.
 
-These surfaces together form the **ledger-centric, deterministic, text-based evidence posture** for the Engine: any acceptance decision for an epic must ultimately be justified by entries in the Human Index and Machine Mirror (and, where used, bundle manifests) that a human operator or a ChatGPT-class agent can inspect per PR. Detailed schema and tokenisation remain single-home elsewhere.
+These surfaces together form the **ledger-centric, deterministic, text-based evidence posture** for the Engine: any acceptance decision for an epic must ultimately be justified by entries in the Human Index and Machine Mirror (and, where used, bundle manifests) that a human operator or the executing agent can inspect per PR. Detailed schema and tokenisation remain single-home elsewhere.
 
 **Where proofs live (titles/paths only).**
 
@@ -1385,7 +1362,7 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
     
 * **HDE-Schemas & Artifacts** — Human Evidence Index (`docs/evidence/INDEX.json`) and Machine Evidence Index (`artifacts/evidence_index.jsonl`) as single homes for ledger listings and mirror schema; optional human-index hash sentinel; bundle and bundle-manifest schemas; and path-proof semantics for governed artifacts and bundles.  
     
-* **Epic-Process-Guide** — PR-first cadence (CodEx opens PR), required same-PR updates for Doc-Delta \+ indices, and CI parity/guardrails.  
+* **Epic-Process-Guide** — PR-first cadence (the executing agent opens PR), required same-PR updates for Doc-Delta \+ indices, and CI parity/guardrails.  
     
 * **PF10-HDE-Build-Notes** — Applicable, active, non-superseded addenda control only the exact points they explicitly address; silence leaves the permanent PF canon in control.  
     

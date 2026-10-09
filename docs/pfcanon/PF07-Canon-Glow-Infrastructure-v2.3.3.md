@@ -1,10 +1,10 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v2.3.2  
+**Version:** v2.3.3  
 **Status:** Canon  
-**Effective date:** 2026-08-25  
-**Last Update Gate:** BN 12.8.9  
+**Effective date:** 2026-10-09  
+**Last Update Gate:** BN 13.5; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md  
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ---
@@ -48,9 +48,9 @@ PF07 records only DB/schema locations, service names, and any canonical infra ke
 
 **Change control (titles-only cross-refs)**
 
-* **Supersession rule (PF10 addenda).** Consult the complete latest active PF10 base version, whether it is one unlettered document or a complete verified lettered set, and treat every document in a lettered set as an equally authoritative container of independently scoped addenda. Apply every applicable, active, non-superseded addendum to its own scope. A later document letter supersedes nothing by itself; a higher-numbered addendum controls only overlapping or explicitly superseded scope, and lower-numbered guidance remains authoritative for distinct scope. PF10 governs PF07 only where such an addendum explicitly addresses a PF07-owned topic; when the complete active PF10 version is silent on that topic, PF07 governs. PF07 integrates applicable PF10 guidance and routes **by title only** to single homes (no version numbers). Build Notes reference posture: cite PF10 by **addendum number \+ addendum title**; do not use PF10 version strings, document letters, or PF10 section numbers as durable anchors.  
+* **HDE Build Notes authority (titles-only).** Resolve current PF documents from `docs/pfcanon/` on `main`, retaining each document's declared standing. **PF10-HDE-Build-Notes** is the canonical override and amendment mechanism. Consult its complete current logical version, whether one unlettered document or a complete verified lettered set. Each active, non-superseded addendum governs its own stated scope; a higher-numbered addendum controls only overlapping or explicitly superseded scope, and a later document letter alone supersedes nothing. When HDE Build Notes is silent on a PF07-owned topic, PF07 governs. PF07 routes to single homes by title only. Current PF prose names **PF10-HDE-Build-Notes** by title alone, without addendum numbers, headings, section numbers, versions or document letters.  
     
-* **PR-first via CodEx.** CodEx opens the PR automatically (one PR per epic or slice). Whenever proofs or artifacts change, update in the same PR: Doc-Delta, the human Evidence Index (`docs/evidence/INDEX.json`) and its path-proof (`docs/evidence/INDEX.json.path_proof.txt`), the Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`) and its path-proof (`docs/evidence/INDEX.sha256.path_proof.txt`), and the machine JSONL mirror (`artifacts/evidence_index.jsonl`).  
+* **PR-first via the executing agent.** The executing agent opens the PR automatically (one PR per epic or slice). Whenever proofs or artifacts change, update in the same PR: Doc-Delta, the human Evidence Index (`docs/evidence/INDEX.json`) and its path-proof (`docs/evidence/INDEX.json.path_proof.txt`), the Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`) and its path-proof (`docs/evidence/INDEX.sha256.path_proof.txt`), and the machine JSONL mirror (`artifacts/evidence_index.jsonl`).  
     
 * **Machine mirror hygiene.** The mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, exactly one trailing `\n`), unknown-keys rejected. Each record includes `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` to a path-proof stored alongside the artifact. Keep 1:1 parity with the human index.  
     
@@ -66,9 +66,9 @@ PF07 records only DB/schema locations, service names, and any canonical infra ke
     
 * **Specificity and review posture.** When PF07 is cited for an infra or ops task, the document MUST name the applicable provider, project, service, repository, base URL or port, database instance or schema, config key, governed evidence root or QA root, and the exact expected value or exact PF07 value source, as relevant. A plan or document that refers to infra or ops work without the concrete PF07-backed value, or without an explicit PF07-gap blocker, is non-conforming and must stop at the gap.  
     
-* **PS discovery for discoverable infrastructure facts.** When a PF07-owned fact needed by a plan, implementation guide, QA plan, OPS task, or remediation guide is missing but can be safely discovered by the PO through bounded OPS discovery or a bounded PO-authorized open-rails check, the artifact MUST route the unknown to that discovery work rather than treating the missing fact as automatic deferral. This does not authorize guessing, secret exposure, uncontrolled external action, or agent-performed OPS. If discovery is unsafe, not authorized, requires a decision that cannot be safely staged, or would require inventing facts, record the PF07 gap and stop at the gap.  
+* **PS discovery for discoverable infrastructure facts.** When a PF07-owned fact needed by a plan, implementation guide, QA plan, OPS task, or remediation guide is missing but can be safely discovered through bounded Product Owner-authorized OPS discovery or an open-rails check, the artifact MUST route the unknown to that discovery work rather than treating the missing fact as automatic deferral. Execution authority for an identified live vendor task, including execution by the Product Owner's directed agent, is governed by **PF10-HDE-Build-Notes** and the owning governance and QA documents. Other OPS and privileged-action boundaries remain with their owning documents. This does not authorize guessing, secret exposure, or uncontrolled external action. If discovery is unsafe, not authorized, requires a decision that cannot be safely staged, or would require inventing facts, record the PF07 gap and stop at the gap.  
     
-* **Codex Audit repo-reality posture.** A supplied Codex Audit may be used as observed repo-reality evidence for existing repo-bound infrastructure loci, such as current config helpers, environment files, evidence helpers, or repo paths. Codex Audit observations do not prove live infrastructure truth, OPS completion, QA PASS, acceptance-token satisfaction, PF09 status, or canon authority. Live facts still require PF07, PO confirmation, OPS discovery, PO-authorized open-rails evidence, or repo validation as applicable.  
+* **Read-only repository audit posture.** A supplied read-only repository audit may be used as observed repo-reality evidence for existing repo-bound infrastructure loci, such as current config helpers, environment files, evidence helpers, or repo paths. Audit observations do not prove live infrastructure truth, OPS completion, QA PASS, acceptance-token satisfaction, PF09 status, or canon authority. Live facts still require PF07, PO confirmation, OPS discovery, PO-authorized open-rails evidence, or repo validation as applicable.  
     
 * **Infrastructure examples and executable exactness in review posture.** Infrastructure examples in plans are not required to be paste-ready unless the artifact is explicitly an execution runbook. PF07-owned commands, paths, endpoints, config keys, environment variables, evidence roots, service names, provider names, base URLs, ports, QA roots, evidence paths, manifests, hash files, path-proof files, artifact identities, and environment or rails examples must be judged by source-level identity and infrastructure boundary preservation. Plan approval MUST NOT block on shell syntax, environment-variable command syntax, escaped command examples, helper-code formatting, heredoc form, or pasted command exactness. Escaped display in assistant output, rendered markdown, copied chat text, preview panes, review prose, or other display-layer text is not evidence that the underlying PF07-owned string is invalid. Infrastructure blockers require real rails, secrets, external-action, config, environment-authority, missing-PF07-fact, or source-level infrastructure defects. Command normalization during execution is allowed when the same infrastructure boundaries, authority, rails posture, config identity, and evidence identity are preserved.
 
@@ -369,7 +369,7 @@ Source-selection snapshots and refresh-policy snapshots are stored under governe
 
 For production-affecting HD Engine work, PF07 records only the infrastructure facts needed by the owning plan and QA homes: target environment, provider, service, base URL, database target, config-key names, secret-binding names, rails keys, and governed evidence roots.
 
-When an epic affects deployed service behavior, vendor ingest, HumanDesignAPI calls, request shaping, response mapping, database persistence or retrieval, database transport behavior, public or app-facing behavior, CLI/API behavior used in production, or environment-variable or secret-binding behavior, the owning Live QA Plan must include at least one bounded open-rails live QA step or an explicit authorized exemption. PF07 does not define the step, PASS/FAIL predicate, token semantics, or QA procedure.
+When an epic affects deployed service behavior, vendor ingest, HumanDesignAPI calls, request shaping, response mapping, database persistence or retrieval, database transport behavior, public or app-facing behavior, CLI/API behavior used in production, or environment-variable or secret-binding behavior, its live-proof requirement is governed by **HDE-Governance** and **Glow QA Guide**. For any surface used to produce a production feature described as functional in PF canon, **PF10-HDE-Build-Notes** governs the mandatory open-rails live vendor test with synthetic data only and its non-substitution rule; an exemption, a closed-rails test, or a non-vendor live step does not replace that scoped requirement. PF07 records the supporting infrastructure facts and does not define the step, PASS/FAIL predicate, token semantics, or QA procedure.
 
 Live QA may verify deployed environment bindings, secret presence, base URL posture, external service reachability, and header-shape posture in redacted form. Live QA must not record raw secrets, raw database passwords, raw private payloads, or uncontrolled production data. Production, dev, QA, and Codespaces environment distinctions must remain explicit, and Live QA must use the correct environment and rails posture for the behavior being proven.
 
@@ -465,7 +465,7 @@ PF07 does **not** decide where behavior tests that satisfy D-goals are executed;
 **Scope (inventory-only).**  
 This section records, at the names-only level, that in the **pre-Glow** period the HD Engine exposes two admin-facing product access surfaces:
 
-* an **Admin GUI** (as recorded in PF10 addenda by title), and  
+* an **Admin GUI** (as recorded in **PF10-HDE-Build-Notes**), and  
     
 * a **terminal CLI** for the HD Engine (for example, `hdctl` as defined in **HDE-CLI-API-Vendor-Ref**).
 
@@ -489,7 +489,7 @@ Any shell that can reach this base URL and/or connect to this DB instance with t
 **CLI-local vendor smoke target distinction (names-only).**
 
 * A controlled HD Engine vendor smoke may target the local HD Engine CLI in a PO-controlled execution context rather than a hosted HD Engine HTTP service.  
-* For this CLI-local vendor smoke target, the infrastructure target facts are: command target `hdctl showcompat`, data source `--source vendor`, vendor binding key `HD_API_BASE_URL`, deprecated compatibility alias `HDAPI_BASE_URL` only when explicitly allowed by the owning task, vendor credential key `HD_API_KEY`, optional geocoding credential key `GEO_API_KEY` when required by the command path, deterministic capture pins `LC_ALL=C`, `LANG=C`, `TZ=UTC`, open-rails keys `SAFE_MODE=0` and `ALLOW_NETWORK=1` for the vendor step only, and application environment key `APP_ENV=dev`.  
+* For this CLI-local vendor smoke target, the infrastructure target facts are: command target `hdctl showcompat`, data source `--source vendor`, vendor binding key `HD_API_BASE_URL`, deprecated compatibility input `HDAPI_BASE_URL` when `HD_API_BASE_URL` is absent, vendor credential keys `HD_API_KEY` and `GEO_API_KEY`, deterministic capture pins `LC_ALL=C`, `LANG=C`, `TZ=UTC`, open-rails keys `SAFE_MODE=0` and `ALLOW_NETWORK=1` for the vendor step only, and application environment key `APP_ENV=dev`.  
 * Presence-only environment captures for this target family may record the following PF07-owned key names without secret values: `ALLOW_NETWORK`, `APP_ENV`, `GEO_API_KEY`, `HD_API_BASE_URL`, `HDAPI_BASE_URL`, `HDE_BASE_URL`, `HD_API_KEY`, `LANG`, `LC_ALL`, `SAFE_MODE`, and `TZ`.  
 * `HDE_BASE_URL` is not required for this CLI-local vendor smoke target unless the target changes to an HD Engine HTTP service call.  
 * If a task changes from CLI-local vendor execution to an HD Engine HTTP service call, the task must name a PF07-backed hosted-service target fact set before execution.  
@@ -544,11 +544,11 @@ The **Glow QA Guide** is the single canonical home for Codespaces QA configurati
 
 **Codespaces snapshot posture (routing-only).** The **Glow QA Guide** controls whether a Codespaces snapshot is required for a Live QA plan. **HDE-Schemas & Artifacts** controls any governed snapshot family, filename, schema, and capture rule. PF07 records only the Codespaces environment and the canonical epic QA root pattern.
 
-**Live QA is gitless (routing-only).**  
-Live QA runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is artifact-based under `audit/qa/<epic-id>/...`. The execution rail is governed by title in **Epic-Process-Guide** and **Glow QA Guide**.
+**Live QA source attribution (routing-only).**  
+**PF19-Canon-Glow-QA-Guide** governs read-only repository observations, including git reads, for tested-source attribution and the working locus. Such observations and ordinary working-tree cleanliness are not QA PASS/FAIL gates. Repository mutation and publication remain in their separately authorized lanes; PF07 supplies no execution or publication authority.
 
-**No non-canonical wrappers (routing-only).**  
-Live QA Plans, QA reviews, and any QA runbooks MUST NOT invent or mint new repo loci (scripts, modules, checks, test files, endpoints, or commands). Any executable locus MUST be audit-proven to exist as a repo locus or explicitly canon-defined as a fixed entrypoint by explicit path, and QA plans MUST NOT create new scripts at run time; missing tooling is a repo gap to be resolved by PR work rather than QA-time script creation. Where canon requires an artifact surface but does not name a tool, the plan must validate or produce the governed artifact surface directly using baseline commands (see §10.5 “Live QA evidence is mechanical”).
+**Harness requirements (routing-only).**  
+**PF19-Canon-Glow-QA-Guide** and **PF27-Canon-Plan-Templates** govern executable entrypoints, approved embedded calls to tracked, reviewed, tested harness APIs, and the boundary excluding newly written decisive evaluators and product/runtime code during QA. An approved embedded call need not create a standalone script. Missing implementation tooling remains a repository gap under the owning QA and implementation routes. PF07 records names and locations and does not define a separate QA execution policy.
 
 **Where PF07 fits (names-only reminder).**  
 PF07 remains the single home for provider/project/service names, stable base URLs, canonical QA root patterns, and infra key names. It routes Codespaces configuration, Live QA runbooks, and acceptance semantics by title to their owning documents.
@@ -1255,10 +1255,10 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 
 * `HD_API_BASE_URL` — canonical HumanDesignAPI base URL environment variable. Current deployed v2 base URL value: `https://api.humandesignapi.nl/v2`. The configured base URL owns the vendor API version boundary.  
 * Runtime request construction must append only version-neutral resource paths to the configured base URL. PF07 records the infrastructure key and current base URL value only. Request construction, byte contracts, route contracts, and validation behavior live in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide** by title.  
-* `HDAPI_BASE_URL` — deprecated legacy alias only. It must not be used as the canonical key in plans, implementation prompts, QA plans, OPS tasks, or PF documentation.  
+* `HDAPI_BASE_URL` — deprecated legacy alias only. It is the compatibility input when `HD_API_BASE_URL` is absent, not a second canonical key. It must not be used as the canonical key in plans, implementation prompts, QA plans, OPS tasks, or PF documentation.  
 * If both `HD_API_BASE_URL` and `HDAPI_BASE_URL` exist with different values, classify that as configuration ambiguity and fail closed through the owning implementation and policy homes. PF07 records the key posture only; runtime behavior remains owned by **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide**.  
 * `HD_API_KEY` — canonical vendor API key environment variable. It is secret-bearing and belongs to the HD Engine infrastructure boundary.  
-* `GEO_API_KEY` — canonical geocoding/vendor-support key when required. It is secret-bearing and belongs to the HD Engine infrastructure boundary.  
+* `GEO_API_KEY` — canonical geocoding/vendor-support API key environment variable. Together with `HD_API_KEY`, it is part of the vendor's two-key configuration; the base URL is separate configuration. It is secret-bearing and belongs to the HD Engine infrastructure boundary. Directed use of environment-held configuration, presence-only evidence and missing-configuration classification are governed by **PF10-HDE-Build-Notes** and the owning governance and QA documents.  
 * Outbound vendor header projection is not the same as environment-variable naming:  
   * HumanDesignAPI v1 legacy BodyGraph routes project `HD_API_KEY` as `HD-Api-Key: {redacted}`.  
   * HumanDesignAPI v2 chart routes project `HD_API_KEY` as `Authorization: Bearer {redacted}`.  
@@ -1331,6 +1331,15 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 ## **9.3 Repositories (titles-only)**
 
 * Authoritative slugs & paths: **§5.1 HD Engine repo**, **§5.2 Glow Backend repo**, **§5.3 Glow Frontend repo**.
+
+**Documentation and navigation locations (names-only).**
+
+* Current PF source: `amthorn78/glow-hdengine-v2`, `docs/pfcanon/` on `main`; each document retains its declared Canon, Build Notes or Reference standing.
+* Change-process documents: `docs/ephemeral/`, referenced by repository path. Persistent prompt-ecosystem management records: `docs/prompt_ecosystem_management/`.
+* Operational board: [Glow HD Engine Development Board](https://app.notion.com/p/3d54590a05eb819dacccfcfbfee8666b?pvs=204), under the Glow Operations Hub.
+* Historical-source navigation: [PF16 Historical Records](https://app.notion.com/p/3d54590a05eb81a7a56be6b0da418f16?pvs=204), [PF20 Historical Records](https://app.notion.com/p/3d54590a05eb811a8df3fe0e5703c4b0?pvs=204), and [PF30 Historical Records](https://app.notion.com/p/3d54590a05eb8199b80edc967990e3e6?pvs=204). The current PF source home for these pointers is `docs/pfcanon/` on `main`, identified by PF identity and versionless title.
+
+The Notion board and pointers are operational metadata and navigation, not PF authority or independent implementation, QA, acceptance or closure proof. Google Drive and ChatGPT Library are neither PF authority nor change-process document destinations; existing files there retain their historical provenance. Governed evidence keeps its established homes and writers. Operating-procedure placement that remains undecided is not assigned a new home here.
 
   ## **9.4 Domains**
 

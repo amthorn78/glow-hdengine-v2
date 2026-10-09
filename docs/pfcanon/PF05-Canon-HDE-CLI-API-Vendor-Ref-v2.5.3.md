@@ -3,17 +3,17 @@
 ## **0.1 Header**
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref  
-**Version:** v2.5.2  
+**Version:** v2.5.3  
 **Status:** Canon  
-**Effective date:** 2026-08-25  
-**Last Update Gate:** BN 12.8.9   
+**Effective date:** 2026-10-09  
+**Last Update Gate:** BN 13.5; HDE-EPIC040-specification-v1.1-approved.md; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md   
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
 ## **0.2 Scope \[Required-Now\]**
 
-* **Supersession (PF10 addenda).** Consult the complete latest active PF10 base version, whether it is one unlettered document or a complete verified lettered set, and treat every document in a lettered set as an equally authoritative container of independently scoped addenda. Apply every applicable, active, non-superseded addendum to its own scope. A later document letter supersedes nothing by itself; a higher-numbered addendum controls only overlapping or explicitly superseded scope, and lower-numbered guidance remains authoritative for distinct scope. PF10 governs PF05 only where such an addendum explicitly addresses a PF05-owned topic; when the complete active PF10 version is silent on that topic, PF05 governs. PF05 integrates applicable PF10 guidance and routes **by title only** to single homes (no version numbers). Build Notes reference posture: cite PF10 by **addendum number \+ addendum title**; do not use PF10 version strings, document letters, or PF10 section numbers as durable anchors.  
+* **Supersession (PF10 addenda).** Consult the complete latest active PF10 base version, whether it is one unlettered document or a complete verified lettered set, and treat every document in a lettered set as an equally authoritative container of independently scoped addenda. Apply every applicable, active, non-superseded addendum to its own scope. A later document letter supersedes nothing by itself; a higher-numbered addendum controls only overlapping or explicitly superseded scope, and lower-numbered guidance remains authoritative for distinct scope. PF10 governs PF05 only where such an addendum explicitly addresses a PF05-owned topic; when the complete active PF10 version is silent on that topic, PF05 governs. PF05 integrates applicable PF10 guidance and routes **by title only** to single homes (no version numbers). Reference **HDE Build Notes** by title only; do not cite its addendum numbers, sections, headings, paragraphs, versions, document letters, or other internal locators. Search the current source by topic to establish applicable scope.  
     
 * **Ownership.** This document owns the **bytes** for CLI, Reader transport, and Vendor ingest (HDAPI): payload shapes, validators, headers & conditional delivery, typed error mapping, and exit-code/stream rules. It is authoritative for CLI and Reader wire bytes. **Appendix A** transport matrices are kept in lockstep with **HDE-Governance §10** (titles only). Writers/errors posture is policy-owned in Governance; PF05 references it by title.  
     
@@ -58,7 +58,7 @@
 
 * **Live QA Plan command-invocation materiality and rendered-escape review.** PF05 may preserve preferred command invocations for execution and evidence reproducibility. Command examples and vendor request examples in plans are not canonical invocation contracts unless PF05 or another owning PF explicitly makes command bytes the proof target. Distinguish normative protocol bytes from illustrative invocation syntax: vendor header names, route families, endpoint families, payload shape, auth posture, environment-variable identity, rails posture, and secret safety are substantive; shell wrapper form, heredoc formatting, indentation, rendered escapes, copied-chat damage, local invocation style, and paste-readiness are not blockers by themselves. A mismatch from preferred command spelling, path spelling, shell syntax, heredoc form, escaped option, interpreter choice, helper-code syntax, indentation, or pasted command form is a Live QA Plan approval blocker only when raw source changes execution, proves the wrong target, opens unsafe rails, exposes secrets, mutates prohibited state, prevents the check from running, makes PASS/FAIL unverdictable, or damages governed evidence trust. PF05 reviewers MUST judge raw command identity and raw artifact identity from source artifacts, governed records, canonical bindings, raw repo files, or execution transcripts, not assistant-rendered output, markdown previews, copied chat text, or review prose. A blocker based on escaping, syntax, command exactness, or shell-wrapper form requires raw/source proof of a separate executable, governed, canonical, safety, scope, evidence-identity, or semantic defect; otherwise the issue belongs in caveats, suggestions, execution notes, in-flight normalization, or the captured QA evidence command transcript.  
     
-* **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **Build Notes** are WIP only; drained guidance must land in canon.  
+* **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **HDE Build Notes** is the canonical override and amendment mechanism; an applicable active addendum governs conflicting earlier canon for its scope until later drainage.  
     
 * **Documentation drainage is never a blocker.** PF10 drain and any later documentation drainage are never prerequisites, required deliverables, required checks, acceptance conditions, or readiness blockers for PF05-owned CLI, Reader, or Vendor work. Allowed blockers remain limited to truth and proof failures, such as missing required QA artifacts, untrusted evidence, or unresolved fail states that affect acceptance.  
     
@@ -100,11 +100,11 @@
 
 * **Endpoint Catalog (JSON success) — Required-Now.** Internal-only, env-gated per entry, and the **single A7 proof surface** for Reader success routes (not `/internal/version`). A7 header matrix, conditional behavior, and proof artifacts are specified in §5.3, §5.6, and Appendix A; PF12 owns the Evidence Index and mirror schema.  
     
-* **Dev harness — Implemented (dev-only).** `/reader?v=1` is the canonical dev Reader surface for schema/LF checks, AB↔BA and two-run identity, and Reader↔CLI reader-dump parity. `/api/reader?v=1` is an alias only when the Reader blueprint is actually mounted under `/api`. Rails remain closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); harness proofs are supplemental and do not replace Endpoint Catalog A7 proofs. See §5.4.  
+* **Dev harness — Implemented (dev-only).** `GET /reader?v=1` is the canonical dev Reader surface for schema/LF checks, AB↔BA and two-run identity, and Reader v1 CLI reader-dump parity. It remains at the root mount. The separate production `POST /api/reader` serves `v=1` and `v=2`; it is not a GET alias. Rails remain closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); harness proofs are supplemental and do not replace Endpoint Catalog A7 proofs. See §5.4.  
     
 * **`/internal/version` (ops endpoint) — Required-Now.** Ops-only identity surface (JSON, no cache, no ETag) used for engine identity and rails snapshots. Header and refusal posture are governed by HDE-Governance §10.5; bytes live in the internal-ops section of Reader transport.  
     
-* **Production Reader surface — Required-Now.** `POST /api/reader?v=1` is the adopted production application route. It accepts only the closed two-UUID request in §5.1, resolves BodyGraphs read-only, and projects either the one-band eligible Reader v1 success or the empty ineligible self-pair success. The existing file-path GET Reader remains development-only and non-authoritative.  
+* **Production Reader surface — Required-Now; implemented in the repository.** `POST /api/reader` selects Reader v1 with exactly one `v=1`, or Reader v2 with exactly one `v=2`. Both accept the closed two-UUID request in §5.1 and resolve complete BodyGraphs read-only. An eligible v1 pair projects only `harmony`; an eligible v2 pair projects all ten categories in governed order. An ineligible self-pair projects `[]` in either version. The file-path GET Reader remains development-only. Repository implementation does not establish deployment or live current-row success; see §5.1.7.  
     
   ---
 
@@ -122,7 +122,7 @@
     
 * **Base-URL, API-version, and credential posture — Required-Now.** `HD_API_BASE_URL` is the canonical HumanDesignAPI base URL key and owns the vendor API-version boundary. Runtime request construction appends only version-neutral resource paths to the configured base URL, preserves any configured version path, and MUST NOT infer route behavior or auth-header family from hardcoded `/v1` or `/v2` path strings. `HDAPI_BASE_URL` is deprecated compatibility only, and conflicting `HD_API_BASE_URL` / `HDAPI_BASE_URL` values fail closed. `HD_API_KEY` is the canonical vendor credential key; v2 chart routes project it as `Authorization: Bearer`, and legacy v1 BodyGraph routes project it as `HD-Api-Key`. `GEO_API_KEY` is preserved where geocoding behavior requires `HD-Geocode-Key`.  
     
-* **Live HTTP gated by SAFE rails — Required-Now.** Vendor calls are permitted only when rails are explicitly open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); default posture for dev/CI is closed. Closed-rails refusal behavior, admin override, and rails evidence live in §7.1. HumanDesignAPI v2 open-rails smoke, when required, remains PO-only and evidence-backed.  
+* **Live HTTP gated by SAFE rails — Required-Now.** Vendor calls are permitted only when rails are explicitly open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); default posture for dev/CI is closed. Closed-rails refusal behavior, the unimplemented production override requirement, and rails evidence live in §7.1. A Product Owner-directed agent may execute a bounded vendor smoke with the same controls and required evidence as a human executor; the direction is task-specific and creates no standing vendor authority.  
     
 * **Adapter data-source policy — Required-Now.** In prod, the adapter reads from DB on the hot path, using vendor only on explicit triggers (birth-data change, scheduled refresh, operator). In dev, direct vendor calls are allowed but must upsert into DB for repeatability. HumanDesignAPI v2 conformance MUST route through one sanctioned vendor seam and MUST NOT create a second HTTP home, bypass adapter guards, or bypass the presenter boundary. See §7.4.  
     
@@ -411,9 +411,9 @@ Exit codes are exhaustive for the public surface. Non-zero exits must not print 
 
 * **Locale/TZ pins.** All CLI byte comparisons run under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`. The process `TZ=UTC` pin controls environment determinism only and MUST NOT be used as a person's birth timezone.
 
-### **Dependent reconciliation outside this selection**
+### **Command-carrier reconciliation gap**
 
-The §3.1.1 carrier set controls globally, but the unselected `bg:export-json` wording in §4.8 still permits empty stdout or a human synopsis for file success, and the unselected `admin-bundle` wording in §4.9 still permits a human file-success synopsis. Those command sections remain unchanged in this selection and require later in-owner reconciliation: each file-only success MUST emit a command-owned canonical JSON receipt after all required writes complete.
+The §3.1.1 carrier set controls globally, but the `bg:export-json` wording in §4.8 still permits empty stdout or a human synopsis for file success, and the `admin-bundle` wording in §4.9 still permits a human file-success synopsis. The command-specific wording requires reconciliation by its owner with the global carrier rule: each file-only success MUST emit a command-owned canonical JSON receipt after all required writes complete.
 
 ## **3.7 Interim “no-user” QA mode (pre-Glow prod)**
 
@@ -443,7 +443,7 @@ The §3.1.1 carrier set controls globally, but the unselected `bg:export-json` w
 * The accepted PR-02 local boundary proof class is birth-only caller input: `birthdate`, `birthtime`, and `location`, with neither caller-provided `person_uid` nor caller-provided `user_id`. That local proof does not replace the separate vendor-backed no-user behavior proof.  
 * Local pytest and grep checks MAY prove public numeric-free posture, canonicalization, serializer/math properties, or internal compute properties only when labeled as such. They MUST NOT substitute for vendor-backed no-user behavior proof when the claim is live behavior in the current pre-App/no-user environment.  
 * Until the product implements a facility to store and replay BodyGraph data locally for QA, Live QA cannot rely on precomputed BodyGraph inputs being available for showcompat runs. Functional birth-based compat runs therefore require vendor acquisition under open rails (`SAFE_MODE=0`, `ALLOW_NETWORK=1`) for the showcompat step. If rails are closed, treat the outcome as an expected blocker or typed refusal for that step, not a product behavior failure. Rails changes must be explicit and step-scoped; restore the default rails posture after the showcompat step.  
-* A controlled vendor-backed no-user smoke, when used as PF05 `showcompat` implementation-validation evidence, MUST be PO-only and IA-guided. Automated agents MUST NOT run the vendor call, and no command may be modified by guesswork to force a PASS.  
+* A controlled vendor-backed no-user smoke, when used as PF05 `showcompat` implementation-validation evidence, MUST be Product Owner-authorized and IA-guided. A directed automated session agent executes the identified task on the Product Owner’s direction and produces its evidence. “PO-only” names the authorizing and accountable principal, not a required physical executor. The agent follows the same exact commands, scope, request limit, rails, stop checks, synthetic inputs, secret scan/quarantine, redaction and evidence contract as a human executor. No command may be modified by guesswork to force a PASS, and no completion may be claimed without the required evidence.
 * For an OPS-02 style controlled vendor smoke, “no-user” means the external command and caller-facing proof use birth data only.  
 * Allowed caller or command inputs are limited to:  
   * `--source vendor`,  
@@ -465,7 +465,7 @@ The §3.1.1 carrier set controls globally, but the unselected `bg:export-json` w
   * `--source db`,  
   * any inline secret value.  
 * The executable command recorded for the controlled smoke MUST be an `hdctl showcompat --source vendor` command with the six birth flags for A and B. Birth values MUST come from `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json` when that file exists, and the recorded command MUST contain no unresolved placeholders before execution.  
-* For this CLI vendor smoke, the target is the HD Engine CLI running in the PO-controlled execution context. Required target facts are `hdctl showcompat`, `--source vendor`, `HDAPI_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY` when required by the command path, `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=0`, `ALLOW_NETWORK=1`, and `APP_ENV=dev`.  
+* For this CLI vendor smoke, the target is the HD Engine CLI running in the PO-controlled execution context. Required target facts are `hdctl showcompat`, `--source vendor`, the two credential names `HD_API_KEY` and `GEO_API_KEY`, the canonical base-URL name `HD_API_BASE_URL` (or deprecated `HDAPI_BASE_URL` only when the canonical value is absent), `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=0`, `ALLOW_NETWORK=1`, and `APP_ENV=dev`. The base URL is configuration, not an API key. Resolve conflicting normalized base-URL values by failing closed; never silently choose one. Use the configuration held in the execution environment, record only `SET` or `UNSET`, keep values off argument lists and out of conversation, logs and artifacts, and scan captured output before using it as evidence. A rails posture MUST NOT remove the only configured base URL. Missing required configuration prevents the call; record missing names by presence only and classify a begun step as `TOOLING_BLOCKED`. Do not substitute manual entry of vendor values.
 * `HDE_BASE_URL` is not required for this exact CLI vendor smoke unless the command changes to call an HD Engine HTTP service. If the target changes from CLI vendor execution to an HD Engine HTTP service call, a new infrastructure-backed target fact set is required before execution.  
 * OPS-02 style controlled smoke execution MUST NOT run unless these conditions are proven before execution: exact command, complete birth-only input values, no user identity in the command, no inline secrets, explicit vendor source, open rails for the vendor step only, determinism pins, required vendor environment presence, safe secret posture, accepted PR-02 birth-only proof, and PO proceed authorization.  
 * If required command proof, birth input, rails, vendor environment presence, PR-02 accepted proof, or PO proceed authorization is missing, record `TOOLING_BLOCKED`. If a user identity input, inline secret, guessed command change, missing evidence file after an attempted run, or secret-bearing artifact appears, record `FAIL_TOOLING`. If prerequisites are proven and runtime behavior contradicts expected birth-only no-user vendor behavior, record `FAIL_BEHAVIOR`.  
@@ -830,12 +830,12 @@ Examples (names may be adjusted in PF12):
 
 Evidence must clearly indicate which environment (dev harness vs vendor-backed) each capture represents. All records must be indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` in the same PR, per PF12.
 
-### 4.1.6 Implementation status (audit v1)
+### 4.1.6 Implementation status (bounded repository inspection)
 
-* **Implementation status at `main@932aebf48c6e0de518d3c452f5ffa451475d0f2c`:** Registered but partially implemented.  
-* **Statically confirmed:** the packaged `hdctl` entrypoint and `showcompat` parser exist; compat stdout, Reader dump, and admin-dump paths are wired; compat stdout and Reader dump use the canonical presenter.  
-* **Required gaps:** category scores are derived from a stable pair/category hash rather than full BodyGraph mechanics; file/stdin mode does not retain full BodyGraph topology; stdout `a`/`b` are not resolved BodyGraphs; the adopted explicit stdin/user flag spellings, file canonical-byte/schema gates, and stdin schema/shape validation are absent; `auto` can select vendor from birth inputs; conjunction passes viewer preferences despite the ignore rule; admin sidecars bypass the presenter; and help describes Reader bytes rather than compat stdout.  
-* **Evidence posture:** checked-in tests and artifacts record intended canonical/parity behavior, but their presence is not a runtime PASS or acceptance-token attestation.
+* **Repository snapshot:** `main@e7265a090ad0cc8de5f36de2f19481216aa3d073`, inspected read-only on 2026-10-09. The packaged `hdctl` parser and `showcompat` entrypoint exist. Eligible stdout is the complete canonical `magic10_compat_result.v1`; the optional `--dump-reader` path remains Reader v1 only. Both delegate byte emission to the shared presenter.
+* **Delivered integration:** complete-chart resolution feeds the admitted Gate-based mechanics path, eligibility precedes evaluation, `auto` is DB-only, file/stdin resolution is local, and admin dumps use the presenter. The earlier stable-hash scorer, missing-topology behavior and automatic birth-based vendor fallback are not the current `showcompat` path. HDE Build Notes records accepted PR04 integration and the later complete-release and Reader deliveries; historical non-admitted interim states remain historical.
+* **Remaining CLI limitations:** the adopted explicit stdin/user flag spellings and file canonical-byte/schema gates are not established by this inspection; the parser still describes Reader v1 bytes rather than compat stdout. `--dump-reader` does not emit Reader v2. The separate stateless run-bundle capability in §4.1.7 remains a gap. The legacy `scripts/hd_cli.py` / `tests/reader_v1/test_cli_proof.py` failure is recorded in HDE Build Notes and is not corrected or rerun here.
+* **Proof boundary:** this is bounded static inspection. Historical exact-head CI, accepted implementation and QA evidence retain their original attribution; none is a new runtime PASS, deployment, production availability or acceptance-token attestation for this documentation revision.
 
 ### **4.1.7 Stateless compat export mode (gap; no-DB JSON QA)**
 
@@ -848,7 +848,7 @@ Provide a **no-DB JSON QA mode** for compat that:
     
 * Writes both **compat JSON** and the **Reader v1 envelope** to governed JSON artifacts, so QA can exercise compat, AB↔BA identity, two-run identity, narratives, and Reader parity **without** an app DB or user IDs.
 
-This capability is a **Calcination gap** recorded in Build Notes (Addendum 11). It is required for future calcination/separation/conjunction epics that want to QA engine math independently of any app user model and persistence.
+This capability is a **Calcination gap** recorded in **HDE Build Notes**. It is required for future calcination/separation/conjunction epics that want to QA engine math independently of any app user model and persistence.
 
 **Inputs (stateless compat harness).**
 
@@ -914,9 +914,7 @@ Compat stdout behaviour for the general case remains as in §4.1.3: compat JSON 
 
 ## 4.2 hdctl read singlebg \[Speculative\]
 
-*(Unchanged in spirit; shown here only for completeness with minor wording aligned to Option B. No new semantics were invented.)*
-
-**Purpose (normative, draft).**  
+**Purpose (normative).**  
 Emit a single‑chart diagnostic to stdout using the same canonical emitter as Reader/CLI success bodies (UTF‑8, sorted keys, compact, exactly one LF). This command is for testing & debugging chart ingestion/normalization; it is not a product surface. It does **not** change the Reader v1 public envelope.
 
 **Contract status (informative).** No detailed invocable contract is adopted in this version. Exact flags, chart schema, stdout shape, typed error tokens/exit codes, and acceptance evidence remain OPEN for the future Doc-Delta that promotes this command from Speculative. Any future contract MUST use the shared presenter and the global canonical-byte/stream rules.
@@ -927,13 +925,13 @@ Implementation status at `main@932aebf48c6e0de518d3c452f5ffa451475d0f2c` (inform
 
 ## 4.3 hdctl list people \[Speculative\]
 
-Needs development.
+Implementation gap. No invocable contract is adopted; the command remains Speculative.
 
 ---
 
 ## 4.4 Fetch commands (person/batch) \[Speculative\]
 
-Needs development.
+Implementation gap. No invocable contract is adopted; the command remains Speculative.
 
 ---
 
@@ -1015,7 +1013,7 @@ These constraints do not change the CLI bytes or flags defined elsewhere in this
     
 * Enable a fully **no-DB JSON QA mode** when combined with `hdctl showcompat` stateless compat export (§4.1.7).
 
-This command is a **required capability and gap** recorded in Build Notes (Addendum 11). It is not implemented in the current CLI; status is **Speculative; gap** until a dedicated epic delivers it.
+This command is a **required capability and gap** recorded in **HDE Build Notes**. It is not implemented in the current CLI; status is **Speculative; gap** until a dedicated epic delivers it.
 
 ### **4.8.1 Inputs (stateless only)**
 
@@ -2046,9 +2044,9 @@ Serialization and determinism:
 ## 5.1 Success envelope \[Required‑Now\]
 
 **Body shape (six keys).**  
-The Reader v1 success body contains exactly these six top‑level keys — no extras:
+The Reader success body contains exactly these six top-level keys — no extras. Reader v1 and Reader v2 use the same closed envelope with their version-specific projection:
 
-* `reader_version` — fixed string `"v1"`.  
+* `reader_version` — fixed string `"v1"` for Reader v1 or `"v2"` for Reader v2.  
     
 * `eligible` — boolean.  
     
@@ -2062,17 +2060,21 @@ The Reader v1 success body contains exactly these six top‑level keys — no ex
 
 ### **5.1.0 Production POST request and resolution (normative)**
 
-`POST /api/reader?v=1` accepts one JSON object with exactly `a_id` and `b_id`. Each value must be an exact lowercase canonical hyphenated RFC 4122 UUID. Unknown keys and inline charts, Gates, weights, profiles, bands, configuration IDs, and viewer preferences are prohibited.
+The production route is `POST /api/reader`. The query MUST carry exactly one `v` whose decoded value is exactly `1` (Reader v1) or `2` (Reader v2). No defaulting, trimming, numeric parsing or version inference is allowed. Missing, empty, repeated (even identical), malformed or unsupported values return status `400` with `ERR_READER_INVALID_VERSION` before body reading or lookup.
 
-The application resolves each UUID read-only through `public.hde_body_graphs_current` with `user_id` equal to the canonical UUID and `vendor = 'hdapi'`, selecting the current `user_id`, `vendor`, `vendor_version`, `input_fingerprint`, and `payload`. Reader resolution performs no write, request-time vendor call, arbitrary-string UUID5 conversion, or silent fallback. A resolved Gate array must be present, nonempty, unique, canonical, and within `1..64` before Engine Core is called.
+Both versions accept one JSON object with exactly `a_id` and `b_id`. Each value must be an exact lowercase canonical hyphenated RFC 4122 UUID. The body is nonempty UTF-8 JSON without a BOM and at most `32,768` bytes, including when `Content-Length` is absent. Invalid JSON, wrong shape, extra or missing keys, invalid UUID spelling and an oversize body return `422 ERR_READER_INVALID_INPUT`. Inline charts, Gates, weights, profiles, bands, configuration IDs and viewer preferences are prohibited.
+
+The application resolves each distinct UUID by one read-only lookup through `public.hde_body_graphs_current` with `user_id` equal to the canonical UUID and `vendor = 'hdapi'`, selecting the current `user_id`, `vendor`, `vendor_version`, `input_fingerprint`, and `payload`. Reader resolution performs no write, request-time vendor call, arbitrary-string UUID5 conversion, or silent fallback. A missing row returns `404 ERR_M10_PERSON_UNRESOLVED`; unavailable or ambiguous resolution or an invalid current-view row contract returns `503 ERR_M10_RESOLVER_UNAVAILABLE`. A resolved Gate array must be present, nonempty, unique, canonical, and within `1..64` before Engine Core is called; incomplete stored Gate data returns `503 ERR_M10_BODYGRAPH_INCOMPLETE`.
 
 Eligibility is decided after both complete projections resolve and before Engine Core, narrative routing, or intrinsic cache access. The same canonical UUID with byte-identical normalized projections is a valid ineligible self-pair. The same canonical UUID with unequal complete normalized projections fails closed. For distinct parties, directional narrative order is `(gate_mask, canonical_person_id)`; ASCII canonical UUID order is used only to break an equal Gate-mask tie. Request order never controls narrative orientation.
 
+Every method other than `POST` at `/api/reader`, including `HEAD`, `OPTIONS` and extension methods, returns the governed `405 ERR_NOT_FOUND` response with `Allow: POST`, `Cache-Control: no-store`, no `ETag` and no `Content-Encoding`; HTTP HEAD suppresses the body. Production POST ignores `If-*` conditionals and never returns `304`. Success is `200` with `Content-Type: application/json; charset=utf-8`, `Cache-Control: private, max-age=0, must-revalidate` and `Vary: Authorization, Accept-Encoding`, with no `ETag`. Errors follow §5.2. Unknown descendant paths are distinct from this exact-route method contract; the factory-specific HTML 404 limitation is retained in §5.1.7.
+
 ### 5.1.1 CLI and admin compatibility surfaces (normative)
 
-* The Reader v1 success envelope above is the **only** public compat payload exposed by the Reader API. It remains six‑key and numeric‑free.  
+* The versioned Reader success envelopes above are the public compat payloads exposed by the Reader API: v1 is single-harmony; v2 is the ordered full Magic-10 projection. Both remain six-key, bands-only and numeric-free.  
     
-* The compat engine produces the pure `magic10_result.v1` and the symmetric complete `magic10_compat_result.v1` defined in §4.1.3. Neither is the Reader v1 envelope.
+* The compat engine produces the pure `magic10_result.v1` and the symmetric complete `magic10_compat_result.v1` defined in §4.1.3. Neither is a public Reader envelope.  
 
 **hdctl showcompat (CLI admin harness).**
 
@@ -2123,7 +2125,7 @@ Richer compat JSON (including numeric scores and narrative selection keys) is re
 
 ### 5.1.3 Emission algorithm (success case; titles‑only)
 
-The Reader v1 success emission algorithm is:
+The Reader v1 and Reader v2 success emission algorithm is the same; `reader_version` and category projection are selected before constructing the preimage:
 
 1. **Build the five-key public preimage.** After eligibility and category projection, build an object with exactly `reader_version`, `eligible`, `categories`, `meta`, and `release_id`. It excludes `idempotence_hash` and `pair_key`; never copy `pair_key` into the public hash.  
      
@@ -2141,21 +2143,23 @@ All byte checks run under `LC_ALL=C`, `LANG=C`, and `TZ=UTC` (where relevant), a
 
 **Public covenant.**
 
-* The Reader v1 success body is **numeric‑free**.  
+* Reader v1 and Reader v2 success bodies are **numeric‑free**.  
     
-* Fields such as `score`, `prompt`, `uncertainty`, or any narrative keys/diagnostics **MUST NOT** appear in the Reader v1 envelope.  
+* Fields such as `score`, `prompt`, `uncertainty`, or any narrative keys/diagnostics **MUST NOT** appear in either public Reader envelope.  
     
 * Numeric scores and narrative keys exist only in compat/admin JSON (e.g., `showcompat` stdout compat JSON and Aux preview inputs), never in the public Reader response.
 
 **Determinism and parity.**
 
-* **AB vs BA.** Normalization at the compat layer guarantees identical preimages and identical final Reader v1 envelope bytes for `{a,b}` and `{b,a}`.  
+* **AB vs BA.** Normalization at the compat layer guarantees identical preimages and identical final version-selected Reader envelope bytes for `{a,b}` and `{b,a}`.  
     
 * **Two‑run identity.** Two serializations with the same inputs produce byte‑identical Reader envelope bytes.  
     
-* **Reader vs CLI.**  
+* **Reader vs CLI (v1 only).**  
     
-  * When the CLI produces Reader v1 bytes via `--dump-reader`, those bytes **MUST** be identical to the Reader 200 success body for the same inputs and environment.  
+  * When the CLI produces Reader v1 bytes via `--dump-reader`, those bytes **MUST** be identical to the Reader v1 200 success body for the same inputs and environment.  
+      
+  * No CLI flag emits Reader v2; v2 has its own ordered goldens and AB↔BA/two-run checks.
       
   * CLI compat JSON (admin/test) is canonical and deterministic, but it is a **distinct envelope** from the Reader v1 public envelope.
 
@@ -2193,6 +2197,63 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 
 ---
 
+### 5.1.6 Reader v2 ordered projection and examples (normative)
+
+Reader v2 is selected by `POST /api/reader?v=2`. It inherits §5.1.0 request, read-only resolution, eligibility, error and transport behavior. `reader_version` is exactly `"v2"`. Its success schema is `schemas/reader.v2.schema.json` and its owned goldens are under `goldens/reader/v2/`.
+
+For an eligible pair, `categories` MUST contain exactly ten items, each exactly `{ "id", "band" }`, in this governed order from `catalog/magic10.json`:
+
+1. `harmony`
+2. `heat`
+3. `communication`
+4. `alignment`
+5. `comfort`
+6. `consistency`
+7. `expansion`
+8. `creativity`
+9. `drive`
+10. `balance`
+
+Each band is that category’s band in the complete canonical intrinsic Magic-10 result and is exactly `Cool`, `Open`, `Warm` or `Glow`. This is an ordered array, not a set-sorted array. No category may be omitted, duplicated, default-filled, substituted by harmony, or altered by viewer preferences. For an ineligible pair, `categories` MUST be `[]`; Engine Core, intrinsic cache and narrative routing are not called.
+
+The five-key preimage contains `reader_version:"v2"`, `eligible`, the ordered `categories`, the closed `meta` object and `release_id`. Hash the canonical LF-terminated preimage, add `idempotence_hash`, and re-emit through the same shared byte-authoritative emitter. AB↔BA and two-run byte identity apply. No public numeric, score, prompt, narrative key, UUID, Gate data, configuration or internal diagnostic is added.
+
+Reader v1 remains unchanged: exactly one harmony item when eligible, otherwise `[]`, `reader_version:"v1"`, the same six-key closure and its existing byte covenant. `schemas/reader.v1.schema.json` now represents that covenant: harmony only, no prompt, closed success topology. Its error branch is the four-key envelope in §5.2, corrected by PR06b. Retired `*_leader` identities are not Reader contracts. `scripts/hd_cli.py` is a retained legacy stub, not a Reader surface.
+
+These complete synthetic examples are the named repository goldens displayed without their final LF. Wire bytes include exactly one final LF. The 64-character `a` release value and `Isis5` / `INV-000000` metadata are fixture identities, not the current production release or observed live responses. The quoted digits in tags and hashes are strings; the bodies contain no JSON number.
+
+Eligible pair — `goldens/reader/v2/g03_eligible_ten_in_order.json`:
+
+```json
+{"categories":[{"band":"Cool","id":"harmony"},{"band":"Open","id":"heat"},{"band":"Warm","id":"communication"},{"band":"Glow","id":"alignment"},{"band":"Cool","id":"comfort"},{"band":"Open","id":"consistency"},{"band":"Warm","id":"expansion"},{"band":"Glow","id":"creativity"},{"band":"Cool","id":"drive"},{"band":"Open","id":"balance"}],"eligible":true,"idempotence_hash":"9e51c57b9e613d9c0f52486979c3c247c265c568a690240ff4e5a11ac445dea4","meta":{"engine_tag":"Isis5","invocation_tag":"INV-000000"},"reader_version":"v2","release_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+```
+
+Ineligible pair — `goldens/reader/v2/g01_ineligible.json`:
+
+```json
+{"categories":[],"eligible":false,"idempotence_hash":"a2cca383ec8f8542d1d4cd04841d5ee389d38fa0ad38b41b4ca7f49b3ff1e23b","meta":{"engine_tag":"Isis5","invocation_tag":"INV-000000"},"reader_version":"v2","release_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+```
+
+Governed Reader error — `goldens/reader/v1/g06_error_invalid_input.json` (same error envelope for Reader v1 and v2):
+
+```json
+{"code":"ERR_READER_INVALID_INPUT","error":"invalid Reader request","ok":false,"schema":"v1"}
+```
+
+The error’s `schema:"v1"` identifies `error_v1`, not the selected Reader success version. No CLI flag emits Reader v2; `hdctl showcompat --dump-reader` and Reader↔CLI dump parity remain v1 only.
+
+### 5.1.7 Delivered scope and proof limits (informative)
+
+At `main@e7265a090ad0cc8de5f36de2f19481216aa3d073`, bounded read-only inspection finds the production Reader blueprint mounted under `/api` in `adapter/factory.py`, `adapter/http_reader.py` and `adapter/wsgi.py`. The dev GET blueprint stays at the root. Reader v1 and v2 share the production handler, read-only current-row resolver and byte-authoritative emitter. The production route’s POST Catalog row is present; query versions select contracts within that one route/method record.
+
+HDE Build Notes records PR06a delivery of PR04’s F03 production-route, F05 v1 success-schema and F07 dev-conjunction capture deferrals. PR06b subsequently delivered C040-08 v1 error-schema conformance. These earlier deferrals are resolved in that delivered lineage, not open route/schema obligations. The admitted roster is 45 members at release version `1.3.0`; `schemas/reader.v2.schema.json` is a member. Release admission and deployment remain distinct.
+
+The recorded HDE-EPIC040 QA verdict is PASS for its tested source and stated proof classes, not a new run here. Reader v1/v2 success used injected rows in-process; loopback HTTP covered refusals. Live Gate readiness and live DB Reader success over live HTTP remained blocked by environment and deferred to a future epic with the App user model. The bounded live-vendor check proved CLI-local acquisition, canonical compat stdout and a Reader v1 dump, not Reader v2 over HTTP, mapped-cache persistence, broad provider conformance or a deployed service.
+
+Known limits remain: unknown non-compat paths, including Reader descendant paths, receive framework HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`; `adapter/wsgi.py` supplies JSON `ERR_NOT_FOUND`. This does not weaken the normative error contract, and the transport owner retains the gap. Other recorded limitations, including the legacy CLI proof failure, wheel-install admission limitation, stale showcompat help and carried implementation/evidence findings, retain their owners; their historical outcomes are not rerun here. This documentation revision runs no product QA, deploys nothing and proves no live availability.
+
+The closure record for HDE-EPIC040 is `CLOSE / CHANGE_CLOSED` by Product Owner-authorized exceptional closure. It resolves the earlier evidence-landing and QA50-F01 indexing gaps. It establishes neither ordinary Close Gate completion nor a close pack, PF09 movement, phase exit, deployment or release activation. It supports later documentation drainage without turning this revision into a closure or acceptance decision.
+
 ## **5.2 Errors \[Required-Now\]**
 
 1. **Typed, numeric-free error\_v1 envelope.** All governed HTTP error surfaces (Reader errors, diagnostic writer errors, and internal health/ready/not-found error responses) **MUST** emit the **error\_v1** JSON envelope, serialized by the single canonical emitter (§6.1/§6.2) and LF-terminated. The **minimum** shape is:  
@@ -2209,7 +2270,7 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 
    
 
-2. Optional fields are defined in the schema owned by **HDE-Schemas & Artifacts** (titles-only). Today this includes:  
+2. Outside the closed Reader contracts, optional fields are defined in the schema owned by **HDE-Schemas & Artifacts** (titles-only). Reader v1 and Reader v2 errors have exactly the four required keys in §5.2.3, with no `retry_after_ms` or `details`. Other governed surfaces may include only their own schema-permitted fields:  
      
    1. `retry_after_ms` — integer ≥ 0, **only** when the transport policy explicitly permits it (e.g. deterministic 429 handling for vendor rate limits).  
         
@@ -2221,7 +2282,7 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 
 3. **Magic10 Reader and internal failure contract (normative).**
 
-   1. For Reader v1, the standard error envelope has exactly `schema`, `ok`, `code`, and `error`; `schema` is `v1`, `ok` is `false`, and `code` and `error` are the governed pair below. Public Reader invokes `engine.compat.errors.error_envelope()` without `details`. No stack, path, UUID, Gate list, configuration contents, database detail, or internal diagnostic detail appears.
+   1. For Reader v1 and Reader v2, the standard error envelope has exactly `schema`, `ok`, `code`, and `error`; `schema` is `"v1"` (the `error_v1` version), `ok` is `false`, and `code` and `error` are a governed pair. The Reader invokes `engine.compat.errors.error_envelope()` without `details`. No retry field, stack, path, UUID, Gate list, configuration contents, database detail, or internal diagnostic appears.
 
 | Condition | Canonical token | HTTP status | Public-envelope rule |
 | ----- | ----- | ----- | ----- |
@@ -2243,7 +2304,7 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 | Token | Exact message |
 | ----- | ----- |
 | `ERR_READER_INVALID_INPUT` | `invalid Reader request` |
-| `ERR_READER_INVALID_CHART` | `invalid Reader chart` |
+| `ERR_READER_INVALID_CHART` | `invalid reader payload` |
 | `ERR_M10_PERSON_UNRESOLVED` | `BodyGraph not found` |
 | `ERR_M10_RESOLVER_UNAVAILABLE` | `BodyGraph resolver unavailable` |
 | `ERR_M10_BODYGRAPH_INCOMPLETE` | `BodyGraph is incomplete` |
@@ -2255,13 +2316,15 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 | `ERR_M10_RESULT_SCHEMA_MISMATCH` | `Magic10 result schema mismatch` |
 | `ERR_M10_STALE_RESULT` | `Magic10 cached result is stale` |
 
-   3. The error branch of `schemas/reader.v1.schema.json` MUST enforce this exact closed topology and the governed token/message pairs. Every new token MUST be registered in `engine/compat/error_tokens.py` and regenerated into `errors/token_map/token_map.json` through `tools/errors/generate_error_artifacts.py`. `adapter/schemas/error_v1.schema.json` remains unchanged unless its parity check proves a mismatch.
+   3. `schemas/reader.v1.schema.json` and `schemas/reader.v2.schema.json` enforce closed Reader error objects and the exact governed token/message pairs. The v1 error branch corrected by PR06b requires `schema:"v1"`, `ok:false`, `code` and `error` and rejects an absent or wrong schema, an ungoverned pair, and every extra key. Reader v1 additionally admits its existing dev-fixture refusal tokens. The two internal/CLI Gate-data tokens in the table above are not public Reader error branches; stored Gate defects project as `ERR_M10_BODYGRAPH_INCOMPLETE`. Every new token MUST be registered in `engine/compat/error_tokens.py` and regenerated into `errors/token_map/token_map.json` through `tools/errors/generate_error_artifacts.py`. `adapter/schemas/error_v1.schema.json` remains the separate generic envelope schema.
 
    
 
    
 
 4. **Canonical error token map (`ERR_*`) and aliases.**  
+     
+   Reader version refusal is `400 ERR_READER_INVALID_VERSION` with message `unsupported reader version`. Every non-POST method at `/api/reader` is `405 ERR_NOT_FOUND` with message `not found` and `Allow: POST`. Dev GET `/reader` retains `ERR_READER_FORBIDDEN` (`reader endpoint disabled`), `ERR_READER_MISSING_PARAM` (`missing required reader parameters`), `ERR_READER_INVALID_PATH` (`invalid chart path`), `ERR_READER_MISSING_TZ_A` (`missing tz for party A`) and `ERR_READER_MISSING_TZ_B` (`missing tz for party B`). These pairs are schema-admitted; the dev tokens do not create v2 GET support.
      
    1. Canonical error tokens are defined in a governed **error token map** (for example `ERROR_TOKEN_MAP` in the engine) and are emitted as **UPPER\_SNAKE** strings in the `code` field, such as:  
         
@@ -2352,9 +2415,9 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
 
 * **Canonical Reader route.** The Reader HTTP surface is defined as `GET /reader` and is the canonical Reader route for the v1 dev/proof surface.  
     
-* **Version selection.** Reader v1 is selected via query parameter `v=1` on the Reader route, without changing the route path.  
+* **Version selection.** Dev `GET /reader` requires exactly one query `v=1`. It does not serve Reader v2; missing, empty, repeated or other values return `400 ERR_READER_INVALID_VERSION`.  
     
-* **API-mount alias posture.** When the Reader blueprint is mounted under an `/api` prefix in a runtime configuration, `/api/reader` (and `/api/reader?v=1`) is an alias of the same Reader surface as `/reader` (and `/reader?v=1`). It is not a distinct contract or a separate proof surface.  
+* **Production mount.** The separate production Reader blueprint is mounted under `/api` and serves `POST /api/reader?v=1` and `POST /api/reader?v=2`. It is not an alias of the dev GET surface. `/api/reader` rejects every non-POST method with the governed `405`, and unprefixed `POST /reader` is a `405` stub. Do not move the dev/internal blueprint or conflate its GET/HEAD A7 proofs with production POST.  
     
 * **Aux narrative surface.** The auxiliary narrative surface is served at `/aux/narrative`. This route is a narrative surface and exists in the same adapter HTTP surface family.  
     
@@ -2401,7 +2464,7 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
 
 ### **Evidence (records-only; titles-only; indexed via PF12)**
 
-* `parity/harness_vs_cli` — harness `GET` or `POST` vs CLI stdout byte-compare (**expected empty diff**).  
+* `parity/harness_vs_cli` — dev harness GET vs CLI Reader v1 reader-dump byte-compare (**expected empty diff**); ordinary compat stdout is not a Reader-envelope parity input.  
 * `determinism/abba`, `determinism/two_run` — AB/BA and two-run fixtures for harness outputs.  
 * `transport/headers` — header snapshots for `200`, `HEAD`, `304` if implemented (captures normalized per **HDE-Schemas & Artifacts**).  
   **Indexing discipline.** Governed evidence identities and paths, Human Index and sentinel behavior, Machine Mirror schema, parity, checksums, and path-proofs are single-homed in **HDE-Schemas & Artifacts** and must be updated coherently when that contract requires it.
@@ -2478,7 +2541,7 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 | Route | Methods defined by PF05/runtime | Transport posture | A7 |
 | :---- | :---- | :---- | :---- |
 | `/reader` | `GET`, `HEAD` | internal dev-harness; explicit `APP_ENV=dev`; production public enablement is a separate change | eligible |
-| `/api/reader` | `POST` | production application Reader v1; closed two-UUID request; read-only current-`hdapi` BodyGraph resolution | not eligible |
+| `/api/reader` | `POST` | production application Reader v1 (`v=1`) and Reader v2 (`v=2`); closed two-UUID request; read-only current-`hdapi` BodyGraph resolution; no GET alias or POST validator | not eligible |
 | `/api/compat/v1` | `GET`, `POST`, `HEAD`, `OPTIONS` | internal admin; production-excluding environment gate; writer `no-store`, no `ETag` | not eligible |
 | `/aux/narrative` | `GET` | canonical public narrative surface; `classification:"public_aux"`; `internal:false`; `env_gate:"not_applicable_public"` | not eligible |
 | `/api/aux/narrative` | `GET` | conditional `/api` alias of `/aux/narrative`, represented by the canonical record's `aliases` array | not eligible |
@@ -3125,7 +3188,7 @@ Evidence and tests (titles-only):
     
   * Provider acquisition MUST be performed through resolver acquisition (not raw cache reads), so cache hits are normalized into a resolved shape and resolved detection remains correct even when a cached record is vendor-shaped.  
   * SAFE rails posture is closed by default. When an explicit environment configuration enables open-rails acquisition, acquisition MAY open rails only long enough to acquire missing data and MUST close back before compute and emission.  
-  * Any governed writer-evidence run that exercises `GET /dev/writer/conjunction` MUST require explicit caller-provided open rails and MUST NOT silently force `SAFE_MODE=0` or `ALLOW_NETWORK=1` on behalf of the caller.  
+  * The owned deterministic conjunction writer-evidence capture runs with explicit closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) and a dev-only `DEV_CONJUNCTION_LOCAL_LOOKUP` of complete deterministic mapped rows. That app-config key is absent by default and is not used by the production Reader. The capture does not acquire vendor data, invent app users or bypass real release admission. A distinct live vendor step, when authorized, requires explicit caller-provided open rails and the vendor controls in §7; the generator MUST NOT silently open rails.  
   * Such writer-evidence runs do not widen the route contract and do not move this endpoint into the A7 proof family.
 
 
@@ -3138,6 +3201,8 @@ Evidence and tests (titles-only):
   * The error envelope type MUST be `dev.writer.conjunction.error.v1`.  
   * Writer-style success and error outcomes on `GET /dev/writer/conjunction` MUST remain `Cache-Control: no-store`, MUST NOT emit `ETag`, and MUST be treated as non-conditional.
 
+
+* **Identity and F07 delivery.** The dev conjunction routes consume the real admitted release identity, with no `dev_compat_identity()` stamp. PR06a restored the dev-only resolver seam, generator assertions and owned writer artifacts, and registered `tools/evidence/generate_conjunction_writer_evidence.py` with `_EVIDENCE_GENERATOR_TEST_OWNERS` for `tests/evidence/test_dev_conjunction_identity.py`. Those are delivered repository definitions and attributed historical evidence, not a new run or proof of live vendor/database behavior. The prior PR04 F07 deferral is resolved in that lineage.
 
 * Endpoints (dev-only).  
     
@@ -3161,7 +3226,7 @@ Evidence and tests (titles-only):
 
 * **Encoding & termination.** Emit UTF-8 JSON, BOM/ANSI-free, with **exactly one** trailing LF (`\n`).  
 * **Ordering & separators.** Serialize with **sorted keys (ASCII lexicographic)** and **compact separators** (`,` and `:`; no spaces).  
-* **Arrays-as-sets.** Any array that functions as a set **MUST** be deduplicated and ASCII-sorted by its identity rule (see **HDE-Schemas & Artifacts §4**).  
+* **Arrays-as-sets.** Any array that functions as a set **MUST** be deduplicated and ASCII-sorted by its identity rule (see **HDE-Schemas & Artifacts §4**). Ordered arrays preserve their governing order. Reader v2 `categories` follows §5.1.6 and MUST NOT be set-sorted or repaired by deduplication/default filling.  
 * **Locale determinism.** All canonicalization and byte comparisons run under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 **No pretty-print; no alternates.** Pretty/indented output and alternate serializers are **not permitted** on public paths. Grep-guards **MUST** block ad-hoc `json.dumps(...)` or any non-presenter emitter.
@@ -3187,7 +3252,7 @@ Evidence and tests (titles-only):
     
 * **Canonicalization coupling.** The byte-authoritative entrypoint MUST enforce canonical JSON (sorted keys, compact separators, stable newline) and shared error tokenization rules for both Reader and CLI.  
     
-* **Determinism & parity.** A single byte-authoritative emitter ensures Reader↔CLI **byte equality**, **AB↔BA parity**, and **two-run identity** for identical inputs and environment.
+* **Determinism & parity.** A single byte-authoritative emitter supplies canonical bytes for both Reader versions, **AB↔BA parity** and **two-run identity** for identical inputs/environment. Reader↔CLI byte-equality applies to Reader v1 and its CLI reader-dump; no CLI Reader v2 carrier is introduced.  
 
 **Acceptance (titles-only).** `CLI_READER_PARITY_OK`, `SINGLE_EMITTER_PARITY_OK`, `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `PARITY_AB_BA_OK`.
 
@@ -3216,9 +3281,9 @@ Evidence and tests (titles-only):
 
 * **Build preimage (exactly five keys).** Construct an object with **exactly** these keys (no others), with values normalized per this spec:  
     
-  * `reader_version`: `"v1"`  
+  * `reader_version`: `"v1"` or `"v2"`, matching the selected Reader contract  
   * `eligible`: `<boolean>`  
-  * `categories`: `[ { "id","band" } … ]` — numeric-free and constrained by **§5.1** *(v1: when eligible: exactly one `{ "id":"harmony","band":… }`)*  
+  * `categories`: `[ { "id","band" } ]` — numeric-free and constrained by **§5.1**: eligible v1 has exactly one harmony item; eligible v2 has exactly ten items in governed order; ineligible v1/v2 has `[]`. Reader v2 order is preserved through hashing.  
   * `meta`: `{ "engine_tag","invocation_tag" }` — non-empty strings; `invocation_tag` uses the **short form** defined in Governance/Invocation (titles-only)  
   * `release_id` — lowercase 64-hex (see **§5.1**)
 
@@ -3227,7 +3292,7 @@ Evidence and tests (titles-only):
     
 * **Finalize.** Add the computed `idempotence_hash` to the object (becoming the **sixth top-level key**) and **re-serialize** with the same emitter to produce the public bytes (LF-terminated).  
     
-* **Parity & determinism.** The `preimage_bytes` and final public bytes produced by Reader and CLI **MUST** be **byte-identical** for identical inputs/environment. Preimage and final bytes **MUST** also be identical for **AB vs BA** normalized inputs, and across **two runs** with the same inputs.
+* **Parity & determinism.** Reader v1 preimage and final bytes MUST equal its CLI reader-dump for identical inputs/environment. Reader v1 and Reader v2 preimage and final bytes MUST independently be identical for **AB vs BA** normalized inputs and across **two runs**. No CLI v2 dump is defined.  
 
 **Validation gates (binary)**
 
@@ -3306,11 +3371,13 @@ Evidence and tests (titles-only):
 
 * `HD_API_BASE_URL`  
 * `HD_API_KEY`  
-* `GEO_API_KEY` (when needed)
+* `GEO_API_KEY`
 
 `HDAPI_BASE_URL` is deprecated legacy spelling. PF05 may mention it only as an observed drift key or temporary compatibility alias during migration. Resolution MUST be canonical-first: read `HD_API_BASE_URL`; if absent, a compatibility implementation MAY read `HDAPI_BASE_URL`; if both exist with different values, fail closed with a typed configuration ambiguity.
 
 Missing or empty env values **MUST** produce a typed failure **without** I/O.
+
+Execution uses the vendor configuration already held in the environment. The Product Owner is not required to type, paste or re-enter values. Presence preflight records only names and `SET`/`UNSET`; the base URL is configuration, not a third API key. Passing the environment to the product process is not plaintext-secret handling. Values MUST stay out of process argument lists, conversation, logs, artifacts and commits; scan captured output before admitting evidence. A rails posture MUST NOT remove the only configured base URL. If required configuration is missing, make no call and classify a begun step as `TOOLING_BLOCKED`, identifying missing names by presence only. `.env.example` omitting `GEO_API_KEY` remains an implementation-lane documentation gap; it does not waive this requirement.
 
 ### **7.1.5 Determinism and shaping (closed rails)**
 
@@ -3379,7 +3446,7 @@ The behavior above is covered by acceptance tokens owned in **HDE-Governance** (
 
 PF05 vendor work MUST NOT be deferred merely because a vendor route, auth header, credential binding, config key, base URL posture, endpoint-family availability, account or tier posture, request shape, response shape, error envelope, rate-limit behavior, or open-rails precondition is unknown.
 
-If the missing fact is safely discoverable, the work MUST route through a bounded OPS discovery task or bounded OPS open-rails task instead of guessing, silently deferring, or treating the unknown as out of scope. OPS discovery and open-rails execution remain PO-only, IA-guided, secret-safe, and evidence-recorded. Automated agents MUST NOT perform live external vendor actions, expose secret values, simulate external state changes, or claim OPS completion.
+If the missing fact is safely discoverable, the work MUST route through a bounded OPS discovery task or bounded OPS open-rails task instead of guessing, silently deferring, or treating the unknown as out of scope. Execution remains Product Owner-authorized, IA-guided, secret-safe and evidence-recorded. The Product Owner may direct an automated session agent to execute the identified live-vendor task with the same commands and controls as a human executor; the agent is the executor and evidence producer, not an independent approver. “PO-only” identifies the authorizing and accountable principal. No agent may expose secret values, simulate external state changes, or claim OPS completion without required evidence. No standing authority is created.
 
 Open-rails testing is allowed when it is necessary to prove or discover live vendor reachability, endpoint availability, auth posture, credential-binding correctness, base URL posture, request/response compatibility, account or tier behavior, rate-limit or retry behavior, error-envelope behavior, or integration viability. A bounded live vendor smoke proves only the narrow interaction it was designed to prove. It MUST NOT be treated as full HumanDesignAPI runtime conformance, public Reader expansion, public payload expansion, new route creation, or acceptance-token satisfaction unless the owning governance source explicitly supports that stronger claim.
 
@@ -3429,6 +3496,8 @@ The bounded Fermentation work and repository request builders do not establish b
 ---
 
 ### **7.1.11 SAFE rails and production vendor override**
+
+**Required-Now implementation gap (DD-04; held).** The following production override contract is a requirement, not an available CLI facility. At `main@e7265a090ad0cc8de5f36de2f19481216aa3d073`, bounded parser/resolver inspection finds no `--allow-prod-vendor` implementation or corresponding authenticated override/audit gate. HDE Build Notes records DD-04 / QA50-B01 outside HDE-EPIC040, retained by the PF05 and CLI owners through change control. Neither the Reader deliveries, exceptional closure nor the directed-agent vendor rule implements or waives this contract. Preserve its required flag, authentication, rails and audit predicates; do not invoke or describe the flag as operational.
 
 Vendor HTTP remains subject to the generic SAFE rails in **HDE-Governance**. Closed SAFE or network rails refuse before every vendor decision and perform no credential loading, DNS, socket, or HTTP activity. The production override is an additional admin gate; it never opens either generic rail and never permits public Reader or Aux traffic to call the vendor.
 
@@ -3804,7 +3873,7 @@ The open-rails path is HumanDesignAPI-only. It MUST NOT include OpenAI, LLM, AI-
 
 ---
 
-## **7.4 Adapter data-source policy (PF10-AA) \[Required-Now\]**
+## **7.4 Adapter data-source policy \[Required-Now\]**
 
 **Purpose.** Pin where the adapter reads BodyGraph data in each environment without changing public transport bytes.
 
@@ -3869,7 +3938,7 @@ The open-rails path is HumanDesignAPI-only. It MUST NOT include OpenAI, LLM, AI-
     
 * `error` (human-readable, non-PII, non-secret)
 
-Optional fields are schema-owned and must remain numeric-free (for example `retry_after_ms` integer ≥ 0 when transport policy explicitly permits it, and optional `details` object when permitted by the error\_v1 schema).
+Reader v1 and Reader v2 use exactly these four keys, with no `retry_after_ms` or `details`; `schema:"v1"` versions the error envelope. Only other surfaces whose own schemas and transport policies permit them may emit optional fields. Their optional fields remain subject to the owning numeric and secret-safety constraints.
 
 **CLI note.** CLI typed failures do **not** emit `error_v1` on stderr. CLI failures emit a single LF-terminated code string token; when the same failure maps to an HTTP surface, that token MUST equal the HTTP `error_v1.code` value for the same condition.
 
@@ -3922,7 +3991,7 @@ These codes are exhaustive for the CLI public surface in the sense that success 
 
 ## 9.1 Parity (binary)
 
-* **Reader↔CLI byte-equality.** For identical inputs and environment, Reader response bytes and Reader-v1 bytes written by `hdctl showcompat --dump-reader <path>` MUST be byte-identical, including the single trailing LF. Ordinary `showcompat` stdout remains the distinct compat JSON envelope.  
+* **Reader↔CLI byte-equality (v1).** For identical inputs and environment, Reader v1 response bytes and Reader v1 bytes written by `hdctl showcompat --dump-reader <path>` MUST be byte-identical, including the single trailing LF. Ordinary `showcompat` stdout remains the distinct compat JSON envelope. Reader v2 has no CLI dump flag; it retains its own AB↔BA, two-run, schema and preimage checks.  
 * **AB↔BA identity.** Swapping pair order produces **bit-for-bit identical** bytes (pair normalization in effect).
 
 * ## **Two-run identity.** Two serializations under identical inputs produce **byte-identical** output.
@@ -4054,6 +4123,7 @@ Admin surfaces are never part of the Reader public covenant and must remain clea
 * v2.4.7 — Define the closed CLI success-carrier set and fail-closed birth-time timezone-source precedence, ambiguity, fold/gap, provenance, and typed-refusal contract in §§0.2 and 3\. Sentinel updated: NO.  
 * v2.4.8 — Define the Required-Now `admin_bundle_v1` CLI and `POST /internal/admin/bundle/v1` contracts, including authentication, request/response bytes, audit identity, file receipt, and parity in §4.9. Sentinel updated: NO.  
 * v2.4.9 — Define the PF12-owned `public_aux` Catalog alias model, reject undocumented Aux query controls, require exactly one `v=1`, and normalize the §6.2 status tag in §§5–6. Sentinel updated: NO.  
+* v2.5.3 — Admit production Reader v1/v2 on the distinct POST mount; define ordered v2 projection/examples and inherited transport; correct v1 success/error schema references and resolve PR04 F03/F05/F07 deferrals; conform directed-agent vendor execution and environment/base-URL alias facts; retain held DD-04 and proof/availability limits in §§0.2, 1, 3.7, 4.1, 5.1–5.6, 5.12, 6, 7.1, 7.4, 8.1, 9.1 and Appendix C. Sentinel updated: NO.
 * **Where to put links.** Governed artifact identities and paths are indexed through the Evidence Catalog in **HDE-Schemas & Artifacts**; do not paste payload or transport bytes here. If the Human Evidence Index changes, record “Sentinel updated: YES” only after recomputing `docs/evidence/INDEX.sha256`; the sentinel is the SHA-256 digest of the canonical bytes of `docs/evidence/INDEX.json` and is not mirrored.
 
 ## **11.2 Doc-Delta Hooks (how we propose, review, and land changes)**
@@ -4250,7 +4320,7 @@ A valid `Retry-After` may project nonnegative integer `retry_after_ms` but never
 
 # **Appendix C — CLI Parity Harness (usage recipes for AB↔BA, two-run) \[Required-Now\]**
 
-**Purpose.** Repeatable recipes to prove **Reader↔CLI byte parity**, **AB↔BA identity**, and **two-run identity**, without exposing vendor calls. The harness is **dev-only** (`APP_ENV=dev`).
+**Purpose.** Repeatable recipes to prove **Reader v1↔CLI reader-dump byte parity**, **AB↔BA identity**, and **two-run identity**, without exposing vendor calls. The harness is **dev-only** (`APP_ENV=dev`). Reader v2 uses its ordered projection and goldens in §5.1.6; no CLI v2 carrier is introduced.
 
 ## **C.1 Reader↔CLI parity (success)**
 

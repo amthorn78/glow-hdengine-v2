@@ -2,13 +2,13 @@
 
 **Title:** PF03-Reference-Technical-Writing-Best-Practices
 
-**Version:** v1.8.7
+**Version:** v1.8.8
 
 **Status:** Reference
 
-**Effective date:** 2026-08-25
+**Effective date:** 2026-10-09
 
-**Last Update Gate:** BN 12.8.9
+**Last Update Gate:** BN 13.5; HDE-EPIC040-specification-v1.1-approved.md
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -27,6 +27,10 @@ An instruction to write about an action does not authorize the action. PF03 does
 # **2\) Roles & audience**
 
 The primary audience is AI agents producing PF documentation.
+
+Describe an assigned actor, audit, or prompt by its function when a current source gives that function governance standing. Use functional terms such as executing agent, repository audit, Implementation Agent, and implementation prompt; do not make a provider, product, model, or effort level part of the assignment unless the current task explicitly supplies it as an execution choice. Preserve the source-established role, session, permission, and evidence boundaries.
+
+Preserve exact product-bearing field names, controlled vocabulary values, machine identifiers, and historical or provenance text when their spelling matters. A product-specific capability statement describes that product; establish another agent's required capabilities from actual task evidence instead of assuming the same access or limitation.
 
 The Product Owner, reviewers, subject-matter experts, developers, QA agents, OPS agents, and maintainers are readers and consumers of those outputs. PF03 does not assign their non-editorial responsibilities.
 
@@ -51,7 +55,9 @@ A reviewer evaluates the text for source fidelity, completeness, placement, owne
 
 Use the current supplied artifact and the current allowed sources. Do not substitute memory, a prior conversation, an earlier draft, a summary, a snippet, or a similarly named file for a required source.
 
-Read every relied-on source completely. A cutoff, missing chunk, malformed table, unmatched fence, incomplete block, or passage ending mid-unit is a retrieval failure, not source content.
+Read the complete target and each complete source unit required by the assigned scope. For selected addenda or sections, verify their current source identity and read each unit through its actual boundary, including subordinate content, tables, notes, and necessary cross-references. Search for relevant governing material rather than loading unrelated canon. Supporting reading resolves meaning or ownership; it does not expand the assigned change scope.
+
+A cutoff, missing chunk, malformed table, unmatched fence, incomplete block, or passage ending mid-unit is a retrieval failure, not source content.
 
 Do not write from an incomplete source view. Reopen or retrieve the source through an allowed complete route. If complete recovery is impossible and the missing content could materially change the output, state the smallest blocker.
 
@@ -72,6 +78,8 @@ Keep one canonical home for each governed truth. Do not duplicate an externally 
 Route a reader to the current owning document by its exact in-document title. Do not include a version number in durable cross-document prose.
 
 Add a section anchor only when the owning document establishes a stable, exact anchor and the reference materially improves retrieval.
+
+A PF document other than PF10-HDE-Build-Notes names that document by title only. Do not append an addendum number, section, heading, paragraph, version, or other internal locator. Resolve relevant Build Notes authority by the current topic and scope rather than following an old numbered citation.
 
 Do not assign ownership from a filename, document number, filename resemblance, historical use, memory, or partial excerpt.
 
@@ -164,7 +172,7 @@ Do not promise background work, future completion, or a later response. Produce 
 
 Resolve ownership before writing a governed statement.
 
-1. Retrieve the candidate owning source completely.  
+1. Resolve the candidate owning source's current identity and retrieve the complete units needed to establish ownership.  
 2. Confirm its exact in-document title.  
 3. Read its scope and the complete content relied upon.  
 4. Determine whether that content actually establishes ownership of the point.  
@@ -189,6 +197,10 @@ When ownership is absent, ambiguous, or conflicting, do not assign a home by inf
 
 Apply each source only within the role it can prove.
 
+For PF writing, resolve current controlled PF text from `docs/pfcanon/` on `main`, record the actual path and repository snapshot, and retain each document's declared standing. A native document, external copy, navigation page, or PF-named file outside that location is not a substitute for the current controlled source.
+
+Retrieve a change-process input by its actual repository path in `docs/ephemeral/`. Preserve whether it is an approved Specification, a working Plan, a review decision, or another source type. Attribute historical external copies as historical sources; do not give a pointer or board entry the authority of the controlling file.
+
 1. The current operator instruction controls the requested output, editable scope, and authorized editorial changes.  
 2. The complete supplied target controls its existing bytes, terminology, structure, and section boundaries.  
 3. The current topic-owning canon controls externally governed requirements within its demonstrated scope.  
@@ -199,7 +211,7 @@ An operator instruction may authorize a rewrite or output form. It does not auth
 
 The target document remains authoritative for its valid existing content unless a more authoritative allowed source explicitly supersedes the exact point.
 
-PF10-HDE-Build-Notes may record decisions, clarifications, staging, history, or drainage intent. It does not independently prove current implementation or permanent canon.
+PF10-HDE-Build-Notes may record decisions, clarifications, staging, history, or drainage intent. It does not independently prove current implementation or drainage into another permanent PF document.
 
 Do not combine competing source versions or silently harmonize conflicting statements. Use an explicit current designation, supersession statement, governing-source resolution, or Product Owner decision.
 
@@ -295,15 +307,13 @@ Illustrative commands, snippets, helper code, shell lines, and examples must be 
 
 ## **Source selection and citation**
 
-Resolve and retrieve the complete latest active PF10 base version before relying on an addendum. Use its complete unlettered document or its complete lettered document set in established order. Do not read, reuse, compare, reconcile, or carry forward content from an older base version.
+Resolve the current active PF10 base version from `docs/pfcanon/` on `main`. Use one logical version: its unlettered document or its contiguous lettered set in established order. Do not mix representations or carry forward an older version as current authority.
 
-For a lettered set, verify the continuous addendum sequence across every member before treating the set as complete.
+For a selected-addenda assignment, verify each selected addendum's identity and complete heading-to-next-heading boundary, including any continuation across parts, and read it in full. Inspect source inventory and part metadata as needed to establish that identity. Read the whole logical source only when the assignment requires whole-source coverage.
 
-Treat an addendum as relevant only to the topic its complete text explicitly addresses.
+Search the current logical version as needed to identify governing material for the topic. Determine applicability from complete scope and substantive content, not an old number, index summary, or filename. For overlapping scopes, apply the later applicable rule only to the overlap and retain lower-numbered rules for distinct unsuperseded scope. Identify necessary unselected dependencies as supporting reading; do not turn them into additional drainage.
 
-Search every document in the complete active PF10 version for all addenda relevant to the current topic. Determine each addendum’s actual scope from its complete heading and substantive content. When addendum scopes overlap, apply only the highest-numbered applicable addendum to the overlapping scope. Continue applying lower-numbered addenda only to distinct scope not superseded by the higher-numbered addendum.
-
-Reference an addendum by its exact addendum number and title. Do not use a document version or document letter as the durable external anchor.
+In a PF document other than PF10-HDE-Build-Notes, cite Build Notes by its exact in-document title only. Do not use its addendum number, section, heading, paragraph, version, or another internal locator as a durable reference. Build Notes addenda may cite other Build Notes addenda. Historical records keep their original wording and provenance; their citations are not rewritten as current guidance.
 
 If supplied Build Notes content differs from the repository copy, state the source split when it affects the authored conclusion. Do not describe supplied-only text as repository-drained canon.
 
@@ -331,7 +341,13 @@ When writing about documentation-only staging, distinguish documentation posture
 
 ## **Output**
 
-Follow the complete current Build Notes structure required by the target. PF03 does not define an addendum schema.
+Follow the complete current Build Notes structure required by the target. PF03 does not define a substantive addendum schema.
+
+For an agent-authored addendum, apply the source-established page-ready form: one H2 heading with the next continuous addendum number and a descriptive title; subordinate headings at H3 or deeper. Resolve the current number and format before writing. Include a source-supported unique identifier or distinguishing metadata in the title when needed for retrieval and lineage.
+
+Write the addendum's subject matter directly: supported decisions, requirements, status effects, exceptions, scope boundaries, nonclaims, evidence anchors, dependencies, consequences, and unresolved work. Use declarative present tense for a durable decision while preserving distinctions among completed work, future work, recommendations, exclusions, and unproven facts.
+
+Keep role-addressed handling, publication, routing, and record-maintenance instructions out of the addendum. Planning, rescoping, escalation, and other addendum genres use the same canonical writing posture; the authored text is complete enough to stand on its own page without external procedural narration.
 
 Inside PF10 body text, cite another PF by its exact in-document title and section only, never by filename or version. Do not restate the cited PF’s content in PF10.
 
@@ -480,6 +496,10 @@ State:
 * the distinction between an action, its evidence, and its interpretation.
 
 Use exact source-established commands, paths, routes, modules, flags, and identifiers. Label an example as an example. Do not turn illustrative text into an asserted canonical invocation.
+
+Use CRD Specification and Epic Specification for the permanent scope records; distinguish them from an Implementation Plan's working direction and a kickoff's transient scaffolding. Preserve an actual historical artifact's identity and wording when reporting its provenance.
+
+When writing a Specification or a Specification delta, retrieve the current owning permanent-record format and cite the resolved owner by exact title and supported section. Do not derive its structure or schema identifier from a prompt-local outline, a neighbouring artifact, a retired `glow-specification` or `glow-kickoff` token, or the superseded thirteen-section structure. A kickoff or Implementation Plan may use the producing prompt's authorized format. If the governing format cannot be resolved and read, report that source-resolution blocker instead of authoring against an assumed format.
 
 PF03 governs the clarity and truthfulness of plans, runbooks, remediation documents, and execution instructions. It does not define their domain templates, workflow, acceptance criteria, or operational authority.
 
