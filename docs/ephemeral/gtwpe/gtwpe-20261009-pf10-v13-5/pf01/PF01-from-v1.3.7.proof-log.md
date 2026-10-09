@@ -2,7 +2,7 @@
 
 Artifact produced: complete `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/PF01-from-v1.3.7.md`, internal version v1.3.8; application report `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/PF01-from-v1.3.7.proof-log.md`. Actual execution date: 2026-10-09 UTC; generated at 2026-10-09T12:46:13Z. The filename preserves Nathan's original-baseline identity; it is not the internal document version.
 
-Application outcome: `APPLIED / VERIFIED` for all 61 substantive operations and three derived metadata edits. Repository save: `PARTIAL_PACKAGE` until both required repository outputs have been retrieved completely and matched. Local complete-output reads passed. No invalid subset, missing output or expected future save is presented as complete. No diagnostic was required. The revised copy is for Nathan's publication; the authoritative canon remains read-only.
+Application outcome: `APPLIED / VERIFIED` for all 61 substantive operations and three derived metadata edits. Repository save: `COMPLETE_PACKAGE` — both required repository outputs were retrieved completely at the artifact commit in the actual receipt below and matched every local UTF-8 character. Local complete-output reads also passed. The receipt-bearing report is saved and re-read under the same unchanged run identity. No diagnostic was required. The revised copy is for Nathan's publication; the authoritative canon remains read-only.
 
 ## Fresh Apply intake and step boundary
 
@@ -291,6 +291,15 @@ The complete final PF and this separate application report were read back locall
 
 ## Save state and next actual action
 
-The application pair is locally complete and verified; the repository save/complete-readback receipt is pending. Save only the exact two application outputs under the assigned namespace on the fresh shared branch head, preserving every prior session's work and checking the actual branch/PR/output state. Read both remote files completely before recording COMPLETE_PACKAGE, then save and re-read the receipt-bearing report, and update only T-PF01's last two completion cells. No required diagnostic exists because Apply passed. Do not create a diagnostic merely to fill an optional path.
+The complete application pair was committed on the fresh shared branch head and completely read back as recorded below. The revised PF bytes remain unchanged by this receipt update. Save and re-read this receipt-bearing report under the same run identity, and update only T-PF01's last two completion cells while preserving other sessions' work. No required diagnostic exists because Apply passed. Do not create a diagnostic merely to fill an optional path.
 
 After complete save verification, Nathan may review the shared draft PR and decide later authoritative publication. This task does not edit canon or the Specification, request reviewers, merge, decide product acceptance/closure, execute product QA or operate a release. No content or verification blocker remains within T-PF01; the retained live/environment/other-owner limitations remain precisely bounded in the disposition accounting above.
+
+## Actual saved-pair completion receipt
+
+At 2026-10-09T12:47:50.204Z, the entire revised PF and its separate application proof log were retrieved at commit `ee52481affaf577151424bd215bce60b125b2f5c`. Every returned UTF-8 character matched the local saved file; both complete comparisons were equal. Their usable retrieval references and actual blobs are:
+
+- `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/PF01-from-v1.3.7.md`: Git blob `5ea667831bc3ab60f386f75c59d2bc04f43e65fb`; https://github.com/amthorn78/glow-hdengine-v2/blob/ee52481affaf577151424bd215bce60b125b2f5c/docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/PF01-from-v1.3.7.md; complete content equality verified.
+- `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/PF01-from-v1.3.7.proof-log.md`: Git blob `3831071b61349b22e238dc12a0839cf77de09102`; https://github.com/amthorn78/glow-hdengine-v2/blob/ee52481affaf577151424bd215bce60b125b2f5c/docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/PF01-from-v1.3.7.proof-log.md; complete content equality verified.
+
+The final PF raw SHA-256 remains `60921fc72a31b832049a53eca54177f0fc23ae63fd101e95b0b369de2ebdaf17`, 189031 bytes, internal v1.3.8. This receipt records completed observations, not an expected future verification. The updated report is read back after saving; no self-referential hash or commit is required. T-PF01 final disposition is `APPLIED_VERIFIED / COMPLETE_PACKAGE`; no diagnostic, unresolved PF01 change or blocker remains. Shared draft PR #596 remains the review destination; Nathan alone decides publication/merge.
