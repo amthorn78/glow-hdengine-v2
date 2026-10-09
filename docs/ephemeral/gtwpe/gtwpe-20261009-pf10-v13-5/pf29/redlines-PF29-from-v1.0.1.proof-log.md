@@ -3,7 +3,7 @@
 Run: gtwpe-20261009-pf10-v13-5 / T-PF29; preparation revision 1; 2026-10-09 UTC.
 Role: TW-DRAIN-10 100926.1, fetched from https://app.notion.com/p/3f44590a05eb8172a314fe6b958bb9ff and read completely. Originating preparer/correction route: this Nathan-started T-PF29 document session; no separate session ID is exposed. Bounded correction returns to this same preparer; no delegation/reviewer.
 
-Preparation validation: READY. Repository save completeness: PARTIAL_PACKAGE — native repository readback has not yet occurred; this is not an Apply handoff. The complete two-file candidate exists in this session and will be committed/read back before READY / COMPLETE_PACKAGE is recorded.
+Preparation outcome: READY. Save completeness: COMPLETE_PACKAGE. Both required repository files were fetched in full at 22e3e96b00cc8831d8705a30ecfffc009776c49c and compared exactly to their complete candidate contents before this receipt was authored. The updated report must also be read back before Apply. The independent saved-payload parser validated all 23 exact REPLACE operations, original heading paths, observed/expected counts 1/1, disjoint spans and one-pass reconstruction. Redlines: 69353 native UTF-8 bytes, SHA-256 1ae5b7bcf4035cdc210c18a618ea06bef3a0e42718e5f8cb2757cf456eeb8f9a. Producer simulation: 71974 bytes, SHA-256 5b3075da58005cd78345018cb1ec24e4fd6c8b943aafc414a4781fe0c7b91e10. EOF LF and every untouched interval were preserved. No application has yet run. Retrieval: repository amthorn78/glow-hdengine-v2, commit above and output paths below.
 
 ## Identity, coverage and header provenance
 
