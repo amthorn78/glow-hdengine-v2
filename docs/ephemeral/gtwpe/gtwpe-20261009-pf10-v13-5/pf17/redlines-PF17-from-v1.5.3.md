@@ -1,7 +1,7 @@
 # Redlines — PF17 from v1.5.3
 
 Run: gtwpe-20261009-pf10-v13-5 / T-PF17.
-Task: T-PF17; stage: TW-DRAIN-10 100926.1.
+Task: T-PF17; stage: TW-DRAIN-10 100926.1; preparation revision R2. R1 at aa5f44037cbfb44c2dd191ff118f32268e636805 was rejected for three incomplete nested heading paths. R2 corrects those paths; all literal content payloads, offsets, IDs and selected sources are unchanged.
 Original: `docs/pfcanon/PF17-Canon-HDE-Narratives-Guide-v1.5.3.md` at `e7265a090ad0cc8de5f36de2f19481216aa3d073`; internal title `PF17-Canon-HDE-Narratives-Guide`, version v1.5.3.
 Original Git blob: `a9e73a8adf03dfccabdad8503d02c4ff4e27e190`.
 Original raw UTF-8 SHA-256: `2655c959637c52868a62ab7f7f27e5e04d9c5bca5f8acb3dbcc2b5d1cfd01d1f`; 121,552 bytes.
@@ -48,6 +48,7 @@ Original heading path:
 
 - `# 1\) Purpose & Ground Rules`
 - `## 1.1 Purpose & Non-Goals`
+- `### Purpose`
 
 Source-ledger basis: T-PF17 / A23, C040-07 narrative/public boundary; A24 confirms delivery, S06/S07/S12 retain non-narrative ownership, C1 establishes exceptional closure.
 Rationale: Keep the existing deterministic composer purpose and add the Reader v2 exclusion from narrative text.
@@ -75,6 +76,7 @@ Original heading path:
 
 - `# 1\) Purpose & Ground Rules`
 - `## 1.1 Purpose & Non-Goals`
+- `### Non-Goals`
 
 Source-ledger basis: T-PF17 / A23, C040-07 narrative/public boundary; A24 confirms delivery, S06/S07/S12 retain non-narrative ownership, C1 establishes exceptional closure.
 Rationale: Preserve every v1 obligation and state the public narrative exclusion for v2; this is a surface restriction, not a new composer rule.
@@ -102,6 +104,7 @@ Original heading path:
 
 - `# 1\) Purpose & Ground Rules`
 - `## 1.3 Terminology & Posture`
+- `### Text, Suppressed, and pre-composition error`
 
 Source-ledger basis: T-PF17 / A23, C040-07 narrative/public boundary; A24 confirms delivery, S06/S07/S12 retain non-narrative ownership, C1 establishes exceptional closure.
 Rationale: Keep terminology aligned with both public Reader versions while retaining Aux and admin CLI as the narrative surfaces.

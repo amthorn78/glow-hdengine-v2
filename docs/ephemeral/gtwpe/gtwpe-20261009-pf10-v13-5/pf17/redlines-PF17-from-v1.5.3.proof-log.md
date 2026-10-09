@@ -1,5 +1,7 @@
 # Preparation proof log — PF17 from v1.5.3
 
+Preparation revision: R2. R1 is preserved at `aa5f44037cbfb44c2dd191ff118f32268e636805`. Fresh Apply rejected R1 with zero edits because RL-002, RL-003 and RL-004 omitted their exact H3 target headings. Diagnostic: `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf17/PF17-from-v1.5.3.diagnostic.md`. The same originating preparer added `### Purpose`, `### Non-Goals`, and `### Text, Suppressed, and pre-composition error` to those respective paths. All nine literal old/new payloads, IDs, counts, offsets and source selections are unchanged. The complete R2 batch is revalidated, rather than treating the valid R1 payloads as an applicable subset. Apply must freshly validate R2 before any output edit.
+
 Run: gtwpe-20261009-pf10-v13-5 / T-PF17. Artifact: `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf17/redlines-PF17-from-v1.5.3.md`.
 Proof: `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf17/redlines-PF17-from-v1.5.3.proof-log.md`.
 Originating preparer and correction route: Nathan-started T-PF17 Work document session; workspace /workspace/scratch/64476f52c0c0; preparer and applier are the same assistant in this conversation; no platform conversation ID is available. An authorized diagnostic returns to this same preparer under TW-DRAIN-10 100926.1; Apply never repairs the package.
@@ -72,7 +74,7 @@ The full saved redlines will be parsed and compared to every exact prepared old/
 
 ## Save and completion state
 
-Producer checks: PASS. Preparation: READY. Save: COMPLETE_PACKAGE. The complete saved redlines and proof log were read back at their exact local repository-relative destinations and compared to their intended content on 2026-10-09 UTC; all nine old/new payload pairs, IDs, heading paths, operations, counts and END OF REDLINES were verified. This receipt was added only after both files had been read completely. The updated proof log was then read back completely and compared again. Remote commit/readback is the next publication check and is not claimed by this local receipt. Redlines SHA-256: 90c536cb4817b4414eef282a164034f0062a60858fbaec67b1dbda473af6476b. The report does not claim a self-referential hash or not-yet-known commit.
+Producer checks: PASS. Preparation: READY. Save: COMPLETE_PACKAGE. The complete saved redlines and proof log were read back at their exact local repository-relative destinations and compared to their intended content on 2026-10-09 UTC; all nine old/new payload pairs, IDs, heading paths, operations, counts and END OF REDLINES were verified. This receipt was added only after both files had been read completely. The updated proof log was then read back completely and compared again. Remote commit/readback is the next publication check and is not claimed by this local receipt. Redlines SHA-256: 8a639c28b1da50da4aa4448fb71e5db073bffdea8d3a15e26fd1c9977762e3d9. The report does not claim a self-referential hash or not-yet-known commit.
 
 ## Limitations and next step
 
