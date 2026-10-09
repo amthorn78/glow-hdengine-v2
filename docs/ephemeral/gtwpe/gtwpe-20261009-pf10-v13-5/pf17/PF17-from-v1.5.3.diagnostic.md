@@ -26,4 +26,4 @@ Required originating-preparer action: append each exact H3 to its corresponding 
 
 Whole R1 batch rejected. Applied edits: **0**. Original unchanged; no final PF or metadata bump produced by this attempt. No subset was applied and no locator was normalized by the applier. This diagnostic does not authorize source, canon, Specification, governed evidence, merge or production writes.
 
-Resolution: awaiting same-session originating-preparer R2 correction and complete revalidation. The final application proof log will record its actual outcome.
+Resolution: **RESOLVED** on 2026-10-09 UTC. The same originating preparer corrected all three paths in complete R2 at 45aa22063cdc5d72db5fe823a656aef480ba2ae6. Fresh TW-APPLY-10 independently validated all nine content operations and the metadata plan, then applied and fully verified the complete v1.5.4 output. The final application proof log records the actual operation/source basis and whole-byte preservation. R1 remains a zero-applied rejected attempt; its historical diagnostic is retained.
