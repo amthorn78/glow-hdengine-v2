@@ -113,5 +113,20 @@ quantified relay scoring and retired recurring header reviews.
 
 ## Publication and readback
 
-Final staged-file validation, complete committed-file readback and remote
-publication are recorded in the successor receipt below when observed.
+- Final staged-file `git diff --cached --check`: exit 0.
+- After the canon refresh, `modification_validate.py docs/ephemeral/modifications/`:
+  14/14 records pass.
+- Complete staged-file readback: all five new files match the working bytes.
+  Census arithmetic (55 complete sources, 54 session-bearing bodies, 45 identity
+  diagnostic bodies / 244 matches), eight parts and empty approval fields verified.
+- Git HTTPS push had no usable username credential. Publication used the connected
+  GitHub Git-data API; no credential was extracted and no access control was bypassed.
+- Published tree `6880088d60a98f6f66a407d99db6b146d219f111` exactly matched
+  the verified local tree.
+- Published analysis commit `67dde0b292eccd96c5e325d6eae76b47aa55d208`.
+  A fresh git fetch and complete `git show` read of every artifact verified all
+  five remote file contents against the verified local files.
+- Draft PR [#598](https://github.com/amthorn78/glow-hdengine-v2/pull/598)
+  is open on the analysis branch. No merge or auto-merge was requested.
+- This receipt adds publication observations after that readback. It changes no
+  analysis conclusion, scope, approval or implementation authority.
