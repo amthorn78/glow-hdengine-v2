@@ -1,0 +1,256 @@
+{
+  "edge_indices": [
+    182,
+    183,
+    184,
+    185,
+    186,
+    187
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-120",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PASS"
+          ],
+          "branch_id": "pass_crd",
+          "change_class": "CRD",
+          "condition": "PASS with verified existing CRD class, complete QA Report/RCA and the matching continuing-Isis closure intake",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "required_artifacts": [
+            "QA_REPORT",
+            "QA_RCA"
+          ],
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-120.md",
+            "section": "Required result and routing"
+          },
+          "state": "PASS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PASS"
+      ],
+      "to": "CL-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-120",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PASS"
+          ],
+          "branch_id": "pass_epic",
+          "change_class": "EPIC",
+          "condition": "PASS with verified existing EPIC class, complete QA Report/RCA and the matching continuing-Isis closure intake",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "required_artifacts": [
+            "QA_REPORT",
+            "QA_RCA"
+          ],
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-120.md",
+            "section": "Required result and routing"
+          },
+          "state": "PASS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PASS"
+      ],
+      "to": "CL-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-120",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FAIL"
+          ],
+          "branch_id": "fail",
+          "condition": "final QA Report/RCA demonstrates a material failure requiring escalation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-120.md",
+            "section": "Required result and routing"
+          },
+          "state": "FAIL",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FAIL"
+      ],
+      "to": "ESC-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-120",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "shared_source_authority_terminal",
+          "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-120.md",
+            "section": "Terminal operator return and receiver compatibility"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-120",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INTERIM"
+          ],
+          "branch_id": "interim_evidence_review",
+          "condition": "remaining evidence requires Kronos classification",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-120.md",
+            "section": "Required result and routing"
+          },
+          "state": "INTERIM",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INTERIM"
+      ],
+      "to": "QA-110",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-120",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INTERIM"
+          ],
+          "branch_id": "interim_task_authoring",
+          "condition": "an unissued selected instruction or authorized retry task must be authored",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-120.md",
+            "section": "Required result and routing"
+          },
+          "state": "INTERIM",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INTERIM"
+      ],
+      "to": "QA-90",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-120",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81a4a3fbc0fae65d153e?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "QA-120",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Final QA Report and RCA for the exact supplied change.",
+    "output_artifacts": [
+      "QA_REPORT / QA_RCA / QA_INTERIM_STATUS"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81589d21e798cf38e8ba",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-120 — Create Final QA Report and RCA — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "CL-C-10",
+      "QA-110",
+      "QA-90",
+      "ESC-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Kronos, continuing QA authority for this Epic or CRD.",
+    "result_states": [
+      "PASS",
+      "FAIL",
+      "INTERIM"
+    ],
+    "sequence": 120,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-120 — Create Final QA Report and RCA — 100926.1"
+  },
+  "state_route_order": [
+    "pass_epic",
+    "pass_crd",
+    "fail",
+    "interim_evidence_review",
+    "interim_task_authoring",
+    "shared_source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

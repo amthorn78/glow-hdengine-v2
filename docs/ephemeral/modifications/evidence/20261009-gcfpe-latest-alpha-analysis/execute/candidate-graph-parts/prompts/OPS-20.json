@@ -1,0 +1,348 @@
+{
+  "edge_indices": [
+    135,
+    136,
+    137,
+    138,
+    139
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED",
+            "FAILED",
+            "NOT_EXECUTED",
+            "NOT_PRODUCED"
+          ],
+          "branch_id": "ops_execution_terminal",
+          "condition": "a decisive source, authority, target, access, or owner fact prevents any runnable continuation",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED",
+        "FAILED",
+        "NOT_EXECUTED",
+        "NOT_PRODUCED"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PARTIAL",
+            "BLOCKED",
+            "FAILED",
+            "NOT_EXECUTED",
+            "NOT_PRODUCED"
+          ],
+          "branch_id": "remediation_discovery",
+          "condition": "the exact authorized remediation package requires bounded discovery before Thoth resumes",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_CONTINUATION",
+          "route_steps": [
+            "OPS-20 -> ESC-25",
+            "ESC-25 result -> ESC-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED",
+        "NOT_EXECUTED",
+        "NOT_PRODUCED"
+      ],
+      "to": "ESC-25",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "result_complete",
+          "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "PARTIAL"
+          ],
+          "branch_id": "result_partial",
+          "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "PARTIAL",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "result_blocked",
+          "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "FAILED"
+          ],
+          "branch_id": "result_failed",
+          "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "FAILED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "NOT_EXECUTED"
+          ],
+          "branch_id": "result_notexecuted",
+          "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "NOT_EXECUTED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "NOT_PRODUCED"
+          ],
+          "branch_id": "result_notproduced",
+          "condition": "one truthful OPS_EXECUTION_RESULT returns to the task creator and receipt reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "NOT_PRODUCED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED",
+        "NOT_EXECUTED",
+        "NOT_PRODUCED"
+      ],
+      "to": "OPS-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PARTIAL",
+            "BLOCKED",
+            "FAILED",
+            "NOT_EXECUTED",
+            "NOT_PRODUCED"
+          ],
+          "branch_id": "ops_execution_native_owner",
+          "condition": "a blocked, incomplete, contradictory, or access-limited result has an exact native owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED",
+        "NOT_EXECUTED",
+        "NOT_PRODUCED"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PARTIAL",
+            "BLOCKED",
+            "FAILED",
+            "NOT_EXECUTED",
+            "NOT_PRODUCED"
+          ],
+          "branch_id": "material_boundary_proposal",
+          "condition": "actual execution evidence establishes a new bounded material boundary requiring proposal; a lawful originating PR implementation author is identified, independent of the IA reviewer; otherwise return the unresolved assignment to the Product Owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [
+            "OPS-20 -> RS-10",
+            "RS-10 complete proposal -> RS-20",
+            "RS-20 REVISION_REQUIRED -> RS-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED",
+        "NOT_EXECUTED",
+        "NOT_PRODUCED"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "OPS-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "OPS-20",
+    "lane": "OPS",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Execute Bounded Ops Task for the exact supplied change.",
+    "output_artifacts": [
+      "OPS_EXECUTION_RESULT"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81858a9dd361d3689ce8",
+      "release": "GCFPE-20260914.1",
+      "title": "OPS-20 — Execute Bounded Ops Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "OPS-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the authorized DevOps or target-environment operator for the exact bounded operation supplied in OPS_TASK_ID.",
+    "result_states": [
+      "COMPLETE",
+      "PARTIAL",
+      "BLOCKED",
+      "FAILED",
+      "NOT_EXECUTED",
+      "NOT_PRODUCED"
+    ],
+    "sequence": 20,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "OPS-20 — Execute Bounded Ops Task — 100926.1"
+  },
+  "state_route_order": [
+    "result_complete",
+    "result_partial",
+    "result_blocked",
+    "result_failed",
+    "result_notexecuted",
+    "result_notproduced",
+    "remediation_discovery",
+    "material_boundary_proposal",
+    "ops_execution_native_owner",
+    "ops_execution_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

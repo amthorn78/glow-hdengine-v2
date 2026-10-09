@@ -1,0 +1,171 @@
+{
+  "edge_indices": [
+    11,
+    12,
+    13
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SPECIFICATION_PENDING"
+          ],
+          "branch_id": "preapproval_revision",
+          "condition": "pending preapproval CRD Specification corrected under the exact redline",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "SPECIFICATION_PENDING",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "SPECIFICATION_PENDING"
+          ],
+          "branch_id": "approved_base_first_delta_authoring",
+          "condition": "first standalone CRD Specification delta authored from the exact Thoth correction assessment/redline; immutable approved base unchanged; return to the same Thoth reviewer for approved-base delta review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "SPECIFICATION_PENDING",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "SPECIFICATION_PENDING"
+          ],
+          "branch_id": "approved_base_delta_revision",
+          "condition": "pending bounded approved-base SPECIFICATION_DELTA corrected without rewriting the approved base",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "SPECIFICATION_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SPECIFICATION_PENDING"
+      ],
+      "to": "CF-C-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "revision_terminal",
+          "condition": "the redline or authority owner cannot be resolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "redline_owner_recovery",
+          "condition": "missing or contradictory redline/authority has an exact evidenced native owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    }
+  ],
+  "id": "CF-C-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81458686cc39d8d98b2a?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "CF-C-40",
+    "lane": "CF-C",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Revise a pending CRD Specification, author the first bounded delta from a justified approved-base correction redline, or revise a denied pending delta.",
+    "output_artifacts": [
+      "CRD_SPECIFICATION / SPECIFICATION_DELTA"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81269931cee342ce8a0e",
+      "release": "GCFPE-20260914.1",
+      "title": "CF-C-40 — Revise CRD Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "CF-C-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, the same continuing Specification author.",
+    "result_states": [
+      "SPECIFICATION_PENDING"
+    ],
+    "sequence": 40,
+    "session_class": "ROLE_CONTINUING",
+    "title": "CF-C-40 — Revise CRD Specification — 100926.1"
+  },
+  "state_route_order": [
+    "preapproval_revision",
+    "approved_base_first_delta_authoring",
+    "approved_base_delta_revision",
+    "redline_owner_recovery",
+    "revision_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

@@ -1,0 +1,105 @@
+{
+  "edge_indices": [
+    75,
+    76
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "AWAITING_THOTH_REMEDIATION"
+          ],
+          "branch_id": "awaiting_thoth_remediation",
+          "condition": "complete QA escalation report is ready for Thoth remediation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "AWAITING_THOTH_REMEDIATION",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "AWAITING_THOTH_REMEDIATION"
+      ],
+      "to": "ESC-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "escalation_terminal",
+          "condition": "missing decisive source, owner, authority, or irrecoverable evidence",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "ESC-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81f2af47fff48995f272?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "ESC-10",
+    "lane": "ESC",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create QA Escalation Report for the exact supplied change.",
+    "output_artifacts": [
+      "QA_ESCALATION_REPORT"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81d582b8d490e77f9f40",
+      "release": "GCFPE-20260914.1",
+      "title": "ESC-10 — Create QA Escalation Report — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "ESC-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same continuing Kronos QA authority.",
+    "result_states": [
+      "AWAITING_THOTH_REMEDIATION"
+    ],
+    "sequence": 10,
+    "session_class": "ROLE_CONTINUING",
+    "title": "ESC-10 — Create QA Escalation Report — 100926.1"
+  },
+  "state_route_order": [
+    "awaiting_thoth_remediation",
+    "escalation_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

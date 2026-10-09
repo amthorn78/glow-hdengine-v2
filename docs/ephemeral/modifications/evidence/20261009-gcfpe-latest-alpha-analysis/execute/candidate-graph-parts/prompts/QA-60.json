@@ -1,0 +1,171 @@
+{
+  "edge_indices": [
+    196,
+    197,
+    198,
+    199
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-60",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked",
+          "condition": "unique source failure, approved-base rewrite request, unrecoverable authority conflict, or missing decisive Audit",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-60",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PLAN_PENDING"
+          ],
+          "branch_id": "plan_pending",
+          "condition": "complete QA Plan returns to continuing Isis review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PLAN_PENDING"
+      ],
+      "to": "QA-70",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-60",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "existing_revision_reuse",
+          "condition": "actual initial QA-70 denial or bounded redline review of this exact Plan already exists with complete review/Audit/upstream intake and same Kronos author lineage",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [],
+      "to": "QA-80",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-60",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "existing_approval_reuse",
+          "condition": "a subsequent still-valid actual QA-70 approval of this exact Plan already exists and its complete native task-creation intake is available; preserve Isis decision and same Kronos lineage without new Plan/review/task execution",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [],
+      "to": "QA-90",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-60",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81489053f72637577807?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "QA-60",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Whole-Change QA Plan for the exact supplied change.",
+    "output_artifacts": [
+      "QA_PLAN"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb810b8aa3e1692830d4b8",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-60 — Create Whole-Change QA Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "QA-70",
+      "QA-80"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same continuing Kronos QA authority.",
+    "result_states": [
+      "PLAN_PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 60,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-60 — Create Whole-Change QA Plan — 100926.1"
+  },
+  "state_route_order": [
+    "existing_approval_reuse",
+    "existing_revision_reuse",
+    "plan_pending",
+    "blocked"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

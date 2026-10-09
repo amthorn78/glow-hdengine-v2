@@ -1,0 +1,810 @@
+{
+  "candidate_release": "GCFPE-20261009.1",
+  "runtime_siblings": [
+    {
+      "id": "CF-C-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:03.197Z",
+      "normalization": "native mention display text"
+    },
+    {
+      "id": "CF-C-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:48.418Z"
+    },
+    {
+      "id": "CF-C-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:50.363Z"
+    },
+    {
+      "id": "CF-C-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:52.355Z"
+    },
+    {
+      "id": "CF-E-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:53.973Z"
+    },
+    {
+      "id": "CF-E-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:57.290Z"
+    },
+    {
+      "id": "CF-E-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:10:58.798Z"
+    },
+    {
+      "id": "CF-E-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:00.884Z"
+    },
+    {
+      "id": "CF-PO-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:02.449Z"
+    },
+    {
+      "id": "CL-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:05.162Z"
+    },
+    {
+      "id": "CL-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:09.557Z"
+    },
+    {
+      "id": "CL-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:12.358Z"
+    },
+    {
+      "id": "CL-C-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:14.868Z"
+    },
+    {
+      "id": "CL-E-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:17.445Z"
+    },
+    {
+      "id": "CL-E-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:34.769Z"
+    },
+    {
+      "id": "CL-E-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:36.747Z"
+    },
+    {
+      "id": "CL-E-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:38.604Z"
+    },
+    {
+      "id": "DOC-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:40.826Z"
+    },
+    {
+      "id": "DOC-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:42.869Z"
+    },
+    {
+      "id": "ESC-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:44.854Z"
+    },
+    {
+      "id": "ESC-25",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:46.838Z"
+    },
+    {
+      "id": "ESC-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:48.657Z"
+    },
+    {
+      "id": "ESC-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:51.439Z"
+    },
+    {
+      "id": "IA-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:54.630Z"
+    },
+    {
+      "id": "IA-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:57.808Z"
+    },
+    {
+      "id": "IA-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:11:59.445Z"
+    },
+    {
+      "id": "IA-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:01.074Z"
+    },
+    {
+      "id": "IA-50",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:02.847Z"
+    },
+    {
+      "id": "IA-60",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:04.842Z"
+    },
+    {
+      "id": "MGR-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:18.429Z"
+    },
+    {
+      "id": "OPS-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:20.059Z"
+    },
+    {
+      "id": "OPS-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:26.012Z"
+    },
+    {
+      "id": "OPS-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:28.694Z"
+    },
+    {
+      "id": "PR-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:31.713Z"
+    },
+    {
+      "id": "PR-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:34.254Z"
+    },
+    {
+      "id": "PR-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:37.057Z"
+    },
+    {
+      "id": "PR-35",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:39.512Z"
+    },
+    {
+      "id": "PR-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:41.788Z"
+    },
+    {
+      "id": "PR-50",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:44.991Z"
+    },
+    {
+      "id": "QA-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:46.643Z"
+    },
+    {
+      "id": "QA-100",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:12:50.193Z"
+    },
+    {
+      "id": "QA-110",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:14.927Z"
+    },
+    {
+      "id": "QA-120",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:16.920Z"
+    },
+    {
+      "id": "QA-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:19.327Z"
+    },
+    {
+      "id": "QA-50",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:21.061Z"
+    },
+    {
+      "id": "QA-60",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:23.178Z"
+    },
+    {
+      "id": "QA-70",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:24.925Z"
+    },
+    {
+      "id": "QA-80",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:27.062Z"
+    },
+    {
+      "id": "QA-90",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:29.043Z"
+    },
+    {
+      "id": "RS-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:30.743Z"
+    },
+    {
+      "id": "RS-20",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:33.913Z"
+    },
+    {
+      "id": "RS-30",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:35.779Z"
+    },
+    {
+      "id": "RS-40",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:37.596Z",
+      "normalization": "native mention display text and documented stripped blank line"
+    },
+    {
+      "id": "UTIL-10",
+      "ok": true,
+      "full_readback": true,
+      "identity": true,
+      "edited": "2026-10-09T20:13:56.908Z"
+    }
+  ],
+  "authoring_control": {
+    "full_readback": true,
+    "ok": true,
+    "edited": "2026-10-09T20:13:58.466Z"
+  },
+  "candidate_catalog": {
+    "url": "https://app.notion.com/p/3f44590a05eb8110aa69fe4189ad9abc?pvs=204",
+    "complete": true,
+    "all_55_members_present": true,
+    "selected": false
+  },
+  "operational_controls": [
+    {
+      "key": "alpha",
+      "id": "3df4590a05eb8111a6a5f67cb82f96f6",
+      "readback": true,
+      "edited": "2026-10-09T20:18:57.716Z"
+    },
+    {
+      "key": "flowindex",
+      "id": "3db4590a05eb81de9736ea69bac61016",
+      "readback": true,
+      "edited": "2026-10-09T20:18:59.171Z"
+    },
+    {
+      "key": "catalog",
+      "id": "3db4590a05eb81738ef1d846e3c0df8c",
+      "readback": true,
+      "edited": "2026-10-09T20:19:00.758Z"
+    },
+    {
+      "key": "selectedentry",
+      "id": "3db4590a05eb816f925ef3b0659de3b8",
+      "readback": true,
+      "edited": "2026-10-09T20:19:02.111Z"
+    },
+    {
+      "key": "IAhub",
+      "id": "3db4590a05eb8195a2ccf7c0959a8b6e",
+      "readback": true,
+      "edited": "2026-10-09T20:19:03.530Z"
+    },
+    {
+      "key": "QAhub",
+      "id": "3db4590a05eb814d96d3dcfa8835f96d",
+      "readback": true,
+      "edited": "2026-10-09T20:19:05.496Z"
+    },
+    {
+      "key": "CFhub",
+      "id": "3db4590a05eb81d59059eb6b95ed5fcf",
+      "readback": true,
+      "edited": "2026-10-09T20:19:06.953Z"
+    },
+    {
+      "key": "Eschub",
+      "id": "3db4590a05eb81cd938de84cfffead9c",
+      "readback": true,
+      "edited": "2026-10-09T20:19:08.504Z"
+    },
+    {
+      "key": "TWhub",
+      "id": "3db4590a05eb811b9c14f2ae89c28df7",
+      "readback": true,
+      "edited": "2026-10-09T20:19:09.916Z"
+    },
+    {
+      "key": "register",
+      "id": "3d24590a05eb81ce942ad994cfca9fa1",
+      "readback": true,
+      "edited": "2026-10-09T20:19:11.175Z"
+    }
+  ],
+  "source_refresh": [
+    {
+      "id": "CF-C-10",
+      "ok": true,
+      "edited": "2026-09-24T15:24:29.077Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-C-20",
+      "ok": true,
+      "edited": "2026-09-24T15:25:00.149Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-C-30",
+      "ok": true,
+      "edited": "2026-09-24T15:25:31.437Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-C-40",
+      "ok": true,
+      "edited": "2026-09-24T15:25:55.492Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-E-10",
+      "ok": true,
+      "edited": "2026-09-24T15:26:19.312Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-E-20",
+      "ok": true,
+      "edited": "2026-09-24T15:26:44.201Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-E-30",
+      "ok": true,
+      "edited": "2026-09-24T15:27:08.227Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-E-40",
+      "ok": true,
+      "edited": "2026-09-24T15:27:30.493Z",
+      "unchanged": true
+    },
+    {
+      "id": "CF-PO-10",
+      "ok": true,
+      "edited": "2026-09-23T13:19:43.642Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-20",
+      "ok": true,
+      "edited": "2026-09-24T15:28:16.809Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-30",
+      "ok": true,
+      "edited": "2026-09-24T15:29:01.883Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-40",
+      "ok": true,
+      "edited": "2026-09-24T15:29:46.100Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-C-10",
+      "ok": true,
+      "edited": "2026-09-24T15:30:45.370Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-E-10",
+      "ok": true,
+      "edited": "2026-09-24T15:31:44.809Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-E-20",
+      "ok": true,
+      "edited": "2026-09-24T15:32:20.043Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-E-30",
+      "ok": true,
+      "edited": "2026-09-24T15:32:58.391Z",
+      "unchanged": true
+    },
+    {
+      "id": "CL-E-40",
+      "ok": true,
+      "edited": "2026-09-24T15:33:34.204Z",
+      "unchanged": true
+    },
+    {
+      "id": "DOC-10",
+      "ok": true,
+      "edited": "2026-09-24T15:34:17.549Z",
+      "unchanged": true
+    },
+    {
+      "id": "DOC-20",
+      "ok": true,
+      "edited": "2026-09-24T15:35:05.401Z",
+      "unchanged": true
+    },
+    {
+      "id": "ESC-10",
+      "ok": true,
+      "edited": "2026-09-24T15:35:43.615Z",
+      "unchanged": true
+    },
+    {
+      "id": "ESC-25",
+      "ok": true,
+      "edited": "2026-09-24T15:36:28.369Z",
+      "unchanged": true
+    },
+    {
+      "id": "ESC-30",
+      "ok": true,
+      "edited": "2026-09-24T15:37:26.214Z",
+      "unchanged": true
+    },
+    {
+      "id": "ESC-40",
+      "ok": true,
+      "edited": "2026-09-24T15:38:04.065Z",
+      "unchanged": true
+    },
+    {
+      "id": "IA-10",
+      "ok": true,
+      "edited": "2026-09-24T15:38:59.570Z",
+      "unchanged": true
+    },
+    {
+      "id": "IA-20",
+      "ok": true,
+      "edited": "2026-09-24T15:39:23.663Z",
+      "unchanged": true
+    },
+    {
+      "id": "IA-30",
+      "ok": true,
+      "edited": "2026-09-24T15:39:54.736Z",
+      "unchanged": true
+    },
+    {
+      "id": "IA-40",
+      "ok": true,
+      "edited": "2026-09-23T13:20:55.194Z",
+      "unchanged": true
+    },
+    {
+      "id": "IA-50",
+      "ok": true,
+      "edited": "2026-09-23T13:21:22.133Z",
+      "unchanged": true
+    },
+    {
+      "id": "IA-60",
+      "ok": true,
+      "edited": "2026-09-23T13:21:46.155Z",
+      "unchanged": true
+    },
+    {
+      "id": "MGR-10",
+      "ok": true,
+      "edited": "2026-09-23T13:29:42.793Z",
+      "unchanged": true
+    },
+    {
+      "id": "OPS-10",
+      "ok": true,
+      "edited": "2026-09-24T15:40:51.854Z",
+      "unchanged": true
+    },
+    {
+      "id": "OPS-20",
+      "ok": true,
+      "edited": "2026-09-24T15:41:40.436Z",
+      "unchanged": true
+    },
+    {
+      "id": "OPS-30",
+      "ok": true,
+      "edited": "2026-09-24T15:43:03.835Z",
+      "unchanged": true
+    },
+    {
+      "id": "PR-10",
+      "ok": true,
+      "edited": "2026-09-24T15:44:17.446Z",
+      "unchanged": true
+    },
+    {
+      "id": "PR-20",
+      "ok": true,
+      "edited": "2026-09-24T15:46:52.719Z",
+      "unchanged": true
+    },
+    {
+      "id": "PR-30",
+      "ok": true,
+      "edited": "2026-09-24T15:47:45.499Z",
+      "unchanged": true
+    },
+    {
+      "id": "PR-35",
+      "ok": true,
+      "edited": "2026-09-24T15:48:24.405Z",
+      "unchanged": true
+    },
+    {
+      "id": "PR-40",
+      "ok": true,
+      "edited": "2026-09-24T15:49:45.516Z",
+      "unchanged": true
+    },
+    {
+      "id": "PR-50",
+      "ok": true,
+      "edited": "2026-09-24T15:50:07.915Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-10",
+      "ok": true,
+      "edited": "2026-09-24T15:51:30.296Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-100",
+      "ok": true,
+      "edited": "2026-09-24T15:52:02.330Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-110",
+      "ok": true,
+      "edited": "2026-09-24T15:52:32.947Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-120",
+      "ok": true,
+      "edited": "2026-09-24T15:53:04.131Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-20",
+      "ok": true,
+      "edited": "2026-09-24T15:53:39.690Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-50",
+      "ok": true,
+      "edited": "2026-09-24T15:54:17.481Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-60",
+      "ok": true,
+      "edited": "2026-09-24T15:54:47.640Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-70",
+      "ok": true,
+      "edited": "2026-09-24T15:55:17.352Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-80",
+      "ok": true,
+      "edited": "2026-09-24T15:55:48.777Z",
+      "unchanged": true
+    },
+    {
+      "id": "QA-90",
+      "ok": true,
+      "edited": "2026-09-24T15:56:22.252Z",
+      "unchanged": true
+    },
+    {
+      "id": "RS-10",
+      "ok": true,
+      "edited": "2026-09-24T15:56:52.996Z",
+      "unchanged": true
+    },
+    {
+      "id": "RS-20",
+      "ok": true,
+      "edited": "2026-09-24T15:57:26.346Z",
+      "unchanged": true
+    },
+    {
+      "id": "RS-30",
+      "ok": true,
+      "edited": "2026-09-24T15:57:55.813Z",
+      "unchanged": true
+    },
+    {
+      "id": "RS-40",
+      "ok": true,
+      "edited": "2026-09-24T15:58:22.358Z",
+      "unchanged": true
+    },
+    {
+      "id": "UTIL-10",
+      "ok": true,
+      "edited": "2026-09-24T15:58:46.985Z",
+      "unchanged": true
+    },
+    {
+      "id": "metaprompt",
+      "ok": true,
+      "edited": "2026-09-23T17:17:22.217Z",
+      "unchanged": true
+    },
+    {
+      "id": "backlog",
+      "ok": true,
+      "edited": "2026-09-24T00:29:29.951Z",
+      "unchanged": true
+    },
+    {
+      "id": "alpha",
+      "ok": true,
+      "edited": "2026-09-29T17:42:28.348Z",
+      "unchanged": true
+    }
+  ],
+  "binding_checks": {
+    "members": 54,
+    "failures": []
+  },
+  "normalization": "Compared full native body text in memory, normalizing paired mention display text to self-closing native references and documented stripped blank lines. No body copies, hashes or diffs persisted.",
+  "shipped_gates": "NOT_RUN_NO_SKILL_ACCESS",
+  "independent_review": "NOT_RUN",
+  "runtime_qa_ops": "NOT_RUN"
+}

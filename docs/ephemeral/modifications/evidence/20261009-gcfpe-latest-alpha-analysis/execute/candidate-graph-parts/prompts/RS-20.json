@@ -1,0 +1,355 @@
+{
+  "edge_indices": [
+    213,
+    214,
+    215,
+    216,
+    217,
+    218
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SPECIFICATION_CHANGE_REQUIRED"
+          ],
+          "branch_id": "specification_change_required",
+          "condition": "native Product Owner Specification-delta decision; no RS-20 addendum",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "SPECIFICATION_CHANGE_REQUIRED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "SPECIFICATION_CHANGE_REQUIRED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_native",
+          "condition": "recorded origin is a non-PR native stage; unchanged authority; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "IN_SCOPE_REPAIR"
+          ],
+          "branch_id": "in_scope_native",
+          "condition": "existing repair owner is a non-PR native stage under unchanged authority; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "IN_SCOPE_REPAIR",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "APPROVE"
+          ],
+          "branch_id": "rescope_non_pr",
+          "condition": "qualifying non-PR bounded rescope; exact native stage reads current PF10",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "IN_SCOPE_REPAIR",
+        "REJECT"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_pr30",
+          "condition": "recorded origin/phase is PR-30; unchanged authority; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "IN_SCOPE_REPAIR"
+          ],
+          "branch_id": "in_scope_pr30",
+          "condition": "existing repair owner/phase is PR-30 under the original Proceed; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "IN_SCOPE_REPAIR",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "APPROVE"
+          ],
+          "branch_id": "rescope_pr30_prepublication",
+          "condition": "PR_RETURN_PHASE=PR-30_PREPUBLICATION; PR-30 reads current PF10; no open PR and RS-40 forbidden",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "IN_SCOPE_REPAIR",
+        "REJECT"
+      ],
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_pr35",
+          "condition": "recorded origin/phase is PR-35; unchanged authority; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "IN_SCOPE_REPAIR"
+          ],
+          "branch_id": "in_scope_pr35",
+          "condition": "existing repair owner/phase is PR-35 under the original Proceed; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "IN_SCOPE_REPAIR",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT",
+        "IN_SCOPE_REPAIR"
+      ],
+      "to": "PR-35",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REVISION_REQUIRED"
+          ],
+          "branch_id": "revision_required",
+          "condition": "same request/proposal author; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "REVISION_REQUIRED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REVISION_REQUIRED"
+      ],
+      "to": "RS-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-20",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE"
+          ],
+          "branch_id": "rescope_open_pr",
+          "condition": "PR_RETURN_PHASE in {PR-30_POSTPUBLICATION, PR-35}; existing open PR identity verified",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE"
+      ],
+      "to": "RS-40",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    }
+  ],
+  "id": "RS-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "RS-20",
+    "lane": "RS",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review Bounded Work-Unit Rescope for the exact supplied change.",
+    "output_artifacts": [
+      "RESCOPE_REVIEW"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81c183aac2ecb40b1497",
+      "release": "GCFPE-20260914.1",
+      "title": "RS-20 — Review Bounded Work-Unit Rescope — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "PR-30",
+      "PR-35",
+      "RS-30",
+      "RS-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "Independent whole-change IA reviewer; never the proposal author; no Isis rescope role.",
+    "result_states": [
+      "APPROVE",
+      "REJECT",
+      "REVISION_REQUIRED",
+      "SPECIFICATION_CHANGE_REQUIRED",
+      "IN_SCOPE_REPAIR"
+    ],
+    "sequence": 20,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "RS-20 — Review Bounded Work-Unit Rescope — 100926.1"
+  },
+  "state_route_order": [
+    "rescope_pr30_prepublication",
+    "rescope_open_pr",
+    "rescope_non_pr",
+    "reject_pr30",
+    "reject_pr35",
+    "reject_native",
+    "in_scope_pr30",
+    "in_scope_pr35",
+    "in_scope_native",
+    "revision_required",
+    "specification_change_required"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "RS-20_DECISION": [
+      "APPROVE",
+      "REJECT",
+      "REVISION_REQUIRED",
+      "SPECIFICATION_CHANGE_REQUIRED",
+      "IN_SCOPE_REPAIR"
+    ]
+  }
+}

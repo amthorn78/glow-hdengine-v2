@@ -1,0 +1,224 @@
+{
+  "edge_indices": [
+    145,
+    146,
+    147,
+    148,
+    149
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "instruction_terminal",
+          "condition": "accepted manual prerequisite or true source/authority/product decision has no runnable prompt receiver",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "upstream_owner_recovery",
+          "condition": "the defective upstream Plan, review, remediation, Specification, or other source has an exact native owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "same_owner_recovery",
+          "condition": "an ordinary instruction defect is repairable by the same PR-10 owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "PR-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INSTRUCTION_READY"
+          ],
+          "branch_id": "instruction_ready",
+          "condition": "complete approved-scope instruction is ready for detailed planning",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "INSTRUCTION_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INSTRUCTION_READY"
+      ],
+      "to": "PR-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "material_boundary",
+          "condition": "a material change to the Epic-level commitment (D23-C) is substantiated; a lawful originating PR implementation author is identified, independent of the IA reviewer; otherwise return the unresolved assignment to the Product Owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [
+            "PR-10 -> RS-10",
+            "RS-10 complete proposal -> RS-20"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "PR-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "PR-10",
+    "lane": "PR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create PR Work-Unit Instructions for the exact supplied change.",
+    "output_artifacts": [
+      "PR_INSTRUCTION"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb818e8359de1994e97a7d",
+      "release": "GCFPE-20260914.1",
+      "title": "PR-10 — Create PR Work-Unit Instructions — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "PR-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same Implementation Agent (IA).",
+    "result_states": [
+      "INSTRUCTION_READY",
+      "DRAFT",
+      "BLOCKED"
+    ],
+    "sequence": 10,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "PR-10 — Create PR Work-Unit Instructions — 100926.1"
+  },
+  "state_route_order": [
+    "instruction_ready",
+    "material_boundary",
+    "same_owner_recovery",
+    "upstream_owner_recovery",
+    "instruction_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

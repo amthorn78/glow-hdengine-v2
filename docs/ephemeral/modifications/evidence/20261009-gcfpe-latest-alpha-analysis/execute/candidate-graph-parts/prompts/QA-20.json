@@ -1,0 +1,141 @@
+{
+  "edge_indices": [
+    188,
+    189,
+    190
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "shared_source_authority_terminal",
+          "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-20.md",
+            "section": "Terminal operator return and receiver compatibility"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked",
+          "condition": "material readiness invalidation or recoverable QA-10 evidence gap requires same-Isis reassessment",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "QA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "GUIDE_READY"
+          ],
+          "branch_id": "guide_ready",
+          "condition": "complete live QA Guide is ready for whole-change QA Audit/Plan",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "GUIDE_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "GUIDE_READY"
+      ],
+      "to": "QA-50",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81289c7be77f66bac909?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "QA-20",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Live QA Guide for the exact supplied change.",
+    "output_artifacts": [
+      "LIVE_QA_GUIDE"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb816daa3adff37283482b",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-20 — Create Live QA Guide — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb816daa3adff37283482b?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "QA-50",
+      "QA-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same Isis who established readiness.",
+    "result_states": [
+      "GUIDE_READY",
+      "BLOCKED"
+    ],
+    "sequence": 20,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-20 — Create Live QA Guide — 100926.1"
+  },
+  "state_route_order": [
+    "guide_ready",
+    "blocked",
+    "shared_source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

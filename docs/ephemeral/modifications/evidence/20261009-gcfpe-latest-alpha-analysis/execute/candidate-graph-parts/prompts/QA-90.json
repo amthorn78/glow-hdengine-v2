@@ -1,0 +1,178 @@
+{
+  "edge_indices": [
+    206,
+    207,
+    208,
+    209
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-90",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ESCALATION_REQUIRED"
+          ],
+          "branch_id": "escalation_required",
+          "condition": "material pre-execution defect; create the native QA escalation report",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-90.md",
+            "section": "Required result and routing"
+          },
+          "state": "ESCALATION_REQUIRED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ESCALATION_REQUIRED"
+      ],
+      "to": "ESC-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-90",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "shared_source_authority_terminal",
+          "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-90.md",
+            "section": "Terminal operator return and receiver compatibility"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-90",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "TASK_READY"
+          ],
+          "branch_id": "task_ready",
+          "condition": "bounded QA execution task is complete",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-90.md",
+            "section": "Required result and routing"
+          },
+          "state": "TASK_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "TASK_READY"
+      ],
+      "to": "QA-100",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-90",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "NOT_EXECUTED"
+          ],
+          "branch_id": "not_executed",
+          "condition": "preserve non-execution evidence for the QA evidence reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-90.md",
+            "section": "Required result and routing"
+          },
+          "state": "NOT_EXECUTED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "NOT_EXECUTED"
+      ],
+      "to": "QA-110",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-90",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81bea720f004a7e1a6d8?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "QA-90",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Bounded QA Execution Task for the exact supplied change.",
+    "output_artifacts": [
+      "QA_TASK / QA_PREEXECUTION_FINDING"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb811e8582cf30238c5b9c",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-90 — Create Bounded QA Execution Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "QA-100",
+      "QA-110",
+      "QA-80",
+      "QA-70"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the continuing Kronos QA authority.",
+    "result_states": [
+      "TASK_READY",
+      "ESCALATION_REQUIRED",
+      "NOT_EXECUTED"
+    ],
+    "sequence": 90,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-90 — Create Bounded QA Execution Task — 100926.1"
+  },
+  "state_route_order": [
+    "task_ready",
+    "escalation_required",
+    "not_executed",
+    "shared_source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

@@ -1,0 +1,739 @@
+{
+  "_epilogue": "```\n",
+  "_other_edge_indices": [
+    122,
+    123,
+    124
+  ],
+  "_other_edges": [
+    {
+      "automatic": false,
+      "branch_id": "nathan_abort",
+      "condition": "Nathan directly instructs Abort PR and Escalate for one exact identified PR",
+      "from": "NATHAN_ABORT_INSTRUCTION",
+      "from_kind": "boundary",
+      "immediate": true,
+      "origin_prompt": "NATHAN_DIRECT_ONLY",
+      "origin_state": "IDENTIFIED_PR",
+      "to": "PR-50",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    },
+    {
+      "automatic": false,
+      "branch_id": "manual_merge_then_lineage_review",
+      "condition": "Nathan has manually merged the identified PR, no MERGE_OBSERVED result was returned for this merge, and he invokes the conditional PR-40 block",
+      "from": "NATHAN_MANUAL_MERGE_ASSERTION",
+      "from_kind": "boundary",
+      "immediate": true,
+      "origin_prompt": "PR-35_OR_RS-40",
+      "origin_state": "MERGE_PENDING",
+      "to": "PR-40",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    },
+    {
+      "automatic": false,
+      "branch_id": "original_proceed",
+      "condition": "the explicit Proceed for the exact approved per-PR plan; never a second Proceed for the same plan",
+      "from": "NATHAN_PROCEED",
+      "from_kind": "boundary",
+      "immediate": true,
+      "origin_prompt": "PR-20",
+      "origin_state": "AWAITING_PO_PROCEED",
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    }
+  ],
+  "_other_nodes": [],
+  "_other_state_vocabularies": {
+    "AUTHORING_CONTEXT": [
+      "INITIAL_OR_PREAPPROVAL_AUTHORING",
+      "APPROVED_BASE_WITH_OVERLAYS"
+    ],
+    "PR_RETURN_PHASE": [
+      {
+        "open_pr_required": false,
+        "receiver": "PR-30",
+        "resumed_phase": "PR-30",
+        "rs40_eligible": false,
+        "value": "PR-30_PREPUBLICATION"
+      },
+      {
+        "open_pr_required": true,
+        "receiver": "RS-40",
+        "resumed_phase": "PR-30",
+        "rs40_eligible": true,
+        "value": "PR-30_POSTPUBLICATION"
+      },
+      {
+        "open_pr_required": true,
+        "receiver": "RS-40",
+        "resumed_phase": "PR-35",
+        "rs40_eligible": true,
+        "value": "PR-35"
+      }
+    ]
+  },
+  "_prologue": "# GCFPE-20261009.1 Candidate Graph Source Parts\n\nNo assembled graph or shipped validation proof exists for these candidate parts. See ../README.md.\n\n```json",
+  "abort_contract": {
+    "agent_skill_prompt_hub_inbound_edges": 0,
+    "automatic_inbound_edges": 0,
+    "identified_pr_required": true,
+    "manual_invoker": "Nathan / Product Owner",
+    "prompt": "PR-50",
+    "prompt_inbound_edges": 0
+  },
+  "alpha_resumption_contract": {
+    "current_handoff_status": "NOT_YET_APPROVED",
+    "execute_pr10": false,
+    "last_accepted_state": "ACCEPTED_FINAL",
+    "last_accepted_unit": "HDE-EPIC040-PR03",
+    "next_intended_stage": "PR-10",
+    "next_intended_unit": "HDE-EPIC040-PR04",
+    "preparation_prerequisites": [
+      "successor selected",
+      "production validation passed",
+      "predecessors archived intact",
+      "selected release and Alpha record reread",
+      "PR03 acceptance reread",
+      "current controlled PF10 Markdown reread",
+      "every applicable active addendum reread",
+      "handoff written under docs/ephemeral/, committed and pushed on the working branch, and completely read back"
+    ],
+    "prepare_only": true,
+    "resume_alpha": false,
+    "resume_authority": "Nathan / Product Owner",
+    "state": "ALPHA_STOPPED_PENDING_CHANGE_FLOW_REFACTOR"
+  },
+  "artifact_availability_contract": {
+    "formation_has_no_approved_implementation_plan_prerequisite": true,
+    "initial_implementation_planning_has_no_own_approved_plan_prerequisite": true,
+    "later_remediation_to_pr": "Bounded approved remedy plus actual originating finding/reference and return owner. Existing QA evidence, including a Guide, may be read when specifically relevant and travels with the remedy when it depends on that evidence; no future QA artifact or blanket QA prerequisite, approved PR base or QA authority is introduced.",
+    "pr_local_tests_and_code_security_reviews_required": true,
+    "pr_qa_artifact_prerequisites": [],
+    "pr_work_products": [
+      "PR_INSTRUCTION",
+      "PR_IMPLEMENTATION_PLAN",
+      "PR_IMPLEMENTATION_RESULT",
+      "PR_WORK_UNIT_LINEAGE_REVIEW",
+      "PR_ABORT_ESCALATION_RECORD",
+      "RESCOPE_REQUEST"
+    ],
+    "pre_readiness_remediation_requires_future_qa_artifacts": false,
+    "preservation_rule": "Protect only existing applicable bases; immutability does not require absent artifacts or invent approval.",
+    "protected_native_graph_changes": false,
+    "qa_artifact_births": {
+      "LIVE_QA_GUIDE": {
+        "after": "READY_FOR_QA",
+        "producer": "QA-20",
+        "separate_approval_required": false,
+        "state": "GUIDE_READY"
+      },
+      "QA_AUDIT": {
+        "after": "GUIDE_READY",
+        "producer": "QA-50",
+        "state": "AUDIT_COMPLETE"
+      },
+      "QA_EVIDENCE_REVIEW": {
+        "after": "MATCHED_TASK_AND_ACTUAL_RESULT",
+        "producer": "QA-110"
+      },
+      "QA_EXECUTION_RESULT": {
+        "after": "AUTHORIZED_DEPENDENCY_READY_SELECTED_TASK",
+        "producer": "QA-100"
+      },
+      "QA_PLAN": {
+        "after": "COMPLETE_QA_AUDIT",
+        "approval_owner": "QA-70",
+        "plan_only_recovery_producer": "QA-60",
+        "producer": "QA-50",
+        "state": "PLAN_PENDING"
+      },
+      "QA_PLAN_REVIEW": {
+        "after": "COMPLETE_PENDING_QA_PLAN_OR_EXPLICIT_APPROVED_BASE_DELTA",
+        "producer": "QA-70"
+      },
+      "QA_READINESS": {
+        "after": "ACCEPTED_IMPLEMENTATION_OPS_AND_FINAL_DOCUMENTATION",
+        "producer": "QA-10",
+        "state": "READY_FOR_QA"
+      },
+      "QA_REPORT_AND_SEPARATE_RCA": {
+        "after": "COMPLETE_REQUIRED_RUN_ACCOUNTING",
+        "closure_owner": "CLASS_MATCHING_ISIS_RECEIVER",
+        "producer": "QA-120"
+      },
+      "QA_TASK": {
+        "after": "APPROVED_QA_PLAN_AND_PRODUCT_OWNER_SELECTION",
+        "producer": "QA-90"
+      }
+    },
+    "qa_guide_authoring_has_no_qa_plan_prerequisite": true,
+    "readiness_has_no_qa_guide_or_qa_plan_prerequisite": true,
+    "recovery_rule": "Reuse only a complete valid actual result with unchanged relevant lineage; preserve unproduced future fields.",
+    "remediation_artifact_identity": {
+      "legacy_alias_rule": "Preserve actual existing REMEDIATION_PLAN/REMEDIATION_PLAN_REVIEW identity only with equivalent semantics and exact lineage; no duplicate artifact or approval.",
+      "proposal": "REMEDIATION_PROPOSAL",
+      "review": "REMEDIATION_REVIEW"
+    },
+    "required_input_rule": "Actual native stage and branch; producer completion and required approval must precede consumption on that lineage.",
+    "role": "VALIDATION_METADATA_NOT_AN_ADDITIONAL_RUNTIME_INPUT_OR_GATE",
+    "schema_version": "gcfpe-artifact-availability/1.0",
+    "stage_categories": {
+      "CF-C-10": "FORMATION",
+      "CF-C-20": "FORMATION",
+      "CF-C-30": "FORMATION",
+      "CF-C-40": "FORMATION",
+      "CF-E-10": "FORMATION",
+      "CF-E-20": "FORMATION",
+      "CF-E-30": "FORMATION",
+      "CF-E-40": "FORMATION",
+      "CF-PO-10": "FORMATION",
+      "CL-20": "POST_CLOSURE",
+      "CL-30": "POST_CLOSURE",
+      "CL-40": "POST_CLOSURE",
+      "CL-C-10": "CLOSURE",
+      "CL-E-10": "CLOSURE",
+      "CL-E-20": "POST_CLOSURE",
+      "CL-E-30": "POST_CLOSURE",
+      "CL-E-40": "POST_CLOSURE",
+      "DOC-10": "ORIGIN_SCOPED_DELIVERY",
+      "DOC-20": "ORIGIN_SCOPED_DELIVERY",
+      "ESC-10": "QA_EXECUTION_EVIDENCE",
+      "ESC-25": "ORIGIN_SCOPED_REMEDIATION",
+      "ESC-30": "ORIGIN_SCOPED_REMEDIATION",
+      "ESC-40": "ORIGIN_SCOPED_REMEDIATION",
+      "GCFPE-MGMT-10": "CONTEXT_SCOPED",
+      "IA-10": "IMPLEMENTATION_PLANNING",
+      "IA-20": "IMPLEMENTATION_PLANNING",
+      "IA-30": "IMPLEMENTATION_PLANNING",
+      "IA-40": "IMPLEMENTATION_PLANNING",
+      "IA-50": "IMPLEMENTATION_PLANNING",
+      "IA-60": "IMPLEMENTATION_PLANNING",
+      "MGR-10": "CONTEXT_SCOPED",
+      "OPS-10": "ORIGIN_SCOPED_DELIVERY",
+      "OPS-20": "ORIGIN_SCOPED_DELIVERY",
+      "OPS-30": "ORIGIN_SCOPED_DELIVERY",
+      "PR-10": "PR_DELIVERY",
+      "PR-20": "PR_DELIVERY",
+      "PR-30": "PR_DELIVERY",
+      "PR-35": "PR_DELIVERY",
+      "PR-40": "PR_DELIVERY",
+      "PR-50": "PR_DELIVERY",
+      "QA-10": "READINESS",
+      "QA-100": "QA_EXECUTION_EVIDENCE",
+      "QA-110": "QA_EXECUTION_EVIDENCE",
+      "QA-120": "QA_EXECUTION_EVIDENCE",
+      "QA-20": "GUIDE_AUTHORING",
+      "QA-50": "QA_PLANNING",
+      "QA-60": "QA_PLANNING",
+      "QA-70": "QA_REVIEW",
+      "QA-80": "QA_REVIEW",
+      "QA-90": "QA_EXECUTION_EVIDENCE",
+      "RS-10": "ORIGIN_SCOPED_DELIVERY",
+      "RS-20": "ORIGIN_SCOPED_DELIVERY",
+      "RS-30": "ORIGIN_SCOPED_DELIVERY",
+      "RS-40": "ORIGIN_SCOPED_DELIVERY",
+      "UTIL-10": "CONTEXT_SCOPED"
+    }
+  },
+  "authority_sources": [
+    "recovery-20260914.1/sources/drive/1QfCDo6pw3_FRjJi5qTooLaxgLThFcURI-repin.md §§5–8",
+    "candidate/contracts/GCFPE-20260914.1-Candidate-Authoring-Contract.md",
+    "baseline/preflight/project-prompt-registry.yaml"
+  ],
+  "baseline": {
+    "member_count": 55,
+    "registry": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+    "release": "GCFPE-20260914.1",
+    "version_family": "091426.1"
+  },
+  "boundary_nodes": {
+    "ACTUAL_OWNER_TERMINAL_RETURN": {
+      "kind": "native_owner_terminal_sink",
+      "selected_member": false
+    },
+    "NATHAN_ABORT_INSTRUCTION": {
+      "kind": "manual_product_owner_invocation",
+      "selected_member": false
+    },
+    "NATHAN_MANUAL_MERGE_ASSERTION": {
+      "kind": "manual_product_owner_event",
+      "selected_member": false
+    },
+    "NATHAN_PROCEED": {
+      "kind": "manual_product_owner_gate",
+      "selected_member": false
+    },
+    "NATHAN_TERMINAL_RETURN": {
+      "kind": "human_terminal_sink",
+      "selected_member": false
+    },
+    "ORIGINAL_NATIVE_STAGE": {
+      "kind": "dynamic_native_owner_boundary",
+      "selected_member": false
+    }
+  },
+  "boundary_transitions": {
+    "NATHAN_ABORT_INSTRUCTION": [
+      {
+        "branch_id": "nathan_abort",
+        "condition": "Nathan directly instructs Abort PR and Escalate for one exact identified PR",
+        "origin_prompt": "NATHAN_DIRECT_ONLY",
+        "origin_state": "IDENTIFIED_PR",
+        "to": "PR-50"
+      }
+    ],
+    "NATHAN_MANUAL_MERGE_ASSERTION": [
+      {
+        "branch_id": "manual_merge_then_lineage_review",
+        "condition": "Nathan has manually merged the identified PR, no MERGE_OBSERVED result was returned for this merge, and he invokes the conditional PR-40 block",
+        "origin_prompt": "PR-35_OR_RS-40",
+        "origin_state": "MERGE_PENDING",
+        "to": "PR-40"
+      }
+    ],
+    "NATHAN_PROCEED": [
+      {
+        "branch_id": "original_proceed",
+        "condition": "the explicit Proceed for the exact approved per-PR plan; never a second Proceed for the same plan",
+        "origin_prompt": "PR-20",
+        "origin_state": "AWAITING_PO_PROCEED",
+        "to": "PR-30"
+      }
+    ]
+  },
+  "candidate": {
+    "member_count": 55,
+    "member_rule": "54 successor runtime members + unchanged GCFPE-MGMT-10; no additions or removals",
+    "release": "GCFPE-20261009.1",
+    "version_family": "100926.1"
+  },
+  "candidate_member_count_excludes_boundaries": true,
+  "canonical_source_contract": {
+    "forbidden_source_types": [
+      "GOOGLE_DOCS",
+      "DOC",
+      "DOCX"
+    ],
+    "fresh_current_pf10_resolution_required": true,
+    "google_docs_fallback": false,
+    "native_document_candidate_content_may_be_opened": false,
+    "native_document_equivalence_check": false,
+    "pfcanon_access": "READ_ONLY",
+    "pfcanon_authority": "CONTROLLED_MARKDOWN_ONLY",
+    "pfcanon_root": "docs/pfcanon",
+    "source_failure_result": "SOURCE_RESOLUTION_ERROR"
+  },
+  "contract_id": "GCFPE-20261009.1-CANDIDATE-GRAPH",
+  "handoff_contract": {
+    "actual_branch_only": true,
+    "complete_paste_ready_prompt": true,
+    "fence_language": "text",
+    "first_line": "NEXT_PROMPT_HANDOFF",
+    "nonterminal_actual_result_next_prompt_handoff_blocks": 1,
+    "prohibited": [
+      "menu",
+      "metadata-only summary",
+      "blank form",
+      "placeholder after publication",
+      "Library ID",
+      "unlinked filename",
+      "above",
+      "conversation reconstruction",
+      "model/strength/reasoning/eligibility/suitability/account/configuration route",
+      "branch",
+      "commit",
+      "restated artifact content"
+    ],
+    "required": [
+      "exact selected prompt full name/version/direct Notion URL",
+      "receiving role/name and exact task/artifact binding; receiving side selects or recovers the session; no persistent session or executor identity prerequisite",
+      "input artifact repository paths with one-line labels",
+      "pull request reference when the receiver continues an existing PR",
+      "minimum exceptional context only for a condition the artifacts do not record"
+    ],
+    "terminal_result_next_prompt_handoff_blocks": 0
+  },
+  "pf10_addendum_contract": {
+    "agent_may_litigate_product_owner_action": false,
+    "assume_pasted_next_turn": true,
+    "exact_producer_set": [
+      "CF-C-30",
+      "CF-E-30",
+      "ESC-40",
+      "IA-30",
+      "QA-70",
+      "RS-20"
+    ],
+    "exactly_one_per_qualifying_approval": true,
+    "forbidden_fields": [
+      "status",
+      "canonicality",
+      "drain_owner",
+      "pf10_addendum_number",
+      "artifact_version",
+      "drain_verification_anchor",
+      "any pinned PF document version",
+      "any field describing this addendum's own drainage state — not a Canon destination, Canon target, or PF09 row"
+    ],
+    "forbidden_fields_scope": "These fields are forbidden inside a PF10 Build Notes Addendum only, and only because they belong to the retired addendum-drainage lifecycle. They place no restriction on Canon disposition anywhere else. Canon conflict and ADR records, NEW_CANON and CANON_RECONCILIATION classifications, the permanent Canon drainage target and owner, and PF09 rows identifying where an approved change must ultimately land in PF Canon are all legitimate and must be preserved intact. Interpret this list by function, never by the word \"drain\": a validator must not reject a field merely because its name or value contains it.",
+    "format_home": "Glow Operations Hub, Notion. Canonical, and not hard-linked to PF10.",
+    "native_outcome_normalization": {
+      "CHANGE_NOT_SUBSTANTIATED": "UNCHANGED",
+      "DELTA_APPROVE": "MATERIAL_APPROVAL",
+      "DELTA_DENY": "DENIAL",
+      "DENY": "DENIAL",
+      "EDITORIAL": "EDITORIAL",
+      "INITIAL_APPROVE": "INITIAL_APPROVAL",
+      "INITIAL_DENY": "DENIAL",
+      "IN_SCOPE_REPAIR": "IN_SCOPE_REPAIR",
+      "PENDING": "PENDING",
+      "PLAN_DELTA_PENDING": "PENDING",
+      "PLAN_DELTA_REDLINE": "PENDING",
+      "REDLINE_INCOMPLETE": "PENDING",
+      "REJECT": "REJECTION",
+      "REVISION_REQUIRED": "REVISION_REQUIRED",
+      "UNCHANGED": "UNCHANGED",
+      "WRONG_NATIVE_LANE": "UNCHANGED"
+    },
+    "never_for": [
+      "INITIAL_APPROVAL",
+      "REJECTION",
+      "DENIAL",
+      "REVISION_REQUIRED",
+      "PENDING",
+      "UNCHANGED",
+      "EDITORIAL",
+      "IN_SCOPE_REPAIR"
+    ],
+    "paste_ready": true,
+    "producer_allocates_pf10_number": false,
+    "producer_claims_canonical_adoption": false,
+    "producer_edits_pf10": false,
+    "producers": {
+      "CF-C-30": "approved material delta to already approved CRD Specification",
+      "CF-E-30": "approved material delta to already approved Epic Specification",
+      "ESC-40": "approved material escalation/remediation or approved-base delta",
+      "IA-30": "approved material delta to already approved whole-change Plan",
+      "QA-70": "approved material delta to already approved QA Plan",
+      "RS-20": "APPROVE of complete bounded work-unit rescope within approved Specification intent"
+    },
+    "required_fields": [
+      "title",
+      "addendum_id",
+      "producing_prompt",
+      "approval_decision",
+      "immutable_base",
+      "applicable_prior_addenda",
+      "approved_delta",
+      "affected_surfaces",
+      "exclusions",
+      "conflicts",
+      "unresolved_items",
+      "return_phase"
+    ]
+  },
+  "post_merge_three_event_contract": {
+    "agent_merge_authorized": false,
+    "direct_PR35_to_PR40_automatic_edge": false,
+    "event_1": {
+      "fact": "prior_pr35_result",
+      "producer": "PR-35",
+      "time": "pre_merge_historical_evidence",
+      "value": "MERGE_PENDING"
+    },
+    "event_2": {
+      "actor": "Nathan / Product Owner",
+      "fact": "product_owner_manual_merge_observed_or_asserted",
+      "time": "observed by the subscribed PR-35 session; asserted at the later PR-40 invocation only where no MERGE_OBSERVED result was returned for this merge",
+      "value": true
+    },
+    "event_3": {
+      "consumer": "PR-40",
+      "fact": "pr40_actual_merge_verification",
+      "independent": true,
+      "values": [
+        "VERIFIED",
+        "PENDING"
+      ]
+    },
+    "observed_merge_edges": [
+      {
+        "automatic": false,
+        "branch_id": "merge_observed",
+        "from": "PR-35",
+        "state": "MERGE_OBSERVED",
+        "to": "PR-40",
+        "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+      },
+      {
+        "automatic": false,
+        "branch_id": "merge_observed",
+        "from": "RS-40",
+        "state": "MERGE_OBSERVED",
+        "to": "PR-40",
+        "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+      }
+    ]
+  },
+  "pr_continuity_contract": {
+    "adds": {
+      "approval": 0,
+      "cross_session_route": 1,
+      "duplicate_work_vehicle": 0,
+      "merge_authority": 0,
+      "proceed": 0,
+      "product_owner_gate": 0,
+      "r1_row": 0,
+      "role": 0,
+      "session": 1,
+      "work_unit": 0,
+      "work_vehicle": 0
+    },
+    "invented_session_inspection_endpoint_prohibited": true,
+    "phase_aware_rescope_sequences": {
+      "PR-30_POSTPUBLICATION": [
+        "PR-30",
+        "RS-20",
+        "RS-40",
+        "PR-30"
+      ],
+      "PR-30_PREPUBLICATION": [
+        "PR-30",
+        "RS-20",
+        "PR-30"
+      ],
+      "PR-35": [
+        "PR-35",
+        "RS-20",
+        "RS-40",
+        "PR-35"
+      ]
+    },
+    "primary_skill": "glow-hde-pr-development",
+    "prompts": [
+      "PR-30",
+      "PR-35",
+      "eligible RS-40 continuation"
+    ],
+    "r1_row": "GCF-17",
+    "shared_exactly_one": [
+      "WORK_UNIT_ID",
+      "original Product Owner Proceed",
+      "workspace/worktree",
+      "branch",
+      "pull request",
+      "PR instruction",
+      "detailed PR plan",
+      "primary skill authority",
+      "continuous recovery/artifact lineage"
+    ],
+    "unsupported_platform_limitation_claim_prohibited": true
+  },
+  "proofs": {},
+  "protected_identities": {
+    "flowmaster_primary_core_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
+    "r1_core_rows": 26,
+    "r1_material_rows": 20,
+    "r1_oracle_sha256": "ede635b14aa2f57c8c99e948a012e88d843338f62bc2b55349d511f52f59fb52",
+    "r1_rows": 46
+  },
+  "qa_closure_contract": {
+    "classification_source": "EXISTING_PRODUCT_OWNER_CLASSIFICATION_AND_APPROVED_SPECIFICATION",
+    "closure_actor": "Isis",
+    "closure_session": "RETAIN_EXISTING",
+    "crd_strategy_card_required": false,
+    "epic_strategy_card": "EXISTING_APPROVED_SPECIFICATION_STRATEGY_CARD",
+    "pass_receivers": {
+      "CRD": "CL-C-10",
+      "EPIC": "CL-E-10"
+    },
+    "qa_pass_closes_change": false,
+    "required_artifacts": [
+      "QA_REPORT",
+      "QA_RCA"
+    ],
+    "unresolved_class_effect": "NATHAN_TERMINAL_RETURN_NO_HANDOFF",
+    "unresolved_receiver_evidence_effect": "NATHAN_TERMINAL_RETURN_NO_HANDOFF",
+    "valid_result_reuse": true
+  },
+  "rca_separation_contract": {
+    "classification": "ACCEPTED_TECHNICAL_HISTORY",
+    "evidence_id": "PR03-R02",
+    "may_authorize_alpha_resumption": false,
+    "may_prove_prompt_completion_or_hang": false,
+    "may_reopen_accepted_pr03": false
+  },
+  "schema_version": "gcfpe-candidate-graph-contract/2.1",
+  "selection_status": "UNSELECTED_CANDIDATE",
+  "source_bindings": {
+    "binding_revision": "20260914.1-recovery.1",
+    "binding_scope": "REPAIR_BASELINE_EVIDENCE_ONLY_NOT_A_RUNTIME_CURRENT_PF10_ALIAS",
+    "bindings": [
+      {
+        "external_id": "1MEMi5OTUr-c7Qd3rtjntnNjSpnxfIXJ4",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1MEMi5OTUr-c7Qd3rtjntnNjSpnxfIXJ4.md",
+        "provider_size_bytes": 354325,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:11.721Z",
+        "sha256": "4f4f015bc8fe8c0a9f7d518fce13b7428a1427b49ca463982b769827169b22a0",
+        "size_bytes": 354325,
+        "source_id": "drive:1MEMi5OTUr-c7Qd3rtjntnNjSpnxfIXJ4",
+        "title": "PF27-Canon-Plan-Templates-v2.0.5.md",
+        "url": "https://drive.google.com/file/d/1MEMi5OTUr-c7Qd3rtjntnNjSpnxfIXJ4/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1PUqOyiY285Yo4dxq3JucrzakiNTNLc-j",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1PUqOyiY285Yo4dxq3JucrzakiNTNLc-j.md",
+        "provider_size_bytes": 26815,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:14.265Z",
+        "sha256": "106c50bb2e06702c1c72764ccece3d5c500bddf4b553e12afa0c4d1f8c7a4c21",
+        "size_bytes": 26815,
+        "source_id": "drive:1PUqOyiY285Yo4dxq3JucrzakiNTNLc-j",
+        "title": "PF13- Reference-Glow-Development-Philosophy v1.md",
+        "url": "https://drive.google.com/file/d/1PUqOyiY285Yo4dxq3JucrzakiNTNLc-j/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1PfbPLcgsI5T7UbbPK1bJNvcdsf3vMzsQ",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1PfbPLcgsI5T7UbbPK1bJNvcdsf3vMzsQ.md",
+        "provider_size_bytes": 619584,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:16.935Z",
+        "sha256": "90e6af98fd18ce3ab4e91cb16fcfefbdb5bdf539690d8726f8e47359238bf853",
+        "size_bytes": 619584,
+        "source_id": "drive:1PfbPLcgsI5T7UbbPK1bJNvcdsf3vMzsQ",
+        "title": "PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.6.md",
+        "url": "https://drive.google.com/file/d/1PfbPLcgsI5T7UbbPK1bJNvcdsf3vMzsQ/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1Q83saZ9QqxG9c9slV6bYkfDiCXLSK4Lp",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1Q83saZ9QqxG9c9slV6bYkfDiCXLSK4Lp.md",
+        "provider_size_bytes": 558988,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:20.208Z",
+        "sha256": "e8234398902ab47e3492d54a83d79ef5e2d17399dee8ad03d0688aec98a23696",
+        "size_bytes": 558988,
+        "source_id": "drive:1Q83saZ9QqxG9c9slV6bYkfDiCXLSK4Lp",
+        "title": "PF04-Canon-HDE-Governance-v2.8.6.md",
+        "url": "https://drive.google.com/file/d/1Q83saZ9QqxG9c9slV6bYkfDiCXLSK4Lp/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1XdZYpx0Kcuu800fW0Yhi7aicD4wU_dJt",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1XdZYpx0Kcuu800fW0Yhi7aicD4wU_dJt.md",
+        "provider_size_bytes": 657008,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:23.438Z",
+        "sha256": "2a4a254422da92933e7f4dce9e074bcd7e1a1a6609ed54a7897d3f5f8cc059d0",
+        "size_bytes": 657008,
+        "source_id": "drive:1XdZYpx0Kcuu800fW0Yhi7aicD4wU_dJt",
+        "title": "PF19-Canon-Glow-QA-Guide-v3.0.5.md",
+        "url": "https://drive.google.com/file/d/1XdZYpx0Kcuu800fW0Yhi7aicD4wU_dJt/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1_ej-UY2JaKS1vFnxMfSKnK881Y_hzlrP",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1_ej-UY2JaKS1vFnxMfSKnK881Y_hzlrP.md",
+        "provider_size_bytes": 175083,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:09.197Z",
+        "sha256": "4b2b0d198cecf6f4ece852c82951342e512124abfb93fa90678df8d97b4f4f86",
+        "size_bytes": 175083,
+        "source_id": "drive:1_ej-UY2JaKS1vFnxMfSKnK881Y_hzlrP",
+        "title": "PF10-HDE-Build-Notes-v13.2.6.md",
+        "url": "https://drive.google.com/file/d/1_ej-UY2JaKS1vFnxMfSKnK881Y_hzlrP/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1f9hWZbmKVt6bMDs4RbdGAONFC_r06yR9",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1f9hWZbmKVt6bMDs4RbdGAONFC_r06yR9.md",
+        "provider_size_bytes": 395891,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:26.388Z",
+        "sha256": "ad238a8fc07af27bcecf5afce71368766d96d0d40104649b2a005a0f721dd2f9",
+        "size_bytes": 395891,
+        "source_id": "drive:1f9hWZbmKVt6bMDs4RbdGAONFC_r06yR9",
+        "title": "PF06-Canon-Change-Process-Guide-v2.5.4.md",
+        "url": "https://drive.google.com/file/d/1f9hWZbmKVt6bMDs4RbdGAONFC_r06yR9/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1zYQC27hl7ynq8b2cWGlQ4kkIRBGxaWmI",
+        "parent_ids": [
+          "1gdBmaB_EqXdlwGBiaz-BP2tlhl9QfXd3"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1zYQC27hl7ynq8b2cWGlQ4kkIRBGxaWmI.md",
+        "provider_size_bytes": 10375,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:29:29.374Z",
+        "sha256": "391bf7d2eb51022e22edb69b90a2ed6eaa63f621dedcf817513c2ae1a0c77e24",
+        "size_bytes": 10375,
+        "source_id": "drive:1zYQC27hl7ynq8b2cWGlQ4kkIRBGxaWmI",
+        "title": "PF21-Reference-7 Phases of Alchemical Engineering.md",
+        "url": "https://drive.google.com/file/d/1zYQC27hl7ynq8b2cWGlQ4kkIRBGxaWmI/view?usp=drivesdk"
+      },
+      {
+        "external_id": "1QfCDo6pw3_FRjJi5qTooLaxgLThFcURI",
+        "parent_ids": [
+          "1pRJ8R1a-p5dYQFY89a1YyJpDceYZ2MLc"
+        ],
+        "path": "recovery-20260914.1/sources/drive/1QfCDo6pw3_FRjJi5qTooLaxgLThFcURI-repin.md",
+        "provider_size_bytes": 53118,
+        "representation": "EXACT_RAW_DRIVE_FILE_BYTES",
+        "retrieved_at": "2026-09-14T21:48:21.881Z",
+        "sha256": "e14c9fa0574633186959c0f96dc62c7a28998336bf892f8046d6359820e7df01",
+        "size_bytes": 53118,
+        "source_id": "drive:1QfCDo6pw3_FRjJi5qTooLaxgLThFcURI",
+        "title": "GCFPE-Change-Flow-Repair-Plan-v2.0-20260914.md",
+        "url": "https://drive.google.com/file/d/1QfCDo6pw3_FRjJi5qTooLaxgLThFcURI/view?usp=drivesdk"
+      }
+    ],
+    "candidate_release": "GCFPE-20260914.1",
+    "candidate_version_family": "091426.1",
+    "correction_report_url": "https://drive.google.com/file/d/1BlPiTmlfSdtpkgSkKm9pHaPSvyL4L6br/view?usp=drivesdk",
+    "prior_capture_disposition": "HISTORICAL_DEFECTIVE_RAW_CAPTURE_PLUS_ONE_LF_NOT_AUTHORITY",
+    "runtime_rule": "Each affected runtime receiver must freshly resolve and read current controlled PF10; these historical repair pins never replace that lookup.",
+    "schema_version": "gcfpe-recovery-source-bindings/1.0",
+    "selection_status": "UNSELECTED_CANDIDATE",
+    "source_manifest_file_sha256": "252fbc9abf573af052e2572c77a3e8dac9725dc8a35c8acbc42d74ee9dca680a",
+    "source_manifest_url": "https://drive.google.com/file/d/14lL-wbaefBcieLxVLVsoMXyvk_DdZCcc/view?usp=drivesdk",
+    "source_snapshot_id": "GCFPE-REPAIR-RECOVERY-CORRECTION-20260914.1",
+    "source_snapshot_sha256": "a8f3351c15279224af81eac4e013d7bbcc7436c3dd5b26b7385abd870f7160be"
+  },
+  "status": "FROZEN_FOR_CANDIDATE_AUTHORING",
+  "terminal_contract": {
+    "invocation_terminal_recoverable": [
+      "SOURCE_RESOLUTION_ERROR",
+      "CURRENT EVIDENCE PENDING IN A NON-PR35 BRANCH WHEN NO RUNNABLE RECEIVER EXISTS"
+    ],
+    "rule": "state completion/stop and return to Nathan; no continuation prompt",
+    "workflow_terminal": [
+      "PR_ABORTED_ESCALATED",
+      "terminal closure/completion native results",
+      "SPECIFICATION_CHANGE_REQUIRED return to Nathan",
+      "PRODUCT_OWNER_DECISION_REQUIRED return to Nathan"
+    ]
+  },
+  "unresolved_graph_predicates": []
+}

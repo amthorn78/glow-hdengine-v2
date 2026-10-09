@@ -1,0 +1,282 @@
+{
+  "edge_indices": [
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "manual_or_owner_pending",
+          "condition": "the required manual act or native owner cannot yet supply a runnable continuation",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "adr_branch",
+          "condition": "the conditional ADR predicate is satisfied and the ADR branch is explicitly selected",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "CL-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "final_scan",
+          "condition": "CL-20 and every actually selected managed post-closure branch have truthful dispositions",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "CL-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "epic_pf09_revalidation",
+          "condition": "the authorized Epic PF09 branch requires initial or corrected revalidation authoring",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "CL-E-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "epic_pf09_review",
+          "condition": "the authorized Epic PF09 branch has a complete revalidation ready for review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "CL-E-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "epic_pf09_maintenance",
+          "condition": "the authorized Epic PF09 branch requires post-Epic maintenance authoring",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "CL-E-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "POST_CLOSURE_PENDING"
+          ],
+          "branch_id": "native_owner_branch",
+          "condition": "an exact manual, source-recovery, escalation, rescope, or other native owner branch is evidenced",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "POST_CLOSURE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "POST_CLOSURE_PENDING"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    }
+  ],
+  "id": "CL-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81739b57da57c285f45d?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "CL-20",
+    "lane": "CL",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Prepare Closure Memo and Post-Closure Record for the exact supplied change.",
+    "output_artifacts": [
+      "CLOSURE_MEMO / POST_CLOSURE_RECORD"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81f4812be61e8877c02c",
+      "release": "GCFPE-20260914.1",
+      "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "CL-30",
+      "CL-E-20",
+      "CL-E-40",
+      "CL-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, after the positive terminal closure decision.",
+    "result_states": [
+      "POST_CLOSURE_PENDING"
+    ],
+    "sequence": 20,
+    "session_class": "ROLE_CONTINUING",
+    "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1"
+  },
+  "state_route_order": [
+    "adr_branch",
+    "epic_pf09_revalidation",
+    "epic_pf09_review",
+    "epic_pf09_maintenance",
+    "final_scan",
+    "native_owner_branch",
+    "manual_or_owner_pending"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

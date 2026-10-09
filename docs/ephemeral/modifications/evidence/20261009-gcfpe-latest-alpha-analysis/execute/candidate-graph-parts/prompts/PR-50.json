@@ -1,0 +1,73 @@
+{
+  "edge_indices": [
+    169
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PR_ABORTED_ESCALATED"
+          ],
+          "branch_id": "pr_aborted_escalated",
+          "condition": "terminal record after Nathan-only identified-PR invocation",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "PR_ABORTED_ESCALATED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "PR_ABORTED_ESCALATED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "PR-50",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81d29748eb21df73b02c?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "PR-50",
+    "lane": "PR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Abort PR and Escalate for the exact supplied change.",
+    "output_artifacts": [
+      "PR_ABORT_ESCALATION_RECORD"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb8138ac99c13cf6f2f282",
+      "release": "GCFPE-20260914.1",
+      "title": "PR-50 — Abort PR and Escalate — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are acting only on Nathan / Product Owner's direct manual invocation.",
+    "result_states": [
+      "PR_ABORTED_ESCALATED"
+    ],
+    "sequence": 50,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "PR-50 — Abort PR and Escalate — 100926.1"
+  },
+  "state_route_order": [
+    "pr_aborted_escalated"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}
