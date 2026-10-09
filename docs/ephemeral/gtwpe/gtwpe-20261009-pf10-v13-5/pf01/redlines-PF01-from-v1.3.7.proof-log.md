@@ -2,7 +2,7 @@
 
 Artifact produced: `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/redlines-PF01-from-v1.3.7.md`; separate processing report: `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/redlines-PF01-from-v1.3.7.proof-log.md`. Original v1.3.7; proposed internal output version derived by Apply is v1.3.8. Prepared at 2026-10-09T12:40:12Z.
 
-Preparation outcome: `READY`. Save completeness: `PARTIAL_PACKAGE` — the complete local redlines/report are prepared and locally read back, but the repository pair has not yet been completely verified. Do not begin Apply until the actual successful saved-pair receipt is recorded and its updated report is read back. No blocking content dependency remains.
+Preparation outcome: `READY`. Save completeness: `COMPLETE_PACKAGE` — both required repository files were completely retrieved and matched the verified local bytes at the preparation artifact commit recorded in the receipt below. This receipt update is read back again before Apply. No blocking content dependency remains.
 
 ## Run, authority and actual access
 
@@ -193,10 +193,19 @@ Baseline native header: Title PF01-Canon-HDE-Math-Spec; Version v1.3.7; Status C
 
 TW-APPLY-10 independently derives the final-component increment v1.3.8 once and the actual execution date in YYYY-MM-DD form (anticipated same-date execution 2026-10-09 is not a substitute for its check). Status remains Canon because this is the revised copy of the existing Canon-class PF; it is not authoritative publication. The ordered, deduplicated source gate is `BN 13.5; HDE-EPIC040-specification-v1.1-approved.md; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md`. The redlines filename, ledger and supporting PF documents never become gate tokens. Three metadata spans are reserved and non-overlapping; no content redline edits them. No local revision-history entry is required by §0.2.
 
-## Output identity and pending save
+## Output identity and save
 
 Redlines bytes: 118621; raw UTF-8 SHA-256 `df5bc3b76a69462cdf94c2d0212f9c8a5c2e33edca9d0e09403bc5980a46f844`. The full saved redlines was independently parsed from disk, every literal block rehashed and every original-bound location/conflict checked. The report is separately written and then read completely. Neither file carries a final-PF body or changes the original.
 
 Execution destination: `docs/20261009-gtwpe-pf10-v13-5`, shared draft PR https://github.com/amthorn78/glow-hdengine-v2/pull/596 . The fresh inspected head `51a375f7c2a5cc2be069732217710d1f6a1dc522` includes other document sessions' work; main remains `e7265a090ad0cc8de5f36de2f19481216aa3d073`. The T-PF01 selection/completion row remains pending and its output namespace is empty. Before each commit, re-read the actual destination/head and preserve every prior session's work using a non-force expected-head ref update. The continuation is not created while #596 remains open.
 
-After remote complete-pair readback, record the actual artifact commit and completion receipt here, re-read this updated report, and update only T-PF01's last two completion cells. Then fetch the pinned TW-APPLY-10 page afresh and validate this entire original-bound package and source/current-target identities before applying. Final and diagnostic paths remain exactly Nathan's supplied paths; a diagnostic is produced only if required by an actual Apply failure.
+The complete-pair receipt below records the actual artifact commit and completed readback. Read the updated receipt-bearing report back, update only T-PF01's last two completion cells, then fetch the pinned TW-APPLY-10 page afresh and validate this entire original-bound package and source/current-target identities before applying. Final and diagnostic paths remain exactly Nathan's supplied paths; a diagnostic is produced only if required by an actual Apply failure.
+
+## Actual saved-pair completion receipt
+
+At 2026-10-09T12:42:20.092Z, both files were retrieved completely at commit `b7cf5bc2742541f6b6e84f95caf0266dc9df2b10` and compared against every UTF-8 character of the local saved files. Both comparisons were equal; no representation normalization was used. The redline hash above is unchanged. The receipt records an already completed verification, not an expected later save. The receipt-bearing report is then saved under this same run identity and read back again before Apply.
+
+- `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/redlines-PF01-from-v1.3.7.md`: actual Git blob `47f4777f3aeb425653c10c9f4b3514a9544d392e`; usable retrieval https://github.com/amthorn78/glow-hdengine-v2/blob/b7cf5bc2742541f6b6e84f95caf0266dc9df2b10/docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/redlines-PF01-from-v1.3.7.md; complete content equality verified.
+- `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/redlines-PF01-from-v1.3.7.proof-log.md`: actual Git blob `a36a80f65b8efa538029d9b85d75d4a2ce1617c7`; usable retrieval https://github.com/amthorn78/glow-hdengine-v2/blob/b7cf5bc2742541f6b6e84f95caf0266dc9df2b10/docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf01/redlines-PF01-from-v1.3.7.proof-log.md; complete content equality verified.
+
+Producer state: `READY / COMPLETE_PACKAGE`. All 61 operations, all 12 selected source units and the exact original are available. No blockers. Next authorized step: TW-APPLY-10 100926.1 in this same session, with a fresh pinned-prompt fetch, current-authority/baseline and complete-package validation.
