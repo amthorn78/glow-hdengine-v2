@@ -1,6 +1,6 @@
 # Redlines — PF09.4-Canon-HDE-Build-Checklist-Conjunction, from v1.2
 
-Run: `gtwpe-20261009-pf10-v13-5 / T-PF09-4`. Preparation revision: `1`. Outcome: `READY` (producer validation passed; saved-package verification is recorded separately in the proof log).
+Run: `gtwpe-20261009-pf10-v13-5 / T-PF09-4`. Preparation revision: `2`, bounded originating-preparer correction of PKG-A30. Outcome: `READY` (producer validation passed; saved-package verification is recorded separately in the proof log).
 Original: `docs/pfcanon/PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.2.md` at `e7265a090ad0cc8de5f36de2f19481216aa3d073`; Git blob `5a97004918e15b5f5783869fd1d2de7d68b4df9f`; raw UTF-8 SHA-256 `441979071515ee95ea8ebb9d02cfc478768c1870d36a92b5bf5aa037a95b8cbb`; 96,003 bytes; LF-only; final LF preserved.
 Originating preparer: Codex, this Nathan-started T-PF09-4 Work conversation; workspace /workspace/scratch/ef74eefe8666; stable platform conversation URL/ID not exposed.
 Ledger: `docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/LEDGER.md` at `f057d124176143b3e02ba7ad599880fd7e9991b1`; assigned row `T-PF09-4`.
@@ -590,6 +590,82 @@ DEFERRED → CL-40 / future Epic with the App user model — live current-row Ga
 * `audit/qa/hde-epic040/`: QA evidence of record landed through PR #559 and registered by its owner; landing is distinct from the original tested source and verdict.
 * Required remaining Conjunction proofs use the actual owning contracts and governed writers; these notes create no new evidence schema, acceptance roster, writer, or path home.
 
+````
+
+## RL-024
+
+Change type: Clarity Fix
+Operation: `REPLACE`
+Target document: `PF09.4-Canon-HDE-Build-Checklist-Conjunction`
+Source-ledger basis: A30
+Rationale: Correct the remaining current task-level shorthand authority reference to the source title while preserving the accepted EPIC029 decision and Done status.
+Section path: # **Phase IV — Conjunction (Surfaces and tools meet the core)** > ## Task HDE-CONJ009 — Global discipline (canonical JSON & Index updates)
+Original scope heading: `## Task HDE-CONJ009 — Global discipline (canonical JSON & Index updates)`
+Expected literal occurrence count: 1
+Old text / FIND (literal; delimiter newlines are not payload):
+````text
+PF10’s decisive in-epic close authority for HDE-EPIC029 remains the authoritative in-flight closure basis for this task, which stays **Done**.
+````
+Replacement text (literal; delimiter newlines are not payload):
+````text
+HDE Build Notes’ decisive in-epic close authority for HDE-EPIC029 remains the authoritative in-flight closure basis for this task, which stays **Done**.
+````
+
+## RL-025
+
+Change type: Clarity Fix
+Operation: `REPLACE`
+Target document: `PF09.4-Canon-HDE-Build-Checklist-Conjunction`
+Source-ledger basis: A30
+Rationale: Use the source title in the current operative CONJ001.4 closure statement without changing its direct-runtime/binding-equivalence facts or historical QA labels.
+Section path: # **Phase IV — Conjunction (Surfaces and tools meet the core)** > ## Task HDE-CONJ001 — Dev HTTP Harness (single home) > ### **Subtask HDE-CONJ001.4 — Dev/internal HTTP harness infra wiring**
+Original scope heading: `### **Subtask HDE-CONJ001.4 — Dev/internal HTTP harness infra wiring**`
+Expected literal occurrence count: 1
+Old text / FIND (literal; delimiter newlines are not payload):
+````text
+* The live PF10 close authority now supports this row to Done with `codespaces` closed by direct runtime validation and `local_dev` closed by binding-equivalence on the same approved published `DEV_SAMPLER_URL` value: `http://127.0.0.1:8000/internal/dev/sampler`.  
+````
+Replacement text (literal; delimiter newlines are not payload):
+````text
+* The live HDE Build Notes close authority now supports this row to Done with `codespaces` closed by direct runtime validation and `local_dev` closed by binding-equivalence on the same approved published `DEV_SAMPLER_URL` value: `http://127.0.0.1:8000/internal/dev/sampler`.  
+````
+
+## RL-026
+
+Change type: Clarity Fix
+Operation: `REPLACE`
+Target document: `PF09.4-Canon-HDE-Build-Checklist-Conjunction`
+Source-ledger basis: A30
+Rationale: Use the source title in the existing current environment-URL governance reference while preserving its authority and prohibition exactly.
+Section path: # **Phase IV — Conjunction (Surfaces and tools meet the core)** > ## Task HDE-CONJ001 — Dev HTTP Harness (single home) > ### **Subtask HDE-CONJ001.4 — Dev/internal HTTP harness infra wiring**
+Original scope heading: `### **Subtask HDE-CONJ001.4 — Dev/internal HTTP harness infra wiring**`
+Expected literal occurrence count: 1
+Old text / FIND (literal; delimiter newlines are not payload):
+````text
+in PF10, Glow QA Guide, HDE Phased Epics, PF09, or QA plans:
+````
+Replacement text (literal; delimiter newlines are not payload):
+````text
+in HDE Build Notes, Glow QA Guide, HDE Phased Epics, PF09, or QA plans:
+````
+
+## RL-027
+
+Change type: Clarity Fix
+Operation: `REPLACE`
+Target document: `PF09.4-Canon-HDE-Build-Checklist-Conjunction`
+Source-ledger basis: A30
+Rationale: Use only the title in the existing source-authority entry, retaining its governance role and the rest of the front matter.
+Section path: # 0\) Front Matter > ## **0.4 Authority and Work-Record Routing**
+Original scope heading: `## **0.4 Authority and Work-Record Routing**`
+Expected literal occurrence count: 1
+Old text / FIND (literal; delimiter newlines are not payload):
+````text
+* **PF10 \- HDE Build Notes:** applicable temporary decisions and change activity awaiting permanent drainage.  
+````
+Replacement text (literal; delimiter newlines are not payload):
+````text
+* **HDE Build Notes:** applicable temporary decisions and change activity awaiting permanent drainage.  
 ````
 
 END OF REDLINES
