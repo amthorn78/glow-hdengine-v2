@@ -1,9 +1,9 @@
 # T-PF29 preparation proof log
 
-Run: gtwpe-20261009-pf10-v13-5 / T-PF29; preparation revision 1; 2026-10-09 UTC.
+Run: gtwpe-20261009-pf10-v13-5 / T-PF29; preparation revision 2; 2026-10-09 UTC.
 Role: TW-DRAIN-10 100926.1, fetched from https://app.notion.com/p/3f44590a05eb8172a314fe6b958bb9ff and read completely. Originating preparer/correction route: this Nathan-started T-PF29 document session; no separate session ID is exposed. Bounded correction returns to this same preparer; no delegation/reviewer.
 
-Preparation outcome: READY. Save completeness: COMPLETE_PACKAGE. Both required repository files were fetched in full at 22e3e96b00cc8831d8705a30ecfffc009776c49c and compared exactly to their complete candidate contents before this receipt was authored. The updated report must also be read back before Apply. The independent saved-payload parser validated all 23 exact REPLACE operations, original heading paths, observed/expected counts 1/1, disjoint spans and one-pass reconstruction. Redlines: 69353 native UTF-8 bytes, SHA-256 1ae5b7bcf4035cdc210c18a618ea06bef3a0e42718e5f8cb2757cf456eeb8f9a. Producer simulation: 71974 bytes, SHA-256 5b3075da58005cd78345018cb1ec24e4fd6c8b943aafc414a4781fe0c7b91e10. EOF LF and every untouched interval were preserved. No application has yet run. Retrieval: repository amthorn78/glow-hdengine-v2, commit above and output paths below.
+Preparation validation: READY for corrected revision 2. Repository save completeness: PARTIAL_PACKAGE pending full corrected-pair readback. The prior revision 1 receipt does not authorize this revision. Originating-preparer correction after Apply diagnostic: RL-014 and RL-022 each used the erroneous internal persistence pointer §12; corrected both literal replacement payloads to the actual existing §11.4. All other original spans and payloads remain identical; no new source, source drift or baseline change. The complete batch must pass producer validation and saved-pair readback again. Diagnostic retained at docs/ephemeral/gtwpe/gtwpe-20261009-pf10-v13-5/pf29/PF29-from-v1.0.1.diagnostic.md. No failed local candidate was delivered to the repository, and canon remains unchanged.
 
 ## Identity, coverage and header provenance
 

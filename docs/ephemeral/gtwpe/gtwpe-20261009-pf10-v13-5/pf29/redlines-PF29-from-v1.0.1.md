@@ -1,6 +1,6 @@
 # PF29 v1.0.1 exact redlines — T-PF29
 
-Run: gtwpe-20261009-pf10-v13-5 / T-PF29, preparation revision 1, 2026-10-09.
+Run: gtwpe-20261009-pf10-v13-5 / T-PF29, preparation revision 2, 2026-10-09.
 Originating preparer: this Nathan-started T-PF29 document session, running TW-DRAIN-10 100926.1. No separate session identifier is exposed; the task, original fingerprint and repository output namespace identify the session's package.
 Target: docs/pfcanon/PF29-Canon-HDE-Users-Guide-v1.0.1.md at e7265a090ad0cc8de5f36de2f19481216aa3d073.
 Original: v1.0.1, UTF-8 native repository content, 60103 bytes; SHA-256 e03cb9ec8005d1a7f18acb03b96623c608e896da1baf7d5121e5e5a1a14a4aaf; Git blob 2f1c6fb1d722ace3c2285c6bb77bb323b4c9cec0.
@@ -622,7 +622,7 @@ Vendor mode is an operator-authorized open-rails workflow and requires complete 
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl showcompat \--source vendor \--birthdate-a YYYY-MM-DD \--birthtime-a HH:MM \--location-a "Place" \--birthdate-b YYYY-MM-DD \--birthtime-b HH:MM \--location-b "Place" \> compat\_vendor.json
 
-The current resolved-compat vendor path uses read-only dry-run acquisition: no mapped-cache database persistence, and success/retry logging is disabled at that acquisition boundary. Do not confuse it with the separately authorized persistence recipe in §12.
+The current resolved-compat vendor path uses read-only dry-run acquisition: no mapped-cache database persistence, and success/retry logging is disabled at that acquisition boundary. Do not confuse it with the separately authorized persistence recipe in §11.4.
 
 With \--source auto, both user IDs are required and resolution is DB-only. Birth-based vendor fallback is prohibited; use explicit \--source vendor for the two complete synthetic birth tuples. Without both IDs, auto refuses AUTO\_SOURCE\_UNRESOLVED. No database or vendor success is implied by the command declaration.
 
@@ -726,7 +726,7 @@ DB mode requires available database access and resolvable rows for both canonica
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl showcompat \--conjunction \--user-a \<user\_a\> \--user-b \<user\_b\> \--source db \> conjunction\_db.json
 
-The current conjunction resolver tries local rows first. After a local miss, explicit vendor source requires both user-ID arguments and may acquire read-only complete charts only with authorized open rails and the required complete birth inputs; closed rails refuse that acquisition. This resolver uses dry-run acquisition and does not perform mapped-cache database persistence. The CLI exposes no \--upsert option for showcompat; explicit persistence belongs to the separate BodyGraph workflow in §12.
+The current conjunction resolver tries local rows first. After a local miss, explicit vendor source requires both user-ID arguments and may acquire read-only complete charts only with authorized open rails and the required complete birth inputs; closed rails refuse that acquisition. This resolver uses dry-run acquisition and does not perform mapped-cache database persistence. The CLI exposes no \--upsert option for showcompat; explicit persistence belongs to the separate BodyGraph workflow in §11.4.
 
 No live DB or vendor success is established by this static availability check. A vendor-source refusal is not a successful acquisition or computation.
 
