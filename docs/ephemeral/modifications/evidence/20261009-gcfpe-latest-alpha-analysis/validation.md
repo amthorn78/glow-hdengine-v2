@@ -130,3 +130,29 @@ quantified relay scoring and retired recurring header reviews.
   is open on the analysis branch. No merge or auto-merge was requested.
 - This receipt adds publication observations after that readback. It changes no
   analysis conclusion, scope, approval or implementation authority.
+
+## Product Owner decision update — 2026-10-09 19:23:10 UTC
+
+Source: Nathan's direct response in this conversation; its complete text is quoted
+in the Modification §9. That successor controls over the earlier open questions.
+
+- Q1–Q4 are resolved. The current readiness field is SPLIT_RECOMMENDED for the
+  previously disclosed, unmeasured skill scope, not NEEDS_RULING on these decisions.
+- Canon relied on is required. The QA-return complaint is withdrawn because its
+  observation was erroneous; the working QA-110 return is preserved.
+- Rescope authorship/review/return is PR implementation → IA → PR implementation.
+  No Isis role is introduced.
+- Kronos authors QA steps. The PO controls how they are executed with wide latitude;
+  no executor or session identity is required.
+- Required evidence indexing is part of QA step instructions.
+- All eight item IDs are retained. Current item wording is corrected; the issued
+  analysis and earlier measurement/validation receipts remain dated history.
+- Targeted Modification validator: 1/1 passed. Changed-file whitespace check passed.
+- Only the Modification and this receipt are included in this update. An unrelated
+  local deletion of docs/ENDPOINTS_CATALOG.json was observed and left untouched;
+  it is excluded from publication.
+- No skill access, prompt/canon/control edit, evidence-index mutation or QA/Ops run.
+  No new independent-review verdict or whole-analysis/PLAN approval is claimed.
+
+This receipt records the decision update's checks; the final remote readback is
+performed against the published branch before reporting the update complete.
