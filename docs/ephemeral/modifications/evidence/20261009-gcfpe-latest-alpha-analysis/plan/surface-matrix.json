@@ -1,0 +1,1436 @@
+{
+  "artifact_type": "GCFPE_PLAN_SURFACE_MATRIX",
+  "modification_id": "MODIFICATION-20261009-gcfpe-latest-alpha-analysis",
+  "date": "2026-10-09",
+  "mode": "PLAN",
+  "baseline": "632f1cdf4839d1bb0d1cdfb3e48c28391d03cfdf",
+  "selected_release": "GCFPE-20260914.1 / 091426.1",
+  "rule": "This file holds identities, bounded edit cohorts and diagnostics only, never prompt bodies. Cohorts overlap; broad scan counts are not exact edit counts or runtime validation.",
+  "members": [
+    {
+      "id": "CF-C-10",
+      "title": "CF-C-10 — Prepare CRD Specification Kickoff Handoff — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8119a5a8e4d083fcf360?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:24:29.077Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 6,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-C-10.json",
+      "registry_row": "CF-C-10"
+    },
+    {
+      "id": "CF-C-20",
+      "title": "CF-C-20 — Create CRD Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:25:00.149Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 5,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-C-20.json",
+      "registry_row": "CF-C-20"
+    },
+    {
+      "id": "CF-C-30",
+      "title": "CF-C-30 — Review and Approve CRD Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:25:31.437Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 6,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-C-30.json",
+      "registry_row": "CF-C-30"
+    },
+    {
+      "id": "CF-C-40",
+      "title": "CF-C-40 — Revise CRD Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:25:55.492Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 5,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-C-40.json",
+      "registry_row": "CF-C-40"
+    },
+    {
+      "id": "CF-E-10",
+      "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:26:19.312Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 6,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-E-10.json",
+      "registry_row": "CF-E-10"
+    },
+    {
+      "id": "CF-E-20",
+      "title": "CF-E-20 — Create Epic Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:26:44.201Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 5,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-E-20.json",
+      "registry_row": "CF-E-20"
+    },
+    {
+      "id": "CF-E-30",
+      "title": "CF-E-30 — Review and Approve Epic Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:27:08.227Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 6,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-E-30.json",
+      "registry_row": "CF-E-30"
+    },
+    {
+      "id": "CF-E-40",
+      "title": "CF-E-40 — Revise Epic Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:27:30.493Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 5,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-E-40.json",
+      "registry_row": "CF-E-40"
+    },
+    {
+      "id": "CF-PO-10",
+      "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-23T13:19:43.642Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 6,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CF-PO-10.json",
+      "registry_row": "CF-PO-10"
+    },
+    {
+      "id": "CL-20",
+      "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:28:16.809Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 30,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-20.json",
+      "registry_row": "CL-20"
+    },
+    {
+      "id": "CL-30",
+      "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:29:01.883Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 28,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-30.json",
+      "registry_row": "CL-30"
+    },
+    {
+      "id": "CL-40",
+      "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:29:46.100Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 27,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-40.json",
+      "registry_row": "CL-40"
+    },
+    {
+      "id": "CL-C-10",
+      "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:30:45.370Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 35,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-C-10.json",
+      "registry_row": "CL-C-10"
+    },
+    {
+      "id": "CL-E-10",
+      "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:31:44.809Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 32,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-E-10.json",
+      "registry_row": "CL-E-10"
+    },
+    {
+      "id": "CL-E-20",
+      "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:32:20.043Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 18,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-E-20.json",
+      "registry_row": "CL-E-20"
+    },
+    {
+      "id": "CL-E-30",
+      "title": "CL-E-30 — Review Bounded PF09 Revalidation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:32:58.391Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 17,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-E-30.json",
+      "registry_row": "CL-E-30"
+    },
+    {
+      "id": "CL-E-40",
+      "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:33:34.204Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 17,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/CL-E-40.json",
+      "registry_row": "CL-E-40"
+    },
+    {
+      "id": "DOC-10",
+      "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:34:17.549Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 28,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/DOC-10.json",
+      "registry_row": "DOC-10"
+    },
+    {
+      "id": "DOC-20",
+      "title": "DOC-20 — Verify Final Repository Documentation Completion — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:35:05.401Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 24,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/DOC-20.json",
+      "registry_row": "DOC-20"
+    },
+    {
+      "id": "ESC-10",
+      "title": "ESC-10 — Create QA Escalation Report — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:35:43.615Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 22,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/ESC-10.json",
+      "registry_row": "ESC-10"
+    },
+    {
+      "id": "ESC-25",
+      "title": "ESC-25 — Execute Bounded Escalation Discovery — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:36:28.369Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-03",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 21,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/ESC-25.json",
+      "registry_row": "ESC-25"
+    },
+    {
+      "id": "ESC-30",
+      "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:37:26.214Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 23,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/ESC-30.json",
+      "registry_row": "ESC-30"
+    },
+    {
+      "id": "ESC-40",
+      "title": "ESC-40 — Review and Return Approved Remediation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:38:04.065Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 20,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/ESC-40.json",
+      "registry_row": "ESC-40"
+    },
+    {
+      "id": "GCFPE-MGMT-10",
+      "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:38:34.295Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [],
+      "disposition": "UNAFFECTED",
+      "reason": "Maintenance member is inside the 55-member comparison but has no runtime session/handoff repair in this plan; do not promote the proposed D20 body.",
+      "diagnostics": {
+        "session_mentions": 0,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/GCFPE-MGMT-10.json",
+      "registry_row": "GCFPE-MGMT-10"
+    },
+    {
+      "id": "IA-10",
+      "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:38:59.570Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 16,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/IA-10.json",
+      "registry_row": "IA-10"
+    },
+    {
+      "id": "IA-20",
+      "title": "IA-20 — Create Whole-Change Implementation Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:39:23.663Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 13,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/IA-20.json",
+      "registry_row": "IA-20"
+    },
+    {
+      "id": "IA-30",
+      "title": "IA-30 — Review Whole-Change Implementation Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:39:54.736Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 8,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/IA-30.json",
+      "registry_row": "IA-30"
+    },
+    {
+      "id": "IA-40",
+      "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-23T13:20:55.194Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 5,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/IA-40.json",
+      "registry_row": "IA-40"
+    },
+    {
+      "id": "IA-50",
+      "title": "IA-50 — IA Answer Seeder — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-23T13:21:22.133Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 8,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/IA-50.json",
+      "registry_row": "IA-50"
+    },
+    {
+      "id": "IA-60",
+      "title": "IA-60 — Thoth Planning Research — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-23T13:21:46.155Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 7,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/IA-60.json",
+      "registry_row": "IA-60"
+    },
+    {
+      "id": "MGR-10",
+      "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-23T13:29:42.793Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 9,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/MGR-10.json",
+      "registry_row": "MGR-10"
+    },
+    {
+      "id": "OPS-10",
+      "title": "OPS-10 — Create Bounded Ops Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:40:51.854Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-02",
+        "PART-03",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 38,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 3
+      },
+      "graph_path": "docs/graph/parts/prompts/OPS-10.json",
+      "registry_row": "OPS-10"
+    },
+    {
+      "id": "OPS-20",
+      "title": "OPS-20 — Execute Bounded Ops Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:41:40.436Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-03",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 38,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 3
+      },
+      "graph_path": "docs/graph/parts/prompts/OPS-20.json",
+      "registry_row": "OPS-20"
+    },
+    {
+      "id": "OPS-30",
+      "title": "OPS-30 — Review Ops Execution Receipt — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:43:03.835Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-02",
+        "PART-03",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 60,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/OPS-30.json",
+      "registry_row": "OPS-30"
+    },
+    {
+      "id": "PR-10",
+      "title": "PR-10 — Create PR Work-Unit Instructions — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:44:17.446Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 55,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/PR-10.json",
+      "registry_row": "PR-10"
+    },
+    {
+      "id": "PR-20",
+      "title": "PR-20 — Create Detailed PR Implementation Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:46:52.719Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 61,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/PR-20.json",
+      "registry_row": "PR-20"
+    },
+    {
+      "id": "PR-30",
+      "title": "PR-30 — PR Implementation Proceed — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:47:45.499Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 51,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/PR-30.json",
+      "registry_row": "PR-30"
+    },
+    {
+      "id": "PR-35",
+      "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:48:24.405Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 34,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/PR-35.json",
+      "registry_row": "PR-35"
+    },
+    {
+      "id": "PR-40",
+      "title": "PR-40 — Review PR Work-Unit Lineage — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:49:45.516Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-01",
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 53,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/PR-40.json",
+      "registry_row": "PR-40"
+    },
+    {
+      "id": "PR-50",
+      "title": "PR-50 — Abort PR and Escalate — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:50:07.915Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 6,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/PR-50.json",
+      "registry_row": "PR-50"
+    },
+    {
+      "id": "QA-10",
+      "title": "QA-10 — Audit Implementation and Establish QA Readiness — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:51:30.296Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 77,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-10.json",
+      "registry_row": "QA-10"
+    },
+    {
+      "id": "QA-100",
+      "title": "QA-100 — Execute Bounded QA Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:52:02.330Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 10,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-100.json",
+      "registry_row": "QA-100"
+    },
+    {
+      "id": "QA-110",
+      "title": "QA-110 — Review QA Evidence and Route the Next Action — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:52:32.947Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 11,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-110.json",
+      "registry_row": "QA-110"
+    },
+    {
+      "id": "QA-120",
+      "title": "QA-120 — Create Final QA Report and RCA — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:53:04.131Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 12,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-120.json",
+      "registry_row": "QA-120"
+    },
+    {
+      "id": "QA-20",
+      "title": "QA-20 — Create Live QA Guide — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb816daa3adff37283482b?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:53:39.690Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 18,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-20.json",
+      "registry_row": "QA-20"
+    },
+    {
+      "id": "QA-50",
+      "title": "QA-50 — Create Whole-Change QA Audit and Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:54:17.481Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 13,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-50.json",
+      "registry_row": "QA-50"
+    },
+    {
+      "id": "QA-60",
+      "title": "QA-60 — Create Whole-Change QA Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:54:47.640Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 13,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-60.json",
+      "registry_row": "QA-60"
+    },
+    {
+      "id": "QA-70",
+      "title": "QA-70 — Review Whole-Change QA Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:55:17.352Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 18,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-70.json",
+      "registry_row": "QA-70"
+    },
+    {
+      "id": "QA-80",
+      "title": "QA-80 — Revise Whole-Change QA Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:55:48.777Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 8,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-80.json",
+      "registry_row": "QA-80"
+    },
+    {
+      "id": "QA-90",
+      "title": "QA-90 — Create Bounded QA Execution Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:56:22.252Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 12,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/QA-90.json",
+      "registry_row": "QA-90"
+    },
+    {
+      "id": "RS-10",
+      "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:56:52.996Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 15,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/RS-10.json",
+      "registry_row": "RS-10"
+    },
+    {
+      "id": "RS-20",
+      "title": "RS-20 — Review Bounded Work-Unit Rescope — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:57:26.346Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 14,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/RS-20.json",
+      "registry_row": "RS-20"
+    },
+    {
+      "id": "RS-30",
+      "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:57:55.813Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 12,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/RS-30.json",
+      "registry_row": "RS-30"
+    },
+    {
+      "id": "RS-40",
+      "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:58:22.358Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 25,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/RS-40.json",
+      "registry_row": "RS-40"
+    },
+    {
+      "id": "UTIL-10",
+      "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9?pvs=204",
+      "selected_version": "091426.1",
+      "read_at": "2026-10-09",
+      "page_last_edited_at": "2026-09-24T15:58:46.985Z",
+      "changed_since_analysis": false,
+      "complete_read": true,
+      "parts": [
+        "PART-07"
+      ],
+      "disposition": "AFFECTED",
+      "reason": "Apply only the named part predicates and preserve native role/authority, actual artifact identities and protected history.",
+      "diagnostics": {
+        "session_mentions": 5,
+        "canon_heading": false,
+        "legacy_ops_path_mentions": 0
+      },
+      "graph_path": "docs/graph/parts/prompts/UTIL-10.json",
+      "registry_row": "UTIL-10"
+    }
+  ],
+  "cohorts": {
+    "PART-01": [
+      "PR-40",
+      "PR-10",
+      "OPS-10",
+      "OPS-30",
+      "DOC-10",
+      "DOC-20",
+      "MGR-10"
+    ],
+    "PART-02": [
+      "CL-20",
+      "CL-40",
+      "CL-C-10",
+      "CL-E-10",
+      "DOC-10",
+      "DOC-20",
+      "OPS-10",
+      "OPS-20",
+      "OPS-30",
+      "PR-10",
+      "PR-20",
+      "PR-30",
+      "PR-35",
+      "PR-40",
+      "QA-10",
+      "QA-50",
+      "RS-10",
+      "RS-20",
+      "RS-30",
+      "RS-40"
+    ],
+    "PART-03": [
+      "OPS-10",
+      "OPS-20",
+      "OPS-30",
+      "ESC-25"
+    ],
+    "PART-04": [
+      "QA-50",
+      "QA-60",
+      "QA-70",
+      "QA-80",
+      "QA-90",
+      "QA-100",
+      "QA-110",
+      "QA-120"
+    ],
+    "PART-05": [
+      "CF-C-30",
+      "CF-E-30",
+      "IA-30",
+      "PR-35",
+      "PR-40",
+      "QA-10",
+      "QA-70",
+      "QA-110",
+      "QA-120",
+      "RS-20",
+      "RS-40",
+      "ESC-40",
+      "OPS-30",
+      "CL-C-10",
+      "CL-E-10",
+      "CL-E-30",
+      "DOC-20",
+      "CL-20"
+    ],
+    "PART-06": [
+      "QA-20",
+      "QA-50",
+      "QA-60",
+      "QA-70",
+      "QA-80",
+      "QA-90",
+      "QA-100",
+      "QA-110",
+      "QA-120",
+      "CL-C-10",
+      "CL-E-10"
+    ],
+    "PART-07": [
+      "CF-C-10",
+      "CF-C-20",
+      "CF-C-30",
+      "CF-C-40",
+      "CF-E-10",
+      "CF-E-20",
+      "CF-E-30",
+      "CF-E-40",
+      "CF-PO-10",
+      "CL-20",
+      "CL-30",
+      "CL-40",
+      "CL-C-10",
+      "CL-E-10",
+      "CL-E-20",
+      "CL-E-30",
+      "CL-E-40",
+      "DOC-10",
+      "DOC-20",
+      "ESC-10",
+      "ESC-25",
+      "ESC-30",
+      "ESC-40",
+      "IA-10",
+      "IA-20",
+      "IA-30",
+      "IA-40",
+      "IA-50",
+      "IA-60",
+      "MGR-10",
+      "OPS-10",
+      "OPS-20",
+      "OPS-30",
+      "PR-10",
+      "PR-20",
+      "PR-30",
+      "PR-35",
+      "PR-40",
+      "PR-50",
+      "QA-10",
+      "QA-100",
+      "QA-110",
+      "QA-120",
+      "QA-20",
+      "QA-50",
+      "QA-60",
+      "QA-70",
+      "QA-80",
+      "QA-90",
+      "RS-10",
+      "RS-20",
+      "RS-30",
+      "RS-40",
+      "UTIL-10"
+    ],
+    "PART-08": []
+  },
+  "counts": {
+    "members": 55,
+    "affected": 54,
+    "unaffected": 1,
+    "skills_measured": null
+  },
+  "part08": {
+    "disposition": "EXCLUDED_UNMEASURED",
+    "reason": "Original no-skill-access exception. Item remains in the frozen scope ledger; no skill implementation is planned."
+  }
+}

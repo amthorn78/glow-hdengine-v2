@@ -2,22 +2,23 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261009-gcfpe-latest-alpha-analysis"
-status: "ANALYZED"
+status: "PLANNING"
 targets: ["prompt","skill","rule","graph","registry","notion_control"]
 gate_tier: 2
 closure: {"upstream":["CF-C-10","CF-C-20","CF-C-30","CF-C-40","CF-E-10","CF-E-20","CF-E-30","CF-E-40","CF-PO-10","CL-20","CL-30","CL-C-10","CL-E-10","CL-E-20","CL-E-30","CL-E-40","DOC-10","DOC-20","ESC-10","ESC-25","ESC-30","ESC-40","GCFPE-MGMT-10","IA-10","IA-20","IA-30","IA-40","IA-50","IA-60","MGR-10","OPS-10","OPS-20","OPS-30","PR-10","PR-20","PR-30","PR-35","PR-40","QA-10","QA-100","QA-110","QA-120","QA-20","QA-50","QA-60","QA-70","QA-80","QA-90","RS-10","RS-20","RS-30","RS-40"],"downstream":["CF-C-10","CF-C-20","CF-C-30","CF-C-40","CF-E-10","CF-E-20","CF-E-30","CF-E-40","CF-PO-10","CL-20","CL-30","CL-40","CL-C-10","CL-E-10","CL-E-20","CL-E-30","CL-E-40","DOC-10","ESC-10","ESC-25","ESC-30","ESC-40","IA-10","IA-20","IA-30","IA-40","IA-50","IA-60","OPS-10","OPS-20","OPS-30","PR-10","PR-20","PR-30","PR-35","PR-40","QA-10","QA-100","QA-110","QA-120","QA-20","QA-50","QA-60","QA-70","QA-80","QA-90","RS-10","RS-20","RS-30","RS-40"],"state_sharers":["CF-C-10","CF-C-20","CF-C-30","CF-C-40","CF-E-10","CF-E-20","CF-E-30","CF-E-40","CL-40","CL-C-10","CL-E-10","CL-E-20","CL-E-30","DOC-10","DOC-20","ESC-25","ESC-30","ESC-40","IA-10","IA-20","IA-30","IA-40","IA-60","OPS-10","OPS-20","OPS-30","PR-10","PR-20","PR-30","PR-35","PR-40","QA-100","QA-110","QA-20","QA-50","QA-60","QA-70","QA-80","QA-90","RS-10","RS-20","RS-30","RS-40","UTIL-10"]}
 readiness: "SPLIT_RECOMMENDED"
 override: {"by":"","overrides":[],"reason":""}
-interaction_cost_predicted: "7 remaining baseline round trips after Q1–Q4 were resolved: 0 open rulings + 2 mode approvals + 2 review rounds + 3 merges; unmeasured skill costs remain excluded."
+interaction_cost_predicted: "5 remaining baseline round trips: 1 PLAN approval + 1 bounded PLAN review + up to 3 manual merges; PLAN-G1 resolution and all unmeasured skill costs excluded, not zero. In-place publication choice is included in the PLAN approval request."
 interaction_cost_actual: null
 estimate: {"plan":"Prompt/control option: 1.5–3 hours and 80,000–160,000 tokens, including one bounded review round. Skill work excluded and unpriced under the explicit no-skill-access exception.","execute":"Prompt/control option: 3–6 hours and 140,000–300,000 tokens, including validation and readbacks; excludes Product Owner waiting time. Skill work and skill-owned gates remain unpriced until separately measurable."}
-reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-09", "required_open": 0, "outcome": "Author dry run: 55 closure calls; record and 14-record directory validators pass. Q1-Q4, unmeasured skill scope and no independent full review explicitly remain; no full-review verdict claimed."}]
+reviews: [{"mode":"ANALYZE","kind":"DRY_RUN","date":"2026-10-09","required_open":0,"outcome":"Author dry run: 55 closure calls; record and 14-record directory validators pass. Q1-Q4, unmeasured skill scope and no independent full review explicitly remain; no full-review verdict claimed."},{"mode":"PLAN","kind":"DRY_RUN","date":"2026-10-09","required_open":1,"outcome":"PARTIAL author dry run: 55 complete source readbacks and repository/record checks available. Graph build/derivation and shipped prompt/registry/interface gates unavailable under no-skill access (PLAN-G1). No independent FULL review or runtime validation claimed."}]
 items: [{"id":"ITEM-01","statement":"Resolve the next planned work unit after PR-40 ACCEPT without defaulting every continuation to PR-10.","source":"AF-014","disposition":""},{"id":"ITEM-02","statement":"Rescope proposals are authored by PR implementation sessions, reviewed by IA sessions, and returned to PR implementation sessions; Isis is not involved.","source":"AF-015","disposition":""},{"id":"ITEM-03","statement":"Make Ops tasks executable, rehearsed, correctly evidenced, and easy to authorize and return without asking the Product Owner to compose approval machinery.","source":"AF-016, AF-017, AF-018, AF-020; AF-019 is contextual evidence only","disposition":""},{"id":"ITEM-04","statement":"Kronos authors QA steps; the Product Owner has wide latitude over execution, with no required executor or session identity; execution returns evidence to QA-110.","source":"AF-021, AF-022, AF-025-EXECUTION; AF-024-QA-RETURN withdrawn as an erroneous observation, per Nathan 2026-10-09","disposition":""},{"id":"ITEM-05","statement":"Require a substantive Canon relied on block in the review and approval artifacts covered by this feedback.","source":"AF-024-CANON","disposition":""},{"id":"ITEM-06","statement":"Require QA evidence indexing and include it in the QA step instructions.","source":"AF-025-INDEX","disposition":""},{"id":"ITEM-07","statement":"Use functional roles and recoverable artifact lineage for handoffs instead of requiring one persistent platform session, while retaining actor independence and authorization.","source":"AF-026","disposition":""},{"id":"ITEM-08","statement":"Assess reusable safe-relay advice without embedding scoring logic in every prompt; skill scope remains unmeasured because no skill access is authorized.","source":"AF-013","disposition":""}]
-parts: [{"id":"PART-01","name":"Plan-driven progression","items":["ITEM-01"],"class":"A","after":[]},{"id":"PART-02","name":"Rescope ownership and return","items":["ITEM-02"],"class":"A","after":[]},{"id":"PART-03","name":"Ops task and evidence contract","items":["ITEM-03"],"class":"A","after":[]},{"id":"PART-04","name":"QA intent and truthful execution result","items":["ITEM-04"],"class":"A","after":[]},{"id":"PART-05","name":"Canon evidence at decision boundaries","items":["ITEM-05"],"class":"A","after":[]},{"id":"PART-06","name":"Evidence indexing in QA step instructions","items":["ITEM-06"],"class":"A","after":[]},{"id":"PART-07","name":"Role continuity and handoff contract","items":["ITEM-07"],"class":"A","after":[]},{"id":"PART-08","name":"Reusable relay advice — unmeasured","items":["ITEM-08"],"class":"A","after":[]}]
+parts: [{"id":"PART-01","name":"Plan-driven progression","items":["ITEM-01"],"class":"A","after":["PART-07"]},{"id":"PART-02","name":"Rescope ownership and return","items":["ITEM-02"],"class":"A","after":["PART-07"]},{"id":"PART-03","name":"Ops task and evidence contract","items":["ITEM-03"],"class":"A","after":["PART-07"]},{"id":"PART-04","name":"QA intent and truthful execution result","items":["ITEM-04"],"class":"A","after":["PART-07"]},{"id":"PART-05","name":"Canon evidence at decision boundaries","items":["ITEM-05"],"class":"A","after":["PART-07"]},{"id":"PART-06","name":"Evidence indexing in QA step instructions","items":["ITEM-06"],"class":"A","after":["PART-04"]},{"id":"PART-07","name":"Role continuity and handoff contract","items":["ITEM-07"],"class":"A","after":[]},{"id":"PART-08","name":"Reusable relay advice — unmeasured","items":["ITEM-08"],"class":"A","after":[]}]
 request: "Review the latest alpha feedback for the GCFPE. Run MGTM analyze on it with this exception:  you do NOT have skill access."
 requested_by: "Nathan"
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan"
+item_count_at_approval: 8
+analyze_approved_date: "2026-10-09T19:31:17Z"
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -27,11 +28,11 @@ shares_package_with: []
 
 # MODIFICATION-20261009-gcfpe-latest-alpha-analysis
 
-**MODE: ANALYZE. Result: PRODUCT_OWNER_ACTION_PENDING. Readiness: SPLIT_RECOMMENDED. All four Product Owner questions are resolved.**
+**MODE: PLAN. Status: PLANNING. ANALYZE approved by Nathan on 2026-10-09. Scope frozen at eight items. The no-skill-access exception continues.**
 
 The latest ledger contains actionable Ops and continuity problems, historical failures that current contracts already address, and several requests that would change authority or acceptance policy. Treating all entries as missing prompt features would reintroduce errors.
 
-This is one Modification with eight atomic parts. It records analysis, not an implementation plan or approval. No prompt, skill, graph part, registry, Notion control or PF canon was changed. The skill exception is applied literally: no skill was opened, read, invoked, inspected, packaged or installed. Unknown skill scope is not reported as zero.
+This is one Modification with eight atomic parts. The approved analysis is preserved in §A; the current planning record follows in §P. No prompt, skill, graph part, registry, Notion control or PF canon was changed. The skill exception is applied literally: no skill was opened, read, invoked, inspected, packaged or installed. Unknown skill scope is not reported as zero.
 
 **Current disposition, 2026-10-09 19:23 UTC:** Nathan's decisions in §9 supersede the earlier alternatives, withdrawal ambiguity and requests for Q1–Q4 below. Sections 1–8 are retained as the issued analysis history. The current frontmatter and §9 carry the corrected scope; the remaining split recommendation concerns unmeasured skill work only.
 
@@ -315,3 +316,201 @@ Open Product Owner rulings: **0**. `NEEDS_RULING` no longer describes these four
 The initial estimate counted four unresolved questions. They were settled together in one Product Owner reply. Remaining baseline interaction estimate is **7**: zero open rulings + two mode approvals + two bounded review rounds + three merges, plus the already-disclosed unknown skill costs. This is an updated estimate, not an assertion that approvals, review rounds or merges occurred.
 
 This response settles the questions. It does not expressly approve the entire analysis or an implementation plan, so the approval fields remain empty. No PLAN or EXECUTE section is created. No skill was accessed; no native prompt, canon, graph, registry, release selection or governed evidence was changed. The next analysis return must use these settled decisions rather than repeat Q1–Q4.
+
+## §P — Plan
+
+### P0. Approval and frozen scope — 2026-10-09
+
+Nathan approved progression from the reviewed analysis to PLAN at **2026-10-09T19:31:17Z**:
+
+> ok, begin the PLAN phase.
+
+The recorded approval covers §A as corrected by its §9 Product Owner dispositions. Its eight items are frozen; PLAN does not rewrite §A or revive superseded alternatives. The approval quote is recorded here at the mode boundary rather than rewriting the issued analysis. This approval does not approve EXECUTE, merging, installation or promotion. `plan_approved_by` and `plan_approved_date` remain empty.
+
+Seven prompt/control parts are being planned. PART-08 remains a named excluded, unmeasured skill item under the original no-skill-access exception; it is not silently reported as complete or measured as zero.
+
+### P1. PLAN result and execution boundary
+
+**Prepared for review; not yet cleared as a mechanically executable PLAN.** Status remains `PLANNING`. The substantive changes, affected surfaces, ordering, acceptance cases and failure handling are specified below. No prompt, graph part, registry, shared rule, Notion control, PF document or governed evidence has been changed in PLAN.
+
+There is one confirmed normal-path capability gap: the required graph build/derivation and shipped prompt/registry/interface gates are skill-owned. The user exception excludes access to those skills. Repository source reads, the 55 prompt readbacks, closure computation and record validation are available; they do not establish the missing gates. No replacement validator or guessed command is designed to bypass that boundary. The plan is returned with that gap visible under D26, without a FULL-review or runtime-validation claim.
+
+The proposed execution order is **PART-07 → PART-05 → PART-01 → PART-02 → PART-03 → PART-04 → PART-06**. PART-08 has an explicit excluded disposition. PART-01 through PART-05 require PART-07 first because their receiver and provenance language shares its role contract; PART-06 also requires PART-04. This is one Modification with one eventual PLAN approval, not seven approval ceremonies. Overlapping pages are edited by part with each part's complete cross-surface readback; page count is not an atomicity boundary.
+
+### P2. Canon relied on
+
+The current repository source remains `main@632f1cdf4839d1bb0d1cdfb3e48c28391d03cfdf`, verified again during PLAN. This is a source-read baseline, not a requirement that future execution use an identical SHA. A substantive change to decisive sources requires a focused reassessment.
+
+| Actual source read | Sections relied on | Application to this plan |
+|---|---|---|
+| PF10-HDE-Build-Notes v13.5.1 | Complete current document, including precedence §§1–9, §1.1 and §2; no current addenda | Resolve current canon and actual overlays; do not carry retired PF10 v13.5 material as current authority. |
+| PF04-Canon-HDE-Governance v2.8.7 | §§9.1.2–9.1.6 | Actual canon reads and topic mapping; persistent artifact lineage; human advice without forced provider/model; substantive currentness; complete affected/unaffected comparison, independent review and truthful publication/runtime claims. |
+| PF27-Canon-Plan-Templates v2.0.5 | §3 Ops Task Record, complete required fields, controlled execution contract, evidence posture and no-governance-drift | Reuse the actual task template; task-specific authorization, supported executable instructions, canonical Ops evidence and retained-path mappings. |
+| PF06-Canon-Change-Process-Guide v2.5.4 | §0.2 Ops tasks, live vendor interface, delegation and evidence posture | PO can execute or delegate; actual task authority governs; no human-only refusal or second generic authorization; stored secret-safe evidence is required. |
+| PF19-Canon-Glow-QA-Guide v3.0.6 | §§4.4.3–4.4.5, §9.2.15.6 and §13.20 | Actual manifest/log/writer contracts and lookup proof; truthful final evidence; EPIC040 execution and indexing are later-resolved history, not work to repeat. |
+
+In-flight and management sources actually read: this Modification's approved §A and §A.9; the source feedback ledger and canon-block brief named in §A; the MGMT D20/D26 testing body; root `AGENTS.md`; the seven management spine documents; D5, D13–D14 and D20–D26 with D23 successors; `prompt-validation-procedure.md`, `postflight-procedure.md`, `notion-write-boundary.md`, `prompt-body-content-policy.md`; the current graph parts, registry and v5.0.0 operating-procedure pointer; and the selected Notion register, catalog, Flow Index, PE Metaprompt and lane hubs. This PLAN does not claim an independent canon approval.
+
+The workflow choices are Nathan's §A.9 dispositions and the reviewed scope that he authorized for PLAN. They are not described as already drained into PF canon. No PF-canon edit is in this cycle.
+
+### P3. Exact source and change map
+
+[The surface matrix](evidence/20261009-gcfpe-latest-alpha-analysis/plan/surface-matrix.json) names every current member's exact Notion URL, title, selected version, observed edit time, graph part, registry row and part membership. All **55 complete selected bodies** were re-fetched during PLAN; **0 edit timestamps changed** from ANALYZE. The matrix records **54 affected runtime members and 1 unaffected maintenance member**. The current selected `GCFPE-MGMT-10` remains unchanged; this work neither promotes its D20 testing replacement nor adds a member.
+
+| Part | Direct edit/comparison cohort | Exact change boundary |
+|---|---|---|
+| PART-01 | PR-40, PR-10, OPS-10, OPS-30, DOC-10, DOC-20, MGR-10 | ACCEPT progression and its existing receiving contracts; do not alter PR-40 REJECT semantics. |
+| PART-02 | PR-20, PR-30, PR-35, PR-40, RS-10/20/30/40 and the shared rescope clauses in the 20 matrix members | PR proposal author → IA reviewer → originating PR author/phase. Other-lane references transport an evidenced finding; they do not become rescope authors or reviewers. |
+| PART-03 | OPS-10, OPS-20, OPS-30, ESC-25 | Task authoring, bounded operation, evidence/receipt and the actual Ops-discovery subset. |
+| PART-04 | QA-50/60/70/80/90/100/110/120 | Kronos authorship, PO execution choice, truthful task/run distinction, collection preservation and actual evidence return. |
+| PART-05 | 18 members listed below | Substantive canon block at actual review/decision outputs; conditional continuation/memo treatment is explicit. |
+| PART-06 | QA-20/50/60/70/80/90/100/110/120, CL-C-10, CL-E-10 | Indexing is authored, executed by its authorized writer, and checked as required QA evidence work. |
+| PART-07 | All 54 runtime members, shared handoff/continuity contracts and affected controls | Role/name plus recoverable artifact lineage; receiving-side session choice; protected role separation and actual authority. |
+| PART-08 | No skill surface measured or scheduled | Excluded under no-skill access; scope is unknown, not zero. |
+
+These cohorts overlap. They are not 122 separate prompt edits, and a text hit is not by itself a defect. Within each named member, the edit is limited to the stated behavior and its necessary input/output, shared clause and handoff references.
+
+**Notion controls to reconcile, without changing selection:** Flow Index `3db4590a05eb81de9736ea69bac61016`; PE Metaprompt `3db4590a05eb8174be35d9e35acb3f77`; IA hub `3db4590a05eb8195a2ccf7c0959a8b6e`; QA hub `3db4590a05eb814d96d3dcfa8835f96d`; Change Flow hub `3db4590a05eb81d59059eb6b95ed5fcf`; Escalation hub `3db4590a05eb81cd938de84cfffead9c`; TW hub `3db4590a05eb811b9c14f2ae89c28df7` only for any GCFPE binding it actually carries. The separate TW ecosystem is outside scope. Preserve a no-change disposition where a control carries no affected instruction.
+
+The register `3d24590a05eb81ce942ad994cfca9fa1`, selected entry `3db4590a05eb816f925ef3b0659de3b8` and catalog `3db4590a05eb81738ef1d846e3c0df8c` receive only approved maintenance/binding/proof updates. They must retain the 55-member selection and unchanged URLs under the publication choice below. No control self-selects; preserve `REGISTER_CONTROLLED`.
+
+**Publication choice proposed for approval:** apply this cycle's repairs in place to the named selected 091426.1 pages, with the current selection preserved and complete readbacks. D23-G normally requires changed-member successors; its September 23 amendment authorized a particular in-place 091426.1 repair. That historical approval is not silently reused as blanket permission. Approval of this PLAN must expressly include this cycle's in-place publication choice. This is a concrete publication decision, not a reopening of Nathan's four settled behavior decisions. If Nathan instead selects a successor release, that publication sequence must be planned in a dated successor §P before any ecosystem write; no release number, promotion or archival is inferred here.
+
+### P4. Common preflight, authority and failure rules
+
+Before the first ecosystem write, the executor must recover this exact Modification, Nathan's explicit PLAN approval, the frozen eight items, current substantive source state and all required execution capabilities. Reuse the existing branch only while it still carries the most advanced record. Do not absorb unrelated workspace changes; in this workspace the pre-existing deletion of `docs/ENDPOINTS_CATALOG.json` is outside the Modification.
+
+The existing decision record ends at D26. **D27 is the proposed decision-record number**, not an assertion that it has been published or approved. Record its allocation and controlling approval before entering EXECUTE. Its entry must distinguish:
+- already-settled §A.9 rulings: canon block, withdrawn erroneous QA-return observation, PR/IA rescope ownership, Kronos/PO QA execution latitude and required indexing;
+- the approved PLAN's implementation choices: role/artifact continuity, progression resolver and Ops instruction/evidence changes; and
+- the separate in-place publication authorization proposed in P3.
+
+Do not attribute the last group to Nathan until he approves it. If D27 has been used by another change before execution, return a corrected number in a successor PLAN; do not overwrite another ruling. The first rule-publication step records the entry in `docs/prompt_ecosystem_management/gcfpe.decision-record.md` before affected bodies are changed.
+
+Every part uses the same finite failure behavior, set by Nathan's D26-B:
+- Before an external ecosystem write: undo only that part's own uncommitted repository edits, record it blocked and preserve all unrelated work. Other parts may continue only if they are not ordered after it.
+- After the first external ecosystem write: stop automation, record exactly what applied and what failed, perform a read-only live-state sweep, preserve the freeze and return to Nathan with a failure-record PR. Nathan merges that record; an agent never merges to satisfy the rule.
+- If restoration needs an earlier Notion body, Nathan restores it from native page history. No local body backup, mirror, hash or export is made. The part remains BLOCKED, the Modification remains EXECUTING where D26 requires it, and later steps are NOT_RUN citing that stop.
+- Repository reversal uses an explicit inverse diff of this part's owned changes after inspecting current state. Never reset shared work or rewrite issued history. A wrong plan returns to PLAN; it is not redesigned during EXECUTE.
+
+### P5. Ordered work by part
+
+Each “reconcile” step below includes its own affected graph part(s), registry row(s), shared contracts and listed Notion controls. Hand-author only the authorized graph source fields and non-derived registry fields. Build the graph from parts; derive registry `outputs[].consumers`, `outputs[].states` and `required_interfaces` using the established tooling. Do not hand-type those derived fields or commit an assembled graph. Gate coverage must name actual members and unevaluated checks. The missing skill capability in P8 prevents claiming these steps are currently executable.
+
+#### PART-07 — Role continuity and handoff contract
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 07.1 | Publish the approved D27 entry and a successor canonical-text/operating-procedure reference for this cycle. Replace the requirement to supply one persistent platform session with required receiving role/name, exact task/artifact binding, recoverable substantive lineage and actual authority. Preserve known historical session facts as provenance. An explicit user selection of an existing session remains an instruction; missing platform IDs alone are not a blocker. | §A.9, ITEM-07; D23-B/D/E and D26; approved P3 publication choice | Compare every normative continuation clause and every “identity missing” stop with cases P07-01/02/05. A surviving requirement for an exact platform identity on an otherwise complete role/artifact handoff fails. | Own repository inverse diff; after Notion writes, P4. |
+| 07.2 | Apply that rule to the 54 runtime bodies' role/intake/continuity/recovery/result/handoff sections. Receiving side chooses or recovers the session. Preserve two dedicated PR-30/PR-35 phase sessions, the same actual work unit/PR/Proceed, independent reviewers where required, and no automatic session creation, dispatch or impersonation. QA executor/session identity is expressly not required. Preserve compact C-HANDOFF/C-ART/C-PLACE behavior and task-specific human advice without introducing AF-013 scoring. | Nathan's role-continuity scope; D23 and PF04 §§9.1.3, 9.1.6 | Cases P07-01–07; complete 55-member affected/unaffected review. Fail if changing session loses attempts, author becomes its own independent approver, PR phases collapse, a hidden session is created, or QA identity returns through a shared template. | P4, naming every applied page/section. |
+| 07.3 | Change `global.json/handoff_contract/required` from “receiving role and exact session” to receiving role/name and artifact-bound task context, with session reference only if actually supplied. Reconcile affected `node.receiving_role`, descriptive `session_class` semantics and identity-only boundary conditions without inventing new schema enums. Update registry non-derived intake/failure/guard clauses and shared Notion guidance. Create a successor to the v5.0.0 operating-procedure pointer; preserve its dated original. | D13–D14; PF04 §9.1.6; approved D27 | Rebuild and derived-registry/interface gates; reject a fixture that restores identity-only refusal, while permitting genuine wrong-role/authority/artifact conflicts. Check the receiver chooses context without acquiring new authority. | Own file inverse diff plus P4 page-history restoration. |
+
+#### PART-05 — Canon relied on at decisions
+
+The unconditional decision-producing cohort is **CF-C-30, CF-E-30, IA-30, PR-35, PR-40, QA-10, QA-70, QA-110, QA-120, RS-20, ESC-40, OPS-30, CL-C-10, CL-E-10, CL-E-30 and DOC-20**. PR-35's scope is its substantive review disposition/merge-readiness record, not a new approval layer. **RS-40** carries the same requirement when resuming the PR-35 review phase; its PR-30 continuation does not acquire a review gate. **CL-20** carries the already-issued closure decision's canon basis plus the sources it actually reads for its memo; it does not re-decide closure. These are 18 member dispositions, including the referral's CL-20 without mistaking it for the actual closure decision.
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 05.1 | Add a required output block titled exactly **Canon relied on** to the stated review/decision artifacts. Require actual PF titles/versions and sections read, current PF10/applicable addenda, each in-flight Specification/Plan/review/PO disposition actually relied on by repository path/version, and one topic-to-governing-section line per issue decided. Where canon is silent, record the searched sources and actual silence; never invent a citation. | Nathan's express ruling; canon-block brief §2; PF04 §9.1.2 | P05-01–03: missing/empty/unread/unrelated/topic-incomplete evidence cannot support a positive decision. A rails decision must cite the sections actually read; the heading alone does not pass. | P4. |
+| 05.2 | Reconcile the same output requirement in non-derived registry requirements/assertions and the PE Metaprompt's GCFPE review overlay. Apply it to each decision in a collection; a shared block may support several decisions only with explicit complete topic/decision mapping. Preserve native negative/pending result vocabularies and all existing approval owners. | D14; PF04 §9.1.6 | Inject missing block, false source, omitted topic and a conditional RS-40/CL-20 misuse. Each must fail for the stated reason; no new review or retroactive closure condition may appear. Consumer/graph checks must retain the existing decision routes. | Own inverse diff plus P4. |
+
+#### PART-01 — Plan-driven progression after PR-40 ACCEPT
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 01.1 | Replace PR-40's ambiguous “native IA prompt named by the current Plan stage” ACCEPT package with a deterministic resolution from the approved ordered Plan, accepted receipts and actual dependencies. The accepted result returns to the whole-change IA in the selected next native role. Resolve ordinary PR → PR-10; Ops → OPS-10 task authoring; final documentation not yet instructed → DOC-10; accepted final-documentation unit awaiting completion verification → DOC-20. Preserve accepted work and blockers. | ITEM-01; approved Plan ownership; D13 and native receiving contracts | P01-01–03/05. One actual next unit/receiver must be evidenced. Fail on an unconditional PR-10 loop, skipping an unmet dependency, inventing a unit, sending ACCEPT straight to execution, or substituting IA-40 as a progress prompt. | P4. |
+| 01.2 | Reconcile PR-10, OPS-10/30, DOC-10/20 and MGR-10 progression consumers and PR-40's `accept` branch under `ORIGINAL_NATIVE_STAGE`. If all delivery is complete, enter the existing QA-10 readiness contract only when its full prerequisites are supported; otherwise return the actual remaining owner or truthful terminal state. Do not claim QA, closure or a new Proceed. Preserve REJECT → PR-20 replanning and instruction-defect ownership. | D13, D23-F; PF04 §9.1.5 | P01-04/06 plus graph terminal/handoff cardinality. Every nonterminal branch has exactly one actual native receiver; true terminal results have none. | Own inverse diff plus P4. |
+
+#### PART-02 — PR-authored rescope, IA-reviewed return
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 02.1 | Make PR implementation the proposal/request author in PR-20/30/35, RS-10 and RS-30. RS-10 is an optional authoring aid used by that author, not a handoff to IA or Isis for proposal authorship. RS-20 remains the distinct whole-change IA reviewer. Replace contradictory rescope ownership in PR-40 and every shared clause in the 20-member cohort, including DOC-20's current IA-authored RS-10 branch. No Isis author, reviewer or extra approval is inserted in rescope. | Nathan's exact rescope ruling; D23-C | P02-01–05. Fail an IA-authored proposal approved by IA, any Isis rescope hop, or a generic “finding author” clause that permits the same substitution. Preserve Isis's separate Specification/whole-Plan/remediation/closure roles outside rescope. | P4. |
+| 02.2 | Keep pre-Proceed planning's actual native return without invented Proceed/PR fields. APPROVE after PR-30_PREPUBLICATION returns directly to PR-30; APPROVE after PR-30_POSTPUBLICATION or PR-35 uses RS-40 to resume that exact phase and existing PR. REVISION_REQUIRED returns through RS-30 to the originating PR author and then IA. REJECT/IN_SCOPE_REPAIR retain the originating repair phase; Specification/product-intent decisions return to Nathan. An external finding without a lawful recoverable PR author remains with its actual owner/Nathan; never fabricate a PR or give IA rescope authorship to fill the gap. | §A.9; existing RS phase contract and D23 | P02 cases, all three phase values, original Proceed and immutable-base checks. Rebuild RS/source branch conditions and registry interfaces; no new resume prompt, plan restart, accepted-final rerun or PR-50 route. | Own inverse diff plus P4. |
+
+#### PART-03 — Usable Ops tasks and evidence
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 03.1 | OPS-10 must instantiate PF27 §3 completely. Carry discovered supported commands/one executable artifact when required, exact substitutions and target facts, or a precise supported non-shell procedure. Include prerequisites, allowed effects, step success/failure proof, stop/recovery, temporary working-output location and final governed publication procedure. For scripted tasks require a safe rehearsal of the same executable artifact; distinguish rehearsal from actual execution and report when rehearsal cannot safely run. Corrected instructions are a complete successor task. | PF27 §3; PF06 §0.2; AF-016/018/020 | P03-01/02. A task with guessed commands, unresolved decisive placeholders, missing evidence/stop/recovery, a different rehearsal artifact or an unsupported “dry-run” switch cannot be READY. No live Ops rehearsal is performed in this maintenance cycle. | P4. |
+| 03.2 | Replace the six prospective `artifacts/ops/` references in OPS-10/20 with PF27's `audit/ops/<epic-id>/<task_id>/` contract. Remove the “no repository evidence” completion fallback. OPS-20 captures actual action/output/status and preserves failed evidence; a complete final set is admitted only by the task's supported validation/publication procedure. OPS-30 verifies required stored proof and returns receipt/progress. Apply the same evidence principles to ESC-25 only when its discovery task actually authorizes Ops effects. | PF27 §3; PF06 §0.2; D5 | P03-03/04/06. Fail missing stored proof or partial-output overclaim. A retained-path manifest may justify historic alternate paths; no history is moved or rewritten merely to normalize names. A copy command alone does not prove atomic publication. | Own inverse diff plus P4. |
+| 03.3 | Supply concise proposed PO authorization wording and an easy place to reference the actual instruction. Never require the PO to reproduce a template verbatim, compose a receipt or grant a redundant generic approval. Preserve all real task-specific dispatch predicates and delegated-execution boundaries. Reconcile author/operator/receipt registry assertions and IA guidance. | Nathan's Ops usability scope; PF06/PF27 delegation | P03-05 and a missing-authorization negative case: supplied template text does not authorize a run; an adequate actual task-specific go-ahead is not refused for different wording. | P4. |
+
+#### PART-04 — Kronos authors; the PO controls execution
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 04.1 | QA-50/60/80 retain Kronos Plan/step authorship; QA-70 checks the contract; QA-90 authors the selected complete task collection. State “authored; not executed” whenever no actual run occurred. Preserve selected ready and dependency-waiting members, original order where dependencies permit, actual attempts and genuine missing-selection handling. Do not impose a fixed collection cap. | Nathan's QA ruling; current QA collection contracts | P04-01/03. Reject an authored task or rehearsal presented as the requested run, a selection narrowed to ready members, or an invented aggregate PASS. | P4. |
+| 04.2 | Replace QA-100's actor exclusion “not Kronos acting as the executor” and all compulsory executor/session-identity prerequisites. Execution may use the PO's chosen human/agent/context/venue within actual task authority. Do not force a combined author/operator session or bar one solely by identity. Preserve actual operations, source/environment, task/step/attempt and evidence lineage; known executor facts may be recorded but an identity is not a prerequisite. QA-110 remains the review activity and execution itself grants no acceptance authority. | Nathan's express execution latitude; PF06 §0.2; PART-07 | P04-02/04/05 and P07-06. The five QA-100 execution-result states still route to QA-110. No routing repair is claimed: AF-024-QA-RETURN is withdrawn because the observation was erroneous. Legitimate QA-110 retry/missing-evidence returns remain. | Own inverse diff plus P4. |
+
+#### PART-06 — Indexing belongs in QA step instructions
+
+| Step | Target and exact edit | Authority | Verification that can fail | Rollback |
+|---|---|---|---|---|
+| 06.1 | Require QA Guide/Plan/task authors to specify each step's actual evidence outputs, canonical destination, required registration set, canonical writer or explicitly owned writer handoff, index/source/manifest dependencies, read-only checks and the proof returned to QA-110. Include indexing as work in the authored step, not a conditional paragraph activated only by a later “ledger-bound” claim. Batch publication may implement several steps' indexing only with an explicit per-step mapping and completion condition. | Nathan's required-indexing ruling; PF19 §§4.4.3–4.4.5; AGENTS canonical-writer ownership | P06-01/03/04. Missing writer/registration/verification/return instructions make the task incomplete. Preserve real canonical primary/manifest bindings; do not invent index rows for transient scratch or token claims. | P4. |
+| 06.2 | QA-100 reports actual registration and verification evidence or the exact unresolved required work. QA-110 checks the required source/Index/Mirror lookups and manifest/log mapping before treating that evidence obligation as complete. QA-120 and closure consumers carry the actual indexing status. Missing indexing is incomplete required work or the applicable tooling failure, not optional paperwork, behavior failure by assumption, or permission to rerun valid QA. | Nathan's decision; PF19 §9.2.15.6 and existing result semantics | P06-02–05. Files/path proofs alone cannot prove registration. Verify the real authorized writer is used; no manual edits to governed indexes/mirrors/proofs and no guessed helper API. Preserve the later EPIC040 resolution. | Own inverse diff plus P4. |
+
+The QA instructions must resolve the current canonical writer and supported arguments when the actual task is authored. At this source baseline, `AGENTS.md` names `tools/evidence/update_evidence_index.py` as the writer and its `--check` interface, `tools/evidence/orientation_demo.py --check`, `tools/evidence/validate_evidence_paths.py`, `ci/checks/check_mirror_schema.sh` and `tools/evidence/check_lf_endings.py` as relevant checks. This maintenance PLAN executes none of those writers and assumes no run-specific parameters. The step must state the real required registration set; indexing does not mean automatically registering every temporary or supplementary file.
+
+#### PART-08 — Explicit excluded disposition
+
+Step 08.1 has **planned disposition NOT_APPLICABLE for this execution scope**, because AF-013 and any skill reconciliation remain unmeasured under the user's no-skill exception. Keep ITEM-08 and PART-08 in the frozen record and state the reason in §E if execution is later authorized. Do not mark AF-013 resolved, inspect a skill, invent a relay score, build a substitute, package/install anything or quote an unmeasured cost as zero. A later measured skill change requires its own authorized scope, linked to this Modification; this PLAN does not create it. Verification: P08-01 and the changed-surface ledger contain no skill reads or writes. Rollback: none; no skill action is planned.
+
+### P6. Behavioral verification and old-rule search
+
+[The acceptance cases](evidence/20261009-gcfpe-latest-alpha-analysis/plan/acceptance-cases.json) contain **39 explicit input/expected-result cases**, all marked **SPECIFIED / NOT_RUN**. They are executable-review requirements, not claimed live QA, observed prompt behavior or already-shipped tests.
+
+For each changed rule, add the appropriate required-output/input/failure assertion to the existing registry and test a positive case plus the named violating case through the shipped validator. Use a mutation of the in-memory candidate text/contract only; preserve live bodies and never create a standing prompt corpus. A literal/regex guard may establish presence but cannot alone establish author/reviewer independence, source truth, correct dynamic routing, actual execution or evidence indexing. Those claims need the behavioral case and actual gate/readback evidence. No unobserved runtime claim is made from a fictional walkthrough.
+
+Search the complete live member set and affected controls by broad concept, then classify permitted exceptions:
+- role/session/identity/continuity/owner/binding/restart language, including terminal “identity missing” branches;
+- proposal/rescope/author/reviewer/return/Isis/IA references;
+- review/approve/accept/readiness/close/complete and the substantive canon basis;
+- Ops instruction/evidence/path/publication/rehearsal/authorization language;
+- QA author/execute/run/result/selection/attempt, evidence/manifest/index/mirror/register and required-work completion.
+
+Permitted exceptions are actual historical provenance, non-session task/artifact/PR identity, explicit user context choices, independent-role separation, real source/authority conflicts, historical accepted evidence mappings, non-PR Isis duties and dated superseded source text clearly marked as history. Every unresolved surviving contradiction fails the affected rule check; do not whitelist a paragraph merely because it also contains the new wording.
+
+### P7. Publication, readback and Product Owner actions
+
+After approval and capability resolution, apply the part sequence with a single writer, one complete affected-surface ledger, a bounded freeze and full readback after every changed Notion page. Use the connector's targeted `update_content` operation on freshly fetched, uniquely anchored sections; preserve child pages and unrelated blocks. Do not send a full-page replacement where a targeted edit suffices. Page IDs, titles and edit observations come from actual readbacks, never inferred success.
+
+The final repository/control steps are:
+1. Validate all affected source parts and non-derived registry changes, rebuild/derive through the established tools, run required guards and injected regressions, and record precise coverage/proof tokens. Publish one coherent implementation/control PR for the approved parts; do not merge it.
+2. Reconcile the Flow Index, relevant hubs, PE Metaprompt, catalog/register maintenance bindings and successor operating-procedure pointer to the same approved contracts. Preserve selection, historical records, the unaffected maintenance member and exact current member identities.
+3. Nathan merges the implementation/control PR. At the permitted post-merge checkpoint, read files on `main` and the changed live pages, compare their substantive approved content and rerun the named closing gates. A commit subject or PR status alone is not completion evidence.
+4. Publish the final §E dispositions and evidence: every step/item is VERIFIED, BLOCKED, NOT_RUN or NOT_APPLICABLE with a reason. A part is complete only when all of its required surfaces agree. Return any final record PR for Nathan's merge and verify its landed files afterward.
+
+Nathan's actions are therefore explicit PLAN approval (including P3's in-place choice and the disclosed no-skill gap's disposition), manual PR merges, and any page-history restoration after a failure. **No install, release promotion, archival, runtime launch, QA/Ops execution or PF-canon edit is included.** Merging PR #598 preserves the planning record; it approves none of those acts by itself.
+
+### P8. Dry run, open findings, cost and return
+
+Available checks and unavailable gates are recorded in [plan/read-only-checks.md](evidence/20261009-gcfpe-latest-alpha-analysis/plan/read-only-checks.md). The authoritative record command is:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 docs/prompt_ecosystem_management/modification_validate.py docs/ephemeral/modifications/
+```
+
+The repository closure command is run against all 55 IDs; the new [closure summary](evidence/20261009-gcfpe-latest-alpha-analysis/plan/closure-summary.json) records computed unions from this PLAN's cohorts:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 docs/prompt_ecosystem_management/closure.py <PROMPT_ID> --json
+```
+
+The management source documents identify the graph build command `python3 scripts/graph_parts.py build docs/graph/parts "$SCRATCH/graph.md"` and the body-validation `--bodies-stdin` interface in `prompt-validation-procedure.md`. Their scripts live in skills. Their installed paths, compatibility, registry derivation entry point and regression invocation cannot be verified without the access Nathan excluded. A documented illustrative command is not a verified installed capability.
+
+| Finding | Path, likelihood and consequence | Disposition and owner |
+|---|---|---|
+| PLAN-G1 — skill-owned execution gates unavailable | Normal path; certain under the current exception. Graph build/derivation, full prompt/registry/interface validation, skill compatibility and injected-regression execution cannot be established. Proceeding while calling them passed would misstate coherence. | Required capability gap, **OPEN**. No ecosystem write is authorized by this incomplete dry run. Nathan must supply an allowed execution/verification path or explicitly decide the policy exceptions; a waiver cannot manufacture missing builder capability. No skill was accessed and no substitute is invented. |
+| PLAN-L1 — independent FULL review not run | Review assurance; review-template authorship independence is not demonstrated. The session's higher-priority delegation restriction permits no unsolicited subagents, and Nathan has not requested them. | **NOT_RUN**, disclosed. The repository review template's two fresh reviewers were not spawned; no author self-review is labeled independent. No FULL or DIFF_CHECK round is recorded. |
+| PLAN-L2 — in-place publication choice | Publication path; deterministic if left unresolved. Applying D23's old exception automatically would imply authority the dated plan did not grant. | **PROPOSED**, P3 explicitly asks for this cycle's authorization within eventual PLAN approval. No page is edited while it remains proposed. |
+| PLAN-L3 — skill-dependent compatibility remains unknown | Integration path; likelihood unmeasured. A supporting installed skill may still expect the old identity or output contract. | Listed limitation under the no-skill exception. Excluding AF-013 does not prove all seven prompt parts skill-compatible; do not call ecosystem completion until its agreed disposition is recorded. |
+| PLAN-L4 — prospective coverage is not runtime proof | Runtime path; likelihood unmeasured. Static checks cannot establish that an agent follows the repaired behavior. | Accepted-risk candidate for approval, not claimed accepted yet. Preserve observed failures for later authorized focused validation; do not rerun EPIC040 or revive the withdrawn QA-return observation. |
+
+The session has prepared the plan and performed available source/record checks. It has not completed the all-gates normal-path dry run required before a FULL review, so it does not use `PLANNED` or request EXECUTE as though those conditions passed. D26's caps remain at two FULL reviews and one repair DIFF_CHECK, with no new “clean” exit condition. Resume an unapproved stopped plan in a dated successor section, preserving this issued section.
+
+**Estimate.** The original PLAN allowance remains 1.5–3 hours / 80,000–160,000 tokens, including a bounded review round. This authoring pass remained within that allowance; exact token expenditure is unavailable and is not invented. The 3–6 hour / 140,000–300,000-token EXECUTE estimate remains provisional for prompt/control work with usable gates. Skill work, gate recovery, independent-review authorization and PO waiting time are excluded, not priced at zero. Resolve PLAN-G1 before presenting an unconditional execution estimate.
+
+**Remaining interaction estimate:** one PLAN approval, one bounded PLAN review round and up to three manual merges (record, implementation/control, final record) = **five baseline round trips**, before any additional decision needed to resolve PLAN-G1. The in-place choice can be settled in that same PLAN approval. ANALYZE approval has already occurred and is not counted again; merging the current record may be combined with a later record checkpoint where permitted. No install or skill-review cycle is priced.
+
+**Result: PRODUCT_OWNER_ACTION_PENDING — PLAN content prepared, capability/review limits disclosed.** The completed PLAN work in this turn is this §P, the exact surface matrix, 39 acceptance cases, computed closure summary and read-only check evidence. They are published to the existing record PR. EXECUTE has not begun.
