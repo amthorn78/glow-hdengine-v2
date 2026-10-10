@@ -54,3 +54,37 @@ The candidate catalog's final summary was updated and read back at `2026-10-10T2
 `proposed-pr.md` contains the complete proposed draft-PR title, destination, branch and description. No retry, alternative GitHub write route or public PR creation followed the rejected push. The report is ready for explicit public-publication approval; formal repository publication remains uncompleted. A later approved push must read back the published branch and PR before claiming that gate.
 
 After the final DRY_RUN/FULL/DIFF_CHECK ledger and return text were written, the exact Modification-directory validator command above returned exit 0, **15/15 passed**. No source/runtime test was repeated to obtain that documentation result.
+
+## Approved public publication — 2026-10-10
+
+At 23:33 UTC, Nathan answered **“yes”** to the concrete question: “May I push that documentation branch and open its draft PR? Approval to enter PLAN remains separate.” The preceding message disclosed the automatic approval-review rejection and the public GitHub destination. This authorizes publication of these reviewed documents, not PLAN, EXECUTE, skill installation, source repairs, promotion or merge. Earlier pending-publication statements in this file describe superseded checkpoints.
+
+The authorized command-line push failed with `could not read Username for 'https://github.com'`; it did not publish a ref. The connected GitHub account was then used to publish the same ordered five repository trees. The connector creates commit metadata, so its commit IDs differ from the original local IDs; each tree ID was checked for exact equality before continuing. These are repository documentation trees, not hashes of native prompt bodies.
+
+| Original local review lineage | Published counterpart | Identical repository tree |
+|---|---|---|
+| `d3b30ccfd50bf970f1477811982f92df2ade3be2` | `f6b0022d624ab55e8f200aab91eec7506717a2ae` | `dc8cc3e451de93fb7e7f92aa81d4b48eae7fdf0c` |
+| `a67b910857f6c72d7d40df3019e9c727402c42ce` | `a9ea31142e738c8620cb4bd742e0fcfa138e76ff` | `e5a4272862c44a1be5a419c3a5036a339b640048` |
+| `7cbbc318f126beb10677151e731d5fde474bb10a` | `b7803e35ffc8a426179a70abbae5ea7f82566e2c` | `bebc3de0beb14bc104a4ab156702e144c418d744` |
+| `620fea09a6fc355f1b28136ea3da0aa3f71b23c3` | `2f863dc050d3b9e47f6f1fdfb3f53060c7ffd743` | `0a6bcc33ec91aab41fc402440035bf1e6a1554c6` |
+| `1cb96866b68bb67ce340d91ebc9cb484114da30a` | `94a4d377867b185c85d637160b23478ebe7e0858` | `c89208fc443ff36498e7371d820757ff28337a10` |
+
+The original local lineage is retained on `docs/20261010-gcfpe-analysis-local-review-lineage`. The publication branch remains `docs/20261010-modification-gcfpe-candidate-skill-analysis`. Original review pins in briefs and reviewer records are historical local identities; the table above resolves them to the content-identical published snapshots. No original reviewer record or verdict was rewritten.
+
+[Draft PR #600](https://github.com/amthorn78/glow-hdengine-v2/pull/600) was created at `2026-10-10T23:37:32Z`, with head `94a4d377867b185c85d637160b23478ebe7e0858` and base `main` at `1ea6a262032c3c4de19c38c549d737d72b03ec2f`. A subsequent PR read confirmed open, draft, unmerged, mergeable, five commits and 16 changed files. The required five description headings and D21-C statement were present. Neither reviewer requests nor merge actions were sent.
+
+### Publication readback
+
+All **16/16 complete published Markdown files** were fetched through GitHub at that head and compared with the original reviewed local file contents and Git blob identities: all matched. This includes the main record, both closure outputs, coverage, source identities, findings, checks, flows, publication/proposed-PR records and all six brief/review files. A separate Git fetch and `git diff --exit-code HEAD origin/docs/20261010-modification-gcfpe-candidate-skill-analysis` also returned exit 0, confirming the complete tree match before switching the local working branch to the published lineage.
+
+The combined-status endpoint returned `statuses: []`; the pull-request workflow endpoint returned `workflow_runs: []` for this publication head. No remote CI pass is claimed. The previously recorded local 15/15 structural result and bounded source checks retain their stated scope.
+
+The Notion summaries now link to PR #600. Readback confirmed:
+
+- Candidate catalog `3f44590a05eb8110aa69fe4189ad9abc`, last edit `2026-10-10T23:38:32.044Z`: published status, PR/analysis/flow/publication links, all three Mermaid diagrams, six open source findings and pending PLAN approval.
+- Alpha feedback `3df4590a05eb8111a6a5f67cb82f96f6`, last edit `2026-10-10T23:38:32.784Z`: PR link, completed documentation readback, pending PLAN approval and unresolved AF-013 integration.
+- Complete closing wrappers were returned for both pages. No release-register or prompt-body edit was performed.
+
+This successor receipt, the main record's §A.9 and the prepared-PR status note are publication metadata only, added after the content-verified head above. The final metadata publication is checked before the user return; its commit can be identified from this file's Git history without a self-referential commit receipt. The mode remains ANALYZE / PRODUCT_OWNER_ACTION_PENDING, with all approval fields empty and §P/§E unentered.
+
+After these publication-status edits, the Modification-directory validator was rerun: exit 0, **15/15 passed**. The source analysis and original reviewer records were unchanged.

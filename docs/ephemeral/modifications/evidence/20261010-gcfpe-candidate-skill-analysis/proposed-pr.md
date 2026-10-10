@@ -1,8 +1,10 @@
-# Prepared pull request — not opened
+# Prepared pull request — historical pre-publication checkpoint
 
 Proposed title: **docs: analyze GCFPE candidates with supplied skills**
 
 Repository: `amthorn78/glow-hdengine-v2`; base: `main`; head: `docs/20261010-modification-gcfpe-candidate-skill-analysis`; draft: yes. The repository is public. Publishing this branch and creating this draft PR await explicit approval after automatic approval review rejected the push. This prepared description creates no remote PR or permission to merge.
+
+**Publication successor — 2026-10-10:** Nathan subsequently approved public publication. [Draft PR #600](https://github.com/amthorn78/glow-hdengine-v2/pull/600) was opened with the description below. The preceding paragraph records the earlier preparation checkpoint; current publication evidence and the local-to-published commit mapping are in [publication.md](publication.md). PLAN approval remains pending.
 
 ## Why
 
