@@ -1,0 +1,159 @@
+{
+  "edge_indices": [
+    219,
+    220,
+    221
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESCOPE_PROPOSAL_PENDING_REVIEW"
+          ],
+          "branch_id": "product_owner_revision_return",
+          "condition": "actual correction authority is Nathan and no exact native decision route is already supplied; preserve his decision ownership and emit no continuation block",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [],
+          "branch_id": "revision_source_terminal",
+          "condition": "source, exact correction authority, target or owner identity is missing; preserve valid artifact and return the exact gap",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-30.md",
+            "section": "Required inputs"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "RESCOPE_PROPOSAL_PENDING_REVIEW"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESCOPE_PROPOSAL_PENDING_REVIEW"
+          ],
+          "branch_id": "product_owner_explicit_native_return",
+          "condition": "Nathan already supplied one exact selected native decision route with complete intake; preserve actual owner, same artifact type and manual gates; never invent IA approval, route PR-50 or bypass Alpha, merge or PF10 controls",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RESCOPE_PROPOSAL_PENDING_REVIEW"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESCOPE_PROPOSAL_PENDING_REVIEW"
+          ],
+          "branch_id": "ia_revision_return",
+          "condition": "actual correction authority is RS-20 REVISION_REQUIRED; preserve RESCOPE_REQUEST vs RESCOPE_PROPOSAL type and return to the same IA decision owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RESCOPE_PROPOSAL_PENDING_REVIEW"
+      ],
+      "to": "RS-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "RS-30",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8131bc61e346a46840e9?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "RS-30",
+    "lane": "RS",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Revise Bounded Work-Unit Rescope Proposal for the exact supplied change.",
+    "output_artifacts": [
+      "RESCOPE_REQUEST / RESCOPE_PROPOSAL"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81ed9fd3d2ef439ceaaf",
+      "release": "GCFPE-20260914.1",
+      "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "RS-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "Same originating PR implementation author revising the proposal; no approval authority.",
+    "result_states": [
+      "RESCOPE_PROPOSAL_PENDING_REVIEW"
+    ],
+    "sequence": 30,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 100926.1"
+  },
+  "state_route_order": [
+    "ia_revision_return",
+    "product_owner_revision_return",
+    "product_owner_explicit_native_return",
+    "revision_source_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

@@ -1,0 +1,245 @@
+{
+  "edge_indices": [
+    191,
+    192,
+    193,
+    194,
+    195
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "qa50_terminal",
+          "condition": "true source or authority stop has no runnable receiver",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "AUDIT_COMPLETE"
+          ],
+          "branch_id": "audit_complete",
+          "condition": "QA Audit is complete but a recoverable interruption prevented Plan completion",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "AUDIT_COMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked_plan_recovery",
+          "condition": "Audit is complete and the planning gap is recoverable",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "AUDIT_COMPLETE",
+        "BLOCKED"
+      ],
+      "to": "QA-60",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PLAN_PENDING"
+          ],
+          "branch_id": "plan_pending",
+          "condition": "both QA Audit and QA Plan are complete and separately read back",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_PENDING",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked_complete_pending_plan",
+          "condition": "the pending QA Plan is complete and ready for review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PLAN_PENDING",
+        "BLOCKED"
+      ],
+      "to": "QA-70",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked_initial_denial",
+          "condition": "an initial pending QA Plan was denied by QA-70 with exact redlines",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "QA-80",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "existing_approval_reuse",
+          "condition": "a subsequent still-valid actual QA-70 approval of this exact Plan already exists and its complete native task-creation intake is available; preserve Isis decision and same Kronos lineage without new Plan/review/task execution",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [],
+      "to": "QA-90",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-50",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb815d89d3e602973d83ad?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "QA-50",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Whole-Change QA Audit and Plan for the exact supplied change.",
+    "output_artifacts": [
+      "QA_AUDIT / QA_PLAN"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81a3ac91f602bad8cfa2",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-50 — Create Whole-Change QA Audit and Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "QA-70",
+      "QA-80",
+      "QA-60"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Kronos, the continuing QA authority for this entire change.",
+    "result_states": [
+      "AUDIT_COMPLETE",
+      "PLAN_PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 50,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-50 — Create Whole-Change QA Audit and Plan — 100926.1"
+  },
+  "state_route_order": [
+    "existing_approval_reuse",
+    "plan_pending",
+    "audit_complete",
+    "blocked_initial_denial",
+    "blocked_plan_recovery",
+    "blocked_complete_pending_plan",
+    "qa50_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

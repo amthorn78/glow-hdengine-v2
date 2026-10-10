@@ -1,0 +1,219 @@
+{
+  "edge_indices": [
+    82,
+    83,
+    84,
+    126,
+    127
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DENY"
+          ],
+          "branch_id": "deny",
+          "condition": "return to remediation author; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "DENY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DENY"
+      ],
+      "to": "ESC-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "remediation_review_terminal",
+          "condition": "native continuation identity, Product Owner/source, or authority predicate is unresolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE",
+            "APPROVE_AS_CHANGED"
+          ],
+          "branch_id": "remediation_non_pr_return",
+          "condition": "recorded remediation return is a non-PR native delivery owner; that receiver reads current PF10",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "APPROVE_AS_CHANGED"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE",
+            "APPROVE_AS_CHANGED"
+          ],
+          "branch_id": "remediation_pr30_return",
+          "condition": "recorded remediation return is PR-30_PREPUBLICATION or PR-30_POSTPUBLICATION; resume PR-30 directly on the qualifying approval, preserving actual vehicle state",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "APPROVE_AS_CHANGED"
+      ],
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE",
+            "APPROVE_AS_CHANGED"
+          ],
+          "branch_id": "remediation_pr35_return",
+          "condition": "recorded remediation return is PR-35; resume PR-35 directly on the qualifying approval in the same open PR",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "APPROVE_AS_CHANGED"
+      ],
+      "to": "PR-35",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    }
+  ],
+  "id": "ESC-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8173905cc6d17a40457b?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "ESC-40",
+    "lane": "ESC",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review and Return Approved Remediation for the exact supplied change.",
+    "output_artifacts": [
+      "REMEDIATION_REVIEW"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81efb6d4cd8d02ba9756",
+      "release": "GCFPE-20260914.1",
+      "title": "ESC-40 — Review and Return Approved Remediation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "ESC-30",
+      "PR-30",
+      "RS-40",
+      "IA-40",
+      "IA-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, the continuing Lead Developer and remediation decision owner.",
+    "result_states": [
+      "APPROVE",
+      "APPROVE_AS_CHANGED",
+      "DENY"
+    ],
+    "sequence": 40,
+    "session_class": "ROLE_CONTINUING",
+    "title": "ESC-40 — Review and Return Approved Remediation — 100926.1"
+  },
+  "state_route_order": [
+    "remediation_pr30_return",
+    "remediation_pr35_return",
+    "remediation_non_pr_return",
+    "deny",
+    "remediation_review_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

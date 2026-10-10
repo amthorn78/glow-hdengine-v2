@@ -1,0 +1,602 @@
+{
+  "scope": "In-memory full published prompt readbacks; body text not saved",
+  "rows": [
+    {
+      "id": "CF-C-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-C-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-C-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-C-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-E-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-E-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-E-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-E-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CF-PO-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-C-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-E-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-E-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-E-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "CL-E-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "DOC-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "DOC-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "ESC-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "ESC-25",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "ESC-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "ESC-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "IA-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "IA-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "IA-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "IA-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "IA-50",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "IA-60",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "MGR-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "OPS-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "OPS-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "OPS-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "PR-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "PR-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "PR-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "PR-35",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "PR-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "PR-50",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-100",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-110",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-120",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-50",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-60",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-70",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-80",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "QA-90",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "RS-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "RS-20",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "RS-30",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "RS-40",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    },
+    {
+      "id": "UTIL-10",
+      "checks": {
+        "full_readback": true,
+        "role_artifact": true,
+        "same_parent": true,
+        "identity": true,
+        "no_retired_handoff": true,
+        "no_old_member_urls": true
+      }
+    }
+  ],
+  "all_pass": true,
+  "assertions": 324,
+  "comparison_note": "Prompt ID comparison accepts the pre-existing inline-code header dialect. The initial unformatted literal check was too narrow; no prompt identity changed or needed repair."
+}

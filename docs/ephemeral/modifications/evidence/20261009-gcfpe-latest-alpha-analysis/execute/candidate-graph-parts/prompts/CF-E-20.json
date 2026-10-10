@@ -1,0 +1,144 @@
+{
+  "edge_indices": [
+    19,
+    20,
+    21
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "invalid_kickoff_recovery",
+          "condition": "kickoff is incomplete, defective, or contradictory and the kickoff owner can correct it",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "CF-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SPECIFICATION_PENDING"
+          ],
+          "branch_id": "specification_pending",
+          "condition": "complete pending Epic Specification is ready for Thoth review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "SPECIFICATION_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SPECIFICATION_PENDING"
+      ],
+      "to": "CF-E-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "specification_authoring_terminal",
+          "condition": "unrecoverable source, identity, or authority blocker",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CF-E-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb813cb9cbc61c225b88e2?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "CF-E-20",
+    "lane": "CF-E",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Epic Specification for the exact supplied change.",
+    "output_artifacts": [
+      "EPIC_SPECIFICATION"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb810eb177f7dced41bc8f",
+      "release": "GCFPE-20260914.1",
+      "title": "CF-E-20 — Create Epic Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "CF-E-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, the continuing Lead Developer and Specification author.",
+    "result_states": [
+      "SPECIFICATION_PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 20,
+    "session_class": "ROLE_CONTINUING",
+    "title": "CF-E-20 — Create Epic Specification — 100926.1"
+  },
+  "state_route_order": [
+    "specification_pending",
+    "invalid_kickoff_recovery",
+    "specification_authoring_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

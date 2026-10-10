@@ -1,0 +1,246 @@
+{
+  "edge_indices": [
+    140,
+    141,
+    142,
+    143,
+    144
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "receipt_terminal",
+          "condition": "the exact native recovery owner or decisive prerequisite is unresolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "remediation_discovery",
+          "condition": "the actual receipt and remediation package explicitly require bounded discovery",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [
+            "OPS-30 -> ESC-25",
+            "ESC-25 result -> ESC-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "ESC-25",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_corrective_task",
+          "condition": "bounded correction or retry begins with a new corrective OPS_TASK; OPS-20 follows only after that task is complete",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [
+            "OPS-30 -> OPS-10",
+            "complete corrective OPS_TASK -> OPS-20",
+            "OPS_EXECUTION_RESULT -> OPS-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "OPS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_native_consumer",
+          "condition": "accepted receipt returns to the exact Plan-named downstream consumer or same creator IA",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "receipt_native_owner",
+          "condition": "a blocked, contradictory, incomplete, or access-limited receipt has an exact native recovery owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT",
+        "REJECT"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "OPS-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "material_boundary",
+          "condition": "the actual receipt establishes a material scope, architecture, requirement, or design boundary; a lawful originating PR implementation author is identified, independent of the IA reviewer; otherwise return the unresolved assignment to the Product Owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [
+            "OPS-30 -> RS-10",
+            "RS-10 complete proposal -> RS-20",
+            "RS-20 REVISION_REQUIRED -> RS-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/OPS-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "OPS-30",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "OPS-30",
+    "lane": "OPS",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review Ops Execution Receipt for the exact supplied change.",
+    "output_artifacts": [
+      "OPS_TASK_RECEIPT"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb816f91c9c394f9c9fa57",
+      "release": "GCFPE-20260914.1",
+      "title": "OPS-30 — Review Ops Execution Receipt — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "OPS-10",
+      "OPS-20",
+      "ESC-30",
+      "RS-10",
+      "RS-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same Implementation Agent (IA) who created the Ops Task.",
+    "result_states": [
+      "ACCEPT",
+      "REJECT"
+    ],
+    "sequence": 30,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "OPS-30 — Review Ops Execution Receipt — 100926.1"
+  },
+  "state_route_order": [
+    "accept_native_consumer",
+    "reject_corrective_task",
+    "remediation_discovery",
+    "material_boundary",
+    "receipt_native_owner",
+    "receipt_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

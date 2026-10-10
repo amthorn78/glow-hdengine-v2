@@ -1,0 +1,319 @@
+{
+  "artifact_type": "GCFPE_PLAN_ACCEPTANCE_CASES",
+  "date": "2026-10-09",
+  "status": "SPECIFIED_NOT_EXECUTED",
+  "cases": [
+    {
+      "id": "P01-01",
+      "part": "PART-01",
+      "input": "PR-40 ACCEPT; next dependency-ready unit is an ordinary PR.",
+      "expected": "IA receives PR-10 with the selected work-unit instruction intake; no automatic Proceed.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P01-02",
+      "part": "PART-01",
+      "input": "PR-40 ACCEPT; next dependency-ready unit is Ops.",
+      "expected": "IA receives OPS-10 to author the task; OPS-20 execution is not authorized by ACCEPT.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P01-03",
+      "part": "PART-01",
+      "input": "PR-40 ACCEPT; next unit is final repository documentation.",
+      "expected": "IA receives DOC-10. If the accepted unit itself is final documentation, IA receives DOC-20 first.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P01-04",
+      "part": "PART-01",
+      "input": "No remaining delivery unit; all required documentation verification exists.",
+      "expected": "Existing readiness entry may resolve QA-10 only with its full intake; otherwise a truthful terminal/pending return, no invented PR or closure.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P01-05",
+      "part": "PART-01",
+      "input": "Next ordered unit has unmet dependencies, or two units cannot be ordered from the approved Plan.",
+      "expected": "Do not skip to a convenient unit or invent an order; identify the blocking owner and preserve ACCEPT.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P01-06",
+      "part": "PART-01",
+      "input": "PR-40 REJECT for an in-scope implementation defect.",
+      "expected": "Existing D23-F PR-20 re-plan/new Proceed remains; do not apply ACCEPT routing.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P02-01",
+      "part": "PART-02",
+      "input": "PR-30 before publication authors a rescope; IA approves.",
+      "expected": "PR author -> RS-20 IA -> PR-30; preserve original Proceed; no RS-40, Isis, open PR or replacement Plan.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P02-02",
+      "part": "PART-02",
+      "input": "PR-30 after publication or PR-35 authors a rescope; IA approves.",
+      "expected": "RS-40 resumes the recorded PR phase and existing PR; no second approval by Isis.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P02-03",
+      "part": "PART-02",
+      "input": "IA returns REVISION_REQUIRED.",
+      "expected": "RS-30 is used by the originating PR implementation author and returns the same artifact type to RS-20.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P02-04",
+      "part": "PART-02",
+      "input": "Proposal is in scope, rejected, or requires a Specification/product-intent decision.",
+      "expected": "IN_SCOPE_REPAIR/REJECT retain the actual repair phase and no addendum; Specification decision returns to Nathan.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P02-05",
+      "part": "PART-02",
+      "input": "PR-20 detects a boundary before Proceed; another native stage has no recoverable PR author.",
+      "expected": "PR-20 planning lineage remains valid without future execution fields; an unresolved non-PR author boundary returns to its actual owner/Nathan, never invents a PR or assigns IA/Isis as rescope author.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P03-01",
+      "part": "PART-03",
+      "input": "A scripted Ops task is complete but its rehearsal used a different executable or unresolved parameters.",
+      "expected": "Task is not READY; exercise the same supported artifact within safe rehearsal authority, without claiming the live task ran.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P03-02",
+      "part": "PART-03",
+      "input": "Task uses a supported non-shell procedure.",
+      "expected": "Complete reproducible instructions and evidence are sufficient; no invented shell interface.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P03-03",
+      "part": "PART-03",
+      "input": "Task has no stored evidence, or only narrative success.",
+      "expected": "No OPS completion/ACCEPT; canonical audit/ops destination and required attributable proof are owed.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P03-04",
+      "part": "PART-03",
+      "input": "A live operation fails and leaves partial output.",
+      "expected": "Stop affected execution, retain failed evidence/residual state, do not publish partial output as a complete final set or overwrite prior accepted evidence.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P03-05",
+      "part": "PART-03",
+      "input": "Nathan supplies an actual task-specific go-ahead; proposed approval wording is also present.",
+      "expected": "Record the actual authorization once; the template alone is not approval; do not demand verbatim wording or a second generic approval.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P03-06",
+      "part": "PART-03",
+      "input": "Historical evidence uses a permitted alternate retained path.",
+      "expected": "Preserve it with canonical mapping; do not move history merely to normalize the path.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P04-01",
+      "part": "PART-04",
+      "input": "Kronos authors a selected collection containing ready and dependency-waiting steps.",
+      "expected": "Return every selected authored member, explicit not-executed status, and unchanged selection/attempt lineage.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P04-02",
+      "part": "PART-04",
+      "input": "PO chooses human, agent, own shell, or Kronos context to execute and supplies no executor/session identity.",
+      "expected": "No identity or venue gate is introduced; actual task permissions, inputs, outputs and evidence still govern.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P04-03",
+      "part": "PART-04",
+      "input": "A task, script or rehearsal exists but the requested run has not occurred.",
+      "expected": "State task authored/not executed/no run evidence, never COMPLETE execution.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P04-04",
+      "part": "PART-04",
+      "input": "QA-100 returns COMPLETE, PARTIAL, BLOCKED, FAILED or NOT_EXECUTED.",
+      "expected": "Every execution-result state returns to QA-110; no task author/operator acceptance or direct repair routing.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P04-05",
+      "part": "PART-04",
+      "input": "One legitimate retry or an already-authored dependency-waiting task becomes runnable.",
+      "expected": "Preserve current QA-110 -> QA-90/QA-100 branch and attempt limits; do not treat this as the withdrawn return defect.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P05-01",
+      "part": "PART-05",
+      "input": "Review is otherwise favorable but Canon relied on is missing, empty or topic-incomplete.",
+      "expected": "Positive approval/readiness/acceptance/closure is unavailable; name the actual missing read/topic.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P05-02",
+      "part": "PART-05",
+      "input": "A complete heading lists documents that were not read, or unrelated sections.",
+      "expected": "Fail substantive support; a heading/literal match is insufficient.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P05-03",
+      "part": "PART-05",
+      "input": "The decisive topic is rails; relevant source was actually read and canon is silent on a separate topic.",
+      "expected": "Name actual rails sections and truthful searched silence for the separate topic; do not invent a rule or waive an unresolved conflict.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P05-04",
+      "part": "PART-05",
+      "input": "CL-20 prepares a memo for an already closed change; RS-40 resumes PR-30 rather than PR-35.",
+      "expected": "CL-20 carries the existing decision's canon basis and its own actual reads without re-closing; RS-40 creates no new approval gate for the PR-30 branch.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P06-01",
+      "part": "PART-06",
+      "input": "QA step describes execution and logs but omits indexing/writer/verification/return instructions.",
+      "expected": "Authored step is incomplete; do not make indexing conditional on a later ledger-bound claim.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P06-02",
+      "part": "PART-06",
+      "input": "Evidence files and path proofs exist but a required source/Index/Mirror lookup is absent.",
+      "expected": "Required evidence work is incomplete/tooling-blocked as applicable; QA-110 receives the actual gap, no claimed indexing PASS.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P06-03",
+      "part": "PART-06",
+      "input": "A bounded cluster has run but selected dependency-waiting steps have not.",
+      "expected": "Index actual required produced evidence and preserve NOT RUN members; no aggregate run completion.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P06-04",
+      "part": "PART-06",
+      "input": "Evidence cannot be indexed by the operator under the supplied authority.",
+      "expected": "Preserve execution evidence and identify the authorized evidence writer with QA-110 return; no manual governed-file editing or invented identity prerequisite.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P06-05",
+      "part": "PART-06",
+      "input": "EPIC040 historical index gap is cited as the reason for new work.",
+      "expected": "Record its later resolution; do not rerun QA or re-register old evidence under this prompt-maintenance cycle.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-01",
+      "part": "PART-07",
+      "input": "Only receiving role/name and complete durable artifacts are known.",
+      "expected": "Handoff is usable without a platform session ID; receiving side chooses context.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-02",
+      "part": "PART-07",
+      "input": "Continuation enters a different session with the same valid work/decision lineage.",
+      "expected": "Recover from artifacts; do not create new authority, duplicate a result, or discard prior attempts.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-03",
+      "part": "PART-07",
+      "input": "The selected receiver is also the author where independent review is required.",
+      "expected": "Reject self-approval on the role/authority facts; absence of a persistent session ID does not remove independence.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-04",
+      "part": "PART-07",
+      "input": "PR-30 hands off to PR-35 without a preallocated platform ID.",
+      "expected": "Preserve two dedicated phase sessions and same work unit/PR; PO/receiving operator assigns PR-35; no automatic session creation or dispatch.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-05",
+      "part": "PART-07",
+      "input": "Historical evidence records real session IDs or an explicit user instruction retains a context.",
+      "expected": "Keep true provenance and explicit user direction; do not blanket-delete identity text.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-06",
+      "part": "PART-07",
+      "input": "Shared graph/template or Notion control still requires exact executor/session identity for QA.",
+      "expected": "Fail the cross-surface check even if QA-100's local wording was fixed.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P07-07",
+      "part": "PART-07",
+      "input": "Handoff includes menu, branch/head payload, or decisions stored only in chat.",
+      "expected": "Fail existing compact handoff/artifact rules; emit one actual receiver with artifact paths and required PR reference only.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    },
+    {
+      "id": "P08-01",
+      "part": "PART-08",
+      "input": "Reusable relay scoring or skill reconciliation is requested during this execution.",
+      "expected": "NOT_APPLICABLE for this bounded no-skill plan; unmeasured, deferred, no skill read/edit/package/install or invented substitute.",
+      "execution_status": "NOT_RUN",
+      "proof_limit": "Acceptance specification, not an observed runtime or shipped-validator result."
+    }
+  ]
+}

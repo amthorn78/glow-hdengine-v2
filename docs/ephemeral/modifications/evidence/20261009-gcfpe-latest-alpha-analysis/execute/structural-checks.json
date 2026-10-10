@@ -1,0 +1,35 @@
+{
+  "scope": "Author structural checks of candidate source artifacts only; not a shipped graph build or runtime validation",
+  "checks": {
+    "55_exact_logical_members": true,
+    "all_edge_endpoints_resolved": true,
+    "edge_index_count_and_uniqueness": true,
+    "known_transport_values_only": true,
+    "state_vocabulary_preserved": true,
+    "all_qa100_return_edges_unchanged": true,
+    "all_qa100_states_return_qa110": true,
+    "pr40_concrete_plan_routes": true,
+    "no_prompt_inbound_to_pr50": true,
+    "node_bindings_match_observed_pages": true,
+    "global_role_artifact_handoff": true,
+    "rescope_author_roles": true,
+    "qa_executor_latitude": true,
+    "registry_all_55_rows": true,
+    "no_handwritten_derived_registry_fields": true,
+    "54_native_readbacks": true,
+    "authoring_control_readback": true,
+    "pr40_reject_routes_preserved_except_approved_rescope_author_guard": true
+  },
+  "nodes": 55,
+  "edges": 236,
+  "passed": 18,
+  "total": 18,
+  "not_run": [
+    "shipped graph assembly and registry derivation",
+    "shipped prompt/interface validators",
+    "injected regressions",
+    "independent FULL review",
+    "runtime QA/Ops"
+  ],
+  "check_scope_note": "Initial exact REJECT-edge comparison flagged the intentionally added RS-10 lawful-author guard. Read-only comparison confirmed that this one authorized predicate is the only difference; re-plan/instruction routing and every other field are preserved. No published body repair was needed."
+}

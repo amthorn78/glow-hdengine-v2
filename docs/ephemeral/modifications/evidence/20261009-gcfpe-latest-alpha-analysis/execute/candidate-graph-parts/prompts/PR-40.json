@@ -1,0 +1,490 @@
+{
+  "edge_indices": [
+    163,
+    164,
+    165,
+    166,
+    167,
+    168,
+    229,
+    230,
+    231,
+    232,
+    233,
+    234,
+    235
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PENDING"
+          ],
+          "branch_id": "pending_terminal",
+          "condition": "manual merge, repository fact, review result, or evidence remains unavailable and no runnable native owner prompt is resolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PENDING",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "PENDING"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "lineage_review_terminal",
+          "condition": "an in-scope correction lacks required repository authority/vehicle or another genuine Product Owner decision is required",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PENDING"
+          ],
+          "branch_id": "pending_native_owner",
+          "condition": "the exact Product Owner, evidence, PR, or IA recovery owner is known and can perform the bounded missing act",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PENDING"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_instruction_owner",
+          "condition": "the substantiated in-scope defect is in the IA-issued PR instruction",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "PR-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_replan",
+          "condition": "a precise in-scope implementation/review/corrected-code/PR-lineage defect in landed work requires a new per-PR plan for the same work unit, in a new top-level session Nathan creates, with a new Proceed",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "PR-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_material_boundary_proposal",
+          "condition": "a substantiated material change to the Epic-level commitment (D23-C) requires a new bounded rescope proposal; a lawful originating PR implementation author is identified, independent of the IA reviewer; otherwise return the unresolved assignment to the Product Owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [
+            "PR-40 -> RS-10",
+            "RS-10 complete proposal -> RS-20",
+            "RS-20 REVISION_REQUIRED -> RS-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_next_pr",
+          "condition": "the accepted unit is not awaiting DOC-20 verification and the approved ordered Plan selects an ordinary next PR whose dependencies are satisfied",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "PR-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_next_ops",
+          "condition": "the accepted unit is not awaiting DOC-20 verification and the approved ordered Plan selects the next Ops unit whose dependencies are satisfied; task authoring only",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "OPS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_finaldoc_instructions",
+          "condition": "the just-accepted unit is not awaiting DOC-20 verification and the approved ordered Plan selects a dependency-ready final documentation unit that has no instructions yet",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "DOC-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_documentation_verification",
+          "condition": "this just-accepted unit is the final documentation PR and its documentation completion verification is still due",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "DOC-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_qa_readiness",
+          "condition": "all required delivery and final documentation verification are complete and the full native QA-10 readiness intake is satisfied",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "QA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_pending_owner",
+          "condition": "accepted delivery is preserved but no next stage is executable; the exact lawful owner and complete package for the unmet dependency or ambiguous order are known",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept_terminal",
+          "condition": "accepted delivery is preserved but no lawful runnable receiver can be resolved or a genuine Product Owner decision is required",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+            "section": "Resolve the next approved Plan stage"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "PR-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "PR-40",
+    "lane": "PR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review PR Work-Unit Lineage for the exact supplied change.",
+    "output_artifacts": [
+      "PR_WORK_UNIT_LINEAGE_REVIEW"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb818786c5cb6051b4d634",
+      "release": "GCFPE-20260914.1",
+      "title": "PR-40 — Review PR Work-Unit Lineage — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "DOC-20",
+      "QA-10",
+      "PR-30",
+      "PR-10",
+      "RS-10",
+      "RS-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the designated PR reviewer for the complete work unit, operating read-only.",
+    "result_states": [
+      "ACCEPT",
+      "REJECT",
+      "PENDING"
+    ],
+    "sequence": 40,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "PR-40 — Review PR Work-Unit Lineage — 100926.1"
+  },
+  "state_route_order": [
+    "accept_next_pr",
+    "accept_next_ops",
+    "accept_finaldoc_instructions",
+    "accept_documentation_verification",
+    "accept_qa_readiness",
+    "accept_pending_owner",
+    "accept_terminal",
+    "reject_replan",
+    "reject_instruction_owner",
+    "reject_material_boundary_proposal",
+    "pending_native_owner",
+    "pending_terminal",
+    "lineage_review_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

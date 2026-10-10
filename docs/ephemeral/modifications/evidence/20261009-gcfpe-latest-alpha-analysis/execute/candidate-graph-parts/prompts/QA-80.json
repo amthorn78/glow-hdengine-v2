@@ -1,0 +1,129 @@
+{
+  "edge_indices": [
+    204,
+    205
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-80",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "WRONG_ROUTE_APPROVED_BASE"
+          ],
+          "branch_id": "wrong_route_terminal",
+          "condition": "approved-base rewrite refused and a complete lawful bounded-delta review intake is absent; identify the actual proposal owner without inventing a delta",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-80.md",
+            "section": "Required result and routing"
+          },
+          "state": "WRONG_ROUTE_APPROVED_BASE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "WRONG_ROUTE_APPROVED_BASE"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-80",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PLAN_PENDING_REVISED"
+          ],
+          "branch_id": "plan_pending_revised",
+          "condition": "complete corrected pending preapproval QA Plan returns to the same Isis reviewer",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-80.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_PENDING_REVISED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "WRONG_ROUTE_APPROVED_BASE"
+          ],
+          "branch_id": "existing_delta_review",
+          "condition": "approved-base rewrite refused but a complete existing explicit bounded delta, actual author, approval lineage and current PF10/addenda satisfy QA-70 APPROVED_QA_PLAN_DELTA_REVIEW intake; carry the existing delta unchanged",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-80.md",
+            "section": "Required result and routing"
+          },
+          "state": "WRONG_ROUTE_APPROVED_BASE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PLAN_PENDING_REVISED",
+        "WRONG_ROUTE_APPROVED_BASE"
+      ],
+      "to": "QA-70",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-80",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb818789e9ff3ffa9e06d8?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "QA-80",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Revise Whole-Change QA Plan for the exact supplied change.",
+    "output_artifacts": [
+      "QA_PLAN"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb813ba9a9dbd9a641d36c",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-80 — Revise Whole-Change QA Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "QA-70"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same Kronos who authored the Plan.",
+    "result_states": [
+      "PLAN_PENDING_REVISED",
+      "WRONG_ROUTE_APPROVED_BASE"
+    ],
+    "sequence": 80,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-80 — Revise Whole-Change QA Plan — 100926.1"
+  },
+  "state_route_order": [
+    "plan_pending_revised",
+    "existing_delta_review",
+    "wrong_route_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

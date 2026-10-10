@@ -1,0 +1,153 @@
+{
+  "edge_indices": [
+    227,
+    228
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "UTIL-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE"
+          ],
+          "branch_id": "incomplete_terminal",
+          "condition": "no selected native receiver can be resolved; do not invent one",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/UTIL-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "INCOMPLETE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "UTIL-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "complete",
+          "condition": "return the complete revised successor and REDLINE_APPLICATION_REPORT to the exact originating decision/review owner through the actual selected native prompt, with its complete receiver inputs.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/UTIL-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "ALREADY_APPLIED"
+          ],
+          "branch_id": "already_applied",
+          "condition": "every item is already applied with matching target/redline lineage and resulting content, and the exact complete successor/report resolves. Reuse them and return their existing lawful route; create no duplicate successor.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/UTIL-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "ALREADY_APPLIED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "INCOMPLETE"
+          ],
+          "branch_id": "incomplete_native_owner",
+          "condition": "return the complete checkpoint, exact unapplied or ambiguous item, evidence, owner and resume point to the exact redline/decision owner when that selected native receiver resolves.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/UTIL-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "INCOMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ALREADY_APPLIED",
+        "COMPLETE",
+        "INCOMPLETE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "UTIL-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81d997d1fd2b8d1b5042?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "UTIL-10",
+    "lane": "UTIL",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Apply Exact Redline to a Complete Artifact for the exact supplied change.",
+    "output_artifacts": [
+      "REVISED_TARGET_ARTIFACT / REDLINE_APPLICATION_REPORT"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81b89fbaf4b31a3ed2a9",
+      "release": "GCFPE-20260914.1",
+      "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the original author or explicitly authorized editor of the exact target.",
+    "result_states": [
+      "COMPLETE",
+      "INCOMPLETE",
+      "ALREADY_APPLIED"
+    ],
+    "sequence": 10,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 100926.1"
+  },
+  "state_route_order": [
+    "complete",
+    "already_applied",
+    "incomplete_native_owner",
+    "incomplete_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "UTIL-10_RESULT": [
+      "COMPLETE",
+      "INCOMPLETE",
+      "ALREADY_APPLIED"
+    ]
+  }
+}

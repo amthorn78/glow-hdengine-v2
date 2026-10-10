@@ -1,0 +1,1237 @@
+{
+  "candidate_release": "GCFPE-20261009.1",
+  "selection_status": "UNSELECTED_CANDIDATE",
+  "catalog": {
+    "id": "3f44590a-05eb-8110-aa69-fe4189ad9abc",
+    "url": "https://app.notion.com/p/3f44590a05eb8110aa69fe4189ad9abc?pvs=204",
+    "properties": {
+      "title": "GCFPE-20261009.1 — Alpha Feedback Candidate — 100926.1"
+    }
+  },
+  "authoring_control": {
+    "id": "3f44590a-05eb-81f9-8b76-c83465dc1960",
+    "url": "https://app.notion.com/p/3f44590a05eb81f98b76c83465dc1960?pvs=204",
+    "properties": {
+      "title": "PE Metaprompt 100926.1"
+    },
+    "readback": {
+      "full_readback": true,
+      "ok": true,
+      "edited": "2026-10-09T20:13:58.466Z"
+    }
+  },
+  "members": [
+    {
+      "id": "CF-C-10",
+      "page_id": "3f44590a-05eb-810f-83d4-d539e5b0e588",
+      "url": "https://app.notion.com/p/3f44590a05eb810f83d4d539e5b0e588?pvs=204",
+      "title": "CF-C-10 — Prepare CRD Specification Kickoff Handoff — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8119a5a8e4d083fcf360?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-C-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:03.197Z",
+        "normalization": "native mention display text"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-C-20",
+      "page_id": "3f44590a-05eb-81a7-a944-f19bd9a2e3de",
+      "url": "https://app.notion.com/p/3f44590a05eb81a7a944f19bd9a2e3de?pvs=204",
+      "title": "CF-C-20 — Create CRD Specification — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-C-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:48.418Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-C-30",
+      "page_id": "3f44590a-05eb-8121-af3b-f2249c6d6ca8",
+      "url": "https://app.notion.com/p/3f44590a05eb8121af3bf2249c6d6ca8?pvs=204",
+      "title": "CF-C-30 — Review and Approve CRD Specification — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-C-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:50.363Z"
+      },
+      "groups": [
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-C-40",
+      "page_id": "3f44590a-05eb-8145-8686-cc39d8d98b2a",
+      "url": "https://app.notion.com/p/3f44590a05eb81458686cc39d8d98b2a?pvs=204",
+      "title": "CF-C-40 — Revise CRD Specification — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-C-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:52.355Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-E-10",
+      "page_id": "3f44590a-05eb-8112-9b09-cddebcc18458",
+      "url": "https://app.notion.com/p/3f44590a05eb81129b09cddebcc18458?pvs=204",
+      "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-E-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:53.973Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-E-20",
+      "page_id": "3f44590a-05eb-813c-b9cb-c61c225b88e2",
+      "url": "https://app.notion.com/p/3f44590a05eb813cb9cbc61c225b88e2?pvs=204",
+      "title": "CF-E-20 — Create Epic Specification — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-E-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:57.290Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-E-30",
+      "page_id": "3f44590a-05eb-8104-824f-e084354a0ef8",
+      "url": "https://app.notion.com/p/3f44590a05eb8104824fe084354a0ef8?pvs=204",
+      "title": "CF-E-30 — Review and Approve Epic Specification — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-E-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:10:58.798Z"
+      },
+      "groups": [
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-E-40",
+      "page_id": "3f44590a-05eb-81f1-994d-f5f6ab3a7f32",
+      "url": "https://app.notion.com/p/3f44590a05eb81f1994df5f6ab3a7f32?pvs=204",
+      "title": "CF-E-40 — Revise Epic Specification — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-E-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:00.884Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CF-PO-10",
+      "page_id": "3f44590a-05eb-81f9-bf84-f4585d9f7a2c",
+      "url": "https://app.notion.com/p/3f44590a05eb81f9bf84f4585d9f7a2c?pvs=204",
+      "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CF-PO-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:02.449Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-20",
+      "page_id": "3f44590a-05eb-8173-9b57-da57c285f45d",
+      "url": "https://app.notion.com/p/3f44590a05eb81739b57da57c285f45d?pvs=204",
+      "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:05.162Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-30",
+      "page_id": "3f44590a-05eb-816e-a12f-ebba885940e8",
+      "url": "https://app.notion.com/p/3f44590a05eb816ea12febba885940e8?pvs=204",
+      "title": "CL-30 — Prepare Conditional Post-Change ADR Maintenance — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:09.557Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-40",
+      "page_id": "3f44590a-05eb-8155-934d-d1c4c2b5d1eb",
+      "url": "https://app.notion.com/p/3f44590a05eb8155934dd1c4c2b5d1eb?pvs=204",
+      "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:12.358Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-C-10",
+      "page_id": "3f44590a-05eb-819b-8022-f2a4cdd3b022",
+      "url": "https://app.notion.com/p/3f44590a05eb819b8022f2a4cdd3b022?pvs=204",
+      "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-C-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:14.868Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-E-10",
+      "page_id": "3f44590a-05eb-8124-8741-f4679b050262",
+      "url": "https://app.notion.com/p/3f44590a05eb81248741f4679b050262?pvs=204",
+      "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-E-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:17.445Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-E-20",
+      "page_id": "3f44590a-05eb-8186-913f-cb9f6b2a2f32",
+      "url": "https://app.notion.com/p/3f44590a05eb8186913fcb9f6b2a2f32?pvs=204",
+      "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-E-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:34.769Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-E-30",
+      "page_id": "3f44590a-05eb-81be-834e-fe3faf7abb6f",
+      "url": "https://app.notion.com/p/3f44590a05eb81be834efe3faf7abb6f?pvs=204",
+      "title": "CL-E-30 — Review Bounded PF09 Revalidation — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-E-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:36.747Z"
+      },
+      "groups": [
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "CL-E-40",
+      "page_id": "3f44590a-05eb-8101-a264-f9fa702b8a6e",
+      "url": "https://app.notion.com/p/3f44590a05eb8101a264f9fa702b8a6e?pvs=204",
+      "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "CL-E-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:38.604Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "DOC-10",
+      "page_id": "3f44590a-05eb-81ce-99b1-d2ade30c572f",
+      "url": "https://app.notion.com/p/3f44590a05eb81ce99b1d2ade30c572f?pvs=204",
+      "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "DOC-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:40.826Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "DOC-20",
+      "page_id": "3f44590a-05eb-81d8-a582-eec0e93e6ee7",
+      "url": "https://app.notion.com/p/3f44590a05eb81d8a582eec0e93e6ee7?pvs=204",
+      "title": "DOC-20 — Verify Final Repository Documentation Completion — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "DOC-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:42.869Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "ESC-10",
+      "page_id": "3f44590a-05eb-81f2-af47-fff48995f272",
+      "url": "https://app.notion.com/p/3f44590a05eb81f2af47fff48995f272?pvs=204",
+      "title": "ESC-10 — Create QA Escalation Report — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "ESC-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:44.854Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "ESC-25",
+      "page_id": "3f44590a-05eb-8194-9370-e6d1b222b40b",
+      "url": "https://app.notion.com/p/3f44590a05eb81949370e6d1b222b40b?pvs=204",
+      "title": "ESC-25 — Execute Bounded Escalation Discovery — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "ESC-25",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:46.838Z"
+      },
+      "groups": [
+        "PART-03",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "ESC-30",
+      "page_id": "3f44590a-05eb-81e3-85db-d4fe337ad9d9",
+      "url": "https://app.notion.com/p/3f44590a05eb81e385dbd4fe337ad9d9?pvs=204",
+      "title": "ESC-30 — Diagnose and Propose Bounded Remediation — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "ESC-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:48.657Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "ESC-40",
+      "page_id": "3f44590a-05eb-8173-905c-c6d17a40457b",
+      "url": "https://app.notion.com/p/3f44590a05eb8173905cc6d17a40457b?pvs=204",
+      "title": "ESC-40 — Review and Return Approved Remediation — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "ESC-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:51.439Z"
+      },
+      "groups": [
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "GCFPE-MGMT-10",
+      "url": "https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54?pvs=204",
+      "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1",
+      "version": "091426.1",
+      "disposition": "REUSED_UNCHANGED",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54?pvs=204"
+    },
+    {
+      "id": "IA-10",
+      "page_id": "3f44590a-05eb-813a-a0cc-d709ebd134d0",
+      "url": "https://app.notion.com/p/3f44590a05eb813aa0ccd709ebd134d0?pvs=204",
+      "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "IA-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:54.630Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "IA-20",
+      "page_id": "3f44590a-05eb-81a8-bf39-f4b16cc61a5f",
+      "url": "https://app.notion.com/p/3f44590a05eb81a8bf39f4b16cc61a5f?pvs=204",
+      "title": "IA-20 — Create Whole-Change Implementation Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "IA-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:57.808Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "IA-30",
+      "page_id": "3f44590a-05eb-811d-b88d-ece791f1f60c",
+      "url": "https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c?pvs=204",
+      "title": "IA-30 — Review Whole-Change Implementation Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "IA-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:11:59.445Z"
+      },
+      "groups": [
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "IA-40",
+      "page_id": "3f44590a-05eb-81ca-83ec-dac0960a6f16",
+      "url": "https://app.notion.com/p/3f44590a05eb81ca83ecdac0960a6f16?pvs=204",
+      "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "IA-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:01.074Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "IA-50",
+      "page_id": "3f44590a-05eb-810a-a299-fbb05a34dece",
+      "url": "https://app.notion.com/p/3f44590a05eb810aa299fbb05a34dece?pvs=204",
+      "title": "IA-50 — IA Answer Seeder — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "IA-50",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:02.847Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "IA-60",
+      "page_id": "3f44590a-05eb-81cd-ab15-c7e7f7094a64",
+      "url": "https://app.notion.com/p/3f44590a05eb81cdab15c7e7f7094a64?pvs=204",
+      "title": "IA-60 — Thoth Planning Research — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "IA-60",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:04.842Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "MGR-10",
+      "page_id": "3f44590a-05eb-813e-a53a-c959e7a4e597",
+      "url": "https://app.notion.com/p/3f44590a05eb813ea53ac959e7a4e597?pvs=204",
+      "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "MGR-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:18.429Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "OPS-10",
+      "page_id": "3f44590a-05eb-8150-9957-c43992c03625",
+      "url": "https://app.notion.com/p/3f44590a05eb81509957c43992c03625?pvs=204",
+      "title": "OPS-10 — Create Bounded Ops Task — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "OPS-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:20.059Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-02",
+        "PART-03",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "OPS-20",
+      "page_id": "3f44590a-05eb-8155-aeba-cd56f469643e",
+      "url": "https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e?pvs=204",
+      "title": "OPS-20 — Execute Bounded Ops Task — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "OPS-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:26.012Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-03",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "OPS-30",
+      "page_id": "3f44590a-05eb-81ec-8da3-effc3b28cf97",
+      "url": "https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97?pvs=204",
+      "title": "OPS-30 — Review Ops Execution Receipt — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "OPS-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:28.694Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-02",
+        "PART-03",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "PR-10",
+      "page_id": "3f44590a-05eb-815d-97d5-f3930c7d3e8a",
+      "url": "https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a?pvs=204",
+      "title": "PR-10 — Create PR Work-Unit Instructions — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "PR-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:31.713Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "PR-20",
+      "page_id": "3f44590a-05eb-819f-bea5-dcd966a750ba",
+      "url": "https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba?pvs=204",
+      "title": "PR-20 — Create Detailed PR Implementation Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "PR-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:34.254Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "PR-30",
+      "page_id": "3f44590a-05eb-8148-a538-f5c80588db14",
+      "url": "https://app.notion.com/p/3f44590a05eb8148a538f5c80588db14?pvs=204",
+      "title": "PR-30 — PR Implementation Proceed — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "PR-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:37.057Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "PR-35",
+      "page_id": "3f44590a-05eb-811e-bf72-e949b7b1572e",
+      "url": "https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e?pvs=204",
+      "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "PR-35",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:39.512Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "PR-40",
+      "page_id": "3f44590a-05eb-8108-8487-e918fd642a7f",
+      "url": "https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204",
+      "title": "PR-40 — Review PR Work-Unit Lineage — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "PR-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:41.788Z"
+      },
+      "groups": [
+        "PART-01",
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "PR-50",
+      "page_id": "3f44590a-05eb-81d2-9748-eb21df73b02c",
+      "url": "https://app.notion.com/p/3f44590a05eb81d29748eb21df73b02c?pvs=204",
+      "title": "PR-50 — Abort PR and Escalate — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "PR-50",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:44.991Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-10",
+      "page_id": "3f44590a-05eb-8134-af92-e7c85a48e67c",
+      "url": "https://app.notion.com/p/3f44590a05eb8134af92e7c85a48e67c?pvs=204",
+      "title": "QA-10 — Audit Implementation and Establish QA Readiness — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:46.643Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-100",
+      "page_id": "3f44590a-05eb-8182-a201-f0e177dad431",
+      "url": "https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431?pvs=204",
+      "title": "QA-100 — Execute Bounded QA Task — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-100",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:12:50.193Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-110",
+      "page_id": "3f44590a-05eb-81ee-9a09-e00af51f33cb",
+      "url": "https://app.notion.com/p/3f44590a05eb81ee9a09e00af51f33cb?pvs=204",
+      "title": "QA-110 — Review QA Evidence and Route the Next Action — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-110",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:14.927Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-120",
+      "page_id": "3f44590a-05eb-81a4-a3fb-c0fae65d153e",
+      "url": "https://app.notion.com/p/3f44590a05eb81a4a3fbc0fae65d153e?pvs=204",
+      "title": "QA-120 — Create Final QA Report and RCA — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-120",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:16.920Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-20",
+      "page_id": "3f44590a-05eb-8128-9c7b-e77f66bac909",
+      "url": "https://app.notion.com/p/3f44590a05eb81289c7be77f66bac909?pvs=204",
+      "title": "QA-20 — Create Live QA Guide — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb816daa3adff37283482b?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:19.327Z"
+      },
+      "groups": [
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-50",
+      "page_id": "3f44590a-05eb-815d-89d3-e602973d83ad",
+      "url": "https://app.notion.com/p/3f44590a05eb815d89d3e602973d83ad?pvs=204",
+      "title": "QA-50 — Create Whole-Change QA Audit and Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-50",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:21.061Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-60",
+      "page_id": "3f44590a-05eb-8148-9053-f72637577807",
+      "url": "https://app.notion.com/p/3f44590a05eb81489053f72637577807?pvs=204",
+      "title": "QA-60 — Create Whole-Change QA Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-60",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:23.178Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-70",
+      "page_id": "3f44590a-05eb-8120-9128-ea7c82938faf",
+      "url": "https://app.notion.com/p/3f44590a05eb81209128ea7c82938faf?pvs=204",
+      "title": "QA-70 — Review Whole-Change QA Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-70",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:24.925Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-05",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-80",
+      "page_id": "3f44590a-05eb-8187-89e9-ff3ffa9e06d8",
+      "url": "https://app.notion.com/p/3f44590a05eb818789e9ff3ffa9e06d8?pvs=204",
+      "title": "QA-80 — Revise Whole-Change QA Plan — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-80",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:27.062Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "QA-90",
+      "page_id": "3f44590a-05eb-81be-a720-f004a7e1a6d8",
+      "url": "https://app.notion.com/p/3f44590a05eb81bea720f004a7e1a6d8?pvs=204",
+      "title": "QA-90 — Create Bounded QA Execution Task — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "QA-90",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:29.043Z"
+      },
+      "groups": [
+        "PART-04",
+        "PART-06",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "RS-10",
+      "page_id": "3f44590a-05eb-81a5-88c9-c82aa8a2d3f2",
+      "url": "https://app.notion.com/p/3f44590a05eb81a588c9c82aa8a2d3f2?pvs=204",
+      "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "RS-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:30.743Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "RS-20",
+      "page_id": "3f44590a-05eb-81be-9566-cd6397c9424c",
+      "url": "https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c?pvs=204",
+      "title": "RS-20 — Review Bounded Work-Unit Rescope — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "RS-20",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:33.913Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "RS-30",
+      "page_id": "3f44590a-05eb-8131-bc61-e346a46840e9",
+      "url": "https://app.notion.com/p/3f44590a05eb8131bc61e346a46840e9?pvs=204",
+      "title": "RS-30 — Revise Bounded Work-Unit Rescope Proposal — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "RS-30",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:35.779Z"
+      },
+      "groups": [
+        "PART-02",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "RS-40",
+      "page_id": "3f44590a-05eb-8139-93be-ccaaf88523d4",
+      "url": "https://app.notion.com/p/3f44590a05eb813993beccaaf88523d4?pvs=204",
+      "title": "RS-40 — Approved Rescope — Resume PR Implementation — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "RS-40",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:37.596Z",
+        "normalization": "native mention display text and documented stripped blank line"
+      },
+      "groups": [
+        "PART-02",
+        "PART-05",
+        "PART-07"
+      ]
+    },
+    {
+      "id": "UTIL-10",
+      "page_id": "3f44590a-05eb-81d9-97d1-fd2b8d1b5042",
+      "url": "https://app.notion.com/p/3f44590a05eb81d997d1fd2b8d1b5042?pvs=204",
+      "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 100926.1",
+      "version": "100926.1",
+      "parent": "https://app.notion.com/p/3db4590a05eb811b9c14f2ae89c28df7",
+      "predecessor_url": "https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9?pvs=204",
+      "predecessor_version": "091426.1",
+      "status": "PUBLISHED_READ_BACK",
+      "readback": {
+        "id": "UTIL-10",
+        "ok": true,
+        "full_readback": true,
+        "identity": true,
+        "edited": "2026-10-09T20:13:56.908Z"
+      },
+      "groups": [
+        "PART-07"
+      ]
+    }
+  ]
+}
