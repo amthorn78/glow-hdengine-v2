@@ -23,3 +23,24 @@ Dry-run required defects still open **in this analysis record**: 0. This is not 
 Not yet completed at the pre-review dry-run checkpoint. Two fresh-context reviewers will receive committed instances of the canonical ANALYZE brief, pinned to the analysis commit. This is not a skill approval, installation or release-selection review. The author will preserve the reviewers' records verbatim and record the actual round outcome in the Modification ledger.
 
 The candidate catalog already has a dated IN FLIGHT analysis entry. Completion will be appended after the analysis is published; earlier dated conclusions and the selected release remain intact. No prompt-body mutation is authorized by this run.
+
+## Dated successor — independent FULL review and publication boundary
+
+The pre-review paragraphs above describe the earlier checkpoint, not the current state. Both canonical briefs were committed at `a67b9108` before fresh-context reviewers started against analysis commit `d3b30ccfd50bf970f1477811982f92df2ade3be2`.
+
+- Reviewer A: one required report-level omission, R-A1, adding PE's applicable GCFPE authoring rule to F05's explicit affected-surface mapping; two listed observations.
+- Reviewer B: zero required report defects; one listed observation duplicating A's QA diagram clarity point.
+- Distinct FULL-round total: one required report defect and two listed clarity risks. The six underlying source findings remain six. Original reviewer files are preserved without author edits.
+- The author corrected R-A1 in findings.md, coverage.md and the Modification's F05 row. A bounded repair DIFF_CHECK is the next review action; no second FULL round is claimed or required merely to seek zero findings.
+
+The attempted `git push -u origin docs/20261010-modification-gcfpe-candidate-skill-analysis` was rejected by automatic approval review. The reason was potential disclosure of prompt/governance analysis to a GitHub destination whose ownership/trust and publication authorization were not established. No alternative write route or retry was used. Read-only GitHub checks then established connected login `amthorn78`, matching repository ownership/admin rights, and **public** visibility. This does not substitute for approval of that public disclosure.
+
+`git ls-remote origin refs/heads/docs/20261010-modification-gcfpe-candidate-skill-analysis` returned exit 0 with no ref: the branch is not published. No pull request was opened, no remote content readback or CI result is claimed, and no merge occurred. Approval to publish this concrete documentation branch is the remaining publication action; PLAN approval is a separate decision.
+
+Authorized Notion documentation updates succeeded and were read back:
+
+- Candidate catalog `3f44590a05eb8110aa69fe4189ad9abc`, last edit `2026-10-10T20:46:30.661Z`: six source-finding summary, package dispositions, source/test limitations and three Mermaid flow diagrams. All six finding IDs, all three diagram blocks and the corrected DOC-10/PR-40 routes were checked in the returned representation.
+- Alpha feedback `3df4590a05eb8111a6a5f67cb82f96f6`, last edit `2026-10-10T20:48:33.428Z`: dated source-review follow-up, AF-013 still unresolved, withdrawn QA-return observation preserved and publication boundary disclosed.
+- The selected release register was read, not edited; it still selects GCFPE-20260914.1 / 091426.1. The current main read-only ref check still reports `1ea6a262032c3c4de19c38c549d737d72b03ec2f`.
+
+These Notion updates provide an accessible visual summary. The repository Modification remains the record home; this summary does not claim the repository publication gate has completed.

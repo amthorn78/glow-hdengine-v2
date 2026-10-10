@@ -60,7 +60,7 @@ One row records all three requested dimensions for each of 55 members. `C` means
 | RS-40 | C | C | F05 + shared F01 | Open-PR only, original Proceed, phase result; PR-35-only Canon block; L02. |
 | UTIL-10 | C | C | C + shared F01 | Exact reviewed base and once-only redlines; no approved-base rewrite. |
 
-No source row is omitted: 55 × 3 = 165 dimension dispositions. The three CL-E maintenance bodies were compared to native candidate parts and relevant runtime skill sections; detailed bundled row-map executable validation was not run. PE independently has F04; testing MGMT was read as the invocation source, not counted as a second member.
+No source row is omitted: 55 × 3 = 165 dimension dispositions. The three CL-E maintenance bodies were compared to native candidate parts and relevant runtime skill sections; detailed bundled row-map executable validation was not run. PE independently has F04 and F05; F05 reaches its applicable GCFPE addendum-authoring instructions without making it a seventh producer or 56th member; testing MGMT was read as the invocation source, not counted as a second member.
 
 ## Native read metadata
 
