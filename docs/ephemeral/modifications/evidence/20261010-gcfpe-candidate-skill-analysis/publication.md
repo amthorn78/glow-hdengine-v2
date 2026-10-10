@@ -44,3 +44,13 @@ Authorized Notion documentation updates succeeded and were read back:
 - The selected release register was read, not edited; it still selects GCFPE-20260914.1 / 091426.1. The current main read-only ref check still reports `1ea6a262032c3c4de19c38c549d737d72b03ec2f`.
 
 These Notion updates provide an accessible visual summary. The repository Modification remains the record home; this summary does not claim the repository publication gate has completed.
+
+## Final local return checkpoint — 2026-10-10
+
+The single bounded `REVIEW-ANALYZE-DIFF.md` confirms R-A1 fixed without a new required defect. Distinct required **report** defects moved from 1 to 0. The six underlying source findings and two listed report observations remain, with no source repair or opt-in inferred. No second FULL round was run.
+
+The candidate catalog's final summary was updated and read back at `2026-10-10T20:56:54.624Z`: the 1-to-0 review result, PE's F05 mapping, all three Mermaid blocks, and the separate publication/PLAN approval boundaries are present. Native closing wrappers are complete. Earlier dated entries remain history. The feedback follow-up remains the read-back entry recorded above.
+
+`proposed-pr.md` contains the complete proposed draft-PR title, destination, branch and description. No retry, alternative GitHub write route or public PR creation followed the rejected push. The report is ready for explicit public-publication approval; formal repository publication remains uncompleted. A later approved push must read back the published branch and PR before claiming that gate.
+
+After the final DRY_RUN/FULL/DIFF_CHECK ledger and return text were written, the exact Modification-directory validator command above returned exit 0, **15/15 passed**. No source/runtime test was repeated to obtain that documentation result.
