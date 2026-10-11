@@ -1,0 +1,1056 @@
+{
+ "record_type": "MB008_PLAN_BODY_OPERATIONS",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "date": "2026-10-11",
+ "scope": "Candidate GCFPE-20261009.1 pages only (54 runtime siblings with ops, and PE). No selected 091426.1 page. GCFPE-MGMT-10 is handled by PART-05, not here.",
+ "d22": "Operations name spans by anchors and carry replacement text; no prompt body is stored. Pins are page_last_edited_at values from body-scan.json.",
+ "span_rule": "start must occur exactly once in the unedited page; end, when present, on the same line after start",
+ "shared_texts": {
+  "CPLACE": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+  "CTS": "Among those lines, name the TypeSafe reading and the surface advice for the receiving session, with the output artifact's path. Before saving the artifact, run the installed TypeSafe scoring skill's script once, on an action text for the receiving session's work written as the skill directs; do not paste its line into the block or write its Notion row. The artifact holds the reading as the skill prints it, with its cell, every probability and its flags, or `TypeSafe: not read` with the reason, and task-specific advice on execution surface, with no model, reasoning-level or effort content. No agent gives its own recommendation, assessment or ranking of model, reasoning level or effort. When Nathan states the model and setting chosen for this session, record that pick in this session's output artifact with a reference to the reading, and never record a setting Nathan did not state."
+ },
+ "pages": {
+  "CF-C-10": {
+   "page_id": "3f44590a05eb810f83d4d539e5b0e588",
+   "expected_last_edited": "2026-10-09T20:10:03.197Z"
+  },
+  "CF-C-20": {
+   "page_id": "3f44590a05eb81a7a944f19bd9a2e3de",
+   "expected_last_edited": "2026-10-09T20:10:48.418Z"
+  },
+  "CF-C-30": {
+   "page_id": "3f44590a05eb8121af3bf2249c6d6ca8",
+   "expected_last_edited": "2026-10-11T15:27:27.407Z"
+  },
+  "CF-C-40": {
+   "page_id": "3f44590a05eb81458686cc39d8d98b2a",
+   "expected_last_edited": "2026-10-09T20:10:52.355Z"
+  },
+  "CF-E-10": {
+   "page_id": "3f44590a05eb81129b09cddebcc18458",
+   "expected_last_edited": "2026-10-09T20:10:53.973Z"
+  },
+  "CF-E-20": {
+   "page_id": "3f44590a05eb813cb9cbc61c225b88e2",
+   "expected_last_edited": "2026-10-09T20:10:57.290Z"
+  },
+  "CF-E-30": {
+   "page_id": "3f44590a05eb8104824fe084354a0ef8",
+   "expected_last_edited": "2026-10-11T15:47:22.369Z"
+  },
+  "CF-E-40": {
+   "page_id": "3f44590a05eb81f1994df5f6ab3a7f32",
+   "expected_last_edited": "2026-10-09T20:11:00.884Z"
+  },
+  "CF-PO-10": {
+   "page_id": "3f44590a05eb81f9bf84f4585d9f7a2c",
+   "expected_last_edited": "2026-10-09T20:11:02.449Z"
+  },
+  "CL-20": {
+   "page_id": "3f44590a05eb81739b57da57c285f45d",
+   "expected_last_edited": "2026-10-09T20:11:05.162Z"
+  },
+  "CL-30": {
+   "page_id": "3f44590a05eb816ea12febba885940e8",
+   "expected_last_edited": "2026-10-09T20:11:09.557Z"
+  },
+  "CL-40": {
+   "page_id": "3f44590a05eb8155934dd1c4c2b5d1eb",
+   "expected_last_edited": "2026-10-09T20:11:12.358Z"
+  },
+  "CL-C-10": {
+   "page_id": "3f44590a05eb819b8022f2a4cdd3b022",
+   "expected_last_edited": "2026-10-09T20:11:14.868Z"
+  },
+  "CL-E-10": {
+   "page_id": "3f44590a05eb81248741f4679b050262",
+   "expected_last_edited": "2026-10-09T20:11:17.445Z"
+  },
+  "CL-E-20": {
+   "page_id": "3f44590a05eb8186913fcb9f6b2a2f32",
+   "expected_last_edited": "2026-10-09T20:11:34.769Z"
+  },
+  "CL-E-30": {
+   "page_id": "3f44590a05eb81be834efe3faf7abb6f",
+   "expected_last_edited": "2026-10-09T20:11:36.747Z"
+  },
+  "CL-E-40": {
+   "page_id": "3f44590a05eb8101a264f9fa702b8a6e",
+   "expected_last_edited": "2026-10-09T20:11:38.604Z"
+  },
+  "DOC-10": {
+   "page_id": "3f44590a05eb81ce99b1d2ade30c572f",
+   "expected_last_edited": "2026-10-09T20:11:40.826Z"
+  },
+  "DOC-20": {
+   "page_id": "3f44590a05eb81d8a582eec0e93e6ee7",
+   "expected_last_edited": "2026-10-09T20:11:42.869Z"
+  },
+  "ESC-10": {
+   "page_id": "3f44590a05eb81f2af47fff48995f272",
+   "expected_last_edited": "2026-10-09T20:11:44.854Z"
+  },
+  "ESC-25": {
+   "page_id": "3f44590a05eb81949370e6d1b222b40b",
+   "expected_last_edited": "2026-10-09T20:11:46.838Z"
+  },
+  "ESC-30": {
+   "page_id": "3f44590a05eb81e385dbd4fe337ad9d9",
+   "expected_last_edited": "2026-10-09T20:11:48.657Z"
+  },
+  "ESC-40": {
+   "page_id": "3f44590a05eb8173905cc6d17a40457b",
+   "expected_last_edited": "2026-10-11T16:05:06.087Z"
+  },
+  "IA-10": {
+   "page_id": "3f44590a05eb813aa0ccd709ebd134d0",
+   "expected_last_edited": "2026-10-09T20:11:54.630Z"
+  },
+  "IA-20": {
+   "page_id": "3f44590a05eb81a8bf39f4b16cc61a5f",
+   "expected_last_edited": "2026-10-09T20:11:57.808Z"
+  },
+  "IA-30": {
+   "page_id": "3f44590a05eb811db88dece791f1f60c",
+   "expected_last_edited": "2026-10-11T15:47:54.598Z"
+  },
+  "IA-40": {
+   "page_id": "3f44590a05eb81ca83ecdac0960a6f16",
+   "expected_last_edited": "2026-10-09T20:12:01.074Z"
+  },
+  "IA-50": {
+   "page_id": "3f44590a05eb810aa299fbb05a34dece",
+   "expected_last_edited": "2026-10-09T20:12:02.847Z"
+  },
+  "IA-60": {
+   "page_id": "3f44590a05eb81cdab15c7e7f7094a64",
+   "expected_last_edited": "2026-10-09T20:12:04.842Z"
+  },
+  "MGR-10": {
+   "page_id": "3f44590a05eb813ea53ac959e7a4e597",
+   "expected_last_edited": "2026-10-09T20:12:18.429Z"
+  },
+  "OPS-10": {
+   "page_id": "3f44590a05eb81509957c43992c03625",
+   "expected_last_edited": "2026-10-09T20:12:20.059Z"
+  },
+  "OPS-20": {
+   "page_id": "3f44590a05eb8155aebacd56f469643e",
+   "expected_last_edited": "2026-10-09T20:12:26.012Z"
+  },
+  "OPS-30": {
+   "page_id": "3f44590a05eb81ec8da3effc3b28cf97",
+   "expected_last_edited": "2026-10-09T20:12:28.694Z"
+  },
+  "PE": {
+   "page_id": "3f44590a05eb81f98b76c83465dc1960",
+   "expected_last_edited": "2026-10-11T16:10:06.322Z"
+  },
+  "PR-10": {
+   "page_id": "3f44590a05eb815d97d5f3930c7d3e8a",
+   "expected_last_edited": "2026-10-09T20:12:31.713Z"
+  },
+  "PR-20": {
+   "page_id": "3f44590a05eb819fbea5dcd966a750ba",
+   "expected_last_edited": "2026-10-09T20:12:34.254Z"
+  },
+  "PR-30": {
+   "page_id": "3f44590a05eb8148a538f5c80588db14",
+   "expected_last_edited": "2026-10-09T20:12:37.057Z"
+  },
+  "PR-35": {
+   "page_id": "3f44590a05eb811ebf72e949b7b1572e",
+   "expected_last_edited": "2026-10-09T20:12:39.512Z"
+  },
+  "PR-40": {
+   "page_id": "3f44590a05eb81088487e918fd642a7f",
+   "expected_last_edited": "2026-10-09T20:12:41.788Z"
+  },
+  "PR-50": {
+   "page_id": "3f44590a05eb81d29748eb21df73b02c",
+   "expected_last_edited": "2026-10-09T20:12:44.991Z"
+  },
+  "QA-10": {
+   "page_id": "3f44590a05eb8134af92e7c85a48e67c",
+   "expected_last_edited": "2026-10-09T20:12:46.643Z"
+  },
+  "QA-100": {
+   "page_id": "3f44590a05eb8182a201f0e177dad431",
+   "expected_last_edited": "2026-10-09T20:12:50.193Z"
+  },
+  "QA-110": {
+   "page_id": "3f44590a05eb81ee9a09e00af51f33cb",
+   "expected_last_edited": "2026-10-09T20:13:14.927Z"
+  },
+  "QA-120": {
+   "page_id": "3f44590a05eb81a4a3fbc0fae65d153e",
+   "expected_last_edited": "2026-10-09T20:13:16.920Z"
+  },
+  "QA-20": {
+   "page_id": "3f44590a05eb81289c7be77f66bac909",
+   "expected_last_edited": "2026-10-09T20:13:19.327Z"
+  },
+  "QA-50": {
+   "page_id": "3f44590a05eb815d89d3e602973d83ad",
+   "expected_last_edited": "2026-10-11T15:02:20.983Z"
+  },
+  "QA-60": {
+   "page_id": "3f44590a05eb81489053f72637577807",
+   "expected_last_edited": "2026-10-09T20:13:23.178Z"
+  },
+  "QA-70": {
+   "page_id": "3f44590a05eb81209128ea7c82938faf",
+   "expected_last_edited": "2026-10-11T15:57:29.752Z"
+  },
+  "QA-80": {
+   "page_id": "3f44590a05eb818789e9ff3ffa9e06d8",
+   "expected_last_edited": "2026-10-09T20:13:27.062Z"
+  },
+  "QA-90": {
+   "page_id": "3f44590a05eb81bea720f004a7e1a6d8",
+   "expected_last_edited": "2026-10-09T20:13:29.043Z"
+  },
+  "RS-10": {
+   "page_id": "3f44590a05eb81a588c9c82aa8a2d3f2",
+   "expected_last_edited": "2026-10-09T20:13:30.743Z"
+  },
+  "RS-20": {
+   "page_id": "3f44590a05eb81be9566cd6397c9424c",
+   "expected_last_edited": "2026-10-11T15:59:38.185Z"
+  },
+  "RS-30": {
+   "page_id": "3f44590a05eb8131bc61e346a46840e9",
+   "expected_last_edited": "2026-10-09T20:13:35.779Z"
+  },
+  "RS-40": {
+   "page_id": "3f44590a05eb813993beccaaf88523d4",
+   "expected_last_edited": "2026-10-09T20:13:37.596Z"
+  },
+  "UTIL-10": {
+   "page_id": "3f44590a05eb81d997d1fd2b8d1b5042",
+   "expected_last_edited": "2026-10-09T20:13:56.908Z"
+  }
+ },
+ "ops": [
+  {
+   "id": "TS-CF-C-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-C-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-C-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-C-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-C-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-C-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-C-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-C-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-E-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-E-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-E-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-E-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-E-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-E-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-E-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-E-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CF-PO-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CF-PO-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-C-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-C-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-E-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-E-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-E-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-E-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-E-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-E-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-CL-E-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-E-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-DOC-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "DOC-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-DOC-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "DOC-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-ESC-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "ESC-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-ESC-25",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "ESC-25",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-ESC-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "ESC-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-ESC-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "ESC-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-IA-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "IA-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-IA-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "IA-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-IA-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "IA-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-IA-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "IA-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-IA-50",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "IA-50",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-IA-60",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "IA-60",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-MGR-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "MGR-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-OPS-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "OPS-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-OPS-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "OPS-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-OPS-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "OPS-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-PE",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PE",
+   "section": "Complete handoff contract (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest (C-PLACE).",
+   "end": null,
+   "new": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest (C-PLACE). @CTS (C-TYPESAFE)"
+  },
+  {
+   "id": "TS-PR-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-PR-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-PR-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-PR-35",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-35",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-PR-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-100",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-100",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-110",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-110",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-120",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-120",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-50",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-50",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-60",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-60",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-70",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-70",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-80",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-80",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-QA-90",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "QA-90",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-RS-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "RS-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-RS-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "RS-20",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-RS-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "RS-30",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-RS-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "RS-40",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "TS-UTIL-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "UTIL-10",
+   "section": "Mandatory single-block handoff (C-PLACE)",
+   "start": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
+   "end": null,
+   "new": "@CPLACE @CTS"
+  },
+  {
+   "id": "T1-PR-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-10",
+   "section": "Managed entry, execution posture and continuing identity",
+   "start": "This prompt and its task handoffs do not prescribe or evaluate a runtime setting, create delegates, or grant execution or approval authority.",
+   "end": null,
+   "new": "This prompt and its task handoffs do not prescribe a runtime setting or give their own assessment of one, create delegates, or grant execution or approval authority; the TypeSafe reading and surface advice that *Mandatory single-block handoff* requires inform Nathan's choice and prescribe nothing."
+  },
+  {
+   "id": "T1-PR-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-20",
+   "section": "Managed entry, execution posture and continuing identity",
+   "start": "This prompt and its task handoffs do not prescribe or evaluate a runtime setting, create delegates, or grant execution or approval authority.",
+   "end": null,
+   "new": "This prompt and its task handoffs do not prescribe a runtime setting or give their own assessment of one, create delegates, or grant execution or approval authority; the TypeSafe reading and surface advice that *Mandatory single-block handoff* requires inform Nathan's choice and prescribe nothing."
+  },
+  {
+   "id": "T1-PR-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-30",
+   "section": "Managed entry, execution posture and continuing identity",
+   "start": "This prompt and its task handoffs do not prescribe or evaluate a runtime setting, create delegates, or grant execution or approval authority.",
+   "end": null,
+   "new": "This prompt and its task handoffs do not prescribe a runtime setting or give their own assessment of one, create delegates, or grant execution or approval authority; the TypeSafe reading and surface advice that *Mandatory single-block handoff* requires inform Nathan's choice and prescribe nothing."
+  },
+  {
+   "id": "T1-PR-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-40",
+   "section": "Managed entry, execution posture and continuing identity",
+   "start": "This prompt and its task handoffs do not prescribe or evaluate a runtime setting, create delegates, or grant execution or approval authority.",
+   "end": null,
+   "new": "This prompt and its task handoffs do not prescribe a runtime setting or give their own assessment of one, create delegates, or grant execution or approval authority; the TypeSafe reading and surface advice that *Mandatory single-block handoff* requires inform Nathan's choice and prescribe nothing."
+  },
+  {
+   "id": "T1-PR-35",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PR-35",
+   "section": "Operator/runtime boundary",
+   "start": "Do not assess, recommend, inspect, or route on model, strength, reasoning, Analyzer, suitability, eligibility, account availability, or configuration.",
+   "end": null,
+   "new": "Do not give your own recommendation, assessment or ranking of model, reasoning level or effort, and do not inspect or route on model, strength, reasoning, Analyzer, suitability, eligibility, account availability, or configuration; the TypeSafe reading and surface advice follow *Mandatory single-block handoff*."
+  },
+  {
+   "id": "CL-CL-20",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-20",
+   "section": "Mandatory single-block handoff",
+   "start": "Do not include runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions.",
+   "end": null,
+   "new": "Do not include in the block runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions."
+  },
+  {
+   "id": "CL-CL-30",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-30",
+   "section": "Mandatory single-block handoff",
+   "start": "Do not include runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions.",
+   "end": null,
+   "new": "Do not include in the block runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions."
+  },
+  {
+   "id": "CL-CL-40",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-40",
+   "section": "Mandatory single-block handoff",
+   "start": "Do not include runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions.",
+   "end": null,
+   "new": "Do not include in the block runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions."
+  },
+  {
+   "id": "CL-CL-C-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-C-10",
+   "section": "Mandatory single-block handoff",
+   "start": "Do not include runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions.",
+   "end": null,
+   "new": "Do not include in the block runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions."
+  },
+  {
+   "id": "CL-CL-E-10",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "CL-E-10",
+   "section": "Mandatory single-block handoff",
+   "start": "Do not include runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions.",
+   "end": null,
+   "new": "Do not include in the block runtime-selection, model/strength/reasoning assessment, Analyzer, eligibility, suitability, account-availability, configuration-based routing, or session-inspection instructions."
+  },
+  {
+   "id": "F5-OPS-10",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "OPS-10",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-OPS-20",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "OPS-20",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-OPS-30",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "OPS-30",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-PR-10",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "PR-10",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-PR-20",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "PR-20",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-PR-30",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "PR-30",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-PR-40",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "PR-40",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-PR-50",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "PR-50",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-QA-10",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "QA-10",
+   "section": "Canonical PF source predicate and PF10 boundary",
+   "start": "No agent edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "No agent edits PF10 or claims canonical adoption; only the qualifying producer resolves an addendum's number, from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-CL-20",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "CL-20",
+   "section": "Canonical PF source predicate, immutable base, and PF10 overlay",
+   "start": "The producer never edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "The producer never edits PF10 or claims canonical adoption; it resolves the addendum's number from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-CL-30",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "CL-30",
+   "section": "Canonical PF source predicate, immutable base, and PF10 overlay",
+   "start": "The producer never edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "The producer never edits PF10 or claims canonical adoption; it resolves the addendum's number from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-CL-40",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "CL-40",
+   "section": "Canonical PF source predicate, immutable base, and PF10 overlay",
+   "start": "The producer never edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "The producer never edits PF10 or claims canonical adoption; it resolves the addendum's number from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-CL-C-10",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "CL-C-10",
+   "section": "Canonical PF source predicate, immutable base, and PF10 overlay",
+   "start": "The producer never edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "The producer never edits PF10 or claims canonical adoption; it resolves the addendum's number from the current controlled PF10 at creation."
+  },
+  {
+   "id": "F5-CL-E-10",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "CL-E-10",
+   "section": "Canonical PF source predicate, immutable base, and PF10 overlay",
+   "start": "The producer never edits PF10, allocates PF10 numbering, or claims canonical adoption.",
+   "end": null,
+   "new": "The producer never edits PF10 or claims canonical adoption; it resolves the addendum's number from the current controlled PF10 at creation."
+  },
+  {
+   "id": "PE-EXCL",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PE",
+   "section": "Authoring and validation exclusion",
+   "start": "These subjects are outside this metaprompt and outside every prompt or handoff it creates or revises.",
+   "end": null,
+   "new": "These subjects are outside this metaprompt and outside every prompt or handoff it creates or revises, with one GCFPE exception: the TypeSafe reading and surface advice that the GCFPE handoff contract requires, which inform Nathan's choice and route nothing."
+  },
+  {
+   "id": "PE-SCAN",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PE",
+   "section": "Authoring and validation exclusion",
+   "start": "Before authoring or approving a revision, scan the candidate body, templates, examples, cross-references, and validation rules for prohibited runtime-selection, internal-processing-setting, operator-access, workload-rating, or configuration-based routing language.",
+   "end": null,
+   "new": "Before authoring or approving a revision, scan the candidate body, templates, examples, cross-references, and validation rules for prohibited runtime-selection, internal-processing-setting, operator-access, workload-rating, or configuration-based routing language. For GCFPE, the TypeSafe reading and surface advice that the GCFPE handoff contract requires are not prohibited language."
+  },
+  {
+   "id": "PE-AF013",
+   "part": "PART-02",
+   "item": "ITEM-03",
+   "prompt": "PE",
+   "section": "GCFPE 100926.1 authoring requirements",
+   "start": "The separate AF-013 skill advice is outside this candidate's implementation; no replacement scoring or new workflow is introduced.",
+   "end": null,
+   "new": "Under current HDE Build Notes, the reading of the installed TypeSafe scoring skill is the model and reasoning-level guidance for every GCFPE downstream session; authored GCFPE bodies carry it as the GCFPE handoff contract states, and no other scoring or advice workflow is introduced."
+  },
+  {
+   "id": "PE-STD",
+   "part": "PART-03",
+   "item": "ITEM-04",
+   "prompt": "PE",
+   "section": "Standards and preservation",
+   "start": "Preparing a standalone PF10 addendum does not authorize live PF10 inspection, numbering, insertion, canon adoption, or repository publication.",
+   "end": null,
+   "new": "Preparing a standalone PF10 addendum does not authorize live PF10 inspection, numbering, insertion, canon adoption, or repository publication; for GCFPE, the qualifying producer resolves the number at creation, as *PF10 overlay and addendum contract* states."
+  }
+ ]
+}

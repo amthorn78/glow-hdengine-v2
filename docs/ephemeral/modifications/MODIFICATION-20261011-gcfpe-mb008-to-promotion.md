@@ -211,9 +211,9 @@ ANALYZE review under D26-A follows the dry run in the ledger.
 |---|---|---|
 | R-A1 (R3) | Printing the reading beside the block breaks D23's C-PLACE or C-ART, and no D23 successor was targeted | A-1 names D23-B, C-PLACE and C-ART. The reading and surface advice go into the artifact; the line before the block names them. DN-B option 3 carries the D23 successor. `scope-measurement.md` §2a-bis lists every place the texts are restated |
 | B-1 (R1) | The execution-surface half of F07 was dropped, although PF10 2.1 leaves it and PF04 §9.1.3 requires it | §A.3, A-1, ITEM-03, PART-02 and §A.5 separate surface advice from the reading. The surface-advice suppressors are dispositioned in `scope-measurement.md` §2a |
-| B-2 (R3) | DN-B option B2 ran the skill "as built", which writes beyond its own D28 and puts the reading in the block | DN-B states each option's exact writes and placement. D28 covers create, correct after a failed readback, and set Nathan's pick on his statement |
+| B-2 (R3) | DN-B option B2 ran the skill "as built", which writes beyond its own D28 and puts the reading in the block | DN-B states each option's exact writes and placement. D28 covers create, correct after a failed readback, and set Nathan's pick on Nathan's statement |
 
-The 33 LISTED findings (A: L-A1 to L-A15; B: L-B1 to L-B18) stay listed. They go to Nathan as accepted risks unless he opts into one. One bounded DIFF_CHECK of the repair follows. It is the last review this mode allows under D26-A.
+The 33 LISTED findings (A: L-A1 to L-A15; B: L-B1 to L-B18) stay listed. They go to Nathan as accepted risks unless Nathan opts into one. One bounded DIFF_CHECK of the repair follows. It is the last review this mode allows under D26-A.
 
 **DIFF_CHECK, 2026-10-11.** Reviewer C, in a fresh context, checked only the repair diff `978d233e..90ccb082`, from a brief committed at `7a4465e7` before it was spawned ([REVIEW-ANALYZE-DIFF.md](evidence/20261011-gcfpe-mb008-to-promotion/REVIEW-ANALYZE-DIFF.md)). R-A1 and B-1 are fixed. B-2 is fixed, and the same rewritten DN-B text carries one new required defect:
 
@@ -270,7 +270,7 @@ What this approves:
 | Decision | Answer | Effect on PLAN |
 |---|---|---|
 | DN-A | F01 and F08 included; MB-010 not batched | PART-04 stays. MB-010 stays on the backlog |
-| DN-B | Option 2 | The reading and the surface advice go into the producing session's output artifact. One line before the block names them and the path. Nathan's pick goes into the receiving session's artifact when he states it. No D28, no D23 or D25 successor, no flow-session Notion write. DIFF-C1 is resolved by this choice, because it arose only under option 1 |
+| DN-B | Option 2 | The reading and the surface advice go into the producing session's output artifact. One line before the block names them and the path. Nathan's pick goes into the receiving session's artifact when Nathan states it. No D28, no D23 or D25 successor, no flow-session Notion write. DIFF-C1 is resolved by this choice, because it arose only under option 1 |
 | DN-C | A | PART-05 makes the D20 three-mode body GCFPE-MGMT-10's successor in this release. D20-B's Class A wording (L-A4, L-B7) is met by this explicit authorization |
 | DN-D | D2 | After qualification EXECUTE returns `PROMOTION_CHECKPOINT_REQUIRED`. Nathan's exact promotion approval then authorizes PART-08, waiving for this run the MGMT-10 body's exclusion of release selection, promotion and archival (L-A3) |
 | DN-E | E1 | Qualification uses the installed attribution lock `10 c518ccb0…`, bound by digest. MB-005 stays open |
