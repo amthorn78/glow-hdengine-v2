@@ -1,0 +1,240 @@
+diff -ruN base/glow-graph-contract/scripts/contract_recipe.py work/glow-graph-contract/scripts/contract_recipe.py
+--- base/glow-graph-contract/scripts/contract_recipe.py	2026-10-11 20:59:31.000000000 +0000
++++ work/glow-graph-contract/scripts/contract_recipe.py	2026-10-11 23:07:39.855940657 +0000
+@@ -10,6 +10,7 @@
+ 
+ usage: PYTHONDONTWRITEBYTECODE=1 python3 contract_recipe.py <graph-md> <template-contract> <oracle-file>
+        <decision-record> <out-contract> --contract-revision <x.y.z> --primary-skill-revision <x.y.z>
++       [--release-values <file>]          a release's literals that no graph field carries (regenerate_contract.py)
+        [--check <shipped-contract> ...]   exit 1 unless every named contract is byte-equal to the recipe's output
+ 
+ With --contract-revision 4.1.0 --primary-skill-revision 1.3.0, the template
+@@ -34,6 +35,7 @@
+ ap.add_argument("decision_record"); ap.add_argument("out")
+ ap.add_argument("--contract-revision", required=True)
+ ap.add_argument("--primary-skill-revision", required=True)
++ap.add_argument("--release-values")
+ ap.add_argument("--check", nargs="+", default=[])
+ args = ap.parse_args()
+ 
+@@ -53,7 +55,7 @@
+ with tempfile.TemporaryDirectory() as d:
+     e2_out = Path(d) / "e2-contract.json"
+     assert rc.generate(args.graph_md, args.template, args.oracle, [str(e2_out)],
+-                       args.contract_revision, args.primary_skill_revision) in (0, None)
++                       args.contract_revision, args.primary_skill_revision, args.release_values) in (0, None)
+     e2 = e2_out.read_bytes()
+ print("E2 regenerator output", hashlib.sha256(e2).hexdigest(), len(e2))
+ canon = lambda obj: (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")  # noqa: E731
+diff -ruN base/glow-graph-contract/scripts/regenerate_contract.py work/glow-graph-contract/scripts/regenerate_contract.py
+--- base/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 20:59:31.000000000 +0000
++++ work/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 23:16:39.581684386 +0000
+@@ -14,6 +14,14 @@
+ 
+ No value-table entry may target a mirrored path (checked). The value table is held here, never read from G.
+ 
++Release derivation (MODIFICATION-20261011-gcfpe-mb008-to-promotion, F06). Every release-identity value the
++contract restates is derived from the graph as well: the release and version pairs from G's `candidate` and
++`baseline`, the lifecycle values from G's `selection_status`, each member's page identity and lifecycle, the
++Notion page manifest, the five named prompt references and the frozen-graph source record. The 091426.1 contract
++still regenerates byte for byte (`acceptance`), because those values equal what its template holds. A release's
++remaining literals, which no graph field carries, come from a release-values file passed to `generate` with
++`--release-values`; the 091426.1 regeneration passes none.
++
+ Commands (run with PYTHONDONTWRITEBYTECODE=1):
+   acceptance <base-parts-dir> <builder> <template-contract> <fv-scripts> <scratch>
+         strip every mirrored path from today's contract, regenerate from today's build with an empty value
+@@ -53,6 +61,35 @@
+     "graph_predecessor_union_destinations": "predecessor_union_destinations",
+ }
+ 
++def _production(g) -> bool:
++    return g["selection_status"] == "SELECTED_PRODUCTION"
++
++
++def _page_id(url: str) -> str:
++    """The dashed page id of a direct Notion URL."""
++    h = re.search(r"/p/([0-9a-f]{32})", url).group(1)
++    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
++
++
++def _node(g, prompt_id: str) -> dict:
++    return next(n for n in g["nodes"] if n["id"] == prompt_id)
++
++
++def _short_name(node: dict) -> str:
++    suffix = " \u2014 " + node["candidate_version"]
++    assert node["title"].endswith(suffix), f"title does not end with its version: {node['title']!r}"
++    return node["title"][: -len(suffix)]
++
++
++# Promotion adds these keys (flowmaster-validate CONTRACT_LIFECYCLE_KEYS): present, naming the release, once it
++# is selected; absent while it stages.
++PROMOTION_DERIVED = [
++    (("selected_release",), lambda g, b: g["candidate"]["release"]),
++    (("selected_prompt_version",), lambda g, b: g["candidate"]["version_family"]),
++    (("selected_member_count",), lambda g, b: g["candidate"]["member_count"]),
++]
++
++
+ TOP_AND_NESTED = [  # (contract path, graph getter) (§6.2)
+     (("selection_status",), lambda g, b: g["selection_status"]),
+     (("route_edges",), lambda g, b: g["edges"]),
+@@ -108,6 +145,83 @@
+      lambda g, b: g["source_bindings"]["source_snapshot_sha256"]),
+ ]
+ 
++# Release derivation (F06): identity, lifecycle and source-record values every release restates.
++RELEASE_DERIVED = [
++    (("target_release",), lambda g, b: g["candidate"]["release"]),
++    (("prompt_version",), lambda g, b: g["candidate"]["version_family"]),
++    (("candidate_member_count",), lambda g, b: g["candidate"]["member_count"]),
++    (("predecessor_release",), lambda g, b: g["baseline"]["release"]),
++    (("predecessor_prompt_version",), lambda g, b: g["baseline"]["version_family"]),
++    (("selected_release_during_staging",), lambda g, b: g["baseline"]["release"]),
++    (("selected_prompt_version_during_staging",), lambda g, b: g["baseline"]["version_family"]),
++    (("selected_member_count_during_staging",), lambda g, b: g["baseline"]["member_count"]),
++    (("contract_id",), lambda g, b: "{}-{}-DIRECT-HANDOFF-{}".format(
++        g["candidate"]["release"], g["candidate"]["version_family"], "SELECTED" if _production(g) else "CANDIDATE")),
++    (("status",), lambda g, b: "SELECTED_PRODUCTION" if _production(g) else "UNSELECTED_CANDIDATE"),
++    (("selection_claim",), lambda g, b: _production(g)),
++    (("publication_evidence",), lambda g, b: _production(g)),
++    (("source_snapshot", "frozen_candidate_graph", "contract_id"), lambda g, b: g["contract_id"]),
++    (("source_snapshot", "frozen_candidate_graph", "schema_version"), lambda g, b: g["schema_version"]),
++    (("source_snapshot", "frozen_candidate_graph", "path"), lambda g, b: "references/{}-{}-candidate-graph-contract.json"
++     .format(g["candidate"]["release"].lower(), g["candidate"]["version_family"])),
++    (("source_snapshot", "frozen_candidate_graph", "external_source_path"),
++     lambda g, b: "candidate/graph/{}-Candidate-Graph-Contract.json".format(g["candidate"]["release"])),
++]
++NAMED_PROMPTS = {  # contract object path -> member whose node it restates
++    ("abort_prompt",): "PR-50",
++    ("continuation_prompt",): "RS-40",
++    ("pr30_prompt",): "PR-30",
++    ("pr35_prompt",): "PR-35",
++    ("pr40_prompt",): "PR-40",
++    ("alpha_resumption_contract", "successor_trigger", "prompt"): "PR-10",
++}
++NAMED_PROMPT_FIELDS = {
++    "id": lambda g, n: n["id"],
++    "name": lambda g, n: _short_name(n),
++    "full_name": lambda g, n: n["title"],
++    "version": lambda g, n: n["candidate_version"],
++    "notion_url": lambda g, n: n["candidate_url"],
++    "notion_page_id": lambda g, n: _page_id(n["candidate_url"]),
++    "selection_status": lambda g, n: g["selection_status"],
++}
++MEMBER_DERIVED = {  # contract member_registry[id] field <- function of the graph node
++    "prompt_id": lambda g, n: n["id"],
++    "notion_page_id": lambda g, n: _page_id(n["candidate_url"]),
++    "lifecycle": lambda g, n: n["lifecycle"],
++    "selection_status": lambda g, n: g["selection_status"],
++}
++MANIFEST_DERIVED = {  # contract notion_page_manifest[id] field <- function of the graph node
++    "id": lambda g, n: _page_id(n["candidate_url"]),
++    "url": lambda g, n: n["candidate_url"],
++    "title": lambda g, n: n["title"],
++    "version": lambda g, n: n["candidate_version"],
++    "selection_status": lambda g, n: g["selection_status"],
++}
++
++
++def derived_items(graph: dict) -> list[tuple]:
++    """(path, value) for every release-derived path, in a fixed order."""
++    items = [(p, get(graph, None)) for p, get in RELEASE_DERIVED]
++    if _production(graph):
++        items += [(p, get(graph, None)) for p, get in PROMOTION_DERIVED]
++    # The addendum format (PF06 §0.1A, PF27): its home always; its expectations where the graph states them.
++    pf10 = graph["pf10_addendum_contract"]
++    items.append((("pf10_addendum_contract", "format_home"), pf10["format_home"]))
++    if "format_expectations" in pf10:
++        items.append((("pf10_addendum_contract", "format_expectations"), pf10["format_expectations"]))
++    mirrored_already = {p for p, _ in TOP_AND_NESTED}  # abort_prompt.id is mirrored from abort_contract
++    for path, prompt_id in NAMED_PROMPTS.items():
++        node = _node(graph, prompt_id)
++        for field, get in NAMED_PROMPT_FIELDS.items():
++            if path + (field,) not in mirrored_already:
++                items.append((path + (field,), get(graph, node)))
++    for node in graph["nodes"]:
++        for field, get in MEMBER_DERIVED.items():
++            items.append((("member_registry", node["id"], field), get(graph, node)))
++        for field, get in MANIFEST_DERIVED.items():
++            items.append((("notion_page_manifest", node["id"], field), get(graph, node)))
++    return items
++
+ # ---------------------------------------------------------------------------------------------
+ # §6.3 contract-only value table. Ops: ("set", path, value) | ("delete", path). A W-8 rename is a
+ # delete of the old key plus a set of the new one. SUCCESSOR_ORACLE_SHA256 is the one E2 value
+@@ -209,6 +323,7 @@
+     for node in graph["nodes"]:
+         for field in MEMBER_PAIRS:
+             paths.append(("member_registry", node["id"], field))
++    paths += [p for p, _ in derived_items(graph)]
+     return paths
+ 
+ 
+@@ -249,6 +364,18 @@
+     for node in graph["nodes"]:
+         for field, gfield in MEMBER_PAIRS.items():
+             _set(out, ("member_registry", node["id"], field), node[gfield])
++    for path, value in derived_items(graph):
++        _set(out, path, value)
++    if not _production(graph):
++        for path, _ in PROMOTION_DERIVED:
++            out.pop(path[0], None)
++    # The staging binding is carried while staging and never once selected (flowmaster-validate 3.2.15).
++    for node in graph["nodes"]:
++        member = out["member_registry"][node["id"]]
++        if _production(graph):
++            member.pop("candidate_page_binding", None)
++        else:
++            member["candidate_page_binding"] = node["candidate_page_binding"]
+     for op in value_table:
+         if op[0] == "set":
+             _set(out, op[1], op[2])
+@@ -353,14 +480,34 @@
+     return 0 if rep["ACCEPTANCE_PASS"] and rep["NEGATIVE_CONTROL_PASS"] and not lo else 1
+ 
+ 
++def release_value_ops(path: str | None, graph: dict) -> list[tuple]:
++    """A release's literals that no graph field carries: a JSON file {"release": R, "version_family": V,
++    "ops": [["set", [path...], value] | ["delete", [path...]]]}. R and V must name the graph's candidate, so a
++    file is never applied to another release's build."""
++    if not path:
++        return []
++    doc = json.loads(open(path, "rb").read())
++    assert (doc.get("release"), doc.get("version_family")) == (graph["candidate"]["release"],
++                                                               graph["candidate"]["version_family"]), \
++        "release-values file names another release"
++    unfilled = re.findall(r'"@[A-Z0-9_]+"', json.dumps(doc["ops"]))
++    assert not unfilled, f"release-values file has unfilled markers: {sorted(set(unfilled))}"
++    ops = []
++    for op in doc["ops"]:
++        assert op[0] in ("set", "delete") and isinstance(op[1], list) and op[1], f"bad release-values op: {op!r}"
++        ops.append((op[0], tuple(op[1])) + ((op[2],) if op[0] == "set" else ()))
++    return ops
++
++
+ def generate(graph_path: str, template_path: str, oracle_path: str, outs: list[str],
+-             contract_revision: str, primary_skill_revision: str) -> int:
++             contract_revision: str, primary_skill_revision: str, release_values: str | None = None) -> int:
+     gb = graph_block(graph_path)
+     g = json.loads(gb)
+     assert hashlib.sha256(open(oracle_path, "rb").read()).hexdigest() == SUCCESSOR_ORACLE_SHA256, "oracle digest"
+     assert g["protected_identities"]["r1_oracle_sha256"] == SUCCESSOR_ORACLE_SHA256, "graph G16 not applied"
+     t = json.loads(open(template_path, "rb").read())
+-    out = serialise(regenerate(t, g, gb, VALUE_TABLE + revision_ops(contract_revision, primary_skill_revision)))
++    ops = VALUE_TABLE + revision_ops(contract_revision, primary_skill_revision) + release_value_ops(release_values, g)
++    out = serialise(regenerate(t, g, gb, ops))
+     for p in outs:
+         open(p, "wb").write(out)
+     print(json.dumps({"graph": [len(gb), hashlib.sha256(gb).hexdigest()],
+@@ -380,6 +527,8 @@
+         ap.add_argument("outs", nargs="+")
+         ap.add_argument("--contract-revision", required=True)
+         ap.add_argument("--primary-skill-revision", required=True)
++        ap.add_argument("--release-values")
+         a = ap.parse_args(sys.argv[2:])
+-        raise SystemExit(generate(a.graph, a.template, a.oracle, a.outs, a.contract_revision, a.primary_skill_revision))
++        raise SystemExit(generate(a.graph, a.template, a.oracle, a.outs, a.contract_revision, a.primary_skill_revision,
++                                  a.release_values))
+     raise SystemExit(__doc__)
