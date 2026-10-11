@@ -286,6 +286,10 @@ Entered 2026-10-11 under Nathan's approval of the plan at `0a6bf2db`. It works P
 | X3 | PART-01 | VERIFIED | Commit `8ec03055`. Every expected value in §4 matched: build 237 edges, 596,008 B, `ff296b1e…`; parts manifest `b27c11ca…` over 56 files; derivation 771 B `27a2be82…` (exit 1, drift `[PR-40, RS-20]`); guards 9,013 B `62245446…` |
 | X4 | PART-01 | VERIFIED | W1–W8: one `update_content` call per page, carrying 1, 4, 4, 4, 1, 1, 2 and 5 replacements. Each call returned success with no error, warning or async task. The pages' new last-edited times run from 15:02:20.983Z (QA-50) to 16:10:06.322Z (PE) |
 | X5 | PART-01 | VERIFIED | T5 16:10:32Z, fresh reads. `check`: `"ok": true`; the revision moved on 8 of 8 pages, 22 of 22 operations landed and 32 of 32 guards pass. `registry`: `"ok": true`, with 24 of 24 fixtures and 32 of 32 page rows in agreement. The full reading found all eight pages intact |
+| X6 | PART-01 | VERIFIED | Checkpoint commit `4ea61c29`, with the record at `EXECUTING`. The validator passes and `git diff --check` is clean. After `git fetch`, `git diff --quiet origin/<branch>` holds, with local and remote both at `4ea61c29` (re-checked at 19:50Z) |
+| X7 | PART-04 | VERIFIED | W9 (candidate catalog) and W10 (Alpha feedback): one `update_content` call each, replacing the PLAN status line; each returned success. Re-fetched, the catalog (last edited 19:47:45.856Z) and Alpha feedback (19:48:02.791Z) each carry exactly one line with the prefix, equal to the EXECUTE text, and the PLAN line is gone. Alpha feedback was checked by script on the harness's saved copy of the fetch. The Modification Backlog is unchanged since 13:33:28Z and shows MB-007 and MB-008 once each |
+| X8 | PART-04 | VERIFIED | PR #600 body updated at 19:52:53Z under the five template headings, including "Merging preserves the record and approves nothing (D21-C)". `pull_request_read` shows every heading; the PR stays draft at `4ea61c29` |
+| X9 | all | NOT_RUN | Stopped before X9 on finding E-2 (template rule 1). Waits on Nathan's decision DN-E2; the record stays `EXECUTING` |
 
 **Checkpoint (X6, D26-C).** PART-01's native repairs and the graph execution copy are landed and verified. The record stays `EXECUTING` until X9.
 
@@ -294,3 +298,47 @@ Observation E-1, outside this Modification's edits. The X5 reading found two fea
 - a bold label containing inline code, which Notion renders with doubled asterisks.
 
 No `old_str` or `new_str` contains a heading or that markup, so neither comes from X4. Neither changes behavior, and they are recorded here rather than repaired (scope freeze).
+
+### Stop before X9 — finding E-2, 2026-10-11
+
+**EXECUTE stops before X9 and returns to Nathan with DECISION NEEDED.** X0–X8 are verified, and PART-01 stays landed. Template rule 1 says a mode that finds its plan wrong records the finding and does not carry on past it. X9 is therefore `NOT_RUN`, and the record stays `EXECUTING`.
+
+**Finding E-2: PLAN successor 2 has no step that updates the Flow Index.**
+
+- **The rule.** PF04-Canon-HDE-Governance §9.1.6 says: "Update the map when a prompt is proposed, contracted, authored, independently reviewed, repaired, published, activated, held, superseded, retired or replaced by an immutable successor." The map it names is the Glow HDE Living Prompt Flow Map, maintained in Notion.
+- **The page.** A Notion search on 2026-10-11 finds no page with that title.
+  - The closest page is *Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1* (`3db4590a05eb81de9736ea69bac61016`). It calls itself "the living operational mapping index for prompt families, actors, artifacts, direct links, lifecycle, repair state, and evidence".
+  - Its last section, *Alpha feedback candidate — 2026-10-09*, was written by MODIFICATION-20261009's EXECUTE. It links the candidate catalog and gives the candidate's state as of that date.
+  - The page was last edited at 2026-10-09T20:18:59Z and carries nothing from this Modification.
+- **Why EXECUTE does not write it.** The plan's tracking writes are W9, on the catalog (a child of that page), and W10, on Alpha feedback. Nathan authorized W1–W10 and no others.
+- **What it is not.** No step failed, and nothing is rolled back. This is not D26-B's failure path.
+
+**Decision DN-E2, for Nathan:**
+
+1. **Authorize W11 (recommended).** W11 is one `update_content` call on the Flow Index.
+   - **The edit:** it replaces the section's last paragraph, which begins "Work record: `docs/ephemeral/modifications/MODIFICATION-20261009", with that paragraph unchanged, followed by the W11 text below.
+   - **Verification:** a re-fetch shows that paragraph once, followed directly by the W11 text, once.
+   - **Rollback:** Nathan restores the page from its history (R-N).
+2. **No write.** Nathan rules that W9's line on the catalog discharges the map update, because the Flow Index links the catalog. Or he moves the map update to the MB-008 Modification.
+
+Under either option, EXECUTE then adds E-2 and the ruling to PR #600's body, and runs X9 as planned, recording the outcome in §E.
+
+**W11 text.** It is applied without the quote markers. The bullets follow the Flow Index's own maintenance protocol, which asks each statement to name its state axis and to record the actor, decision owner, unresolved items and next gate.
+
+> **MODIFICATION-20261010 — 2026-10-11.** Recorded from completed readbacks. It creates no selection, activation or runtime authority.
+> - **Implementation conformity:** F02–F05 are repaired in eight candidate bodies (QA-50, CF-C-30, CF-E-30, IA-30, QA-70, RS-20, ESC-40 and PE), each re-read and checked after the write. An execution copy of the candidate graph carrying F05 and F09, with its registry inputs, is in the record.
+> - **Implementation conformity, unresolved:** the package side of F02, F04 and F05, together with F06 and F07, moved to a new Modification (MB-008 on the GCFPE Modification Backlog). F01 and F08 remain listed risks.
+> - **Operational lifecycle:** the candidate's members stay published and unselected; none is active.
+> - **Execution gate:** no candidate member may be invoked at runtime. The register still selects GCFPE-20260914.1 / 091426.1.
+> - **Actor, decision owner and next gate:** GCFPE-MGMT-10, run in a Claude Code session, authored and checked the repairs; no independent acceptance is claimed. Nathan owns the merge of [PR #600](https://github.com/amthorn78/glow-hdengine-v2/pull/600) and any promotion, and promotion also needs the MB-008 Modification. The record is `docs/ephemeral/modifications/MODIFICATION-20261010-gcfpe-candidate-skill-analysis.md`.
+
+**Sources searched for E-2.**
+
+- PF04-Canon-HDE-Governance §9.1.6, read in full on `main` at `1ea6a262`.
+- PF10-HDE-Build-Notes v13.5.1: no current addenda, so no override.
+- `docs/prompt_ecosystem_management/notion-write-boundary.md`, *What this does not change*: the maintenance destinations.
+- The Flow Index page, read in full.
+
+Canon requires a map update but does not name a page with the map's title. Nathan's approval excludes any write beyond W10. Neither settles the question, so it goes to Nathan.
+
+**D22.** The executor's PE reads were saved by the harness to the tool-results files `…1791728124612` (X2) and `…1791735118465` (X5). They were never reopened and are left to the harness's teardown. The other seven pages were read inline, in the executor's transcript. Pages that are not prompt bodies (the catalog, Alpha feedback, the backlog and the Flow Index) are outside D22.
