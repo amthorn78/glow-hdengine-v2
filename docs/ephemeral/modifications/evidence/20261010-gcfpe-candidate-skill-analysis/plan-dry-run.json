@@ -1,0 +1,339 @@
+{
+  "date_utc": "2026-10-11T01:10:04.675890+00:00",
+  "mode": "PLAN",
+  "outcome": "INCOMPLETE_DRY_RUN_PRE_REVIEW_STOP",
+  "all_baseline_identities_match": true,
+  "source_identities": [
+    {
+      "skill": "change-flow",
+      "expected_freeze": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+      "observed_freeze": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+      "freeze_matches": true,
+      "archive_sha256": "4b145079b5233b287930aeb32c96ff3f45882bbe9e74a6e9a81979ef18d20441",
+      "archive_matches": true
+    },
+    {
+      "skill": "flowmaster-primary",
+      "expected_freeze": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6",
+      "observed_freeze": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6",
+      "freeze_matches": true,
+      "archive_sha256": "3660420a9674cfe12737e76e6f29952c07575f077a3dc5d06f3021bafe5037c3",
+      "archive_matches": true
+    },
+    {
+      "skill": "flowmaster-propagate",
+      "expected_freeze": "3 6297d67ad34ae0b33c1a31c29d32eef4db6156537c7b101469d499309e326ddf",
+      "observed_freeze": "3 6297d67ad34ae0b33c1a31c29d32eef4db6156537c7b101469d499309e326ddf",
+      "freeze_matches": true,
+      "archive_sha256": "10918f599cad00935145085fcabb4a639f911f5116ac3dd286d7b5f06eadd8bb",
+      "archive_matches": true
+    },
+    {
+      "skill": "flowmaster-validate",
+      "expected_freeze": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+      "observed_freeze": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+      "freeze_matches": true,
+      "archive_sha256": "e6134cfe1107e9f3c58a8d5ff3de13bd336491093f9abe2d5e42357b4ada1d95",
+      "archive_matches": true
+    },
+    {
+      "skill": "glow-hde-pr-development",
+      "expected_freeze": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+      "observed_freeze": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+      "freeze_matches": true,
+      "archive_sha256": "e137cb6e163dbedb697215ba7a573023293744549bcae8eb8d062fb90bf7dac3",
+      "archive_matches": true
+    },
+    {
+      "skill": "glow-merged-change-attribution-lock",
+      "expected_freeze": "11 ee253cfaf844a5ce28da3646e469d3a926167ecb3898e5dc205b0365dc946a8e",
+      "observed_freeze": "11 ee253cfaf844a5ce28da3646e469d3a926167ecb3898e5dc205b0365dc946a8e",
+      "freeze_matches": true,
+      "archive_sha256": "f278928bd4dd194ad8e3181b9e0af1d8a944883769539a6d415dbfc0392d1ad7",
+      "archive_matches": true
+    },
+    {
+      "skill": "typesafe-scoring",
+      "expected_freeze": "3 088c77f36ae96bcb9a1bcbdd9b1b8ee58272175094b0f3208b5337a3ce4881f5",
+      "observed_freeze": "3 088c77f36ae96bcb9a1bcbdd9b1b8ee58272175094b0f3208b5337a3ce4881f5",
+      "freeze_matches": true,
+      "archive_sha256": "63127fa0367bad36775972408f257f87f3830971ccc745d81066f4cf04f7486b",
+      "archive_matches": true
+    }
+  ],
+  "command_receipts": [
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/change-flow"
+      ],
+      "exit_code": 0,
+      "stdout": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/flowmaster-primary"
+      ],
+      "exit_code": 0,
+      "stdout": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/flowmaster-propagate"
+      ],
+      "exit_code": 0,
+      "stdout": "3 6297d67ad34ae0b33c1a31c29d32eef4db6156537c7b101469d499309e326ddf\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/flowmaster-validate"
+      ],
+      "exit_code": 0,
+      "stdout": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/glow-hde-pr-development"
+      ],
+      "exit_code": 0,
+      "stdout": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/glow-merged-change-attribution-lock"
+      ],
+      "exit_code": 0,
+      "stdout": "11 ee253cfaf844a5ce28da3646e469d3a926167ecb3898e5dc205b0365dc946a8e\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/freeze.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/typesafe-scoring"
+      ],
+      "exit_code": 0,
+      "stdout": "3 088c77f36ae96bcb9a1bcbdd9b1b8ee58272175094b0f3208b5337a3ce4881f5\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/prompt_ecosystem_management/modification_validate.py",
+        "docs/ephemeral/modifications/MODIFICATION-20261010-gcfpe-candidate-skill-analysis.md"
+      ],
+      "exit_code": 1,
+      "stdout": "FAIL  docs/ephemeral/modifications/MODIFICATION-20261010-gcfpe-candidate-skill-analysis.md\n        SCOPE FREEZE: status PLANNING requires item_count_at_approval; without it the freeze is unenforced and items can be added after approval\n\n0/1 passed\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/change-flow/scripts/validate_gcfpe_20260914.py"
+      ],
+      "exit_code": 0,
+      "stdout": "PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/glow-hde-pr-development/scripts/validate_glow_hde_pr_development.py"
+      ],
+      "exit_code": 0,
+      "stdout": "PASS: Glow HDE PR development skill structural contract\n",
+      "stdout_kind": "complete text stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/flowmaster-validate/scripts/validate_gcfpe_20260914.py",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/change-flow",
+        "--contract",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
+      ],
+      "exit_code": 0,
+      "top_level_keys": [
+        "candidate_member_count",
+        "contract_sha256",
+        "contract_status",
+        "errors",
+        "frozen_graph_edge_count",
+        "frozen_graph_node_count",
+        "frozen_graph_sha256",
+        "ok",
+        "pf10_producers",
+        "plan_writers",
+        "profile",
+        "prompt_bodies_validated",
+        "prompt_body_checks_not_evaluated",
+        "prompt_body_count",
+        "prompt_version",
+        "selected_alias_during_staging",
+        "selected_member_count",
+        "selection_status",
+        "target_release"
+      ],
+      "receipt": {
+        "candidate_member_count": 55,
+        "contract_sha256": "dbae180bb5c2f73e3f27a46601bfb5cbe7321e5431dbaba8763b1a576cd9343c",
+        "contract_status": "SELECTED_PRODUCTION",
+        "errors": [],
+        "frozen_graph_edge_count": 229,
+        "frozen_graph_node_count": 55,
+        "frozen_graph_sha256": "ae2bd159f0ba947c2e470f96579fadfbf060f74423aa974ae1194ac16bb2484d",
+        "ok": true,
+        "profile": "GCFPE-20260914.1-091426.1-VALIDATION",
+        "prompt_bodies_validated": [],
+        "prompt_body_checks_not_evaluated": [
+          "ALL_BODY_LEVEL_CHECKS"
+        ],
+        "prompt_body_count": 0,
+        "prompt_version": "091426.1",
+        "selected_alias_during_staging": null,
+        "selected_member_count": 55,
+        "selection_status": "SELECTED_PRODUCTION",
+        "target_release": "GCFPE-20260914.1"
+      },
+      "stdout_kind": "selected top-level JSON fields; not complete raw stdout",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs/flowmaster-validate/scripts/validate_flowmaster.py",
+        "--skills-root",
+        "/workspace/scratch/fa82d6934864/skill-review-inputs",
+        "--strict-warnings"
+      ],
+      "exit_code": 1,
+      "top_level_keys": [
+        "advisories",
+        "change_contract_coverage",
+        "finding_counts",
+        "findings",
+        "fixtures",
+        "missing_expected_skills",
+        "oracle_authority",
+        "oracle_profile",
+        "primary_prerequisite",
+        "primary_revision",
+        "primary_sha256",
+        "schema_version",
+        "self_identity",
+        "skills",
+        "suite_ok",
+        "validator_revision",
+        "verdict",
+        "warnings"
+      ],
+      "receipt": {
+        "missing_expected_skills": [
+          "tw-flowmaster",
+          "session-branch-flowmaster",
+          "session-relay-flowmaster"
+        ],
+        "oracle_profile": "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260923_1",
+        "primary_revision": "1.0.3",
+        "primary_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
+        "schema_version": "flowmaster-validation-report-v2",
+        "self_identity": "OK",
+        "suite_ok": false,
+        "validator_revision": "3.3.2",
+        "verdict": "FLOWMASTER_SUITE_FAIL",
+        "warnings": []
+      },
+      "stdout_kind": "selected top-level JSON fields; not complete raw stdout",
+      "stderr": ""
+    }
+  ],
+  "candidate_baseline": {
+    "candidate_prompt_count": 55,
+    "rs20_has_pr20_edge": false,
+    "producer_allocates_pf10_number": false,
+    "interpretation": "Observed unrepaired baseline, not a passing repair gate."
+  },
+  "missing_from_supplied_input_root": [
+    "glow-graph-contract",
+    "session-relay-flowmaster",
+    "tw-flowmaster",
+    "session-branch-flowmaster",
+    "amthor-workspace-governance-audit"
+  ],
+  "not_run": [
+    "shipped candidate graph/registry derivation",
+    "implemented six-repair guard fixtures",
+    "governed packaging/extracted repaired gates",
+    "D24 package review",
+    "formal PLAN FULL review",
+    "any runtime QA/Ops or skill installation"
+  ],
+  "limits": [
+    "Commands run against unchanged supplied inputs.",
+    "Missing intended companions were not replaced with old installed copies.",
+    "Historical fixture results are reused from ANALYZE, not recounted as new coverage.",
+    "Native page checks are separate in plan-source-checks.json.",
+    "No prompt body was supplied, copied, hashed or saved."
+  ],
+  "record_check_rerun": {
+    "argv": [
+      "python",
+      "-B",
+      "docs/prompt_ecosystem_management/modification_validate.py",
+      "docs/ephemeral/modifications/MODIFICATION-20261010-gcfpe-candidate-skill-analysis.md"
+    ],
+    "exit_code": 0,
+    "stdout": "ok    docs/ephemeral/modifications/MODIFICATION-20261010-gcfpe-candidate-skill-analysis.md\n\n1/1 passed\n",
+    "stderr": "",
+    "correction": "Set item_count_at_approval to 4; no item or part changed. Initial failure preserved above."
+  }
+}
