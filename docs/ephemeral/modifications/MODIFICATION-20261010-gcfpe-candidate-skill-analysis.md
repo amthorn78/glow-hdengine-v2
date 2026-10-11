@@ -165,6 +165,10 @@ Next: obtain `glow-graph-contract`, intended current `session-relay-flowmaster`,
 
 The record remains `PLANNING`; `plan_approved_by` and `plan_approved_date` remain empty. No prompt, skill, selected graph/registry, canon or release selection changed. Merging preserves the record and approves nothing (D21-C).
 
+### PLAN publication checkpoint — 2026-10-11
+
+The eight PLAN documents were published at `590c21000707e40325bde45968aad0b2d8d889b2` in [draft PR #600](https://github.com/amthorn78/glow-hdengine-v2/pull/600), fetched completely and matched to the local files and Git tree. The candidate catalog and Alpha feedback were updated and read back, with the original three catalog diagrams preserved. [plan-publication.json](evidence/20261010-gcfpe-candidate-skill-analysis/plan-publication.json) records the exact file and native-page receipts. This publishes the stopped plan; it does not claim PLAN completion, formal review, repair or EXECUTE approval.
+
 ## §E — Execute
 
 Not entered. No skills, prompt bodies, canon, selected graph/registry or release state were changed.
