@@ -1,0 +1,59 @@
+{
+ "rows": 55,
+ "parts": 55,
+ "drift": [
+  "PR-40",
+  "RS-20"
+ ],
+ "rows_without_part": [],
+ "derived": {
+  "PR-40": {
+   "required_interfaces": [
+    "DOC-10",
+    "DOC-20",
+    "OPS-10",
+    "PR-10",
+    "PR-20",
+    "QA-10",
+    "RS-10"
+   ],
+   "consumers": [
+    "DOC-10",
+    "DOC-20",
+    "OPS-10",
+    "PR-10",
+    "PR-20",
+    "QA-10",
+    "RS-10"
+   ],
+   "states": [
+    "ACCEPT",
+    "PENDING",
+    "REJECT"
+   ]
+  },
+  "RS-20": {
+   "required_interfaces": [
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "RS-30",
+    "RS-40"
+   ],
+   "consumers": [
+    "PR-20",
+    "PR-30",
+    "PR-35",
+    "RS-30",
+    "RS-40"
+   ],
+   "states": [
+    "APPROVE",
+    "IN_SCOPE_REPAIR",
+    "REJECT",
+    "REVISION_REQUIRED",
+    "SPECIFICATION_CHANGE_REQUIRED"
+   ]
+  }
+ }
+}
