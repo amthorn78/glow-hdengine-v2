@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261011-gcfpe-mb008-to-promotion"
-status: "ANALYZING"
+status: "ANALYZED"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "GCFPE-MGMT-10", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -11,7 +11,7 @@ override: {"by": "", "overrides": [], "reason": ""}
 interaction_cost_predicted: 19
 interaction_cost_actual:
 estimate: {"plan": "6–10 h and 4–7M aggregate tokens: fresh reads of about 56 pages for the dry run, operations for about 54 bodies and PE, redlines for six packages, the F06 profile and contract design, the registry guards, the qualification procedure and the promotion transaction plan, then one FULL round of two reviewers and at most one DIFF_CHECK", "execute": "12–20 h and 6–10M aggregate tokens, excluding Product Owner waiting time: about 70 Notion body operations with fresh-read checks, six packages through one D24 cycle, the qualification gates and post-flight, and the promotion transaction of about 70 Notion writes and moves plus the literal sweep"}
-reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-11", "required_open": 0, "outcome": "Author dry run: 55 of 55 closure calls exit 0; the candidate build reproduces 237 edges ff296b1e… and the selected build the proof token ae2bd159…; the contract probe's control returns 0 and 0 errors, the candidate 62 in 8 classes; all 13 installed skill digests match their recorded values (12 in the parent's PLAN successor 1, glow-po-reporting in D22's status entry); 8 of 8 sampled worker quotes match fresh reads of PR-35 and CL-40; the validator passes on this record and on all 16 records. No defect in the analysis record is open from the dry run."}, {"mode": "ANALYZE", "kind": "FULL", "date": "2026-10-11", "required_open": 3, "outcome": "Round 1 at 978d233e, two fresh reviewers. A: 1 required (R-A1, printing the reading beside the block breaks D23's C-PLACE or C-ART, and no D23 successor is targeted). B: 2 required (B-1, the execution-surface half of F07 is dropped although PF10 2.1 leaves it and PF04 §9.1.3 requires it; B-2, DN-B option B2 has the skill write and place things its own D28 and D23-B forbid). Distinct required count 3, none in repaired text. 33 LISTED (A 15, B 18) stay listed. All measurements reproduced by both. The author repairs the three; one DIFF_CHECK follows."}]
+reviews: [{"mode": "ANALYZE", "kind": "DRY_RUN", "date": "2026-10-11", "required_open": 0, "outcome": "Author dry run: 55 of 55 closure calls exit 0; the candidate build reproduces 237 edges ff296b1e… and the selected build the proof token ae2bd159…; the contract probe's control returns 0 and 0 errors, the candidate 62 in 8 classes; all 13 installed skill digests match their recorded values (12 in the parent's PLAN successor 1, glow-po-reporting in D22's status entry); 8 of 8 sampled worker quotes match fresh reads of PR-35 and CL-40; the validator passes on this record and on all 16 records. No defect in the analysis record is open from the dry run."}, {"mode": "ANALYZE", "kind": "FULL", "date": "2026-10-11", "required_open": 3, "outcome": "Round 1 at 978d233e, two fresh reviewers. A: 1 required (R-A1, printing the reading beside the block breaks D23's C-PLACE or C-ART, and no D23 successor is targeted). B: 2 required (B-1, the execution-surface half of F07 is dropped although PF10 2.1 leaves it and PF04 §9.1.3 requires it; B-2, DN-B option B2 has the skill write and place things its own D28 and D23-B forbid). Distinct required count 3, none in repaired text. 33 LISTED (A 15, B 18) stay listed. All measurements reproduced by both. The author repairs the three; one DIFF_CHECK follows."}, {"mode": "ANALYZE", "kind": "DIFF_CHECK", "date": "2026-10-11", "required_open": 1, "outcome": "Reviewer C checked 978d233e..90ccb082 on the record and scope-measurement.md. R-A1 and B-1 fixed; B-2 fixed with a new required defect in the same rewritten text, DIFF-C1 (R3): DN-B option 1's D28 gives CL-40 and nine read-only bodies a Notion write that D25-A and D25-B rule out, and no D25 successor is targeted. Required count 3 to 1, more than halved. 13 LISTED (L-C1 to L-C13). This was the last ANALYZE review D26-A allows; the analysis returns to Nathan with every open finding listed."}]
 items:
   - {"id": "ITEM-01", "statement": "Bring change-flow, flowmaster-validate and glow-hde-pr-development into line with the repaired candidate's F02, F04 and F05 behavior.", "source": "MB-008; MODIFICATION-20261010 findings F02, F04, F05", "disposition": ""}
   - {"id": "ITEM-02", "statement": "Give those packages a candidate contract and validation profile derived from the final candidate graph, keeping the 091426.1 instruments as history (F06).", "source": "MB-008; MODIFICATION-20261010 finding F06", "disposition": ""}
@@ -213,3 +213,48 @@ ANALYZE review under D26-A follows the dry run in the ledger.
 | B-2 (R3) | DN-B option B2 ran the skill "as built", which writes beyond its own D28 and puts the reading in the block | DN-B states each option's exact writes and placement. D28 covers create, correct after a failed readback, and set Nathan's pick on his statement |
 
 The 33 LISTED findings (A: L-A1 to L-A15; B: L-B1 to L-B18) stay listed. They go to Nathan as accepted risks unless he opts into one. One bounded DIFF_CHECK of the repair follows. It is the last review this mode allows under D26-A.
+
+**DIFF_CHECK, 2026-10-11.** Reviewer C, in a fresh context, checked only the repair diff `978d233e..90ccb082`, from a brief committed at `7a4465e7` before it was spawned ([REVIEW-ANALYZE-DIFF.md](evidence/20261011-gcfpe-mb008-to-promotion/REVIEW-ANALYZE-DIFF.md)). R-A1 and B-1 are fixed. B-2 is fixed, and the same rewritten DN-B text carries one new required defect:
+
+- **DIFF-C1 (R3), open.** Option 1 has every handoff-emitting session create a uses-table row under D28, and that includes CL-40.
+  - D25-A says CL-40 "writes no other Notion page" than the Candidate CRD Items List; CL-40's body and candidate registry row say the same.
+  - D25-B's "Nothing else is excluded" is pinned on nine handoff-emitting rows: CL-20, CL-30, CL-40, CL-E-20, DOC-20, ESC-25, PR-20, PR-40, QA-10.
+  - No D25 successor is targeted. Option 2 is unaffected.
+  - The reviewer's smallest correction: either record D28 as a D25 successor naming those limits, or have CL-40 (and, if preferred, the nine) skip the row and record the reading as option 2 does. That correction is a ruling's wording, so it is carried into DN-B in §11 rather than repaired after the last review.
+
+The required count went from 3 to 1. Thirteen LISTED observations (L-C1 to L-C13) stay listed.
+
+**Open findings at return, accepted as risks on approval unless Nathan opts in** (`DISP-001`, D26-A rule 4):
+
+| Source | Findings | Where each is stated |
+|---|---|---|
+| DIFF_CHECK, required | DIFF-C1 | above; resolved by Nathan's DN-B answer (§11) |
+| Round 1, reviewer A | L-A1 to L-A15 | `REVIEW-ANALYZE-1-A.md`, each with path, likelihood and consequence |
+| Round 1, reviewer B | L-B1 to L-B18, plus two PLAN questions | `REVIEW-ANALYZE-1-B.md` |
+| DIFF_CHECK, reviewer C | L-C1 to L-C13 | `REVIEW-ANALYZE-DIFF.md` |
+| This analysis | A-6 to A-10 | §A.6 |
+
+### 11. Return to Nathan — 2026-10-11
+
+**`PRODUCT_OWNER_ACTION_PENDING`.** The analysis is complete within D26-A's review cap. One FULL round found 3 required defects, and all were repaired. The single DIFF_CHECK found 1 new required defect, DIFF-C1, inside DN-B option 1. Your approval of the analysis, with answers to DN-A to DN-F, opens PLAN.
+
+**DN-B after the DIFF_CHECK (successor to the recommendation in §A.7, which stays as written).** DIFF-C1 shows option 1 needs two rule changes, not one: D28, and a D25 successor for CL-40's single-page limit and the nine read-only claims. Otherwise CL-40 and those nine skip the row.
+
+- **Option 2 is now recommended.** It meets PF10 2.1 within every existing ruling: the reading lives in the producing session's artifact, the line before the block names it, and your pick goes in the receiving session's artifact when you state it.
+- **Choose option 1 if you want GCFPE readings in the central TypeSafe uses table.** Then say which form:
+  - **1a:** D28 recorded as a D25 successor covering CL-40 and the nine;
+  - **1b:** CL-40 and the nine skip the row.
+
+**Spend.**
+
+- **Time:** about 1 h 15 min, from about 21:00Z to 22:15Z.
+- **Subagent tokens, as reported by the harness:** 2.19M in total.
+  - Four body-scan workers: 0.87M (161K, 221K, 210K, 275K).
+  - Reviewers A and B: 1.00M.
+  - Reviewer C: 0.32M.
+- **Coordinator:** the session counter fell by about 0.68M.
+- **Total:** about 2.9M.
+- No estimate existed for ANALYZE itself. PLAN and EXECUTE are estimated in frontmatter.
+
+**Approval form that fits this record:** "Nathan approves the analysis of MODIFICATION-20261011-gcfpe-mb008-to-promotion at `<commit>`, with DN-A …, DN-B …, DN-C …, DN-D …, DN-E …, DN-F …, accepting the open findings listed in §A.10. Go on to PLAN." `analyze_approved_by` stays empty until then (D21-C: merging approves nothing).
+
