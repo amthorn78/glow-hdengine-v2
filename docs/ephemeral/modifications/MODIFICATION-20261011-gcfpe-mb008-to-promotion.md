@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261011-gcfpe-mb008-to-promotion"
-status: "ANALYZED"
+status: "PLANNING"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "GCFPE-MGMT-10", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -33,8 +33,9 @@ parts:
   - {"id": "PART-08", "name": "Promotion transaction", "items": ["ITEM-08"], "class": "B", "after": ["PART-07"]}
 request: "start the MB-008 Modification and take it to promotion."
 requested_by: "Nathan"
-analyze_approved_by: ""
-analyze_approved_date: ""
+analyze_approved_by: "Nathan"
+analyze_approved_date: "2026-10-11"
+item_count_at_approval: 9
 plan_approved_by: ""
 plan_approved_date: ""
 supersedes: ""
@@ -258,3 +259,21 @@ The required count went from 3 to 1. Thirteen LISTED observations (L-C1 to L-C13
 
 **Approval form that fits this record:** "Nathan approves the analysis of MODIFICATION-20261011-gcfpe-mb008-to-promotion at `<commit>`, with DN-A …, DN-B …, DN-C …, DN-D …, DN-E …, DN-F …, accepting the open findings listed in §A.10. Go on to PLAN." `analyze_approved_by` stays empty until then (D21-C: merging approves nothing).
 
+### 12. Approval to enter PLAN — 2026-10-11
+
+Nathan, approving: “Nathan approves the analysis of MODIFICATION-20261011-gcfpe-mb008-to-promotion at 80da7805, with DN-A …, DN-B …, DN-C …, DN-D …, DN-E …, DN-F …, accepting the open findings in §A.10. Go on to PLAN.”
+
+The six decision slots came through as the template's “…”. Asked which answers PLAN should use, Nathan chose “All six recommendations (Recommended)”. That option read: “DN-A: include F01+F08; MB-010 stays on the backlog. DN-B: option 2 (reading in the producing session's file, one line before the handoff names it, your pick in the receiving session's file; no new rule). DN-C: A (three-mode body becomes MGMT-10's successor). DN-D: D2 (after your promotion approval, this Modification runs the transaction with your installs). DN-E: E1 (installed attribution lock, pinned by digest). DN-F: F1 (post-flight by two fresh reviewer subagents).”
+
+What this approves:
+
+| Decision | Answer | Effect on PLAN |
+|---|---|---|
+| DN-A | F01 and F08 included; MB-010 not batched | PART-04 stays. MB-010 stays on the backlog |
+| DN-B | Option 2 | The reading and the surface advice go into the producing session's output artifact. One line before the block names them and the path. Nathan's pick goes into the receiving session's artifact when he states it. No D28, no D23 or D25 successor, no flow-session Notion write. DIFF-C1 is resolved by this choice, because it arose only under option 1 |
+| DN-C | A | PART-05 makes the D20 three-mode body GCFPE-MGMT-10's successor in this release. D20-B's Class A wording (L-A4, L-B7) is met by this explicit authorization |
+| DN-D | D2 | After qualification EXECUTE returns `PROMOTION_CHECKPOINT_REQUIRED`. Nathan's exact promotion approval then authorizes PART-08, waiving for this run the MGMT-10 body's exclusion of release selection, promotion and archival (L-A3) |
+| DN-E | E1 | Qualification uses the installed attribution lock `10 c518ccb0…`, bound by digest. MB-005 stays open |
+| DN-F | F1 | The post-flight runs as two fresh-context reviewer subagents under D24's conditions |
+
+The analysis above (§A.1 to §A.11) is unchanged and now frozen. The open findings listed in §A.10 are accepted as risks (`DISP-001`). The scope is the nine items, recorded as `item_count_at_approval: 9`. `plan_approved_by` stays empty until Nathan approves the plan.
