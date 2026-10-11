@@ -342,3 +342,9 @@ Under either option, EXECUTE then adds E-2 and the ruling to PR #600's body, and
 Canon requires a map update but does not name a page with the map's title. Nathan's approval excludes any write beyond W10. Neither settles the question, so it goes to Nathan.
 
 **D22.** The executor's PE reads were saved by the harness to the tool-results files `…1791728124612` (X2) and `…1791735118465` (X5). They were never reopened and are left to the harness's teardown. The other seven pages were read inline, in the executor's transcript. Pages that are not prompt bodies (the catalog, Alpha feedback, the backlog and the Flow Index) are outside D22.
+
+### DN-E2 decision — 2026-10-11
+
+Nathan: “Authorize W11 as written in §E of the record at 86898299.”
+
+This chooses option 1. It authorizes one Notion write, W11, on the Flow Index (`3db4590a05eb81de9736ea69bac61016`), with the edit, text, verification and rollback in *Stop before X9 — finding E-2* above, as committed at `86898299`. No other write is added. EXECUTE resumes with W11, then adds E-2 and this decision to PR #600's body, then runs X9.
