@@ -6,7 +6,7 @@
  "semantics": "A unit is a line, or a sentence within a line (split after . ! or ?). A unit matches when every `all` pattern matches it and no `except` pattern does. A forbidden guard passes at 0 matching units; a required guard passes at exactly `expect` matching units per prompt. Only counts are reported (D22).",
  "fixture_rule": "Fixtures are synthetic text, not prompt bodies. Each `pass` fixture must satisfy the guard and each `fail` fixture must violate it; a guard whose fail fixture passes has never fired (GUARD-001).",
  "guards": [
-  {"id": "G-F02-A", "finding": "F02", "kind": "forbidden", "unit": "line", "prompts": ["QA-50"],
+  {"id": "G-F02-A", "finding": "F02", "kind": "forbidden", "unit": "sentence", "prompts": ["QA-50"],
    "all": ["(?i)\\b(executor|operator)\\b"],
    "except": ["(?i)wide latitude", "(?i)do not require an executor name", "(?i)executor identity, session-inspection API", "(?i)record the execution arrangement"],
    "fixtures": {"fail": ["3. Name the authorized environment executor. Another authorized operator executes them."],

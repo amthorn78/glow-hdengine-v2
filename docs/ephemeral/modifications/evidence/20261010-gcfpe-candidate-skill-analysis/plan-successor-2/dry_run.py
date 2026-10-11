@@ -11,7 +11,10 @@ Usage, from the repository root, with the newest fetch of each page in this sess
 
     PYTHONDONTWRITEBYTECODE=1 python3 \\
       docs/ephemeral/modifications/evidence/20261010-gcfpe-candidate-skill-analysis/plan-successor-2/dry_run.py \\
-      <installed-skills-root> <scratch-dir> [<since-minutes>] > <receipt.json>
+      <installed-skills-root> <scratch-dir> [<since-minutes> [<fetched-after>]] > <receipt.json>
+
+<fetched-after> is an ISO UTC time taken just before this run's own fetches of the eight pages; with it, the
+native gates use only those reads and never an earlier read (D22).
 """
 from __future__ import annotations
 
@@ -54,6 +57,7 @@ def as_json(r: dict):
 def main() -> int:
     installed, scratch = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
     since = sys.argv[3] if len(sys.argv) > 3 else "120"
+    after = ["--fetched-after", sys.argv[4]] if len(sys.argv) > 4 else []
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", TMPDIR=str(scratch / "tmp"))
     for d in ("skills-root", "tmp", "graph"):
         (scratch / d).mkdir(parents=True, exist_ok=True)
@@ -61,7 +65,8 @@ def main() -> int:
     out = {"record_type": "PLAN_SUCCESSOR_2_DRY_RUN", "modification": MOD,
            "date_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "repository_head": run(["git", "rev-parse", "HEAD"], env)["stdout"].strip(),
-           "origin_main": run(["git", "rev-parse", "origin/main"], env)["stdout"].strip(), "gates": {}}
+           "origin_main": run(["git", "rev-parse", "origin/main"], env)["stdout"].strip(),
+           "fetched_after": sys.argv[4] if len(sys.argv) > 4 else None, "gates": {}}
     g = out["gates"]
 
     # N0 identities of the two skills whose shipped scripts the graph/registry steps run.
@@ -83,7 +88,7 @@ def main() -> int:
     g["N1_body_guard_selftest"] = {"exit_code": r["exit_code"], "guards": rep.get("guards"),
                                    "fixture_rows": len(rep.get("fixture_rows", [])),
                                    "span_resolver": rep.get("span_resolver"), "ok": rep.get("ok") is True}
-    r = run(body + ["plan", "--no-ops", "--since-minutes", since], env)
+    r = run(body + ["plan", "--no-ops", "--since-minutes", since] + after, env)
     rep = as_json(r) or {}
     pages = []
     for p in rep.get("pages", []):
@@ -93,7 +98,7 @@ def main() -> int:
         pages.append({"prompt": p["prompt"], "fetch_captured": p["fetch_captured"], "as_of": p["as_of"],
                       "revision_matches_plan": p["revision_matches_plan"],
                       "ops": len(p["ops"]), "ops_applied": sum(o["applied"] for o in p["ops"]),
-                      "batch_safe": p["batch_safe"],
+                      "batch_safe": p["batch_safe"], "check_would_pass": p["check_would_pass"],
                       "guards": len(p["guards_before"]),
                       "guards_failing_before": sorted(k for k, v in p["guards_before"].items() if not v["pass"]),
                       "guards_failing_after": sorted(k for k, v in p["guards_after"].items() if not v["pass"]),
@@ -101,8 +106,8 @@ def main() -> int:
                       "ok": p["ok"]})
     g["N2_native_rehearsal"] = {"exit_code": r["exit_code"], "pages": pages,
                                 "ops_total": sum(p.get("ops", 0) for p in pages), "ok": rep.get("ok") is True}
-    r = run(body + ["registry", "--audit-root", sr / "amthor-workspace-governance-audit", "--since-minutes", since],
-            env)
+    r = run(body + ["registry", "--audit-root", sr / "amthor-workspace-governance-audit", "--since-minutes", since]
+            + after, env)
     rep = as_json(r) or {}
     g["N3_registry_form_guards"] = {
         "exit_code": r["exit_code"], "engine": rep.get("engine"),

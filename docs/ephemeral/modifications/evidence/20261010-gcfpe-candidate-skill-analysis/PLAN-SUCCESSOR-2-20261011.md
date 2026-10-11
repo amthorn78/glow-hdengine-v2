@@ -1,8 +1,8 @@
 # PLAN successor 2 — the plan for the scope kept in DN-1 — 2026-10-11
 
-**PLAN is complete for the scope Nathan kept in DN-1, and its normal path passes a full dry run.** EXECUTE edits eight unselected candidate pages: 22 bounded operations for F02–F05, checked before and after landing by 9 behavior guards. It also builds a candidate graph execution copy carrying F05 and F09, with its registry inputs. Every step has a command that can fail and an expected value fixed by this dry run. Nothing here is selected, installed or promoted. The plan goes to one bounded FULL review before it returns to Nathan for EXECUTE approval.
+**PLAN is complete for the scope Nathan kept in DN-1, and its normal path passes a full dry run.** EXECUTE edits eight unselected candidate pages: 22 bounded operations for F02–F05, checked before and after landing by 9 behavior guards. It also builds a candidate graph execution copy carrying F05 and F09, with its registry inputs. Every step has a check that can fail and an expected value fixed by this dry run. Nothing here is selected, installed or promoted. The plan goes to one bounded FULL review before it returns to Nathan for EXECUTE approval.
 
-This successor does not rewrite the [dated plan](PLAN-20261011.md), [successor 1](PLAN-SUCCESSOR-1-20261011.md) or §A. For the scope kept in DN-1, its steps X0–X8 replace the dated plan's E0–E8: E0 becomes X1; E1 and E3 become X3, graph side only; E2's native-page part becomes X2, X4 and X5; E6 becomes X6's ITEM-03 disposition; E7 becomes X6–X8; and E8's merge stays with Nathan. E2's package part, E4, E5 and E8's install moved with the package work.
+This successor does not rewrite the [dated plan](PLAN-20261011.md), [successor 1](PLAN-SUCCESSOR-1-20261011.md) or §A. For the scope kept in DN-1, its steps X0–X8 replace the dated plan's E0–E8: E0 becomes X1; E1 and E3 become X3, graph side only; E2's native-page part becomes X2, X4 and X5; E6 becomes X9's ITEM-03 disposition; E7 becomes X6–X9; and E8's merge stays with Nathan. E2's package part, E4, E5 and E8's install moved with the package work.
 
 ## 1. Basis
 
@@ -60,7 +60,7 @@ Design points a reviewer should know:
 2. **PE's generic Glow clause keeps its non-GCFPE rule, scoped by “Outside GCFPE”.** F05's approved correction scope covers PE's GCFPE authoring rules “including the generic rule where applied to GCFPE”, and preserves other ecosystems' rules. The non-GCFPE remainder still assigns numbering to Nathan, which PF06 §0.1A does not support for agent-authored addenda. It is outside the frozen scope and is listed in §8 as P2-1.
 3. **The new edge's position belongs to the shipped builder.** An edge beyond its part's index list is placed after the largest `global.json` index, here 125. `reindex` then renumbers every later edge, so 25 part files change only in `edge_indices`. `graph_repair.py check` proves three things: the bookkeeping is exactly 0..236, every existing edge keeps its relative order, and nothing else in any part moved.
 4. **The registry form is weaker than the body guard on one point.** The audit engine's `required_regex` proves presence (at least one unit), and the exactly-once count stays with `body_check.py`. The registry form agrees with every guard on all 24 fixtures and on all 32 page rows before and after (N3).
-5. **Landing is checked against the whole page, in memory.** After the write, `body_check.py check` requires the re-read page to equal the pre-edit read of the pinned revision with exactly the planned operations applied. A stray or partial edit, or an interleaved change by someone else, fails it. Nothing is stored or hashed (D22).
+5. **Landing is checked on the fresh read alone.** After the write, `body_check.py check` uses only the read in hand, the X5 fetch selected by `--fetched-after`. On that read, each operation's replacement must be present, and its old span's start and end anchors must survive only where the page's replacements carry them. X2 proves every anchor occurs exactly once in the unedited page, so a truncated, shifted or partial replacement leaves a count off and fails. Every guard must pass on the same read. G-F02-A is evaluated per sentence, so its permitted phrases cannot shelter a leftover sentence on the same line. No earlier read is reused, and no body is compared with another read (D22 conditions 2 to 4; corpus policy). The executor then reads each landed page in full, the complete readback PF04 §9.1.6 asks for. A stray change outside the 22 spans is caught only by that reading, which §8 lists as P2-7.
 
 ## 4. Dry run (D26-A step 1)
 
@@ -69,8 +69,8 @@ Command, committed: [plan-successor-2/dry_run.py](plan-successor-2/dry_run.py). 
 | Gate | Result |
 |---|---|
 | N0 identities | PASS: glow-graph-contract `9 e241bb9a…` and amthor-workspace-governance-audit `15 c214e874…`, installed and scratch copy, equal to the bindings in successor 1 §2 |
-| N1 body guard self-test | PASS: 9 guards, 24 fixture rows; span resolver refuses a second send, an ambiguous start and a cross-line span; landed equality holds for the exact edit and fails on an extra change and on a partial edit |
-| N2 native rehearsal | PASS: 8 pages at their pins; 22 of 22 operations applied in memory; every page batch-safe (each old span unique in the unedited page, gone afterwards, with no mention, link or escape markup); 27 failing guard rows before, 0 after; every operation LANDED |
+| N1 body guard self-test | PASS: 9 guards, 24 fixture rows. The span resolver refuses a second send, an ambiguous start and a cross-line span. The anchor-count landing accepts an exact replacement and refuses one that kept the old span's head or tail, or never happened |
+| N2 native rehearsal | PASS: 8 pages at their pins; 22 of 22 operations applied in memory; every page batch-safe (each old span and end anchor unique in the unedited page, the old span gone afterwards, no mention, link or escape markup); 27 failing guard rows before, 0 after; every operation LANDED; X5's landing check passes on each page with the edits applied in memory to the same read |
 | N3 registry-form guards | PASS: the shipped `_evaluate_assertions` agrees with the guards on 24 of 24 fixtures and 32 of 32 page rows, before and after |
 | N4 graph repair self-test | PASS, 17 of 17 cases. A clean repair passes; a second apply is a no-op. Each of these fails for its intended reason: the unrepaired base, a missing reindex, branch removal, a terminal branch, two handoffs, a missing route row, `allocates` false, a stale format home, missing format expectations, `edits_pf10` true, `claims_adoption` true, a changed producer set, a changed `never_for`, dropped forbidden fields and another part moved |
 | N5 graph dry run | PASS: apply makes 7 changes, and a second apply makes none. Reindex reports 237 edges and 25 files rewritten; a second reindex rewrites none. Base build: 236 edges, sha256 `3510b2bf…`, as in successor 1 G3. Repaired build: 55 nodes, 237 edges, 596,008 B, sha256 `ff296b1e740a77ee207c1223cc9bdff1f56c6c167bd4714a41ae92ef8708f18b`. `check` and `built` pass |
@@ -85,11 +85,11 @@ Expected EXECUTE outputs fixed by this dry run, all deterministic for the pinned
 | Repaired build | 237 edges · 596,008 B · sha256 `ff296b1e740a77ee207c1223cc9bdff1f56c6c167bd4714a41ae92ef8708f18b` |
 | `execute/candidate-graph-parts/` (56 files) | `(cd <parts> && find . -type f -name '*.json' \| LC_ALL=C sort \| xargs sha256sum \| sha256sum)` = `b27c11ca2f93fbcb740ebbbd68f54d86bccb5e85703c97d2427a7e59b27e307d` |
 | `execute/candidate-registry-derivation.json` | 771 B · sha256 `27a2be82b5336464c83e9c95f9694596d7beddc8c99cda75ed7158560335eb74` · deriver exit 1 (drift) |
-| `execute/candidate-registry-guards.json` | 8,869 B · sha256 `8eb546592671932a3051c2c9b5ebb9d1e3f06b94709b9e87c3be4f2dfe8e62ee` |
+| `execute/candidate-registry-guards.json` | 9,013 B · sha256 `62245446821994f70a50091664d45bc9234f0ad011b0d24a614692769d233114` (G-F02-A per sentence since the round-1 repair) |
 
 ## 5. EXECUTE steps
 
-Run from the repository root on this Modification's branch, with `PYTHONDONTWRITEBYTECODE=1`. `SK` is the installed skills root, the synced skills bucket with one directory per skill. `SCR` is the session scratch directory. `PLAN_COMMIT` is the commit Nathan approves.
+Run from the repository root on this Modification's branch, with `PYTHONDONTWRITEBYTECODE=1`. `SK` is the installed skills root, the synced skills bucket with one directory per skill. `SCR` is the session scratch directory. `PLAN_COMMIT` is the commit Nathan approves. `T2` and `T5` are UTC times taken with `date -u +%Y-%m-%dT%H:%M:%S.000Z` immediately before X2's and X5's fetches; `--fetched-after` makes each check use only the reads that follow them.
 
 ```sh
 EX=docs/ephemeral/modifications/evidence/20261010-gcfpe-candidate-skill-analysis
@@ -105,20 +105,21 @@ PARTS=$EX/execute/candidate-graph-parts
 |---|---|---|---|---|---|---|
 | X0 | all | record frontmatter and §E | Record Nathan's approval verbatim in `plan_approved_by`, with `plan_approved_date`. Set `status: EXECUTING`. Open §E with the approved commit. Commit and push | Template rules 1–2; D21-C | `modification_validate.py` on the record passes its EXECUTE entry gate; `git diff --check` | R-G |
 | X1 | all | none (read-only) | Pre-write checks | D26-A; D26-B | `python3 docs/prompt_ecosystem_management/freeze.py "$SK/glow-graph-contract"` prints `9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c`; the same for `"$AU"` prints `15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab`; `git diff --quiet $(git merge-base HEAD origin/main) HEAD -- docs/graph/parts "$REG" docs/pfcanon`; `git diff --quiet "$PLAN_COMMIT" HEAD -- "$BASE" "$P2"`; `test ! -e "$EX/execute"`; `python3 "$P2/body_check.py" selftest` and `python3 "$P2/graph_repair.py" selftest "$BASE" "$SCR/selftest" "$GC/graph_parts.py"` each print `"ok": true` | none; stop before any write |
-| X2 | PART-01 | the eight pages (read-only) | `notion-fetch` each page by ID, in §2's order; then `python3 "$P2/body_check.py" plan --since-minutes 30` | D22 transient reads | `"ok": true`; every page `revision_matches_plan` and `batch_safe` true; 22 operations applied; every `guards_after` row passes. `ops_payload_for_execute` stays in the session and is never written to the repository | none; stop before any write |
+| X2 | PART-01 | the eight pages (read-only) | Take `T2`; `notion-fetch` each page by ID, in §2's order; then `python3 "$P2/body_check.py" plan --fetched-after "$T2"` | D22 transient reads | `"ok": true`; every page `revision_matches_plan`, `batch_safe` and `check_would_pass` true; 22 operations applied; every `guards_after` row passes. `ops_payload_for_execute` stays in the session and is never written to the repository | none; stop before any write |
 | X3 | PART-01 | `$EX/execute/` | The commands in §5.2, then commit and push | D13 (graph authority); D14 and GUARD-001; dated plan E1/E3 for the graph side | Each expected value in §5.2's comments: the 7 changes, the idempotent second apply and reindex, both builds' edge counts and digests, `check` and `built` `"ok": true`, the deriver's exit 1, and the parts manifest and two file digests equal to §4's. `git status --porcelain` lists only `$EX/execute/` | R-G |
 | X4 | PART-01 | Notion writes W1–W8 | One `notion-update-page` call per page, in §2's order. Each call is `{"page_id": <id>, "command": "update_content", "content_updates": <that page's ops_payload_for_execute entries from X2, in order, old_str and new_str verbatim>, "allow_async": false}`. If a call returns an async task, `notion-get-async-task` until it succeeds | Nathan's approval of W1–W8; D27 and the findings | Each call succeeds with no error and no deletion warning | R-N |
-| X5 | PART-01 | the eight pages (read-only) | `notion-fetch` each page again; `python3 "$P2/body_check.py" check --since-minutes 240`; `python3 "$P2/body_check.py" registry --audit-root "$AU" --since-minutes 240` | D22 transient reads; D26-E | `check`: every page `revision_moved`, `pre_edit_read_found` and `rest_unchanged` true, `differing_lines` 0, every operation `LANDED`, every guard passing. `registry`: `"ok": true` on the landed pages | R-N for W1–W8; R-G for X3 |
-| X6 | all | record §E and frontmatter | Write §E: step dispositions X0–X8, parts, artifacts with their readbacks, interaction cost, remaining PO actions, canon relied on and the D22 disclosure. Item dispositions: ITEM-01 `VERIFIED` (the scope kept by DN-1; the package side moved); ITEM-02 `NOT_APPLICABLE` (PART-02 dropped by DN-1 and moved); ITEM-03 `VERIFIED` (the item is the assessment, which §A.4 and §A.5 hold; implementation, which the dated plan's E6 marked `NOT_APPLICABLE`, is not part of the item and stays absent); ITEM-04 `VERIFIED`. Set `status: COMPLETE` and `interaction_cost_actual`. Commit and push | Template rules 5–6; D26-B | The validator passes at COMPLETE. `git diff --check` is clean. `grep -c 'typesafe-scoring request v6'` on the record prints 1. `git ls-files` lists findings.md, flows.md, source-identities.md, coverage.md, plan-flows.md and this file. After `git fetch origin <branch>`, `git diff --quiet origin/<branch>` holds | R-G |
+| X5 | PART-01 | the eight pages (read-only) | Take `T5`; `notion-fetch` each page again; `python3 "$P2/body_check.py" check --fetched-after "$T5"`; `python3 "$P2/body_check.py" registry --audit-root "$AU" --fetched-after "$T5"`; then read each landed page in full | D22 transient reads; D26-E; PF04 §9.1.6 | `check`: `"ok": true`, meaning every page `revision_moved`, every operation `landed` (replacement present, start and end anchor counts as planned), every guard passing. `registry`: `"ok": true` on the landed pages. The full reading finds each page intact: no damaged, duplicated or truncated text around or outside the 22 operations | R-N for W1–W8; R-G for X3 |
+| X6 | PART-01 | record §E | Checkpoint (D26-C): record X0–X5's dispositions and evidence in §E. `status` stays `EXECUTING`. Commit and push | Template rule 5; D26-C | The validator passes; `git diff --check` is clean; after `git fetch origin <branch>`, `git diff --quiet origin/<branch>` holds | R-G |
 | X7 | PART-04 | Notion writes W9–W10 | `update_content` on the candidate catalog (W9) and Alpha feedback (W10). Each replaces the single line that begins `**MODIFICATION-20261010 status:**` (written when PLAN returns) with the EXECUTE line in §5.1 | MGMT-10 maintenance surfaces; Nathan's approval of W9–W10 | A re-fetch of each page shows exactly one line with that prefix, carrying the EXECUTE text. The Modification Backlog still shows MB-007 and MB-008 once each | R-T |
-| X8 | PART-04 | PR #600 | Update the body under the template headings, including “Merging preserves the record and approves nothing (D21-C)”, and mark it ready for review | AGENTS.md PR-description rule | `pull_request_read` shows the head SHA equal to the pushed SHA, `draft: false` and every template heading | edit the body back |
+| X8 | PART-04 | PR #600 | Update the body under the template headings, including “Merging preserves the record and approves nothing (D21-C)” | AGENTS.md PR-description rule | `pull_request_read` shows every template heading in the body | edit the body back |
+| X9 | all | record §E and frontmatter; PR #600 | Close the record. Record X6–X9's dispositions and readbacks in §E, with the parts, artifacts, interaction cost, remaining PO actions, canon relied on and the D22 disclosure. Item dispositions: ITEM-01 `VERIFIED` (the scope kept by DN-1; the package side moved); ITEM-02 `NOT_APPLICABLE` (PART-02 dropped by DN-1 and moved); ITEM-03 `VERIFIED` (the item is the assessment, which §A.4 and §A.5 hold; implementation, which the dated plan's E6 marked `NOT_APPLICABLE`, is not part of the item and stays absent); ITEM-04 `VERIFIED`. Set `status: COMPLETE` and `interaction_cost_actual`. Commit and push, then mark PR #600 ready for review | Template rules 5–6; D26-B | The validator passes at COMPLETE. `git diff --check` is clean. `grep -c 'typesafe-scoring request v6'` on the record prints 1. `git ls-files` lists findings.md, flows.md, source-identities.md, coverage.md, plan-flows.md and this file. After `git fetch origin <branch>`, `git diff --quiet origin/<branch>` holds. `pull_request_read` shows the head SHA equal to the pushed SHA and `draft: false` | R-G; mark the PR draft again |
 
 ### 5.1 Notion writes this plan authorizes, and no others
 
 | Write | Page | Content |
 |---|---|---|
 | W1–W8 | the eight pages in §2 | exactly the 22 operations in edits.json, one `update_content` call per page |
-| W9 | candidate catalog `3f44590a05eb8110aa69fe4189ad9abc` | replace the status line with: `**MODIFICATION-20261010 status:** EXECUTE complete on <date>. The eight candidate pages carry the F02–F05 repairs, re-read and checked; the candidate graph execution copy carries F05 and F09 with its registry inputs (<record link at the X6 commit>). The package work moved to a new Modification (DN-1). Nothing is selected or installed; Nathan merges PR #600.` |
+| W9 | candidate catalog `3f44590a05eb8110aa69fe4189ad9abc` | replace the status line with: `**MODIFICATION-20261010 status:** EXECUTE complete on <date>. The eight candidate pages carry the F02–F05 repairs, re-read and checked; the candidate graph execution copy carries F05 and F09 with its registry inputs. The record is `docs/ephemeral/modifications/MODIFICATION-20261010-gcfpe-candidate-skill-analysis.md` in [PR #600](https://github.com/amthorn78/glow-hdengine-v2/pull/600). The package work moved to a new Modification (DN-1). Nothing is selected or installed; Nathan merges PR #600.` |
 | W10 | Alpha feedback `3df4590a05eb8111a6a5f67cb82f96f6` | the same line |
 
 ### 5.2 X3 commands
@@ -147,11 +148,15 @@ git status --porcelain
 A failed verification stops EXECUTE at that step. Nothing is retried or worked around. In every case `status` stays `EXECUTING`, the freeze is kept, and Nathan decides the next step: a dated successor plan, a restore, or abandonment.
 
 - **Before X4**, no external write has happened. If X3 committed, revert it under R-G. Record the failure in §E, with the failed step `BLOCKED` and later steps `NOT_RUN` citing the stop. Commit and push, and return to Nathan.
-- **From X4 onward**, use the D26-B carve-out:
-  - Run a read-only sweep: re-fetch every page and run `body_check.py check`. It reports, by counts, which operations are `LANDED`, `UNTOUCHED` or `CONFLICT`.
+- **At X4 or X5**, use the D26-B carve-out:
+  - Run a read-only sweep: take a new time, re-fetch every page and run `body_check.py check --fetched-after` that time. It reports, per operation, whether the replacement and the anchor counts landed.
   - Record PART-01 as `BLOCKED`, naming the pages written. Revert X3 under R-G.
   - Keep `status: EXECUTING` and the freeze.
   - Commit the failure record to the branch, whose PR is the record PR, and return to Nathan with DECISION NEEDED.
+- **At X6 to X9**, PART-01 has already landed and been verified, so it stays landed, and X3 is not reverted.
+  - Record the failed step `BLOCKED` with what it wrote, and later steps `NOT_RUN` citing the stop.
+  - A half-written tracking line is swapped back under R-T.
+  - Keep `status: EXECUTING`, commit the failure record and return to Nathan.
 
 Rollbacks:
 
@@ -173,11 +178,13 @@ flowchart TD
   D -->|a digest or check differs| S1["Revert X3; record; return"]
   D --> E["X4 one update_content call per page"]
   E -->|a call fails| F["Read-only sweep; PART-01 BLOCKED; revert X3"]
-  E --> G["X5 re-read; landed, whole-page equality, guards, registry form"]
+  E --> G["X5 fresh re-read; anchor landing, guards, registry form; full reading"]
   G -->|any page fails| F
   F --> H["Nathan restores named pages from history; EXECUTING kept"]
-  G --> I["X6 §E and COMPLETE; X7 tracking lines; X8 PR ready"]
-  I --> J["Nathan merges PR #600; nothing selected or installed"]
+  G --> I["X6 checkpoint record, EXECUTING; X7 tracking lines; X8 PR body"]
+  I -->|a step fails| K["Record the stop; PART-01 stays landed; EXECUTING kept"]
+  I --> L["X9 close the record: COMPLETE; PR ready"]
+  L --> J["Nathan merges PR #600; nothing selected or installed"]
 ```
 
 ## 8. Open findings, accepted as risks
@@ -201,6 +208,8 @@ Approving the plan accepts these (DISP-001). None is a required kind under D26-A
 | P2-4 | until the package Modification regenerates the contract, the September validator rejects the repaired candidate graph's F05 values | certain if run against the candidate | a validator failure on an unselected candidate | the candidate is unselected and no gate here runs that validator against it; the package work owns the contract |
 | P2-5 | Notion renders a landed text differently from the text written | low: the new texts use constructs already on these pages | a false stop at X5 after writes, so Nathan restores pages | detected, never silent; cannot be dry-run without a write |
 | P2-6 | no fresh sweep of the other 47 candidate pages for surviving old rules | low: ANALYZE screened all 55 members at these revisions | an unlisted page keeps an old rule | an all-page read costs about 0.5M tokens; release qualification runs the registry assertions across every row |
+| P2-7 | a stray change outside the 22 spans, such as an unplanned extra replacement in an X4 call | low: each call carries only that page's planned entries | the change lands on a candidate page and is caught only by X5's full reading | D22 forbids comparing the landed page with an earlier read; added by the round-1 repair (R-A1, B-1) |
+| Review round 1 | the LISTED findings L-A1 to L-A14 in [REVIEW-PLAN-1-A.md](REVIEW-PLAN-1-A.md) and L-B1 to L-B19 in [REVIEW-PLAN-1-B.md](REVIEW-PLAN-1-B.md), each with its path, likelihood and consequence there | as listed there | as listed there | not required kinds (D26-A rule 8); they include an erratum in §3 point 3, where the largest `global.json` index is 124 (L-B13) |
 
 ## 9. Product Owner actions
 
@@ -224,13 +233,13 @@ There is no install, promotion, release selection or skill review in this Modifi
 
 ## 11. Review, cost and estimate
 
-**Review.** One FULL round of two fresh-context reviewers follows this commit, from a brief committed before they are spawned. At most one DIFF_CHECK follows a repair. Only the four required kinds are repaired. The round stops early on non-convergence or at twice the re-priced estimate. Every round goes in the `reviews` ledger. Neither FULL review nor the DIFF_CHECK has been used for PLAN.
+**Review.** One FULL round of two fresh-context reviewers follows this commit, from a brief committed before they are spawned. At most one DIFF_CHECK follows a repair. Only the four required kinds are repaired. The round stops early on non-convergence or at twice the re-priced estimate. Every round goes in the `reviews` ledger. Round 1 found 2 distinct required defects, both repaired as the reviewers proposed; the DIFF_CHECK of that repair is the last review for PLAN.
 
 **Spend against the re-priced estimate** (2–4 h and 1.1–1.7M aggregate tokens from the decision). Time: the decision was recorded at 11:20Z, and this successor was committed about 45 minutes later. Tokens are not measured as an aggregate. The session budget counter fell by about 0.2M after the context reset at about 11:23Z. That counter has reset before when the worker restarted, so it is not an aggregate. The part between the decision and the reset is unmeasured. The interaction forecast stays at successor 1's figure of about 8, against ANALYZE's recorded 11. Remaining interactions: EXECUTE approval and the merge, plus one if EXECUTE stops after a write.
 
 ## 12. Transient reads (D22)
 
-Page bodies were read only as transient reads. They are this session's own fetch results, kept in its harness records, and were read by `body_check.py` for the read in hand. Nothing in the repository holds a body, a body hash or a body comparison. The anchors in edits.json are short phrases, of the kind the findings quote. The harness files holding fetched bodies cannot be deleted from this session (`rm` is refused as transcript tampering), so they are left to harness teardown:
+Page bodies were read only as transient reads. They are this session's own fetch results, kept in its harness records, and were read by `body_check.py` for the read in hand. Nothing in the repository holds a body or a body hash, and no check compares two reads of a body: each check uses only the read in hand. The anchors in edits.json are short phrases, of the kind the findings quote. The harness files holding fetched bodies cannot be deleted from this session (`rm` is refused as transcript tampering), so they are left to harness teardown:
 
 - PE: tool results `…1791704373809.txt` and `…1791717822802.txt`
 - release register: `…1791704456929.txt`

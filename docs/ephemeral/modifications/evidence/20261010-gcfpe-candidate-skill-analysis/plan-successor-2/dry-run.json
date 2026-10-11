@@ -1,8 +1,8 @@
 {
  "record_type": "PLAN_SUCCESSOR_2_DRY_RUN",
  "modification": "MODIFICATION-20261010-gcfpe-candidate-skill-analysis",
- "date_utc": "2026-10-11T12:02:18+00:00",
- "repository_head": "d7e325e05e63e7e1a4c0c95eb9b03598347ccaec",
+ "date_utc": "2026-10-11T12:47:59+00:00",
+ "repository_head": "80928f6ffe97e7bea09c8959991a62fb290470b5",
  "origin_main": "1ea6a262032c3c4de19c38c549d737d72b03ec2f",
  "gates": {
   "N0_identities": {
@@ -34,9 +34,10 @@
     "second_send_refused": true,
     "ambiguous_refused": true,
     "cross_line_refused": true,
-    "landed_equality_holds": true,
-    "landed_equality_detects_extra_change": true,
-    "landed_equality_detects_partial_edit": true
+    "anchor_landing_exact": true,
+    "anchor_landing_refuses_kept_tail": true,
+    "anchor_landing_refuses_kept_head": true,
+    "anchor_landing_refuses_untouched": true
    },
    "ok": true
   },
@@ -45,12 +46,13 @@
    "pages": [
     {
      "prompt": "QA-50",
-     "fetch_captured": "2026-10-11T11:23:10.513Z",
+     "fetch_captured": "2026-10-11T12:12:24.630Z",
      "as_of": "2026-10-09T20:13:21.061Z",
      "revision_matches_plan": true,
      "ops": 1,
      "ops_applied": 1,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 2,
      "guards_failing_before": [
       "G-F02-A",
@@ -62,12 +64,13 @@
     },
     {
      "prompt": "CF-C-30",
-     "fetch_captured": "2026-10-11T11:32:03.672Z",
+     "fetch_captured": "2026-10-11T12:12:41.334Z",
      "as_of": "2026-10-09T20:10:50.363Z",
      "revision_matches_plan": true,
      "ops": 4,
      "ops_applied": 4,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 5,
      "guards_failing_before": [
       "G-F03-A",
@@ -82,12 +85,13 @@
     },
     {
      "prompt": "CF-E-30",
-     "fetch_captured": "2026-10-11T11:23:10.477Z",
+     "fetch_captured": "2026-10-11T12:13:51.991Z",
      "as_of": "2026-10-09T20:10:58.798Z",
      "revision_matches_plan": true,
      "ops": 4,
      "ops_applied": 4,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 5,
      "guards_failing_before": [
       "G-F03-A",
@@ -102,12 +106,13 @@
     },
     {
      "prompt": "IA-30",
-     "fetch_captured": "2026-10-11T11:23:10.418Z",
+     "fetch_captured": "2026-10-11T12:14:41.415Z",
      "as_of": "2026-10-09T20:11:59.445Z",
      "revision_matches_plan": true,
      "ops": 4,
      "ops_applied": 4,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 5,
      "guards_failing_before": [
       "G-F03-A",
@@ -121,12 +126,13 @@
     },
     {
      "prompt": "QA-70",
-     "fetch_captured": "2026-10-11T11:23:42.375Z",
+     "fetch_captured": "2026-10-11T12:15:27.157Z",
      "as_of": "2026-10-09T20:13:24.925Z",
      "revision_matches_plan": true,
      "ops": 1,
      "ops_applied": 1,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 3,
      "guards_failing_before": [
       "G-F05-A",
@@ -138,12 +144,13 @@
     },
     {
      "prompt": "RS-20",
-     "fetch_captured": "2026-10-11T11:23:42.365Z",
+     "fetch_captured": "2026-10-11T12:15:37.704Z",
      "as_of": "2026-10-09T20:13:33.913Z",
      "revision_matches_plan": true,
      "ops": 1,
      "ops_applied": 1,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 3,
      "guards_failing_before": [
       "G-F05-A",
@@ -155,12 +162,13 @@
     },
     {
      "prompt": "ESC-40",
-     "fetch_captured": "2026-10-11T11:23:42.385Z",
+     "fetch_captured": "2026-10-11T12:16:39.613Z",
      "as_of": "2026-10-09T20:11:51.439Z",
      "revision_matches_plan": true,
      "ops": 2,
      "ops_applied": 2,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 3,
      "guards_failing_before": [
       "G-F05-A",
@@ -172,12 +180,13 @@
     },
     {
      "prompt": "PE",
-     "fetch_captured": "2026-10-11T11:23:42.802Z",
+     "fetch_captured": "2026-10-11T12:16:48.490Z",
      "as_of": "2026-10-09T20:13:58.466Z",
      "revision_matches_plan": true,
      "ops": 5,
      "ops_applied": 5,
      "batch_safe": true,
+     "check_would_pass": true,
      "guards": 6,
      "guards_failing_before": [
       "G-F04-A",

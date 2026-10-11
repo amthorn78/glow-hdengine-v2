@@ -4,14 +4,14 @@ MODIFICATION-20261010-gcfpe-candidate-skill-analysis (PLAN successor 2).
 
   body_check.py selftest                       every guard against its synthetic fixtures, and the span
                                                resolver's apply-once behaviour on synthetic text
-  body_check.py plan  [--no-ops] [--prompts P ...]
+  body_check.py plan  [--no-ops] [--prompts P ...] [--fetched-after T]
                                                on the newest fetch of each page: refuse a moved revision,
                                                resolve every operation's span exactly once, apply in memory,
                                                and run every guard before and after
-  body_check.py check [--prompts P ...]        after landing, on a fresh fetch: the revision moved, every
-                                               operation LANDED, every guard passing, and the page equal to
-                                               the newest pre-edit read of the pinned revision with exactly
-                                               the planned operations applied (in memory)
+  body_check.py check [--prompts P ...] [--fetched-after T]
+                                               after landing, on a fresh fetch only: the revision moved,
+                                               every operation landed by its anchor counts, and every guard
+                                               passing
   body_check.py registry --audit-root DIR [--emit]
                                                each guard in the registry's own audit_assertions form, run
                                                by the shipped governance-audit engine on every fixture and on
@@ -19,8 +19,10 @@ MODIFICATION-20261010-gcfpe-candidate-skill-analysis (PLAN successor 2).
                                                with the guard everywhere. --emit prints only the assertions
 
 Bodies are read only as D22 transient reads: the newest `notion-fetch` result for each page in this session's
-own harness records (transcript, tool results, subagents), within --since-minutes. Nothing is hashed or
-written, and the report carries counts, ids and booleans only. `plan` without --no-ops also prints each
+own harness records (transcript, tool results, subagents), captured at or after --fetched-after (an ISO UTC time
+taken just before the fetches) and within --since-minutes. Each check uses only the read in hand: no earlier
+read is reused, and no body is hashed, compared with another read or written. The report carries counts, ids
+and booleans only. `plan` without --no-ops also prints each
 operation's old_str and new_str for EXECUTE's update_content calls; never redirect that output into the
 repository. Run from anywhere with PYTHONDONTWRITEBYTECODE=1; CLAUDE_CODE_SESSION_ID names the session.
 """
@@ -72,10 +74,40 @@ def _texts(obj):
             yield from _texts(v)
 
 
-def all_fetches(page_id: str, root: str, session: str, since_minutes: int) -> list:
-    """Every captured fetch of the page in the window, oldest first: (captured, as_of, body)."""
+def _recent_lines(path: str, cutoff_iso: str):
+    """A JSONL record's entries newest first, stopping at the first entry older than the cutoff, so earlier
+    reads held in the record are never read again (D22 condition 4)."""
+    with open(path, "rb") as fh:
+        fh.seek(0, os.SEEK_END)
+        pos, tail = fh.tell(), b""
+        while pos > 0:
+            step = min(1 << 20, pos)
+            pos -= step
+            fh.seek(pos)
+            lines = (fh.read(step) + tail).split(b"\n")
+            tail = lines.pop(0) if pos > 0 else b""
+            for raw in reversed(lines):
+                if not raw.strip():
+                    continue
+                try:
+                    obj = json.loads(raw)
+                except ValueError:
+                    continue
+                ts = obj.get("timestamp") if isinstance(obj, dict) else None
+                if isinstance(ts, str) and ts < cutoff_iso:
+                    return
+                yield obj
+
+
+def all_fetches(page_id: str, root: str, session: str, since_minutes: int, fetched_after: str = "") -> list:
+    """Every captured fetch of the page at or after the cutoff, oldest first: (captured, as_of, body). The cutoff
+    is --fetched-after when given, else --since-minutes ago. A saved result written before the cutoff is never
+    opened, and a transcript is read only back to the cutoff."""
     page = page_id.replace("-", "")
     cutoff = time.time() - since_minutes * 60
+    if fetched_after:
+        cutoff = max(cutoff, datetime.strptime(fetched_after, "%Y-%m-%dT%H:%M:%S.%fZ")
+                     .replace(tzinfo=timezone.utc).timestamp())
     cutoff_iso = datetime.fromtimestamp(cutoff, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     base = os.path.join(root, "*", session)
     files = glob.glob(base + ".jsonl") + glob.glob(base + "/tool-results/*") \
@@ -85,21 +117,16 @@ def all_fetches(page_id: str, root: str, session: str, since_minutes: int) -> li
     for f in files:
         if os.path.getmtime(f) < cutoff:
             continue
-        try:
-            raw = open(f, encoding="utf-8").read()
-        except OSError:
-            continue
-        if page not in raw:
-            continue
-        units = raw.splitlines() if f.endswith(".jsonl") else [raw]
-        for line in units:
+        if f.endswith(".jsonl"):
+            entries = _recent_lines(f, cutoff_iso)
+        else:
             try:
-                obj = json.loads(line)
-            except ValueError:
+                raw = open(f, encoding="utf-8").read()
+                entries = [json.loads(raw)] if page in raw else []
+            except (OSError, ValueError):
                 continue
+        for obj in entries:
             ts = obj.get("timestamp") if isinstance(obj, dict) else None
-            if f.endswith(".jsonl") and not (isinstance(ts, str) and ts >= cutoff_iso):
-                continue
             for t in _texts(obj):
                 inner = t
                 if not inner.startswith("Here is the result of"):
@@ -115,15 +142,17 @@ def all_fetches(page_id: str, root: str, session: str, since_minutes: int) -> li
                     continue
                 captured = ts if f.endswith(".jsonl") else datetime.fromtimestamp(
                     os.path.getmtime(f), timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+                if not captured or captured < cutoff_iso:
+                    continue
                 # one capture can appear in several records (transcript and tool-result file): keep one per body
                 key = (head.group(2), m.group(1))
-                if key not in found or (captured or "") > found[key][0]:
-                    found[key] = (captured or "", head.group(2), m.group(1))
+                if key not in found or captured > found[key][0]:
+                    found[key] = (captured, head.group(2), m.group(1))
     return sorted(found.values(), key=lambda c: c[0])
 
 
-def latest_fetch(page_id: str, root: str, session: str, since_minutes: int):
-    got = all_fetches(page_id, root, session, since_minutes)
+def latest_fetch(page_id: str, root: str, session: str, since_minutes: int, fetched_after: str = ""):
+    got = all_fetches(page_id, root, session, since_minutes, fetched_after)
     return got[-1] if got else None  # (captured, as_of, body) or None
 
 
@@ -152,6 +181,21 @@ def state(text: str, op: dict) -> str:
     if span is None and new_n == 1:
         return "LANDED"
     return "CONFLICT"
+
+
+def landed(text: str, op: dict, page_ops: list) -> dict:
+    """An operation has landed when, on this read alone, its replacement is present and its old span's start
+    and end anchors survive only where the page's replacements carry them. The plan proves each anchor occurs
+    exactly once in the unedited page, so any truncated, shifted or partial replacement leaves an anchor
+    count off. Uses no other read (D22)."""
+    news = [expand(o["new"]) for o in page_ops]
+    want = lambda s: sum(occ(n, s) for n in news)
+    new = expand(op["new"])
+    row = {"new": occ(text, new) == want(new) >= 1, "start": occ(text, op["start"]) == want(op["start"])}
+    if op.get("end") is not None:
+        row["end"] = occ(text, op["end"]) == want(op["end"])
+    row["landed"] = all(row.values())
+    return row
 
 
 def apply_all(text: str, ops: list) -> tuple[str, list]:
@@ -252,7 +296,7 @@ def _registry_pass(evaluate, g: dict, text: str) -> bool:
     return not evaluate({"prompt_key": g["id"], "audit_assertions": {k: [v]}}, text, "transient")
 
 
-def registry(audit_root: str, root: str, session: str, since: int) -> dict:
+def registry(audit_root: str, root: str, session: str, since: int, fetched_after: str = "") -> dict:
     evaluate = _engine(audit_root)
     fixtures, pages, ok = [], [], True
     for g in GUARDS["guards"]:
@@ -263,7 +307,7 @@ def registry(audit_root: str, root: str, session: str, since: int) -> dict:
                 ok &= agree
                 fixtures.append({"guard": g["id"], "fixture": f"{want}[{k}]", "agrees": agree})
     for prompt, meta in EDITS["pages"].items():
-        got = latest_fetch(meta["page_id"], root, session, since)
+        got = latest_fetch(meta["page_id"], root, session, since, fetched_after)
         if got is None:
             pages.append({"prompt": prompt, "error": "NO_FETCH_FOUND"})
             ok = False
@@ -303,20 +347,24 @@ def selftest() -> dict:
              "second_send_refused": resolve(t1, op)[0] is None,
              "ambiguous_refused": resolve(t0 + "\nAlpha begins here. and ends here.", op)[1] == "START_COUNT_2",
              "cross_line_refused": resolve("Alpha begins here.\nand ends here.", op)[1] == "END_NOT_ON_LINE",
-             # check's in-memory landed equality: holds for the exact edit, fails on any other change
-             "landed_equality_holds": apply_all(t0, [op])[0] == t1,
-             "landed_equality_detects_extra_change": apply_all(t0, [op])[0] != t1.replace("Tail.", "Tail!"),
-             "landed_equality_detects_partial_edit": apply_all(t0, [op])[0] != t0}
+             # check's anchor-count landing on one read: an exact edit lands; a replacement that kept the old
+             # span's tail or head, or never happened, does not
+             "anchor_landing_exact": landed(t1, op, [op])["landed"],
+             "anchor_landing_refuses_kept_tail": not landed(
+                 t0.replace("Alpha begins here. Middle words", "Beta replaces it."), op, [op])["landed"],
+             "anchor_landing_refuses_kept_head": not landed(
+                 t0.replace("Middle words and ends here.", "Beta replaces it."), op, [op])["landed"],
+             "anchor_landing_refuses_untouched": not landed(t0, op, [op])["landed"]}
     ok &= all(synth.values())
     return {"mode": "selftest", "guards": len(GUARDS["guards"]), "fixture_rows": rows, "span_resolver": synth, "ok": ok}
 
 
-def run(mode: str, prompts, no_ops: bool, root: str, session: str, since: int) -> dict:
+def run(mode: str, prompts, no_ops: bool, root: str, session: str, since: int, fetched_after: str = "") -> dict:
     out, ops_payload, all_ok = [], [], True
     for prompt, meta in EDITS["pages"].items():
         if prompts and prompt not in prompts:
             continue
-        fetches = all_fetches(meta["page_id"], root, session, since)
+        fetches = all_fetches(meta["page_id"], root, session, since, fetched_after)
         if not fetches:
             out.append({"prompt": prompt, "error": "NO_FETCH_FOUND"})
             all_ok = False
@@ -334,6 +382,8 @@ def run(mode: str, prompts, no_ops: bool, root: str, session: str, since: int) -
             for r in op_rows:
                 if r["applied"]:
                     r["old_str_unique_in_original"] = occ(body, r["old_str"]) == 1
+                    op = next(o for o in ops if o["id"] == r["id"])
+                    r["end_unique_in_original"] = op.get("end") is None or occ(body, op["end"]) == 1
                     r["old_str_absent_after"] = occ(text, r["old_str"]) == 0
                     r["span_has_markup"] = any(m in r["old_str"] for m in ("<", "](", "\\"))
                     if not no_ops:
@@ -341,29 +391,22 @@ def run(mode: str, prompts, no_ops: bool, root: str, session: str, since: int) -
                                             "new_str": r["new_str"]})
             row["ops"] = [{k: v for k, v in r.items() if k not in ("old_str", "new_str")} for r in op_rows]
             row["batch_safe"] = all(r.get("old_str_unique_in_original") and r.get("old_str_absent_after")
-                                    and not r.get("span_has_markup") for r in op_rows if r["applied"])
+                                    and r.get("end_unique_in_original") and not r.get("span_has_markup")
+                                    for r in op_rows if r["applied"])
             row["guards_after"] = {g["id"]: dict(zip(("count", "pass"), guard_pass(text, g))) for g in guards_for(prompt)}
             row["landed_state_after"] = {o["id"]: state(text, o) for o in ops}
+            # X5's landing check run on this same read with the edits applied in memory: a correct landing must
+            # pass it, or EXECUTE would stop after writing
+            row["check_would_pass"] = all(landed(text, o, ops)["landed"] for o in ops)
             row["ok"] = (row["revision_matches_plan"] and all(r["applied"] for r in op_rows) and row["batch_safe"]
                          and all(v["pass"] for v in row["guards_after"].values())
-                         and all(v == "LANDED" for v in row["landed_state_after"].values()))
+                         and all(v == "LANDED" for v in row["landed_state_after"].values())
+                         and row["check_would_pass"])
         else:
-            row["op_states"] = {o["id"]: state(body, o) for o in ops}
-            row["guards"] = {g["id"]: dict(zip(("count", "pass"), guard_pass(body, g))) for g in guards_for(prompt)}
             row["revision_moved"] = as_of != meta["expected_last_edited"]
-            # Silent-wrong-edit check, in memory only: the landed page must equal the newest pre-edit read of
-            # the pinned revision with exactly the planned operations applied. Nothing is stored or hashed.
-            pre = [f for f in fetches[:-1] if f[1] == meta["expected_last_edited"]]
-            row["pre_edit_read_found"] = bool(pre)
-            if pre:
-                expected, _ = apply_all(pre[-1][2], ops)
-                row["rest_unchanged"] = expected == body
-                a, b = expected.split("\n"), body.split("\n")
-                row["differing_lines"] = sum(1 for x, y in zip(a, b) if x != y) + abs(len(a) - len(b))
-            else:
-                row["rest_unchanged"] = False
-            row["ok"] = (row["revision_moved"] and row["pre_edit_read_found"] and row["rest_unchanged"]
-                         and all(v == "LANDED" for v in row["op_states"].values())
+            row["ops"] = {o["id"]: landed(body, o, ops) for o in ops}
+            row["guards"] = {g["id"]: dict(zip(("count", "pass"), guard_pass(body, g))) for g in guards_for(prompt)}
+            row["ok"] = (row["revision_moved"] and all(v["landed"] for v in row["ops"].values())
                          and all(v["pass"] for v in row["guards"].values()))
         all_ok &= row["ok"]
         out.append(row)
@@ -382,6 +425,8 @@ def main() -> int:
     ap.add_argument("--no-ops", action="store_true")
     ap.add_argument("--prompts", nargs="*")
     ap.add_argument("--since-minutes", type=int, default=60)
+    ap.add_argument("--fetched-after", default="",
+                    help="ISO UTC time taken just before the fetches; older reads are never used")
     ap.add_argument("--harness-root", default=os.path.expanduser("~/.claude/projects"))
     ap.add_argument("--session", default=os.environ.get("CLAUDE_CODE_SESSION_ID"))
     a = ap.parse_args()
@@ -394,12 +439,12 @@ def main() -> int:
         if not (a.audit_root and a.session):
             print(json.dumps({"error": "registry needs --audit-root and a session"}))
             return 2
-        res = registry(a.audit_root, a.harness_root, a.session, a.since_minutes)
+        res = registry(a.audit_root, a.harness_root, a.session, a.since_minutes, a.fetched_after)
     else:
         if not a.session:
             print(json.dumps({"error": "SESSION_UNKNOWN: set CLAUDE_CODE_SESSION_ID or --session"}))
             return 2
-        res = run(a.mode, a.prompts, a.no_ops, a.harness_root, a.session, a.since_minutes)
+        res = run(a.mode, a.prompts, a.no_ops, a.harness_root, a.session, a.since_minutes, a.fetched_after)
     print(json.dumps(res, indent=1, ensure_ascii=False))
     return 0 if res["ok"] else 1
 
