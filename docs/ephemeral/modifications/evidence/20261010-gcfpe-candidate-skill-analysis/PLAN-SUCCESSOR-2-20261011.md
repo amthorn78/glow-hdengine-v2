@@ -64,7 +64,7 @@ Design points a reviewer should know:
 
 ## 4. Dry run (D26-A step 1)
 
-Command, committed: [plan-successor-2/dry_run.py](plan-successor-2/dry_run.py). Receipt: [plan-successor-2/dry-run.json](plan-successor-2/dry-run.json), run 2026-10-11T12:02:18Z on this successor's files, before their commit on HEAD `d7e325e0`; `main` `1ea6a262`. The native rows used this session's reads of the eight pages, captured 11:23–11:32Z.
+Command, committed: [plan-successor-2/dry_run.py](plan-successor-2/dry_run.py). Receipt: [plan-successor-2/dry-run.json](plan-successor-2/dry-run.json), run 2026-10-11T12:55:46Z on the repaired files at `0f39f89f`, `main` `1ea6a262`. The native gates used only that run's own reads of the eight pages, taken after 12:55:22Z (`--fetched-after`), and all eight pages were at their pins. The pre-review run of 12:02:18Z, at `d7e325e0`, used this session's 11:23–11:32Z reads and passed the same gates.
 
 | Gate | Result |
 |---|---|
@@ -245,6 +245,7 @@ Page bodies were read only as transient reads. They are this session's own fetch
 - release register: `…1791704456929.txt`
 - Alpha feedback: `…1791704550479.txt`, `…1791707266261.txt` and `…1791709022479.txt`
 - QA-50, CF-C-30, CF-E-30, IA-30, QA-70, RS-20 and ESC-40: inline in the session transcript
+- The round-1 reviewers and the repair dry runs took their own fresh reads. Each reviewer's record names its own files. The repair dry runs' PE results are `…1791723048592.txt` (a superseded run on pre-commit code) and `…1791723332274.txt` (the receipt's run); their other pages are inline in their subagent transcripts.
 
 ## 13. Canon relied on
 
