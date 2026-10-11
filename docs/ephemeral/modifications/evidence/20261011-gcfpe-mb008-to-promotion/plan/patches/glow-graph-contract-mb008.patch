@@ -1,4 +1,4 @@
-diff -ruN base/glow-graph-contract/scripts/contract_recipe.py work/glow-graph-contract/scripts/contract_recipe.py
+diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe_20261009.py -x gcfpe-20261009.1-100926.1 base/glow-graph-contract/scripts/contract_recipe.py work/glow-graph-contract/scripts/contract_recipe.py
 --- base/glow-graph-contract/scripts/contract_recipe.py	2026-10-11 20:59:31.000000000 +0000
 +++ work/glow-graph-contract/scripts/contract_recipe.py	2026-10-11 23:07:39.855940657 +0000
 @@ -10,6 +10,7 @@
@@ -26,9 +26,16 @@ diff -ruN base/glow-graph-contract/scripts/contract_recipe.py work/glow-graph-co
      e2 = e2_out.read_bytes()
  print("E2 regenerator output", hashlib.sha256(e2).hexdigest(), len(e2))
  canon = lambda obj: (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")  # noqa: E731
-diff -ruN base/glow-graph-contract/scripts/regenerate_contract.py work/glow-graph-contract/scripts/regenerate_contract.py
+diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe_20261009.py -x gcfpe-20261009.1-100926.1 base/glow-graph-contract/scripts/regenerate_contract.py work/glow-graph-contract/scripts/regenerate_contract.py
 --- base/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 20:59:31.000000000 +0000
-+++ work/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 23:16:39.581684386 +0000
++++ work/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 23:24:56.269045943 +0000
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Contract regenerator for the 091426.1 direct-handoff contract (spec v2 §6; A1-2).
++"""Contract regenerator for the GCFPE direct-handoff contract (spec v2 §6; A1-2; release derivation, MB-008 F06).
+ 
+ Maintained in glow-graph-contract (MODIFICATION-20260923-closeout-residuals ITEM-13), moved from
+ docs/ephemeral/modifications/evidence/regenerate_contract.py. The two release-bound values are no longer
 @@ -14,6 +14,14 @@
  
  No value-table entry may target a mirrored path (checked). The value table is held here, never read from G.
