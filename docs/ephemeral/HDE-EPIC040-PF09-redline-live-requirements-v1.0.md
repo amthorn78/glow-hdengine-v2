@@ -5,9 +5,9 @@ logical_id: HDE-EPIC040-PF09-REDLINE-LIVE-REQUIREMENTS
 origin_change: HDE-EPIC040 (closed; CL-40 finding G-1 and F-2)
 author: Isis, continuing Lead Developer for HDE-EPIC040 (https://claude.ai/code/session_012tPq26JWVhCYZmcqTidpV2)
 requested_by: 'Product Owner, 2026-10-11: "Ok, I want you to draft a standalone PF09 redline. Will do the update manually."'
-applied_by: the Product Owner, as PF09 owner, by hand
+applied_by: 'Isis, in the same PR as this record, at the Product Owner''s direction of 2026-10-11: "I give direct permission to apply the redlines to the canonical docs and open a new PR."'
 base_commit: origin/main 1ea6a262
-standing: Proposal only. Nothing in docs/pfcanon changes until the Product Owner applies it.
+standing: Applied in the same PR. The docs/pfcanon changes become current only when the Product Owner merges that PR.
 ---
 
 # PF09 redline: re-home HDE-EPIC040's two deferred live requirements
