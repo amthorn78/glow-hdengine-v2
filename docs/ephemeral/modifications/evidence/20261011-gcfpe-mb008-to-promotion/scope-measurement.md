@@ -21,17 +21,27 @@ Broad match: `model|models|reasoning|effort|strength|advice|advise|advisory|reco
 
 | Skill | Line | Text, shortened | Disposition under 2.1 |
 |---|---|---|---|
-| change-flow | `SKILL.md:301` | "Do not create, require, recommend, or route through a model/strength assessment, reasoning recommendation, …" | **Conflicts**: forbids the reading. Keep the route/gate/AI-recommendation ban; require the reading |
+| change-flow | `SKILL.md:301` | "Do not create, require, recommend, or route through a model/strength assessment, reasoning recommendation, eligibility/suitability/account check, capability appraisal, …" | **Conflicts**: forbids the reading, and its "capability appraisal" and "eligibility/suitability" terms also suppress the surface advice PF04 §9.1.3 still requires. Keep the bans on routes, gates and an agent's own model or reasoning recommendation; require the reading and the surface advice |
 | flowmaster-validate | `SKILL.md:161` | "Direct continuation has no model/strength assessment, Analyzer, reasoning recommendation, …" | **Conflicts** the same way |
-| flowmaster-validate | `validate_flowmaster.py:359–366` | forbidden phrases "surface/model/reasoning recommendation", "eligible human recommendation" | Compatible (rule 3); a required guard for the reading is missing |
+| flowmaster-validate | `validate_flowmaster.py:359–366` | forbidden phrases "surface/model/reasoning recommendation", "eligible human recommendation" | **Partly conflicts**: the phrase at `:364` also forbids surface advice, which PF04 §9.1.3 keeps. The model and reasoning half matches rule 3. A required guard for the reading is missing |
 | glow-hde-pr-development | `SKILL.md:184` | "Do not introduce model, strength, configuration, or reasoning-level assessment or routing." | **Conflicts** (assessment) |
 | glow-hde-pr-development | `validate_glow_hde_pr_development.py:106–107` | forbids "recommend a model", "reasoning-level recommendation" | Compatible (rule 3) |
 | session-relay-flowmaster | `SKILL.md:283` | "For GCFPE, no handoff, relay message or ledger carries a model/strength assessment, reasoning recommendation, …" | **Conflicts**: a relay is in 2.1's scope by name |
 | amthor-workspace-governance-audit | `SKILL.md:41`; `references/interoperability-contracts.md:56` | "No operative prompt, … skill, or validator requires a model/strength assessment, …" | **Conflicts**: the audit would report the reading rule as a violation |
-| amthor-workspace-governance-audit | `references/epic-reengineering-interoperability.md:54–56` | Analyzer, `MODEL_HANDOFF`, surface/model/reasoning advice | Retired content (MB-003); rule 3 forbids the advice |
+| amthor-workspace-governance-audit | `references/epic-reengineering-interoperability.md:54–56` | Analyzer, `MODEL_HANDOFF`, surface/model/reasoning advice | Retired Analyzer handoff content (MB-003). Its model and reasoning advice is what rule 3 forbids. Surface advice is carried by PART-02's rule, not by this reference |
 | change-flow, flowmaster-validate | bundled contracts, `prohibited_references` | "model/strength/reasoning/eligibility/suitability/account/configuration route" | Compatible: a route, and the reading is no route |
 | typesafe-scoring | `SKILL.md` description | "Score a Glow app session prompt …"; records a row in the Notion uses table | The tool 2.1 names; no change established. Its recording step meets the write boundary (DN-B) |
 | flowmaster-primary, glow-po-reporting, session-branch-flowmaster, glow-graph-contract | — | no GCFPE model-guidance rule | Unaffected |
+
+### 2a-bis. Texts the placement must keep (R-A1, round 1)
+
+D23's canonical wording, from `MODIFICATION-20260923-alpha-feedback-open-entries` §P, constrains where the reading and the surface advice go:
+
+| Text | Where it is restated | Under DN-B options 1 and 2 | Under option 3 |
+|---|---|---|---|
+| **C-PLACE**: "The final response ends with the `NEXT_PROMPT_HANDOFF` block. Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest." | 53 candidate bodies and PE (the "handoff preamble" in §2b); change-flow `SKILL.md:299`; glow-hde-pr-development `SKILL.md:174`; session-relay-flowmaster `SKILL.md:285`; governance audit pin `SKILL.md:40` | Kept: the line before the block names the reading's cell, its flags and the artifact path | Amended by a D23 successor in every place listed |
+| **C-ART**: "Before emitting any handoff, write every result this prompt produces … into its output artifact … it never carries the only copy of a fact." | the nonterminal bodies; glow-hde-pr-development `SKILL.md:170`; governance audit pin `SKILL.md:39` | Kept: the printed reading and the surface advice are written into the artifact | Kept |
+| **D23-B**: the block's five contents | the bodies' *Mandatory single-block handoff*; the four skills above | Kept | Kept |
 
 ### 2b. Prompt bodies
 
@@ -46,7 +56,7 @@ Broad match: `model|models|reasoning|effort|strength|advice|advise|advisory|reco
 | T2 in-block prohibitions | 23 pages: 8 PR/OPS/QA-10 pages, 10 CF/MGR pages, 5 CL pages. The CL sentence opens "Do not include …" without naming the block |
 | GCFPE-MGMT-10 091426.1 | no handoff preamble, no `NEXT_PROMPT_HANDOFF` literal, no T1–T5 text; graph shows 2 handoff branches; its conditional handoff names `PR-10 — … — 091426.1` (the predecessor page) |
 
-Reach of rule 1, by function: every member that emits a handoff needs the reading beside it, so 53 candidate bodies plus GCFPE-MGMT-10 (DN-C) and PE's authoring rules. Exceptions: PR-50 emits no handoff, and its two prohibitions forbid its own assessment, which rule 3 also forbids; the 23 T2 sentences stay valid when the reading is printed beside the block, not in it.
+Reach of rule 1, by function: every member that emits a handoff needs the reading for its receiving session, so 53 candidate bodies plus GCFPE-MGMT-10 (DN-C) and PE's authoring rules. PF04 §9.1.3's surface advice reaches the same bodies, and the same general prohibitions suppress it. Exceptions: PR-50 emits no handoff, and its two prohibitions forbid its own assessment, which rule 3 also forbids. Of the 23 T2 sentences, 18 stay valid as written and the 5 CL ones gain "in the block", because nothing about the reading or the advice goes inside the block.
 
 ## 3. F06 — candidate contract and profile
 
