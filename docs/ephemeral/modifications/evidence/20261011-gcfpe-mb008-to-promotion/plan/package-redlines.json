@@ -463,16 +463,6 @@
    "old": " Predecessor recommends the Analyzer, Analyzer reads the entire worker contract/decisive sources and returns MODEL_HANDOFF plus unchanged worker invocation. Unknown picker does not prevent supported concrete advice. Official guidance remains dynamically appraised; no fixed worker table or measured-cost claim is added.",
    "new": "",
    "count": 1
-  },
-  {
-   "id": "GG-DOC-1",
-   "part": "PART-01",
-   "finding": "F06",
-   "skill": "glow-graph-contract",
-   "file": "scripts/regenerate_contract.py",
-   "old": "\"\"\"Contract regenerator for the 091426.1 direct-handoff contract (spec v2 §6; A1-2).",
-   "new": "\"\"\"Contract regenerator for the GCFPE direct-handoff contract (spec v2 §6; A1-2; release derivation, MB-008 F06).",
-   "count": 1
   }
  ]
 }

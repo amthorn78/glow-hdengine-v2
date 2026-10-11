@@ -1,0 +1,219 @@
+{
+ "record_type": "MB008_PLAN_DRY_RUN",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "date_utc": "2026-10-11T23:33:09+00:00",
+ "repository_head": "6629c03693572afaf646dfd7b5bb05a0b42ad52c",
+ "fetched_after": "2026-10-11T22:48:40.000Z",
+ "gates": {
+  "N0_identities": {
+   "rows": [
+    {
+     "skill": "change-flow",
+     "expected": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "installed": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "copy": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "ok": true
+    },
+    {
+     "skill": "flowmaster-validate",
+     "expected": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+     "installed": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+     "copy": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+     "ok": true
+    },
+    {
+     "skill": "glow-hde-pr-development",
+     "expected": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "installed": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "copy": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "ok": true
+    },
+    {
+     "skill": "glow-graph-contract",
+     "expected": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "installed": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "copy": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "ok": true
+    },
+    {
+     "skill": "session-relay-flowmaster",
+     "expected": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "installed": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "copy": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "ok": true
+    },
+    {
+     "skill": "amthor-workspace-governance-audit",
+     "expected": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "installed": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "copy": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "ok": true
+    },
+    {
+     "skill": "glow-merged-change-attribution-lock",
+     "expected": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+     "installed": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+     "copy": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "N1_body_guard_selftest": {
+   "exit_code": 0,
+   "guards": 14,
+   "fixture_rows": 37,
+   "span_resolver": {
+    "untouched": true,
+    "landed": true,
+    "second_send_refused": true,
+    "ambiguous_refused": true,
+    "cross_line_refused": true,
+    "anchor_landing_exact": true,
+    "anchor_landing_refuses_kept_tail": true,
+    "anchor_landing_refuses_kept_head": true,
+    "anchor_landing_refuses_untouched": true,
+    "insert_untouched": true,
+    "insert_applied_once": true,
+    "insert_landed": true,
+    "insert_second_send_refused": true,
+    "insert_anchor_landing": true,
+    "insert_landing_refuses_untouched": true,
+    "insert_landing_refuses_doubled": true,
+    "replace_landed_unchanged": true
+   },
+   "ok": true
+  },
+  "N2_body_rehearsal": {
+   "exit_code": 0,
+   "pages": 55,
+   "ops": 82,
+   "ops_applied": 82,
+   "revisions_match_pins": 55,
+   "batch_safe": 55,
+   "guard_rows_after": 210,
+   "guard_rows_passing_after": 210,
+   "guard_rows_passing_before": 55,
+   "check_would_pass": 55,
+   "failing_pages": [],
+   "ok": true
+  },
+  "N3_registry_form": {
+   "exit_code": 0,
+   "fixtures": 37,
+   "fixtures_agree": 37,
+   "page_rows": 210,
+   "page_rows_agree": 210,
+   "ok": true
+  },
+  "N4_graph": {
+   "selftest": {
+    "mode": "selftest",
+    "rows": {
+     "clean_apply_passes": true,
+     "second_apply_changes_nothing": true,
+     "clean_flip_passes": true,
+     "unflipped_fails_flipped_check": true,
+     "rejects_other_part_change": true,
+     "rejects_kept_pr10_edge": true,
+     "rejects_missing_state": true,
+     "rejects_global_change": true,
+     "rejects_old_member_rule": true,
+     "rejects_bad_url": true,
+     "rejects_stale_proofs": true,
+     "proofs_describe_no_added_member": true
+    },
+    "ok": true
+   },
+   "check_candidate": {
+    "ok": true,
+    "errors": []
+   },
+   "check_production": {
+    "ok": true,
+    "errors": []
+   },
+   "builds": {
+    "parent": {
+     "exit_code": 0,
+     "edges": 237,
+     "bytes": 596008,
+     "sha256": "ff296b1e740a77ee207c1223cc9bdff1f56c6c167bd4714a41ae92ef8708f18b",
+     "validation_pass": true
+    },
+    "candidate": {
+     "exit_code": 0,
+     "edges": 235,
+     "bytes": 593625,
+     "sha256": "df3b57a5022f2716c80bc76a59cd4ea73e84e34085c2ae21c2b127be49684942",
+     "validation_pass": true
+    },
+    "production": {
+     "exit_code": 0,
+     "edges": 235,
+     "bytes": 593569,
+     "sha256": "8391ad84af4734a61fd1ca9afcc6949b39f85bfdf3c95f37d211f42d1c0205a2",
+     "validation_pass": true
+    }
+   },
+   "mgmt10_url": "STAND-IN: the testing page; EXECUTE uses the duplicated successor's URL",
+   "ok": true
+  },
+  "N5_regenerator": {
+   "patch_applied": true,
+   "shipped_091426_contract_regenerates_equal": true,
+   "unfilled_marker_refused": true,
+   "contracts_100926": {
+    "candidate": {
+     "exit_code": 0,
+     "bytes": 634454,
+     "sha256": "5d41250408506eca7e796d308c565590a945680a3f2dab8acf32ec30b5e2f131"
+    },
+    "production": {
+     "exit_code": 0,
+     "bytes": 631092,
+     "sha256": "17bf6c3f0e5904415af2be7ddb03ba4c43ebebf8f021d760bb3d05915c1c8f17"
+    }
+   },
+   "plan_digest": "STAND-IN: edits.json",
+   "ok": true
+  },
+  "N6_profile_100926": {
+   "substitutions": 25,
+   "errors": [
+    "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.4.0",
+    "SKILL_SELF_IDENTITY:DECLARED_284b3ac150be_MEASURED_e1437df7c580"
+   ],
+   "unexpected_errors": [],
+   "pending_by_design": "change-flow's revision moves to 3.4.0 with its redlines in EXECUTE's package build; SKILL_TREE_SHA256 is recomputed as the package build's last step",
+   "ok": true
+  },
+  "N7_bodies_through_profile": {
+   "before": {
+    "bodies_validated": 54,
+    "not_evaluated": [],
+    "body_error_classes": [
+     "PROMPT_TYPESAFE_READING"
+    ],
+    "body_errors": 53
+   },
+   "after": {
+    "bodies_validated": 54,
+    "not_evaluated": [],
+    "body_error_classes": [],
+    "body_errors": 0
+   },
+   "ok": true
+  },
+  "N8_package_redlines": {
+   "ops": 46,
+   "applied": true,
+   "landed": 46,
+   "second_apply_refused": true,
+   "audit_fixture_suite_ok": true,
+   "ok": true
+  }
+ },
+ "ok": true,
+ "d22": "transient reads of this session's harness records; no body text in this receipt"
+}
