@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261010-gcfpe-candidate-skill-analysis"
-status: "PLANNED"
+status: "EXECUTING"
 targets: ["prompt", "skill", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "GCFPE-MGMT-10", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -19,8 +19,8 @@ requested_by: "Nathan"
 analyze_approved_by: "Nathan"
 analyze_approved_date: "2026-10-11"
 item_count_at_approval: 4
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan"
+plan_approved_date: "2026-10-11"
 supersedes: ""
 spawned_from: "MODIFICATION-20261009-gcfpe-latest-alpha-analysis"
 shares_package_with: []
@@ -268,6 +268,16 @@ Reviewer C, in a fresh context, checked only the repair from `cfa3a496` to `c9bd
 
 Merging preserves the record and approves nothing (D21-C).
 
+### Approval to enter EXECUTE — 2026-10-11
+
+Nathan: “Nathan approves the plan of MODIFICATION-20261010-gcfpe-candidate-skill-analysis at 0a6bf2db (2026-10-11), accepting the open findings in PLAN successor 2 §8 and L-C1 to L-C7. It authorizes the Notion writes W1 to W10 and no others. Go on to EXECUTE.”
+
+This approves PLAN successor 2 (steps X0–X9) as committed at `0a6bf2db`. It accepts the open findings listed there and the DIFF_CHECK's L-C1 to L-C7. It authorizes Notion writes W1–W10 only. `plan_approved_by` and `plan_approved_date` record it. The dated plan sections above are unchanged.
+
 ## §E — Execute
 
-Not entered. No skills, prompt bodies, canon, selected graph/registry or release state were changed.
+Entered 2026-10-11 under Nathan's approval of the plan at `0a6bf2db`. It works PLAN successor 2's steps X0–X9 in order, verifying each step by its named check; dispositions are recorded as the steps complete. `main` is unchanged at `1ea6a262` for `docs/pfcanon`, `docs/graph/parts` and the ecosystem controls.
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| X0 | all | VERIFIED | approval recorded; record validates at `EXECUTING` |
