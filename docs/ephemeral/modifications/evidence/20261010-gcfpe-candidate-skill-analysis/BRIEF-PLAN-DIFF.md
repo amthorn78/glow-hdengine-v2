@@ -4,7 +4,8 @@ You are PLAN DIFF_CHECK reviewer C for MODIFICATION-20261010-gcfpe-candidate-ski
 
 This is the one bounded repair-diff check D26-A allows after FULL round 1. It is not another FULL review. The rubric and the cap are the fixed text in the committed canonical brief `BRIEF-PLAN-1-A.md`, §3 and §5; read them there. No scope, severity or exit rule is widened. The round-1 reviewer records are immutable.
 
-**What you review.** Only the repair, from `cfa3a49637680802395f42839cd97e488c7300e9` (the commit round 1 reviewed) to `c9bdae72baec052a6d83a5f49e01c5493416f36b` in `amthorn78/glow-hdengine-v2`, branch `docs/20261010-modification-gcfpe-candidate-skill-analysis`. Use those commits, not the branch head. Between them are three commits:
+**What you review.** Only the repair, from `cfa3a49637680802395f42839cd97e488c7300e9` (the commit round 1 reviewed) to `c9bdae72baec052a6d83a5f49e01c5493416f36b` in `amthorn78/glow-hdengine-v2`, branch `docs/20261010-modification-gcfpe-candidate-skill-analysis`. Use those commits, not the branch head. Between them are four commits:
+- `2c9ded0c`: the round-1 review briefs. It contains no plan change.
 - `80928f6f`: the round-1 records, the reviews-ledger entry and a §P note. It contains no plan change.
 - `0f39f89f`: the repair.
 - `c9bdae72`: the fresh-read dry-run receipt that goes with the repair.
