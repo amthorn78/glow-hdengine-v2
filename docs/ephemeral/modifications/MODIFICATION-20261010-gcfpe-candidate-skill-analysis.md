@@ -2,17 +2,17 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261010-gcfpe-candidate-skill-analysis"
-status: "EXECUTING"
+status: "COMPLETE"
 targets: ["prompt", "skill", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "GCFPE-MGMT-10", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
 readiness: "SPLIT_RECOMMENDED"
 override: {"by": "Nathan", "overrides": ["scope_freeze"], "reason": "DN-1 Option 1, 2026-10-11: the three package repairs and F06 move to a new Modification planned with release qualification; this Modification keeps the candidate prompt-page and graph/registry repairs. His words are quoted in §P, DN-1 decision."}
 interaction_cost_predicted: 11
-interaction_cost_actual: 0
+interaction_cost_actual: 9
 estimate: {"plan": "Re-priced and accepted by Nathan 2026-10-11 (DN-1): completing PLAN takes 2–4 h and 1.1–1.7M aggregate tokens from the decision, including one FULL round of two reviewers and at most one DIFF_CHECK. Spent before the decision: about 3.7 h in both sessions; about 0.85M tokens in the successor session; the dated session's tokens were not measured", "execute": "Re-priced and accepted by Nathan 2026-10-11 (DN-1, Option 1): 3–5 h and 0.5–1.0M aggregate tokens, excluding Product Owner waiting time"}
 reviews: [{"mode":"ANALYZE","kind":"DRY_RUN","date":"2026-10-10","required_open":0,"outcome":"Author dry run: 110 closure calls succeeded; all 15 Modification records validate. No confirmed defect in the analysis record remains from this dry run. Six required source defects, listed compatibility risks and missing release gates remain explicit; publication.md records the dry-run boundary."},{"mode":"ANALYZE","kind":"FULL","date":"2026-10-10","required_open":1,"outcome":"Round 1: reviewer A reported 1 required affected-surface omission (PE under F05); reviewer B reported 0. Distinct required count is 1. Two distinct listed clarity risks remain opt-in. R-A1 is corrected in the author repair; one bounded DIFF_CHECK follows."},{"mode":"ANALYZE","kind":"DIFF_CHECK","date":"2026-10-10","required_open":0,"outcome":"Reviewer A confirmed R-A1 fixed without a new required defect; distinct required report defects 1 to 0. Six underlying source findings and two listed report observations remain. One FULL round and the single bounded DIFF_CHECK are complete; return to Nathan with publication and PLAN decisions separate."},{"mode":"PLAN","kind":"DRY_RUN","date":"2026-10-11","required_open":0,"outcome":"INCOMPLETE pre-review dry run. First record check found missing item_count_at_approval; set it to the unchanged four items and reran successfully. Seven supplied archive/freeze identities reproduce; source anchors confirm defects persist; static checks pass only their baseline scope; full suite fails on missing companions. Shipped derivation, new repair guards and governed packaging remain unavailable. No FULL review started or candidate/repair pass claimed."},{"mode":"PLAN","kind":"DRY_RUN","date":"2026-10-11","required_open":2,"outcome":"Second session, resumed under D26-C before any external write. The dated plan's tooling and companion stop is cleared: shipped graph build (selected token reproduced; candidate parts build at 236 edges), registry derivation, contract regeneration and the packaging route pass on baselines; companions are bound by prior verdicts; the nine native targets are unchanged. It finds 2 required normal-path defects in the dated plan: DR-1, the package-contract edits cannot be executed because the contract is derived from the selected parts; DR-2, installing before promotion leaves the skills incompatible with the selected release (PF04 §9.1.6). Package gates fail on the intended set only because the analysed attribution lock is absent here. No FULL review; returned to Nathan with DN-1 and a re-price (PLAN-SUCCESSOR-1-20261011.md)."},{"mode":"PLAN","kind":"DRY_RUN","date":"2026-10-11","required_open":0,"outcome":"Successor 2, on the scope kept in DN-1: 10 of 10 gates pass. Identities reproduce; 8 pages sit at their pins with 22 of 22 operations applied in memory, batch-safe, and 27 failing guard rows fall to 0; the shipped audit engine agrees with the registry-form guards on 24 fixtures and 32 page rows; the graph repair self-test passes 17 of 17; the repaired build has 237 edges (ff296b1e…); registry drift is exactly [PR-40, RS-20]; selected surfaces are untouched; 15 records validate. No required defect is open; one FULL round follows."},{"mode":"PLAN","kind":"FULL","date":"2026-10-11","required_open":2,"outcome":"Round 1 at cfa3a496: reviewers A and B each found the same 2 required defects, both in successor 2's own text. X5's whole-page landing check byte-compares landed bodies with an earlier transient read, against D22 (R3). X6 closes the record before X7 and X8 run (R1). The distinct required count is 2. Their 33 LISTED findings (A 14, B 19) stay listed. Both defects take the reviewers' author repair; one DIFF_CHECK follows."},{"mode":"PLAN","kind":"DIFF_CHECK","date":"2026-10-11","required_open":0,"outcome":"Reviewer C checked the repair cfa3a496..c9bdae72. R-A1/B-1 and R-A2/B-2 are fixed with no new required defect; the required count moved from 2 to 0. Seven LISTED observations (L-C1 to L-C7) stay listed. One FULL round and the single DIFF_CHECK are complete, and PLAN returns to Nathan with every open finding listed."}]
-items: [{"id": "ITEM-01", "statement": "Reconcile candidate runtime instructions and supplied skill authority with D27, preserving existing approvals and roles.", "source": "Current user request; D27; AF-014–AF-026", "disposition": ""}, {"id": "ITEM-02", "statement": "Determine whether supplied validation, core propagation and missing tooling dependencies can support this candidate.", "source": "Current user request; prior Modification remaining gates", "disposition": ""}, {"id": "ITEM-03", "statement": "Assess supplied typesafe-scoring against AF-013 reusable relay advice, documenting capability and trigger limits.", "source": "Current user request; AF-013", "disposition": ""}, {"id": "ITEM-04", "statement": "Document current and intended flows, source identity, per-surface disposition and related MGMT/PE control drift.", "source": "Current user request", "disposition": ""}]
+items: [{"id": "ITEM-01", "statement": "Reconcile candidate runtime instructions and supplied skill authority with D27, preserving existing approvals and roles.", "source": "Current user request; D27; AF-014–AF-026", "disposition": "VERIFIED"}, {"id": "ITEM-02", "statement": "Determine whether supplied validation, core propagation and missing tooling dependencies can support this candidate.", "source": "Current user request; prior Modification remaining gates", "disposition": "NOT_APPLICABLE"}, {"id": "ITEM-03", "statement": "Assess supplied typesafe-scoring against AF-013 reusable relay advice, documenting capability and trigger limits.", "source": "Current user request; AF-013", "disposition": "VERIFIED"}, {"id": "ITEM-04", "statement": "Document current and intended flows, source identity, per-surface disposition and related MGMT/PE control drift.", "source": "Current user request", "disposition": "VERIFIED"}]
 parts: [{"id": "PART-01", "name": "Candidate and runtime skill coherence", "items": ["ITEM-01"], "class": "B", "after": []}, {"id": "PART-02", "name": "Validation and propagation fit", "items": ["ITEM-02"], "class": "C", "after": ["PART-01"]}, {"id": "PART-03", "name": "Reusable relay advice", "items": ["ITEM-03"], "class": "A", "after": []}, {"id": "PART-04", "name": "Management and documentation coherence", "items": ["ITEM-04"], "class": "C", "after": []}]
 request: "ok, here are the skills then. Do a new MGMT analyze run on the new candidates with these included. careful documenting and flow diagrams should be part of this process, use notion as needed. Determine if any changes to these skills or related recently prompts is needed."
 requested_by: "Nathan"
@@ -348,3 +348,80 @@ Canon requires a map update but does not name a page with the map's title. Natha
 Nathan: “Authorize W11 as written in §E of the record at 86898299.”
 
 This chooses option 1. It authorizes one Notion write, W11, on the Flow Index (`3db4590a05eb81de9736ea69bac61016`), with the edit, text, verification and rollback in *Stop before X9 — finding E-2* above, as committed at `86898299`. No other write is added. EXECUTE resumes with W11, then adds E-2 and this decision to PR #600's body, then runs X9.
+
+### Resume and close — 2026-10-11
+
+EXECUTE resumed after DN-E2 and ran W11, the PR body update and X9. The X9 row in the first table stays as written at the stop.
+
+| step | part | disposition | evidence |
+|---|---|---|---|
+| W11 | PART-04 | VERIFIED | Authorized by DN-E2, recorded at `67c5c13a`. A fresh read just before the write (20:10Z) showed the Flow Index unchanged since 2026-10-09T20:18:59Z, with the anchor paragraph once. One `update_content` call returned success, with no error, warning or async task. On a re-fetch (last edited 20:10:23.284Z), the anchor paragraph appears once, followed directly by the W11 text, once |
+| X8, E-2 update | PART-04 | VERIFIED | PR #600 body updated at 20:10:59Z to add E-2, DN-E2 and W11. `pull_request_read` shows the five template headings and the D21-C sentence |
+| X9 | all | VERIFIED | Before this commit: the validator passes at `COMPLETE` on this record and on all 15 records; `git diff --check` is clean; the plan's count of the TypeSafe row in §A.4 prints 1; `git ls-files` lists findings.md, flows.md, source-identities.md, coverage.md, plan-flows.md and PLAN-SUCCESSOR-2-20261011.md. The push, the remote comparison, marking PR #600 ready and the head check follow this commit, so they are reported in the return to Nathan, not here |
+
+### Parts
+
+- **PART-01 (B, ITEM-01): landed whole, for the scope DN-1 kept.** W1–W8 carry F02–F05 on eight candidate pages, verified at X5. The candidate graph execution copy and its registry inputs carry F05 and F09, verified at X3. Nothing was rolled back. The package side of the part moved to a new Modification (MB-008).
+- **PART-02 (C, ITEM-02): dropped by DN-1.** It moved, with F06, to the new Modification (MB-008). Nothing was applied.
+- **PART-03 (A, ITEM-03): the assessment only.** The item is the assessment that §A.4 and §A.5 hold: TypeSafe is conditional, no package repair is established, and the integration is unmeasured. No implementation was planned, and nothing was applied.
+- **PART-04 (C, ITEM-04): landed whole.** It covers ANALYZE's findings, flows, source identities and coverage, and PLAN's plan flows. In EXECUTE it added the tracking lines W9 and W10 (X7), the Flow Index entry W11 and the PR body (X8). Each was read back, and X9 confirms the files are tracked.
+
+Item dispositions: ITEM-01 `VERIFIED`; ITEM-02 `NOT_APPLICABLE`; ITEM-03 `VERIFIED`; ITEM-04 `VERIFIED`. None is `BLOCKED`, so no part is half applied.
+
+### Artifacts produced
+
+- **`evidence/20261010-gcfpe-candidate-skill-analysis/execute/candidate-graph-parts/`:** 56 files, manifest `b27c11ca…`, committed at `8ec03055`. Read back at X3 by rebuilding it: 237 edges, `ff296b1e…`.
+- **`execute/candidate-registry-derivation.json`** (771 B, `27a2be82…`) and **`execute/candidate-registry-guards.json`** (9,013 B, `62245446…`): committed at X3. At X5 the shipped audit engine agreed with the guards on 24 of 24 fixtures and 32 of 32 page rows.
+- **This record:** commits `58bca09d` (X0), `4ea61c29` (X6), `86898299` (the stop), `67c5c13a` (DN-E2) and this close. Each was validated, pushed and compared with the remote by `git diff --quiet`.
+- **Notion:**
+  - the eight candidate pages (W1–W8), read back at X5;
+  - the status lines on the catalog and Alpha feedback (W9, W10), read back at X7;
+  - the Flow Index entry (W11), read back at 20:10:23Z.
+- **PR #600 body:** read back at X8 (19:52:53Z) and after the E-2 update (20:10:59Z).
+
+### Interaction cost, actual against predicted
+
+Predicted 11. Actual 9.
+
+| term | predicted | actual |
+|---|---|---|
+| open rulings | 0 | 2: DN-1 and DN-E2 |
+| mode approvals | 2 | 2: PLAN (§A.10, given in two messages, counted once) and EXECUTE |
+| ANALYZE and PLAN review rounds | 2 | 2: one FULL round each; each DIFF_CHECK sits within its round |
+| skill review cycles | 1 | 0 |
+| installs | 3 | 0 |
+| merges | 3 | 1: PR #600, pending at this commit |
+| outside the formula | — | 2: the publication approval (§A.9) and the PLAN re-invocation after the source stop |
+
+Why they differ: DN-1 moved the three packages out, removing one skill review cycle, three installs and two merges (−6). The two rulings add 2. The publication approval and the PLAN resume are round trips the formula does not count (+2). 11 − 6 + 2 + 2 = 9. DN-E2 came from a step the plan missed (E-2), not from new scope.
+
+### Remaining Product Owner actions
+
+1. **Merge PR #600.** Only Nathan merges. After the merge, this session verifies the files on `main` and returns `ECOSYSTEM_CHANGE_COMPLETE`.
+2. **Open the new Modification for MB-008, when Nathan chooses.** It covers the package repairs (F02, F04, F05), F06 and F07, with `spawned_from` set to this Modification, and starts from the candidate graph execution copy and registry inputs.
+
+MB-007 and MB-009 stay open on the backlog for later runs. No selection, promotion or install is requested.
+
+### Canon relied on
+
+- **PF04-Canon-HDE-Governance v2.8.7 §9.1.6**, read in full on `main` at `1ea6a262` during EXECUTE. It is applied to:
+  - the complete readback of changed published bodies (X5's full reading);
+  - keeping checked candidate corrections separate from selection and from observed runtime correction;
+  - one coherent successor selection: the candidate is not ready for selection while MB-008 is open;
+  - the map update (E-2, W11);
+  - recording the actual author, checker and acceptor (below).
+- **PF06-Canon-Change-Process-Guide v2.5.4 §0.1A**, its paragraph on agent-authored HDE Build Notes addenda, and **PF27-Canon-Plan-Templates v2.0.5, *Canon precedence for template use***. Both were re-read on `main` during EXECUTE. They govern the F05 text that W1–W8 applied verbatim, as approved in PLAN successor 2.
+- **PF10-HDE-Build-Notes v13.5.1:** no current addenda, so no override applies.
+- **In-flight documents:**
+  - this record's §A and §P, with PLAN successor 2 at `0a6bf2db`, and the approvals quoted in §P and §E;
+  - `gcfpe.decision-record.md`: D21-C, D22, D26-B and D26-C;
+  - `modification-template.md`: rules 1, 5 and 6;
+  - `notion-write-boundary.md`.
+
+**Actor record (PF04 §9.1.6).**
+
+- **Author:** this Claude Code session, running GCFPE-MGMT-10. One executor subagent made W1–W8 and the X2 and X5 reads. The coordinating session made W9–W11, the commits and the PR body.
+- **Checker:** the same session, through X5's tool checks and the executor's full reading. The check is not independent: the independent reviews covered the plan, and the plan called for no independent check of the landed pages.
+- **Acceptor:** none. No acceptance, selection or runtime correction is claimed.
+
+**D22.** EXECUTE's saved PE reads are named in *Stop before X9* above. After the stop, the session read only the Flow Index, twice, which is not a prompt body.
