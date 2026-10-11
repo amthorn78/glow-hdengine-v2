@@ -280,4 +280,17 @@ Entered 2026-10-11 under Nathan's approval of the plan at `0a6bf2db`. It works P
 
 | step | part | disposition | evidence |
 |---|---|---|---|
-| X0 | all | VERIFIED | approval recorded; record validates at `EXECUTING` |
+| X0 | all | VERIFIED | Approval recorded at `58bca09d`; the record validates at `EXECUTING` |
+| X1 | all | VERIFIED | Freeze digests match: glow-graph-contract `9 e241bb9a…`, governance audit `15 c214e874…`. The selected graph parts, the registry and `docs/pfcanon` are untouched. The base parts and the plan files are unchanged since `0a6bf2db`, and there was no prior execution copy. `body_check.py selftest` and the graph-repair self-test pass, the latter at 17 of 17 cases |
+| X2 | PART-01 | VERIFIED | T2 14:15:06Z. Eight fresh reads, 14:15:09–14:15:24Z, each at its pinned revision, batch-safe and passing `check_would_pass`. 22 of 22 operations applied in memory; failing guard rows went from 27 to 0 |
+| X3 | PART-01 | VERIFIED | Commit `8ec03055`. Every expected value in §4 matched: build 237 edges, 596,008 B, `ff296b1e…`; parts manifest `b27c11ca…` over 56 files; derivation 771 B `27a2be82…` (exit 1, drift `[PR-40, RS-20]`); guards 9,013 B `62245446…` |
+| X4 | PART-01 | VERIFIED | W1–W8: one `update_content` call per page, carrying 1, 4, 4, 4, 1, 1, 2 and 5 replacements. Each call returned success with no error, warning or async task. The pages' new last-edited times run from 15:02:20.983Z (QA-50) to 16:10:06.322Z (PE) |
+| X5 | PART-01 | VERIFIED | T5 16:10:32Z, fresh reads. `check`: `"ok": true`; the revision moved on 8 of 8 pages, 22 of 22 operations landed and 32 of 32 guards pass. `registry`: `"ok": true`, with 24 of 24 fixtures and 32 of 32 page rows in agreement. The full reading found all eight pages intact |
+
+**Checkpoint (X6, D26-C).** PART-01's native repairs and the graph execution copy are landed and verified. The record stays `EXECUTING` until X9.
+
+Observation E-1, outside this Modification's edits. The X5 reading found two features of the PE page that no operation touched:
+- an empty H2, *Candidate authoring contract*, directly above the H2 *GCFPE 100926.1 authoring requirements*;
+- a bold label containing inline code, which Notion renders with doubled asterisks.
+
+No `old_str` or `new_str` contains a heading or that markup, so neither comes from X4. Neither changes behavior, and they are recorded here rather than repaired (scope freeze).
