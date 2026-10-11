@@ -1,8 +1,8 @@
 {
  "record_type": "MB008_PLAN_DRY_RUN",
  "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
- "date_utc": "2026-10-11T23:33:09+00:00",
- "repository_head": "6629c03693572afaf646dfd7b5bb05a0b42ad52c",
+ "date_utc": "2026-10-11T23:35:25+00:00",
+ "repository_head": "93bb9e363158806b75bc4ab98d491b7122ee35be",
  "fetched_after": "2026-10-11T22:48:40.000Z",
  "gates": {
   "N0_identities": {
