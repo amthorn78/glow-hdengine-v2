@@ -1,11 +1,11 @@
 {
   "edge_indices": [
+    221,
     222,
     223,
     224,
     225,
-    226,
-    129
+    128
   ],
   "edges": [
     {
@@ -258,8 +258,8 @@
   "id": "RS-40",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb813993beccaaf88523d4?pvs=204",
+    "candidate_version": "100926.1",
     "id": "RS-40",
     "lane": "RS",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -268,11 +268,11 @@
       "PR_IMPLEMENTATION_RESULT"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb815e98f5ea7b605b70a3",
-      "release": "GCFPE-20260913.1",
-      "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb815e98f5ea7b605b70a3",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb8183b5ffdf4270133226",
+      "release": "GCFPE-20260914.1",
+      "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "PR-35",
@@ -292,7 +292,7 @@
     ],
     "sequence": 40,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091426.1"
+    "title": "RS-40 — Approved Rescope — Resume PR Implementation — 100926.1"
   },
   "state_route_order": [
     "source_resolution_error",

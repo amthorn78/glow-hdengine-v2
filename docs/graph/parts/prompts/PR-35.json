@@ -1,10 +1,10 @@
 {
   "edge_indices": [
+    158,
     159,
     160,
     161,
-    162,
-    128
+    127
   ],
   "edges": [
     {
@@ -198,8 +198,8 @@
     "adds_work_unit": false,
     "adds_work_vehicle": false,
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e?pvs=204",
+    "candidate_version": "100926.1",
     "cross_session_route": true,
     "id": "PR-35",
     "lane": "PR",
@@ -208,7 +208,13 @@
     "output_artifacts": [
       "PR_IMPLEMENTATION_RESULT"
     ],
-    "predecessor": null,
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb8120b443ed2cb08b723c",
+      "release": "GCFPE-20260914.1",
+      "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204",
+      "version": "091426.1"
+    },
     "predecessor_union_destinations": [],
     "r1_mapping": "GCF-17",
     "receiving_role": "You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you continue its existing pull request. PR-35 runs as its own top-level session, entered from PR-30's handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other session.",
@@ -222,7 +228,7 @@
     ],
     "sequence": 35,
     "session_class": "DEDICATED_PR_REVIEW_SESSION",
-    "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1"
+    "title": "PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1"
   },
   "state_route_order": [
     "merge_pending",

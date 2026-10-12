@@ -1896,3 +1896,45 @@ flowmaster-validate's suite reports `name_line_forms`: every `SKILL.md` under th
 forms through each name reader and skill-file hash it has, and a scan of its own scripts for a reader
 that accepts one form only; `suite_ok` is false unless it passes. Each was shown to fire when the
 equivalence is removed (`execute/fv341-proof.json` in the record's evidence).
+
+## D29 — `GCFPE-20261009.1 / 100926.1 / 55` is promoted; the 091426.1 predecessors are archived intact
+
+**Product Owner, 2026-10-12**, in `MODIFICATION-20261011-gcfpe-mb008-to-promotion`: *"Nathan approves
+promotion of GCFPE-20261009.1 / 100926.1 as the snapshot in execute/PROMOTION-PACKET.md at 31c14f1,
+accepting the listed risks in its §6, including PFC-L1 / W-1. Go on to PART-08."* After the X17
+install he amended that snapshot for flowmaster-validate alone (`D28`): the package moved to 3.4.1, with
+no review round.
+
+The register's three predicates were met in order: complete behaviour validation of the pinned
+snapshot (X12, and X18 on the activated state), the independent post-flight (`PASS WITH WARNINGS`
+twice after AM-2, no mandatory finding), and Nathan's approval quoted above.
+
+### What became current
+
+- **The register selects `GCFPE-20261009.1` / `100926.1` / 55 from 2026-10-12 14:23:57Z**, written
+  last, after the nine control pages and the new catalog had been written and read back (`D17`'s
+  order). Every control reads `REGISTER_CONTROLLED`, operative only while the register selects it.
+- **The 091426.1 Flow Index, five lane hubs and Alpha checklist were updated in place**, because the
+  100926.1 members sit under them (`D27`'s publication). A new catalog was created. Archiving the
+  controls would have taken the successors with them.
+- **Skills:** change-flow 3.4.0, flowmaster-validate 3.4.1, glow-hde-pr-development 1.4.0,
+  glow-graph-contract, session-relay-flowmaster 3.3.0 and amthor-workspace-governance-audit 1.14.1.
+  Each installed tree measures its approved digest with `freeze.py`.
+- **Archival:** 57 pages — 54 runtime members, GCFPE-MGMT-10 091426.1, the 091426.1 catalog and PE
+  Metaprompt 091426.1 — were **moved** to *04 Archived Prompt Versions* on 2026-10-12, after X18
+  passed. None had child pages; all 57 were read back under the archive.
+- **Repository:** `docs/graph/parts/` holds the selected 100926.1 parts (proof token
+  `55 nodes · 235 edges · 55 state_routes · 593,569 bytes · sha256 43f84f29…`) and
+  `project-prompt-contract-registry.md` the approved `GCFPE-PCR-20261009.1`, both built by script.
+
+### What it does not change
+
+Alpha state, PF canon, the TW ecosystem and the TypeSafe uses table. The listed risks in the
+promotion packet's §6 and the Modification's §E stay listed; none is resolved by promotion.
+
+### The tested guard (`D14`)
+
+`control_check.py` (activation and archived phases) on the nine control pages and the catalog;
+`activation_render.py check` on every operation written; X18's production validation with the
+installed skills; and X22's rebuild of the parts and check of the registry from `main`. Each is in
+the Modification's evidence.

@@ -1,7 +1,7 @@
 {
   "edge_indices": [
-    227,
-    228
+    226,
+    227
   ],
   "edges": [
     {
@@ -108,8 +108,8 @@
   "id": "UTIL-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81d997d1fd2b8d1b5042?pvs=204",
+    "candidate_version": "100926.1",
     "id": "UTIL-10",
     "lane": "UTIL",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -118,11 +118,11 @@
       "REVISED_TARGET_ARTIFACT / REDLINE_APPLICATION_REPORT"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb8114a88cda5c9728e26c",
-      "release": "GCFPE-20260913.1",
-      "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb8114a88cda5c9728e26c",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb81b89fbaf4b31a3ed2a9",
+      "release": "GCFPE-20260914.1",
+      "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [],
     "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
@@ -134,7 +134,7 @@
     ],
     "sequence": 10,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1"
+    "title": "UTIL-10 — Apply Exact Redline to a Complete Artifact — 100926.1"
   },
   "state_route_order": [
     "complete",

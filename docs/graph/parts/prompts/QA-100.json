@@ -1,7 +1,7 @@
 {
   "edge_indices": [
-    174,
-    175
+    173,
+    174
   ],
   "edges": [
     {
@@ -140,8 +140,8 @@
   "id": "QA-100",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431?pvs=204",
+    "candidate_version": "100926.1",
     "id": "QA-100",
     "lane": "QA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -150,11 +150,11 @@
       "QA_EXECUTION_RESULT"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb8111b12cea07a97f1a50",
-      "release": "GCFPE-20260913.1",
-      "title": "QA-100 — Execute Bounded QA Task — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb8111b12cea07a97f1a50",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb811a8d13c0bbbf77a848",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-100 — Execute Bounded QA Task — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "QA-110",
@@ -163,7 +163,7 @@
       "QA-70"
     ],
     "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
-    "receiving_role": "You are the authorized environment or DevOps operator, not Kronos acting as the executor.",
+    "receiving_role": "Executor under the Product Owner-chosen arrangement; no executor/session identity or venue prerequisite; QA-110 owns evidence review.",
     "result_states": [
       "COMPLETE",
       "PARTIAL",
@@ -173,7 +173,7 @@
     ],
     "sequence": 100,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "QA-100 — Execute Bounded QA Task — 091426.1"
+    "title": "QA-100 — Execute Bounded QA Task — 100926.1"
   },
   "state_route_order": [
     "complete",

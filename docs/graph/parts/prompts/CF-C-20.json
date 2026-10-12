@@ -105,8 +105,8 @@
   "id": "CF-C-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81a7a944f19bd9a2e3de?pvs=204",
+    "candidate_version": "100926.1",
     "id": "CF-C-20",
     "lane": "CF-C",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -115,11 +115,11 @@
       "CRD_SPECIFICATION"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb8173a162e1b06427c7bf",
-      "release": "GCFPE-20260913.1",
-      "title": "CF-C-20 — Create CRD Specification — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb8173a162e1b06427c7bf",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb8173a73edc73f302a90a",
+      "release": "GCFPE-20260914.1",
+      "title": "CF-C-20 — Create CRD Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "CF-C-30"
@@ -132,7 +132,7 @@
     ],
     "sequence": 20,
     "session_class": "ROLE_CONTINUING",
-    "title": "CF-C-20 — Create CRD Specification — 091426.1"
+    "title": "CF-C-20 — Create CRD Specification — 100926.1"
   },
   "state_route_order": [
     "specification_pending",
