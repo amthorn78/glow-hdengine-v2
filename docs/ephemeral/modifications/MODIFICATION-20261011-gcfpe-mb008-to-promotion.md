@@ -594,3 +594,21 @@ Nathan's words:
 - **Decision 2.** Applied at X16, below. The pin is the register's revision read right after the register entry's X15 row is marked. It is used only if the register's own last edit is still `2026-10-09T20:19:11.175Z` and its revision equals the entry's revision on that read.
 
 - **D22, X15 resumed and X16.** The harness saved four more fetch results to its own tool-results folder: PE twice (`mcp-Notion-notion-fetch-1791814885060.txt`, `…1791815057977.txt`) and the register twice (`…1791814963066.txt`, `…1791815074460.txt`). The workers searched them only for revision, title and the register's first current heading. They stay for the harness's cleanup and are not read again. The X16 plan's emitted payload was held in scratch only to send it, then deleted.
+
+### Return to Nathan — 2026-10-12, X17 install
+
+**Result: `PRODUCT_OWNER_ACTION_PENDING`.** X15 and X16 are verified, and the register has selected GCFPE-20261009.1 / 100926.1 / 55 since 14:23:57Z. X17 is Nathan's install.
+
+- **Delivered at 14:31Z**, one `.skill` per message, each caption led by its sha256 (`skill-packaging-and-delivery.md`), with `BRIEF-D24-R2.md`, `REVIEW-D24-C.md` and `REVIEW-D24-D.md`. Each archive was re-hashed before delivery and equals `execute/x10-packages.json`.
+- **What each replaces** (installed revision and tree, read at 14:30Z):
+
+  | package | installed | delivered |
+  |---|---|---|
+  | change-flow | 3.3.1 (`22 9a551af3…`) | 3.4.0 |
+  | flowmaster-validate | 3.3.2 (`31 90c15e98…`) | 3.4.0 |
+  | glow-hde-pr-development | 1.3.1 (`4 265f9170…`) | 1.4.0 |
+  | glow-graph-contract | no revision field (`9 e241bb9a…`) | no revision field |
+  | session-relay-flowmaster | 3.2.0 (`5 c8a5b224…`) | 3.3.0 |
+  | amthor-workspace-governance-audit | 1.13.0 (`15 c214e874…`) | 1.14.1 |
+
+- **Verification after install:** `freeze.py` on each installed tree must equal the packet's §2 tree value. A mismatch voids the review for that package and is reported, not reconciled. GCFPE execution is held until X18 passes (PLAN §7).
