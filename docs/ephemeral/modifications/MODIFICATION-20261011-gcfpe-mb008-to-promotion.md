@@ -2,7 +2,7 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261011-gcfpe-mb008-to-promotion"
-status: "PLANNED"
+status: "EXECUTING"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "GCFPE-MGMT-10", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
@@ -36,8 +36,8 @@ requested_by: "Nathan"
 analyze_approved_by: "Nathan"
 analyze_approved_date: "2026-10-11"
 item_count_at_approval: 9
-plan_approved_by: ""
-plan_approved_date: ""
+plan_approved_by: "Nathan"
+plan_approved_date: "2026-10-12"
 supersedes: ""
 spawned_from: "MODIFICATION-20261010-gcfpe-candidate-skill-analysis"
 shares_package_with: []
@@ -425,3 +425,18 @@ This is option 2 of the return above, with the check of the repair's diff includ
 - **Your pick:** recorded here when you state it; none is recorded now.
 
 **Spend, the bounded repair.** About 45 minutes, from your opt-in at 01:24Z to about 02:10Z. Subagent tokens as reported by the harness: 0.54M (the page-fetch worker 0.11M, reviewer D 0.42M). The session counter fell by about 0.14M. Total about 0.68M, under the 1.5–2.0M estimated for the repair and its check. PLAN's total is now about 4.9M, inside the frontmatter estimate of 4–7M; its time, about 4 h, is inside 6–10 h.
+
+### Approval to enter EXECUTE — 2026-10-12
+
+Nathan, approving: “Nathan approves the plan of MODIFICATION-20261011-gcfpe-mb008-to-promotion at 91add4b with amendment PIN-1-A as written in §P, accepting the other open findings listed in §P. Go on to EXECUTE.”
+
+This is option 1 of the return above. It approves the plan at `91add4b` with amendment PIN-1-A exactly as written there, which EXECUTE applies as its first commit and verifies with a fresh dry run before any Notion write. It accepts as risks every other open finding listed in §P: P-L1 to P-L9, the LISTED findings of PLAN review round 1 and of both diff checks that no repair closed, and the second diff check's M-2, M-4, M-5 and M-6. The open findings accepted at ANALYZE stand (§A.10).
+
+**Nathan's pick for the `EXECUTE` session**, against the 02:03Z reading (TypeSafe v6: Opus 5.5, extra high): “Opus 5.5 at extra high.”
+
+## §E — Execution
+
+*Written by MODE = EXECUTE, which began 2026-10-12 after the approval above.*
+
+| step | part | disposition | evidence |
+|---|---|---|---|
