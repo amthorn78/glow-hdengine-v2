@@ -1,0 +1,136 @@
+{
+  "edge_indices": [
+    85
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "GCFPE-MGMT-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PRODUCT_OWNER_ACTION_PENDING"
+          ],
+          "branch_id": "product_owner_action_pending",
+          "condition": "the session waits on Nathan: an ANALYZE or PLAN section returned for approval, or an EXECUTE step that is Nathan's, such as a merge or an install; name the action, where it is recorded and how the session will verify it; the Modification continues only in its own next mode after Nathan's recorded approval; no handoff to any prompt",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Result routing"
+          },
+          "state": "PRODUCT_OWNER_ACTION_PENDING",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "ECOSYSTEM_CHANGE_COMPLETE"
+          ],
+          "branch_id": "maintenance_complete_terminal",
+          "condition": "the Modification is applied and verified; return the read-back Modification record to Nathan",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Result routing"
+          },
+          "state": "ECOSYSTEM_CHANGE_COMPLETE",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "IMPLEMENTATION_BLOCKED"
+          ],
+          "branch_id": "implementation_blocked",
+          "condition": "a real blocker; return its exact statement, evidence, owner and recovery point to Nathan",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Result routing"
+          },
+          "state": "IMPLEMENTATION_BLOCKED",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "PROMOTION_CHECKPOINT_REQUIRED"
+          ],
+          "branch_id": "promotion_checkpoint_required",
+          "condition": "a control-layer action is outstanding; return it to Nathan without treating general change authority as promotion approval",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Result routing"
+          },
+          "state": "PROMOTION_CHECKPOINT_REQUIRED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "ECOSYSTEM_CHANGE_COMPLETE",
+        "IMPLEMENTATION_BLOCKED",
+        "PRODUCT_OWNER_ACTION_PENDING",
+        "PROMOTION_CHECKPOINT_REQUIRED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "GCFPE-MGMT-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f74590a05eb81b69bd8c27106f7a59d?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "GCFPE-MGMT-10",
+    "lane": "GCFPE-MGMT",
+    "lifecycle": "SELECTED_PRODUCTION",
+    "native_function": "Manage one ecosystem Modification from request to applied result through three explicit modes, ANALYZE, PLAN and EXECUTE, stopping at merge and install, which are Nathan's.",
+    "output_artifacts": [
+      "GCFPE_MODIFICATION_RECORD"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81d1bb64ebcb3ca8eb54",
+      "release": "GCFPE-20260914.1",
+      "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "ORIGINAL_NATIVE_STAGE",
+      "PR-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "Act as the Managing Prompt Engineer for one requested GCFPE change.",
+    "result_states": [
+      "PRODUCT_OWNER_ACTION_PENDING",
+      "ECOSYSTEM_CHANGE_COMPLETE",
+      "IMPLEMENTATION_BLOCKED",
+      "PROMOTION_CHECKPOINT_REQUIRED"
+    ],
+    "sequence": 10,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1"
+  },
+  "state_route_order": [
+    "product_owner_action_pending",
+    "maintenance_complete_terminal",
+    "implementation_blocked",
+    "promotion_checkpoint_required"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}
