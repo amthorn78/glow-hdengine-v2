@@ -440,3 +440,5 @@ This is option 1 of the return above. It approves the plan at `91add4b` with ame
 
 | step | part | disposition | evidence |
 |---|---|---|---|
+| A0 | all | APPLIED | Amendment PIN-1-A committed at `330fd1f` before any Notion write. The dry run at `330fd1f` passes all eleven gates: 341 activation operations applied on 10 pages at their pins, none refused, 0 findings after ([execute/amendment-dry-run.json](evidence/20261011-gcfpe-mb008-to-promotion/execute/amendment-dry-run.json)) |
+| X0 | all | VERIFIED | 02:22–02:24Z: 7 of 7 installed digests equal the recorded ones (the amendment dry run's N0); `main` is still `9312add2`, and its PF10-HDE-Build-Notes v13.5.2 has one addendum, 2.1; fresh read 02:23:52Z: the register's first section is *Current selection — GCFPE-20260914.1 / 091426.1* at its pin `2026-10-09T20:19:11.175Z`; the testing page is at its pin `2026-09-24T11:00:24.691Z` |
