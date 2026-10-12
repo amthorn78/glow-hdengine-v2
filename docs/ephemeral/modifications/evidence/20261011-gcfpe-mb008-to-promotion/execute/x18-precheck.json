@@ -1,0 +1,36 @@
+{
+ "record_type": "MB008_X18_LOCAL_PRECHECK",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "scope": "local only, no Notion read: the installed gates X18 runs, on a scratch copy of the 13-skill root X12 used, copied from the install; and the same root with only SKILL.md line 2 unquoted",
+ "installed": {
+  "flowmaster_suite": {
+   "exit": 2,
+   "fatal_error": "frontmatter requires name and description: <scratch>/x18-root/amthor-workspace-governance-audit/SKILL.md"
+  },
+  "profile_100926_without_bodies": {
+   "exit": 1,
+   "ok": false,
+   "errors": [
+    "SKILL_MISSING:glow-hde-pr-development",
+    "SKILL_SELF_IDENTITY:DECLARED_429eda210840_MEASURED_514b7272ae34"
+   ]
+  },
+  "fixtures_100926_without_bodies": {
+   "exit": 0,
+   "fixture_suite_ok": true,
+   "case_count": 283
+  }
+ },
+ "line2_unquoted": {
+  "flowmaster_suite": {
+   "exit": 0,
+   "suite_ok": true
+  },
+  "profile_100926_without_bodies": {
+   "exit": 0,
+   "ok": true,
+   "errors": []
+  }
+ },
+ "cause": "flowmaster-validate scripts/validate_flowmaster.py NAME_RE = r'(?m)^name:\\s*([a-z0-9-]+)\\s*$' accepts no quoted name; the profile's skill lookup and the SKILL_TREE_SHA256 self-identity check fail on the same line"
+}
