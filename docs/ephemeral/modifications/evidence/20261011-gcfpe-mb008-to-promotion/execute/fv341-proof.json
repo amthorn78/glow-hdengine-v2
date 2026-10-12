@@ -1,0 +1,728 @@
+{
+ "control_3_4_0": {
+  "plain": {
+   "freeze_raw_recipe": {
+    "change-flow": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "flowmaster-validate": "37 02a69b8a99181e79e554299a51dcc31e8b6b629d4974d05c96b191cf948fa200"
+   },
+   "installed_revision": "3.4.0",
+   "profile_100926": {
+    "errors": [],
+    "exit": 0,
+    "ok": true
+   },
+   "suite": {
+    "exit": 0,
+    "fatal_error": null,
+    "self_identity": "OK",
+    "verdict": "FLOWMASTER_SUITE_PASS"
+   }
+  },
+  "quoted": {
+   "freeze_raw_recipe": {
+    "change-flow": "25 ddeae736b179be32f4253ec9fa4871bdeae1f3988f68c8a8ca9046666d16b094",
+    "flowmaster-validate": "37 e2d7fb379330d747c1442dbf8ad4915829edf99cceb1a52602db55699d215811"
+   },
+   "installed_revision": "3.4.0",
+   "profile_100926": {
+    "errors": [
+     "PRIMARY_FILE_IDENTITY",
+     "SKILL_MISSING:glow-hde-pr-development",
+     "SKILL_MISSING:glow-merged-change-attribution-lock",
+     "SKILL_SELF_IDENTITY:DECLARED_429eda210840_MEASURED_514b7272ae34"
+    ],
+    "exit": 1,
+    "ok": false
+   },
+   "suite": {
+    "exit": 2,
+    "fatal_error": "frontmatter requires name and description: <root>/amthor-workspace-governance-audit/SKILL.md",
+    "self_identity": null,
+    "verdict": null
+   }
+  }
+ },
+ "freeze_selftest": "freeze.py self-test ok: quoted and plain name lines give the same digest",
+ "gates": {
+  "plain": {
+   "attribution_lock_tests": {
+    "run_artifact_adversarial_tests": {
+     "exit": 0
+    },
+    "run_collector_adversarial_tests": {
+     "exit": 0
+    },
+    "run_fixture_tests": {
+     "exit": 0
+    }
+   },
+   "audit_fixture_suite": {
+    "exit": 0,
+    "line": "OK"
+   },
+   "change_flow_fixtures": {
+    "exit": 0,
+    "ok": true,
+    "passed": 34,
+    "total": 34
+   },
+   "change_flow_validate_091426_history": {
+    "exit": 1,
+    "line": "FAIL: specialization revision"
+   },
+   "change_flow_validate_100926": {
+    "exit": 0,
+    "line": "PASS: change-flow GCFPE-20261009.1 contract and Markdown-only source policy"
+   },
+   "fixtures_100926": {
+    "cases": 283,
+    "exit": 0,
+    "fixture_suite_ok": true,
+    "fixtures": 54,
+    "passed": 54,
+    "variants": 55
+   },
+   "fixtures_current": {
+    "cases": 283,
+    "exit": 0,
+    "fixture_suite_ok": true
+   },
+   "freeze": {
+    "amthor-workspace-governance-audit": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "built-in-browser": "2 19055c4952ca5c2ef9fafde05b87b573c929d016c115d53304e6c13b7b6ee6b4",
+    "canva-drive-facebook-workflow": "1 23a54aaf41b8c2726b1136e82f992f855413d6b05bf153eb057a2f09f825e4cf",
+    "change-flow": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "chrome-browser": "2 445ef6649cc132ecd6b92b6db1c297024bbe6fb18da46bdb2d34f869e987f8dc",
+    "computer-use": "2 e4717f6cbdb1be926bcd9275d2eda93a72528ec47dcbd1404154bcb863671f9b",
+    "deep-research": "3 c140ef6f07ff2a8e1a2306902cd25a7909c85a3b1e981fd2498697f04542efc4",
+    "docs": "1 1dffc10fbedd22b5e806ad78e824741a604bf49ca6fc00b440405dc502057c39",
+    "docx": "61 b209c8df39061f1cebf76093712af7f4d25cad05998504e71d20de92d603421b",
+    "flowmaster-primary": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6",
+    "flowmaster-validate": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "glow-artifact-storage": "1 502b4ecf11cea156702207ddb829b2d51064fe9eaa8678ac5db05c04375cba1c",
+    "glow-graph-contract": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "glow-hd-report-author": "1 2da719ecb2217c4c9272e40ba47602b3ebd6266ce0f1cd6990d0f6b433c706fa",
+    "glow-hde-pr-development": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "glow-merged-change-attribution-lock": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+    "glow-workspace-currency": "3 5f2b4ae0d43f0609ae3c3b88409a2578791b008cf6908bd6516181688e06dd93",
+    "glow-write-boundary": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "google-workspace": "9 5326aa679d11104ede0814dff0728c661b6a93ecb111751b9398eefe568a213e",
+    "hd-typesafe-scoring": "1 604b07df61b79bf62cf7bbbb3e91a678be99f2368867b75a489b3ada2992ad46",
+    "human-design-reader": "1 90f8674af92166062317a32f8d2e26e121a738bb826b8909bcf1f22ea72ca94b",
+    "human-design-reading-flowmaster": "1 a876c342645ef6e145c6e91cda3df3789b91fe9488ed68a5849e73ce92402755",
+    "import-memory": "1 77be9411dcd3209678825b17481202889508973fcff3c44a872f1478c3af03e0",
+    "morning": "3 b95d8ede815722fd56a9d6cc15498387d1bd8aa03be985815a9149980df5c349",
+    "pdf": "12 1ea202c04164cbd6f9a455714d9b0736faf17d054a1dd26b779306ece4b4bac3",
+    "pptx": "57 2fa5b5b020db432f577f01f1e7fc3ef9653e043ef2dd2d45cd87c6cb154d67d1",
+    "pre-handoff-records-check": "1 43f205ad4af563f81e03893b61380ac65f8c466c056a8f86784f0266e21f64ef",
+    "session-branch-flowmaster": "2 17b5800b35d352216eb6ea7708fa4058400f66dd7d908debbea16fa9154b3008",
+    "session-relay-flowmaster": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "skill-creator": "18 e4fee9c98c4f3941916fd9005ea9e8bec6bc1adc1aae85380f0150febbdf6ebe",
+    "tw-flowmaster": "2 0581205ba29f195ce784ff585ca9019de5644750c9e357b06e377e91827a722c",
+    "typesafe-ai": "2 6c4a7eb044581746e20fa2f6e076905819c72d0c626d17035dd0003a9fc761cf",
+    "typesafe-scoring": "3 088c77f36ae96bcb9a1bcbdd9b1b8ee58272175094b0f3208b5337a3ce4881f5",
+    "xlsx": "53 81af9c780cc737d5be221a488b4fb29937f34ec16bc29a37bdcc6ddf26a58fda"
+   },
+   "graph_builds": {
+    "candidate": {
+     "exit": 0,
+     "line": "       validation PASS -> <scratch>/graph-<root>-candidate.md"
+    },
+    "main": {
+     "exit": 0,
+     "line": "       validation PASS -> <scratch>/graph-<root>-main.md"
+    },
+    "production": {
+     "exit": 0,
+     "line": "       validation PASS -> <scratch>/graph-<root>-production.md"
+    }
+   },
+   "historical_runners": {
+    "run_alpha_feedback_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 38
+    },
+    "run_epic_alpha_fixtures": {
+     "exit": 1,
+     "fixture_suite_ok": false,
+     "total": 193
+    },
+    "run_final_scan_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 26
+    },
+    "run_integrated_readiness_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 65
+    },
+    "run_strength_middleware_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 203
+    }
+   },
+   "pr_development_validator": {
+    "exit": 0,
+    "line": "PASS: Glow HDE PR development skill structural contract"
+   },
+   "profile_100926": {
+    "errors": [],
+    "exit": 0,
+    "not_evaluated": [
+     "ALL_BODY_LEVEL_CHECKS"
+    ],
+    "ok": true,
+    "profile": "GCFPE-20261009.1-100926.1-VALIDATION"
+   },
+   "regenerator_candidate_100926": {
+    "equal_to_x7": true,
+    "exit": 0
+   },
+   "regenerator_production_100926": {
+    "equal_to_x7": true,
+    "exit": 0
+   },
+   "regenerator_shipped_091426": {
+    "equal_lines": 2,
+    "exit": 0
+   },
+   "registry_deriver_candidate": {
+    "exit": 0,
+    "line": "}"
+   },
+   "registry_deriver_main": {
+    "exit": 0,
+    "line": "}"
+   },
+   "relay_self_test": {
+    "exit": 0,
+    "status": "PASS"
+   },
+   "suite": {
+    "change_flow_fixtures": {
+     "fixture_suite_ok": true,
+     "passed_expectations": 34,
+     "total": 34
+    },
+    "current_fixtures": {
+     "case_count": 283,
+     "fixture_suite_ok": true,
+     "section_13_fixture_count": 54,
+     "section_13_passed": 54
+    },
+    "current_overlay": {
+     "contract_status": "SELECTED_PRODUCTION",
+     "errors": [],
+     "ok": true,
+     "profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+     "target_release": "GCFPE-20261009.1"
+    },
+    "exit": 0,
+    "fatal_error": null,
+    "finding_counts": {
+     "ADVISORY": 0,
+     "BLOCKER": 0,
+     "ERROR": 0,
+     "WARNING": 0
+    },
+    "findings": [],
+    "interfaces_closed": true,
+    "name_line_forms": {
+     "errors": [],
+     "ok": true,
+     "skills_checked": 35
+    },
+    "rows_exact": true,
+    "self_identity": "OK",
+    "skills": {
+     "change-flow": "PASS",
+     "flowmaster-primary": "PASS",
+     "flowmaster-validate": "PASS",
+     "session-branch-flowmaster": "PASS",
+     "session-relay-flowmaster": "PASS",
+     "tw-flowmaster": "PASS"
+    },
+    "suite_ok": true,
+    "verdict": "FLOWMASTER_SUITE_PASS"
+   },
+   "suite_explicit_100926": {
+    "candidate_errors": [],
+    "candidate_fixtures_ok": true,
+    "candidate_ok": true,
+    "exit": 0,
+    "verdict": "FLOWMASTER_SUITE_PASS"
+   },
+   "suite_untargeted": {
+    "change_flow_fixtures": {
+     "fixture_suite_ok": true,
+     "passed_expectations": 34,
+     "total": 34
+    },
+    "current_fixtures": {
+     "case_count": 283,
+     "fixture_suite_ok": true,
+     "section_13_fixture_count": 54,
+     "section_13_passed": 54
+    },
+    "current_overlay": {
+     "contract_status": "SELECTED_PRODUCTION",
+     "errors": [],
+     "ok": true,
+     "profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+     "target_release": "GCFPE-20261009.1"
+    },
+    "exit": 1,
+    "fatal_error": null,
+    "finding_counts": {
+     "ADVISORY": 0,
+     "BLOCKER": 0,
+     "ERROR": 3,
+     "WARNING": 0
+    },
+    "findings": [
+     "FMV-SKILL-STRUCTURE-001:ERROR"
+    ],
+    "interfaces_closed": true,
+    "name_line_forms": {
+     "errors": [],
+     "ok": true,
+     "skills_checked": 35
+    },
+    "rows_exact": true,
+    "self_identity": "OK",
+    "skills": {
+     "change-flow": "PASS",
+     "flowmaster-primary": "PASS",
+     "flowmaster-validate": "PASS",
+     "human-design-reading-flowmaster": "FAIL",
+     "session-branch-flowmaster": "PASS",
+     "session-relay-flowmaster": "PASS",
+     "tw-flowmaster": "PASS"
+    },
+    "suite_ok": false,
+    "verdict": "FLOWMASTER_SUITE_FAIL"
+   }
+  },
+  "quoted": {
+   "attribution_lock_tests": {
+    "run_artifact_adversarial_tests": {
+     "exit": 0
+    },
+    "run_collector_adversarial_tests": {
+     "exit": 0
+    },
+    "run_fixture_tests": {
+     "exit": 0
+    }
+   },
+   "audit_fixture_suite": {
+    "exit": 0,
+    "line": "OK"
+   },
+   "change_flow_fixtures": {
+    "exit": 0,
+    "ok": true,
+    "passed": 34,
+    "total": 34
+   },
+   "change_flow_validate_091426_history": {
+    "exit": 1,
+    "line": "FAIL: specialization revision"
+   },
+   "change_flow_validate_100926": {
+    "exit": 0,
+    "line": "PASS: change-flow GCFPE-20261009.1 contract and Markdown-only source policy"
+   },
+   "fixtures_100926": {
+    "cases": 283,
+    "exit": 0,
+    "fixture_suite_ok": true,
+    "fixtures": 54,
+    "passed": 54,
+    "variants": 55
+   },
+   "fixtures_current": {
+    "cases": 283,
+    "exit": 0,
+    "fixture_suite_ok": true
+   },
+   "freeze": {
+    "amthor-workspace-governance-audit": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "built-in-browser": "2 19055c4952ca5c2ef9fafde05b87b573c929d016c115d53304e6c13b7b6ee6b4",
+    "canva-drive-facebook-workflow": "1 23a54aaf41b8c2726b1136e82f992f855413d6b05bf153eb057a2f09f825e4cf",
+    "change-flow": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "chrome-browser": "2 445ef6649cc132ecd6b92b6db1c297024bbe6fb18da46bdb2d34f869e987f8dc",
+    "computer-use": "2 e4717f6cbdb1be926bcd9275d2eda93a72528ec47dcbd1404154bcb863671f9b",
+    "deep-research": "3 c140ef6f07ff2a8e1a2306902cd25a7909c85a3b1e981fd2498697f04542efc4",
+    "docs": "1 1dffc10fbedd22b5e806ad78e824741a604bf49ca6fc00b440405dc502057c39",
+    "docx": "61 b209c8df39061f1cebf76093712af7f4d25cad05998504e71d20de92d603421b",
+    "flowmaster-primary": "2 2d41da26a39de98af02ad65e0f2818732fc0930e87223cb90ef75a2dc9e977e6",
+    "flowmaster-validate": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "glow-artifact-storage": "1 502b4ecf11cea156702207ddb829b2d51064fe9eaa8678ac5db05c04375cba1c",
+    "glow-graph-contract": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "glow-hd-report-author": "1 2da719ecb2217c4c9272e40ba47602b3ebd6266ce0f1cd6990d0f6b433c706fa",
+    "glow-hde-pr-development": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "glow-merged-change-attribution-lock": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "glow-po-reporting": "1 7e04368a63e40c99e31ede3eda9ba88cfbbb9915a48b46cdc39027da7cef68e1",
+    "glow-workspace-currency": "3 5f2b4ae0d43f0609ae3c3b88409a2578791b008cf6908bd6516181688e06dd93",
+    "glow-write-boundary": "1 662f9647ccfd996aa72e3d80ac70edc3d06a4310805ef14207b1340c69e93fc4",
+    "google-workspace": "9 5326aa679d11104ede0814dff0728c661b6a93ecb111751b9398eefe568a213e",
+    "hd-typesafe-scoring": "1 604b07df61b79bf62cf7bbbb3e91a678be99f2368867b75a489b3ada2992ad46",
+    "human-design-reader": "1 90f8674af92166062317a32f8d2e26e121a738bb826b8909bcf1f22ea72ca94b",
+    "human-design-reading-flowmaster": "1 a876c342645ef6e145c6e91cda3df3789b91fe9488ed68a5849e73ce92402755",
+    "import-memory": "1 77be9411dcd3209678825b17481202889508973fcff3c44a872f1478c3af03e0",
+    "morning": "3 b95d8ede815722fd56a9d6cc15498387d1bd8aa03be985815a9149980df5c349",
+    "pdf": "12 1ea202c04164cbd6f9a455714d9b0736faf17d054a1dd26b779306ece4b4bac3",
+    "pptx": "57 2fa5b5b020db432f577f01f1e7fc3ef9653e043ef2dd2d45cd87c6cb154d67d1",
+    "pre-handoff-records-check": "1 43f205ad4af563f81e03893b61380ac65f8c466c056a8f86784f0266e21f64ef",
+    "session-branch-flowmaster": "2 17b5800b35d352216eb6ea7708fa4058400f66dd7d908debbea16fa9154b3008",
+    "session-relay-flowmaster": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "skill-creator": "18 e4fee9c98c4f3941916fd9005ea9e8bec6bc1adc1aae85380f0150febbdf6ebe",
+    "tw-flowmaster": "2 0581205ba29f195ce784ff585ca9019de5644750c9e357b06e377e91827a722c",
+    "typesafe-ai": "2 6c4a7eb044581746e20fa2f6e076905819c72d0c626d17035dd0003a9fc761cf",
+    "typesafe-scoring": "3 088c77f36ae96bcb9a1bcbdd9b1b8ee58272175094b0f3208b5337a3ce4881f5",
+    "xlsx": "53 81af9c780cc737d5be221a488b4fb29937f34ec16bc29a37bdcc6ddf26a58fda"
+   },
+   "graph_builds": {
+    "candidate": {
+     "exit": 0,
+     "line": "       validation PASS -> <scratch>/graph-<root>-candidate.md"
+    },
+    "main": {
+     "exit": 0,
+     "line": "       validation PASS -> <scratch>/graph-<root>-main.md"
+    },
+    "production": {
+     "exit": 0,
+     "line": "       validation PASS -> <scratch>/graph-<root>-production.md"
+    }
+   },
+   "historical_runners": {
+    "run_alpha_feedback_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 38
+    },
+    "run_epic_alpha_fixtures": {
+     "exit": 1,
+     "fixture_suite_ok": false,
+     "total": 193
+    },
+    "run_final_scan_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 26
+    },
+    "run_integrated_readiness_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 65
+    },
+    "run_strength_middleware_fixtures": {
+     "exit": 0,
+     "fixture_suite_ok": true,
+     "total": 203
+    }
+   },
+   "pr_development_validator": {
+    "exit": 0,
+    "line": "PASS: Glow HDE PR development skill structural contract"
+   },
+   "profile_100926": {
+    "errors": [],
+    "exit": 0,
+    "not_evaluated": [
+     "ALL_BODY_LEVEL_CHECKS"
+    ],
+    "ok": true,
+    "profile": "GCFPE-20261009.1-100926.1-VALIDATION"
+   },
+   "regenerator_candidate_100926": {
+    "equal_to_x7": true,
+    "exit": 0
+   },
+   "regenerator_production_100926": {
+    "equal_to_x7": true,
+    "exit": 0
+   },
+   "regenerator_shipped_091426": {
+    "equal_lines": 2,
+    "exit": 0
+   },
+   "registry_deriver_candidate": {
+    "exit": 0,
+    "line": "}"
+   },
+   "registry_deriver_main": {
+    "exit": 0,
+    "line": "}"
+   },
+   "relay_self_test": {
+    "exit": 0,
+    "status": "PASS"
+   },
+   "suite": {
+    "change_flow_fixtures": {
+     "fixture_suite_ok": true,
+     "passed_expectations": 34,
+     "total": 34
+    },
+    "current_fixtures": {
+     "case_count": 283,
+     "fixture_suite_ok": true,
+     "section_13_fixture_count": 54,
+     "section_13_passed": 54
+    },
+    "current_overlay": {
+     "contract_status": "SELECTED_PRODUCTION",
+     "errors": [],
+     "ok": true,
+     "profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+     "target_release": "GCFPE-20261009.1"
+    },
+    "exit": 0,
+    "fatal_error": null,
+    "finding_counts": {
+     "ADVISORY": 0,
+     "BLOCKER": 0,
+     "ERROR": 0,
+     "WARNING": 0
+    },
+    "findings": [],
+    "interfaces_closed": true,
+    "name_line_forms": {
+     "errors": [],
+     "ok": true,
+     "skills_checked": 35
+    },
+    "rows_exact": true,
+    "self_identity": "OK",
+    "skills": {
+     "change-flow": "PASS",
+     "flowmaster-primary": "PASS",
+     "flowmaster-validate": "PASS",
+     "session-branch-flowmaster": "PASS",
+     "session-relay-flowmaster": "PASS",
+     "tw-flowmaster": "PASS"
+    },
+    "suite_ok": true,
+    "verdict": "FLOWMASTER_SUITE_PASS"
+   },
+   "suite_explicit_100926": {
+    "candidate_errors": [],
+    "candidate_fixtures_ok": true,
+    "candidate_ok": true,
+    "exit": 0,
+    "verdict": "FLOWMASTER_SUITE_PASS"
+   },
+   "suite_untargeted": {
+    "change_flow_fixtures": {
+     "fixture_suite_ok": true,
+     "passed_expectations": 34,
+     "total": 34
+    },
+    "current_fixtures": {
+     "case_count": 283,
+     "fixture_suite_ok": true,
+     "section_13_fixture_count": 54,
+     "section_13_passed": 54
+    },
+    "current_overlay": {
+     "contract_status": "SELECTED_PRODUCTION",
+     "errors": [],
+     "ok": true,
+     "profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+     "target_release": "GCFPE-20261009.1"
+    },
+    "exit": 1,
+    "fatal_error": null,
+    "finding_counts": {
+     "ADVISORY": 0,
+     "BLOCKER": 0,
+     "ERROR": 3,
+     "WARNING": 0
+    },
+    "findings": [
+     "FMV-SKILL-STRUCTURE-001:ERROR"
+    ],
+    "interfaces_closed": true,
+    "name_line_forms": {
+     "errors": [],
+     "ok": true,
+     "skills_checked": 35
+    },
+    "rows_exact": true,
+    "self_identity": "OK",
+    "skills": {
+     "change-flow": "PASS",
+     "flowmaster-primary": "PASS",
+     "flowmaster-validate": "PASS",
+     "human-design-reading-flowmaster": "FAIL",
+     "session-branch-flowmaster": "PASS",
+     "session-relay-flowmaster": "PASS",
+     "tw-flowmaster": "PASS"
+    },
+    "suite_ok": false,
+    "verdict": "FLOWMASTER_SUITE_FAIL"
+   }
+  }
+ },
+ "gcfpe_pass": {
+  "plain": {
+   "checks": {
+    "attribution_lock_tests": true,
+    "audit_fixture_suite": true,
+    "change_flow_fixtures": true,
+    "change_flow_validate_100926": true,
+    "fixtures_100926": true,
+    "fixtures_current": true,
+    "freeze_reviewed": true,
+    "graph_builds": true,
+    "pr_development_validator": true,
+    "profile_100926": true,
+    "regenerator_candidate_100926": true,
+    "regenerator_production_100926": true,
+    "regenerator_shipped_091426": true,
+    "registry_deriver_candidate": true,
+    "registry_deriver_main": true,
+    "relay_self_test": true,
+    "suite": true,
+    "suite_explicit_100926": true,
+    "suite_untargeted_fails_only_on_other_project": true
+   },
+   "ok": true
+  },
+  "quoted": {
+   "checks": {
+    "attribution_lock_tests": true,
+    "audit_fixture_suite": true,
+    "change_flow_fixtures": true,
+    "change_flow_validate_100926": true,
+    "fixtures_100926": true,
+    "fixtures_current": true,
+    "freeze_reviewed": true,
+    "graph_builds": true,
+    "pr_development_validator": true,
+    "profile_100926": true,
+    "regenerator_candidate_100926": true,
+    "regenerator_production_100926": true,
+    "regenerator_shipped_091426": true,
+    "registry_deriver_candidate": true,
+    "registry_deriver_main": true,
+    "relay_self_test": true,
+    "suite": true,
+    "suite_explicit_100926": true,
+    "suite_untargeted_fails_only_on_other_project": true
+   },
+   "ok": true
+  }
+ },
+ "mutations": {
+  "canonical_removed_1009": {
+   "edit_found": 1,
+   "error_kinds": [
+    "NAME_LINE_FORMS_UNTESTED:amthor-workspace-governance-audit",
+    "NAME_LINE_FORMS_UNTESTED:built-in-browser",
+    "NAME_LINE_FORMS_UNTESTED:canva-drive-facebook-workflow",
+    "NAME_LINE_FORMS_UNTESTED:change-flow",
+    "NAME_LINE_FORMS_UNTESTED:chrome-browser",
+    "NAME_LINE_FORMS_UNTESTED:computer-use",
+    "NAME_LINE_FORMS_UNTESTED:deep-research",
+    "NAME_LINE_FORMS_UNTESTED:docs",
+    "NAME_LINE_FORMS_UNTESTED:docx",
+    "NAME_LINE_FORMS_UNTESTED:flowmaster-primary",
+    "NAME_LINE_FORMS_UNTESTED:flowmaster-validate",
+    "NAME_LINE_FORMS_UNTESTED:glow-artifact-storage",
+    "NAME_LINE_FORMS_UNTESTED:glow-graph-contract",
+    "NAME_LINE_FORMS_UNTESTED:glow-hd-report-author",
+    "NAME_LINE_FORMS_UNTESTED:glow-hde-pr-development",
+    "NAME_LINE_FORMS_UNTESTED:glow-merged-change-attribution-lock",
+    "NAME_LINE_FORMS_UNTESTED:glow-po-reporting",
+    "NAME_LINE_FORMS_UNTESTED:glow-workspace-currency",
+    "NAME_LINE_FORMS_UNTESTED:glow-write-boundary",
+    "NAME_LINE_FORMS_UNTESTED:google-workspace",
+    "NAME_LINE_FORMS_UNTESTED:hd-typesafe-scoring",
+    "NAME_LINE_FORMS_UNTESTED:human-design-reader",
+    "NAME_LINE_FORMS_UNTESTED:human-design-reading-flowmaster",
+    "NAME_LINE_FORMS_UNTESTED:import-memory",
+    "NAME_LINE_FORMS_UNTESTED:morning",
+    "NAME_LINE_FORMS_UNTESTED:pdf",
+    "NAME_LINE_FORMS_UNTESTED:pptx",
+    "NAME_LINE_FORMS_UNTESTED:pre-handoff-records-check",
+    "NAME_LINE_FORMS_UNTESTED:session-branch-flowmaster",
+    "NAME_LINE_FORMS_UNTESTED:session-relay-flowmaster",
+    "NAME_LINE_FORMS_UNTESTED:skill-creator",
+    "NAME_LINE_FORMS_UNTESTED:tw-flowmaster",
+    "NAME_LINE_FORMS_UNTESTED:typesafe-ai",
+    "NAME_LINE_FORMS_UNTESTED:typesafe-scoring",
+    "NAME_LINE_FORMS_UNTESTED:xlsx"
+   ],
+   "fired": true,
+   "name_line_forms_ok": false,
+   "suite_exit": 1,
+   "verdict": "FLOWMASTER_SUITE_FAIL"
+  },
+  "current_find_skill_one_form": {
+   "edit_found": 1,
+   "error_kinds": [
+    "NAME_LINE_ONE_FORM_READER:validate_gcfpe_current.py"
+   ],
+   "fired": true,
+   "name_line_forms_ok": false,
+   "suite_exit": 1,
+   "verdict": "FLOWMASTER_SUITE_FAIL"
+  },
+  "digest_without_canonical": {
+   "edit_found": 1,
+   "error_kinds": [
+    "NAME_LINE_FORMS:validate_gcfpe_20260914.skill_identity_bytes"
+   ],
+   "fired": true,
+   "name_line_forms_ok": false,
+   "suite_exit": 1,
+   "verdict": "FLOWMASTER_SUITE_FAIL"
+  },
+  "flowmaster_NAME_RE_one_form": {
+   "edit_found": 1,
+   "error_kinds": [
+    "NAME_LINE_FORMS:frontmatter"
+   ],
+   "fired": true,
+   "name_line_forms_ok": false,
+   "suite_exit": 1,
+   "verdict": "FLOWMASTER_SUITE_FAIL"
+  },
+  "freeze_canonical_removed": {
+   "edit_found": 1,
+   "exit": 2,
+   "fired": true,
+   "printed_digest": false,
+   "stderr": "freeze.py self-test failed, no digest printed: `name: \"<skill>\"` and `name: <skill>` give different digests; `name: '<skill>'` and `name: <skill>` give different digests"
+  }
+ },
+ "ok": true,
+ "package_freeze": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+ "quoted_vs_plain_differences": [],
+ "receipt_note": "Run 2026-10-12 by fv341_proof.py on a copy of the installed skills directory at /root/.claude/skills/synced/<bucket>/ (35 skills), with flowmaster-validate 3.4.1 extracted from flowmaster-validate.skill sha256 b8370977415afb85978ff5bf702316b3642b8f09abc9b72995f48f521c2bf24f, 510,442 B",
+ "record_type": "MB008_FV341_PROOF",
+ "roots": {
+  "plain": {
+   "forms": [
+    "plain"
+   ],
+   "lines_rewritten": 11,
+   "skills": 35
+  },
+  "quoted": {
+   "forms": [
+    "quoted"
+   ],
+   "lines_rewritten": 24,
+   "skills": 35
+  }
+ }
+}

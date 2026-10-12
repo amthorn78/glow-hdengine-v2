@@ -1,0 +1,430 @@
+diff -ruN a/flowmaster-validate/SKILL.md b/flowmaster-validate/SKILL.md
+--- a/flowmaster-validate/SKILL.md	2026-10-12 16:27:06.414135914 +0000
++++ b/flowmaster-validate/SKILL.md	2026-10-12 16:30:36.913761533 +0000
+@@ -5,8 +5,15 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.4.0
+-SKILL_TREE_SHA256: 429eda21084062f33d5b25e9ea27373f260789e666ab08be693bd8603f90917b
++FLOWMASTER_VALIDATE_REVISION: 3.4.1
++SKILL_TREE_SHA256: b1f00f3ae3b786c343fd03cefb0622a94fae0ee120145b58960cd2f9e460a13e
++
++3.4.1 (`D28`, Nathan, 2026-10-12): the Save skill install writes each skill's name line as
++`name: "<skill>"`. Every check here that reads a skill's name or hashes a skill's files gives the
++same result whether that line is quoted or not: the frontmatter parser, each profile's skill lookup,
++the Primary file identity and `SKILL_TREE_SHA256`, which is measured with the name line plain. The
++suite reports `name_line_forms` and fails unless every `SKILL.md` under the root reads the same in
++both forms and no script carries a one-form name reader.
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+diff -ruN a/flowmaster-validate/references/gcfpe-20261009.1-100926.1-validation-profile.json b/flowmaster-validate/references/gcfpe-20261009.1-100926.1-validation-profile.json
+--- a/flowmaster-validate/references/gcfpe-20261009.1-100926.1-validation-profile.json	2026-10-12 16:22:33.465094041 +0000
++++ b/flowmaster-validate/references/gcfpe-20261009.1-100926.1-validation-profile.json	2026-10-12 16:30:36.843136046 +0000
+@@ -42,5 +42,5 @@
+   "selected_release_during_staging": "GCFPE-20260914.1",
+   "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20261009.1",
+-  "validator_revision": "3.4.0"
++  "validator_revision": "3.4.1"
+ }
+diff -ruN a/flowmaster-validate/scripts/run_alpha_feedback_fixtures.py b/flowmaster-validate/scripts/run_alpha_feedback_fixtures.py
+--- a/flowmaster-validate/scripts/run_alpha_feedback_fixtures.py	2026-10-12 16:22:33.467092324 +0000
++++ b/flowmaster-validate/scripts/run_alpha_feedback_fixtures.py	2026-10-12 16:30:36.864242427 +0000
+@@ -1,6 +1,6 @@
+ """Focused response-record and mutation cases; no live effects."""
+ from __future__ import annotations
+-import copy,json
++import copy,json,re
+ from pathlib import Path
+ from validate_alpha_feedback import check_assignment,check_addendum,check_authoring,validate_package
+ 
+@@ -67,5 +67,5 @@
+ 
+ if __name__=='__main__':
+     root=Path(__file__).resolve().parents[2]
+-    dirs=[p.parent for p in root.glob('*/SKILL.md') if '\nname: change-flow\n' in p.read_text()]
++    dirs=[p.parent for p in root.glob('*/SKILL.md') if re.search(r'(?m)^name:\s*(["\']?)change-flow\1\s*$',p.read_text())]
+     result=run(dirs[0] if len(dirs)==1 else None);print(json.dumps(result,indent=2));raise SystemExit(0 if result['fixture_suite_ok'] else 1)
+diff -ruN a/flowmaster-validate/scripts/run_final_scan_fixtures.py b/flowmaster-validate/scripts/run_final_scan_fixtures.py
+--- a/flowmaster-validate/scripts/run_final_scan_fixtures.py	2026-10-12 16:22:33.469039268 +0000
++++ b/flowmaster-validate/scripts/run_final_scan_fixtures.py	2026-10-12 16:30:36.864886637 +0000
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python3
+ """Isolated extension mutations and declared-state cases; never executes the scan."""
+ from __future__ import annotations
+-import argparse,copy,json,sys
++import argparse,copy,json,re,sys
+ from pathlib import Path
+ sys.dont_write_bytecode=True
+ from validate_final_scan import check_extension,expected_action,graph_projection
+@@ -53,6 +53,6 @@
+     directory=args.change_directory
+     if directory is None:
+         for p in Path(__file__).resolve().parents[2].glob('*/SKILL.md'):
+-            if '\nname: change-flow\n' in p.read_text():directory=p.parent;break
++            if re.search(r'(?m)^name:\s*(["\']?)change-flow\1\s*$',p.read_text()):directory=p.parent;break
+     if directory is None:raise SystemExit('Exact change-flow directory required')
+     report=run(directory);print(json.dumps(report,indent=2));raise SystemExit(0 if report['fixture_suite_ok'] else 1)
+diff -ruN a/flowmaster-validate/scripts/run_gcfpe_20261009_fixtures.py b/flowmaster-validate/scripts/run_gcfpe_20261009_fixtures.py
+--- a/flowmaster-validate/scripts/run_gcfpe_20261009_fixtures.py	2026-10-12 16:22:33.469781359 +0000
++++ b/flowmaster-validate/scripts/run_gcfpe_20261009_fixtures.py	2026-10-12 16:30:36.850331860 +0000
+@@ -975,7 +975,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.4.0",
++        "validator_revision": "3.4.1",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+diff -ruN a/flowmaster-validate/scripts/run_integrated_readiness_fixtures.py b/flowmaster-validate/scripts/run_integrated_readiness_fixtures.py
+--- a/flowmaster-validate/scripts/run_integrated_readiness_fixtures.py	2026-10-12 16:22:33.470510079 +0000
++++ b/flowmaster-validate/scripts/run_integrated_readiness_fixtures.py	2026-10-12 16:30:36.865527836 +0000
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python3
+ """Isolated contract mutation and declared-state tests; no remote effects."""
+ from __future__ import annotations
+-import argparse,copy,json,sys
++import argparse,copy,json,re,sys
+ from pathlib import Path
+ sys.dont_write_bytecode=True
+ from validate_integrated_readiness import check_correction,validate_observation,graph_projection
+@@ -78,6 +78,6 @@
+     directory=args.change_directory
+     if directory is None:
+         for p in Path(__file__).resolve().parents[2].glob('*/SKILL.md'):
+-            if '\nname: change-flow\n' in p.read_text():directory=p.parent;break
++            if re.search(r'(?m)^name:\s*(["\']?)change-flow\1\s*$',p.read_text()):directory=p.parent;break
+     if directory is None:raise SystemExit('Exact change-flow candidate/installed directory required')
+     report=run(directory);print(json.dumps(report,indent=2));raise SystemExit(0 if report['fixture_suite_ok'] else 1)
+diff -ruN a/flowmaster-validate/scripts/validate_flowmaster.py b/flowmaster-validate/scripts/validate_flowmaster.py
+--- a/flowmaster-validate/scripts/validate_flowmaster.py	2026-10-12 16:22:33.473276833 +0000
++++ b/flowmaster-validate/scripts/validate_flowmaster.py	2026-10-12 16:30:36.848861941 +0000
+@@ -53,7 +53,9 @@
+ END = "<!-- FLOWMASTER_CORE_END -->"
+ SPEC_BEGIN = "<!-- FLOWMASTER_SPECIALIZATION_BEGIN -->"
+ SPEC_END = "<!-- FLOWMASTER_SPECIALIZATION_END -->"
+-NAME_RE = re.compile(r"(?m)^name:\s*([a-z0-9-]+)\s*$")
++# D28: a quoted name line (`name: "<skill>"`, as the Save skill install writes it) and a plain one
++# read as the same name.
++NAME_RE = re.compile(r"(?m)^name:\s*([\"']?)([a-z0-9-]+)\1\s*$")
+ REVISION_RE = re.compile(
+     r"FLOWMASTER_CORE_REVISION:\s*([0-9]+\.[0-9]+\.[0-9]+)"
+ )
+@@ -482,7 +484,7 @@
+     description_match = re.search(r"(?m)^description:\s*(.+)\s*$", raw)
+     if not name_match or not description_match:
+         raise ValidationError(f"frontmatter requires name and description: {path}")
+-    return name_match.group(1), description_match.group(1), keys
++    return name_match.group(2), description_match.group(1), keys
+ 
+ 
+ def active_skills(root: Path) -> dict[str, Path]:
+@@ -1895,6 +1897,70 @@
+     return parser.parse_args()
+ 
+ 
++# D28 (Nathan, 2026-10-12): "Make every check that reads a skill's name or hashes a skill's files
++# give the same result whether that line is quoted or not ... Add a standing test of both forms so
++# a later change cannot bring it back."  This runs on every suite run.  Every SKILL.md under the
++# root is tested in both forms, plain and quoted, through each name reader and each skill-file hash
++# this skill has; and no script in this skill may carry a reader that accepts one form only.  The
++# one-form idioms are written as adjacent literals, so this file does not match itself.
++ONE_FORM_NAME_IDIOMS = (
++    "\\n" "name: ",
++    "^name:\\s*" "([a-z0-9-]",
++    "^name:\\s*" "{re.escape",
++)
++
++
++def quoted_name_form(data: bytes) -> bytes:
++    """SKILL.md bytes with a plain frontmatter name line quoted, as the Save skill install writes it."""
++    if not data.startswith(b"---"):
++        return data
++    end = data.find(b"\n---", 3)
++    if end < 0:
++        return data
++    head = re.sub(rb"(?m)^(name:[ \t]*)([a-z0-9-]+)([ \t]*\r?)$", rb'\1"\2"\3', data[:end], count=1)
++    return head + data[end:]
++
++
++def name_line_forms(skills_root: Path) -> dict[str, object]:
++    import validate_gcfpe_20260914 as v0914
++    import validate_gcfpe_20261009 as v1009
++    import validate_gcfpe_current as vcur
++
++    errors: list[str] = []
++    checked: list[str] = []
++    for skill_md in sorted(skills_root.glob("*/SKILL.md")):
++        label = skill_md.parent.name
++        plain = v1009.canonical_skill_md(skill_md.read_bytes())
++        quoted = quoted_name_form(plain)
++        if quoted == plain or v1009.canonical_skill_md(quoted) != plain:
++            errors.append(f"NAME_LINE_FORMS_UNTESTED:{label}")
++            continue
++        texts = (plain.decode("utf-8"), quoted.decode("utf-8"))
++        try:
++            parsed = [frontmatter(text, skill_md) for text in texts]
++        except ValidationError:
++            errors.append(f"NAME_LINE_FORMS:frontmatter:{label}")
++            continue
++        if parsed[0] != parsed[1]:
++            errors.append(f"NAME_LINE_FORMS:frontmatter:{label}")
++        name = parsed[0][0]
++        for module in (v0914, v1009, vcur):
++            if not all(module.names_skill(text, name) for text in texts):
++                errors.append(f"NAME_LINE_FORMS:{module.__name__}.names_skill:{label}")
++            if module.canonical_skill_md(plain) != module.canonical_skill_md(quoted):
++                errors.append(f"NAME_LINE_FORMS:{module.__name__}.canonical_skill_md:{label}")
++        for module in (v0914, v1009):
++            if module.skill_identity_bytes("SKILL.md", plain) != module.skill_identity_bytes("SKILL.md", quoted):
++                errors.append(f"NAME_LINE_FORMS:{module.__name__}.skill_identity_bytes:{label}")
++        checked.append(label)
++    for script in sorted(Path(__file__).resolve().parent.glob("*.py")):
++        source = script.read_text(encoding="utf-8")
++        for idiom in ONE_FORM_NAME_IDIOMS:
++            if idiom in source:
++                errors.append(f"NAME_LINE_ONE_FORM_READER:{script.name}:{idiom}")
++    return {"ok": bool(checked) and not errors, "skills_checked": len(checked), "errors": sorted(set(errors))}
++
++
+ def main() -> int:
+     args = parse_args()
+     try:
+@@ -1941,7 +2007,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.4.0",
++            "validator_revision": "3.4.1",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+@@ -2177,6 +2243,8 @@
+         from validate_gcfpe_20260914 import validate_self_identity
+         self_identity = validate_self_identity(Path(__file__).resolve().parent.parent)
+         report["self_identity"] = self_identity or "OK"
++        name_forms = name_line_forms(args.skills_root)
++        report["name_line_forms"] = name_forms
+         if not args.target and missing:
+             report["suite_ok"] = False
+         else:
+@@ -2184,6 +2252,7 @@
+                 not primary_errors
+                 and not blocking_findings
+                 and not self_identity
++                and bool(name_forms["ok"])
+                 and all(item["status"] == "PASS" for item in report["skills"].values())
+                 and bool(fixture_report.get("fixture_suite_ok"))
+             )
+diff -ruN a/flowmaster-validate/scripts/validate_gcfpe_20260914.py b/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- a/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-10-12 16:22:33.476110750 +0000
++++ b/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-10-12 16:30:36.861006534 +0000
+@@ -2095,11 +2095,35 @@
+     return sorted(set(errors))
+ 
+ 
++# D28 (Nathan, 2026-10-12): the Save skill install writes a skill's name line as
++# `name: "<skill>"`, and a package carries `name: <skill>`.  YAML reads both as the same string, so
++# every name read and every hash of a skill's files here gives the same result on either form.
++# validate_flowmaster.py tests both forms on every suite run.
++SKILL_NAME_QUOTED_RE = re.compile(rb"(?m)^(name:[ \t]*)([\"'])([a-z0-9-]+)\2([ \t]*\r?)$")
++
++
++def names_skill(text: str, name: str) -> bool:
++    return re.search(rf"(?m)^name:\s*([\"']?){re.escape(name)}\1\s*$", text) is not None
++
++
++def canonical_skill_md(data: bytes) -> bytes:
++    """SKILL.md bytes with a quoted frontmatter name line written plain, as it is packaged."""
++    if not data.startswith(b"---"):
++        return data
++    end = data.find(b"\n---", 3)
++    if end < 0:
++        return data
++    return SKILL_NAME_QUOTED_RE.sub(rb"\1\3\4", data[:end], count=1) + data[end:]
++
++
++def skill_md_sha256(path: Path) -> str:
++    return hashlib.sha256(canonical_skill_md(path.read_bytes())).hexdigest()
++
++
+ def find_skill(skills_root: Path, name: str) -> tuple[Path, str] | None:
+-    pattern = re.compile(rf"(?m)^name:\s*{re.escape(name)}\s*$")
+     for path in sorted(skills_root.glob("*/SKILL.md")):
+         text = path.read_text(encoding="utf-8")
+-        if pattern.search(text):
++        if names_skill(text, name):
+             return path, text
+     return None
+ 
+@@ -2362,6 +2386,13 @@
+ SELF_IDENTITY_DECLARATION_RE = re.compile(r"(?m)^SKILL_TREE_SHA256: ([0-9a-f]{64})$")
+ 
+ 
++def skill_identity_bytes(name: str, data: bytes) -> bytes:
++    """The bytes the digest takes for one file: SKILL.md without its declaration, name line plain."""
++    if name == "SKILL.md":
++        return canonical_skill_md(SELF_IDENTITY_RE.sub(b"", data))
++    return data
++
++
+ def skill_tree_digest(root: Path) -> str:
+     """Digest of a skill directory: sorted relative paths, each with its content hash."""
+     digest = hashlib.sha256()
+@@ -2370,9 +2401,7 @@
+         key=lambda name: name.encode("utf-8"),
+     )
+     for name in names:
+-        data = (root / name).read_bytes()
+-        if name == "SKILL.md":
+-            data = SELF_IDENTITY_RE.sub(b"", data)
++        data = skill_identity_bytes(name, (root / name).read_bytes())
+         digest.update(name.encode("utf-8") + b"\n")
+         digest.update(hashlib.sha256(data).hexdigest().encode("ascii") + b"\n")
+     return digest.hexdigest()
+@@ -2723,7 +2752,7 @@
+             if marker.lower() not in resolved[1].lower():
+                 errors.append(f"SKILL_CONTRACT:{name}:{marker}")
+     primary = find_skill(skills_root, "flowmaster-primary")
+-    if primary is None or sha256(primary[0]) != "0665507735b10b94a4f2bb76d65947db1ee6368f12a32a03ac5a509f1e609345":
++    if primary is None or skill_md_sha256(primary[0]) != "0665507735b10b94a4f2bb76d65947db1ee6368f12a32a03ac5a509f1e609345":
+         errors.append("PRIMARY_FILE_IDENTITY")
+     runtime_map = change_skill_dir / "references" / "glow-hde-canonical-change-flow-r1-runtime-map-20260923.json"
+     if not runtime_map.is_file() or sha256(runtime_map) != "aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4":
+diff -ruN a/flowmaster-validate/scripts/validate_gcfpe_20261009.py b/flowmaster-validate/scripts/validate_gcfpe_20261009.py
+--- a/flowmaster-validate/scripts/validate_gcfpe_20261009.py	2026-10-12 16:22:33.477154411 +0000
++++ b/flowmaster-validate/scripts/validate_gcfpe_20261009.py	2026-10-12 16:30:36.863400991 +0000
+@@ -1169,7 +1169,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20261009.1-100926.1-VALIDATION",
+-        "validator_revision": "3.4.0",
++        "validator_revision": "3.4.1",
+         "target_release": "GCFPE-20261009.1",
+         "prompt_version": "100926.1",
+         "candidate_member_count": 55,
+@@ -2110,11 +2110,35 @@
+     return sorted(set(errors))
+ 
+ 
++# D28 (Nathan, 2026-10-12): the Save skill install writes a skill's name line as
++# `name: "<skill>"`, and a package carries `name: <skill>`.  YAML reads both as the same string, so
++# every name read and every hash of a skill's files here gives the same result on either form.
++# validate_flowmaster.py tests both forms on every suite run.
++SKILL_NAME_QUOTED_RE = re.compile(rb"(?m)^(name:[ \t]*)([\"'])([a-z0-9-]+)\2([ \t]*\r?)$")
++
++
++def names_skill(text: str, name: str) -> bool:
++    return re.search(rf"(?m)^name:\s*([\"']?){re.escape(name)}\1\s*$", text) is not None
++
++
++def canonical_skill_md(data: bytes) -> bytes:
++    """SKILL.md bytes with a quoted frontmatter name line written plain, as it is packaged."""
++    if not data.startswith(b"---"):
++        return data
++    end = data.find(b"\n---", 3)
++    if end < 0:
++        return data
++    return SKILL_NAME_QUOTED_RE.sub(rb"\1\3\4", data[:end], count=1) + data[end:]
++
++
++def skill_md_sha256(path: Path) -> str:
++    return hashlib.sha256(canonical_skill_md(path.read_bytes())).hexdigest()
++
++
+ def find_skill(skills_root: Path, name: str) -> tuple[Path, str] | None:
+-    pattern = re.compile(rf"(?m)^name:\s*{re.escape(name)}\s*$")
+     for path in sorted(skills_root.glob("*/SKILL.md")):
+         text = path.read_text(encoding="utf-8")
+-        if pattern.search(text):
++        if names_skill(text, name):
+             return path, text
+     return None
+ 
+@@ -2377,6 +2401,13 @@
+ SELF_IDENTITY_DECLARATION_RE = re.compile(r"(?m)^SKILL_TREE_SHA256: ([0-9a-f]{64})$")
+ 
+ 
++def skill_identity_bytes(name: str, data: bytes) -> bytes:
++    """The bytes the digest takes for one file: SKILL.md without its declaration, name line plain."""
++    if name == "SKILL.md":
++        return canonical_skill_md(SELF_IDENTITY_RE.sub(b"", data))
++    return data
++
++
+ def skill_tree_digest(root: Path) -> str:
+     """Digest of a skill directory: sorted relative paths, each with its content hash."""
+     digest = hashlib.sha256()
+@@ -2385,9 +2416,7 @@
+         key=lambda name: name.encode("utf-8"),
+     )
+     for name in names:
+-        data = (root / name).read_bytes()
+-        if name == "SKILL.md":
+-            data = SELF_IDENTITY_RE.sub(b"", data)
++        data = skill_identity_bytes(name, (root / name).read_bytes())
+         digest.update(name.encode("utf-8") + b"\n")
+         digest.update(hashlib.sha256(data).hexdigest().encode("ascii") + b"\n")
+     return digest.hexdigest()
+@@ -2744,7 +2773,7 @@
+             if marker.lower() not in resolved[1].lower():
+                 errors.append(f"SKILL_CONTRACT:{name}:{marker}")
+     primary = find_skill(skills_root, "flowmaster-primary")
+-    if primary is None or sha256(primary[0]) != "0665507735b10b94a4f2bb76d65947db1ee6368f12a32a03ac5a509f1e609345":
++    if primary is None or skill_md_sha256(primary[0]) != "0665507735b10b94a4f2bb76d65947db1ee6368f12a32a03ac5a509f1e609345":
+         errors.append("PRIMARY_FILE_IDENTITY")
+     runtime_map = change_skill_dir / "references" / "glow-hde-canonical-change-flow-r1-runtime-map-20260923.json"
+     if not runtime_map.is_file() or sha256(runtime_map) != "aa6ed8e34363b77e08e8467d9f31b4dc795c2c9fa2c2c3c7ed1cea6cf4202ee4":
+diff -ruN a/flowmaster-validate/scripts/validate_gcfpe_current.py b/flowmaster-validate/scripts/validate_gcfpe_current.py
+--- a/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-10-12 16:22:33.479286332 +0000
++++ b/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-10-12 16:30:36.857917465 +0000
+@@ -530,11 +530,35 @@
+     return {**terminal, "reason": "UNKNOWN_RECEIVER"}
+ 
+ 
++# D28 (Nathan, 2026-10-12): the Save skill install writes a skill's name line as
++# `name: "<skill>"`, and a package carries `name: <skill>`.  YAML reads both as the same string, so
++# every name read and every hash of a skill's files here gives the same result on either form.
++# validate_flowmaster.py tests both forms on every suite run.
++SKILL_NAME_QUOTED_RE = re.compile(rb"(?m)^(name:[ \t]*)([\"'])([a-z0-9-]+)\2([ \t]*\r?)$")
++
++
++def names_skill(text: str, name: str) -> bool:
++    return re.search(rf"(?m)^name:\s*([\"']?){re.escape(name)}\1\s*$", text) is not None
++
++
++def canonical_skill_md(data: bytes) -> bytes:
++    """SKILL.md bytes with a quoted frontmatter name line written plain, as it is packaged."""
++    if not data.startswith(b"---"):
++        return data
++    end = data.find(b"\n---", 3)
++    if end < 0:
++        return data
++    return SKILL_NAME_QUOTED_RE.sub(rb"\1\3\4", data[:end], count=1) + data[end:]
++
++
++def skill_md_sha256(path: Path) -> str:
++    return hashlib.sha256(canonical_skill_md(path.read_bytes())).hexdigest()
++
++
+ def find_skill(skills_root: Path, name: str) -> tuple[Path, str] | None:
+-    pattern = re.compile(rf"(?m)^name:\s*{re.escape(name)}\s*$")
+     for path in sorted(skills_root.glob("*/SKILL.md")):
+         text = path.read_text(encoding="utf-8")
+-        if pattern.search(text):
++        if names_skill(text, name):
+             return path, text
+     return None
+ 
+@@ -667,7 +691,7 @@
+             if marker not in pr_skill[1]:
+                 errors.append(f"PR_SKILL_CONTRACT_MISSING:{marker}")
+     primary = find_skill(skills_root, "flowmaster-primary")
+-    if primary is None or sha256(primary[0]) != EXPECTED_PRIMARY_SHA256:
++    if primary is None or skill_md_sha256(primary[0]) != EXPECTED_PRIMARY_SHA256:
+         errors.append("PRIMARY_IDENTITY")
+     runtime_map = change_skill_dir / "references" / "glow-hde-canonical-change-flow-r1-runtime-map-20260923.json"
+     if not runtime_map.is_file() or sha256(runtime_map) != EXPECTED_INSTALLED_RUNTIME_MAP_SHA256:

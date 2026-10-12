@@ -1854,3 +1854,45 @@ this entry says so rather than implying a guard exists for them.
 **Publication:** D23-G successor publication applies. The 54 changed runtime members have 100926.1 sibling pages under their predecessor parents; GCFPE-MGMT-10 is reused unchanged. Candidate inventory GCFPE-20261009.1 and the successor PE Metaprompt are recorded in Notion. The register retains GCFPE-20260914.1 / 091426.1 as selected. Candidate graph parts and non-derived registry proposals are isolated under this Modification's `execute/` evidence directory; no selected graph/registry replacement is inferred.
 
 **Exception and remaining gates:** The user authorized completing this candidate on a best-effort basis without skill access. No skill was opened, invoked, inspected, packaged or installed. Shipped graph/registry derivation, shipped validators, injected regressions and independent FULL review were not performed or deemed passed. They remain prerequisites for a separately proposed release selection. AF-013 is excluded/unmeasured, not resolved. No runtime QA/Ops or governed evidence mutation is part of this maintenance work.
+
+## D28 — A skill's name line reads the same quoted or plain
+
+**Product Owner, 2026-10-12**, in `MODIFICATION-20261011-gcfpe-mb008-to-promotion` after the X17
+install: *"The Save skill install writes each skill's name line as name: "<skill>". Make every check
+that reads a skill's name or hashes a skill's files give the same result whether that line is quoted
+or not: in flowmaster-validate, and in the repository's freeze.py and the two procedures that use it
+(skill-identity-and-freeze.md, skill-packaging-and-delivery.md). Add a standing test of both forms so
+a later change cannot bring it back."* His decision 2 the same day: *"Proof before you deliver: make
+two copies of the installed skills directory, one with every skill's name line quoted and one with
+every one plain, with your new package in both. Every gate and the freeze.py comparison must give the
+same result on both, and every GCFPE gate must pass."* The record quotes both decisions in full in
+its §E.
+
+### The rulings
+
+- **The name line is not identity.** `name: "<skill>"`, `name: '<skill>'` and `name: <skill>` are the
+  same YAML string. Every name read and every hash of a skill's files gives the same result on each:
+  `freeze.py` hashes the root `SKILL.md` with its frontmatter name line plain, and flowmaster-validate
+  3.4.1 does the same in its frontmatter parser, each profile's skill lookup, the Primary file
+  identity and `SKILL_TREE_SHA256`. A plain tree's digest is unchanged.
+- **Install verification models the install.** Extracting a `.skill` does not reproduce what *Save
+  skill* writes. Before delivery the gates run on two copies of the installed skills directory with
+  the new package in both, every name line quoted in one and plain in the other, and must agree
+  (`skill-packaging-and-delivery.md`).
+- **For this change only:** Nathan overrides the Modification's scope freeze for this work, it amends
+  the promotion snapshot for flowmaster-validate alone, and he waives `D24` for that package — no
+  review round. The waiver does not carry to any other package or change.
+
+### What it does not decide
+
+Other projects' skills, such as human-design-reading-flowmaster, are outside it. It changes no other
+frontmatter key: a quoted `description` is the author's own text, and the install leaves it alone.
+
+### The tested guard (`D14`)
+
+Two, both run every time and neither optional. `freeze.py` tests both forms in memory, through the
+same code that digests the tree, before it prints a digest, and prints none if they differ.
+flowmaster-validate's suite reports `name_line_forms`: every `SKILL.md` under the root read in both
+forms through each name reader and skill-file hash it has, and a scan of its own scripts for a reader
+that accepts one form only; `suite_ok` is false unless it passes. Each was shown to fire when the
+equivalence is removed (`execute/fv341-proof.json` in the record's evidence).
