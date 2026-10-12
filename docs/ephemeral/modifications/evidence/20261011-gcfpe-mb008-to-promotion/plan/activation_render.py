@@ -157,7 +157,7 @@ def catalog_text(parts: dict, values: dict) -> str:
 
 def register_entry_text(parts: dict, values: dict) -> str:
     ev = "docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion"
-    steps = [("X15", "successor bindings prepared and read back", "done @ACTIVATION_DATE"),
+    steps = [("X15", "successor bindings prepared and read back", "pending"),
              ("X16", "this register's selection updated last", "pending"),
              ("X17", "the six packages installed; installed digests equal the reviewed ones", "pending"),
              ("X18", "production validation on the activated state", "pending"),

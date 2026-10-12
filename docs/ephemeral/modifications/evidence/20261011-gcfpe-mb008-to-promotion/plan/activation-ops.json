@@ -38,6 +38,12 @@
    ],
    "ops": [
     {
+     "id": "FI-FM-DISP",
+     "start": "predecessor_disposition: SUPERSEDED_ARCHIVED_INTACT",
+     "end": null,
+     "new": "predecessor_disposition: SUPERSEDED"
+    },
+    {
      "id": "FI-ACT-H",
      "start": "## Activation contract — discharged 2026-09-21",
      "end": null,
@@ -53,7 +59,7 @@
      "id": "FI-BIND-P",
      "start": "**These bindings are operative.**",
      "end": "(the `D23` close-out) and read back then.",
-     "new": "**These bindings are operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`.** Each was prepared and read back before the register changed (X15 of `MODIFICATION-20261011-gcfpe-mb008-to-promotion`, @ACTIVATION_DATE). The operating-procedure binding is v5.0.0, unchanged since 2026-09-23."
+     "new": "**These bindings are operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`.** Each was prepared and read back at X15 of `MODIFICATION-20261011-gcfpe-mb008-to-promotion` (@ACTIVATION_DATE); the register's selection is updated only after that readback. The operating-procedure binding is v5.0.0, unchanged since 2026-09-23."
     },
     {
      "id": "FI-B-CAT",
@@ -447,7 +453,7 @@
      "id": "REG-MEM",
      "start": "## Current explicit membership — 091426.1",
      "end": null,
-     "new": "## Current explicit membership — 100926.1\n[Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/@CATALOG_PAGE_ID) is the exact 55-page mapping. Every member is a successor page at `100926.1`; `GCFPE-MGMT-10`'s successor is the D20 three-mode body, which manages one ecosystem Modification and hands off to no prompt. No member was added or removed. `RS-40` and `PR-50` remain registered members; `PR-50` is a manual Product Owner-only terminal control with **zero** prompt-originated inbound edges on the selected graph. PE Metaprompt is a separate authoring control and is not counted among the 55. No assessment middleware is selected.\nThe predecessor `091426.1` versions retain their identities and history and are archived intact; archival preserves each page, its ID and its body.\n**Release rule.** A release's membership and each member's current version live in the register and the complete-prompt-set catalog. A member whose body changes gets a successor page at the new version; a member whose body does not change keeps its page, and the register records it in the new release. Bodies carry no release-bound header line (`D23-G`). Each member's `current_version` is recorded in the catalog's `current_version` column; all 55 are `100926.1`. The prompt-authoring control follows the same rule (AF-012; Product Owner, 2026-09-23).\n## Historical explicit membership — 091426.1"
+     "new": "## Current explicit membership — 100926.1\n[Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/@CATALOG_PAGE_ID) is the exact 55-page mapping. Every member is a successor page at `100926.1`; `GCFPE-MGMT-10`'s successor is the D20 three-mode body, which manages one ecosystem Modification and hands off to no prompt. No member was added or removed. `RS-40` and `PR-50` remain registered members; `PR-50` is a manual Product Owner-only terminal control with **zero** prompt-originated inbound edges on the selected graph. PE Metaprompt is a separate authoring control and is not counted among the 55. No assessment middleware is selected.\nThe predecessor `091426.1` versions keep their identities and history. They are archived intact, by move, at the transaction's archival step, which the register entry records; archival preserves each page, its ID and its body.\n**Release rule.** A release's membership and each member's current version live in the register and the complete-prompt-set catalog. A member whose body changes gets a successor page at the new version; a member whose body does not change keeps its page, and the register records it in the new release. Bodies carry no release-bound header line (`D23-G`). Each member's `current_version` is recorded in the catalog's `current_version` column; all 55 are `100926.1`. The prompt-authoring control follows the same rule (AF-012; Product Owner, 2026-09-23).\n## Historical explicit membership — 091426.1"
     },
     {
      "id": "REG-SRC",
@@ -524,5 +530,23 @@
    "title": "GCFPE Membership and Release Register Entry — GCFPE-20261009.1",
    "parent": "3d24590a05eb81ce942ad994cfca9fa1"
   }
- }
+ },
+ "x19": {
+  "step": "X19",
+  "note": "Applied after X19's verification passes (amendment PIN-1-A, item 3); the register entry's X19 row is marked done in the same step.",
+  "pages": {
+   "3db4590a05eb81de9736ea69bac61016": {
+    "name": "Flow Index",
+    "ops": [
+     {
+      "id": "FI-X19-DISP",
+      "start": "predecessor_disposition: SUPERSEDED",
+      "end": null,
+      "new": "predecessor_disposition: SUPERSEDED_ARCHIVED_INTACT"
+     }
+    ]
+   }
+  }
+ },
+ "amendment": "PIN-1-A (Nathan's plan approval, 2026-10-12): REG-MEM's archival sentence, FI-BIND-P's readback sentence, FI-FM-DISP and the X19 operation; the register entry is created with X15 pending."
 }
