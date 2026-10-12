@@ -1,0 +1,41 @@
+{
+ "record_type": "MB008_X12_QUALIFICATION_VALIDATORS",
+ "step": "X12",
+ "reads": {
+  "fetched_after": "2026-10-12T02:32:23.000Z",
+  "members": 55,
+  "as_of_min": "2026-10-12T02:29:03.544Z",
+  "as_of_max": "2026-10-12T02:30:54.130Z",
+  "d22": "55 member bodies read transiently from this session's fetch records and piped on stdin; no body text or digest written"
+ },
+ "profile_100926_with_bodies": {
+  "exit": 0,
+  "ok": true,
+  "errors": [],
+  "profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+  "prompt_bodies_validated": 55,
+  "prompt_body_count": 55,
+  "prompt_body_checks_not_evaluated": [],
+  "contract_status": "SELECTED_PRODUCTION",
+  "frozen_graph_edge_count": 235
+ },
+ "flowmaster_suite": {
+  "exit": 0,
+  "verdict": "FLOWMASTER_SUITE_PASS",
+  "suite_ok": true,
+  "finding_counts": {
+   "ADVISORY": 0,
+   "BLOCKER": 0,
+   "ERROR": 0,
+   "WARNING": 0
+  },
+  "self_identity": "OK",
+  "current_profile": "GCFPE-20261009.1-100926.1-VALIDATION"
+ },
+ "release_semantic_equality": {
+  "candidate_vs_production_outside_lifecycle_and_graph_digest": true,
+  "differing_paths": [],
+  "method": "release_semantic_view after removing CONTRACT_LIFECYCLE_KEYS and source_snapshot.frozen_candidate_graph.sha256"
+ },
+ "ok": true
+}
