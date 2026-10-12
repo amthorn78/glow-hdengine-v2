@@ -577,3 +577,17 @@ Two Flow Index operations were written but do not pass the exact-landing check, 
 **If you choose the recommended options:** about 20 minutes and about 0.3M tokens to finish X15 and X16. Then X17, your install of the six packages.
 
 **Spend since the promotion approval.** About 20 minutes (13:26Z to 13:46Z). Subagent tokens: three read-only fetch workers in that stretch, about 0.37M (0.14M, 0.15M, 0.08M), plus the worker that read the catalog back at X15(a). Since X8 in all, about 3.5M, inside the EXECUTE estimate.
+
+### Nathan's decisions after X15 — 2026-10-12
+
+Nathan's words:
+
+> Decision 1: amendment AM-3 as you described it; the two Flow Index operations' expected text in Notion's stored form, same words, no Notion write.
+> Decision 2: pin X16 to the register's revision read right after the X15 row is marked, accepted only if the register's own last edit is still 2026-10-09T20:19:11.175Z and its revision equals the register entry's.
+> Decision 3: PR #606 is merged as the record pull request. Continue on this branch restarted from main, in a new PR.
+
+**Applied.**
+
+- **Decision 3.** PR #606 merged as `2d2d583` (14:18:13Z), detected by files on `main` (D26-C): the branch's tree equalled `main`'s (`96dfc240…`). The branch was restarted from `main` at `2d2d583`. GitHub had deleted the remote branch on merge, so the push re-created it; there was nothing to overwrite. The run continues in a new pull request.
+- **Decision 1, AM-3.** Applied to `plan/activation-ops.json` and noted in its `amendment` key. FI-ACT-1's and FI-BIND-P's `new` texts carry `****` around their three code spans, the form Notion stores and REG-SEL already uses. Nothing else changes: removing `****` gives back each original text, and every other key and operation in the file is equal (checked by script). File sha256 after: `0f559f6c…`. `activation_render.py selftest` 6 of 6; `control_check.py selftest` ok. No Notion write.
+- **Decision 2.** Applied at X16, below. The pin is the register's revision read right after the register entry's X15 row is marked. It is used only if the register's own last edit is still `2026-10-09T20:19:11.175Z` and its revision equals the entry's revision on that read.
