@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.5.2**  
-Effective Date: 2026.10.11  
+**Version: v13.5.3**  
+Effective Date: 2026.10.12  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -183,7 +183,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 
 ## **1.1 Addendum Index**
 
-2.1 GCFPE model and reasoning-level guidance is the TypeSafe reading; no AI recommendation is given
+* 2.1 GCFPE model and reasoning-level guidance is the TypeSafe reading; no AI recommendation is given  
+* 2.2 HDE-CRD-0002 WU-PR-01: two HDAPI v2 contract-inventory evidence tools join the CI-coverage work unit for bounded corrections; the legacy chart-loader test is retired with its defect routed to the Product Owner
 
 # **2\) Numbered Addenda**
 
@@ -220,5 +221,85 @@ Where this addendum conflicts with earlier PF-Canon, this addendum governs for t
 * No epic, task or PF09 row changes status by this addendum.  
 * The GCFPE prompt and skill changes that implement it are unperformed.  
 * This addendum does not extend to other ecosystems, select any model, or make a reading an approval or gate.
+
+## 2.2 HDE-CRD-0002 WU-PR-01: two HDAPI v2 contract-inventory evidence tools join the CI-coverage work unit for bounded corrections; the legacy chart-loader test is retired with its defect routed to the Product Owner
+
+Timestamp: 101226 23:07 (UTC) Details: Records the whole-change Implementation Agent's approval, through Review Bounded Work-Unit Rescope, of one bounded implementation rescope of work unit WU-PR-01 (CI coverage of every test file; requirements S03, S04, S05) of the approved HDE-CRD-0002 Implementation Plan v1.1. Origin: the WU-PR-01 rescope request v1.0 (items RP-1 and RP-2) from the dedicated PR engineering session during pre-Proceed planning. Evidence: the review's own reproduction of both findings at main 6c664dd9 and at cf9198df, and its reading of the tools, the adapter, the classifier and the loader.
+
+### Decision and approval status
+
+The continuing whole-change Implementation Agent for HDE-CRD-0002 decided APPROVE on the WU-PR-01 rescope request v1.0, as one state for the one request. The decision record is docs/ephemeral/HDE-CRD-0002-WU-PR-01-rescope-review-v1.0.md. The approval is a bounded implementation rescope within the approved Specification's intent; it is not a change to the Epic-level commitment, to any acceptance criterion, protected boundary, other work unit, accepted dependency or Product Owner matter. The immutable base is not rewritten. This addendum is the one overlay the approval creates; the effective baseline for WU-PR-01 is the approved base plus this addendum.
+
+### Base
+
+HDE-CRD-0002 Specification v1.1, requirement S03 ("Bring every test file into a CI lane or retire it with a recorded reason"; criterion "No test file runs in no CI lane; each retirement has a recorded reason; recorded failures and collection errors are fixed or retired with their files"; constraint "S03 may expose real defects that enlarge the work"). Implementation Plan v1.1, work unit WU-PR-01 (deliverables, acceptance (1) to (5), risk R-1). WU-PR-01 PR instruction v1.0 §6 (bounded files: fixes stay inside test code and test-local fixtures), §7 (no change to any tools/\*\* or scripts/\*\* file), §9.2 (fix-versus-retire criterion), §9.8 (a real product defect is not fixed by changing a test's expectation; a needed non-test change is routed) and §14 (rescope behavior). None of these is changed.
+
+### Approved delta (RP-1)
+
+WU-PR-01's bounded files are extended by exactly two items, and the instruction's tools/\*\* exclusion is relaxed for exactly the changes stated here:
+
+1. tools/evidence/generate\_hdapi\_v2\_contract\_inventory.py: only the data of ADAPTER\_BOUNDARY\_PUBLIC\_ROUTE\_BASELINE\_RECORDS changes. It is rebuilt from the public route records the three app factories register at the PR head and reviewed against HDE CLI/API/Vendor Reference §5.1.0 and §5.4 before commit. It must contain reader\_post, reader\_method\_not\_allowed and reader\_post\_not\_allowed at /api and must not contain the removed reader\_v1\_post. The generator's outputs, schema, evidence family, refusal codes, flags and write paths do not change; it gains no \--check mode or other feature; it is not run in write mode against the repository.  
+2. tools/evidence/hdapi\_v2\_boundary\_analyzer.py: the change is confined to presenter-provenance resolution in \_adapter\_routes\_without\_presenter and any private helper it needs inside the analyzer. Provenance through a helper is accepted only when the view calls a module-level helper of its own module with an argument whose bound value, or whose parameter default, is a sanctioned presenter callable (the production Reader's get\_reader\_api\_bp → \_production\_reader\_response(emit\_fn) shape, whose default is emit\_reader\_public\_bytes). Bypass detection is not weakened: a parameter whose default is not a sanctioned presenter callable, a helper that emits through any other path, a parameter with neither a sanctioned default nor a sanctioned bound value, and every case reported today stay reported.
+
+With them, inside files WU-PR-01 already owns:
+
+* ci/checks/classify\_ci\_changes.py: \_EVIDENCE\_GENERATOR\_TEST\_OWNERS\["tools/evidence/generate\_hdapi\_v2\_contract\_inventory.py"\] \= ("tests/evidence/test\_hdapi\_v2\_contract\_inventory.py",); tools/evidence/hdapi\_v2\_boundary\_analyzer.py leaves \_EVIDENCE\_HELPERS\_REQUIRING\_OWNER and enters \_EVIDENCE\_HELPER\_TEST\_OWNERS with owners tests/evidence/test\_hdapi\_v2\_contract\_inventory.py and \_EVIDENCE\_HELPER\_OWNERSHIP\_TEST. These two source keys are the only exception to the detailed plan's rule that no new source key is created.  
+* tests/evidence/test\_hdapi\_v2\_contract\_inventory.py: the 103 tmp\_boundary\_test fixture sites move to tmp\_path; one positive analyzer case (the shape above is accepted) and one negative case (a helper with a non-presenter default is reported and fails the analyzer verdict) are added; the file is registered under the detailed plan's registration rule.  
+* tests/evidence/test\_rails\_ci\_workflow\_integration.py: every pin over the owner registries stays true.
+
+### Binding requirements
+
+* The file passes 298 of 298 plus the two new cases with ruby on PATH, in the detached-worktree full-validation run, with a clean tree and a clean mtime check. No test is skipped, deselected, xfail-marked or quarantined.  
+* changed\_test\_targets returns the test for each tool (plus the ownership test for the analyzer).  
+* The lane that runs the file has ruby available or the run fails; it never skips. The detailed plan records ruby as a visible dependency and names where the lane obtains it.  
+* No governed artifact changes: the diff from base to head over artifacts/vendor/hdapi\_v2/, docs/evidence/, artifacts/evidence\_index.jsonl and its checksum, and artifacts/architecture/ is empty; the frozen HDE-EPIC033 to HDE-EPIC035 captures are unchanged; the architecture snapshot test stays green. Neither tool gains a new import symbol, because the architecture snapshot records both by import-symbol keys; a needed new import is a new finding to the Implementation Agent, never a regeneration.  
+* If the analyzer change cannot be made without weakening bypass detection, that is a new finding to the Implementation Agent through the rescope lane; it is not resolved by changing a test.  
+* The detailed plan states the mechanism by which a route change in adapter/factory.py or adapter/http\_reader.py re-runs this test, so that the baseline stays current when WU-PR-03 changes those routes.  
+* WU-PR-01's acceptance (1) to (5), its interface contracts C-1 to C-6, its evidence obligations, its nonclaims and its PR-30/PR-35 split are unchanged.
+
+### RP-2: in scope under the base; no delta
+
+tests/loader/test\_chart\_loader\_uses\_provider\_and\_is\_safe\_mode\_default.py is retired under the base's own authority (S03; instruction §9.2; the detailed plan's retirement class for a legacy signature no current entrypoint reaches). Its ledger row records the reason: the file exposes a product defect in the legacy signature of engine/charts/loader.py (\_call\_legacy calls get\_chart on a FixturesProvider that has none, since 6c6f4b2a, 2025-09-28); only tests call it; the loader is not a release member and is not reached at runtime; the defect is routed to the Product Owner as the decision owner for Task HDE-SEPA006 (HDE Build Checklist — Separation; HDE Architecture §1.1 "Non-BodyGraph chart loader classification"); it is not fixed in HDE-CRD-0002. Replacing coverage for its passing case: tests/provider/test\_vendor\_and\_prod\_guard\_min.py::test\_vendor\_refuses\_in\_safe\_mode and tests/provider/test\_vendor\_call\_rails\_and\_config.py::test\_vendor\_refused\_when\_safe\_mode\_on, both retained and passing at the PR head. engine/charts/loader.py, engine/provider/fixtures.py and every other non-test file stay unchanged; the tracked artifacts/logs/loader\_call.jsonl is not edited, truncated or regenerated. Neither the ledger nor the PR result record represents the defect as fixed, deferred to a unit of HDE-CRD-0002, or resolved.
+
+### Scope, exclusions and nonclaims
+
+* No other tools/\*\* or scripts/\*\* file changes; ci/jobs/\*.yml and ci/checks/run\_rails\_job\_definitions.py are unchanged.  
+* No release member changes; catalog/manifest.json, engine/config/registry\_loader.py and the admission constants are unchanged; no manifest refresh.  
+* No public route, public payload, public flag, transport or runtime behavior changes; the production Reader continues to emit only through the presenter.  
+* No live vendor, production or database call; closed rails throughout.  
+* No QA artifact, QA verdict, acceptance, PF09 or PF30 status movement, deployment, canon edit, Product Owner Proceed, merge authority or epic/CRD closure follows from this addendum.  
+* Retiring the contract-inventory test together with both tools as historical was not decided; it remains a separate product decision the Product Owner may raise.  
+* A repair of engine/charts/loader.py was not approved.
+
+### Affected surfaces
+
+* Requirements. S03 acceptance (1) and (2) become reachable; S04, S05 and acceptance (3) to (5) are unaffected; S03 remains classified as not production-affecting.  
+* Dependencies. None upstream. The coverage definition contracted to WU-PR-06 is unchanged; WU-PR-06's sweep environment must provide ruby for this file.  
+* Tests. Two cases added; one file retired. The detailed plan's dispositions become 42 retained, 27 retained-and-fixed and 66 retired, restated by plan v1.1 from its own table.  
+* Ops. None.  
+* Documentation. The undeclared ruby dependency of the generator (the detailed plan's observation OBS-12) is a documentation delta candidate for the Product Owner.  
+* Downstream work. WU-PR-03 later changes the adapter routes and must keep the generator's baseline current; the Implementation Agent carries that into the WU-PR-03 PR instruction. The WU-PR-06 instruction carries the ruby requirement of the sweep environment.
+
+### Evidence
+
+* At main 6c664dd9, with Python 3.12, CI's install, closed rails and ruby on PATH: tests/evidence/test\_hdapi\_v2\_contract\_inventory.py gives 21 failed and 277 passed, every failure raising ADAPTER\_BOUNDARY\_CHECK\_FAILED:presenter\_emitter\_inspected,no\_presenter\_bypass,no\_public\_reader\_change; at cf9198df, the parent of HDE-EPIC040 PR06a (d79cfc1c), it gives 298 passed. The tree was clean after both runs.  
+* The production Reader view reader\_post returns \_production\_reader\_response(emit\_fn), whose default is the sanctioned emitter emit\_reader\_public\_bytes; the analyzer does not follow the parameter-passed emitter; the generator's baseline predates the production Reader and still names reader\_v1\_post.  
+* At 6c664dd9, tests/loader/test\_chart\_loader\_uses\_provider\_and\_is\_safe\_mode\_default.py gives 1 failed (AttributeError at engine/charts/loader.py:81) and 1 passed, and the run appends to the tracked artifacts/logs/loader\_call.jsonl.  
+* The detailed plan v1.0's integrated prototype leaves exactly these two files uncovered; the two findings are the whole remaining gap to acceptance (1).
+
+### Conflicts
+
+NONE. The CANON\_CONFLICT\_REGISTER entries CR-1 to CR-3 of HDE-CRD-0002 are carried unchanged (APPROVED\_AS\_CHANGED); no new entry.
+
+### Unresolved obligations and owners
+
+* The analyzer change design: not prototyped at approval; owner, the dedicated WU-PR-01 PR engineering session (plan v1.1, then PR-30), with the failure route above.  
+* ruby on hosted runners after the announced move of ubuntu-latest to Ubuntu 26.04: unknown; owner, PR-35 observation of hosted CI, with the documentation delta candidate to the Product Owner.  
+* The legacy chart-loader defect: returned to the Product Owner as the decision owner for HDE-SEPA006; nothing in HDE-CRD-0002 waits on it.  
+* PF10 numbering and publication: the Product Owner.
+
+### Status and consequences
+
+Completed: the review decision and this overlay. Not yet done: plan v1.1, the Product Owner's Proceed, implementation, reviews and merge of WU-PR-01; the WU-PR-03 and WU-PR-06 instructions that carry the downstream obligations. Unproven: that the analyzer change can be made without weakening bypass detection, pending the prototype. Consequence: when WU-PR-01 lands under this overlay, every tracked test file runs in a CI lane or is retired with a recorded reason, the two HDAPI v2 contract-inventory tools regain a registered owner test that runs on their change, and the loader defect remains recorded and owned rather than hidden.
 
 \<eof\>
