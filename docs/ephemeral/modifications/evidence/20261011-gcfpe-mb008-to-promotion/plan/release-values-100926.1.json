@@ -43,6 +43,7 @@
   "governing_plan": "This Modification's PLAN document. @PLAN_SHA256 and @PLAN_BYTES are filled in EXECUTE from the approved file on the branch, before the contract is generated; generation refuses an unfilled marker.",
   "predecessor_direct_handoff_contract": "The installed 091426.1 contract, sha256 dbae180b..., 613,326 B, byte-equal in change-flow and flowmaster-validate (contract_recipe.py --check EQUAL, PLAN dry run).",
   "sole_added_member": "100926.1 adds no member: the candidate catalog's 55 are the 091426.1 members (global.json candidate.member_rule).",
-  "receiver_compatibility.PR-20": "F09 (parent Modification): the RS-20 to PR-20 edge's three branches APPROVE, REJECT and IN_SCOPE_REPAIR, each only from the recorded PR-20 planning origin before Proceed (candidate part RS-20.json, branches rescope_pr20_preproceed, reject_pr20_preproceed, in_scope_pr20_preproceed)."
+  "receiver_compatibility.PR-20": "F09 (parent Modification): the RS-20 to PR-20 edge's three branches APPROVE, REJECT and IN_SCOPE_REPAIR, each only from the recorded PR-20 planning origin before Proceed (candidate part RS-20.json, branches rescope_pr20_preproceed, reject_pr20_preproceed, in_scope_pr20_preproceed).",
+  "promoted_at": "Not an op: the template's promoted_at (2026-09-21) is 091426.1's promotion date. The patched regenerator carries promoted_at only when the graph is the template's own release and selected, so both 100926.1 contracts omit it; its date exists only after X16 (P-B2). flowmaster-validate's validate_contract, contract_top_level_key_drift and contract_lifecycle_key_shape accept its absence (PLAN review round 1, reviewer B)."
  }
 }

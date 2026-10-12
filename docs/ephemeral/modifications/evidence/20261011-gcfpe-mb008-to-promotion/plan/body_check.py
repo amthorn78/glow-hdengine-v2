@@ -7,7 +7,10 @@ Two changes to the logic, for insertion operations, whose replacement carries th
 TypeSafe text after C-PLACE, and PE-SCAN): an operation has LANDED when its replacement occurs once and its start
 anchor occurs only inside the page's replacements; and a page's batch is safe when each old_str occurs exactly
 once in the text at the moment update_content applies it in order, and afterwards only inside its own new_str.
-A replacement operation behaves exactly as in the parent script.
+A replacement operation behaves exactly as in the parent script. An operation with `lines` may span lines: its end
+anchor may sit on a later line, and the span must contain exactly that many line breaks (GCFPE-MGMT-10's page-state
+block, R-A3). `--page ID=PAGE@LAST_EDITED` points an entry at another page and pin (EXECUTE's MGMT-10 successor), and
+`--shared KEY=VALUE` sets a shared text (its URL).
 
   body_check.py selftest                       every guard against its synthetic fixtures, and the span
                                                resolver's apply-once behaviour on synthetic text
@@ -172,9 +175,15 @@ def resolve(text: str, op: dict):
     i = text.find(s)
     if op.get("end") is None:
         return (i, i + len(s)), None
+    j = text.find(op["end"], i + len(s))
+    if op.get("lines") is not None:
+        if j < 0 or occ(text[i + len(s):], op["end"]) != 1:
+            return None, "END_NOT_UNIQUE_AFTER_START"
+        if text[i:j + len(op["end"])].count("\n") != op["lines"]:
+            return None, "SPAN_LINES_" + str(text[i:j + len(op["end"])].count("\n"))
+        return (i, j + len(op["end"])), None
     line_end = text.find("\n", i)
     line_end = len(text) if line_end < 0 else line_end
-    j = text.find(op["end"], i + len(s))
     if j < 0 or j + len(op["end"]) > line_end:
         return None, "END_NOT_ON_LINE"
     return (i, j + len(op["end"])), None
@@ -327,6 +336,13 @@ def registry(audit_root: str, root: str, session: str, since: int, fetched_after
                 agree = _registry_pass(evaluate, g, text) == guard_pass(text, g)[1] == (want == "pass")
                 ok &= agree
                 fixtures.append({"guard": g["id"], "fixture": f"{want}[{k}]", "agrees": agree})
+        # a required guard's count above `expect`: the guard fails it and the registry form, which proves presence
+        # only, passes it, as its docstring says; the registry row carries its own check where one is needed
+        for k, fx in enumerate(g["fixtures"].get("fail_count_only", [])):
+            text = expand(fx)
+            agree = _registry_pass(evaluate, g, text) and not guard_pass(text, g)[1]
+            ok &= agree
+            fixtures.append({"guard": g["id"], "fixture": f"fail_count_only[{k}]", "agrees": agree})
     for prompt, meta in EDITS["pages"].items():
         got = latest_fetch(meta["page_id"], root, session, since, fetched_after)
         if got is None:
@@ -353,7 +369,8 @@ def registry(audit_root: str, root: str, session: str, since: int, fetched_after
 def selftest() -> dict:
     rows, ok = [], True
     for g in GUARDS["guards"]:
-        for want, fixtures in (("pass", g["fixtures"]["pass"]), ("fail", g["fixtures"]["fail"])):
+        for want, fixtures in (("pass", g["fixtures"]["pass"]), ("fail", g["fixtures"]["fail"]),
+                               ("fail", g["fixtures"].get("fail_count_only", []))):
             for k, fx in enumerate(fixtures):
                 c, passed = guard_pass(expand(fx), g)
                 good = passed if want == "pass" else not passed
@@ -376,6 +393,12 @@ def selftest() -> dict:
              "anchor_landing_refuses_kept_head": not landed(
                  t0.replace("Middle words and ends here.", "Beta replaces it."), op, [op])["landed"],
              "anchor_landing_refuses_untouched": not landed(t0, op, [op])["landed"]}
+    # a bounded multi-line span: exactly the stated number of line breaks, and nothing when that differs
+    ml = {"id": "SYN-3", "start": "Head one.", "end": "Tail three.", "lines": 2, "new": "Joined."}
+    t4 = "x\nHead one.\nmiddle two\nTail three.\ny"
+    synth.update({"multiline_resolves": resolve(t4, ml)[0] is not None,
+                  "multiline_refuses_other_line_count": resolve(t4.replace("middle two", "middle\ntwo"), ml)[0] is None,
+                  "multiline_lands": state(apply_all(t4, [ml])[0], ml) == "LANDED"})
     # an insertion operation, whose replacement keeps the start anchor: untouched, landed once, never applied twice
     ins = {"id": "SYN-2", "start": "Alpha begins here.", "end": None, "new": "Alpha begins here. Gamma follows."}
     t2, r2 = apply_all(t0, [ins])
@@ -466,7 +489,16 @@ def main() -> int:
                     help="ISO UTC time taken just before the fetches; older reads are never used")
     ap.add_argument("--harness-root", default=os.path.expanduser("~/.claude/projects"))
     ap.add_argument("--session", default=os.environ.get("CLAUDE_CODE_SESSION_ID"))
+    ap.add_argument("--page", action="append", default=[], help="PROMPT=PAGE_ID@LAST_EDITED")
+    ap.add_argument("--shared", action="append", default=[], help="KEY=VALUE")
     a = ap.parse_args()
+    for item in a.page:
+        key, rest = item.split("=", 1)
+        pid, ts = rest.split("@", 1)
+        EDITS["pages"][key] = {"page_id": pid, "expected_last_edited": ts}
+    for item in a.shared:
+        key, val = item.split("=", 1)
+        SHARED[key] = val
     if a.mode == "selftest":
         res = selftest()
     elif a.mode == "registry" and a.emit:

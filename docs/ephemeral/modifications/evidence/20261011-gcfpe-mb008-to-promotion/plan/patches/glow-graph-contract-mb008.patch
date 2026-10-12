@@ -1,4 +1,4 @@
-diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe_20261009.py -x gcfpe-20261009.1-100926.1 base/glow-graph-contract/scripts/contract_recipe.py work/glow-graph-contract/scripts/contract_recipe.py
+diff -ruN base/glow-graph-contract/scripts/contract_recipe.py work/glow-graph-contract/scripts/contract_recipe.py
 --- base/glow-graph-contract/scripts/contract_recipe.py	2026-10-11 20:59:31.000000000 +0000
 +++ work/glow-graph-contract/scripts/contract_recipe.py	2026-10-11 23:07:39.855940657 +0000
 @@ -10,6 +10,7 @@
@@ -26,9 +26,9 @@ diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe
      e2 = e2_out.read_bytes()
  print("E2 regenerator output", hashlib.sha256(e2).hexdigest(), len(e2))
  canon = lambda obj: (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")  # noqa: E731
-diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe_20261009.py -x gcfpe-20261009.1-100926.1 base/glow-graph-contract/scripts/regenerate_contract.py work/glow-graph-contract/scripts/regenerate_contract.py
+diff -ruN base/glow-graph-contract/scripts/regenerate_contract.py work/glow-graph-contract/scripts/regenerate_contract.py
 --- base/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 20:59:31.000000000 +0000
-+++ work/glow-graph-contract/scripts/regenerate_contract.py	2026-10-11 23:24:56.269045943 +0000
++++ work/glow-graph-contract/scripts/regenerate_contract.py	2026-10-12 00:45:11.026435941 +0000
 @@ -1,5 +1,5 @@
  #!/usr/bin/env python3
 -"""Contract regenerator for the 091426.1 direct-handoff contract (spec v2 §6; A1-2).
@@ -179,7 +179,7 @@ diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe
      return paths
  
  
-@@ -249,6 +364,18 @@
+@@ -249,6 +364,22 @@
      for node in graph["nodes"]:
          for field, gfield in MEMBER_PAIRS.items():
              _set(out, ("member_registry", node["id"], field), node[gfield])
@@ -188,6 +188,10 @@ diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe
 +    if not _production(graph):
 +        for path, _ in PROMOTION_DERIVED:
 +            out.pop(path[0], None)
++    # A promotion date belongs to the release that was promoted: it is carried only when the graph is that release,
++    # selected. A new release's production contract is built before its promotion, so it has none.
++    if not _production(graph) or template.get("target_release") != graph["candidate"]["release"]:
++        out.pop("promoted_at", None)
 +    # The staging binding is carried while staging and never once selected (flowmaster-validate 3.2.15).
 +    for node in graph["nodes"]:
 +        member = out["member_registry"][node["id"]]
@@ -198,7 +202,7 @@ diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe
      for op in value_table:
          if op[0] == "set":
              _set(out, op[1], op[2])
-@@ -353,14 +480,34 @@
+@@ -353,14 +484,34 @@
      return 0 if rep["ACCEPTANCE_PASS"] and rep["NEGATIVE_CONTROL_PASS"] and not lo else 1
  
  
@@ -235,7 +239,7 @@ diff -ruN -x __pycache__ -x 'gcfpe-20261009.1-100926.1-*.json' -x validate_gcfpe
      for p in outs:
          open(p, "wb").write(out)
      print(json.dumps({"graph": [len(gb), hashlib.sha256(gb).hexdigest()],
-@@ -380,6 +527,8 @@
+@@ -380,6 +531,8 @@
          ap.add_argument("outs", nargs="+")
          ap.add_argument("--contract-revision", required=True)
          ap.add_argument("--primary-skill-revision", required=True)

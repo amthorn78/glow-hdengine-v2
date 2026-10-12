@@ -1,0 +1,80 @@
+{
+ "record_type": "MB008_PLAN_ACTIVATION_DELTA",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "finding": "P-B1 (PLAN review round 1, reviewer B)",
+ "purpose": "The complete release-bound change to every in-place control at X15 and X16 (PLAN §7). EXECUTE renders the exact text from these rules at X14, the promotion packet carries it, and the post-flight reviews it as specified text (P-L2). control_check.py is the check that can fail: after X15 on the X15 pages, after X16 on all of them (phase activation), and after X19 with child pages counted (phase archived). Every page section that control_check flags on the 2026-10-11 reads is named below (dry-run gate N10).",
+ "markers": {
+  "@ACTIVATION_DATE": "the UTC date (YYYY-MM-DD) on which X15 starts; X15 and X16 run consecutively in one session, and if X16 completes on a later UTC date it corrects each activated_at written at X15 (a current-state field)",
+  "@CATALOG_PAGE_ID": "the page X15(a) creates",
+  "@REGISTER_ENTRY_PAGE_ID": "the page X15(f) creates",
+  "@MGMT10_PAGE_ID": "the successor page X1 creates",
+  "@PRODUCTION_TOKEN": "the production graph's proof token from X3's build of the flipped parts"
+ },
+ "rules": {
+  "SUBST": "In current text only: GCFPE-20260914.1 → GCFPE-20261009.1 and 091426.1 → 100926.1 where they name the selected release; every link to an archive-set page → the link to its successor (SUCCESSORS), with the successor's title. Never inside a predecessor_* key, a historical section or a struck-through passage.",
+  "SUCCESSORS": "each of the 54 runtime predecessors → its successor (the candidate parts: node.predecessor.notion_page_id → node.candidate_url, node.title); GCFPE-MGMT-10 091426.1 3db4590a05eb81d1bb64ebcb3ca8eb54 → @MGMT10_PAGE_ID; the 091426.1 catalog 3db4590a05eb81738ef1d846e3c0df8c → @CATALOG_PAGE_ID; PE Metaprompt 091426.1 3db4590a05eb8174be35d9e35acb3f77 → PE Metaprompt 100926.1 3f44590a05eb81f98b76c83465dc1960; Register entry — GCFPE-20260914.1 3db4590a05eb816f925ef3b0659de3b8 → @REGISTER_ENTRY_PAGE_ID",
+  "FRONTMATTER": "artifact_version \"100926.1\"; title = the page's new title; selected_release: GCFPE-20261009.1 (a `candidate_release` key is replaced by it); prompt_version_family \"100926.1\"; selection_rule: \"This {index|version} is operative if and only if the register selects GCFPE-20261009.1 / 100926.1 / 55. It does not assert its own selection.\"; activated_at: @ACTIVATION_DATE; predecessor_release: GCFPE-20260914.1; predecessor_version_family: \"091426.1\"; recovery_correction_run is replaced by source_modification: MODIFICATION-20261011-gcfpe-mb008-to-promotion. Every other key is kept.",
+  "RENAME_HISTORICAL": "the section's heading gains the prefix `Historical — ` (the register's own convention); its text is kept exactly as written",
+  "NEW_CURRENT": "a new section `## Current <subject> — 100926.1` is written directly before the old one, holding the old section's text with SUBST applied and any further change named in its row; the old heading becomes `## Historical <subject> — 091426.1` and its text is kept exactly as written"
+ },
+ "pages": [
+  {
+   "step": "X15(a)", "page": "new", "title": "Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1",
+   "parent": "3db4590a05eb81de9736ea69bac61016",
+   "content": "FRONTMATTER on the 091426.1 catalog's keys, with predecessor_catalog: 3db4590a05eb81738ef1d846e3c0df8c; one table row per member in registry order: ID, title, current_version `100926.1`, the successor's direct URL (the candidate parts; MGMT-10's from X1); no other link to an archive-set page. control_check.py --catalog verifies all 55 successors are linked"
+  },
+  {
+   "step": "X15(b)", "page": "3f44590a05eb81f98b76c83465dc1960", "title": "PE Metaprompt 100926.1",
+   "content": "the frontmatter block only: artifact_version \"100926.1\"; title unchanged; selected_release: GCFPE-20261009.1 replacing candidate_release; status: REGISTER_CONTROLLED; selection_authority unchanged; selection_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261009.1 / 100926.1 / 55. It does not assert its own selection.\"; predecessor unchanged; activated_at: @ACTIVATION_DATE; promotion_authorized: true; validation_status: VALIDATED; validation_scope: \"guards at X6 and the independent post-flight at X13, MODIFICATION-20261011-gcfpe-mb008-to-promotion\"; source_modification as FRONTMATTER. The body is not edited (P-L8)",
+   "sections": [["<frontmatter>", "as content"]]
+  },
+  {
+   "step": "X15(c)", "page": "3db4590a05eb81de9736ea69bac61016", "title": "Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1",
+   "sections": [
+    ["<frontmatter>", "FRONTMATTER (selection_rule: index); predecessor_disposition kept"],
+    ["Activation contract — discharged 2026-09-21", "heading `## Activation contract — discharged @ACTIVATION_DATE`; first paragraph: \"**This index is operative**, because the register selected `GCFPE-20261009.1` / `100926.1` / `55` on @ACTIVATION_DATE. It does not assert its own selection. Register-last promotion and complete binding readback succeeded; the predecessor release's `091426.1` catalog and members are superseded and archived intact.\" The second paragraph is kept"],
+    ["Direct successor control bindings", "every row SUBST: catalog → @CATALOG_PAGE_ID; register entry → @REGISTER_ENTRY_PAGE_ID; GCFPE-MGMT-10 → @MGMT10_PAGE_ID; PE → PE Metaprompt 100926.1; the five hubs and the Alpha checklist → their new titles (same pages); the two `docs/ephemeral/GCFPE-20260914.1-…` validation rows → `execute/qualification-validators.json` and `execute/qualification-fixtures.json` under this Modification's evidence directory; the proof token → @PRODUCTION_TOKEN"],
+    ["Promotion evidence — the four bindings this section required before the register could change", "the round-27 rows → this Modification's `execute/REVIEW-POSTFLIGHT-A.md` and `-B.md` with their verdict, `execute/REVIEW-D24-A.md` and `-B.md` (`SKILL_FIT_CONFIRMED` on the installed digests), and `execute/PROMOTION-PACKET.md` (digests, contract, graph token, revisions); the fourth row names Nathan's approval as quoted in §E"],
+    ["Selected topology", "each of the 55 rows: the successor's title and direct URL (the candidate parts; MGMT-10's from X1), in the table's existing order"],
+    ["Native flow changes", "the GCFPE-MGMT-10 bullet becomes: \"- GCFPE-MGMT-10 manages one ecosystem Modification through `ANALYZE`, `PLAN` and `EXECUTE` and returns every result to Nathan with no handoff; it does not execute Alpha.\""],
+    ["Alpha feedback candidate — 2026-10-09", "RENAME_HISTORICAL"]
+   ]
+  },
+  {
+   "step": "X15(d)", "pages": ["3db4590a05eb81d59059eb6b95ed5fcf", "3db4590a05eb8195a2ccf7c0959a8b6e", "3db4590a05eb814d96d3dcfa8835f96d", "3db4590a05eb81cd938de84cfffead9c", "3db4590a05eb811b9c14f2ae89c28df7"],
+   "title": "registry-header-100926.1.json control_titles",
+   "sections": [
+    ["<frontmatter>", "FRONTMATTER (selection_rule: version)"],
+    ["Activation contract", "\"This hub is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`; it does not assert its own selection. The release register is the sole selection authority; this hub provides direct navigation and preserves the family's native purpose.\""],
+    ["Candidate family members", "each member row: the successor's title and direct URL; heading and columns kept"],
+    ["GCFPE authoring control", "TW hub only: \"`PE Metaprompt 100926.1` is the authoring control for this release.\" with a mention of 3f44590a05eb81f98b76c83465dc1960"],
+    ["Alpha feedback candidate — 2026-10-09", "RENAME_HISTORICAL"]
+   ]
+  },
+  {
+   "step": "X15(e)", "page": "3db4590a05eb812f87caed515836687f", "title": "GCFPE Alpha Establishment and Change Management Checklist — 100926.1",
+   "sections": [
+    ["<frontmatter>", "FRONTMATTER (selection_rule: version)"],
+    ["Alpha state — this page does not hold it", "a new `### Historical — Alpha state as of 2026-09-21` heading is inserted directly before the paragraph beginning \"As of 2026-09-21 that block reads\"; that paragraph and the next (\"**Resuming is not a Proceed.**…\") are kept exactly as written under it. The Alpha state itself is not changed (§11)"],
+    ["Governance repair checklist", "RENAME_HISTORICAL, as `## Historical — Governance repair checklist — 091426.1 repair`"]
+   ]
+  },
+  {
+   "step": "X15(f)", "page": "new", "title": "GCFPE Membership and Release Register Entry — GCFPE-20261009.1",
+   "parent": "3d24590a05eb81ce942ad994cfca9fa1",
+   "content": "on the Register entry — GCFPE-20260914.1's structure (3db4590a05eb816f925ef3b0659de3b8): the promotion transaction X15–X21 with each step's readback, Nathan's approval as quoted in §E, and the archival receipt, which X19 completes"
+  },
+  {
+   "step": "X16", "page": "3d24590a05eb81ce942ad994cfca9fa1", "title": "GCFPE Membership and Release Register",
+   "sections": [
+    ["Current selection — GCFPE-20260914.1 / 091426.1", "NEW_CURRENT at the top: `## Current selection — GCFPE-20261009.1 / 100926.1`; \"**Selected GCFPE contract: `GCFPE-20261009.1` / `100926.1`, exactly 55 members**\" on the old line's pattern; the binding table with the catalog @CATALOG_PAGE_ID, the Flow Index, GCFPE-MGMT-10 @MGMT10_PAGE_ID, PE Metaprompt 100926.1, the register entry @REGISTER_ENTRY_PAGE_ID and \"Change Flow, IA, QA, Escalation, TW — all `100926.1`, all `REGISTER_CONTROLLED`\"; the promotion evidence as in the Flow Index's Promotion evidence row, with X12's receipts as behaviour validation. The old section becomes `## Historical selection — GCFPE-20260914.1 / 091426.1`, directly after it"],
+    ["Current explicit membership — 091426.1", "NEW_CURRENT: the catalog @CATALOG_PAGE_ID \"is the exact 55-page mapping. GCFPE-MGMT-10's successor is the D20 three-mode body; no member is added or removed, and all 55 are `100926.1`.\" and the Release rule line with SUBST"],
+    ["Current source-reference policy — 091426.1", "NEW_CURRENT: the old text with SUBST"],
+    ["Current GCFPE change-management process — 091426.1", "NEW_CURRENT: the old text with SUBST; its GCFPE-MGMT-10 sentence describes the three-mode body (ANALYZE, PLAN, EXECUTE; every result returns to Nathan; no handoff)"],
+    ["Current GCFPE procedure and operator access — 091426.1", "NEW_CURRENT: the old text with SUBST (PE Metaprompt 100926.1 governs GCFPE authoring)"],
+    ["Unselected candidate record — GCFPE-20261009.1 — 2026-10-09", "kept exactly as written; a new section `## Candidate record executed — GCFPE-20261009.1 — @ACTIVATION_DATE` follows it: \"Promoted on @ACTIVATION_DATE by MODIFICATION-20261011-gcfpe-mb008-to-promotion, after Nathan's exact promotion approval; the record above is kept as written.\" (L-18)"]
+   ]
+  }
+ ],
+ "not_changed": "the Flow Index's Alpha-state block and its retired block (D18, D23-G); every historical section; the un-versioned Flow Index; PE's body (P-L8); every runtime member body (X20's stop rule)"
+}

@@ -2,12 +2,15 @@
  "record_type": "MB008_PLAN_BODY_OPERATIONS",
  "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
  "date": "2026-10-11",
- "scope": "Candidate GCFPE-20261009.1 pages only (54 runtime siblings with ops, and PE). No selected 091426.1 page. GCFPE-MGMT-10 is handled by PART-05, not here.",
+ "scope": "Candidate GCFPE-20261009.1 pages: 54 runtime siblings and PE, and the GCFPE-MGMT-10 successor (PART-05). No selected 091426.1 page. The GCFPE-MGMT-10 entry points at the testing body 3e34590a05eb811b93d2da9b4ef8106d for the PLAN dry run; EXECUTE points it at the successor with --page GCFPE-MGMT-10=<id>@<last edited> and sets --shared MGMT10_URL=https://app.notion.com/p/<id>.",
  "d22": "Operations name spans by anchors and carry replacement text; no prompt body is stored. Pins are page_last_edited_at values from body-scan.json.",
  "span_rule": "start must occur exactly once in the unedited page; end, when present, on the same line after start",
  "shared_texts": {
   "CPLACE": "Anything before it is at most a few lines naming what was produced and where; the artifact holds the rest.",
-  "CTS": "Among those lines, name the TypeSafe reading and the surface advice for the receiving session, with the output artifact's path. Before saving the artifact, run the installed TypeSafe scoring skill's script once, on an action text for the receiving session's work written as the skill directs; do not paste its line into the block or write its Notion row. The artifact holds the reading as the skill prints it, with its cell, every probability and its flags, or `TypeSafe: not read` with the reason, and task-specific advice on execution surface, with no model, reasoning-level or effort content. No agent gives its own recommendation, assessment or ranking of model, reasoning level or effort. When Nathan states the model and setting chosen for this session, record that pick in this session's output artifact with a reference to the reading, and never record a setting Nathan did not state."
+  "CTS": "Among those lines, name the TypeSafe reading and the surface advice for the receiving session, with the output artifact's path. Before saving the artifact, run the installed TypeSafe scoring skill's script once, on an action text for the receiving session's work written as the skill directs; do not paste its line into the block or write its Notion row. The artifact holds the reading as the skill prints it, with its cell, every probability and its flags, or `TypeSafe: not read` with the reason, and task-specific advice on execution surface, with no model, reasoning-level or effort content. No agent gives its own recommendation, assessment or ranking of model, reasoning level or effort. When Nathan states the model and setting chosen for this session, record that pick in this session's output artifact with a reference to the reading, and never record a setting Nathan did not state.",
+  "MGMT10_URL": "https://app.notion.com/p/3e34590a05eb811b93d2da9b4ef8106d",
+  "MGMT10_TITLE": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1",
+  "MGMT10_TS": "When a return asks Nathan to approve the next mode, record in the Modification the TypeSafe reading for that mode's session and name it, with the record's path, in the few lines of the return: before saving the record, run the installed TypeSafe scoring skill's script once, on an action text for that mode's work written as the skill directs, and record the reading as the skill prints it, with its cell, every probability and its flags, or `TypeSafe: not read` with the reason, with task-specific advice on execution surface, with no model, reasoning-level or effort content. Do not write the skill's Notion row. No agent gives its own recommendation, assessment or ranking of model, reasoning level or effort. When Nathan states the model and setting chosen for a session, record that pick in the Modification with a reference to the reading, and never record a setting Nathan did not state."
  },
  "pages": {
   "CF-C-10": {
@@ -229,6 +232,10 @@
   "UTIL-10": {
    "page_id": "3f44590a05eb81d997d1fd2b8d1b5042",
    "expected_last_edited": "2026-10-09T20:13:56.908Z"
+  },
+  "GCFPE-MGMT-10": {
+   "page_id": "3e34590a05eb811b93d2da9b4ef8106d",
+   "expected_last_edited": "2026-09-24T11:00:24.691Z"
   }
  },
  "ops": [
@@ -1051,6 +1058,57 @@
    "start": "Preparing a standalone PF10 addendum does not authorize live PF10 inspection, numbering, insertion, canon adoption, or repository publication.",
    "end": null,
    "new": "Preparing a standalone PF10 addendum does not authorize live PF10 inspection, numbering, insertion, canon adoption, or repository publication; for GCFPE, the qualifying producer resolves the number at creation, as *PF10 overlay and addendum contract* states."
+  },
+  {
+   "id": "M-HEAD",
+   "part": "PART-05",
+   "item": "ITEM-06",
+   "prompt": "GCFPE-MGMT-10",
+   "section": "page state above the body, the heading and the Prompt ID line",
+   "start": "```yaml\nartifact_type: GCFPE_PROPOSED_PROMPT_BODY",
+   "end": "Prompt ID: `GCFPE-MGMT-10`",
+   "lines": 15,
+   "new": "@MGMT10_TITLE\nPrompt ID: GCFPE-MGMT-10\nNotion URL: <mention-page url=\"@MGMT10_URL\">@MGMT10_TITLE</mention-page>"
+  },
+  {
+   "id": "M-TS",
+   "part": "PART-05",
+   "item": "ITEM-06",
+   "prompt": "GCFPE-MGMT-10",
+   "section": "Result routing",
+   "start": "The Modification record carries everything the next mode needs.",
+   "end": null,
+   "new": "The Modification record carries everything the next mode needs. @MGMT10_TS"
+  },
+  {
+   "id": "MG-PR35",
+   "part": "PART-05",
+   "item": "ITEM-06",
+   "prompt": "PR-35",
+   "section": "Prompt navigation and maintenance",
+   "start": "Report a defect in this prompt/version to the selected `GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1`; do not repair prompt policy during a PR run.",
+   "end": null,
+   "new": "Report a defect in this prompt/version to the selected `GCFPE-MGMT-10 — Manage an Ecosystem Change`; do not repair prompt policy during a PR run."
+  },
+  {
+   "id": "MG-PE-1",
+   "part": "PART-05",
+   "item": "ITEM-06",
+   "prompt": "PE",
+   "section": "Validation and completion",
+   "start": "`GCFPE-MGMT-10` remains a reusable ecosystem manager with the actual case-bound `GCFPE_ECOSYSTEM_CHANGE_REPORT`.",
+   "end": "after exact approved promotion, production validation and intact archival.",
+   "new": "`GCFPE-MGMT-10` manages one ecosystem Modification through `ANALYZE`, `PLAN` and `EXECUTE` and writes the `GCFPE_MODIFICATION_RECORD`. It hands off to no other prompt: `PRODUCT_OWNER_ACTION_PENDING`, `ECOSYSTEM_CHANGE_COMPLETE`, `IMPLEMENTATION_BLOCKED` and `PROMOTION_CHECKPOINT_REQUIRED` each return to Nathan with zero handoffs, and its only continuation is its own next mode after Nathan's recorded approval."
+  },
+  {
+   "id": "MG-PE-2",
+   "part": "PART-05",
+   "item": "ITEM-06",
+   "prompt": "PE",
+   "section": "Current Alpha and Product Owner boundaries",
+   "start": "Only when the exact case separately authorizes Alpha-package preparation,",
+   "end": "it does not execute PR-10, begin PR04 planning, or resume Alpha.",
+   "new": "GCFPE-MGMT-10 prepares no Alpha invocation, and does not execute PR-10, begin PR04 planning, or resume Alpha; Alpha state is what the Epic's own artifacts under `docs/ephemeral/` record (`D18` successor)."
   }
  ]
 }

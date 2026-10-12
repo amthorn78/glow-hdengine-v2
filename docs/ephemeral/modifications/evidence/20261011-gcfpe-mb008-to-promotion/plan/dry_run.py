@@ -6,15 +6,17 @@ Notion: it copies the installed skills and the parent's candidate graph parts in
 change there and in memory, and prints one JSON receipt on stdout. Nothing in the receipt is prompt-body text
 (D22); page bodies are read only as transient reads of this session's own fetch records, by body_check.py.
 
-Usage, from the repository root, after fetching all 55 pages listed in edits.json in this session:
+Usage, from the repository root, after fetching all 56 pages listed in edits.json in this session (the MGMT-10
+testing page stands in for the successor) and the nine control pages control_check.py reads:
 
     PYTHONDONTWRITEBYTECODE=1 CLAUDE_CODE_SESSION_ID=<session> python3 \\
       docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/plan/dry_run.py \\
       <installed-skills-root> <scratch-dir> <fetched-after> > <receipt.json>
 
 <fetched-after> is an ISO UTC time taken just before those fetches. The MGMT-10 successor page does not exist
-until EXECUTE, so the dry run uses the testing page's URL as a stand-in, and the PLAN document's digest is
-stood in by edits.json's; both are named in the receipt.
+until EXECUTE, so the dry run uses the testing page's URL and revisions as stand-ins, and the PLAN document's digest
+is stood in by edits.json's; N9 stands in each page's pinned revision for its post-edit one and fills the two
+selected-stage markers with stand-ins. All are named in the receipt.
 """
 from __future__ import annotations
 
@@ -228,7 +230,8 @@ def main() -> int:
                              "SKILL_TREE_SHA256 is recomputed as the package build's last step",
         "ok": cm == 0 and not unexpected}
 
-    # N7: the profile's body checks on the 54 candidate member bodies, unedited and with the edits applied in memory
+    # N7: the profile's body checks on the 55 candidate member bodies (the MGMT-10 testing body standing in for its
+    # successor), unedited and with the edits applied in memory
     sys.path.insert(0, str(HERE))
     sys.dont_write_bytecode = True
     import body_check as B  # noqa: E402
@@ -252,7 +255,7 @@ def main() -> int:
                       "not_evaluated": res.get("prompt_body_checks_not_evaluated"),
                       "body_error_classes": body_errs,
                       "body_errors": sum(1 for e in res.get("errors", []) if e.startswith("PROMPT"))}
-    gates["N7_bodies_through_profile"] = {**rows, "ok": rows["after"]["bodies_validated"] == 54
+    gates["N7_bodies_through_profile"] = {**rows, "ok": rows["after"]["bodies_validated"] == 55
                                           and rows["after"]["body_errors"] == 0 and rows["before"]["body_errors"] > 0}
 
     # N8: package text redlines on the scratch copies; the governance audit's own fixture suite afterwards
@@ -266,6 +269,66 @@ def main() -> int:
                                     "second_apply_refused": c8c != 0,
                                     "audit_fixture_suite_ok": c8d == 0 and "OK" in (out8 + err8).splitlines()[-1],
                                     "ok": c8a == 0 and c8c != 0 and c8d == 0}
+
+    # N9: the candidate and selected registries assembled, checked, and every row's assertions run by the shipped
+    # audit engine on the fresh reads with the edits applied in memory, each assertion also proven to fire (R-A2)
+    ra, reg = HERE / "registry_assemble.py", scratch / "registry"
+    reg.mkdir()
+    revs = {k: v["expected_last_edited"] for k, v in B.EDITS["pages"].items()}
+    (reg / "revisions-standin.json").write_text(json.dumps(revs, indent=1), encoding="utf-8")
+    roots = ["--audit-root", work / "amthor-workspace-governance-audit", "--graph-contract", work / "glow-graph-contract"]
+    common = [*roots, "--parts", cand, "--revisions", reg / "revisions-standin.json"]
+    mg = ["--set", "@MGMT10_PAGE_ID=3e34590a05eb811b93d2da9b4ef8106d"]
+    standins = ["--set", "@PROMOTION_APPROVED_AT=2026-10-12", "--set", "@CATALOG_PAGE_ID=" + "0" * 32]
+    b1, bo1 = jrun([sys.executable, ra, "build", "--stage", "candidate", *common, "--out", reg / "candidate.md", *mg])
+    k1, ck1 = jrun([sys.executable, ra, "check", "--stage", "candidate", "--registry", reg / "candidate.md", *roots,
+                    "--parts", cand])
+    a9, as9 = jrun([sys.executable, ra, "assertions", "--registry", reg / "candidate.md", "--audit-root",
+                    work / "amthor-workspace-governance-audit", "--since-minutes", "900", "--fetched-after",
+                    fetched_after, "--inject"])
+    b2, _ = jrun([sys.executable, ra, "build", "--stage", "selected", *common, "--out", reg / "selected.md", *mg, *standins])
+    k2, ck2 = jrun([sys.executable, ra, "check", "--stage", "selected", "--registry", reg / "selected.md", *roots,
+                    "--parts", cand])
+    m9, cm9 = jrun([sys.executable, ra, "compare", reg / "candidate.md", reg / "selected.md", "--audit-root",
+                    work / "amthor-workspace-governance-audit"])
+    b3, _, _ = run([sys.executable, ra, "build", "--stage", "selected", *common, "--out", reg / "unfilled.md", *mg])
+    arows = as9.get("rows", [])
+    gates["N9_registry"] = {
+        "candidate_build": bo1, "candidate_check_ok": k1 == 0 and ck1.get("ok"),
+        "validator_errors": ck1.get("validator_errors"), "deriver_drift": ck1.get("deriver_drift"),
+        "rows": len(arows), "rows_passing_after_edits": sum(bool(r.get("ok")) for r in arows),
+        "assertions_evaluated": sum(r.get("assertions", 0) for r in arows),
+        "injected_regressions_fired": sum(r.get("injected_fired", 0) for r in arows),
+        "injected_regressions_missed": sum(len(r.get("injected_missed", [])) for r in arows),
+        "failing_rows": [r.get("prompt") for r in arows if not r.get("ok")],
+        "selected_check_ok": k2 == 0 and ck2.get("ok"), "stages_differ_only_as_specified": m9 == 0 and cm9.get("ok"),
+        "differing_paths": cm9.get("differing_paths"), "unfilled_selected_marker_refused": b3 != 0,
+        "stand_ins": "MGMT-10: the testing page's id and pinned revision; every row's page_last_edited_at: its pinned "
+                     "revision (EXECUTE uses X6's check report); approval date and catalog id: stand-in values",
+        "ok": b1 == 0 and k1 == 0 and a9 == 0 and b2 == 0 and k2 == 0 and m9 == 0 and b3 != 0 and len(arows) == 55}
+
+    # N10: the activation check (P-B1): its self-test, and on today's control pages it fires, and every page section
+    # it flags is named in the activation delta
+    cc = HERE / "control_check.py"
+    c10a, st10 = jrun([sys.executable, cc, "selftest", "--parts", cand])
+    c10b, ck10 = jrun([sys.executable, cc, "check", "--parts", cand, "--phase", "activation", "--since-minutes", "900",
+                       "--fetched-after", fetched_after])
+    delta = json.loads((HERE / "activation-delta-100926.1.json").read_text(encoding="utf-8"))
+    named = {}
+    for entry in delta["pages"]:
+        for pid in entry.get("pages", [entry.get("page")]):
+            named.setdefault(pid, set()).update(sec for sec, _ in entry.get("sections", []))
+    flagged = {(p["page"], r["section"]) for p in ck10.get("pages", []) for r in p.get("finding_rows", [])}
+    uncovered = sorted(f"{pg}:{sec}" for pg, sec in flagged if sec not in named.get(pg, set()))
+    gates["N10_activation_check"] = {
+        "selftest_cases": len(st10.get("cases", {})), "selftest_ok": c10a == 0 and st10.get("ok"),
+        "archive_set": ck10.get("archive_set"), "pages": len(ck10.get("pages", [])),
+        "pages_read": sum("error" not in p for p in ck10.get("pages", [])),
+        "findings_today": sum(p.get("findings", 0) for p in ck10.get("pages", [])),
+        "page_sections_flagged": len(flagged), "page_sections_not_in_delta": uncovered,
+        "fires_today": c10b == 1,
+        "ok": c10a == 0 and c10b == 1 and not uncovered and ck10.get("archive_set") == 57
+        and all("error" not in p for p in ck10.get("pages", []))}
 
     ok = all(v["ok"] for v in gates.values())
     print(json.dumps({"record_type": "MB008_PLAN_DRY_RUN", "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",

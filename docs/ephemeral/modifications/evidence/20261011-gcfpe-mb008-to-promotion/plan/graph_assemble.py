@@ -8,8 +8,9 @@
         exists only once EXECUTE duplicates the testing page; the PLAN dry run passes the testing page's URL as a
         stand-in. Idempotent: a second apply changes nothing and says so.
   graph_assemble.py flip <src-parts-dir> <dst-parts-dir>
-        the production parts for PART-08: a copy whose only change is the lifecycle literals the selected parts
-        carry (global selection_status and each node's lifecycle, to SELECTED_PRODUCTION). Nothing else moves.
+        the production parts for PART-08: a copy whose only changes are the lifecycle literals the selected parts
+        carry (global selection_status and each node's lifecycle, to SELECTED_PRODUCTION) and global.json's
+        `_prologue`, which becomes the selected header on the 091426.1 pattern (P-B6). Nothing else moves.
   graph_assemble.py check <parts-dir> <base-parts-dir> [--flipped]
         after the shipped reindex: the parts carry exactly the planned values, and nothing else differs from the
         base except edge_indices lists (two edges leave the assembled order) and, with --flipped, the lifecycle
@@ -61,6 +62,25 @@ CONDITIONS = {
         "a control-layer action is outstanding; return it to Nathan without treating general change authority as "
         "promotion approval"),
 }
+# global.json's `_prologue` is the envelope above the embedded JSON; graph_parts.py stamps the complete_source
+# lines of the built graph from them, so they carry 0 until the first build.
+CANDIDATE_PROLOGUE = (
+    "# GCFPE-20261009.1 Candidate Graph Source Parts\n\n"
+    "Candidate parts for MODIFICATION-20261011-gcfpe-mb008-to-promotion. Their build, validation and "
+    "qualification evidence is in that record.\n\n```json")
+SELECTED_PROLOGUE = (
+    "# GCFPE-20261009.1 Candidate Graph Contract\n\n```yaml\n"
+    "artifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\n"
+    "release: GCFPE-20261009.1\n"
+    "prompt_version_family: '100926.1'\n"
+    "selection_status: SELECTED_PRODUCTION\n"
+    "complete_source_path: candidate/graph/GCFPE-20261009.1-Candidate-Graph-Contract.json\n"
+    "complete_source_bytes: 0\n"
+    "complete_source_sha256: 0\n"
+    "content_status: COMPLETE\n"
+    "source_binding_revision: MODIFICATION-20261011-gcfpe-mb008-to-promotion\n"
+    "validation_scope: QUALIFICATION_AND_POSTFLIGHT_RECORDED_IN_MODIFICATION-20261011-gcfpe-mb008-to-promotion\n"
+    "```\n\n```json")
 MEMBER_RULE = ("54 successor runtime members + the GCFPE-MGMT-10 successor (D20 three-mode body); no additions or "
                "removals")
 
@@ -159,8 +179,9 @@ def apply(parts_dir: str, url: str) -> int:
     if {k: v for k, v in new_part.items() if k != "edge_indices"} != {k: v for k, v in part.items() if k != "edge_indices"}:
         _write(pp, new_part)
         changed.append(str(pp.relative_to(root)))
-    if glob_["candidate"]["member_rule"] != MEMBER_RULE:
+    if glob_["candidate"]["member_rule"] != MEMBER_RULE or glob_.get("_prologue") != CANDIDATE_PROLOGUE:
         glob_["candidate"]["member_rule"] = MEMBER_RULE
+        glob_["_prologue"] = CANDIDATE_PROLOGUE
         _write(gp, glob_)
         changed.append("global.json")
     proofs = measured_proofs(root)
@@ -180,6 +201,7 @@ def flip(src: str, dst: str) -> int:
     shutil.copytree(s, d)
     g = _load(d / "global.json")
     g["selection_status"] = "SELECTED_PRODUCTION"
+    g["_prologue"] = SELECTED_PROLOGUE
     _write(d / "global.json", g)
     for f in sorted((d / "prompts").glob("*.json")):
         p = _load(f)
@@ -193,6 +215,7 @@ def _strip(obj, flipped: bool, is_global: bool):
     obj = copy.deepcopy(obj)
     if is_global:
         obj.pop("_other_edge_indices", None)
+        obj.pop("_prologue", None)
         if flipped:
             obj.pop("selection_status", None)
     else:
@@ -211,6 +234,8 @@ def check_errors(parts_dir: str, base_dir: str, flipped: bool = False) -> list[s
     g, bg = _load(root / "global.json"), _load(base / "global.json")
     if g["candidate"]["member_rule"] != MEMBER_RULE:
         errors.append("MEMBER_RULE")
+    if g.get("_prologue") != (SELECTED_PROLOGUE if flipped else CANDIDATE_PROLOGUE):
+        errors.append("PROLOGUE")
     if flipped and g.get("selection_status") != "SELECTED_PRODUCTION":
         errors.append("FLIP_GLOBAL")
     exp_g = _strip(bg, flipped, True)
@@ -294,6 +319,9 @@ def selftest(base_dir: str, scratch: str, graph_parts: str) -> int:
                                      lambda o: o["node"].__setitem__("candidate_url", "PLACEHOLDER")))
     rows["rejects_stale_proofs"] = injected("inj7", mut_json("global.json",
                                           lambda o: o["proofs"].__setitem__("sole_added_node", ["PR-35"])))
+    rows["rejects_candidate_prologue_on_flipped"] = bool(check_errors(str(clean), base_dir, True))
+    rows["flipped_prologue_is_selected"] = "selection_status: SELECTED_PRODUCTION" in _load(
+        work / "flipped" / "global.json")["_prologue"]
     rows["proofs_describe_no_added_member"] = (_load(clean / "global.json")["proofs"]["sole_added_node"] == []
                                                and _load(clean / "global.json")["proofs"]["pf10_producer_set_exact"])
     ok = all(rows.values())

@@ -1,0 +1,205 @@
+{
+ "record_type": "MB008_PLAN_MGMT10_REGISTRY_ROW",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "finding": "R-A2 (PLAN review round 1, reviewer A)",
+ "purpose": "The complete registry row for GCFPE-MGMT-10's successor (DN-C A), replacing the 2026-10-09 proposal's row, which describes the reused 091426.1 page. registry_assemble.py fills the markers, adds the fields derived from the final parts (outputs[].states, outputs[].consumers, required_interfaces), retitles expected_parent_title with the other rows, and appends the guards in registry form.",
+ "markers": {
+  "@MGMT10_PAGE_ID": "the duplicate's 32-hex page id, read back at X1",
+  "@MGMT10_LAST_EDITED": "the duplicate's last_edited_time on X2's fresh read after M-HEAD and M-TS"
+ },
+ "sources": {
+  "identity": "PART-05: the duplicate of the testing page 3e34590a05eb811b93d2da9b4ef8106d, under the Flow Index 3db4590a05eb81de9736ea69bac61016, titled as M-HEAD's title line",
+  "function": "graph_assemble.py node_values native_function, from the body's *Native purpose*",
+  "inputs": "the body's *Entry contract*: two inputs, MODE and the subject",
+  "mutations": "the body's *Boundaries*, *Native purpose* and *Result routing*",
+  "failure_contract": "the body's *Failure contract*",
+  "outputs": "graph_assemble.py node_values output_artifacts; §9A's stage 3 specification",
+  "audit_assertions": "forbidden_regex: the proposal row's 22 release-wide assertions, carried, and one for a second `Prompt ID:` line (R-A3; the registry form of G-MGMT-2 proves presence only); required_regex: the proposal's `docs/pfcanon/` and four sentences of the successor body (*Artifact and source boundaries*, *Boundaries*, *Result routing*). The proposal's two D25 required_regex are dropped: they assert sentences of the 091426.1 body that the successor does not carry, and D25-B requires the scoping sentence only on a row whose body claims to be read-only, which the successor body does not (its three `read-only` sentences describe sweeps and the dry run)",
+  "session_class": "carried from the proposal row: the registry schema's five classes have none for one Modification carried across modes (P-L7)",
+  "supersedes": "the 091426.1 page that X19 archives",
+  "expected_parent_title": "set to the Flow Index's current title; registry_assemble.py retitles every row's parent title to its post-X15 title"
+ },
+ "row": {
+  "audit_assertions": {
+   "forbidden_literals": [],
+   "forbidden_regex": [
+    {
+     "rule_id": "CTR-001",
+     "value": "addendum_id[\\s\\S]{0,400}?artifact_version"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "Glow / Core Docs / PFCanon"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "Glow / Ephemeral Planning Files"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "drive\\.google\\.com"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "EPHEMERAL_DRIVE"
+    },
+    {
+     "rule_id": "SRC-001",
+     "value": "off-repositor"
+    },
+    {
+     "rule_id": "CTR-002",
+     "value": "state the mismatch"
+    },
+    {
+     "rule_id": "CTR-002",
+     "value": "[Cc]ompare the current PF10"
+    },
+    {
+     "rule_id": "INV-003",
+     "value": "DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS"
+    },
+    {
+     "rule_id": "SRC-001",
+     "value": "(?<![.\\w/-])glow-hde-devops(?![\\w-])"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "CONTROL_NOTION"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "(?i)operational state[^.\\n]{0,80}\\b(?:remains?|lives?|stays?)\\b[^.\\n]{0,40}\\bNotion\\b"
+    },
+    {
+     "rule_id": "SRC-001",
+     "value": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?Prompt [Vv]ersion(?:\\*\\*|__|`){0,2}[ \\t]*:"
+    },
+    {
+     "rule_id": "INV-003",
+     "value": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?Ecosystem release(?:\\*\\*|__|`){0,2}[ \\t]*:"
+    },
+    {
+     "rule_id": "SRC-001",
+     "value": "(?m)^[ \\t>*_|`#-]*(?:\\d+\\.[ \\t]+)?(?:\\*\\*|__)?`?Set(?:\\*\\*|__|`){0,2}[ \\t]*:"
+    },
+    {
+     "rule_id": "TOP-001",
+     "value": "(?:metadata|lineage) or (?:the |returned |the returned )?handoff\\b|artifact/handoff metadata|, in (?:the )?returned handoff\\b"
+    },
+    {
+     "rule_id": "TOP-001",
+     "value": "substantive artifact(?: metadata/content)? and handoffs?\\b|through (?:all next/recovery packages|every next and recovery package)\\b|review result and every native return\\b|and every return package\\b|receipt, review and handoff metadata|receipt and handoff when applicable"
+    },
+    {
+     "rule_id": "TOP-001",
+     "value": "current status and lineage; decisions already made|Carry complete native inputs rather than referring to"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\\b|PR-40 independently verifies the later asserted merge\\b|usable only after Nathan later manually merges the identified PR\\.|merge-approval effect is defined above"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "does not execute product Change Flow, implementation, repository work[^.\\n]*\\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "Reviewers remain read-only(?! toward the work they review)"
+    },
+    {
+     "rule_id": "CTR-001",
+     "value": "Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written"
+    },
+    {
+     "rule_id": "SRC-001",
+     "value": "(?s)^Prompt ID:.*^Prompt ID:"
+    }
+   ],
+   "required_literals": null,
+   "required_regex": [
+    {
+     "rule_id": "CTR-002",
+     "value": "docs/pfcanon/"
+    },
+    {
+     "rule_id": "CTR-002",
+     "value": "Every artifact is written under the path its kind belongs to — `docs/ephemeral/` for the Modification and its evidence, `docs/graph/` for graph parts, `docs/prompt_ecosystem_management/` for the controls this prompt maintains"
+    },
+    {
+     "rule_id": "CTR-002",
+     "value": "Repository paths outside the writable set are not written, and `docs/pfcanon/` is read only\\."
+    },
+    {
+     "rule_id": "CTR-002",
+     "value": "\\*\\*Nathan alone merges\\. Nathan alone installs\\.\\*\\*"
+    },
+    {
+     "rule_id": "TOP-001",
+     "value": "\\*\\*This prompt hands off to no other prompt\\.\\*\\* Every result returns to Nathan\\."
+    }
+   ]
+  },
+  "controlling_sources": [
+   "GCFPE-20261009.1",
+   "100926.1",
+   "https://app.notion.com/p/@MGMT10_PAGE_ID?pvs=204",
+   "AGENTS.md and current PF canon on main"
+  ],
+  "creator_role": "Act as the Managing Prompt Engineer for one ecosystem Modification.",
+  "evidence_contract": [
+   "Complete native Notion readback matches authored content, allowing native mention display normalization and stripped blank lines.",
+   "The page is the duplicate of the approved testing body 3e34590a05eb811b93d2da9b4ef8106d with only M-HEAD and M-TS applied (MODIFICATION-20261011-gcfpe-mb008-to-promotion, PLAN PART-05); the testing page is unchanged and stays as the record.",
+   "No body corpus, body checksum or shipped validator receipt is created."
+  ],
+  "expected_parent_id": "3db4590a05eb81de9736ea69bac61016",
+  "expected_parent_title": "Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1",
+  "expected_title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1",
+  "failure_contract": [
+   "Return the truthful blocked or incomplete state to the exact owner, with the failed predicate and the recovery point; never invent missing evidence.",
+   "A source that cannot be uniquely resolved and read is a resolution error, not an assumed absence.",
+   "After the first external write, a failure takes D26-B's path: a failure record that reaches main in a record pull request, a read-only sweep, the freeze kept, and a return to Nathan."
+  ],
+  "function": "Manage one ecosystem Modification from request to applied result through three explicit modes, ANALYZE, PLAN and EXECUTE, stopping at merge and install, which are Nathan's.",
+  "inputs": [
+   "MODE: ANALYZE, PLAN or EXECUTE.",
+   "The subject: for ANALYZE, the request in whatever form it arrives, or the Modification id when the invocation arrives as the intake and triage prompt's NEXT_PROMPT_HANDOFF; for PLAN and EXECUTE, the Modification id."
+  ],
+  "lane": "GCFPE-MGMT",
+  "lifecycle": "ACTIVE",
+  "mutations": {
+   "allowed": [
+    "Write only to docs/ephemeral/, docs/graph/ and docs/prompt_ecosystem_management/, to Notion where a destination rule or explicit task authorization allows, and to installed skills"
+   ],
+   "forbidden": [
+    "Merge a pull request or install a skill: Nathan alone merges and installs",
+    "Write docs/pfcanon/ or edit PF10 directly",
+    "Mirror, export, hash or byte-compare a prompt body to disk",
+    "Execute product Change Flow, implementation, QA, release selection, promotion or archival, or Alpha work",
+    "Emit a handoff to any prompt"
+   ]
+  },
+  "notion_page_id": "@MGMT10_PAGE_ID",
+  "notion_url": "https://app.notion.com/p/@MGMT10_PAGE_ID",
+  "outputs": [
+   {
+    "artifact": "GCFPE_MODIFICATION_RECORD"
+   }
+  ],
+  "prompt_key": "GCFPE-MGMT-10",
+  "reviewer_role": "NONE",
+  "sequence": 10,
+  "session_class": "DEDICATED_ONE_OFF",
+  "session_role": "Act as the Managing Prompt Engineer for one ecosystem Modification.",
+  "source_snapshot": {
+   "completeness": "COMPLETE",
+   "notion_url": "https://app.notion.com/p/@MGMT10_PAGE_ID?pvs=204",
+   "page_last_edited_at": "@MGMT10_LAST_EDITED",
+   "representation": "NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY"
+  },
+  "superseded_by": null,
+  "supersedes": [
+   "https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54?pvs=204"
+  ]
+ }
+}
