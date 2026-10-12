@@ -491,3 +491,23 @@ Every listed finding of the four D24 records and the two post-flight records sta
 **If you choose both recommended options:** about 1 to 1.5 hours and about 1M tokens more before the promotion packet: the D-1 repair and its diff check, AM-2 with a fresh render, the focused post-flight, then X14 and `PROMOTION_CHECKPOINT_REQUIRED`.
 
 **Spend so far in EXECUTE.** About 1 h 50 min since A0 (02:20Z to 04:10Z). Subagent tokens reported since X8: about 2.4M (D24 reviewers 0.55M, 0.50M, 0.39M, 0.38M; post-flight reviewers 0.14M and 0.16M; two read-only fetch workers 0.27M). Inside the 12–20 h and 6–10M estimated for EXECUTE.
+
+### Nathan's decisions after X13 — 2026-10-12
+
+Nathan's words:
+
+> Decision 1: accept D-1 as a listed risk and ship the round-2 packages. No repair and no third review round.
+> Decision 2: amendment AM-2 as described in §E, with both opt-ins (REG-SEL cites execute/x11-registry.json; the post-flight marker carries both reviewers' verdicts), then two fresh reviewers run the post-flight on only the changed operations.
+> Decision 3: PR #605 is merged as the failure-record PR. Continue on this branch restarted from main, in a new PR.
+
+**Applied.**
+
+- **Decision 3.** PR #605 merged as `d86b885`; detected by files on `main` (D26-C): the record with this section's predecessors and every X13 record are on `main`, and the branch's tree equalled `main`'s. The branch was restarted from `main` at `d86b885` (force-with-lease; it carried only merged history). The run continues in a new pull request.
+- **Decision 1.** D-1 (REVIEW-D24-D) is a listed risk Nathan accepted (D26-A rule 4; DISP-001). The packages are the round-2 bytes, unchanged: the five round-1 archives and amthor-workspace-governance-audit `6199c76d…` (`execute/x10-packages.json`). X10's D24 result: REVIEW-D24-C `SKILL_FIT_CONFIRMED`; REVIEW-D24-D `SKILL_REPAIR_REQUIRED`, its one required finding accepted by Nathan.
+- **Decision 2, AM-2.** Applied to `plan/activation-ops.json` and `plan/activation_render.py`, and noted in the file's `amendment` key:
+  - FI-B-SKILL, FI-PEV-2 and REG-SEL cite a new marker, `@D24_RECORDS`, filled at X14 with the D24 records bound to the digests X17 installs, each with its verdict and the accepted D-1 (F-1, PFB-M1).
+  - REG-SEL's first predicate cites `execute/x11-registry.json` for the assertion run (PFB-L3).
+  - `@POSTFLIGHT_VERDICT` carries both reviewers' verdicts, each with its record's path (PFB-L4). So that the marker can carry the records, FI-PEV-1 and REG-SEL's second predicate no longer name `REVIEW-POSTFLIGHT-A.md` and `-B.md` beside it, since those records say `FAIL`.
+  - **One site beyond the three named:** the new catalog's frontmatter line `validation_evidence` (written by `activation_render.py`) said "D24 SKILL_FIT_CONFIRMED". It now names the D24 review and the post-flight recorded in this Modification and points to the register for their verdicts. It is the same finding at a fourth site, which neither post-flight reported; the focused post-flight reviews it with the others.
+  - **Not edited: `PLAN-20261011.md`.** Both shipped contracts, change-flow's validator and the 100926.1 profile pin it by digest (`4de47784…`, 50,156 B) as the governing plan. Editing it would leave those pins naming superseded text, so PLAN PART-07's D24 and post-flight rows stand amended by this section and by `activation-ops.json`'s `amendment` key, not in the file. This departs from "PLAN PART-07's packet row reads the same" in the decision request; the reason is stated here.
+  - Verified: `activation_render.py selftest` 6 of 6 and `control_check.py selftest` ok. On the 04:00Z sweep reads, with stand-ins, all nine pages render at their pins: nothing refused, every batch safe, no finding. Rendered without `--pages`, the catalog and the register entry pass with no marker left.
