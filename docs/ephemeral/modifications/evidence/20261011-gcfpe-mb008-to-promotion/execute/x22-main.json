@@ -1,0 +1,79 @@
+{
+ "record_type": "MB008_X22_FROM_MAIN",
+ "step": "X22",
+ "main": "d3123d2ac539e1e9f1a57ec11c19d8b20ad7ad69",
+ "merge_detected_by_files": {
+  "global_json_names_GCFPE-20261009.1": true,
+  "registry_id_GCFPE-PCR-20261009.1": true
+ },
+ "parts_build": {
+  "exit": 0,
+  "lines": [
+   "build: 55 nodes, 235 edges, 55 state_routes",
+   "embedded JSON 593569 bytes  sha256 43f84f29b9921c21f63ffbe21dd36a14bd846a89ae697ba3cf38746c2f887eb1",
+   "validation PASS -> <scratch>/x22/main.md"
+  ],
+  "reproduces_production_token": true
+ },
+ "registry_check_selected": {
+  "exit": 0,
+  "ok": true,
+  "validator_errors": 0,
+  "validator_warnings": 0,
+  "deriver_drift": [],
+  "rows": 55,
+  "rows_active": 55,
+  "header_values_ok": true,
+  "markers_left": []
+ },
+ "installed_digests": {
+  "method": "freeze.py from main (D28: name line read plain)",
+  "selftest": "freeze.py self-test ok: quoted and plain name lines give the same digest",
+  "rows": [
+   {
+    "skill": "change-flow",
+    "expected": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "installed": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+    "ok": true
+   },
+   {
+    "skill": "flowmaster-validate",
+    "expected": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "installed": "37 45c7d5d743fbcdf2100fa74ba6b2ff06609c0f056b7cfdee93a5fd74750f716d",
+    "ok": true
+   },
+   {
+    "skill": "glow-hde-pr-development",
+    "expected": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "installed": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+    "ok": true
+   },
+   {
+    "skill": "glow-graph-contract",
+    "expected": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "installed": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+    "ok": true
+   },
+   {
+    "skill": "session-relay-flowmaster",
+    "expected": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "installed": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+    "ok": true
+   },
+   {
+    "skill": "amthor-workspace-governance-audit",
+    "expected": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "installed": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+    "ok": true
+   },
+   {
+    "skill": "glow-merged-change-attribution-lock",
+    "expected": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "installed": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+    "ok": true
+   }
+  ],
+  "ok": true
+ },
+ "ok": true
+}
