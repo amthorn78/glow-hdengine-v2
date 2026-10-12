@@ -1,8 +1,8 @@
 {
  "record_type": "MB008_PLAN_DRY_RUN",
  "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
- "date_utc": "2026-10-12T00:48:30+00:00",
- "repository_head": "4055a357f84a3bfce73ccf76c27147db434f992a",
+ "date_utc": "2026-10-12T01:36:44+00:00",
+ "repository_head": "a50deab25b8663c3c71deeacef9616159197ef6c",
  "fetched_after": "2026-10-11T22:48:40.000Z",
  "gates": {
   "N0_identities": {
@@ -221,8 +221,8 @@
   },
   "N9_registry": {
    "candidate_build": {
-    "written": "/tmp/claude-0/-home-user-glow-hdengine-v2/11695baf-e0d2-5d3b-80fc-7c96de66c6a8/scratchpad/dr3/registry/candidate.md",
-    "bytes": 535955,
+    "written": "/tmp/claude-0/-home-user-glow-hdengine-v2/11695baf-e0d2-5d3b-80fc-7c96de66c6a8/scratchpad/dr4/registry/candidate.md",
+    "bytes": 535417,
     "rows": 55,
     "read_back_equal": true
    },
@@ -245,19 +245,32 @@
     "status"
    ],
    "unfilled_selected_marker_refused": true,
+   "landed_mode_fails_before_writes": true,
+   "deleted_key_citation_refused": true,
    "stand_ins": "MGMT-10: the testing page's id and pinned revision; every row's page_last_edited_at: its pinned revision (EXECUTE uses X6's check report); approval date and catalog id: stand-in values",
    "ok": true
   },
-  "N10_activation_check": {
-   "selftest_cases": 16,
-   "selftest_ok": true,
+  "N10_activation": {
+   "check_selftest_cases": 16,
+   "check_selftest_ok": true,
    "archive_set": 57,
-   "pages": 9,
-   "pages_read": 9,
+   "control_pages_read": 9,
    "findings_today": 306,
-   "page_sections_flagged": 37,
-   "page_sections_not_in_delta": [],
    "fires_today": true,
+   "render_selftest_ok": true,
+   "pages_rendered": 10,
+   "pins_match": 10,
+   "operations_listed": 59,
+   "operations_generated": 281,
+   "operations_applied": 340,
+   "operations_refused": 0,
+   "findings_after_render": 0,
+   "failing_pages": [],
+   "new_pages": {
+    "CATALOG": true,
+    "REGISTER_ENTRY": true
+   },
+   "stand_ins": "marker values, including the successor's id, are stand-ins; EXECUTE fills them from X1, X3, X13, X14 and X15",
    "ok": true
   }
  },
