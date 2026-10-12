@@ -1,0 +1,53 @@
+{
+ "record_type": "MB008_X10_REPAIRED_PACKAGES",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "step": "X10 repair",
+ "method": "execute/package_build.py with step A2 (execute/d24-repair-redlines.json) rebuilt all six from the installed copies; five trees are byte-identical to round 1, so their round-1 archives are kept unrepackaged; amthor-workspace-governance-audit was validated (quick_validate) and packaged anew; all six extracted and gated (execute/x10-repair-gates.json)",
+ "packages": {
+  "change-flow": {
+   "skill_sha256": "eea8dd2068fdce1e0b80c0c84f658745544ac3673663831e4bd9663602204bfd",
+   "skill_bytes": 390333,
+   "extracted_freeze": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+   "built_freeze": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+   "same_archive_as_round_1": true
+  },
+  "flowmaster-validate": {
+   "skill_sha256": "1e8d413234cc4d388cb1d3ff7486de182639314bfbcb331889a4dfa0498d4e7c",
+   "skill_bytes": 507685,
+   "extracted_freeze": "37 02a69b8a99181e79e554299a51dcc31e8b6b629d4974d05c96b191cf948fa200",
+   "built_freeze": "37 02a69b8a99181e79e554299a51dcc31e8b6b629d4974d05c96b191cf948fa200",
+   "same_archive_as_round_1": true
+  },
+  "glow-hde-pr-development": {
+   "skill_sha256": "1aad2cf4f9ff0ad54dd8612aa78d1bedce7c45be5759163262effa5e847d2409",
+   "skill_bytes": 23332,
+   "extracted_freeze": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+   "built_freeze": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+   "same_archive_as_round_1": true
+  },
+  "glow-graph-contract": {
+   "skill_sha256": "2b6cc39637dc374d2ca3bfb4d2de1cccb90d30fcc1dc8ef46baa7589a5f3131e",
+   "skill_bytes": 58371,
+   "extracted_freeze": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+   "built_freeze": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+   "same_archive_as_round_1": true
+  },
+  "session-relay-flowmaster": {
+   "skill_sha256": "6028346473f984519d78284efa8d295d257019c83f984ebacd3596427a13c1c4",
+   "skill_bytes": 56563,
+   "extracted_freeze": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+   "built_freeze": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+   "same_archive_as_round_1": true
+  },
+  "amthor-workspace-governance-audit": {
+   "skill_sha256": "6199c76d1cd607284d7760ec2f121cd665dc7eb152c9e53a3704899cd479fd96",
+   "skill_bytes": 57190,
+   "extracted_freeze": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+   "built_freeze": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8",
+   "same_archive_as_round_1": false
+  }
+ },
+ "gates_from_extracted_ok": true,
+ "guard_fires": "with the retired R-2 sentence put back into a scratch copy of SKILL.md, the audit fixture suite fails test_retired_mb008_role_and_numbering_rules_absent (38 tests, 1 failure)",
+ "d26e_search": "broad match over the six built trees (*.md, *.py, *.json; the bundled 091426.1-and-earlier history files excluded) for allocate canon numbering, allocated PF10/canon numbering, pastes and numbers, select final PF10 numbering, DevOps owns/executes bounded Ops and QA, KRONOS_NEVER_EXECUTES_OPS_OR_QA, KRONOS_EXECUTES_QA and Kronos executing QA: every hit is a forbidden-phrase guard, a fixture key or the oracle mapping; no active text states a retired rule"
+}

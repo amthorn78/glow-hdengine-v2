@@ -1,0 +1,76 @@
+{
+ "record_type": "MB008_X9_PACKAGES",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "step": "X9",
+ "method": "skill-creator scripts.quick_validate and scripts.package_skill run from a copy of skill-creator; each .skill extracted into a clean directory; every gate run from the extracted bytes with untouched siblings from the installed copies (x9-gates-extracted.json, by execute/x8_gates.py)",
+ "packages": {
+  "change-flow": {
+   "skill_file": "change-flow.skill",
+   "skill_sha256": "eea8dd2068fdce1e0b80c0c84f658745544ac3673663831e4bd9663602204bfd",
+   "skill_bytes": 390333,
+   "extracted_freeze": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+   "built_freeze": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2",
+   "installed_freeze": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+   "quick_validate": "Skill is valid!",
+   "name_preserved": true,
+   "extracted_equals_built": true
+  },
+  "flowmaster-validate": {
+   "skill_file": "flowmaster-validate.skill",
+   "skill_sha256": "1e8d413234cc4d388cb1d3ff7486de182639314bfbcb331889a4dfa0498d4e7c",
+   "skill_bytes": 507685,
+   "extracted_freeze": "37 02a69b8a99181e79e554299a51dcc31e8b6b629d4974d05c96b191cf948fa200",
+   "built_freeze": "37 02a69b8a99181e79e554299a51dcc31e8b6b629d4974d05c96b191cf948fa200",
+   "installed_freeze": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+   "quick_validate": "Skill is valid!",
+   "name_preserved": true,
+   "extracted_equals_built": true
+  },
+  "glow-hde-pr-development": {
+   "skill_file": "glow-hde-pr-development.skill",
+   "skill_sha256": "1aad2cf4f9ff0ad54dd8612aa78d1bedce7c45be5759163262effa5e847d2409",
+   "skill_bytes": 23332,
+   "extracted_freeze": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+   "built_freeze": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0",
+   "installed_freeze": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+   "quick_validate": "Skill is valid!",
+   "name_preserved": true,
+   "extracted_equals_built": true
+  },
+  "glow-graph-contract": {
+   "skill_file": "glow-graph-contract.skill",
+   "skill_sha256": "2b6cc39637dc374d2ca3bfb4d2de1cccb90d30fcc1dc8ef46baa7589a5f3131e",
+   "skill_bytes": 58371,
+   "extracted_freeze": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+   "built_freeze": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9",
+   "installed_freeze": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+   "quick_validate": "Skill is valid!",
+   "name_preserved": true,
+   "extracted_equals_built": true
+  },
+  "session-relay-flowmaster": {
+   "skill_file": "session-relay-flowmaster.skill",
+   "skill_sha256": "6028346473f984519d78284efa8d295d257019c83f984ebacd3596427a13c1c4",
+   "skill_bytes": 56563,
+   "extracted_freeze": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+   "built_freeze": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c",
+   "installed_freeze": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+   "quick_validate": "Skill is valid!",
+   "name_preserved": true,
+   "extracted_equals_built": true
+  },
+  "amthor-workspace-governance-audit": {
+   "skill_file": "amthor-workspace-governance-audit.skill",
+   "skill_sha256": "8c68ab082d614d9f1ddd4a2820d291b0de50849df2a8c9567157ab883a507931",
+   "skill_bytes": 56871,
+   "extracted_freeze": "15 43e765196bd73d9a484b9739aee78560ef856f48e92bff57e5124db60ed6a438",
+   "built_freeze": "15 43e765196bd73d9a484b9739aee78560ef856f48e92bff57e5124db60ed6a438",
+   "installed_freeze": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+   "quick_validate": "Skill is valid!",
+   "name_preserved": true,
+   "extracted_equals_built": true
+  }
+ },
+ "gates_from_extracted_ok": true,
+ "advertised_identity_diff": "flowmaster-validate: FLOWMASTER_VALIDATE_REVISION 3.3.2 -> 3.4.0, SKILL_TREE_SHA256 moved, every current validator_revision 3.4.0 (the 091426.1 files keep 3.3.2 as history); change-flow 3.3.1 -> 3.4.0; glow-hde-pr-development 1.3.1 -> 1.4.0; session-relay-flowmaster 3.2.0 -> 3.3.0; amthor-workspace-governance-audit 1.13.0 -> 1.14.0; glow-graph-contract advertises no identity value (vacuous, digest only)"
+}

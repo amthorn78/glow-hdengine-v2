@@ -1,0 +1,249 @@
+{
+  "edge_indices": [
+    7,
+    8,
+    9,
+    10
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INITIAL_DENY"
+          ],
+          "branch_id": "initial_deny",
+          "condition": "initial denial returns exact redlines to the same Isis author; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "INITIAL_DENY",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "CORRECTION_REDLINE"
+          ],
+          "branch_id": "approved_base_correction_redline",
+          "condition": "approved immutable CRD base plus a source-backed factual finding or actual authorized product/scope decision is assessed as justified; exact Thoth correction redline goes to the same Isis author for the first standalone pending delta; no approval or PF10 addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "CORRECTION_REDLINE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "DELTA_DENY"
+          ],
+          "branch_id": "delta_deny",
+          "condition": "return bounded delta redlines to the same Specification author; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DELTA_DENY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INITIAL_DENY",
+        "DELTA_DENY",
+        "CORRECTION_REDLINE"
+      ],
+      "to": "CF-C-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INITIAL_APPROVE"
+          ],
+          "branch_id": "initial_approve",
+          "condition": "initial approval; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "INITIAL_APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INITIAL_APPROVE"
+      ],
+      "to": "IA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "review_terminal",
+          "condition": "missing source, authority, or review mode",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [],
+          "branch_id": "correction_not_substantiated_terminal",
+          "condition": "source-backed factual finding is assessed as unsupported; immutable approved base remains unchanged and no delta, denial, approval, or PF10 addendum is produced",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [],
+          "branch_id": "product_scope_decision_required_terminal",
+          "condition": "the requested correction requires an unresolved genuine product-intent or scope choice; return the exact decision required to Nathan without disguising it as a factual correction",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-30",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DELTA_APPROVE"
+          ],
+          "branch_id": "crd_specification_delta_return",
+          "condition": "the exact affected native receiver recorded by the approved CRD Specification delta reads current PF10; this is not an RS-40 rescope route",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DELTA_APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DELTA_APPROVE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    }
+  ],
+  "id": "CF-C-30",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8121af3bf2249c6d6ca8?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "CF-C-30",
+    "lane": "CF-C",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Review an initial pending CRD Specification, assess a requested correction to an approved immutable CRD base, or review one pending bounded CRD Specification delta.",
+    "output_artifacts": [
+      "INITIAL_SPECIFICATION_REVIEW / SPECIFICATION_CORRECTION_ASSESSMENT / SPECIFICATION_DELTA_REVIEW",
+      "CORRECTION_REDLINE"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb8149a8d2ed42c9c01ffd",
+      "release": "GCFPE-20260914.1",
+      "title": "CF-C-30 — Review and Approve CRD Specification — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "IA-10",
+      "CF-C-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Thoth, Head of Development, in the same continuing review session for this change.",
+    "result_states": [
+      "INITIAL_APPROVE",
+      "INITIAL_DENY",
+      "CORRECTION_REDLINE",
+      "DELTA_APPROVE",
+      "DELTA_DENY"
+    ],
+    "sequence": 30,
+    "session_class": "ROLE_CONTINUING",
+    "title": "CF-C-30 — Review and Approve CRD Specification — 100926.1"
+  },
+  "state_route_order": [
+    "initial_approve",
+    "initial_deny",
+    "approved_base_correction_redline",
+    "crd_specification_delta_return",
+    "delta_deny",
+    "review_terminal",
+    "correction_not_substantiated_terminal",
+    "product_scope_decision_required_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

@@ -1,0 +1,33 @@
+{
+ "record_type": "MB008_X12_QUALIFICATION_FIXTURES",
+ "step": "X12",
+ "with_bodies": {
+  "exit": 0,
+  "fixture_suite_ok": true,
+  "profile_errors": [],
+  "section_13_fixture_count": 54,
+  "section_13_passed": 54,
+  "section_13_variant_count": 55,
+  "section_13_variants_passed": 55,
+  "case_count": 309,
+  "qa_closure_source_case_count": 9,
+  "artifact_timing_case_count": 17,
+  "artifact_timing_actual_source_mutation_count": 13,
+  "failed_cases": []
+ },
+ "without_bodies": {
+  "exit": 0,
+  "fixture_suite_ok": true,
+  "profile_errors": [],
+  "section_13_fixture_count": 54,
+  "section_13_passed": 54,
+  "section_13_variant_count": 55,
+  "section_13_variants_passed": 55,
+  "case_count": 283,
+  "qa_closure_source_case_count": 0,
+  "artifact_timing_case_count": 0,
+  "artifact_timing_actual_source_mutation_count": 0,
+  "failed_cases": []
+ },
+ "ok": true
+}

@@ -1,0 +1,552 @@
+{
+ "record_type": "MB008_PLAN_ACTIVATION_OPS",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "findings": "P-B1 (round 1); P-B1-R, DIFF-1, DIFF-2 and L-9 (diff check)",
+ "purpose": "The exact operations X6a, X15 and X16 apply to the control pages, and the content of the two pages X15 creates. Each operation names its span by anchors, as edits.json does, and carries its replacement; activation_render.py adds the generated operations (each member row's title and binding, and the frontmatter rule), applies them in memory to fresh reads, refuses an anchor that does not resolve exactly once, and runs control_check.py on the result. Every Current section the register gains is written here in full; nothing is carried by a rule.",
+ "markers": {
+  "@ACTIVATION_DATE": "the UTC date X15 starts (YYYY-MM-DD); if X16 completes on a later date, X16 corrects each activated_at written at X15",
+  "@CATALOG_PAGE_ID": "the page X15(a) creates",
+  "@REGISTER_ENTRY_PAGE_ID": "the page X15(f) creates",
+  "@MGMT10_PAGE_ID": "the successor page X1 creates",
+  "@PRODUCTION_TOKEN": "the production graph's proof token from X3's build of the flipped parts",
+  "@POSTFLIGHT_VERDICT": "X13's verdict as both records state it: PASS or PASS WITH WARNINGS",
+  "@PROMOTION_APPROVED_AT": "the date of Nathan's exact promotion approval, as quoted in §E",
+  "@SUCC_URL:<ID>": "the successor's direct Notion URL from the candidate parts (node.candidate_url without its query)"
+ },
+ "frontmatter_rule": {
+  "artifact_version: \"091426.1\"": "artifact_version: \"100926.1\"",
+  "candidate_release: GCFPE-20260914.1": "selected_release: GCFPE-20261009.1",
+  "selected_release: GCFPE-20260914.1": "selected_release: GCFPE-20261009.1",
+  "prompt_version_family: \"091426.1\"": "prompt_version_family: \"100926.1\"",
+  "selection_rule: \"This version is operative if and only if the register selects GCFPE-20260914.1 / 091426.1 / 55. It does not assert its own selection.\"": "selection_rule: \"This version is operative if and only if the register selects GCFPE-20261009.1 / 100926.1 / 55. It does not assert its own selection.\"",
+  "selection_rule: \"This index is operative if and only if the register selects GCFPE-20260914.1 / 091426.1 / 55. It does not assert its own selection.\"": "selection_rule: \"This index is operative if and only if the register selects GCFPE-20261009.1 / 100926.1 / 55. It does not assert its own selection.\"",
+  "activated_at: 2026-09-21": "activated_at: @ACTIVATION_DATE",
+  "predecessor_release: GCFPE-20260913.1": "predecessor_release: GCFPE-20260914.1",
+  "predecessor_version_family: \"091326.2\"": "predecessor_version_family: \"091426.1\"",
+  "recovery_correction_run: GCFPE-REPAIR-RECOVERY-CORRECTION-20260914.1": "source_modification: MODIFICATION-20261011-gcfpe-mb008-to-promotion"
+ },
+ "pages": {
+  "3db4590a05eb81de9736ea69bac61016": {
+   "step": "X15(c)",
+   "name": "Flow Index",
+   "title": "Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1",
+   "frontmatter_rule": true,
+   "member_rows": true,
+   "frontmatter_title": [
+    "title: \"Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1\"",
+    "title: \"Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "FI-FM-DISP",
+     "start": "predecessor_disposition: SUPERSEDED_ARCHIVED_INTACT",
+     "end": null,
+     "new": "predecessor_disposition: SUPERSEDED"
+    },
+    {
+     "id": "FI-ACT-H",
+     "start": "## Activation contract — discharged 2026-09-21",
+     "end": null,
+     "new": "## Activation contract"
+    },
+    {
+     "id": "FI-ACT-1",
+     "start": "**This index is operative**, because the register selected",
+     "end": "are superseded and archived intact.",
+     "new": "**This index is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`.** It does not assert its own selection. The register entry for GCFPE-20261009.1 records the register-last promotion, the binding readback and the archival of the predecessor release's `091426.1` catalog and members."
+    },
+    {
+     "id": "FI-BIND-P",
+     "start": "**These bindings are operative.**",
+     "end": "(the `D23` close-out) and read back then.",
+     "new": "**These bindings are operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`.** Each was prepared and read back at X15 of `MODIFICATION-20261011-gcfpe-mb008-to-promotion` (@ACTIVATION_DATE); the register's selection is updated only after that readback. The operating-procedure binding is v5.0.0, unchanged since 2026-09-23."
+    },
+    {
+     "id": "FI-B-CAT",
+     "start": "<td>[Glow HDE Complete Prompt Set — GCFPE-20260914.1 — 091426.1](https://app.notion.com/p/3db4590a05eb81738ef1d846e3c0df8c)</td>",
+     "end": null,
+     "new": "<td>[Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/@CATALOG_PAGE_ID)</td>"
+    },
+    {
+     "id": "FI-B-ENTRY-L",
+     "start": "<td>Candidate register entry</td>",
+     "end": null,
+     "new": "<td>Register entry</td>"
+    },
+    {
+     "id": "FI-B-ENTRY",
+     "start": "<td>[GCFPE Membership and Release Register Entry — GCFPE-20260914.1](https://app.notion.com/p/3db4590a05eb816f925ef3b0659de3b8)</td>",
+     "end": null,
+     "new": "<td>[GCFPE Membership and Release Register Entry — GCFPE-20261009.1](https://app.notion.com/p/@REGISTER_ENTRY_PAGE_ID)</td>"
+    },
+    {
+     "id": "FI-B-MGMT",
+     "start": "<td>[GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1](https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54)</td>",
+     "end": null,
+     "new": "<td>[GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1](https://app.notion.com/p/@MGMT10_PAGE_ID)</td>"
+    },
+    {
+     "id": "FI-B-PE",
+     "start": "<td>[PE Metaprompt 091426.1](https://app.notion.com/p/3db4590a05eb8174be35d9e35acb3f77)</td>",
+     "end": null,
+     "new": "<td>[PE Metaprompt 100926.1](https://app.notion.com/p/3f44590a05eb81f98b76c83465dc1960)</td>"
+    },
+    {
+     "id": "FI-B-GRAPH-L",
+     "start": "<td>Frozen candidate graph</td>",
+     "end": null,
+     "new": "<td>Selected graph source</td>"
+    },
+    {
+     "id": "FI-B-GRAPH",
+     "start": "<td>`docs/graph/parts/` in `amthorn78/glow-hdengine-v2`. The assembled graph",
+     "end": "227 edges when frozen at promotion).</td>",
+     "new": "<td>`docs/graph/parts/` in `amthorn78/glow-hdengine-v2`. The assembled graph is rebuilt by script on demand, is never stored and never committed, and is represented by its proof token `@PRODUCTION_TOKEN`.</td>"
+    },
+    {
+     "id": "FI-B-MANIFEST-L",
+     "start": "<td>Corrected raw-source manifest</td>",
+     "end": null,
+     "new": "<td>Promotion packet</td>"
+    },
+    {
+     "id": "FI-B-MANIFEST",
+     "start": "<td>`docs/ephemeral/GCFPE-Repair-Corrected-Source-Manifest-v1.0-20260914.md`",
+     "end": "</td>",
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/PROMOTION-PACKET.md` in `amthorn78/glow-hdengine-v2`</td>"
+    },
+    {
+     "id": "FI-B-VALID-L",
+     "start": "<td>Complete candidate validation</td>",
+     "end": null,
+     "new": "<td>Complete validation</td>"
+    },
+    {
+     "id": "FI-B-VALID",
+     "start": "<td>`docs/ephemeral/GCFPE-20260914.1-Candidate-Suite-Validation.md`",
+     "end": "</td>",
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/qualification-validators.json` in `amthorn78/glow-hdengine-v2`</td>"
+    },
+    {
+     "id": "FI-B-FIX",
+     "start": "<td>`docs/ephemeral/GCFPE-20260914.1-Behavior-Fixture-Results.md`",
+     "end": "</td>",
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/qualification-fixtures.json` in `amthorn78/glow-hdengine-v2`</td>"
+    },
+    {
+     "id": "FI-B-SKILL",
+     "start": "<td>[GCFPE PR Development Skill-Fit and Interoperability Decision — 20260914.1](https://app.notion.com/p/3db4590a05eb81d49943dffdaaaeed7c)</td>",
+     "end": null,
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/REVIEW-D24-A.md` and `REVIEW-D24-B.md` in `amthorn78/glow-hdengine-v2` — `SKILL_FIT_CONFIRMED` on the reviewed digests. The 20260914.1 decision page is a historical record.</td>"
+    },
+    {
+     "id": "FI-B-HUB-ed5fcf",
+     "start": "<td>[HDE Change Flow — GCFPE-20260914.1 — 091426.1](https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf)</td>",
+     "end": null,
+     "new": "<td>[HDE Change Flow — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf)</td>"
+    },
+    {
+     "id": "FI-B-HUB-9a8b6e",
+     "start": "<td>[HDE IA — GCFPE-20260914.1 — 091426.1](https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e)</td>",
+     "end": null,
+     "new": "<td>[HDE IA — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e)</td>"
+    },
+    {
+     "id": "FI-B-HUB-35f96d",
+     "start": "<td>[HDE QA — GCFPE-20260914.1 — 091426.1](https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d)</td>",
+     "end": null,
+     "new": "<td>[HDE QA — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d)</td>"
+    },
+    {
+     "id": "FI-B-HUB-fead9c",
+     "start": "<td>[Escalation — GCFPE-20260914.1 — 091426.1](https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c)</td>",
+     "end": null,
+     "new": "<td>[Escalation — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c)</td>"
+    },
+    {
+     "id": "FI-B-HUB-c28df7",
+     "start": "<td>[HDE TW — GCFPE-20260914.1 — 091426.1](https://app.notion.com/p/3db4590a05eb811b9c14f2ae89c28df7)</td>",
+     "end": null,
+     "new": "<td>[HDE TW — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/3db4590a05eb811b9c14f2ae89c28df7)</td>"
+    },
+    {
+     "id": "FI-B-CHK",
+     "start": "<td>[GCFPE Alpha Establishment and Change Management Checklist — 091426.1](https://app.notion.com/p/3db4590a05eb812f87caed515836687f)</td>",
+     "end": null,
+     "new": "<td>[GCFPE Alpha Establishment and Change Management Checklist — 100926.1](https://app.notion.com/p/3db4590a05eb812f87caed515836687f)</td>"
+    },
+    {
+     "id": "FI-PEV-1",
+     "start": "<td>`docs/ephemeral/gcfpe.round27/POSTFLIGHT-REPORT-r27.md`",
+     "end": "no mandatory open finding</td>",
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/REVIEW-POSTFLIGHT-A.md` and `REVIEW-POSTFLIGHT-B.md` — **@POSTFLIGHT_VERDICT**, no mandatory open finding</td>"
+    },
+    {
+     "id": "FI-PEV-2L",
+     "start": "<td>§10 independent skill review</td>",
+     "end": null,
+     "new": "<td>D24 independent skill review</td>"
+    },
+    {
+     "id": "FI-PEV-2",
+     "start": "<td>`docs/ephemeral/gcfpe.round27/` — `SKILL_FIT_CONFIRMED`",
+     "end": "</td>",
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/REVIEW-D24-A.md` and `REVIEW-D24-B.md` — `SKILL_FIT_CONFIRMED`, scoped to the reviewed digests</td>"
+    },
+    {
+     "id": "FI-PEV-3",
+     "start": "<td>`docs/ephemeral/gcfpe.round27/FREEZE-SNAPSHOT-r27.md`",
+     "end": "</td>",
+     "new": "<td>`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/PROMOTION-PACKET.md` — package digests, contracts, graph proof token, revisions</td>"
+    },
+    {
+     "id": "FI-PEV-4",
+     "start": "<td>2026-09-21, recorded in the promotion record under `docs/ephemeral/` and in the release register</td>",
+     "end": null,
+     "new": "<td>@PROMOTION_APPROVED_AT, quoted in §E of `MODIFICATION-20261011-gcfpe-mb008-to-promotion` and recorded in the release register</td>"
+    },
+    {
+     "id": "FI-PEV-5",
+     "start": "The ordering this section set was followed:",
+     "end": "No receipt was inferred.",
+     "new": "The order this section sets: successor bindings prepared and verified first, the stable selection register updated last, production validation rerun against the activated state, and the intact-archive receipt recorded in the register entry only after that. No receipt is inferred."
+    },
+    {
+     "id": "FI-FLOW",
+     "start": "- GCFPE-MGMT-10 complete repair returns",
+     "end": "it does not execute Alpha.",
+     "new": "- GCFPE-MGMT-10 manages one ecosystem Modification through `ANALYZE`, `PLAN` and `EXECUTE` and returns every result to Nathan with no handoff; it does not execute Alpha."
+    },
+    {
+     "id": "FI-ACTOR-1",
+     "start": "<td>Coordination state, exact redline result, governed ecosystem repair result</td>",
+     "end": null,
+     "new": "<td>Coordination state, exact redline result, the `GCFPE_MODIFICATION_RECORD`</td>"
+    },
+    {
+     "id": "FI-ACTOR-2",
+     "start": "<td>These controls preserve native owners. GCFPE maintenance does not execute product work or Alpha;",
+     "end": "</td>",
+     "new": "<td>These controls preserve native owners. GCFPE maintenance does not execute product work or Alpha; GCFPE-MGMT-10 returns every result to Nathan and emits no handoff.</td>"
+    },
+    {
+     "id": "ALPHA-FB",
+     "start": "## Alpha feedback candidate — 2026-10-09",
+     "end": null,
+     "new": "## Historical — Alpha feedback candidate — 2026-10-09"
+    }
+   ],
+   "pin": "2026-10-11T20:10:23.284Z"
+  },
+  "3db4590a05eb81d59059eb6b95ed5fcf": {
+   "step": "X15(d)",
+   "name": "hub",
+   "title": "HDE Change Flow — GCFPE-20261009.1 — 100926.1",
+   "frontmatter_rule": true,
+   "member_rows": true,
+   "frontmatter_title": [
+    "title: \"HDE Change Flow — GCFPE-20260914.1 — 091426.1\"",
+    "title: \"HDE Change Flow — GCFPE-20261009.1 — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "HUB-ACT",
+     "start": "This candidate hub becomes operative only with the complete `GCFPE-20260914.1` promotion.",
+     "end": "preserves the family's native purpose.",
+     "new": "This hub is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`; it does not assert its own selection. The release register is the sole selection authority; this hub provides direct navigation and preserves the family's native purpose."
+    },
+    {
+     "id": "ALPHA-FB",
+     "start": "## Alpha feedback candidate — 2026-10-09",
+     "end": null,
+     "new": "## Historical — Alpha feedback candidate — 2026-10-09"
+    }
+   ],
+   "pin": "2026-10-11T15:47:22.369Z"
+  },
+  "3db4590a05eb8195a2ccf7c0959a8b6e": {
+   "step": "X15(d)",
+   "name": "hub",
+   "title": "HDE IA — GCFPE-20261009.1 — 100926.1",
+   "frontmatter_rule": true,
+   "member_rows": true,
+   "frontmatter_title": [
+    "title: \"HDE IA — GCFPE-20260914.1 — 091426.1\"",
+    "title: \"HDE IA — GCFPE-20261009.1 — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "HUB-ACT",
+     "start": "This candidate hub becomes operative only with the complete `GCFPE-20260914.1` promotion.",
+     "end": "preserves the family's native purpose.",
+     "new": "This hub is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`; it does not assert its own selection. The release register is the sole selection authority; this hub provides direct navigation and preserves the family's native purpose."
+    },
+    {
+     "id": "ALPHA-FB",
+     "start": "## Alpha feedback candidate — 2026-10-09",
+     "end": null,
+     "new": "## Historical — Alpha feedback candidate — 2026-10-09"
+    }
+   ],
+   "pin": "2026-10-11T15:59:38.185Z"
+  },
+  "3db4590a05eb814d96d3dcfa8835f96d": {
+   "step": "X15(d)",
+   "name": "hub",
+   "title": "HDE QA — GCFPE-20261009.1 — 100926.1",
+   "frontmatter_rule": true,
+   "member_rows": true,
+   "frontmatter_title": [
+    "title: \"HDE QA — GCFPE-20260914.1 — 091426.1\"",
+    "title: \"HDE QA — GCFPE-20261009.1 — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "HUB-ACT",
+     "start": "This candidate hub becomes operative only with the complete `GCFPE-20260914.1` promotion.",
+     "end": "preserves the family's native purpose.",
+     "new": "This hub is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`; it does not assert its own selection. The release register is the sole selection authority; this hub provides direct navigation and preserves the family's native purpose."
+    },
+    {
+     "id": "ALPHA-FB",
+     "start": "## Alpha feedback candidate — 2026-10-09",
+     "end": null,
+     "new": "## Historical — Alpha feedback candidate — 2026-10-09"
+    }
+   ],
+   "pin": "2026-10-11T15:57:29.752Z"
+  },
+  "3db4590a05eb81cd938de84cfffead9c": {
+   "step": "X15(d)",
+   "name": "hub",
+   "title": "Escalation — GCFPE-20261009.1 — 100926.1",
+   "frontmatter_rule": true,
+   "member_rows": true,
+   "frontmatter_title": [
+    "title: \"Escalation — GCFPE-20260914.1 — 091426.1\"",
+    "title: \"Escalation — GCFPE-20261009.1 — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "HUB-ACT",
+     "start": "This candidate hub becomes operative only with the complete `GCFPE-20260914.1` promotion.",
+     "end": "preserves the family's native purpose.",
+     "new": "This hub is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`; it does not assert its own selection. The release register is the sole selection authority; this hub provides direct navigation and preserves the family's native purpose."
+    },
+    {
+     "id": "ALPHA-FB",
+     "start": "## Alpha feedback candidate — 2026-10-09",
+     "end": null,
+     "new": "## Historical — Alpha feedback candidate — 2026-10-09"
+    }
+   ],
+   "pin": "2026-10-11T16:05:06.087Z"
+  },
+  "3db4590a05eb811b9c14f2ae89c28df7": {
+   "step": "X15(d)",
+   "name": "hub",
+   "title": "HDE TW — GCFPE-20261009.1 — 100926.1",
+   "frontmatter_rule": true,
+   "member_rows": true,
+   "frontmatter_title": [
+    "title: \"HDE TW — GCFPE-20260914.1 — 091426.1\"",
+    "title: \"HDE TW — GCFPE-20261009.1 — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "HUB-ACT",
+     "start": "This candidate hub becomes operative only with the complete `GCFPE-20260914.1` promotion.",
+     "end": "preserves the family's native purpose.",
+     "new": "This hub is operative only while the register selects `GCFPE-20261009.1` / `100926.1` / `55`; it does not assert its own selection. The release register is the sole selection authority; this hub provides direct navigation and preserves the family's native purpose."
+    },
+    {
+     "id": "TW-PE",
+     "start": "The candidate `PE Metaprompt 091426.1` is the authoring control for this release.",
+     "end": null,
+     "new": "<mention-page url=\"https://app.notion.com/p/3f44590a05eb81f98b76c83465dc1960\">PE Metaprompt 100926.1</mention-page> is the authoring control for this release."
+    },
+    {
+     "id": "ALPHA-FB",
+     "start": "## Alpha feedback candidate — 2026-10-09",
+     "end": null,
+     "new": "## Historical — Alpha feedback candidate — 2026-10-09"
+    }
+   ],
+   "pin": "2026-10-11T16:10:06.322Z"
+  },
+  "3db4590a05eb812f87caed515836687f": {
+   "step": "X15(e)",
+   "name": "Alpha checklist",
+   "title": "GCFPE Alpha Establishment and Change Management Checklist — 100926.1",
+   "frontmatter_rule": true,
+   "frontmatter_title": [
+    "title: \"GCFPE Alpha Establishment and Change Management Checklist — 091426.1\"",
+    "title: \"GCFPE Alpha Establishment and Change Management Checklist — 100926.1\""
+   ],
+   "ops": [
+    {
+     "id": "CHK-H3",
+     "start": "As of 2026-09-21 that block reads `ALPHA_RESUMED`.",
+     "end": null,
+     "new": "### Historical — Alpha state as of 2026-09-21\nAs of 2026-09-21 that block reads `ALPHA_RESUMED`."
+    },
+    {
+     "id": "CHK-GOV",
+     "start": "## Governance repair checklist",
+     "end": null,
+     "new": "## Historical — Governance repair checklist — 091426.1 repair"
+    }
+   ],
+   "pin": "2026-09-23T17:43:43.526Z"
+  },
+  "3f44590a05eb81f98b76c83465dc1960": {
+   "step": "X15(b)",
+   "name": "PE Metaprompt 100926.1",
+   "title": "PE Metaprompt 100926.1",
+   "pin_from_x6": true,
+   "ops": [
+    {
+     "id": "PE-FM-REL",
+     "start": "candidate_release: GCFPE-20261009.1",
+     "end": null,
+     "new": "selected_release: GCFPE-20261009.1"
+    },
+    {
+     "id": "PE-FM-STATUS",
+     "start": "status: UNSELECTED_CANDIDATE",
+     "end": null,
+     "new": "status: REGISTER_CONTROLLED"
+    },
+    {
+     "id": "PE-FM-RULE",
+     "start": "selection_authority: GCFPE Membership and Release Register\npredecessor: PE Metaprompt 091426.1",
+     "end": null,
+     "new": "selection_authority: GCFPE Membership and Release Register\nselection_rule: \"This version is operative while the register binds it as the prompt-authoring control of GCFPE-20261009.1 / 100926.1 / 55. It does not assert its own selection.\"\npredecessor: PE Metaprompt 091426.1\nactivated_at: @ACTIVATION_DATE"
+    },
+    {
+     "id": "PE-FM-PROM",
+     "start": "promotion_authorized: false",
+     "end": null,
+     "new": "promotion_authorized: true"
+    },
+    {
+     "id": "PE-FM-VAL",
+     "start": "validation_status: BEST_EFFORT_AUTHOR_CHECKS_ONLY",
+     "end": null,
+     "new": "validation_status: VALIDATED\nvalidation_scope: \"guards at X6 and the independent post-flight at X13, MODIFICATION-20261011-gcfpe-mb008-to-promotion\"\nsource_modification: MODIFICATION-20261011-gcfpe-mb008-to-promotion"
+    }
+   ],
+   "pin": "2026-10-11T16:10:06.322Z"
+  },
+  "3d24590a05eb81ce942ad994cfca9fa1": {
+   "step": "X16",
+   "name": "register",
+   "title": "GCFPE Membership and Release Register",
+   "ops": [
+    {
+     "id": "REG-SEL",
+     "start": "## Current selection — GCFPE-20260914.1 / 091426.1",
+     "end": null,
+     "new": "## Current selection — GCFPE-20261009.1 / 100926.1\n**Selected GCFPE contract: ****`GCFPE-20261009.1`**** / ****`100926.1`****, exactly 55 members** — a successor for each of the 55 predecessor logical IDs, `GCFPE-MGMT-10`'s being the D20 three-mode body. No member was added or removed. Selected @ACTIVATION_DATE by Nathan / Product Owner. **This register is the sole selection authority; no catalog, index, hub or prompt asserts its own selection.**\n<table header-row=\"true\">\n<tr>\n<td>binding</td>\n<td>where</td>\n</tr>\n<tr>\n<td>55-member catalog</td>\n<td>[Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/@CATALOG_PAGE_ID)</td>\n</tr>\n<tr>\n<td>operational index</td>\n<td>[Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/3db4590a05eb81de9736ea69bac61016)</td>\n</tr>\n<tr>\n<td>management</td>\n<td>[GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1](https://app.notion.com/p/@MGMT10_PAGE_ID)</td>\n</tr>\n<tr>\n<td>prompt authoring</td>\n<td>[PE Metaprompt 100926.1](https://app.notion.com/p/3f44590a05eb81f98b76c83465dc1960)</td>\n</tr>\n<tr>\n<td>register entry</td>\n<td>[GCFPE Membership and Release Register Entry — GCFPE-20261009.1](https://app.notion.com/p/@REGISTER_ENTRY_PAGE_ID)</td>\n</tr>\n<tr>\n<td>operating procedure</td>\n<td>`docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md` (on `main` from PR #477) — a pointer that restates no rule; the sources it names govern. v4.0.0 is superseded (2026-09-23) and historical; do not execute it.</td>\n</tr>\n<tr>\n<td>machine contract</td>\n<td>`docs/graph/parts/` — rebuilt by script, never committed assembled; proof token `@PRODUCTION_TOKEN`</td>\n</tr>\n<tr>\n<td>per-prompt contracts</td>\n<td>`docs/prompt_ecosystem_management/project-prompt-contract-registry.md` (`GCFPE-PCR-20261009.1`)</td>\n</tr>\n<tr>\n<td>lane hubs</td>\n<td>Change Flow, IA, QA, Escalation, TW — all `100926.1`, all `REGISTER_CONTROLLED`</td>\n</tr>\n</table>\n**The three promotion predicates, met before the register changed.**\n1. **Complete behaviour validation of the exact pinned snapshot.** The shipped validators over all 55 members, the flowmaster suite and fixtures, and the candidate registry's assertions on fresh reads: `docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/qualification-validators.json`, `docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/qualification-fixtures.json`, `docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/candidate-registry.md`.\n2. **Independent governance post-flight:** **`@POSTFLIGHT_VERDICT`**, no mandatory open finding. Evidence: `docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/REVIEW-POSTFLIGHT-A.md` and `REVIEW-POSTFLIGHT-B.md`.\n3. **Nathan / Product Owner's separate approval of that exact snapshot**, @PROMOTION_APPROVED_AT, quoted in §E of `MODIFICATION-20261011-gcfpe-mb008-to-promotion`.\nThe D24 independent skill review returned `SKILL_FIT_CONFIRMED` for the six reviewed packages (`docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/execute/REVIEW-D24-A.md`, `REVIEW-D24-B.md`); the installed digests are compared with the reviewed ones at install.\n**Transaction order.** The register entry for GCFPE-20261009.1 records each step of the register-last transaction — bindings, this register, installs, production validation, archival — as it completes.\n**Alpha state** is not held on this page: see *Alpha state — recorded in the repository, not here* on the [Prompt Flow Index](https://app.notion.com/p/3db4590a05eb81de9736ea69bac61016).\nMerge and abort remain Nathan-only actions. This page emits no runtime invocation.\n**Evidence architecture.** Decision `D7` retired Google Drive as a storage authority for this ecosystem. Promotion evidence is in the repository under `docs/ephemeral/` and `docs/prompt_ecosystem_management/`, not in Drive; Drive ids that survive in historical sections below are lineage only and carry no authority.\n## Historical selection — GCFPE-20260914.1 / 091426.1"
+    },
+    {
+     "id": "REG-MEM",
+     "start": "## Current explicit membership — 091426.1",
+     "end": null,
+     "new": "## Current explicit membership — 100926.1\n[Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/@CATALOG_PAGE_ID) is the exact 55-page mapping. Every member is a successor page at `100926.1`; `GCFPE-MGMT-10`'s successor is the D20 three-mode body, which manages one ecosystem Modification and hands off to no prompt. No member was added or removed. `RS-40` and `PR-50` remain registered members; `PR-50` is a manual Product Owner-only terminal control with **zero** prompt-originated inbound edges on the selected graph. PE Metaprompt is a separate authoring control and is not counted among the 55. No assessment middleware is selected.\nThe predecessor `091426.1` versions keep their identities and history. They are archived intact, by move, at the transaction's archival step, which the register entry records; archival preserves each page, its ID and its body.\n**Release rule.** A release's membership and each member's current version live in the register and the complete-prompt-set catalog. A member whose body changes gets a successor page at the new version; a member whose body does not change keeps its page, and the register records it in the new release. Bodies carry no release-bound header line (`D23-G`). Each member's `current_version` is recorded in the catalog's `current_version` column; all 55 are `100926.1`. The prompt-authoring control follows the same rule (AF-012; Product Owner, 2026-09-23).\n## Historical explicit membership — 091426.1"
+    },
+    {
+     "id": "REG-SRC",
+     "start": "## Current source-reference policy — 091426.1",
+     "end": null,
+     "new": "## Current source-reference policy — 100926.1\n**The repository is the persistent versioned authority; Notion is the operational layer; Google Drive is not a storage authority** (decision `D7`). Runtime ledgers, manifests, reports, addenda, checkpoints and handoffs are machine-readable Markdown under `docs/ephemeral/`, landed by pull request and referenced by repository path. `docs/pfcanon/` is read-only and is the sole PFCanon authority; never resolve canon from Drive, and never compare a repository canon file against a Drive copy to decide which is current.\n`docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md` is this release's operating procedure (on `main` from PR #477); it restates no rule and points to where each lives. Handoffs follow C-HANDOFF and C-PLACE in each body that emits one, and runtime artifacts follow C-ART and, where placed, C-NOTION (`D23`). v4.0.0 is superseded (2026-09-23) and historical.\n**Prompt bodies are authored and revised in Notion in place and are never mirrored into the repository.** The Prompt Corpus Storage and Fidelity Policy (Product Owner, 2026-09-21, permanent) prohibits whole-corpus exports, local prompt directories, and byte-identity checks on prompt bodies. The repository holds their contracts — `docs/prompt_ecosystem_management/project-prompt-contract-registry.md` — and their machine-readable restatement, `docs/graph/parts/`, not their text.\nThe PF10 reference boundary is unchanged: an authorized read-only check reads the authoritative Markdown PF10 and applicable addenda to establish status, base-plan overlay and lineage. It authorizes no numbering, insertion, editing, replacement or mirroring. Nathan performs the manual drain.\n## Historical source-reference policy — 091426.1"
+    },
+    {
+     "id": "REG-CHG",
+     "start": "## Current GCFPE change-management process — 091426.1",
+     "end": null,
+     "new": "## Current GCFPE change-management process — 100926.1\nUse [Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1](https://app.notion.com/p/@CATALOG_PAGE_ID) and this register for every actual selected destination. Submit governance changes to [GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1](https://app.notion.com/p/@MGMT10_PAGE_ID), which runs one Modification through `ANALYZE`, `PLAN` and `EXECUTE` with the real affected area, expected and actual result, and evidence, and returns every result to Nathan. Begin new work only from actual Product Owner intake and its selected class-bound entry; continue an existing work unit from its actual role-owned state and the complete direct handoff. Optional [MGR-10 — 100926.1](@SUCC_URL:MGR-10) coordination inserts no assessment stage. The final [CL-40 — 100926.1](@SUCC_URL:CL-40) scan uses its real closure intake and returns terminally to the Product Owner. Navigation grants no execution authority and cannot restart completed work or invoke manual abort.\nHow a change to this ecosystem is made routine — the five-step lifecycle, the defect-class catalogue, the standing instruments and the definition of done — is `docs/prompt_ecosystem_management/ecosystem-change-management.md`, which is normative. Skill changes follow `docs/prompt_ecosystem_management/skill-packaging-and-delivery.md`: **no skill change is trusted until a party that did not author it has validated it**, and a verdict is scoped to exact bytes and does not carry. Post-flight follows `docs/prompt_ecosystem_management/postflight-procedure.md`.\nPreserve one continuing maintenance owner, bounded impact dispositions for every member, actual validation and publication evidence, and the existing error log. Selection follows successful candidate checks; complete selected-state readback and independent audit precede archival. Publication alone does not establish runtime success.\n## Historical change-management process — 091426.1"
+    },
+    {
+     "id": "REG-PROC",
+     "start": "## Current GCFPE procedure and operator access — 091426.1",
+     "end": null,
+     "new": "## Current GCFPE procedure and operator access — 100926.1\n`docs/ephemeral/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v5.0.0-20260923.md` is the GCFPE operating procedure (on `main` from PR #477): a pointer that restates no rule; the sources it names govern. v4.0.0 is superseded (2026-09-23) and historical. [PE Metaprompt 100926.1](https://app.notion.com/p/3f44590a05eb81f98b76c83465dc1960) governs GCFPE authoring. Other ecosystem protocols and the historical monthly task below are outside this GCFPE selection and are not a GCFPE assessment or launch gate. No automation is invoked or altered by this record.\n## Historical procedures and operator access — 091426.1"
+    },
+    {
+     "id": "REG-EXEC",
+     "start": "AF-013 remains excluded and unmeasured.",
+     "end": null,
+     "new": "AF-013 remains excluded and unmeasured.\n## Candidate record executed — GCFPE-20261009.1 — @ACTIVATION_DATE\nPromoted on @ACTIVATION_DATE by `MODIFICATION-20261011-gcfpe-mb008-to-promotion`, after Nathan's exact promotion approval of @PROMOTION_APPROVED_AT; the record above is kept as written."
+    }
+   ],
+   "pin": "2026-10-09T20:19:11.175Z"
+  },
+  "3f44590a05eb8110aa69fe4189ad9abc": {
+   "step": "X6a",
+   "name": "candidate inventory",
+   "title": null,
+   "ops": [
+    {
+     "id": "INV-STATUS",
+     "start": "The 55-member inventory reuses GCFPE-MGMT-10 at 091426.1 unchanged.",
+     "end": null,
+     "new": "The 55-member inventory carries GCFPE-MGMT-10's successor at 100926.1, the D20 three-mode body (`MODIFICATION-20261011-gcfpe-mb008-to-promotion`)."
+    },
+    {
+     "id": "INV-COUNT",
+     "start": "54 successor siblings; one unchanged reused member.",
+     "end": null,
+     "new": "55 successor siblings, GCFPE-MGMT-10's included."
+    },
+    {
+     "id": "INV-ROW",
+     "start": "<td>GCFPE-MGMT-10</td>",
+     "end": "<td>091426.1 / reused unchanged</td>",
+     "new": "<td>GCFPE-MGMT-10</td>\n<td><mention-page url=\"https://app.notion.com/p/@MGMT10_PAGE_ID\"/></td>\n<td>100926.1 / successor (D20 three-mode body), published and read back</td>",
+     "lines": 2
+    }
+   ],
+   "check": {
+    "present": [
+     "@MGMT10_PAGE_ID"
+    ],
+    "absent": [
+     "reuses GCFPE-MGMT-10 at 091426.1",
+     "reused unchanged"
+    ]
+   },
+   "pin": "2026-10-11T19:47:45.856Z"
+  }
+ },
+ "new_pages": {
+  "CATALOG": {
+   "step": "X15(a)",
+   "title": "Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1",
+   "parent": "3db4590a05eb81de9736ea69bac61016"
+  },
+  "REGISTER_ENTRY": {
+   "step": "X15(f)",
+   "title": "GCFPE Membership and Release Register Entry — GCFPE-20261009.1",
+   "parent": "3d24590a05eb81ce942ad994cfca9fa1"
+  }
+ },
+ "x19": {
+  "step": "X19",
+  "note": "Applied after X19's verification passes (amendment PIN-1-A, item 3); the register entry's X19 row is marked done in the same step.",
+  "pages": {
+   "3db4590a05eb81de9736ea69bac61016": {
+    "name": "Flow Index",
+    "ops": [
+     {
+      "id": "FI-X19-DISP",
+      "start": "predecessor_disposition: SUPERSEDED",
+      "end": null,
+      "new": "predecessor_disposition: SUPERSEDED_ARCHIVED_INTACT"
+     }
+    ]
+   }
+  }
+ },
+ "amendment": "PIN-1-A (Nathan's plan approval, 2026-10-12): REG-MEM's archival sentence, FI-BIND-P's readback sentence, FI-FM-DISP and the X19 operation; the register entry is created with X15 pending."
+}
