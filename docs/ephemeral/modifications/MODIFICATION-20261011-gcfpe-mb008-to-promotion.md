@@ -644,3 +644,15 @@ EXECUTE stops at X17. Its verification (each installed tree equals the reviewed 
 **If you choose option 1 without bumps:** about 45–60 minutes and about 1M tokens (the repackage and gates, two reviewers, delivery), then your reinstall, then X18.
 
 **Spend since you reported the install.** About 10 minutes, with no subagents.
+
+### Nathan's reply on X17 — 2026-10-12
+
+Nathan's words:
+
+> You produced those skills and I installed them through your interface.
+
+**Correction.**
+- Nathan installed the six packages with the *Save skill* button on the file cards this session delivered (`skill-packaging-and-delivery.md`: "its file card shows a **Save skill** button that installs it"). That is the only install path this process gives him. The return's option 2, which asked him for a byte-faithful path, is withdrawn: there is no other path for him to find.
+- The `name:` quoting is written by that install step. This process did not foresee it. `skill-packaging-and-delivery.md` step 4 ("verify by installing it yourself") extracts the archive, which does not reproduce what *Save skill* writes. So no gate before delivery could have caught it.
+- **Omitted from the return and stated here:** any repackage departs from the snapshot Nathan approved. The packet at `31c14f1` names the six package digests, so new bytes need his ruling as an amendment to that snapshot, whatever happens to the revisions.
+- **Measured since.** Line 2 aside, the installed trees are the reviewed bytes. So a package carrying the quoted line would equal the installed tree exactly for five of the six. Only flowmaster-validate would also differ, by its re-declared `SKILL_TREE_SHA256` line. Where revisions are pinned: glow-hde-pr-development `1.4.0` by the approved production contract; change-flow `3.4.0` by flowmaster-validate's and change-flow's own validators; flowmaster-validate `3.4.0`, session-relay-flowmaster `3.3.0` and amthor-workspace-governance-audit `1.14.1` only inside their own packages.
