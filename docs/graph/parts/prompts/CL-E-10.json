@@ -167,8 +167,8 @@
   "id": "CL-E-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81248741f4679b050262?pvs=204",
+    "candidate_version": "100926.1",
     "id": "CL-E-10",
     "lane": "CL-E",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -177,11 +177,11 @@
       "CHANGE_CLOSURE_DECISION"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb8177bf3cd7c9c7ca39f7",
-      "release": "GCFPE-20260913.1",
-      "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb8177bf3cd7c9c7ca39f7",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb811a8578d75885c16cac",
+      "release": "GCFPE-20260914.1",
+      "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "CL-20",
@@ -196,7 +196,7 @@
     ],
     "sequence": 10,
     "session_class": "ROLE_CONTINUING",
-    "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 091426.1"
+    "title": "CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1"
   },
   "state_route_order": [
     "change_closed_postclosure",

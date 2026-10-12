@@ -68,8 +68,8 @@
   "id": "ESC-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81f2af47fff48995f272?pvs=204",
+    "candidate_version": "100926.1",
     "id": "ESC-10",
     "lane": "ESC",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -78,11 +78,11 @@
       "QA_ESCALATION_REPORT"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb81dca03dc24874692130",
-      "release": "GCFPE-20260913.1",
-      "title": "ESC-10 — Create QA Escalation Report — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb81dca03dc24874692130",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb81d582b8d490e77f9f40",
+      "release": "GCFPE-20260914.1",
+      "title": "ESC-10 — Create QA Escalation Report — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "ESC-30"
@@ -94,7 +94,7 @@
     ],
     "sequence": 10,
     "session_class": "ROLE_CONTINUING",
-    "title": "ESC-10 — Create QA Escalation Report — 091426.1"
+    "title": "ESC-10 — Create QA Escalation Report — 100926.1"
   },
   "state_route_order": [
     "awaiting_thoth_remediation",

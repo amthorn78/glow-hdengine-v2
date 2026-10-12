@@ -79,7 +79,7 @@ and **precedent set by an unauthorized write does not retroactively authorize it
 
 | Notion-managed | Not Notion-managed |
 |---|---|
-| The selected release's prompt bodies — currently the 55 members of `GCFPE-20260914.1 / 091426.1` | one-off prompts for a specific, bounded task |
+| The selected release's prompt bodies — currently the 55 members of `GCFPE-20261009.1 / 100926.1` (selected 2026-10-12; the register is the authority) | one-off prompts for a specific, bounded task |
 | The PE Metaprompt, the manager prompt, and the controls the register binds | session-to-session handoff prompts |
 | Prompts a `GCFPE-MGMT-10` change deliberately creates as durable members | temporary correction, recovery, review or clarification prompts |
 | | development prompts running or continuing the ecosystem flow |

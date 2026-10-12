@@ -1,11 +1,11 @@
 {
   "edge_indices": [
+    181,
     182,
     183,
     184,
     185,
-    186,
-    187
+    186
   ],
   "edges": [
     {
@@ -210,8 +210,8 @@
   "id": "QA-120",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81a4a3fbc0fae65d153e?pvs=204",
+    "candidate_version": "100926.1",
     "id": "QA-120",
     "lane": "QA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -220,11 +220,11 @@
       "QA_REPORT / QA_RCA / QA_INTERIM_STATUS"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb81a99a28d8c1c17aa861",
-      "release": "GCFPE-20260913.1",
-      "title": "QA-120 — Create Final QA Report and RCA — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb81a99a28d8c1c17aa861",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb81589d21e798cf38e8ba",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-120 — Create Final QA Report and RCA — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "CL-C-10",
@@ -241,7 +241,7 @@
     ],
     "sequence": 120,
     "session_class": "ROLE_CONTINUING",
-    "title": "QA-120 — Create Final QA Report and RCA — 091426.1"
+    "title": "QA-120 — Create Final QA Report and RCA — 100926.1"
   },
   "state_route_order": [
     "pass_epic",

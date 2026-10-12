@@ -1,9 +1,9 @@
 {
   "edge_indices": [
+    195,
     196,
     197,
-    198,
-    199
+    198
   ],
   "edges": [
     {
@@ -130,8 +130,8 @@
   "id": "QA-60",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81489053f72637577807?pvs=204",
+    "candidate_version": "100926.1",
     "id": "QA-60",
     "lane": "QA",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -140,11 +140,11 @@
       "QA_PLAN"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb81e79893ef7df08bf7fe",
-      "release": "GCFPE-20260913.1",
-      "title": "QA-60 — Create Whole-Change QA Plan — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb81e79893ef7df08bf7fe",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb810b8aa3e1692830d4b8",
+      "release": "GCFPE-20260914.1",
+      "title": "QA-60 — Create Whole-Change QA Plan — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "QA-70",
@@ -158,7 +158,7 @@
     ],
     "sequence": 60,
     "session_class": "ROLE_CONTINUING",
-    "title": "QA-60 — Create Whole-Change QA Plan — 091426.1"
+    "title": "QA-60 — Create Whole-Change QA Plan — 100926.1"
   },
   "state_route_order": [
     "existing_approval_reuse",

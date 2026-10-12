@@ -1,8 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.1"
+artifact_version: "1.2"
 created_date: 2026-09-21
-revised_date: 2026-09-23 — D24, the review is run by reviewer subagents
+revised_date: 2026-10-12 — D28, install verification models what Save skill writes; earlier 2026-09-23 — D24, the review is run by reviewer subagents
 status: BINDING
 authority: Product Owner direction 2026-09-21 — persistent procedure lives in the repository, not in Notion
 migrated_from: Glow Operations Hub, *Skill packaging and installation — 2026-09-20* and *Delivered artifacts must be identifiable from their filename — 2026-09-21*
@@ -38,7 +38,11 @@ python3 -m scripts.quick_validate <path/to/skill-folder>
 python3 -m scripts.package_skill <path/to/skill-folder> <output-dir>
 ```
 Expect `Skill is valid!` then `✅ Successfully packaged skill to: <output-dir>/<name>.skill`. The packager automatically excludes `__pycache__`, `node_modules`, `*.pyc`, `.DS_Store`, and a root-level `evals/`.
-**4. Verify by installing it yourself — do not skip this.** Extract the `.skill` into a clean directory, add back any untouched sibling skills the tooling needs to resolve, and run that skill's own gates **from the extracted contents**, not from the working copy. This is what catches a reference file dropped during packaging. Confirm `name:` survived and the intended change is present.
+**4. Verify by installing it yourself — do not skip this.** Extract the `.skill` into a clean directory and run that skill's own gates **from the extracted contents**, not from the working copy. This is what catches a reference file dropped during packaging. Confirm `name:` survived and the intended change is present.
+**Extraction is not the install** (`D28`). *Save skill* writes the `SKILL.md` name line as `name: "<skill>"`, and MB-008's X17 found it only after the install, when flowmaster-validate could not read its own suite. So the gates run on what the install produces, beside every skill it will sit with:
+1. Copy the **whole** installed skills directory twice — never a hand-picked subset — and put the extracted package in both copies.
+2. In one copy write every skill's name line quoted, `name: "<skill>"`; in the other write every one plain, `name: <skill>`.
+3. Run every gate, and `freeze.py` on every skill, on both copies. Each gate must give the same result on both, and every gate of the change must pass. A gate that differs between the copies reads the name line, and that is a defect to fix before delivery, not an environment limit.
 **5. Review, then deliver.** Run the independent review with reviewer subagents (`D24`, below). Only once both reviewers confirm, deliver the `.skill` file(s) with `SendUserFile`, captioned with each digest, together with the verdict files, and state what changed, where each file installs, and what Nathan should see after installing.
 ### Reading a validator's result
 Read each tool's **own top-level flag** by name — `ok`, `fixture_suite_ok`, `suite_ok`/`verdict`, and the suite result. A green subsidiary section flag while the overall flag is false is meaningless, and a green section count (for example "33/33 passed") next to `fixture_suite_ok: false` means the suite failed.
@@ -59,7 +63,7 @@ On a **re-review**, add the disposition of every prior finding — fixed, declin
 **Practical consequence, learned the expensive way:** batch small corrections into one change rather than shipping them one at a time. Three separate one-line fixes cost three independent reviews; one change carrying all three costs one.
 **Prevent bytecode rather than excluding it.** Run every validator with `PYTHONDONTWRITEBYTECODE=1`. The Freeze rule below is right that `__pycache__` is not a content change, but a stray `.pyc` has been packaged into a `.skill` before and was caught only by a file count — preventing it is cheaper than reasoning about it.
 ### GCFPE tie-in
-The GCFPE plan's §10 requires that any approved skill edit be made with `skill-creator`, preserve unrelated behaviour, be committed and read back, and then have the dedicated skill review re-run against the **final installed snapshot**. Packaging is not the end of the gate. Since `D24`, the review runs on the packages before Nathan installs, and the post-install digest comparison is what binds the installed snapshot to the reviewed bytes. If the installed digest differs from the reviewed one, the review is void and runs again on the installed tree.
+The GCFPE plan's §10 requires that any approved skill edit be made with `skill-creator`, preserve unrelated behaviour, be committed and read back, and then have the dedicated skill review re-run against the **final installed snapshot**. Packaging is not the end of the gate. Since `D24`, the review runs on the packages before Nathan installs, and the post-install digest comparison is what binds the installed snapshot to the reviewed bytes. If the installed digest differs from the reviewed one, the review is void and runs again on the installed tree. `freeze.py` reads the name line plain (`D28`), so the install's quoting does not make the digests differ; after the install, run the same gates again on the installed skills directory itself.
 ### Freeze rule
 No skill may be installed while a review is running. A review that judges a moving snapshot is void. Freeze the tree, hash it, review, then re-hash and confirm nothing moved. Note that merely *running* a bundled Python validator writes `__pycache__/*.pyc` into the tree; that is expected, is not a content change, and should be compared with `__pycache__` excluded.
 
