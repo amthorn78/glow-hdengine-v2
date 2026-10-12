@@ -20,12 +20,14 @@
         unfilled `@` marker.
   registry_assemble.py check --stage S --registry FILE --audit-root A --graph-contract G --parts P
         validate_project_registry: no error; registry_deriver drift(): none; 55 ACTIVE rows; every header value
-        as registry-header states for the stage; no `@` marker left.
+        as registry-header states for the stage; every deleted key and row absent, and no header string citing a
+        deleted key; no `@` marker left.
   registry_assemble.py assertions --registry FILE --audit-root A [--fetched-after T] [--page K=ID@TS]
-                                  [--shared K=V] [--inject]
+                                  [--shared K=V] [--inject] [--landed]
         every row's audit_assertions run by the shipped engine (_evaluate_assertions) on the newest fresh read of
         its page with this plan's operations applied in memory (D22: body_check.py's transient reads; counts and
-        ids only). --inject also proves each row's assertions fire: each required assertion, with every line it
+        ids only). With --landed (X11, X18) nothing is applied: each page is evaluated as read, and every operation
+        on it must already have LANDED; X11 and X18 pass MGMT-10's successor with --page and --shared. --inject also proves each row's assertions fire: each required assertion, with every line it
         matches removed, and two release-wide forbidden assertions (D23-G's `Prompt version:` line and
         CONTROL_NOTION), with a violating line added, must each be reported.
   registry_assemble.py compare CANDIDATE SELECTED --audit-root A
@@ -179,7 +181,14 @@ def assemble(stage: str, audit_root: str, gc_root: str, parts_dir: str, revision
         target = header
         for k in path[:-1]:
             target = target[k]
-        del target[path[-1]]
+        last = path[-1]
+        if isinstance(last, dict):  # the list element whose fields equal these
+            hits = [i for i, e in enumerate(target) if all(e.get(f) == v for f, v in last.items())]
+            if len(hits) != 1:
+                sys.exit(f"registry_assemble: delete {path} matches {len(hits)} elements")
+            del target[hits[0]]
+        else:
+            del target[last]
     for lane in header["lanes"]:
         lane["notion_parent_title"] = retitle(lane["notion_parent_title"])
         if HEADER["control_titles"].get(lane["notion_parent_id"]) != lane["notion_parent_title"]:
@@ -259,13 +268,20 @@ def check(a) -> dict:
         "deriver_drift": drift, "rows_without_part": rows_without_part,
         "rows": len(rows), "rows_active": sum(r.get("lifecycle") == "ACTIVE" for r in rows),
         "header_values_ok": all(header_ok.values()), "header_values_failing": [p for p, ok in header_ok.items() if not ok],
-        "deleted_absent": all(path[0] not in data for path, _ in HEADER["delete"]),
+        "deleted_absent": all(path[0] not in data for path, _ in HEADER["delete"] if len(path) == 1),
+        # a header string must not cite a key the build deleted (DIFF-3)
+        "deleted_keys_cited": sorted({path[-1] for path, _ in HEADER["delete"] if isinstance(path[-1], str)
+                                      and path[-1] in json.dumps({k: v for k, v in data.items() if k != "prompts"},
+                                                                 ensure_ascii=False, default=str)}),
+        "manifest_row_absent": not any(isinstance(s, dict) and s.get("type") == "COMPLETE_PROMPT_FETCH_MANIFEST"
+                                       for s in data.get("authority_sources", [])),
         "markers_left": markers_left(data),
         "parent_titles_in_control_titles": all(r.get("expected_parent_title", next(iter(HEADER["control_titles"].values())))
                                                in HEADER["control_titles"].values() for r in rows),
     }
     res["ok"] = (not errors and drift == [] and rows_without_part == [] and res["rows"] == 55 and res["rows_active"] == 55
-                 and res["header_values_ok"] and res["deleted_absent"] and not res["markers_left"]
+                 and res["header_values_ok"] and res["deleted_absent"] and not res["deleted_keys_cited"]
+                 and res["manifest_row_absent"] and not res["markers_left"]
                  and res["parent_titles_in_control_titles"])
     return res
 
@@ -310,12 +326,19 @@ def assertions(a) -> dict:
             rows_out.append({"prompt": key, "error": "NO_FETCH_FOUND"})
             ok = False
             continue
-        after, _ = B.apply_all(got[2], [o for o in B.EDITS["ops"] if o["prompt"] == key])
+        page_ops = [o for o in B.EDITS["ops"] if o["prompt"] == key]
+        if a.landed:
+            # after X5: evaluate the page as it is, and require every operation on it to have landed (L-5)
+            after = got[2]
+            not_landed = sorted(o["id"] for o in page_ops if B.state(after, o) != "LANDED")
+        else:
+            after, _ = B.apply_all(got[2], page_ops)
+            not_landed = []
         findings = A._evaluate_assertions(row, after, "transient")
-        r = {"prompt": key, "as_of": got[1],
+        r = {"prompt": key, "as_of": got[1], "operations_not_landed": not_landed,
              "assertions": sum(len(row["audit_assertions"].get(k) or []) for k in ASSERTION_KEYS),
              "findings_after": len(findings),
-             "failing": sorted({f["observed"][:90] for f in findings})}
+             "failing": sorted({str(f.get("observed"))[:90] for f in findings})}
         if a.inject:
             fired, missed = 0, []
             for raw in row["audit_assertions"].get("required_regex") or []:
@@ -337,7 +360,7 @@ def assertions(a) -> dict:
                 else:
                     missed.append(needle)
             r["injected_fired"], r["injected_missed"] = fired, missed
-        r["ok"] = not findings and not r.get("injected_missed")
+        r["ok"] = not findings and not r.get("injected_missed") and not not_landed
         ok &= r["ok"]
         rows_out.append(r)
     return {"mode": "assertions", "engine": "amthor-workspace-governance-audit _evaluate_assertions",
@@ -390,6 +413,8 @@ def main() -> int:
     s.add_argument("--page", action="append", default=[])
     s.add_argument("--shared", action="append", default=[])
     s.add_argument("--inject", action="store_true")
+    s.add_argument("--landed", action="store_true",
+                   help="X11 and X18: evaluate each page as read, and require its operations to have LANDED")
     m = sub.add_parser("compare")
     m.add_argument("candidate")
     m.add_argument("selected")

@@ -7,7 +7,8 @@ change there and in memory, and prints one JSON receipt on stdout. Nothing in th
 (D22); page bodies are read only as transient reads of this session's own fetch records, by body_check.py.
 
 Usage, from the repository root, after fetching all 56 pages listed in edits.json in this session (the MGMT-10
-testing page stands in for the successor) and the nine control pages control_check.py reads:
+testing page stands in for the successor), the nine control pages control_check.py reads and the candidate inventory
+page activation_render.py also writes:
 
     PYTHONDONTWRITEBYTECODE=1 CLAUDE_CODE_SESSION_ID=<session> python3 \\
       docs/ephemeral/modifications/evidence/20261011-gcfpe-mb008-to-promotion/plan/dry_run.py \\
@@ -292,6 +293,16 @@ def main() -> int:
     m9, cm9 = jrun([sys.executable, ra, "compare", reg / "candidate.md", reg / "selected.md", "--audit-root",
                     work / "amthor-workspace-governance-audit"])
     b3, _, _ = run([sys.executable, ra, "build", "--stage", "selected", *common, "--out", reg / "unfilled.md", *mg])
+    # X11 and X18 evaluate landed pages: on today's unedited reads every row must fail for its unlanded operations
+    l9, ls9 = jrun([sys.executable, ra, "assertions", "--registry", reg / "candidate.md", "--audit-root",
+                    work / "amthor-workspace-governance-audit", "--since-minutes", "900", "--fetched-after",
+                    fetched_after, "--landed"])
+    # a header string citing a deleted key is refused (DIFF-3)
+    stale = (reg / "candidate.md").read_text(encoding="utf-8").replace(
+        "registry_id: GCFPE-PCR-20261009.1", "registry_id: GCFPE-PCR-20261009.1 see body_extraction_convention", 1)
+    (reg / "stale.md").write_text(stale, encoding="utf-8")
+    k3, ck3 = jrun([sys.executable, ra, "check", "--stage", "candidate", "--registry", reg / "stale.md", *roots,
+                    "--parts", cand])
     arows = as9.get("rows", [])
     gates["N9_registry"] = {
         "candidate_build": bo1, "candidate_check_ok": k1 == 0 and ck1.get("ok"),
@@ -303,32 +314,44 @@ def main() -> int:
         "failing_rows": [r.get("prompt") for r in arows if not r.get("ok")],
         "selected_check_ok": k2 == 0 and ck2.get("ok"), "stages_differ_only_as_specified": m9 == 0 and cm9.get("ok"),
         "differing_paths": cm9.get("differing_paths"), "unfilled_selected_marker_refused": b3 != 0,
+        "landed_mode_fails_before_writes": l9 == 1 and all(r.get("operations_not_landed") for r in ls9.get("rows", [])),
+        "deleted_key_citation_refused": k3 == 1 and ck3.get("deleted_keys_cited") == ["body_extraction_convention"],
         "stand_ins": "MGMT-10: the testing page's id and pinned revision; every row's page_last_edited_at: its pinned "
                      "revision (EXECUTE uses X6's check report); approval date and catalog id: stand-in values",
-        "ok": b1 == 0 and k1 == 0 and a9 == 0 and b2 == 0 and k2 == 0 and m9 == 0 and b3 != 0 and len(arows) == 55}
+        "ok": b1 == 0 and k1 == 0 and a9 == 0 and b2 == 0 and k2 == 0 and m9 == 0 and b3 != 0 and len(arows) == 55
+        and l9 == 1 and all(r.get("operations_not_landed") for r in ls9.get("rows", [])) and k3 == 1
+        and ck3.get("deleted_keys_cited") == ["body_extraction_convention"]}
 
-    # N10: the activation check (P-B1): its self-test, and on today's control pages it fires, and every page section
-    # it flags is named in the activation delta
-    cc = HERE / "control_check.py"
+    # N10: the activation check and the rendered activation (P-B1, DIFF-1, DIFF-2): control_check fires on today's control
+    # pages; activation_render applies every operation in memory to those reads and the rendered pages pass it
+    cc, ar = HERE / "control_check.py", HERE / "activation_render.py"
     c10a, st10 = jrun([sys.executable, cc, "selftest", "--parts", cand])
     c10b, ck10 = jrun([sys.executable, cc, "check", "--parts", cand, "--phase", "activation", "--since-minutes", "900",
                        "--fetched-after", fetched_after])
-    delta = json.loads((HERE / "activation-delta-100926.1.json").read_text(encoding="utf-8"))
-    named = {}
-    for entry in delta["pages"]:
-        for pid in entry.get("pages", [entry.get("page")]):
-            named.setdefault(pid, set()).update(sec for sec, _ in entry.get("sections", []))
-    flagged = {(p["page"], r["section"]) for p in ck10.get("pages", []) for r in p.get("finding_rows", [])}
-    uncovered = sorted(f"{pg}:{sec}" for pg, sec in flagged if sec not in named.get(pg, set()))
-    gates["N10_activation_check"] = {
-        "selftest_cases": len(st10.get("cases", {})), "selftest_ok": c10a == 0 and st10.get("ok"),
-        "archive_set": ck10.get("archive_set"), "pages": len(ck10.get("pages", [])),
-        "pages_read": sum("error" not in p for p in ck10.get("pages", [])),
-        "findings_today": sum(p.get("findings", 0) for p in ck10.get("pages", [])),
-        "page_sections_flagged": len(flagged), "page_sections_not_in_delta": uncovered,
-        "fires_today": c10b == 1,
-        "ok": c10a == 0 and c10b == 1 and not uncovered and ck10.get("archive_set") == 57
-        and all("error" not in p for p in ck10.get("pages", []))}
+    c10c, rs10 = jrun([sys.executable, ar, "selftest", "--parts", cand])
+    stand = {"@ACTIVATION_DATE": "2026-10-12", "@CATALOG_PAGE_ID": "0" * 32, "@REGISTER_ENTRY_PAGE_ID": "f" * 32,
+             "@MGMT10_PAGE_ID": "3e34590a05eb811b93d2da9b4ef8106d", "@PRODUCTION_TOKEN": "STAND-IN",
+             "@POSTFLIGHT_VERDICT": "PASS", "@PROMOTION_APPROVED_AT": "2026-10-12"}
+    sets = [x for k, v in stand.items() for x in ("--set", f"{k}={v}")]
+    c10d, rp10 = jrun([sys.executable, ar, "plan", "--parts", cand, *sets, "--since-minutes", "900",
+                       "--fetched-after", fetched_after])
+    rpages = rp10.get("pages", [])
+    gates["N10_activation"] = {
+        "check_selftest_cases": len(st10.get("cases", {})), "check_selftest_ok": c10a == 0 and st10.get("ok"),
+        "archive_set": ck10.get("archive_set"), "control_pages_read": sum("error" not in p for p in ck10.get("pages", [])),
+        "findings_today": sum(p.get("findings", 0) for p in ck10.get("pages", [])), "fires_today": c10b == 1,
+        "render_selftest_ok": c10c == 0 and rs10.get("ok"),
+        "pages_rendered": len(rpages), "pins_match": sum(bool(p.get("revision_matches_pin")) for p in rpages),
+        "operations_listed": sum(p.get("ops_listed", 0) for p in rpages),
+        "operations_generated": sum(p.get("ops_generated", 0) for p in rpages),
+        "operations_applied": sum(p.get("applied", 0) for p in rpages),
+        "operations_refused": sum(len(p.get("refused", [])) for p in rpages),
+        "findings_after_render": sum(p.get("findings_after", 0) or 0 for p in rpages),
+        "failing_pages": [p.get("page") for p in rpages if not p.get("ok")],
+        "new_pages": {k: v.get("ok") for k, v in rp10.get("new_pages", {}).items()},
+        "stand_ins": "marker values, including the successor's id, are stand-ins; EXECUTE fills them from X1, X3, X13, X14 and X15",
+        "ok": c10a == 0 and c10b == 1 and c10c == 0 and c10d == 0 and ck10.get("archive_set") == 57
+        and len(rpages) == 10}
 
     ok = all(v["ok"] for v in gates.values())
     print(json.dumps({"record_type": "MB008_PLAN_DRY_RUN", "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",

@@ -5,7 +5,7 @@
  "purpose": "The complete registry row for GCFPE-MGMT-10's successor (DN-C A), replacing the 2026-10-09 proposal's row, which describes the reused 091426.1 page. registry_assemble.py fills the markers, adds the fields derived from the final parts (outputs[].states, outputs[].consumers, required_interfaces), retitles expected_parent_title with the other rows, and appends the guards in registry form.",
  "markers": {
   "@MGMT10_PAGE_ID": "the duplicate's 32-hex page id, read back at X1",
-  "@MGMT10_LAST_EDITED": "the duplicate's last_edited_time on X2's fresh read after M-HEAD and M-TS"
+  "@MGMT10_LAST_EDITED": "overwritten by registry_assemble.py from X6's check report, as every row's page_last_edited_at is (the successor's operations land at X5)"
  },
  "sources": {
   "identity": "PART-05: the duplicate of the testing page 3e34590a05eb811b93d2da9b4ef8106d, under the Flow Index 3db4590a05eb81de9736ea69bac61016, titled as M-HEAD's title line",
