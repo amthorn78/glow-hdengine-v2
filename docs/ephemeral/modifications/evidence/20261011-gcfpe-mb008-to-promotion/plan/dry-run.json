@@ -1,8 +1,8 @@
 {
  "record_type": "MB008_PLAN_DRY_RUN",
  "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
- "date_utc": "2026-10-11T23:35:25+00:00",
- "repository_head": "93bb9e363158806b75bc4ab98d491b7122ee35be",
+ "date_utc": "2026-10-12T00:48:30+00:00",
+ "repository_head": "4055a357f84a3bfce73ccf76c27147db434f992a",
  "fetched_after": "2026-10-11T22:48:40.000Z",
  "gates": {
   "N0_identities": {
@@ -61,8 +61,8 @@
   },
   "N1_body_guard_selftest": {
    "exit_code": 0,
-   "guards": 14,
-   "fixture_rows": 37,
+   "guards": 20,
+   "fixture_rows": 58,
    "span_resolver": {
     "untouched": true,
     "landed": true,
@@ -73,6 +73,9 @@
     "anchor_landing_refuses_kept_tail": true,
     "anchor_landing_refuses_kept_head": true,
     "anchor_landing_refuses_untouched": true,
+    "multiline_resolves": true,
+    "multiline_refuses_other_line_count": true,
+    "multiline_lands": true,
     "insert_untouched": true,
     "insert_applied_once": true,
     "insert_landed": true,
@@ -86,24 +89,24 @@
   },
   "N2_body_rehearsal": {
    "exit_code": 0,
-   "pages": 55,
-   "ops": 82,
-   "ops_applied": 82,
-   "revisions_match_pins": 55,
-   "batch_safe": 55,
-   "guard_rows_after": 210,
-   "guard_rows_passing_after": 210,
-   "guard_rows_passing_before": 55,
-   "check_would_pass": 55,
+   "pages": 56,
+   "ops": 87,
+   "ops_applied": 87,
+   "revisions_match_pins": 56,
+   "batch_safe": 56,
+   "guard_rows_after": 273,
+   "guard_rows_passing_after": 273,
+   "guard_rows_passing_before": 111,
+   "check_would_pass": 56,
    "failing_pages": [],
    "ok": true
   },
   "N3_registry_form": {
    "exit_code": 0,
-   "fixtures": 37,
-   "fixtures_agree": 37,
-   "page_rows": 210,
-   "page_rows_agree": 210,
+   "fixtures": 58,
+   "fixtures_agree": 58,
+   "page_rows": 273,
+   "page_rows_agree": 273,
    "ok": true
   },
   "N4_graph": {
@@ -121,6 +124,8 @@
      "rejects_old_member_rule": true,
      "rejects_bad_url": true,
      "rejects_stale_proofs": true,
+     "rejects_candidate_prologue_on_flipped": true,
+     "flipped_prologue_is_selected": true,
      "proofs_describe_no_added_member": true
     },
     "ok": true
@@ -166,13 +171,13 @@
    "contracts_100926": {
     "candidate": {
      "exit_code": 0,
-     "bytes": 634454,
-     "sha256": "5d41250408506eca7e796d308c565590a945680a3f2dab8acf32ec30b5e2f131"
+     "bytes": 634423,
+     "sha256": "215663f2006447b1fc9b30e31481988c987811bc5d6fff30e0986e81f728a6b6"
     },
     "production": {
      "exit_code": 0,
-     "bytes": 631092,
-     "sha256": "17bf6c3f0e5904415af2be7ddb03ba4c43ebebf8f021d760bb3d05915c1c8f17"
+     "bytes": 631061,
+     "sha256": "769f2a11121fe210992977f0f477490ccee6b4c95eccaa982e3c8fd25b00d215"
     }
    },
    "plan_digest": "STAND-IN: edits.json",
@@ -182,7 +187,7 @@
    "substitutions": 25,
    "errors": [
     "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.4.0",
-    "SKILL_SELF_IDENTITY:DECLARED_284b3ac150be_MEASURED_e1437df7c580"
+    "SKILL_SELF_IDENTITY:DECLARED_284b3ac150be_MEASURED_05001dc0650f"
    ],
    "unexpected_errors": [],
    "pending_by_design": "change-flow's revision moves to 3.4.0 with its redlines in EXECUTE's package build; SKILL_TREE_SHA256 is recomputed as the package build's last step",
@@ -190,15 +195,16 @@
   },
   "N7_bodies_through_profile": {
    "before": {
-    "bodies_validated": 54,
+    "bodies_validated": 55,
     "not_evaluated": [],
     "body_error_classes": [
+     "PROMPT_BODY_IDENTITY",
      "PROMPT_TYPESAFE_READING"
     ],
-    "body_errors": 53
+    "body_errors": 55
    },
    "after": {
-    "bodies_validated": 54,
+    "bodies_validated": 55,
     "not_evaluated": [],
     "body_error_classes": [],
     "body_errors": 0
@@ -211,6 +217,47 @@
    "landed": 46,
    "second_apply_refused": true,
    "audit_fixture_suite_ok": true,
+   "ok": true
+  },
+  "N9_registry": {
+   "candidate_build": {
+    "written": "/tmp/claude-0/-home-user-glow-hdengine-v2/11695baf-e0d2-5d3b-80fc-7c96de66c6a8/scratchpad/dr3/registry/candidate.md",
+    "bytes": 535955,
+    "rows": 55,
+    "read_back_equal": true
+   },
+   "candidate_check_ok": true,
+   "validator_errors": 0,
+   "deriver_drift": [],
+   "rows": 55,
+   "rows_passing_after_edits": 55,
+   "assertions_evaluated": 2398,
+   "injected_regressions_fired": 665,
+   "injected_regressions_missed": 0,
+   "failing_rows": [],
+   "selected_check_ok": true,
+   "stages_differ_only_as_specified": true,
+   "differing_paths": [
+    "approved_at",
+    "approved_by",
+    "authority_sources.1.pending",
+    "authority_sources.1.url",
+    "status"
+   ],
+   "unfilled_selected_marker_refused": true,
+   "stand_ins": "MGMT-10: the testing page's id and pinned revision; every row's page_last_edited_at: its pinned revision (EXECUTE uses X6's check report); approval date and catalog id: stand-in values",
+   "ok": true
+  },
+  "N10_activation_check": {
+   "selftest_cases": 16,
+   "selftest_ok": true,
+   "archive_set": 57,
+   "pages": 9,
+   "pages_read": 9,
+   "findings_today": 306,
+   "page_sections_flagged": 37,
+   "page_sections_not_in_delta": [],
+   "fires_today": true,
    "ok": true
   }
  },
