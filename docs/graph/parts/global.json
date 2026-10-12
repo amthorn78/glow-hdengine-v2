@@ -1,9 +1,9 @@
 {
   "_epilogue": "```\n",
   "_other_edge_indices": [
-    122,
-    123,
-    124
+    120,
+    121,
+    122
   ],
   "_other_edges": [
     {
@@ -76,7 +76,7 @@
       }
     ]
   },
-  "_prologue": "# GCFPE-20260914.1 Candidate Graph Contract\n\n```yaml\nartifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\nrelease: GCFPE-20260914.1\nprompt_version_family: '091426.1'\nselection_status: SELECTED_PRODUCTION\ncomplete_source_path: candidate/graph/GCFPE-20260914.1-Candidate-Graph-Contract.json\ncomplete_source_bytes: 580051\ncomplete_source_sha256: 77e9e1e0f393fc8bc630a78bda8f50ee77d72e118e436cb2a244e20c9cb0c344\ncontent_status: COMPLETE\nsource_binding_revision: 20260916.1-batch-2-contract-synchronization\nvalidation_scope: TARGETED_AUTHOR_SELF_REVIEW_PENDING_INDEPENDENT_POSTFLIGHT_REQUIRED\n```\n\n```json",
+  "_prologue": "# GCFPE-20261009.1 Candidate Graph Contract\n\n```yaml\nartifact_type: GCFPE_CANDIDATE_GRAPH_CONTRACT\nrelease: GCFPE-20261009.1\nprompt_version_family: '100926.1'\nselection_status: SELECTED_PRODUCTION\ncomplete_source_path: candidate/graph/GCFPE-20261009.1-Candidate-Graph-Contract.json\ncomplete_source_bytes: 0\ncomplete_source_sha256: 0\ncontent_status: COMPLETE\nsource_binding_revision: MODIFICATION-20261011-gcfpe-mb008-to-promotion\nvalidation_scope: QUALIFICATION_AND_POSTFLIGHT_RECORDED_IN_MODIFICATION-20261011-gcfpe-mb008-to-promotion\n```\n\n```json",
   "abort_contract": {
     "agent_skill_prompt_hub_inbound_edges": 0,
     "automatic_inbound_edges": 0,
@@ -245,10 +245,10 @@
     "baseline/preflight/project-prompt-registry.yaml"
   ],
   "baseline": {
-    "member_count": 54,
-    "registry": "baseline/preflight/project-prompt-registry.yaml",
-    "release": "GCFPE-20260913.1",
-    "version_family": "091326.2"
+    "member_count": 55,
+    "registry": "docs/prompt_ecosystem_management/project-prompt-contract-registry.md",
+    "release": "GCFPE-20260914.1",
+    "version_family": "091426.1"
   },
   "boundary_nodes": {
     "ACTUAL_OWNER_TERMINAL_RETURN": {
@@ -307,9 +307,9 @@
   },
   "candidate": {
     "member_count": 55,
-    "member_rule": "54 selected predecessors + PR-35; no removals",
-    "release": "GCFPE-20260914.1",
-    "version_family": "091426.1"
+    "member_rule": "54 successor runtime members + the GCFPE-MGMT-10 successor (D20 three-mode body); no additions or removals",
+    "release": "GCFPE-20261009.1",
+    "version_family": "100926.1"
   },
   "candidate_member_count_excludes_boundaries": true,
   "canonical_source_contract": {
@@ -327,7 +327,7 @@
     "pfcanon_root": "docs/pfcanon",
     "source_failure_result": "SOURCE_RESOLUTION_ERROR"
   },
-  "contract_id": "GCFPE-20260914.1-CANDIDATE-GRAPH",
+  "contract_id": "GCFPE-20261009.1-CANDIDATE-GRAPH",
   "handoff_contract": {
     "actual_branch_only": true,
     "complete_paste_ready_prompt": true,
@@ -350,7 +350,7 @@
     ],
     "required": [
       "exact selected prompt full name/version/direct Notion URL",
-      "receiving role and exact session",
+      "receiving role/name and exact task/artifact binding; receiving side selects or recovers the session; no persistent session or executor identity prerequisite",
       "input artifact repository paths with one-line labels",
       "pull request reference when the receiver continues an existing PR",
       "minimum exceptional context only for a condition the artifacts do not record"
@@ -380,7 +380,14 @@
       "any field describing this addendum's own drainage state — not a Canon destination, Canon target, or PF09 row"
     ],
     "forbidden_fields_scope": "These fields are forbidden inside a PF10 Build Notes Addendum only, and only because they belong to the retired addendum-drainage lifecycle. They place no restriction on Canon disposition anywhere else. Canon conflict and ADR records, NEW_CANON and CANON_RECONCILIATION classifications, the permanent Canon drainage target and owner, and PF09 rows identifying where an approved change must ultimately land in PF Canon are all legitimate and must be preserved intact. Interpret this list by function, never by the word \"drain\": a validator must not reject a field merely because its name or value contains it.",
-    "format_home": "Glow Operations Hub, Notion. Canonical, and not hard-linked to PF10.",
+    "format_expectations": {
+      "excluded_content": "role-addressed handling, publication, routing and record-maintenance instructions, which stay in the decision and handoff",
+      "heading": "exactly one H2 carrying the next continuous addendum number, resolved by the producer from current controlled PF10 at creation, and a descriptive title",
+      "number_carrier": "the H2 heading; no standalone pf10_addendum_number metadata field, which stays forbidden",
+      "subject_matter": "page-ready, self-contained declarative statement of the approved decision and its approval status, durable requirements, exceptions, scope, exclusions and nonclaims, evidence, dependencies, conflicts, consequences and unresolved obligations, keeping completed work, future work, recommendations and unproven facts distinct",
+      "subordinate_headings": "H3 or lower only"
+    },
+    "format_home": "PF06-Canon-Change-Process-Guide §0.1A and PF27-Canon-Plan-Templates, Canon precedence for template use, read from docs/pfcanon on main",
     "native_outcome_normalization": {
       "CHANGE_NOT_SUBSTANTIATED": "UNCHANGED",
       "DELTA_APPROVE": "MATERIAL_APPROVAL",
@@ -410,7 +417,7 @@
       "IN_SCOPE_REPAIR"
     ],
     "paste_ready": true,
-    "producer_allocates_pf10_number": false,
+    "producer_allocates_pf10_number": true,
     "producer_claims_canonical_adoption": false,
     "producer_edits_pf10": false,
     "producers": {
@@ -551,9 +558,7 @@
     ],
     "pf10_producer_set_exact": true,
     "prompt_inbound_edges_to_PR-50": 0,
-    "sole_added_node": [
-      "PR-35"
-    ],
+    "sole_added_node": [],
     "unique_node_ids": true,
     "unresolved_edges": []
   },

@@ -1,10 +1,10 @@
 {
   "edge_indices": [
+    144,
     145,
     146,
     147,
-    148,
-    149
+    148
   ],
   "edges": [
     {
@@ -154,7 +154,7 @@
             "BLOCKED"
           ],
           "branch_id": "material_boundary",
-          "condition": "a material change to the Epic-level commitment (D23-C) is substantiated",
+          "condition": "a material change to the Epic-level commitment (D23-C) is substantiated; a lawful originating PR implementation author is identified, independent of the IA reviewer; otherwise return the unresolved assignment to the Product Owner",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "CONDITIONAL_RECOVERY",
@@ -182,8 +182,8 @@
   "id": "PR-10",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a?pvs=204",
+    "candidate_version": "100926.1",
     "id": "PR-10",
     "lane": "PR",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -192,11 +192,11 @@
       "PR_INSTRUCTION"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb81c594a0f9bf5cb151a7",
-      "release": "GCFPE-20260913.1",
-      "title": "PR-10 — Create PR Work-Unit Instructions — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb81c594a0f9bf5cb151a7",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb818e8359de1994e97a7d",
+      "release": "GCFPE-20260914.1",
+      "title": "PR-10 — Create PR Work-Unit Instructions — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "PR-20"
@@ -210,7 +210,7 @@
     ],
     "sequence": 10,
     "session_class": "CHANGE_LIFETIME",
-    "title": "PR-10 — Create PR Work-Unit Instructions — 091426.1"
+    "title": "PR-10 — Create PR Work-Unit Instructions — 100926.1"
   },
   "state_route_order": [
     "instruction_ready",

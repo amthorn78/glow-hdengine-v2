@@ -1,0 +1,279 @@
+{
+ "record_type": "MB008_PLAN_DRY_RUN",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "date_utc": "2026-10-12T01:36:44+00:00",
+ "repository_head": "a50deab25b8663c3c71deeacef9616159197ef6c",
+ "fetched_after": "2026-10-11T22:48:40.000Z",
+ "gates": {
+  "N0_identities": {
+   "rows": [
+    {
+     "skill": "change-flow",
+     "expected": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "installed": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "copy": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+     "ok": true
+    },
+    {
+     "skill": "flowmaster-validate",
+     "expected": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+     "installed": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+     "copy": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+     "ok": true
+    },
+    {
+     "skill": "glow-hde-pr-development",
+     "expected": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "installed": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "copy": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+     "ok": true
+    },
+    {
+     "skill": "glow-graph-contract",
+     "expected": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "installed": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "copy": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+     "ok": true
+    },
+    {
+     "skill": "session-relay-flowmaster",
+     "expected": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "installed": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "copy": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+     "ok": true
+    },
+    {
+     "skill": "amthor-workspace-governance-audit",
+     "expected": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "installed": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "copy": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+     "ok": true
+    },
+    {
+     "skill": "glow-merged-change-attribution-lock",
+     "expected": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+     "installed": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+     "copy": "10 c518ccb0076b042859de4d2e136ef682bb127b6524133d2a575d433490eaf48f",
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "N1_body_guard_selftest": {
+   "exit_code": 0,
+   "guards": 20,
+   "fixture_rows": 58,
+   "span_resolver": {
+    "untouched": true,
+    "landed": true,
+    "second_send_refused": true,
+    "ambiguous_refused": true,
+    "cross_line_refused": true,
+    "anchor_landing_exact": true,
+    "anchor_landing_refuses_kept_tail": true,
+    "anchor_landing_refuses_kept_head": true,
+    "anchor_landing_refuses_untouched": true,
+    "multiline_resolves": true,
+    "multiline_refuses_other_line_count": true,
+    "multiline_lands": true,
+    "insert_untouched": true,
+    "insert_applied_once": true,
+    "insert_landed": true,
+    "insert_second_send_refused": true,
+    "insert_anchor_landing": true,
+    "insert_landing_refuses_untouched": true,
+    "insert_landing_refuses_doubled": true,
+    "replace_landed_unchanged": true
+   },
+   "ok": true
+  },
+  "N2_body_rehearsal": {
+   "exit_code": 0,
+   "pages": 56,
+   "ops": 87,
+   "ops_applied": 87,
+   "revisions_match_pins": 56,
+   "batch_safe": 56,
+   "guard_rows_after": 273,
+   "guard_rows_passing_after": 273,
+   "guard_rows_passing_before": 111,
+   "check_would_pass": 56,
+   "failing_pages": [],
+   "ok": true
+  },
+  "N3_registry_form": {
+   "exit_code": 0,
+   "fixtures": 58,
+   "fixtures_agree": 58,
+   "page_rows": 273,
+   "page_rows_agree": 273,
+   "ok": true
+  },
+  "N4_graph": {
+   "selftest": {
+    "mode": "selftest",
+    "rows": {
+     "clean_apply_passes": true,
+     "second_apply_changes_nothing": true,
+     "clean_flip_passes": true,
+     "unflipped_fails_flipped_check": true,
+     "rejects_other_part_change": true,
+     "rejects_kept_pr10_edge": true,
+     "rejects_missing_state": true,
+     "rejects_global_change": true,
+     "rejects_old_member_rule": true,
+     "rejects_bad_url": true,
+     "rejects_stale_proofs": true,
+     "rejects_candidate_prologue_on_flipped": true,
+     "flipped_prologue_is_selected": true,
+     "proofs_describe_no_added_member": true
+    },
+    "ok": true
+   },
+   "check_candidate": {
+    "ok": true,
+    "errors": []
+   },
+   "check_production": {
+    "ok": true,
+    "errors": []
+   },
+   "builds": {
+    "parent": {
+     "exit_code": 0,
+     "edges": 237,
+     "bytes": 596008,
+     "sha256": "ff296b1e740a77ee207c1223cc9bdff1f56c6c167bd4714a41ae92ef8708f18b",
+     "validation_pass": true
+    },
+    "candidate": {
+     "exit_code": 0,
+     "edges": 235,
+     "bytes": 593625,
+     "sha256": "df3b57a5022f2716c80bc76a59cd4ea73e84e34085c2ae21c2b127be49684942",
+     "validation_pass": true
+    },
+    "production": {
+     "exit_code": 0,
+     "edges": 235,
+     "bytes": 593569,
+     "sha256": "8391ad84af4734a61fd1ca9afcc6949b39f85bfdf3c95f37d211f42d1c0205a2",
+     "validation_pass": true
+    }
+   },
+   "mgmt10_url": "STAND-IN: the testing page; EXECUTE uses the duplicated successor's URL",
+   "ok": true
+  },
+  "N5_regenerator": {
+   "patch_applied": true,
+   "shipped_091426_contract_regenerates_equal": true,
+   "unfilled_marker_refused": true,
+   "contracts_100926": {
+    "candidate": {
+     "exit_code": 0,
+     "bytes": 634423,
+     "sha256": "215663f2006447b1fc9b30e31481988c987811bc5d6fff30e0986e81f728a6b6"
+    },
+    "production": {
+     "exit_code": 0,
+     "bytes": 631061,
+     "sha256": "769f2a11121fe210992977f0f477490ccee6b4c95eccaa982e3c8fd25b00d215"
+    }
+   },
+   "plan_digest": "STAND-IN: edits.json",
+   "ok": true
+  },
+  "N6_profile_100926": {
+   "substitutions": 25,
+   "errors": [
+    "CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.4.0",
+    "SKILL_SELF_IDENTITY:DECLARED_284b3ac150be_MEASURED_05001dc0650f"
+   ],
+   "unexpected_errors": [],
+   "pending_by_design": "change-flow's revision moves to 3.4.0 with its redlines in EXECUTE's package build; SKILL_TREE_SHA256 is recomputed as the package build's last step",
+   "ok": true
+  },
+  "N7_bodies_through_profile": {
+   "before": {
+    "bodies_validated": 55,
+    "not_evaluated": [],
+    "body_error_classes": [
+     "PROMPT_BODY_IDENTITY",
+     "PROMPT_TYPESAFE_READING"
+    ],
+    "body_errors": 55
+   },
+   "after": {
+    "bodies_validated": 55,
+    "not_evaluated": [],
+    "body_error_classes": [],
+    "body_errors": 0
+   },
+   "ok": true
+  },
+  "N8_package_redlines": {
+   "ops": 46,
+   "applied": true,
+   "landed": 46,
+   "second_apply_refused": true,
+   "audit_fixture_suite_ok": true,
+   "ok": true
+  },
+  "N9_registry": {
+   "candidate_build": {
+    "written": "/tmp/claude-0/-home-user-glow-hdengine-v2/11695baf-e0d2-5d3b-80fc-7c96de66c6a8/scratchpad/dr4/registry/candidate.md",
+    "bytes": 535417,
+    "rows": 55,
+    "read_back_equal": true
+   },
+   "candidate_check_ok": true,
+   "validator_errors": 0,
+   "deriver_drift": [],
+   "rows": 55,
+   "rows_passing_after_edits": 55,
+   "assertions_evaluated": 2398,
+   "injected_regressions_fired": 665,
+   "injected_regressions_missed": 0,
+   "failing_rows": [],
+   "selected_check_ok": true,
+   "stages_differ_only_as_specified": true,
+   "differing_paths": [
+    "approved_at",
+    "approved_by",
+    "authority_sources.1.pending",
+    "authority_sources.1.url",
+    "status"
+   ],
+   "unfilled_selected_marker_refused": true,
+   "landed_mode_fails_before_writes": true,
+   "deleted_key_citation_refused": true,
+   "stand_ins": "MGMT-10: the testing page's id and pinned revision; every row's page_last_edited_at: its pinned revision (EXECUTE uses X6's check report); approval date and catalog id: stand-in values",
+   "ok": true
+  },
+  "N10_activation": {
+   "check_selftest_cases": 16,
+   "check_selftest_ok": true,
+   "archive_set": 57,
+   "control_pages_read": 9,
+   "findings_today": 306,
+   "fires_today": true,
+   "render_selftest_ok": true,
+   "pages_rendered": 10,
+   "pins_match": 10,
+   "operations_listed": 59,
+   "operations_generated": 281,
+   "operations_applied": 340,
+   "operations_refused": 0,
+   "findings_after_render": 0,
+   "failing_pages": [],
+   "new_pages": {
+    "CATALOG": true,
+    "REGISTER_ENTRY": true
+   },
+   "stand_ins": "marker values, including the successor's id, are stand-ins; EXECUTE fills them from X1, X3, X13, X14 and X15",
+   "ok": true
+  }
+ },
+ "ok": true,
+ "d22": "transient reads of this session's harness records; no body text in this receipt"
+}

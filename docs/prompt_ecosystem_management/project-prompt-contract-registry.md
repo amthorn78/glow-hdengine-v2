@@ -1,94 +1,37 @@
-# Project Prompt Contract Registry — GCFPE-20260914.1 / 091426.1
+# Project Prompt Contract Registry — GCFPE-20261009.1 / 100926.1
 
 artifact_type: `PROJECT_PROMPT_CONTRACT_REGISTRY`  
 status: `APPROVED`  
 approved_by: `Nathan / Product Owner`  
-approved_at: `2026-09-17`  
-release: `GCFPE-20260914.1 / 091426.1 / 55`  
+approved_at: `2026-10-12`  
+release: `GCFPE-20261009.1 / 100926.1 / 55`  
 home: `docs/prompt_ecosystem_management/`  
-supersedes: `GCFPE-20260914.1-Predecessor-Project-Prompt-Registry.md` (DRAFT, 091326.2 / 54), removed from `docs/ephemeral/` in the same change
+supersedes: `GCFPE-PCR-20260914.1` (APPROVED, 091426.1 / 55), replaced in this file by MODIFICATION-20261011-gcfpe-mb008-to-promotion; its text stays in this file's history on `main`
 
 ```yaml
 schema_version: project-prompt-contract-registry/1.0
-registry_id: GCFPE-PCR-20260914.1
+registry_id: GCFPE-PCR-20261009.1
 project_id: glow-hde
 status: APPROVED
 approved_by: Nathan / Product Owner
-approved_at: 2026-09-17
+approved_at: '2026-10-12'
 workspace_skill_registry_id: WSR-20260914.1-OBSERVATIONAL
-workspace_skill_registry_disposition: 'Evidence only. That registry is DRAFT, unapproved, and
-  self-classified INVENTORY_EVIDENCE_NOT_APPROVED_EXPECTED_STATE, observed from a checkout absent
-  from this environment. It confers no skill lifecycle on this approved registry. Its glow-hde-devops
-  row is a dated observation and is preserved unedited; that skill is retired by D16, which is the
-  authority for its disposition, and the forbidden literal on all 55 rows below is correct.'
+workspace_skill_registry_disposition: Evidence only. That registry is DRAFT, unapproved, and self-classified
+  INVENTORY_EVIDENCE_NOT_APPROVED_EXPECTED_STATE, observed from a checkout absent from this environment.
+  It confers no skill lifecycle on this approved registry. Its glow-hde-devops row is a dated observation
+  and is preserved unedited; that skill is retired by D16, which is the authority for its disposition,
+  and the forbidden literal on all 55 rows below is correct.
 authority_sources:
 - type: SELECTED_RELEASE_REGISTER
-  release: GCFPE-20260914.1
+  release: GCFPE-20261009.1
   url: https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1
 - type: SELECTED_CATALOG
-  version_family: '091426.1'
+  version_family: '100926.1'
   member_count: 55
-  url: https://app.notion.com/p/3db4590a05eb81738ef1d846e3c0df8c
-  correction: 'Until 2026-09-21 this row named 091426.1 and 55 members but pointed at the
-    091326.2 catalog (3da4590a05eb81bcbc5deb2d2cec4f1f), which holds 54 members of a different
-    release. The identifiers were right and the URL was wrong. Corrected at promotion (D17) to
-    the catalog that actually carries the 55 rows this registry describes; the predecessor
-    catalog is archived intact and is historical evidence only.'
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
-  note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path does not exist in the repository. Current prompt bodies are authored in Notion and are resolved through the candidate catalog; the evidence_contract byte count and SHA-256 on each row below identified the bodies before `D23` and no longer do (see body_extraction_convention.body_identity_disposition).'
-  disposition: HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH
-body_extraction_convention:
-  in_force: STRIP_BOTH_BOUNDARY_NEWLINES
-  definition: 'The exact slice between the fetch result''s <content> and </content> markers, with
-    the two boundary newlines dropped: the newline that follows <content> and the one that precedes
-    </content>. The markers occupy their own lines, so a literal reading that keeps them yields a
-    body two bytes larger on every prompt. This is the convention under which every
-    evidence_contract byte count and SHA-256 below was produced, and the only convention under
-    which they reproduced the pre-`D23` bodies (see body_identity_disposition).'
-  row_wording_disposition: 'All 55 rows carry the dated line "Extraction convention: the exact
-    slice between the fetch result''s <content> and </content> markers, with no trailing newline
-    added". That wording is incomplete in two ways: it omits the leading newline entirely, and it
-    states the trailing treatment as an addition withheld rather than a byte dropped. Read
-    literally it describes a different corpus from the one the recorded digests identify. Those 55
-    lines are dated evidence statements and are preserved unedited under AUTH-001; this key is the
-    authority for the convention in force, and each row''s recorded byte count and SHA-256 were
-    the reproducible identity until `D23` (see body_identity_disposition).'
-  evidence:
-  - 'Reverse-applied edits reproduce the recorded pre-edit SHA-256 for 21 of 21 repaired bodies
-    under strip-both and 0 of 21 under as-extracted, leading-only or trailing-only. Three untouched
-    prompts extracted under all four variants reproduce their recorded digests only under
-    strip-both: CF-C-10 41dce73a… / 7203 B, MGR-10 5c8aebc6… / 7276 B, PR-40 042255564c… /
-    54043 B. Recorded in docs/ephemeral/gcfpe.prompt-body-addendum-schema.repair-report.md and
-    docs/prompt_ecosystem_management/pe-succession/pe32-to-pe33.md.'
-  evidence_scope: 'The evidence above is reproducible in this repository and covers 24 of the 55
-    bodies: 21 repaired bodies by reverse-applied edit, and 3 untouched prompts extracted under all
-    four variants. No body corpus exists on disk and prompt_bodies_validated is false, so no
-    checked-in artifact exercises the remaining 31. The conclusion does not depend on them: the
-    convention in force is established by 0 of 21 reproducing under any other variant, and by three
-    untouched prompts reproducing only under strip-both. A claim of complete-corpus coverage is
-    NOT made by this key.'
-  corroboration_not_reproducible_here: 'A Product Owner-relayed human review dated 2026-09-20
-    reports 55 of 55 live bodies matching on both SHA-256 and byte count under strip-both, totalling
-    1,060,573 bytes across the 55 evidence_contract rows. That figure reconciles exactly with the
-    sum of those rows, which is the only part of it this repository can check. The review itself is
-    a relayed narrative: no report, inputs or command is checked in, so it cannot be reproduced and
-    it is recorded here as corroboration, never as evidence. It is promoted to evidence only by
-    landing the run — per-body digest, byte count and the extraction command — in a repository
-    evidence artifact.'
-  applies_to: 'The evidence_contract byte count and SHA-256 on each row below, which were the body
-    identity for validation until `D23` (see body_identity_disposition). This key does not alter, revive or reinterpret any source_snapshot
-    record; those remain the 2026-09-17 pre-merge extraction that authority_sources dispositions as
-    HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH.'
-  why_it_matters: 'The convention defined the ecosystem''s tamper-evidence until `D23` changed the bodies, whose hashing is prohibited. The ambiguity already
-    produced one silent two-byte error that no amount of agreement between independent extractions
-    would have surfaced, because both extractions were wrong in the same way.'
-  body_identity_disposition: 'The `evidence_contract` and `source_snapshot` identities on every row
-    describe the bodies before `D23` (2026-09-23) and no longer identify them. They are not
-    regenerated, because hashing bodies is prohibited (`prompt-corpus-policy.md`).'
+  url: https://app.notion.com/p/3f74590a05eb812db385c2544d7570f7
 observation:
-  release: GCFPE-20260914.1
-  version_family: '091426.1'
+  release: GCFPE-20261009.1
+  version_family: '100926.1'
   selected_member_count: 55
   complete_body_count: 55
   mutation_posture: READ_ONLY
@@ -96,88 +39,88 @@ lanes:
 - lane: GCFPE-MGMT
   title: GCFPE management
   notion_parent_id: 3db4590a05eb81de9736ea69bac61016
-  notion_parent_title: Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: CF-PO
   title: Product Owner change-class selection
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: CF-C
   title: CRD specification
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: CF-E
   title: Epic specification
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: CL-C
   title: CRD closure
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: CL-E
   title: Epic closure and PF09 maintenance
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: CL
   title: Shared closure administration
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: DOC
   title: Repository documentation
   notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: ESC
   title: Escalation and remediation
   notion_parent_id: 3db4590a05eb81cd938de84cfffead9c
-  notion_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: Escalation — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: IA
   title: Whole-change implementation audit and plan
   notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: MGR
   title: Optional flow coordination
   notion_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  notion_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: OPS
   title: Bounded operations
   notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: PR
   title: PR work-unit development
   notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: QA
   title: Whole-change QA
   notion_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  notion_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: RS
   title: Bounded rescope
   notion_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  notion_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
   active: true
 - lane: UTIL
   title: Exact redline utility
   notion_parent_id: 3db4590a05eb811b9c14f2ae89c28df7
-  notion_parent_title: HDE TW — GCFPE-20260914.1 — 091426.1
+  notion_parent_title: HDE TW — GCFPE-20261009.1 — 100926.1
   active: true
 prompts:
 - prompt_key: CF-C-10
-  notion_page_id: 3db4590a05eb8119a5a8e4d083fcf360
-  notion_url: https://app.notion.com/p/3db4590a05eb8119a5a8e4d083fcf360
-  expected_title: CF-C-10 — Prepare CRD Specification Kickoff Handoff — 091426.1
+  notion_page_id: 3f44590a05eb810f83d4d539e5b0e588
+  notion_url: https://app.notion.com/p/3f44590a05eb810f83d4d539e5b0e588
+  expected_title: CF-C-10 — Prepare CRD Specification Kickoff Handoff — 100926.1
   lane: CF-C
   sequence: 10
   lifecycle: ACTIVE
@@ -195,7 +138,7 @@ prompts:
     states:
     - BLOCKED
     - KICKOFF_READY
-    consumers:
+    consumers: &id001
     - CF-C-20
     - CF-E-10
     - CF-PO-10
@@ -207,106 +150,138 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7203 bytes'
-  - 'SHA-256 of that extraction: 41dce73a62735927d291bd8f7342654d314d38de47070fe37f8a6c9318fd1702'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-20
-  - CF-E-10
-  - CF-PO-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id001
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-C-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb810f83d4d539e5b0e588?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8119a5a8e4d083fcf360?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-C-10.md
-    sha256: 0e449fe7730e4493e775d407ea38c36b7ac9dec58281f0ba4a030ce134f5105d
-    bytes: 7276
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb810f83d4d539e5b0e588?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:03.544Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE with the preserved source/change facts'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE
+        with the preserved source/change facts
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-C-20
-  notion_page_id: 3db4590a05eb8173a73edc73f302a90a
-  notion_url: https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a
-  expected_title: CF-C-20 — Create CRD Specification — 091426.1
+  notion_page_id: 3f44590a05eb81a7a944f19bd9a2e3de
+  notion_url: https://app.notion.com/p/3f44590a05eb81a7a944f19bd9a2e3de
+  expected_title: CF-C-20 — Create CRD Specification — 100926.1
   lane: CF-C
   sequence: 20
   lifecycle: ACTIVE
@@ -322,7 +297,7 @@ prompts:
     states:
     - BLOCKED
     - SPECIFICATION_PENDING
-    consumers:
+    consumers: &id002
     - CF-C-10
     - CF-C-30
   mutations:
@@ -333,105 +308,138 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5888 bytes'
-  - 'SHA-256 of that extraction: 4570e718530316c018b18dcb15848f061e938e268ae4ec163630b310c14c67c7'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-10
-  - CF-C-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id002
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-C-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81a7a944f19bd9a2e3de?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-C-20.md
-    sha256: 6995097d2950f2ddd0425ed088cfe1d4dea9b2850ea94deec232965749cb8f6d
-    bytes: 5973
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81a7a944f19bd9a2e3de?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:09.414Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'direct package contains the exact pending Specification, class/change lineage|recovery carries the original kickoff link, exact defect, class/change lineage'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: direct package contains the exact pending Specification, class/change lineage|recovery carries
+        the original kickoff link, exact defect, class/change lineage
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-C-30
-  notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
-  notion_url: https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd
-  expected_title: CF-C-30 — Review and Approve CRD Specification — 091426.1
+  notion_page_id: 3f44590a05eb8121af3bf2249c6d6ca8
+  notion_url: https://app.notion.com/p/3f44590a05eb8121af3bf2249c6d6ca8
+  expected_title: CF-C-30 — Review and Approve CRD Specification — 100926.1
   lane: CF-C
   sequence: 30
   lifecycle: ACTIVE
@@ -450,9 +458,9 @@ prompts:
     - DELTA_DENY
     - INITIAL_APPROVE
     - INITIAL_DENY
-    consumers:
-    - IA-10
+    consumers: &id003
     - CF-C-40
+    - IA-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -461,105 +469,161 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9420 bytes'
-  - 'SHA-256 of that extraction: b56d218a4f5d2a08f4f12af99fe097b001925dd1a1a445c2375edf4d3cd894e7'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-40
-  - IA-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id003
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-C-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8121af3bf2249c6d6ca8?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-C-30.md
-    sha256: 4b7b6b739c909f6bdb994985d5ec5b6084d63cacf372712301cdb3c2afd76f24
-    bytes: 10121
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8121af3bf2249c6d6ca8?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:05.619Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'and approval lineage, the carried conflict register'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: and approval lineage, the carried conflict register
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)^(?!.*(?i:\bnonterminal\b))(?=.*(?:DELTA_APPROVE))(?=.*(?i:\bterminal(ly)?\b|\bno (runnable
+        )?continuation\b|\bemit no\b))
+      guard: G-F03-A
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?i:Outside GCFPE\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-A
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:format recorded in the Glow Operations Hub|one `##` heading carrying its title|canonical
+        PF10 build-notes addendum format))
+      guard: G-F05-B
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?:DELTA_APPROVE))(?=.*(?i:\bnonterminal\b))(?=.*(?i:exactly one complete continuation
+        block))(?=.*(?i:return (phase|point)))
+      guard: G-F03-B
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:one H2 heading with the next continuous number))(?=.*(?:PF06-Canon-Change-Process-Guide))(?=.*(?:PF27-Canon-Plan-Templates))(?=.*(?i:only
+        H3 or lower))
+      guard: G-F05-C
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-C-40
-  notion_page_id: 3db4590a05eb81269931cee342ce8a0e
-  notion_url: https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e
-  expected_title: CF-C-40 — Revise CRD Specification — 091426.1
+  notion_page_id: 3f44590a05eb81458686cc39d8d98b2a
+  notion_url: https://app.notion.com/p/3f44590a05eb81458686cc39d8d98b2a
+  expected_title: CF-C-40 — Revise CRD Specification — 100926.1
   lane: CF-C
   sequence: 40
   lifecycle: ACTIVE
@@ -574,7 +638,7 @@ prompts:
   - artifact: CRD_SPECIFICATION / SPECIFICATION_DELTA
     states:
     - SPECIFICATION_PENDING
-    consumers:
+    consumers: &id004
     - CF-C-30
   mutations:
     allowed:
@@ -584,104 +648,137 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7518 bytes'
-  - 'SHA-256 of that extraction: 9b62004b93aa3a1e93fb5cf325bb6e78ea460ed78f49c523a654be6fd5a0c95f'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id004
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-C-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81458686cc39d8d98b2a?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-C-40.md
-    sha256: ccfcbd5d4595d3455f059e90b3a715063d3fc4316f3278b39999e8a331949218
-    bytes: 7597
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81458686cc39d8d98b2a?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:18.974Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'actual mode, class/change/base lineage'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: actual mode, class/change/base lineage
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-E-10
-  notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
-  notion_url: https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1
-  expected_title: CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091426.1
+  notion_page_id: 3f44590a05eb81129b09cddebcc18458
+  notion_url: https://app.notion.com/p/3f44590a05eb81129b09cddebcc18458
+  expected_title: CF-E-10 — Prepare Epic Specification Kickoff Handoff — 100926.1
   lane: CF-E
   sequence: 10
   lifecycle: ACTIVE
@@ -699,7 +796,7 @@ prompts:
     states:
     - BLOCKED
     - KICKOFF_READY
-    consumers:
+    consumers: &id005
     - CF-C-10
     - CF-E-20
     - CF-PO-10
@@ -711,106 +808,138 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7307 bytes'
-  - 'SHA-256 of that extraction: 5cdfce4d502c5b5b564b562b18e108cc38b1ffa85b3b655edd6706d0e76e80fe'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-10
-  - CF-E-20
-  - CF-PO-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id005
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-E-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81129b09cddebcc18458?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-E-10.md
-    sha256: 02eb026dfb7a891b4ff1e778a66676b070419fbce575c25daec6ef0b0c131410
-    bytes: 7380
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81129b09cddebcc18458?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:06.412Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE with the preserved source/change facts'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: recovery package carries the original CLASS_SELECTION_REF|UNRESOLVED_CLASSIFICATION_CASE
+        with the preserved source/change facts
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-E-20
-  notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
-  notion_url: https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f
-  expected_title: CF-E-20 — Create Epic Specification — 091426.1
+  notion_page_id: 3f44590a05eb813cb9cbc61c225b88e2
+  notion_url: https://app.notion.com/p/3f44590a05eb813cb9cbc61c225b88e2
+  expected_title: CF-E-20 — Create Epic Specification — 100926.1
   lane: CF-E
   sequence: 20
   lifecycle: ACTIVE
@@ -826,7 +955,7 @@ prompts:
     states:
     - BLOCKED
     - SPECIFICATION_PENDING
-    consumers:
+    consumers: &id006
     - CF-E-10
     - CF-E-30
   mutations:
@@ -837,105 +966,138 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5900 bytes'
-  - 'SHA-256 of that extraction: 5add38939d7e920b90c4031846e51f0fdb29b1bf50ec3574dcb72eaddc134108'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-E-10
-  - CF-E-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id006
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-E-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb813cb9cbc61c225b88e2?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-E-20.md
-    sha256: a3305b3a9da58e9fbebd8ce7cda8df889aca76cda0342a6826704ddb8fbcfd23
-    bytes: 5985
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb813cb9cbc61c225b88e2?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:12.283Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'direct package contains the exact pending Specification, class/change lineage|recovery carries the original kickoff link, exact defect, class/change lineage'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: direct package contains the exact pending Specification, class/change lineage|recovery carries
+        the original kickoff link, exact defect, class/change lineage
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-E-30
-  notion_page_id: 3db4590a05eb81b4be79f405566da9a7
-  notion_url: https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7
-  expected_title: CF-E-30 — Review and Approve Epic Specification — 091426.1
+  notion_page_id: 3f44590a05eb8104824fe084354a0ef8
+  notion_url: https://app.notion.com/p/3f44590a05eb8104824fe084354a0ef8
+  expected_title: CF-E-30 — Review and Approve Epic Specification — 100926.1
   lane: CF-E
   sequence: 30
   lifecycle: ACTIVE
@@ -954,9 +1116,9 @@ prompts:
     - DELTA_DENY
     - INITIAL_APPROVE
     - INITIAL_DENY
-    consumers:
-    - IA-10
+    consumers: &id007
     - CF-E-40
+    - IA-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -965,105 +1127,161 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9428 bytes'
-  - 'SHA-256 of that extraction: 6e92232ba58cc4e8c53004af7176ae2422863f2e1bcf1c6e209dc3a257066e76'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-E-40
-  - IA-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id007
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-E-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8104824fe084354a0ef8?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-E-30.md
-    sha256: 00e55e788b4e6662a37bec715cf503ae783dec3d9fb60c74a11467463e58c3a1
-    bytes: 10129
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8104824fe084354a0ef8?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:08.639Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'and approval lineage, the carried conflict register'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: and approval lineage, the carried conflict register
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)^(?!.*(?i:\bnonterminal\b))(?=.*(?:DELTA_APPROVE))(?=.*(?i:\bterminal(ly)?\b|\bno (runnable
+        )?continuation\b|\bemit no\b))
+      guard: G-F03-A
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?i:Outside GCFPE\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-A
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:format recorded in the Glow Operations Hub|one `##` heading carrying its title|canonical
+        PF10 build-notes addendum format))
+      guard: G-F05-B
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?:DELTA_APPROVE))(?=.*(?i:\bnonterminal\b))(?=.*(?i:exactly one complete continuation
+        block))(?=.*(?i:return (phase|point)))
+      guard: G-F03-B
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:one H2 heading with the next continuous number))(?=.*(?:PF06-Canon-Change-Process-Guide))(?=.*(?:PF27-Canon-Plan-Templates))(?=.*(?i:only
+        H3 or lower))
+      guard: G-F05-C
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-E-40
-  notion_page_id: 3db4590a05eb8101b655ed223b11a85e
-  notion_url: https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e
-  expected_title: CF-E-40 — Revise Epic Specification — 091426.1
+  notion_page_id: 3f44590a05eb81f1994df5f6ab3a7f32
+  notion_url: https://app.notion.com/p/3f44590a05eb81f1994df5f6ab3a7f32
+  expected_title: CF-E-40 — Revise Epic Specification — 100926.1
   lane: CF-E
   sequence: 40
   lifecycle: ACTIVE
@@ -1078,7 +1296,7 @@ prompts:
   - artifact: EPIC_SPECIFICATION / SPECIFICATION_DELTA
     states:
     - SPECIFICATION_PENDING
-    consumers:
+    consumers: &id008
     - CF-E-30
   mutations:
     allowed:
@@ -1088,104 +1306,137 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7533 bytes'
-  - 'SHA-256 of that extraction: e5e297ebcf0585c4114d30311535089ea16bad4ea679120a8e0e8d08050987ce'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-E-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id008
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-E-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81f1994df5f6ab3a7f32?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-E-40.md
-    sha256: ce8bed7759d9d1b2e6c0f4427da9d45a98514969a6b43bec71d93b453070b73f
-    bytes: 7612
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81f1994df5f6ab3a7f32?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:22.102Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'actual mode, class/change/base lineage'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: actual mode, class/change/base lineage
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CF-PO-10
-  notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
-  notion_url: https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c
-  expected_title: CF-PO-10 — Record Product Owner Change-Class Selection — 091426.1
+  notion_page_id: 3f44590a05eb81f9bf84f4585d9f7a2c
+  notion_url: https://app.notion.com/p/3f44590a05eb81f9bf84f4585d9f7a2c
+  expected_title: CF-PO-10 — Record Product Owner Change-Class Selection — 100926.1
   lane: CF-PO
   sequence: 10
   lifecycle: ACTIVE
@@ -1203,9 +1454,9 @@ prompts:
   - artifact: CHANGE_CLASS_SELECTION
     states:
     - CLASS_SELECTED
-    consumers:
-    - CF-E-10
+    consumers: &id009
     - CF-C-10
+    - CF-E-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1214,103 +1465,135 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6091 bytes'
-  - 'SHA-256 of that extraction: ba98c011ec3607c25618d2dfe8409c4a1f6232dbf0323812b80f551a8a277b79'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-10
-  - CF-E-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id009
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CF-PO-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81f9bf84f4585d9f7a2c?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CF-PO-10.md
-    sha256: ca3d97a07474b610cdc9f036bac0ec93ccf058502d443724c9fa7ed2dd7adbaa
-    bytes: 6164
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81f9bf84f4585d9f7a2c?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:09.502Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CL-20
-  notion_page_id: 3db4590a05eb81f4812be61e8877c02c
-  notion_url: https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c
-  expected_title: CL-20 — Prepare Closure Memo and Post-Closure Record — 091426.1
+  notion_page_id: 3f44590a05eb81739b57da57c285f45d
+  notion_url: https://app.notion.com/p/3f44590a05eb81739b57da57c285f45d
+  expected_title: CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1
   lane: CL
   sequence: 20
   lifecycle: ACTIVE
@@ -1326,7 +1609,7 @@ prompts:
   - artifact: CLOSURE_MEMO / POST_CLOSURE_RECORD
     states:
     - POST_CLOSURE_PENDING
-    consumers:
+    consumers: &id010
     - CL-30
     - CL-40
     - CL-E-20
@@ -1340,134 +1623,177 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 32573 bytes'
-  - 'SHA-256 of that extraction: 6c7860c0b23210e7a4f58938b134c0f80ba1f2ec69d4c4bfe567d2b83608660e'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - Carry existing closure canon basis and actual memo-source reads without a new closure decision.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-30
-  - CL-40
-  - CL-E-20
-  - CL-E-30
-  - CL-E-40
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id010
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81739b57da57c285f45d?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-20.md
-    sha256: bcf1dd21f0ec6afe4f0c6b363a054decc031a94c67b871d22e8d79316b092b78
-    bytes: 33952
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81739b57da57c285f45d?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:16.766Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
-      rule_id: CTR-002
-    - value: 'Name the positive closure decision and every post-closure result artifact by repository path'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'that entry creates no runtime approval'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
-    - value: 'when none is supplied, record the board update as pending, owned under PF04 §9\.1\.1'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'lineage into its result and handoff\b'
-      rule_id: TOP-001
-    - value: 'Carry the positive closure decision, complete post-closure results'
-      rule_id: TOP-001
-    - value: 'carrying the exact qualified condition, lineage, evidence'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Use only the read-only tools, stores, repository access[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'These candidate URL tokens must be replaced'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: lineage into its result and handoff\b
+    - rule_id: TOP-001
+      value: Carry the positive closure decision, complete post-closure results
+    - rule_id: TOP-001
+      value: carrying the exact qualified condition, lineage, evidence
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Use only the read-only tools, stores, repository access[^.\n]*\.(?! Every statement in this
+        prompt that it is read-only or does not change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: These candidate URL tokens must be replaced
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\bdo not include\b(?! in the block)))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:model/strength/reasoning))
+      guard: G-CL-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: PF10/addendum lineage into its result artifact, which the handoff names
+    - rule_id: CTR-002
+      value: Name the positive closure decision and every post-closure result artifact by repository path
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: that entry creates no runtime approval
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: when none is supplied, record the board update as pending, owned under PF04 §9\.1\.1
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:The producer never edits PF10 or claims canonical adoption;
+        it resolves the addendum's number from the current controlled PF10 at creation\.))
+      guard: G-F05-F
 - prompt_key: CL-30
-  notion_page_id: 3db4590a05eb8190a444d8818e445c1d
-  notion_url: https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d
-  expected_title: CL-30 — Prepare Conditional Post-Change ADR Maintenance — 091426.1
+  notion_page_id: 3f44590a05eb816ea12febba885940e8
+  notion_url: https://app.notion.com/p/3f44590a05eb816ea12febba885940e8
+  expected_title: CL-30 — Prepare Conditional Post-Change ADR Maintenance — 100926.1
   lane: CL
   sequence: 30
   lifecycle: ACTIVE
@@ -1483,7 +1809,7 @@ prompts:
     states:
     - ADR_CANDIDATE
     - NO_ADR_NEEDED
-    consumers:
+    consumers: &id011
     - CL-40
   mutations:
     allowed:
@@ -1493,130 +1819,176 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 29622 bytes'
-  - 'SHA-256 of that extraction: dc0a967032467707c738c465069b0cc3c042b1b1cbcdadb3389356e1d7b7d2c1'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-40
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id011
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb816ea12febba885940e8?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-30.md
-    sha256: 60e01caed575653a8c0992dce1001f1668de69f734583427f1c9d2545ddb1dd6
-    bytes: 30792
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb816ea12febba885940e8?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:13.172Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
-      rule_id: CTR-002
-    - value: 'Name the positive closure decision and every post-closure result artifact by repository path'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'that entry creates no runtime approval'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'lineage into its result and handoff\b'
-      rule_id: TOP-001
-    - value: 'Carry the positive closure decision, complete post-closure results'
-      rule_id: TOP-001
-    - value: 'Carry the complete candidate, positive closure and architecture-decision lineage'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Use only the read-only tools, stores, repository access[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'These candidate URL tokens must be replaced'
-      rule_id: CTR-001
-    - value: 'decision lineage; existing ADR/conflict history'
-      rule_id: TOP-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: lineage into its result and handoff\b
+    - rule_id: TOP-001
+      value: Carry the positive closure decision, complete post-closure results
+    - rule_id: TOP-001
+      value: Carry the complete candidate, positive closure and architecture-decision lineage
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Use only the read-only tools, stores, repository access[^.\n]*\.(?! Every statement in this
+        prompt that it is read-only or does not change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: These candidate URL tokens must be replaced
+    - rule_id: TOP-001
+      value: decision lineage; existing ADR/conflict history
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\bdo not include\b(?! in the block)))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:model/strength/reasoning))
+      guard: G-CL-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: PF10/addendum lineage into its result artifact, which the handoff names
+    - rule_id: CTR-002
+      value: Name the positive closure decision and every post-closure result artifact by repository path
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: that entry creates no runtime approval
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:The producer never edits PF10 or claims canonical adoption;
+        it resolves the addendum's number from the current controlled PF10 at creation\.))
+      guard: G-F05-F
 - prompt_key: CL-40
-  notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
-  notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
-  expected_title: CL-40 — Scan for PF09 Gaps and CRD Candidates — 091426.1
+  notion_page_id: 3f44590a05eb8155934dd1c4c2b5d1eb
+  notion_url: https://app.notion.com/p/3f44590a05eb8155934dd1c4c2b5d1eb
+  expected_title: CL-40 — Scan for PF09 Gaps and CRD Candidates — 100926.1
   lane: CL
   sequence: 40
   lifecycle: ACTIVE
@@ -1640,129 +2012,178 @@ prompts:
     states:
     - COMPLETE
     - INCOMPLETE
-    consumers: []
+    consumers: &id012 []
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
-    - Update the Notion page Candidate CRD Items List in place with this change's new CRD candidates, and no other Notion page; that page is the list's only store, named by a destination rule
+    - Update the Notion page Candidate CRD Items List in place with this change's new CRD candidates,
+      and no other Notion page; that page is the list's only store, named by a destination rule
     forbidden:
     - Edit PF10 directly
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 29401 bytes'
-  - 'SHA-256 of that extraction: a3fd6cd79929c91829672faee9c5129e3f0ca80b9eef38360a6c1f80dc898e06'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: []
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id012
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8155934dd1c4c2b5d1eb?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-40.md
-    sha256: bc8970a7e52ce216ba20311497e023b9cbee106dd1062783e8794166504decee
-    bytes: 30437
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8155934dd1c4c2b5d1eb?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:26.600Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
-    - value: 'Notion page `?Candidate CRD Items List`? \(`?https://app\.notion\.com/p/[0-9a-f]{32}(?:\?pvs=\d+)?`?\)'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'lineage into its result and handoff\b'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'It does not edit Canonical PF09, PF10, Canon, a board, registry, repository[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'These candidate URL tokens must be replaced'
-      rule_id: CTR-001
-    - value: 'This authoring candidate does not perform that update'
-      rule_id: CTR-001
-    - value: '\{\{CANDIDATE_CRD_LIST_URL\}\}'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: lineage into its result and handoff\b
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: It does not edit Canonical PF09, PF10, Canon, a board, registry, repository[^.\n]*\.(?! Every
+        statement in this prompt that it is read-only or does not change the repository excludes its own
+        output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: These candidate URL tokens must be replaced
+    - rule_id: CTR-001
+      value: This authoring candidate does not perform that update
+    - rule_id: CTR-001
+      value: \{\{CANDIDATE_CRD_LIST_URL\}\}
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\bdo not include\b(?! in the block)))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:model/strength/reasoning))
+      guard: G-CL-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: PF10/addendum lineage into its result artifact, which the handoff names
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: Notion page `?Candidate CRD Items List`? \(`?https://app\.notion\.com/p/[0-9a-f]{32}(?:\?pvs=\d+)?`?\)
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:The producer never edits PF10 or claims canonical adoption;
+        it resolves the addendum's number from the current controlled PF10 at creation\.))
+      guard: G-F05-F
 - prompt_key: CL-C-10
-  notion_page_id: 3db4590a05eb81ad8989faa77f441a64
-  notion_url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
-  expected_title: CL-C-10 — Perform CRD Retrospective and Decide Closure — 091426.1
+  notion_page_id: 3f44590a05eb819b8022f2a4cdd3b022
+  notion_url: https://app.notion.com/p/3f44590a05eb819b8022f2a4cdd3b022
+  expected_title: CL-C-10 — Perform CRD Retrospective and Decide Closure — 100926.1
   lane: CL-C
   sequence: 10
   lifecycle: ACTIVE
@@ -1780,7 +2201,7 @@ prompts:
     states:
     - CHANGE_CLOSED
     - DO_NOT_CLOSE
-    consumers:
+    consumers: &id013
     - CL-20
     - ESC-30
   mutations:
@@ -1791,125 +2212,180 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 35878 bytes'
-  - 'SHA-256 of that extraction: 794b9bf3bed9278386379f898039bfde22e1831a92bdf40942fe74ca4d7b1b91'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-20
-  - ESC-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id013
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-C-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb819b8022f2a4cdd3b022?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-C-10.md
-    sha256: 5e61b02e8939dea84d517ea6c3e80a9e0a45b060fbdd8c8361e96ce9fb92a511
-    bytes: 37121
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb819b8022f2a4cdd3b022?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:13.994Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'that entry creates no runtime approval'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'lineage into its result and handoff\b'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'These candidate URL tokens must be replaced'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: lineage into its result and handoff\b
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: These candidate URL tokens must be replaced
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\bdo not include\b(?! in the block)))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:model/strength/reasoning))
+      guard: G-CL-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: PF10/addendum lineage into its result artifact, which the handoff names
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: that entry creates no runtime approval
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:The producer never edits PF10 or claims canonical adoption;
+        it resolves the addendum's number from the current controlled PF10 at creation\.))
+      guard: G-F05-F
 - prompt_key: CL-E-10
-  notion_page_id: 3db4590a05eb811a8578d75885c16cac
-  notion_url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
-  expected_title: CL-E-10 — Perform Epic Retrospective and Decide Closure — 091426.1
+  notion_page_id: 3f44590a05eb81248741f4679b050262
+  notion_url: https://app.notion.com/p/3f44590a05eb81248741f4679b050262
+  expected_title: CL-E-10 — Perform Epic Retrospective and Decide Closure — 100926.1
   lane: CL-E
   sequence: 10
   lifecycle: ACTIVE
@@ -1926,7 +2402,7 @@ prompts:
     states:
     - CHANGE_CLOSED
     - DO_NOT_CLOSE
-    consumers:
+    consumers: &id014
     - CL-20
     - CL-E-20
     - ESC-30
@@ -1938,126 +2414,180 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 36353 bytes'
-  - 'SHA-256 of that extraction: 0c2b669d5833dcfb4c60d11fe5afe3851343c2f866251bffeb8f1af952b00753'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-20
-  - CL-E-20
-  - ESC-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id014
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-E-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81248741f4679b050262?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-E-10.md
-    sha256: 13380a6babd2c71cb8a6bedce6b26f3573cc957187e119fddd2850f35a33841b
-    bytes: 37579
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81248741f4679b050262?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:21.313Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'PF10/addendum lineage into its result artifact, which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'that entry creates no runtime approval'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'lineage into its result and handoff\b'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'These candidate URL tokens must be replaced'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: lineage into its result and handoff\b
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: Carry exact (?:CRD|Epic) Specification|Each runnable (?:direct-native )?package states
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: These candidate URL tokens must be replaced
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\bdo not include\b(?! in the block)))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:model/strength/reasoning))
+      guard: G-CL-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: PF10/addendum lineage into its result artifact, which the handoff names
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: that entry creates no runtime approval
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:The producer never edits PF10 or claims canonical adoption;
+        it resolves the addendum's number from the current controlled PF10 at creation\.))
+      guard: G-F05-F
 - prompt_key: CL-E-20
-  notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
-  notion_url: https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45
-  expected_title: CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091426.1
+  notion_page_id: 3f44590a05eb8186913fcb9f6b2a2f32
+  notion_url: https://app.notion.com/p/3f44590a05eb8186913fcb9f6b2a2f32
+  expected_title: CL-E-20 — Perform Bounded PF09 Epic Revalidation — 100926.1
   lane: CL-E
   sequence: 20
   lifecycle: ACTIVE
@@ -2072,10 +2602,10 @@ prompts:
   outputs:
   - artifact: PF09_REVALIDATION
     states:
+    - BLOCKED
     - COMPLETE
     - PARTIAL
-    - BLOCKED
-    consumers:
+    consumers: &id015
     - CL-E-30
   mutations:
     allowed:
@@ -2085,112 +2615,148 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 14832 bytes'
-  - 'SHA-256 of that extraction: 10698a09852b296886f36d4df4ae0250285f8b13741c122ba9fcb90f54659689'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-E-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id015
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-E-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8186913fcb9f6b2a2f32?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-E-20.md
-    sha256: 439366e754cba931fe1ef0022ebd516fbe37b7514290703c6bf25f49767b8e70
-    bytes: 15304
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8186913fcb9f6b2a2f32?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:16.227Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'revalidation session, read-only\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: revalidation session, read-only\.(?! Every statement in this prompt that it is read-only
+        or does not change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CL-E-30
-  notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
-  notion_url: https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345
-  expected_title: CL-E-30 — Review Bounded PF09 Revalidation — 091426.1
+  notion_page_id: 3f44590a05eb81be834efe3faf7abb6f
+  notion_url: https://app.notion.com/p/3f44590a05eb81be834efe3faf7abb6f
+  expected_title: CL-E-30 — Review Bounded PF09 Revalidation — 100926.1
   lane: CL-E
   sequence: 30
   lifecycle: ACTIVE
@@ -2208,9 +2774,9 @@ prompts:
     states:
     - ACCEPT
     - DENY
-    consumers:
-    - CL-E-40
+    consumers: &id016
     - CL-E-20
+    - CL-E-40
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2219,109 +2785,146 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 13629 bytes'
-  - 'SHA-256 of that extraction: 7e1524159e9f6b00f5b4ffb8d33a90b3cd78e4115b526313322d7a0f5f8b99ae'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-E-20
-  - CL-E-40
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id016
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-E-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81be834efe3faf7abb6f?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-E-30.md
-    sha256: 7dfb3c0d6ec737cbcec4fa26b09afa96fc06b91d6742a16f80513f50bf99888d
-    bytes: 14180
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81be834efe3faf7abb6f?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:29.629Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: CL-E-40
-  notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
-  notion_url: https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68
-  expected_title: CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1
+  notion_page_id: 3f44590a05eb8101a264f9fa702b8a6e
+  notion_url: https://app.notion.com/p/3f44590a05eb8101a264f9fa702b8a6e
+  expected_title: CL-E-40 — Prepare Post-Epic PF09 Maintenance — 100926.1
   lane: CL-E
   sequence: 40
   lifecycle: ACTIVE
@@ -2337,7 +2940,7 @@ prompts:
   - artifact: PF09_MAINTENANCE_CANDIDATE
     states:
     - MAINTENANCE_PENDING
-    consumers:
+    consumers: &id017
     - CL-40
     - CL-E-20
   mutations:
@@ -2348,109 +2951,141 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 15457 bytes'
-  - 'SHA-256 of that extraction: 582b6476d38e45bc9733c5d5d3e599281178a1a9f0cadb99aaf451dcbddd3b8c'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-40
-  - CL-E-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id017
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/CL-E-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8101a264f9fa702b8a6e?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/CL-E-40.md
-    sha256: cccef152db6eb0f9d6cd0c4e7338f51d73ffd4069abe7512c4d3b4e6ba8c3a5c
-    bytes: 16002
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8101a264f9fa702b8a6e?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:17.029Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: DOC-10
-  notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
-  notion_url: https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d
-  expected_title: DOC-10 — Create Final Repository Documentation PR Instructions — 091426.1
+  notion_page_id: 3f44590a05eb81ce99b1d2ade30c572f
+  notion_url: https://app.notion.com/p/3f44590a05eb81ce99b1d2ade30c572f
+  expected_title: DOC-10 — Create Final Repository Documentation PR Instructions — 100926.1
   lane: DOC
   sequence: 10
   lifecycle: ACTIVE
@@ -2477,7 +3112,7 @@ prompts:
     - DRAFT
     - INSTRUCTION_READY
     - PENDING
-    consumers:
+    consumers: &id018
     - PR-20
     - RS-10
   mutations:
@@ -2488,115 +3123,152 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 19787 bytes'
-  - 'SHA-256 of that extraction: c858901a70cf0532395fda643841b9de2ea55b236b48f12bb24cac77661218ac'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-20
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id018
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/DOC-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81ce99b1d2ade30c572f?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/DOC-10.md
-    sha256: dbeb6f96a39b4868e750e72b3f39ba6fafaf8d4790626f122385830af3de502f
-    bytes: 20261
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81ce99b1d2ade30c572f?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:24.131Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual
+        merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical
+        PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40
+        read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion
+        and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: DOC-20
-  notion_page_id: 3db4590a05eb8164ac09e722dc967f25
-  notion_url: https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25
-  expected_title: DOC-20 — Verify Final Repository Documentation Completion — 091426.1
+  notion_page_id: 3f44590a05eb81d8a582eec0e93e6ee7
+  notion_url: https://app.notion.com/p/3f44590a05eb81d8a582eec0e93e6ee7
+  expected_title: DOC-20 — Verify Final Repository Documentation Completion — 100926.1
   lane: DOC
   sequence: 20
   lifecycle: ACTIVE
@@ -2627,7 +3299,7 @@ prompts:
     - COMPLETE
     - INCOMPLETE
     - PENDING
-    consumers:
+    consumers: &id019
     - DOC-10
     - PR-40
     - QA-10
@@ -2640,121 +3312,164 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 20217 bytes'
-  - 'SHA-256 of that extraction: e37624c24c349aff20324721fd2c9ae3d9b23e33b7261d6e49884805fafd4194'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - DOC-10
-  - PR-40
-  - QA-10
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id019
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/DOC-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81d8a582eec0e93e6ee7?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/DOC-20.md
-    sha256: 967fcdd78641d410e5255579010931146f7711eb4884a0601d6eefb450b5dbc6
-    bytes: 20784
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81d8a582eec0e93e6ee7?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:19.255Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
-      rule_id: CTR-001
-    - value: 'do not edit documentation, Canon, PF10, or repository state\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual
+        merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical
+        PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40
+        read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion
+        and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+    - rule_id: CTR-001
+      value: do not edit documentation, Canon, PF10, or repository state\.(?! Every statement in this
+        prompt that it is read-only or does not change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: ESC-10
-  notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
-  notion_url: https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40
-  expected_title: ESC-10 — Create QA Escalation Report — 091426.1
+  notion_page_id: 3f44590a05eb81f2af47fff48995f272
+  notion_url: https://app.notion.com/p/3f44590a05eb81f2af47fff48995f272
+  expected_title: ESC-10 — Create QA Escalation Report — 100926.1
   lane: ESC
   sequence: 10
   lifecycle: ACTIVE
@@ -2770,7 +3485,7 @@ prompts:
   - artifact: QA_ESCALATION_REPORT
     states:
     - AWAITING_THOTH_REMEDIATION
-    consumers:
+    consumers: &id020
     - ESC-30
   mutations:
     allowed:
@@ -2780,108 +3495,142 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 16683 bytes'
-  - 'SHA-256 of that extraction: 93b05f42c6c18c4a1bc67bac767efc36c8d84f075a90292384a7be64e7e6e75c'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id020
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/ESC-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81f2af47fff48995f272?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
-  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: Escalation — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/ESC-10.md
-    sha256: 87b310229a85227426392c40e1d928558de07d4fa80efd35657a665aaede3a82
-    bytes: 17169
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81f2af47fff48995f272?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:32.722Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: ESC-25
-  notion_page_id: 3db4590a05eb81bf9326e46a1017de38
-  notion_url: https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38
-  expected_title: ESC-25 — Execute Bounded Escalation Discovery — 091426.1
+  notion_page_id: 3f44590a05eb81949370e6d1b222b40b
+  notion_url: https://app.notion.com/p/3f44590a05eb81949370e6d1b222b40b
+  expected_title: ESC-25 — Execute Bounded Escalation Discovery — 100926.1
   lane: ESC
   sequence: 25
   lifecycle: ACTIVE
@@ -2897,10 +3646,10 @@ prompts:
   outputs:
   - artifact: DISCOVERY_RESULT
     states:
+    - BLOCKED
     - COMPLETE
     - PARTIAL
-    - BLOCKED
-    consumers:
+    consumers: &id021
     - ESC-30
   mutations:
     allowed:
@@ -2910,118 +3659,156 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 17279 bytes'
-  - 'SHA-256 of that extraction: 7766e52f3da17ee56e3ff4b60edb2a264215503e53fa7ed286a097769c6c09e2'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-30
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id021
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/ESC-25.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81949370e6d1b222b40b?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
-  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: Escalation — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/ESC-25.md
-    sha256: 1d04bc4b76a28557502a9b499d10ec00b65b1282f405b0cdf8ea2ec6091499cd
-    bytes: 17817
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81949370e6d1b222b40b?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:20.067Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'read-only repository reviewer[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: read-only repository reviewer[^.\n]*\.(?! Every statement in this prompt that it is read-only
+        or does not change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: ESC-30
-  notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
-  notion_url: https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae
-  expected_title: ESC-30 — Diagnose and Propose Bounded Remediation — 091426.1
+  notion_page_id: 3f44590a05eb81e385dbd4fe337ad9d9
+  notion_url: https://app.notion.com/p/3f44590a05eb81e385dbd4fe337ad9d9
+  expected_title: ESC-30 — Diagnose and Propose Bounded Remediation — 100926.1
   lane: ESC
   sequence: 30
   lifecycle: ACTIVE
   function: Execute Diagnose and Propose Bounded Remediation for the exact supplied change.
   session_class: ROLE_CONTINUING
-  session_role: You are Thoth, the continuing Head of Development and remediation proposal author for this change.
+  session_role: You are Thoth, the continuing Head of Development and remediation proposal author for
+    this change.
   creator_role: Thoth, the continuing Head of Development and remediation proposal author for this change.
   reviewer_role: NONE
   inputs:
@@ -3035,10 +3822,10 @@ prompts:
   outputs:
   - artifact: REMEDIATION_PROPOSAL
     states:
-    - REMEDIATION_PENDING
-    - DISCOVERY_REQUIRED
     - BLOCKED
-    consumers:
+    - DISCOVERY_REQUIRED
+    - REMEDIATION_PENDING
+    consumers: &id022
     - ESC-25
     - ESC-40
   mutations:
@@ -3049,109 +3836,142 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 17751 bytes'
-  - 'SHA-256 of that extraction: 459ed2988a3fe000e70079a02967a1f47a8644498f54fc6199586c16a428ac6a'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-25
-  - ESC-40
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id022
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/ESC-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81e385dbd4fe337ad9d9?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
-  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: Escalation — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/ESC-30.md
-    sha256: 579c893c9576a25233a7238dffc01333058cedfd8de01d73df8bc669539962c9
-    bytes: 18446
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81e385dbd4fe337ad9d9?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:51.552Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: ESC-40
-  notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
-  notion_url: https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756
-  expected_title: ESC-40 — Review and Return Approved Remediation — 091426.1
+  notion_page_id: 3f44590a05eb8173905cc6d17a40457b
+  notion_url: https://app.notion.com/p/3f44590a05eb8173905cc6d17a40457b
+  expected_title: ESC-40 — Review and Return Approved Remediation — 100926.1
   lane: ESC
   sequence: 40
   lifecycle: ACTIVE
@@ -3168,7 +3988,7 @@ prompts:
     - APPROVE
     - APPROVE_AS_CHANGED
     - DENY
-    consumers:
+    consumers: &id023
     - ESC-30
     - PR-30
     - PR-35
@@ -3180,219 +4000,329 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 17786 bytes'
-  - 'SHA-256 of that extraction: 9159ec0d9b52a52a58b1cf654547f31089381c331f5d10d133c1f619cea2bd08'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-30
-  - PR-30
-  - PR-35
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id023
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/ESC-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8173905cc6d17a40457b?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81cd938de84cfffead9c
-  expected_parent_title: Escalation — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: Escalation — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/ESC-40.md
-    sha256: 8ca0090c6b067e55e744d52eccf5d9f9ba2ff9898e05266dfda0f1033fe2a8c9
-    bytes: 18896
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8173905cc6d17a40457b?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:22.274Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?i:Outside GCFPE\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-A
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:format recorded in the Glow Operations Hub|one `##` heading carrying its title|canonical
+        PF10 build-notes addendum format))
+      guard: G-F05-B
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:one H2 heading with the next continuous number))(?=.*(?:PF06-Canon-Change-Process-Guide))(?=.*(?:PF27-Canon-Plan-Templates))(?=.*(?i:only
+        H3 or lower))
+      guard: G-F05-C
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: GCFPE-MGMT-10
-  notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
-  notion_url: https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54
-  expected_title: GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1
+  notion_page_id: 3f74590a05eb81b69bd8c27106f7a59d
+  notion_url: https://app.notion.com/p/3f74590a05eb81b69bd8c27106f7a59d
+  expected_title: GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926.1
   lane: GCFPE-MGMT
   sequence: 10
   lifecycle: ACTIVE
-  function: Execute Manage an Ecosystem Change for the exact supplied change.
+  function: Manage one ecosystem Modification from request to applied result through three explicit modes,
+    ANALYZE, PLAN and EXECUTE, stopping at merge and install, which are Nathan's.
   session_class: DEDICATED_ONE_OFF
-  session_role: Act as the Managing Prompt Engineer for one requested GCFPE change.
-  creator_role: Act as the Managing Prompt Engineer for one requested GCFPE change.
+  session_role: Act as the Managing Prompt Engineer for one ecosystem Modification.
+  creator_role: Act as the Managing Prompt Engineer for one ecosystem Modification.
   reviewer_role: NONE
   inputs:
-  - Use the user's supplied error report, requested change, runtime/environment update or proposed new prompt.
+  - 'MODE: ANALYZE, PLAN or EXECUTE.'
+  - 'The subject: for ANALYZE, the request in whatever form it arrives, or the Modification id when the
+    invocation arrives as the intake and triage prompt''s NEXT_PROMPT_HANDOFF; for PLAN and EXECUTE, the
+    Modification id.'
   outputs:
-  - artifact: GCFPE_SUCCESSOR_RELEASE / CHANGE_RECORD
+  - artifact: GCFPE_MODIFICATION_RECORD
     states:
     - ECOSYSTEM_CHANGE_COMPLETE
     - IMPLEMENTATION_BLOCKED
+    - PRODUCT_OWNER_ACTION_PENDING
     - PROMOTION_CHECKPOINT_REQUIRED
-    - READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION
-    consumers:
-    - PR-10
+    consumers: &id024 []
   mutations:
     allowed:
-    - Perform only the authorized GCFPE prompt/control publication mutations
+    - Write only to docs/ephemeral/, docs/graph/ and docs/prompt_ecosystem_management/, to Notion where
+      a destination rule or explicit task authorization allows, and to installed skills
     forbidden:
-    - Edit PF10 directly
-    - Merge a pull request or enable automatic merge
-    - Automatically invoke PR-50
+    - 'Merge a pull request or install a skill: Nathan alone merges and installs'
+    - Write docs/pfcanon/ or edit PF10 directly
+    - Mirror, export, hash or byte-compare a prompt body to disk
+    - Execute product Change Flow, implementation, QA, release selection, promotion or archival, or Alpha
+      work
+    - Emit a handoff to any prompt
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 8015 bytes'
-  - 'SHA-256 of that extraction: e5b77f9c5c9939b2234146b106360b06fe73101b6ec50459ada16b18f6d25b12'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - The page is the duplicate of the approved testing body 3e34590a05eb811b93d2da9b4ef8106d with only
+    M-HEAD and M-TS applied (MODIFICATION-20261011-gcfpe-mb008-to-promotion, PLAN PART-05); the testing
+    page is unchanged and stays as the record.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-10
+  - Return the truthful blocked or incomplete state to the exact owner, with the failed predicate and
+    the recovery point; never invent missing evidence.
+  - A source that cannot be uniquely resolved and read is a resolution error, not an assumed absence.
+  - 'After the first external write, a failure takes D26-B''s path: a failure record that reaches main
+    in a record pull request, a read-only sweep, the freeze kept, and a return to Nathan.'
+  required_interfaces: *id024
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/GCFPE-MGMT-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f74590a05eb81b69bd8c27106f7a59d?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81de9736ea69bac61016
-  expected_parent_title: Glow HDE Prompt Flow Index — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/GCFPE-MGMT-10.md
-    sha256: 85729677e80aa579fb9ca80684eeab1dd0b7c7a5d95561051c4844da570e4e1c
-    bytes: 8065
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f74590a05eb81b69bd8c27106f7a59d?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:05.584Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals: null
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
-    - value: 'This prompt''s artifacts are written only under `docs/ephemeral/` and `docs/graph/`, the controls it maintains only under `docs/prompt_ecosystem_management/`'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'does not execute product Change Flow, implementation, repository work[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: does not execute product Change Flow, implementation, repository work[^.\n]*\.(?! Every statement
+        in this prompt that it is read-only or does not change the repository excludes its own output
+        artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written
+    - rule_id: SRC-001
+      value: '(?s)^Prompt ID:.*^Prompt ID:'
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:approved_for_testing|gcfpe_proposed_prompt_body|not_selected:|proposed replacement
+        body))
+      guard: G-MGMT-3
+    required_literals: null
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: Every artifact is written under the path its kind belongs to — `docs/ephemeral/` for the
+        Modification and its evidence, `docs/graph/` for graph parts, `docs/prompt_ecosystem_management/`
+        for the controls this prompt maintains
+    - rule_id: CTR-002
+      value: Repository paths outside the writable set are not written, and `docs/pfcanon/` is read only\.
+    - rule_id: CTR-002
+      value: \*\*Nathan alone merges\. Nathan alone installs\.\*\*
+    - rule_id: TOP-001
+      value: \*\*This prompt hands off to no other prompt\.\*\* Every result returns to Nathan\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:record in the Modification the TypeSafe reading for that mode''s session and
+        name it, with the record''s path, in the few lines of the return))(?=.*(?i:run the installed TypeSafe
+        scoring skill''s script once, on an action text for that mode''s work written as the skill directs))(?=.*(?i:record
+        the reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?:Do not write the skill''s Notion row\.))(?=.*(?i:When Nathan states
+        the model and setting chosen for a session, record that pick in the Modification with a reference
+        to the reading))'
+      guard: G-TS-7
+    - rule_id: CTR-002
+      value: '(?m)^(?=(?:Prompt ID: ))'
+      guard: G-MGMT-2
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?:In a fresh session, he invokes this prompt with that `MODE` and the Modification
+        id\. Never without his approval\.))
+      guard: G-MGMT-4
+    - rule_id: CTR-002
+      value: (?m)^(?=(?:GCFPE-MGMT-10 — Manage an Ecosystem Change — 100926\.1$))
+      guard: G-MGMT-5
 - prompt_key: IA-10
-  notion_page_id: 3db4590a05eb817aa191f1e822c30480
-  notion_url: https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480
-  expected_title: IA-10 — Create Whole-Change Implementation Audit and Plan — 091426.1
+  notion_page_id: 3f44590a05eb813aa0ccd709ebd134d0
+  notion_url: https://app.notion.com/p/3f44590a05eb813aa0ccd709ebd134d0
+  expected_title: IA-10 — Create Whole-Change Implementation Audit and Plan — 100926.1
   lane: IA
   sequence: 10
   lifecycle: ACTIVE
@@ -3407,9 +4337,9 @@ prompts:
   - artifact: IMPLEMENTATION_AUDIT / IMPLEMENTATION_PLAN
     states:
     - AUDIT_COMPLETE
-    - PLAN_PENDING
     - BLOCKED
-    consumers:
+    - PLAN_PENDING
+    consumers: &id025
     - IA-20
     - IA-30
     - IA-50
@@ -3422,105 +4352,139 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 10301 bytes'
-  - 'SHA-256 of that extraction: 5b7980fe30e9fced15b3c88133f834236d0309dc1f8966db9d0a9430b4fe8659'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - IA-20
-  - IA-30
-  - IA-50
-  - IA-60
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id025
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/IA-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb813aa0ccd709ebd134d0?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/IA-10.md
-    sha256: 2adcc3b6a7f7e9264fc4dde8cd64d8242f8fa4f95ddb875f3be2887c85257c68
-    bytes: 10287
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb813aa0ccd709ebd134d0?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:35.733Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: IA-20
-  notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
-  notion_url: https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750
-  expected_title: IA-20 — Create Whole-Change Implementation Plan — 091426.1
+  notion_page_id: 3f44590a05eb81a8bf39f4b16cc61a5f
+  notion_url: https://app.notion.com/p/3f44590a05eb81a8bf39f4b16cc61a5f
+  expected_title: IA-20 — Create Whole-Change Implementation Plan — 100926.1
   lane: IA
   sequence: 20
   lifecycle: ACTIVE
@@ -3535,9 +4499,9 @@ prompts:
   outputs:
   - artifact: IMPLEMENTATION_PLAN
     states:
-    - PLAN_PENDING
     - BLOCKED
-    consumers:
+    - PLAN_PENDING
+    consumers: &id026
     - IA-30
     - IA-50
     - IA-60
@@ -3549,104 +4513,139 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6411 bytes'
-  - 'SHA-256 of that extraction: 802ccd490feb83f6c4df3c73c325342e0202a02935579ffbf33c74feb35451be'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - IA-30
-  - IA-50
-  - IA-60
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id026
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/IA-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81a8bf39f4b16cc61a5f?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/IA-20.md
-    sha256: fccb50a0746843e6d5bbcd401f820a95802d40f1825778e2a7b393b9f558db3f
-    bytes: 6332
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81a8bf39f4b16cc61a5f?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:23.010Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: IA-30
-  notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
-  notion_url: https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464
-  expected_title: IA-30 — Review Whole-Change Implementation Plan — 091426.1
+  notion_page_id: 3f44590a05eb811db88dece791f1f60c
+  notion_url: https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c
+  expected_title: IA-30 — Review Whole-Change Implementation Plan — 100926.1
   lane: IA
   sequence: 30
   lifecycle: ACTIVE
@@ -3669,9 +4668,9 @@ prompts:
     - PLAN_DELTA_REDLINE
     - PRODUCT_OWNER_DECISION_REQUIRED
     - WRONG_NATIVE_LANE
-    consumers:
-    - PR-10
+    consumers: &id027
     - IA-40
+    - PR-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3680,119 +4679,181 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 9729 bytes'
-  - 'SHA-256 of that extraction: a07e8933a00a4979298fabb703a0c2226aaf96eb870f1109a2c71b1252d14ebc'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - IA-40
-  - PR-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id027
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/IA-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/IA-30.md
-    sha256: a757109e79b733bc45cb9d05d337f7f361a4d661bcf23586a18d0153681473e7
-    bytes: 9858
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:54.641Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'unresolved items/owners, next action, and expected (?:output|review state)'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: unresolved items/owners, next action, and expected (?:output|review state)
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)^(?!.*(?i:\bnonterminal\b))(?=.*(?:DELTA_APPROVE))(?=.*(?i:\bterminal(ly)?\b|\bno (runnable
+        )?continuation\b|\bemit no\b))
+      guard: G-F03-A
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?i:Outside GCFPE\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-A
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:format recorded in the Glow Operations Hub|one `##` heading carrying its title|canonical
+        PF10 build-notes addendum format))
+      guard: G-F05-B
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?:DELTA_APPROVE))(?=.*(?i:\bnonterminal\b))(?=.*(?i:exactly one complete continuation
+        block))(?=.*(?i:return (phase|point)))
+      guard: G-F03-B
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:one H2 heading with the next continuous number))(?=.*(?:PF06-Canon-Change-Process-Guide))(?=.*(?:PF27-Canon-Plan-Templates))(?=.*(?i:only
+        H3 or lower))
+      guard: G-F05-C
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: IA-40
-  notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
-  notion_url: https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969
-  expected_title: IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091426.1
+  notion_page_id: 3f44590a05eb81ca83ecdac0960a6f16
+  notion_url: https://app.notion.com/p/3f44590a05eb81ca83ecdac0960a6f16
+  expected_title: IA-40 — Prepare or Revise Whole-Change Implementation Plan — 100926.1
   lane: IA
   sequence: 40
   lifecycle: ACTIVE
   function: Execute Prepare or Revise Whole-Change Implementation Plan for the exact supplied change.
   session_class: CHANGE_LIFETIME
-  session_role: You are the same Implementation Agent (IA) who authored the pending preapproval whole-change Plan.
+  session_role: You are the same Implementation Agent (IA) who authored the pending preapproval whole-change
+    Plan.
   creator_role: the same Implementation Agent (IA) who authored the pending preapproval whole-change Plan.
   reviewer_role: Isis / Lead Developer
   inputs:
-  - Require one complete pending initial Implementation Plan plus the exact IA-30 denial/redline for that version, or an interrupted preapproval recovery package with the same author/reviewer lineage.
+  - Require one complete pending initial Implementation Plan plus the exact IA-30 denial/redline for that
+    version, or an interrupted preapproval recovery package with the same author/reviewer lineage.
   outputs:
   - artifact: IMPLEMENTATION_PLAN
     states:
@@ -3814,100 +4875,134 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5712 bytes'
-  - 'SHA-256 of that extraction: 8c9bb2273f3e54ba8b1422a6f8d1c3bd1132497faa0ffd561038342a0c268326'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
   required_interfaces:
   - IA-30
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/IA-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81ca83ecdac0960a6f16?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/IA-40.md
-    sha256: 78c209da41eb258c4dd5c667e71150b2585eb3355758020aab02294dc5a71083
-    bytes: 5537
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81ca83ecdac0960a6f16?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:25.413Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: IA-50
-  notion_page_id: 3db4590a05eb81d78eeae384e93dd697
-  notion_url: https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697
-  expected_title: IA-50 — IA Answer Seeder — 091426.1
+  notion_page_id: 3f44590a05eb810aa299fbb05a34dece
+  notion_url: https://app.notion.com/p/3f44590a05eb810aa299fbb05a34dece
+  expected_title: IA-50 — IA Answer Seeder — 100926.1
   lane: IA
   sequence: 50
   lifecycle: ACTIVE
@@ -3921,9 +5016,9 @@ prompts:
   outputs:
   - artifact: IA_RECOVERY_SEED
     states:
-    - SEED_READY
     - SEED_INCOMPLETE
-    consumers:
+    - SEED_READY
+    consumers: &id028
     - IA-10
     - IA-20
     - IA-30
@@ -3936,103 +5031,133 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6668 bytes'
-  - 'SHA-256 of that extraction: 42ce029be426cd3d745b3e9f7099439a091d3ee915c1f4c0dcd660cf5cf0afef'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - IA-10
-  - IA-20
-  - IA-30
-  - IA-40
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id028
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/IA-50.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb810aa299fbb05a34dece?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/IA-50.md
-    sha256: 504f9454328a2230ace76128d1837fbeae404e14d01384226a4a7025daa9492d
-    bytes: 6526
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb810aa299fbb05a34dece?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:38.746Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: IA-60
-  notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
-  notion_url: https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2
-  expected_title: IA-60 — Thoth Planning Research — 091426.1
+  notion_page_id: 3f44590a05eb81cdab15c7e7f7094a64
+  notion_url: https://app.notion.com/p/3f44590a05eb81cdab15c7e7f7094a64
+  expected_title: IA-60 — Thoth Planning Research — 100926.1
   lane: IA
   sequence: 60
   lifecycle: ACTIVE
@@ -4042,14 +5167,15 @@ prompts:
   creator_role: Act as Thoth for one bounded advanced engineering planning inquiry before Plan approval.
   reviewer_role: NONE
   inputs:
-  - 'PLANNING_INQUIRY: exact original question/identity; actual files/interfaces and repository evidence; constraints, alternatives, failure modes, decision criteria and specific requested finding.'
+  - 'PLANNING_INQUIRY: exact original question/identity; actual files/interfaces and repository evidence;
+    constraints, alternatives, failure modes, decision criteria and specific requested finding.'
   outputs:
   - artifact: PLANNING_RESEARCH_FINDING
     states:
-    - RESEARCH_COMPLETE
-    - PARTIAL
     - BLOCKED
-    consumers:
+    - PARTIAL
+    - RESEARCH_COMPLETE
+    consumers: &id029
     - IA-50
   mutations:
     allowed:
@@ -4059,121 +5185,156 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5633 bytes'
-  - 'SHA-256 of that extraction: 5addd33093e4c794e609829bba434275f06e798d313eda8ed29d63ffdba3e8c6'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - IA-50
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id029
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/IA-60.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81cdab15c7e7f7094a64?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/IA-60.md
-    sha256: 6a8971c4c2bc1ca9000843b7da2b2df86f08ec6eb8f1b2ffa701a930700c0deb
-    bytes: 5357
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81cdab15c7e7f7094a64?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:00.331Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: MGR-10
-  notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
-  notion_url: https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4
-  expected_title: MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091426.1
+  notion_page_id: 3f44590a05eb813ea53ac959e7a4e597
+  notion_url: https://app.notion.com/p/3f44590a05eb813ea53ac959e7a4e597
+  expected_title: MGR-10 — Coordinate the Complete Change Flow within Current Authority — 100926.1
   lane: MGR
   sequence: 10
   lifecycle: ACTIVE
-  function: Execute Coordinate the Complete Change Flow within Current Authority for the exact supplied change.
+  function: Execute Coordinate the Complete Change Flow within Current Authority for the exact supplied
+    change.
   session_class: ORCHESTRATOR_RUN
   session_role: You are the Change Flow coordinator, without taking over any substantive actor or approval.
   creator_role: the Change Flow coordinator, without taking over any substantive actor or approval.
   reviewer_role: NONE
   inputs:
-  - For a request only to prepare Product Owner cycle-entry launch guidance, accept known or unresolved classification and all actual intake without inventing change identity.
+  - For a request only to prepare Product Owner cycle-entry launch guidance, accept known or unresolved
+    classification and all actual intake without inventing change identity.
   outputs:
   - artifact: FLOW_PROGRESS
     states:
     - FLOW_PROGRESS
     - TERMINAL_RETURN
-    consumers:
-    - CF-PO-10
-    - CF-E-10
+    consumers: &id030
     - CF-C-10
-    - QA-10
+    - CF-E-10
+    - CF-PO-10
     - CL-40
+    - QA-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -4182,106 +5343,135 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7276 bytes'
-  - 'SHA-256 of that extraction: 5c8aebc68f7f7f6aa708851e0464e5793b27df158af1e37537ab450efbd86f6a'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CF-C-10
-  - CF-E-10
-  - CF-PO-10
-  - CL-40
-  - QA-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id030
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/MGR-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb813ea53ac959e7a4e597?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb81d59059eb6b95ed5fcf
-  expected_parent_title: HDE Change Flow — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE Change Flow — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/MGR-10.md
-    sha256: 63b4897d9774eea985f94b78b4d43b83a3443a3be8adb7543283042e2882810b
-    bytes: 7357
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb813ea53ac959e7a4e597?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:57.710Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion-resident artifact'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion-resident artifact
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: OPS-10
-  notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
-  notion_url: https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5
-  expected_title: OPS-10 — Create Bounded Ops Task — 091426.1
+  notion_page_id: 3f44590a05eb81509957c43992c03625
+  notion_url: https://app.notion.com/p/3f44590a05eb81509957c43992c03625
+  expected_title: OPS-10 — Create Bounded Ops Task — 100926.1
   lane: OPS
   sequence: 10
   lifecycle: ACTIVE
@@ -4297,9 +5487,9 @@ prompts:
   outputs:
   - artifact: OPS_TASK
     states:
-    - READY
     - BLOCKED
-    consumers:
+    - READY
+    consumers: &id031
     - ESC-25
     - OPS-20
     - RS-10
@@ -4311,140 +5501,189 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 42826 bytes'
-  - 'SHA-256 of that extraction: 4a30d7342f4a71e314b7962c2f7eb2ab6b313d9323044a1fcc8e6cbc6bc41563'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - PF27 section 3 executable task, safe same-script rehearsal where supported, real authority/target/effects,
+    stop/recovery and canonical audit/ops stored evidence; preserve permitted historical mappings.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-25
-  - OPS-20
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required stored evidence cannot support completion/ACCEPT; no verbatim approval formula required.
+  required_interfaces: *id031
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/OPS-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81509957c43992c03625?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/OPS-10.md
-    sha256: 47f2e40af709fbfc1486d7fca67a2114527aa2a2fd2be8bb3f03e268f236d25d
-    bytes: 43576
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81509957c43992c03625?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:29.013Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'Reviewers remain read-only toward the work they review'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\n]*CANON_CONFLICT_REGISTER)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'must preserve in its execution result and return handoff'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\n]*CANON_CONFLICT_REGISTER)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: must preserve in its execution result and return handoff
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: Reviewers remain read-only toward the work they review
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: OPS-20
-  notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
-  notion_url: https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8
-  expected_title: OPS-20 — Execute Bounded Ops Task — 091426.1
+  notion_page_id: 3f44590a05eb8155aebacd56f469643e
+  notion_url: https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e
+  expected_title: OPS-20 — Execute Bounded Ops Task — 100926.1
   lane: OPS
   sequence: 20
   lifecycle: ACTIVE
   function: Execute Execute Bounded Ops Task for the exact supplied change.
   session_class: DEDICATED_ONE_OFF
-  session_role: You are the authorized DevOps or target-environment operator for the exact bounded operation supplied in OPS_TASK_ID.
-  creator_role: the authorized DevOps or target-environment operator for the exact bounded operation supplied in OPS_TASK_ID.
+  session_role: You are the authorized DevOps or target-environment operator for the exact bounded operation
+    supplied in OPS_TASK_ID.
+  creator_role: the authorized DevOps or target-environment operator for the exact bounded operation supplied
+    in OPS_TASK_ID.
   reviewer_role: NONE
   inputs:
   - OPS_TASK_ID
   outputs:
   - artifact: OPS_EXECUTION_RESULT
     states:
-    - COMPLETE
-    - PARTIAL
     - BLOCKED
+    - COMPLETE
     - FAILED
     - NOT_EXECUTED
     - NOT_PRODUCED
-    consumers:
+    - PARTIAL
+    consumers: &id032
     - ESC-25
     - OPS-30
     - RS-10
@@ -4456,114 +5695,161 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36912 bytes'
-  - 'SHA-256 of that extraction: 429c6ccca8c1602b3457433b85f3c91f96d7c21bb4891ee921dd56decd8b2c0c'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - PF27 section 3 executable task, safe same-script rehearsal where supported, real authority/target/effects,
+    stop/recovery and canonical audit/ops stored evidence; preserve permitted historical mappings.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-25
-  - OPS-30
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required stored evidence cannot support completion/ACCEPT; no verbatim approval formula required.
+  required_interfaces: *id032
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/OPS-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/OPS-20.md
-    sha256: 066ace58820320724fab5e22b269f33fa13db92c646a46e9b7462b6b273b4a0f
-    bytes: 37499
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8155aebacd56f469643e?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:42.649Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\n]*CANON_CONFLICT_REGISTER)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b|^(?:Complete return to ESC-30|RS-30 native revision):[^\n]*CANON_CONFLICT_REGISTER)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: OPS-30
-  notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
-  notion_url: https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57
-  expected_title: OPS-30 — Review Ops Execution Receipt — 091426.1
+  notion_page_id: 3f44590a05eb81ec8da3effc3b28cf97
+  notion_url: https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97
+  expected_title: OPS-30 — Review Ops Execution Receipt — 100926.1
   lane: OPS
   sequence: 30
   lifecycle: ACTIVE
@@ -4588,7 +5874,7 @@ prompts:
     states:
     - ACCEPT
     - REJECT
-    consumers:
+    consumers: &id033
     - ESC-25
     - OPS-10
     - RS-10
@@ -4600,128 +5886,180 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 57532 bytes'
-  - 'SHA-256 of that extraction: 321e626fc72fb71dddf865860193b9d66fb36eae30b6a43c7d713e27443ff45f'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
+  - PF27 section 3 executable task, safe same-script rehearsal where supported, real authority/target/effects,
+    stop/recovery and canonical audit/ops stored evidence; preserve permitted historical mappings.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-25
-  - OPS-10
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Missing required stored evidence cannot support completion/ACCEPT; no verbatim approval formula required.
+  required_interfaces: *id033
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/OPS-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/OPS-30.md
-    sha256: 6a90191f32d8c9a8698bb39abb6fd5043dcb1afd8a27f28317e3b0e649f0381e
-    bytes: 58399
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:04.097Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'each input artifact by repository path; the artifacts hold the rest'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Reviewers remain read-only toward the work they review'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'native inputs, lineage, current state, gates, risks and required action'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'A saved attachment, link or scattered fields do not replace the handoff\.'
-      rule_id: TOP-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: native inputs, lineage, current state, gates, risks and required action
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: TOP-001
+      value: A saved attachment, link or scattered fields do not replace the handoff\.
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: each input artifact by repository path; the artifacts hold the rest
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Reviewers remain read-only toward the work they review
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: PR-10
-  notion_page_id: 3db4590a05eb818e8359de1994e97a7d
-  notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
-  expected_title: PR-10 — Create PR Work-Unit Instructions — 091426.1
+  notion_page_id: 3f44590a05eb815d97d5f3930c7d3e8a
+  notion_url: https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a
+  expected_title: PR-10 — Create PR Work-Unit Instructions — 100926.1
   lane: PR
   sequence: 10
   lifecycle: ACTIVE
@@ -4738,10 +6076,10 @@ prompts:
   outputs:
   - artifact: PR_INSTRUCTION
     states:
-    - INSTRUCTION_READY
-    - DRAFT
     - BLOCKED
-    consumers:
+    - DRAFT
+    - INSTRUCTION_READY
+    consumers: &id034
     - PR-20
     - RS-10
   mutations:
@@ -4752,129 +6090,192 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 49351 bytes'
-  - 'SHA-256 of that extraction: d1e2458c39037c9aa1dfbc3f97641e2e6b2c1dd2143447f40c142dacb6a8b623'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-20
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id034
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/PR-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/PR-10.md
-    sha256: a731f158057d5ff896a13e1ada3d323bbd20d827de577ed005ddf01e334913e4
-    bytes: 50295
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:33.739Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'carry PR_INSTRUCTION_ID and its complete content|dependency and evidence history; read-only substantiation of the mismatch; completed work'
-      rule_id: TOP-001
-    - value: '(?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: carry PR_INSTRUCTION_ID and its complete content|dependency and evidence history; read-only
+        substantiation of the mismatch; completed work
+    - rule_id: TOP-001
+      value: (?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original
+        Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session,
+        open PR|commit and remote-head references; completed work|branch and repository/reference baseline
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual
+        merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical
+        PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40
+        read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion
+        and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(their|your|its) own (recommendation|assessment)\b))(?!(?i:Never
+        infer external state or execution success\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(assess\w*|evaluat\w*|recommend\w*|apprais\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(runtime
+        setting|model|reasoning|strength|suitability|eligibility)\b))
+      guard: G-TS-4
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:do not prescribe a runtime setting
+        or give their own assessment of one))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:the TypeSafe reading and
+        surface advice that \*Mandatory single-block handoff\* requires inform Nathan's choice and prescribe
+        nothing))
+      guard: G-TS-5
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: PR-20
-  notion_page_id: 3db4590a05eb8174abf8c04318ab04be
-  notion_url: https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be
-  expected_title: PR-20 — Create Detailed PR Implementation Plan — 091426.1
+  notion_page_id: 3f44590a05eb819fbea5dcd966a750ba
+  notion_url: https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba
+  expected_title: PR-20 — Create Detailed PR Implementation Plan — 100926.1
   lane: PR
   sequence: 20
   lifecycle: ACTIVE
@@ -4885,14 +6286,15 @@ prompts:
   reviewer_role: Nathan / Product Owner
   inputs:
   - PR_INSTRUCTION_ID
-  - PR_WORK_UNIT_LINEAGE_REVIEW with REJECT (reject_replan) and its in-scope finding, for a re-plan of the same WORK_UNIT_ID in a new dedicated session Nathan seeds
+  - PR_WORK_UNIT_LINEAGE_REVIEW with REJECT (reject_replan) and its in-scope finding, for a re-plan of
+    the same WORK_UNIT_ID in a new dedicated session Nathan seeds
   outputs:
   - artifact: PR_IMPLEMENTATION_PLAN
     states:
     - AWAITING_PO_PROCEED
-    - DRAFT
     - BLOCKED
-    consumers:
+    - DRAFT
+    consumers: &id035
     - RS-10
   mutations:
     allowed:
@@ -4902,134 +6304,201 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 51725 bytes'
-  - 'SHA-256 of that extraction: d64997b20867063089a23b42d44f6744a6537f158844e0a13f84670fd5f41110'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id035
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/PR-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/PR-20.md
-    sha256: 3d0b5c6dec34ce39e04d2229a6e5a3cf5c0919552a40c5e0e4426516a08c3c2f
-    bytes: 52673
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:47.327Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'accepts\s+a\s+`?PR_WORK_UNIT_LINEAGE_REVIEW`?\s+whose\s+result\s+is\s+`?REJECT'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'dependency/evidence history, completed work and unaffected obligations|all actual merge/commit/order/check evidence|current stage and suspended boundary, completed work, dependencies, evidence'
-      rule_id: TOP-001
-    - value: '(?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
-      rule_id: CTR-001
-    - value: 'Do not mutate the repository in this authoring operation\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: dependency/evidence history, completed work and unaffected obligations|all actual merge/commit/order/check
+        evidence|current stage and suspended boundary, completed work, dependencies, evidence
+    - rule_id: TOP-001
+      value: (?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original
+        Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session,
+        open PR|commit and remote-head references; completed work|branch and repository/reference baseline
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual
+        merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical
+        PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40
+        read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion
+        and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+    - rule_id: CTR-001
+      value: Do not mutate the repository in this authoring operation\.(?! Every statement in this prompt
+        that it is read-only or does not change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(their|your|its) own (recommendation|assessment)\b))(?!(?i:Never
+        infer external state or execution success\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(assess\w*|evaluat\w*|recommend\w*|apprais\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(runtime
+        setting|model|reasoning|strength|suitability|eligibility)\b))
+      guard: G-TS-4
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: accepts\s+a\s+`?PR_WORK_UNIT_LINEAGE_REVIEW`?\s+whose\s+result\s+is\s+`?REJECT
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:do not prescribe a runtime setting
+        or give their own assessment of one))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:the TypeSafe reading and
+        surface advice that \*Mandatory single-block handoff\* requires inform Nathan's choice and prescribe
+        nothing))
+      guard: G-TS-5
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: PR-30
-  notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
-  notion_url: https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294
-  expected_title: PR-30 — PR Implementation Proceed — 091426.1
+  notion_page_id: 3f44590a05eb8148a538f5c80588db14
+  notion_url: https://app.notion.com/p/3f44590a05eb8148a538f5c80588db14
+  expected_title: PR-30 — PR Implementation Proceed — 100926.1
   lane: PR
   sequence: 30
   lifecycle: ACTIVE
@@ -5048,149 +6517,208 @@ prompts:
     - PR_CANDIDATE_PUBLISHED
     - RECOVERY_PENDING
     - RESCOPE_PENDING
-    consumers:
+    consumers: &id036
     - PR-35
     - RS-20
   mutations:
     allowed:
-    - Implement, test, commit and publish the exact proceeded PR work unit; review findings and CI fixes on the published PR belong to PR-35
+    - Implement, test, commit and publish the exact proceeded PR work unit; review findings and CI fixes
+      on the published PR belong to PR-35
     forbidden:
     - Edit PF10 directly
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 39791 bytes'
-  - 'SHA-256 of that extraction: 482ca2a7657058154147acf3768334dfb956246c45a400a80e6c6f0138004a9d'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-35
-  - RS-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id036
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/PR-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8148a538f5c80588db14?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/PR-30.md
-    sha256: c666d6560a8aac597612944b4ef3755ec29351229ad128d86b9142cc89a546fe
-    bytes: 40571
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8148a538f5c80588db14?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:08.672Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'An\s+\*?In-flight decisions\*?\s+section'
-      rule_id: CTR-002
-    - value: 'Decide it during work'
-      rule_id: CTR-002
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'they do not share a session'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: '(?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session, open PR|commit and remote-head references; completed work|branch and repository/reference baseline'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'outside the approved Plan, return the metadata\b'
-      rule_id: TOP-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: (?i)\b(?:hands?|carry|carrying|carries)\s+(?:the\s+)?(?:one\s+|exact\s+|same\s+)?(?:original
+        Proceed, dedicated PR session, )?workspace/worktree, branch\b|Carry the exact dedicated session,
+        open PR|commit and remote-head references; completed work|branch and repository/reference baseline
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: TOP-001
+      value: outside the approved Plan, return the metadata\b
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(their|your|its) own (recommendation|assessment)\b))(?!(?i:Never
+        infer external state or execution success\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(assess\w*|evaluat\w*|recommend\w*|apprais\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(runtime
+        setting|model|reasoning|strength|suitability|eligibility)\b))
+      guard: G-TS-4
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: An\s+\*?In-flight decisions\*?\s+section
+    - rule_id: CTR-002
+      value: Decide it during work
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: they do not share a session
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:do not prescribe a runtime setting
+        or give their own assessment of one))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:the TypeSafe reading and
+        surface advice that \*Mandatory single-block handoff\* requires inform Nathan's choice and prescribe
+        nothing))
+      guard: G-TS-5
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: PR-35
-  notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
-  notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
-  expected_title: PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1
+  notion_page_id: 3f44590a05eb811ebf72e949b7b1572e
+  notion_url: https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e
+  expected_title: PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1
   lane: PR
   sequence: 35
   lifecycle: ACTIVE
   function: Execute the review-resolution and merge-readiness phase for one proceeded PR work unit.
   session_class: DEDICATED_PR_REVIEW_SESSION
-  session_role: You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you continue its existing pull request. PR-35 runs as its own top-level session, entered from PR-30's handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of any other session.
-  creator_role: The dedicated PR-35 session; PR-30 and PR-35 are two phases of one work unit, run in two dedicated sessions.
+  session_role: You are the dedicated PR-35 session for one work unit, entered from PR-30's handoff; you
+    continue its existing pull request. PR-35 runs as its own top-level session, entered from PR-30's
+    handoff that Nathan pastes, and never as a subagent, forked agent or workflow agent of PR-30 or of
+    any other session.
+  creator_role: The dedicated PR-35 session; PR-30 and PR-35 are two phases of one work unit, run in two
+    dedicated sessions.
   reviewer_role: NONE
   inputs:
   - WORK_UNIT_ID and exact change/Epic identity
@@ -5198,7 +6726,8 @@ prompts:
   - 'session_disposition: NEW_DEDICATED — the dedicated PR-35 session for this WORK_UNIT_ID'
   - original Product Owner Proceed for the exact detailed PR Plan
   - complete IA-issued PR instruction
-  - immutable approved Specification and whole-change Implementation Plan with review and approved overlay lineage
+  - immutable approved Specification and whole-change Implementation Plan with review and approved overlay
+    lineage
   outputs:
   - artifact: PR_IMPLEMENTATION_RESULT
     states:
@@ -5208,7 +6737,7 @@ prompts:
     - RECOVERY_PENDING
     - REMOTE_EVIDENCE_PENDING
     - RESCOPE_PENDING
-    consumers:
+    consumers: &id037
     - PR-40
     - RS-20
   mutations:
@@ -5219,136 +6748,190 @@ prompts:
     forbidden:
     - Merge a pull request or enable automatic merge
     - Edit PF10 directly
-    - Add an R1 row, actor, approval, Proceed or work unit, or any session beyond its own dedicated PR-35 session
+    - Add an R1 row, actor, approval, Proceed or work unit, or any session beyond its own dedicated PR-35
+      session
     - Produce a PF10_BUILD_NOTES_ADDENDUM
   source_snapshot:
-    path: candidate/prompts/PR-35.md
-    sha256: 39d72456ae6080d47488508005a038e88e4555a20efa5a9c394f03726b675e51
-    bytes: 17934
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:15.569Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: CTR-002
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'An\s+\*?In-flight decisions\*?\s+section'
-      rule_id: CTR-002
-    - value: 'Decide it during work'
-      rule_id: CTR-002
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'they do not share a session'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: '[Ss]ubscribe to the pull request'
-      rule_id: CTR-002
-    - value: 'stay subscribed and do not poll'
-      rule_id: CTR-002
-    - value: 'The observed merge event is the fact PR-40 is entered on'
-      rule_id: CTR-002
-    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
-      rule_id: CTR-002
-    - value: '`MERGE_OBSERVED`: [^\n]*?the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan'
-      rule_id: CTR-002
-    - value: 'seventh top-level PR-35 result'
-      rule_id: CTR-002
-    - value: 'for `MERGE_OBSERVED`, it is the same selected PR-40'
-      rule_id: CTR-002
-    - value: 'This prompt''s artifacts are written only under `docs/ephemeral/` and `docs/graph/`'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: 'launched as a new session'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'sixth top-level PR-35 result'
-      rule_id: CTR-001
-    - value: 'The PR-40 handoff must say:|Nathan''s later paste asserts'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: CTR-001
+      value: launched as a new session
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed
+        work, commits/local changes|reviews/checks already observed, unresolved items|with each actual
+        PR reference, commit identity, order
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: sixth top-level PR-35 result
+    - rule_id: CTR-001
+      value: The PR-40 handoff must say:|Nathan's later paste asserts
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(their|your|its) own (recommendation|assessment)\b))(?!(?i:Never
+        infer external state or execution success\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(assess\w*|evaluat\w*|recommend\w*|apprais\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(runtime
+        setting|model|reasoning|strength|suitability|eligibility)\b))
+      guard: G-TS-4
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: An\s+\*?In-flight decisions\*?\s+section
+    - rule_id: CTR-002
+      value: Decide it during work
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: they do not share a session
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: '[Ss]ubscribe to the pull request'
+    - rule_id: CTR-002
+      value: stay subscribed and do not poll
+    - rule_id: CTR-002
+      value: The observed merge event is the fact PR-40 is entered on
+    - rule_id: CTR-002
+      value: verified at entry from the recorded vehicle and repository state; the handoff does not carry
+        them
+    - rule_id: CTR-002
+      value: '`MERGE_OBSERVED`: [^\n]*?the subscribed PR-35 session observes the merge of the identified
+        PR, performed by Nathan'
+    - rule_id: CTR-002
+      value: seventh top-level PR-35 result
+    - rule_id: CTR-002
+      value: for `MERGE_OBSERVED`, it is the same selected PR-40
+    - rule_id: CTR-002
+      value: This prompt's artifacts are written only under `docs/ephemeral/` and `docs/graph/`
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:Do not give your own recommendation,
+        assessment or ranking of model, reasoning level or effort, and do not inspect or route on model))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:the
+        TypeSafe reading and surface advice follow \*Mandatory single-block handoff\*))
+      guard: G-TS-6
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 17908 bytes'
-  - 'SHA-256 of that extraction: 51e8a5e85ca3b66ce755e979d0a1ac61540c7f06e58237f516f3a28148570e79'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-40
-  - RS-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id037
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/PR-35.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb811ebf72e949b7b1572e?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  registry_note: Added 2026-09-17. Present in the 091426.1 candidate and absent from the 091326.2 predecessor; this entry was derived from the candidate body, not carried over.
+  registry_note: Added 2026-09-17. Present in the 091426.1 candidate and absent from the 091326.2 predecessor;
+    this entry was derived from the candidate body, not carried over.
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c?pvs=204
 - prompt_key: PR-40
-  notion_page_id: 3db4590a05eb818786c5cb6051b4d634
-  notion_url: https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634
-  expected_title: PR-40 — Review PR Work-Unit Lineage — 091426.1
+  notion_page_id: 3f44590a05eb81088487e918fd642a7f
+  notion_url: https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f
+  expected_title: PR-40 — Review PR Work-Unit Lineage — 100926.1
   lane: PR
   sequence: 40
   lifecycle: ACTIVE
@@ -5361,22 +6944,34 @@ prompts:
   - PR_INSTRUCTION_ID and complete PR_INSTRUCTION
   - PR_IMPLEMENTATION_PLAN_ID and complete PR_IMPLEMENTATION_PLAN
   - The complete PR-30 result with PR_CANDIDATE_PUBLISHED
-  - 'The complete PR-35 result: MERGE_OBSERVED with the observed merge event, or, only where no MERGE_OBSERVED result was returned for this merge, the earlier MERGE_PENDING, which is historical pre-merge evidence.'
-  - The complete ordered PR_REFS for this work unit; PR-40 resolves each PR's commits, order, review/check state and merge evidence from repository evidence
-  - CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved Specification, Implementation Audit, Plan, Plan review, dependency and acceptance/evidence lineage
-  - Existing PR reviewer/session lineage for a rereview, the PR-30 and PR-35 session identities, the whole-change IA context and exact return owner
-  - CANON_CONFLICT_REGISTER, recovery state, truthful pending, NOT PRODUCED and NOT EXECUTED values, and all actual access limitations
-  - The branch, head and commits are verified at entry from the recorded vehicle and repository state; the handoff does not carry them.
-  - PR-40 is entered on the observed merge event for the identified PR, delivered to the subscribed PR-35 session as MERGE_OBSERVED, or, only where no MERGE_OBSERVED result was returned for this merge, on Nathan's assertion that he manually merged it.
+  - 'The complete PR-35 result: MERGE_OBSERVED with the observed merge event, or, only where no MERGE_OBSERVED
+    result was returned for this merge, the earlier MERGE_PENDING, which is historical pre-merge evidence.'
+  - The complete ordered PR_REFS for this work unit; PR-40 resolves each PR's commits, order, review/check
+    state and merge evidence from repository evidence
+  - CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved Specification, Implementation Audit, Plan, Plan review,
+    dependency and acceptance/evidence lineage
+  - Existing PR reviewer/session lineage for a rereview, the PR-30 and PR-35 session identities, the whole-change
+    IA context and exact return owner
+  - CANON_CONFLICT_REGISTER, recovery state, truthful pending, NOT PRODUCED and NOT EXECUTED values, and
+    all actual access limitations
+  - The branch, head and commits are verified at entry from the recorded vehicle and repository state;
+    the handoff does not carry them.
+  - PR-40 is entered on the observed merge event for the identified PR, delivered to the subscribed PR-35
+    session as MERGE_OBSERVED, or, only where no MERGE_OBSERVED result was returned for this merge, on
+    Nathan's assertion that he manually merged it.
   outputs:
   - artifact: PR_WORK_UNIT_LINEAGE_REVIEW
     states:
     - ACCEPT
-    - REJECT
     - PENDING
-    consumers:
+    - REJECT
+    consumers: &id038
+    - DOC-10
+    - DOC-20
+    - OPS-10
     - PR-10
     - PR-20
+    - QA-10
     - RS-10
   mutations:
     allowed:
@@ -5386,148 +6981,219 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 54043 bytes'
-  - 'SHA-256 of that extraction: 042255564c9916c4a933f0986ad8f98e36a495bdf1e35a956cdc0704a87991dc'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-10
-  - PR-20
-  - RS-10
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id038
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/PR-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/PR-40.md
-    sha256: 9350d497844631345b0ab851f457554a97e4a308aad522b644995a7ea99de3f5
-    bytes: 54974
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:38.234Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'every native return names those artifacts'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 're-plans through `?PR-20`?, as \*\*PRECISE IN-SCOPE DEFECT → re-plan\*\* states'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
-    - value: 'Reviewers remain read-only toward the work they review'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: 'original Proceed and a suitable actual authorized implementation vehicle'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'PR instruction and implementation result; actual merged-state evidence|dependency, acceptance and evidence history; completed work|all completed review work; attempts; limitations'
-      rule_id: TOP-001
-    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
-      rule_id: CTR-001
-    - value: 'ordinary in-scope defect remains with the existing PR owner'
-      rule_id: CTR-001
-    - value: 'operating read-only\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
-    - value: 'RESCOPE_PROPOSAL_ID and complete RESCOPE_PROPOSAL\b'
-      rule_id: TOP-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: CTR-001
+      value: original Proceed and a suitable actual authorized implementation vehicle
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: PR instruction and implementation result; actual merged-state evidence|dependency, acceptance
+        and evidence history; completed work|all completed review work; attempts; limitations
+    - rule_id: TOP-001
+      value: Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed
+        work, commits/local changes|reviews/checks already observed, unresolved items|with each actual
+        PR reference, commit identity, order
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual
+        merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical
+        PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40
+        read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion
+        and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+    - rule_id: CTR-001
+      value: ordinary in-scope defect remains with the existing PR owner
+    - rule_id: CTR-001
+      value: operating read-only\.(?! Every statement in this prompt that it is read-only or does not
+        change the repository excludes its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: TOP-001
+      value: RESCOPE_PROPOSAL_ID and complete RESCOPE_PROPOSAL\b
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(their|your|its) own (recommendation|assessment)\b))(?!(?i:Never
+        infer external state or execution success\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(assess\w*|evaluat\w*|recommend\w*|apprais\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(runtime
+        setting|model|reasoning|strength|suitability|eligibility)\b))
+      guard: G-TS-4
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: every native return names those artifacts
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: verified at entry from the recorded vehicle and repository state; the handoff does not carry
+        them
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: re-plans through `?PR-20`?, as \*\*PRECISE IN-SCOPE DEFECT → re-plan\*\* states
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: Reviewers remain read-only toward the work they review
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:do not prescribe a runtime setting
+        or give their own assessment of one))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:the TypeSafe reading and
+        surface advice that \*Mandatory single-block handoff\* requires inform Nathan's choice and prescribe
+        nothing))
+      guard: G-TS-5
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: PR-50
-  notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
-  notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
-  expected_title: PR-50 — Abort PR and Escalate — 091426.1
+  notion_page_id: 3f44590a05eb81d29748eb21df73b02c
+  notion_url: https://app.notion.com/p/3f44590a05eb81d29748eb21df73b02c
+  expected_title: PR-50 — Abort PR and Escalate — 100926.1
   lane: PR
   sequence: 50
   lifecycle: ACTIVE
@@ -5537,12 +7203,14 @@ prompts:
   creator_role: acting only on Nathan / Product Owner's direct manual invocation.
   reviewer_role: NONE
   inputs:
-  - Require Nathan's direct manual invocation, exact change/work unit, PR/session/workspace/worktree/branch/head, original Proceed, immutable base and applicable overlays, failure/recovery evidence, completed work, reviews/CI, artifacts, constraints and the reason continuation is unrecoverable.
+  - Require Nathan's direct manual invocation, exact change/work unit, PR/session/workspace/worktree/branch/head,
+    original Proceed, immutable base and applicable overlays, failure/recovery evidence, completed work,
+    reviews/CI, artifacts, constraints and the reason continuation is unrecoverable.
   outputs:
   - artifact: PR_ABORT_ESCALATION_RECORD
     states:
     - PR_ABORTED_ESCALATED
-    consumers: []
+    consumers: &id039 []
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -5551,104 +7219,136 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6887 bytes'
-  - 'SHA-256 of that extraction: ac910fe9e1374a4206179c58b8fba187b6c0e62e66e9c0cc1ffab85de93a91c8'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: []
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id039
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/PR-50.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81d29748eb21df73b02c?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/PR-50.md
-    sha256: 4c08399c9300b7bf85e007f0512954895a523db9d61a348e333e98241c7b2d8d
-    bytes: 7257
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81d29748eb21df73b02c?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:48.607Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: controlled Markdown
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\n]*\.(?! Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts)'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: otherwise mutating the workspace, worktree, branch, open PR, commits or evidence[^.\n]*\.(?!
+        Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts)
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: controlled Markdown
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: QA-10
-  notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
-  notion_url: https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29
-  expected_title: QA-10 — Audit Implementation and Establish QA Readiness — 091426.1
+  notion_page_id: 3f44590a05eb8134af92e7c85a48e67c
+  notion_url: https://app.notion.com/p/3f44590a05eb8134af92e7c85a48e67c
+  expected_title: QA-10 — Audit Implementation and Establish QA Readiness — 100926.1
   lane: QA
   sequence: 10
   lifecycle: ACTIVE
   function: Execute Audit Implementation and Establish QA Readiness for the exact supplied change.
   session_class: ROLE_CONTINUING
-  session_role: You are Isis, the continuing Lead Developer and whole-change readiness decision owner for the exact supplied change.
-  creator_role: Isis, the continuing Lead Developer and whole-change readiness decision owner for the exact supplied change.
+  session_role: You are Isis, the continuing Lead Developer and whole-change readiness decision owner
+    for the exact supplied change.
+  creator_role: Isis, the continuing Lead Developer and whole-change readiness decision owner for the
+    exact supplied change.
   reviewer_role: NONE
   inputs:
   - CHANGE_CLASS
@@ -5670,12 +7370,12 @@ prompts:
   outputs:
   - artifact: REALITY_AUDIT / CHANGE_AUDIT_TRIAGE / QA_READINESS
     states:
-    - READY_FOR_QA
-    - NOT_READY
     - ASSESSMENT_INCOMPLETE
-    consumers:
-    - QA-20
+    - NOT_READY
+    - READY_FOR_QA
+    consumers: &id040
     - ESC-30
+    - QA-20
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -5684,143 +7384,196 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 82485 bytes'
-  - 'SHA-256 of that extraction: 9aeaeff42ad12f44f0e6036e922cb14c9da16457128a07159a8ee4331b152b99'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-30
-  - QA-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  required_interfaces: *id040
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8134af92e7c85a48e67c?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-10.md
-    sha256: af8f7fa69427a843bd1a8c3c303cf0b2f1a3ceba890d4338d4687b91c4250ca7
-    bytes: 83229
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8134af92e7c85a48e67c?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:12.398Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'unresolved facts in the output artifact, which each next or recovery handoff names'
-      rule_id: CTR-002
-    - value: 'every return package names those artifacts'
-      rule_id: CTR-002
-    - value: 'Then give the other fields the handoff rule above names; sections the artifact already holds are named, not repeated\.'
-      rule_id: CTR-002
-    - value: 'each input artifact by repository path; the artifacts hold the rest'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
-    - value: 'Every statement in this prompt that it is read-only or does not change the repository excludes its own output artifacts, which it writes, commits and pushes, and any pull request that carries them\.'
-      rule_id: CTR-002
-    - value: 'Reviewers remain read-only toward the work they review'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: 'Notion and repository persistence'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?: and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict register\b)'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Catalogs and runtime handoffs carry\b'
-      rule_id: TOP-001
-    - value: 'native inputs, lineage, current state, gates, risks and required action'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'read-only audit and readiness role'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Embed only applicable workflow contracts'
-      rule_id: CTR-001
-    - value: 'A saved attachment, link or scattered fields do not replace the handoff\.'
-      rule_id: TOP-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: CTR-001
+      value: Notion and repository persistence
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: '(?m)(?:^(?:Complete native input package|(?:Exact |Required |Complete )?[Nn]ative inputs(?:
+        and artifact lineage)?|RS-\d+ complete native inputs|Complete RS-\d+ package|Sole substantive
+        input)\b[^\n]*`?CANON_CONFLICT_REGISTER|^(?:Complete native input package|Required native inputs|Complete
+        RS-\d+ package):\n(?:- [^\n]*\n)*?- [^\n]*`?CANON_CONFLICT_REGISTER|(?:\bsend\b|\bcarrying\b)[^.\n]*\bconflict
+        register\b)'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Catalogs and runtime handoffs carry\b
+    - rule_id: TOP-001
+      value: native inputs, lineage, current state, gates, risks and required action
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: read-only audit and readiness role
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Embed only applicable workflow contracts
+    - rule_id: TOP-001
+      value: A saved attachment, link or scattered fields do not replace the handoff\.
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-D
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: unresolved facts in the output artifact, which each next or recovery handoff names
+    - rule_id: CTR-002
+      value: every return package names those artifacts
+    - rule_id: CTR-002
+      value: Then give the other fields the handoff rule above names; sections the artifact already holds
+        are named, not repeated\.
+    - rule_id: CTR-002
+      value: each input artifact by repository path; the artifacts hold the rest
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: Every statement in this prompt that it is read-only or does not change the repository excludes
+        its own output artifacts, which it writes, commits and pushes, and any pull request that carries
+        them\.
+    - rule_id: CTR-002
+      value: Reviewers remain read-only toward the work they review
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?i:No agent edits PF10 or claims canonical adoption; only the
+        qualifying producer resolves an addendum's number, from the current controlled PF10 at creation\.))
+      guard: G-F05-E
 - prompt_key: QA-100
-  notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
-  notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
-  expected_title: QA-100 — Execute Bounded QA Task — 091426.1
+  notion_page_id: 3f44590a05eb8182a201f0e177dad431
+  notion_url: https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431
+  expected_title: QA-100 — Execute Bounded QA Task — 100926.1
   lane: QA
   sequence: 100
   lifecycle: ACTIVE
   function: Execute Execute Bounded QA Task for the exact supplied change.
   session_class: DEDICATED_ONE_OFF
-  session_role: You are the authorized environment or DevOps operator, not Kronos acting as the executor.
-  creator_role: the authorized environment or DevOps operator, not Kronos acting as the executor.
-  reviewer_role: NONE
+  session_role: Executor under the Product Owner-chosen arrangement; no executor/session identity or venue
+    prerequisite; QA-110 owns evidence review.
+  creator_role: Product Owner-chosen executor
+  reviewer_role: Kronos through QA-110
   inputs:
   - QA_TASK_IDS
   - QA_PLAN_ID
@@ -5831,12 +7584,12 @@ prompts:
   outputs:
   - artifact: QA_EXECUTION_RESULT
     states:
-    - COMPLETE
-    - PARTIAL
     - BLOCKED
+    - COMPLETE
     - FAILED
     - NOT_EXECUTED
-    consumers:
+    - PARTIAL
+    consumers: &id041
     - QA-110
   mutations:
     allowed:
@@ -5846,104 +7599,145 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 13317 bytes'
-  - 'SHA-256 of that extraction: 373907a43557e87e46892fb35c683228a779765fb388cfff9dc98389d0c3fb7c'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - QA-110
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  - No Kronos executor exclusion or actor/venue identity prerequisite. All five execution states return
+    to QA-110 without acceptance authority.
+  required_interfaces: *id041
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-100.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-100.md
-    sha256: baaa8505fc4f0ba58f97c554d948ce11cf8e35204d95dbc200f7637b69fc77ba
-    bytes: 13449
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8182a201f0e177dad431?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:45.204Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-110
-  notion_page_id: 3db4590a05eb816984d1d34da0e08f40
-  notion_url: https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40
-  expected_title: QA-110 — Review QA Evidence and Route the Next Action — 091426.1
+  notion_page_id: 3f44590a05eb81ee9a09e00af51f33cb
+  notion_url: https://app.notion.com/p/3f44590a05eb81ee9a09e00af51f33cb
+  expected_title: QA-110 — Review QA Evidence and Route the Next Action — 100926.1
   lane: QA
   sequence: 110
   lifecycle: ACTIVE
@@ -5967,11 +7761,11 @@ prompts:
     - BOUNDED_RERUN_REQUIRED
     - ESCALATION_REQUIRED
     - INCOMPLETE
-    consumers:
+    consumers: &id042
+    - ESC-10
+    - QA-100
     - QA-120
     - QA-90
-    - QA-100
-    - ESC-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -5980,111 +7774,155 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14305 bytes'
-  - 'SHA-256 of that extraction: 698c44f0c57d7294eed8a9a34049ee729b4a334eda81d6da0da8ad2dfb287718'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-10
-  - QA-100
-  - QA-120
-  - QA-90
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id042
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-110.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81ee9a09e00af51f33cb?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-110.md
-    sha256: 92afcc89e220af90c5f26bcf556771741468de84b8cfa707705bf4a26189d197
-    bytes: 14371
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81ee9a09e00af51f33cb?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:41.377Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'a completed failing run is `ACCEPT` and continues to QA-120'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'code/Ops remediation\. Do not fix it here\.(?! This applies only before the whole approved run is complete)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: code/Ops remediation\. Do not fix it here\.(?! This applies only before the whole approved
+        run is complete)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: a completed failing run is `ACCEPT` and continues to QA-120
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-120
-  notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
-  notion_url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
-  expected_title: QA-120 — Create Final QA Report and RCA — 091426.1
+  notion_page_id: 3f44590a05eb81a4a3fbc0fae65d153e
+  notion_url: https://app.notion.com/p/3f44590a05eb81a4a3fbc0fae65d153e
+  expected_title: QA-120 — Create Final QA Report and RCA — 100926.1
   lane: QA
   sequence: 120
   lifecycle: ACTIVE
@@ -6106,10 +7944,10 @@ prompts:
   outputs:
   - artifact: QA_REPORT / QA_RCA / QA_INTERIM_STATUS
     states:
-    - PASS
     - FAIL
     - INTERIM
-    consumers:
+    - PASS
+    consumers: &id043
     - CL-C-10
     - CL-E-10
     - ESC-10
@@ -6123,108 +7961,150 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13731 bytes'
-  - 'SHA-256 of that extraction: 94d6abb95dc8c637f91e2cb16d5a68323addc416bb961cef32c27477fb6a53d4'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - CL-C-10
-  - CL-E-10
-  - ESC-10
-  - QA-110
-  - QA-90
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id043
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-120.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81a4a3fbc0fae65d153e?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-120.md
-    sha256: 58d9bf66480b7fc07cd057bdef2881dcd031b1cfab8287ea78441226a92ccc48
-    bytes: 13751
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81a4a3fbc0fae65d153e?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:51.614Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-20
-  notion_page_id: 3db4590a05eb816daa3adff37283482b
-  notion_url: https://app.notion.com/p/3db4590a05eb816daa3adff37283482b
-  expected_title: QA-20 — Create Live QA Guide — 091426.1
+  notion_page_id: 3f44590a05eb81289c7be77f66bac909
+  notion_url: https://app.notion.com/p/3f44590a05eb81289c7be77f66bac909
+  expected_title: QA-20 — Create Live QA Guide — 100926.1
   lane: QA
   sequence: 20
   lifecycle: ACTIVE
@@ -6240,11 +8120,11 @@ prompts:
   outputs:
   - artifact: LIVE_QA_GUIDE
     states:
-    - GUIDE_READY
     - BLOCKED
-    consumers:
-    - QA-50
+    - GUIDE_READY
+    consumers: &id044
     - QA-10
+    - QA-50
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -6253,109 +8133,149 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13217 bytes'
-  - 'SHA-256 of that extraction: 927b57745409bb99c4a83013a84f86ba7a375f2811b03d5a8beb46dcaba453a2'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - QA-10
-  - QA-50
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id044
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81289c7be77f66bac909?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb816daa3adff37283482b?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-20.md
-    sha256: 8935c48a7be1331c3bf726afffdaa7923bd01b3ea544f14769deaf3af77db4ec
-    bytes: 13460
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81289c7be77f66bac909?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:15.395Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered on the observed merge event for the identified PR'
-      rule_id: CTR-002
-    - value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: PR-40 is entered on the observed merge event for the identified PR
+    - rule_id: CTR-002
+      value: 'PR-40 is entered once per merge: paste the `?MERGE_OBSERVED`? handoff when one arrives'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-50
-  notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
-  notion_url: https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2
-  expected_title: QA-50 — Create Whole-Change QA Audit and Plan — 091426.1
+  notion_page_id: 3f44590a05eb815d89d3e602973d83ad
+  notion_url: https://app.notion.com/p/3f44590a05eb815d89d3e602973d83ad
+  expected_title: QA-50 — Create Whole-Change QA Audit and Plan — 100926.1
   lane: QA
   sequence: 50
   lifecycle: ACTIVE
@@ -6373,9 +8293,9 @@ prompts:
   - artifact: QA_AUDIT / QA_PLAN
     states:
     - AUDIT_COMPLETE
-    - PLAN_PENDING
     - BLOCKED
-    consumers:
+    - PLAN_PENDING
+    consumers: &id045
     - QA-60
     - QA-70
     - QA-80
@@ -6388,107 +8308,154 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16351 bytes'
-  - 'SHA-256 of that extraction: 6fee14353c20e21d8ae1d38df31d3be2fc93a73161606fc17a7e45bd385881ff'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - QA-60
-  - QA-70
-  - QA-80
-  - QA-90
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id045
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-50.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb815d89d3e602973d83ad?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-50.md
-    sha256: 438a56d57746acfe41c39a0a6354fcc8db2a1ea521ad05ac4ec13890682e5014
-    bytes: 16482
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb815d89d3e602973d83ad?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:48.299Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:wide latitude))(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:do
+        not require an executor name))(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:executor identity, session-inspection
+        API))(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:record the execution arrangement))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(executor|operator)\b))
+      guard: G-F02-A
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:record the execution arrangement the Product Owner chooses))(?=.*(?i:not categorically
+        barred from execution))
+      guard: G-F02-B
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-60
-  notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
-  notion_url: https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8
-  expected_title: QA-60 — Create Whole-Change QA Plan — 091426.1
+  notion_page_id: 3f44590a05eb81489053f72637577807
+  notion_url: https://app.notion.com/p/3f44590a05eb81489053f72637577807
+  expected_title: QA-60 — Create Whole-Change QA Plan — 100926.1
   lane: QA
   sequence: 60
   lifecycle: ACTIVE
@@ -6502,9 +8469,9 @@ prompts:
   outputs:
   - artifact: QA_PLAN
     states:
-    - PLAN_PENDING
     - BLOCKED
-    consumers:
+    - PLAN_PENDING
+    consumers: &id046
     - QA-70
     - QA-80
     - QA-90
@@ -6516,110 +8483,149 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14012 bytes'
-  - 'SHA-256 of that extraction: f523e6354696e5ba637181f1ad7f1b60b54f11bb421ea39ac55cf7b9ede965a3'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - QA-70
-  - QA-80
-  - QA-90
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id046
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-60.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81489053f72637577807?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-60.md
-    sha256: 7b783e2638b7cc8818a8b2f2fa465360f2e9bc9ec2aefb361f148eb126bcd12d
-    bytes: 14201
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81489053f72637577807?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:44.410Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '`ASK OK\?` is the line immediately before the block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '\bends? `ASK OK\?`'
-      rule_id: CTR-002
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: CTR-002
+      value: \bends? `ASK OK\?`
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: TOP-001
+      value: '`ASK OK\?` is the line immediately before the block\.'
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-70
-  notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
-  notion_url: https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7
-  expected_title: QA-70 — Review Whole-Change QA Plan — 091426.1
+  notion_page_id: 3f44590a05eb81209128ea7c82938faf
+  notion_url: https://app.notion.com/p/3f44590a05eb81209128ea7c82938faf
+  expected_title: QA-70 — Review Whole-Change QA Plan — 100926.1
   lane: QA
   sequence: 70
   lifecycle: ACTIVE
@@ -6635,9 +8641,9 @@ prompts:
     states:
     - APPROVE
     - DENY
-    consumers:
-    - QA-90
+    consumers: &id047
     - QA-80
+    - QA-90
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -6646,107 +8652,163 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 14014 bytes'
-  - 'SHA-256 of that extraction: ed4ee3adca15bf2a3e91525eca413d6aba0d2ef1819ce81640f9b4cbd2505881'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - QA-80
-  - QA-90
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id047
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-70.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81209128ea7c82938faf?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-70.md
-    sha256: 338b991180b96858170988db5043d297163d7353f526b0091e3036964d8cd6cc
-    bytes: 14302
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81209128ea7c82938faf?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:54.691Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: never a gate on later work
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?i:Outside GCFPE\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-A
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:format recorded in the Glow Operations Hub|one `##` heading carrying its title|canonical
+        PF10 build-notes addendum format))
+      guard: G-F05-B
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never a gate on later work
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:one H2 heading with the next continuous number))(?=.*(?:PF06-Canon-Change-Process-Guide))(?=.*(?:PF27-Canon-Plan-Templates))(?=.*(?i:only
+        H3 or lower))
+      guard: G-F05-C
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-80
-  notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
-  notion_url: https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c
-  expected_title: QA-80 — Revise Whole-Change QA Plan — 091426.1
+  notion_page_id: 3f44590a05eb818789e9ff3ffa9e06d8
+  notion_url: https://app.notion.com/p/3f44590a05eb818789e9ff3ffa9e06d8
+  expected_title: QA-80 — Revise Whole-Change QA Plan — 100926.1
   lane: QA
   sequence: 80
   lifecycle: ACTIVE
@@ -6756,13 +8818,14 @@ prompts:
   creator_role: the same Kronos who authored the Plan.
   reviewer_role: Isis / Lead Developer
   inputs:
-  - Require one complete pending initial QA Plan plus the exact QA-70 denial/redline for that version, or an interrupted preapproval recovery package with the same Kronos author and Isis reviewer.
+  - Require one complete pending initial QA Plan plus the exact QA-70 denial/redline for that version,
+    or an interrupted preapproval recovery package with the same Kronos author and Isis reviewer.
   outputs:
   - artifact: QA_PLAN
     states:
     - PLAN_PENDING_REVISED
     - WRONG_ROUTE_APPROVED_BASE
-    consumers:
+    consumers: &id048
     - QA-70
   mutations:
     allowed:
@@ -6772,112 +8835,153 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 10163 bytes'
-  - 'SHA-256 of that extraction: 3c0080857a39aa14cf8e8e93f80674858e906a5e30e58d44dfdc944abfa8a02d'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - QA-70
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id048
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-80.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb818789e9ff3ffa9e06d8?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-80.md
-    sha256: 7fea018710fd4eabf260a90faf5693153f16696122d4e7cde2cedf35fa3d8178
-    bytes: 10205
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb818789e9ff3ffa9e06d8?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:18.516Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '`ASK OK\?` is the line immediately before the block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'routed as \*Required result and routing\* states'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '\bends? `ASK OK\?`'
-      rule_id: CTR-002
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: '`WRONG_ROUTE_APPROVED_BASE` terminally'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: CTR-002
+      value: \bends? `ASK OK\?`
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: '`WRONG_ROUTE_APPROVED_BASE` terminally'
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: TOP-001
+      value: '`ASK OK\?` is the line immediately before the block\.'
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: routed as \*Required result and routing\* states
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: QA-90
-  notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
-  notion_url: https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c
-  expected_title: QA-90 — Create Bounded QA Execution Task — 091426.1
+  notion_page_id: 3f44590a05eb81bea720f004a7e1a6d8
+  notion_url: https://app.notion.com/p/3f44590a05eb81bea720f004a7e1a6d8
+  expected_title: QA-90 — Create Bounded QA Execution Task — 100926.1
   lane: QA
   sequence: 90
   lifecycle: ACTIVE
@@ -6895,10 +8999,10 @@ prompts:
   outputs:
   - artifact: QA_TASK / QA_PREEXECUTION_FINDING
     states:
-    - TASK_READY
     - ESCALATION_REQUIRED
     - NOT_EXECUTED
-    consumers:
+    - TASK_READY
+    consumers: &id049
     - ESC-10
     - QA-100
     - QA-110
@@ -6910,121 +9014,163 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13892 bytes'
-  - 'SHA-256 of that extraction: b77124fc789087f297fb668547617c3d6d82f3b0e4c8fcaff93686684c62d097'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - QA instructions and evidence review require actual output/destination/registration mapping, canonical
+    writer or owned handoff, dependencies, read-only checks and QA-110 indexing proof; not conditional
+    on a ledger-bound claim.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - ESC-10
-  - QA-100
-  - QA-110
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing required indexing remains incomplete/tooling work; no hand-edit of governed artifacts or rerun
+    solely to index valid evidence.
+  required_interfaces: *id049
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/QA-90.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81bea720f004a7e1a6d8?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb814d96d3dcfa8835f96d
-  expected_parent_title: HDE QA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE QA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/QA-90.md
-    sha256: 83cdc85066147308327b9c57adceb11d1b6de5405fadd5a5de488f91f15ad517
-    bytes: 13982
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81bea720f004a7e1a6d8?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:51.327Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-025-INDEX
+      value: Required QA evidence indexing
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: RS-10
-  notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
-  notion_url: https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4
-  expected_title: RS-10 — Create Bounded Work-Unit Rescope Proposal — 091426.1
+  notion_page_id: 3f44590a05eb81a588c9c82aa8a2d3f2
+  notion_url: https://app.notion.com/p/3f44590a05eb81a588c9c82aa8a2d3f2
+  expected_title: RS-10 — Create Bounded Work-Unit Rescope Proposal — 100926.1
   lane: RS
   sequence: 10
   lifecycle: ACTIVE
   function: Execute Create Bounded Work-Unit Rescope Proposal for the exact supplied change.
   session_class: DEDICATED_ONE_OFF
-  session_role: You are Sekhmet or the explicitly assigned finding author, with no approval authority.
-  creator_role: Sekhmet or the explicitly assigned finding author, with no approval authority.
-  reviewer_role: Whole-change Implementation Agent
+  session_role: Originating PR implementation author; no rescope approval authority.
+  creator_role: Originating PR implementation author
+  reviewer_role: Independent whole-change IA through RS-20
   inputs:
-  - Supply the exact CHANGE_CLASS, CHANGE_ID and work-unit/finding identity; approved Specification and immutable approved Plan/review; current PF10 Markdown and applicable addenda; actual originating stage, owner/session, suspended boundary and read-only finding evidence; existing draft/result and any prior proposal/review.
+  - Supply the exact CHANGE_CLASS, CHANGE_ID and work-unit/finding identity; approved Specification and
+    immutable approved Plan/review; current PF10 Markdown and applicable addenda; actual originating stage,
+    owner/session, suspended boundary and read-only finding evidence; existing draft/result and any prior
+    proposal/review.
   outputs:
   - artifact: RESCOPE_PROPOSAL
     states:
     - RESCOPE_PROPOSAL_PENDING_REVIEW
-    consumers:
+    consumers: &id050
     - RS-20
   mutations:
     allowed:
@@ -7034,131 +9180,167 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 12732 bytes'
-  - 'SHA-256 of that extraction: 93905c67c008c31d829ad1cf3b3b621ff699a84228df61cb2268a6d0cbfc83c1'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - RS-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id050
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/RS-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81a588c9c82aa8a2d3f2?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/RS-10.md
-    sha256: ef6b73601ce867e02d291358877abbe2446bfccf6136916bd65bdb0a0bd13e33
-    bytes: 12819
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81a588c9c82aa8a2d3f2?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:47.386Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '`ASK OK\?` is the line immediately before the block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '\bends? `ASK OK\?`'
-      rule_id: CTR-002
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: CTR-002
+      value: \bends? `ASK OK\?`
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: TOP-001
+      value: '`ASK OK\?` is the line immediately before the block\.'
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: RS-20
-  notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
-  notion_url: https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497
-  expected_title: RS-20 — Review Bounded Work-Unit Rescope — 091426.1
+  notion_page_id: 3f44590a05eb81be9566cd6397c9424c
+  notion_url: https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c
+  expected_title: RS-20 — Review Bounded Work-Unit Rescope — 100926.1
   lane: RS
   sequence: 20
   lifecycle: ACTIVE
   function: Execute Review Bounded Work-Unit Rescope for the exact supplied change.
   session_class: CHANGE_LIFETIME
-  session_role: You are the continuing whole-change Implementation Agent (IA).
-  creator_role: the continuing whole-change Implementation Agent (IA).
-  reviewer_role: NONE
+  session_role: Independent whole-change IA reviewer; never the proposal author; no Isis rescope role.
+  creator_role: Originating PR implementation author
+  reviewer_role: Independent whole-change IA
   inputs:
-  - 'Supply exactly one complete read-back rescope artifact: a RESCOPE_REQUEST produced by PR-30 or revised by RS-30, or a RESCOPE_PROPOSAL produced by RS-10 or revised by RS-30.'
+  - 'Supply exactly one complete read-back rescope artifact: a RESCOPE_REQUEST produced by PR-30 or revised
+    by RS-30, or a RESCOPE_PROPOSAL produced by RS-10 or revised by RS-30.'
   outputs:
   - artifact: RESCOPE_REVIEW
     states:
     - APPROVE
+    - IN_SCOPE_REPAIR
     - REJECT
     - REVISION_REQUIRED
     - SPECIFICATION_CHANGE_REQUIRED
-    - IN_SCOPE_REPAIR
-    consumers:
+    consumers: &id051
+    - PR-20
     - PR-30
     - PR-35
     - RS-30
@@ -7171,130 +9353,183 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 14818 bytes'
-  - 'SHA-256 of that extraction: e6ccd013f8b390fc39069bbd3f87508cf630d3c1d267fda5feada00184ec5659'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - 'Produce substantive Canon relied on: actual current PF titles/versions/sections read, PF10/addenda,
+    approved in-flight path/version and decision-topic mapping or truthful searched silence.'
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-30
-  - PR-35
-  - RS-30
-  - RS-40
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  - Missing, empty, unread, unrelated or topic-incomplete canon basis cannot support a positive decision.
+  - Self-authored proposal cannot receive IA approval; Isis has no rescope role; preserve original PR
+    return phase and actual Proceed/vehicle.
+  required_interfaces: *id051
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/RS-20.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/RS-20.md
-    sha256: 4736d703b0b34e4767572b61ff50ae67bd2f8660b23b53fb2b93bce84f10f251
-    bytes: 15709
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81be9566cd6397c9424c?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:57.795Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '\*{0,2}Material\*{0,2} means a change to the Epic-level commitment'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
-    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Decide it during work'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed
+        work, commits/local changes|reviews/checks already observed, unresolved items|with each actual
+        PR reference, commit identity, order
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Decide it during work
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?i:Outside GCFPE\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\ballocat\w*\b[^.\n]{0,40}\bnumber|\bnumber\w*\b[^.\n]{0,20}\ballocat))
+      guard: G-F05-A
+    - rule_id: CTR-001
+      value: (?m)^(?=.*(?i:format recorded in the Glow Operations Hub|one `##` heading carrying its title|canonical
+        PF10 build-notes addendum format))
+      guard: G-F05-B
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    - rule_id: AF-024-CANON
+      value: Canon relied on
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: \*{0,2}Material\*{0,2} means a change to the Epic-level commitment
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: verified at entry from the recorded vehicle and repository state; the handoff does not carry
+        them
+    - rule_id: CTR-002
+      value: (?m)^(?=.*(?i:one H2 heading with the next continuous number))(?=.*(?:PF06-Canon-Change-Process-Guide))(?=.*(?:PF27-Canon-Plan-Templates))(?=.*(?i:only
+        H3 or lower))
+      guard: G-F05-C
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: RS-30
-  notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
-  notion_url: https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf
-  expected_title: RS-30 — Revise Bounded Work-Unit Rescope Proposal — 091426.1
+  notion_page_id: 3f44590a05eb8131bc61e346a46840e9
+  notion_url: https://app.notion.com/p/3f44590a05eb8131bc61e346a46840e9
+  expected_title: RS-30 — Revise Bounded Work-Unit Rescope Proposal — 100926.1
   lane: RS
   sequence: 30
   lifecycle: ACTIVE
   function: Execute Revise Bounded Work-Unit Rescope Proposal for the exact supplied change.
   session_class: DEDICATED_ONE_OFF
-  session_role: You are the same Sekhmet or explicitly assigned rescope-artifact author.
-  creator_role: the same Sekhmet or explicitly assigned rescope-artifact author.
-  reviewer_role: Whole-change Implementation Agent
+  session_role: Same originating PR implementation author revising the proposal; no approval authority.
+  creator_role: Originating PR implementation author
+  reviewer_role: Independent whole-change IA through RS-20
   inputs:
-  - 'Supply exactly one RESCOPE_REQUEST_ID or RESCOPE_PROPOSAL_ID and the actual correction authority: either its RS-20 REVISION_REQUIRED review or Nathan''s exact Product Owner correction.'
+  - 'Supply exactly one RESCOPE_REQUEST_ID or RESCOPE_PROPOSAL_ID and the actual correction authority:
+    either its RS-20 REVISION_REQUIRED review or Nathan''s exact Product Owner correction.'
   outputs:
   - artifact: RESCOPE_REQUEST / RESCOPE_PROPOSAL
     states:
     - RESCOPE_PROPOSAL_PENDING_REVIEW
-    consumers:
+    consumers: &id052
     - RS-20
   mutations:
     allowed:
@@ -7304,114 +9539,149 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 12113 bytes'
-  - 'SHA-256 of that extraction: 4c5f96f002762200a18fc8eff864d85157ef5d12487e6b044adc51e3fef5641a'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - RS-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id052
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/RS-30.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb8131bc61e346a46840e9?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/RS-30.md
-    sha256: 347ee4e749843fe50420bcecce47fc1049c303178a45a8e114886beddfa4961f
-    bytes: 12001
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb8131bc61e346a46840e9?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:23.555Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: '`ASK OK\?` is the line immediately before the block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: 'in the output artifact''s (?:existing )?permitted metadata'
-      rule_id: CTR-002
-    - value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff names'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '\bends? `ASK OK\?`'
-      rule_id: CTR-002
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: CTR-002
+      value: \bends? `ASK OK\?`
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: TOP-001
+      value: '`ASK OK\?` is the line immediately before the block\.'
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: in the output artifact's (?:existing )?permitted metadata
+    - rule_id: CTR-002
+      value: '(?:substantive artifact(?: metadata/content)?|review metadata|and receipt), which the handoff
+        names'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: RS-40
-  notion_page_id: 3db4590a05eb8183b5ffdf4270133226
-  notion_url: https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226
-  expected_title: RS-40 — Approved Rescope — Resume PR Implementation — 091426.1
+  notion_page_id: 3f44590a05eb813993beccaaf88523d4
+  notion_url: https://app.notion.com/p/3f44590a05eb813993beccaaf88523d4
+  expected_title: RS-40 — Approved Rescope — Resume PR Implementation — 100926.1
   lane: RS
   sequence: 40
   lifecycle: ACTIVE
   function: Execute Approved Rescope — Resume PR Implementation for the exact supplied change.
   session_class: DEDICATED_ONE_OFF
-  session_role: 'You resume the recorded phase in its own dedicated session: PR-30''s session for a PR-30 phase, the PR-35 session for PR_RETURN_PHASE PR-35.'
+  session_role: 'You resume the recorded phase in its own dedicated session: PR-30''s session for a PR-30
+    phase, the PR-35 session for PR_RETURN_PHASE PR-35.'
   creator_role: the recorded phase's own dedicated session for the exact suspended work unit.
   reviewer_role: NONE
   inputs:
@@ -7427,7 +9697,7 @@ prompts:
     - REMOTE_EVIDENCE_PENDING
     - RESCOPE_PENDING
     - SOURCE_RESOLUTION_ERROR
-    consumers:
+    consumers: &id053
     - PR-30
     - PR-35
     - PR-40
@@ -7440,129 +9710,168 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-19: 8233 bytes'
-  - 'SHA-256 of that extraction: ddef768be169c6eb41660433ff7557d72b3ebc5dd3ba8f617bdeb113b4732630'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
+  - Canon relied on required for resumed PR-35 review; no new approval gate in PR-30 continuation.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces:
-  - PR-30
-  - PR-35
-  - PR-40
-  - RS-20
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id053
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/RS-40.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb813993beccaaf88523d4?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb8195a2ccf7c0959a8b6e
-  expected_parent_title: HDE IA — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE IA — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/RS-40.md
-    sha256: 1bbcfadf8193f22fc11ffb3cb501f49ebdc5669879dd826893927add52d37a11
-    bytes: 8858
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb813993beccaaf88523d4?pvs=204
+    page_last_edited_at: '2026-10-12T02:30:54.130Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: never a gate on later work
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'An\s+\*?In-flight decisions\*?\s+section'
-      rule_id: CTR-002
-    - value: 'they do not share a session'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30'
-      rule_id: CTR-002
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
-    - value: '[Ss]ubscribe to the pull request'
-      rule_id: CTR-002
-    - value: 'stay subscribed and do not poll'
-      rule_id: CTR-002
-    - value: 'The observed merge event is the fact PR-40 is entered on'
-      rule_id: CTR-002
-    - value: 'verified at entry from the recorded vehicle and repository state; the handoff does not carry them'
-      rule_id: CTR-002
-    - value: '`MERGE_OBSERVED`: [^\n]*?the subscribed PR-35 session observes the merge of the identified PR, performed by Nathan'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: 'launched as a new session'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed work, commits/local changes|reviews/checks already observed, unresolved items|with each actual PR reference, commit identity, order'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40 read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
-    - value: 'Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: CTR-001
+      value: launched as a new session
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: Carry original Proceed, dedicated PR session, workspace/worktree, branch|current head; completed
+        work, commits/local changes|reviews/checks already observed, unresolved items|with each actual
+        PR reference, commit identity, order
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: 'only after Nathan asserts it occurred may PR-40|Nathan invokes PR-40 asserting that manual
+        merge occurred|Nathan''s invocation supplies only the later manual-merge assertion|historical
+        PR-35 `MERGE_PENDING` result, Nathan''s later manual-merge assertion|Nathan manual merge, PR-40
+        read-only landed-lineage review(?! entered on `MERGE_OBSERVED`)|Nathan''s later merge assertion
+        and PR-40''s independent|needed after Nathan''s assertion: continue to `?PR-40'
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: Repository paths outside `?docs/ephemeral/`? and `?docs/graph/`? are not written
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never a gate on later work
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: An\s+\*?In-flight decisions\*?\s+section
+    - rule_id: CTR-002
+      value: they do not share a session
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent,\s+forked\s+agent\s+or\s+workflow\s+agent\s+of\s+PR-30
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: '[Ss]ubscribe to the pull request'
+    - rule_id: CTR-002
+      value: stay subscribed and do not poll
+    - rule_id: CTR-002
+      value: The observed merge event is the fact PR-40 is entered on
+    - rule_id: CTR-002
+      value: verified at entry from the recorded vehicle and repository state; the handoff does not carry
+        them
+    - rule_id: CTR-002
+      value: '`MERGE_OBSERVED`: [^\n]*?the subscribed PR-35 session observes the merge of the identified
+        PR, performed by Nathan'
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 - prompt_key: UTIL-10
-  notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
-  notion_url: https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9
-  expected_title: UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1
+  notion_page_id: 3f44590a05eb81d997d1fd2b8d1b5042
+  notion_url: https://app.notion.com/p/3f44590a05eb81d997d1fd2b8d1b5042
+  expected_title: UTIL-10 — Apply Exact Redline to a Complete Artifact — 100926.1
   lane: UTIL
   sequence: 10
   lifecycle: ACTIVE
@@ -7580,7 +9889,7 @@ prompts:
     - ALREADY_APPLIED
     - COMPLETE
     - INCOMPLETE
-    consumers: []
+    consumers: &id054 []
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -7589,104 +9898,138 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6934 bytes'
-  - 'SHA-256 of that extraction: 9234ff70454e2cd12f2d98e40a9ce103f9a27c87d51e7ded78aae5352cd96de4'
-  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
-  - Extraction, not a canonical publication receipt; the Notion page is authority
+  - Complete native Notion readback matches authored content, allowing native mention display normalization
+    and stripped blank lines.
+  - No body corpus, body checksum or shipped validator receipt is created.
   failure_contract:
-  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: []
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not
+    invent missing evidence.
+  - Missing persistent session/executor identity is not a blocker; require exact role/task/artifact lineage
+    and preserve independent authority, explicit PO context choice and known provenance.
+  required_interfaces: *id054
   controlling_sources:
-  - GCFPE-20260914.1
-  - '091426.1'
-  - candidate/prompts/UTIL-10.md
+  - GCFPE-20261009.1
+  - '100926.1'
+  - https://app.notion.com/p/3f44590a05eb81d997d1fd2b8d1b5042?pvs=204
+  - AGENTS.md and current PF canon on main
   expected_parent_id: 3db4590a05eb811b9c14f2ae89c28df7
-  expected_parent_title: HDE TW — GCFPE-20260914.1 — 091426.1
-  supersedes: []
+  expected_parent_title: HDE TW — GCFPE-20261009.1 — 100926.1
+  supersedes:
+  - https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9?pvs=204
   superseded_by: null
   source_snapshot:
-    path: candidate/prompts/UTIL-10.md
-    sha256: 9be2271229c5988b58f15f817b019147c73f834326aa021118d384f4ef6bf382
-    bytes: 6653
     completeness: COMPLETE
-    extracted_as_of: '2026-09-17'
-    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+    notion_url: https://app.notion.com/p/3f44590a05eb81d997d1fd2b8d1b5042?pvs=204
+    page_last_edited_at: '2026-10-12T02:29:50.321Z'
+    representation: NOTION_READBACK_METADATA_ONLY_NO_BODY_COPY
   audit_assertions:
-    required_literals:
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex:
-    - value: docs/pfcanon/
-      rule_id: CTR-002
-    - value: 'never\s+carries\s+the\s+only\s+copy'
-      rule_id: CTR-002
-    - value: 'The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.'
-      rule_id: TOP-001
-    - value: 'never\s+as\s+a\s+subagent\s+of\s+another\s+session'
-      rule_id: CTR-002
     forbidden_regex:
-    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
-      rule_id: CTR-001
-    - value: Glow / Core Docs / PFCanon
-      rule_id: CTR-001
-    - value: Glow / Ephemeral Planning Files
-      rule_id: CTR-001
-    - value: drive\.google\.com
-      rule_id: CTR-001
-    - value: EPHEMERAL_DRIVE
-      rule_id: CTR-001
-    - value: off-repositor
-      rule_id: SRC-001
-    - value: state the mismatch
-      rule_id: CTR-002
-    - value: '[Cc]ompare the current PF10'
-      rule_id: CTR-002
-    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
-      rule_id: INV-003
-    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
-      rule_id: SRC-001
-    - value: 'CONTROL_NOTION'
-      rule_id: CTR-001
-    - value: '(?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b'
-      rule_id: CTR-001
-    - value: '(?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit (?:SHA|hash|identity|id)\b|\bremote head\b)'
-      rule_id: TOP-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: INV-003
-    - value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
-      rule_id: SRC-001
-    - value: 'Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!n''t )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?![''’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked agent|workflow agent)\b'
-      rule_id: CTR-001
-    - value: '(?i)(?<!never )(?<!not )(?<!no )(?<!n''t )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this prompt|the next prompt|the destination prompt|a main-ecosystem prompt)'
-      rule_id: CTR-001
-    - value: '(?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b'
-      rule_id: CTR-001
-    - value: '(?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|, in (?:the )?returned handoff\b'
-      rule_id: TOP-001
-    - value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery packages|every next and recovery package)\b|review result and every native return\b|and every return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
-      rule_id: TOP-001
-    - value: 'current status and lineage; decisions already made|Carry complete native inputs rather than referring to'
-      rule_id: TOP-001
-    - value: 'unresolved items/owners, next action, and expected (?:output|review state)'
-      rule_id: TOP-001
-    - value: 'Nathan''s (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval effect is defined above'
-      rule_id: CTR-001
-    - value: 'Reviewers remain read-only(?! toward the work they review)'
-      rule_id: CTR-001
+    - rule_id: CTR-001
+      value: addendum_id[\s\S]{0,400}?artifact_version
+    - rule_id: CTR-001
+      value: Glow / Core Docs / PFCanon
+    - rule_id: CTR-001
+      value: Glow / Ephemeral Planning Files
+    - rule_id: CTR-001
+      value: drive\.google\.com
+    - rule_id: CTR-001
+      value: EPHEMERAL_DRIVE
+    - rule_id: SRC-001
+      value: off-repositor
+    - rule_id: CTR-002
+      value: state the mismatch
+    - rule_id: CTR-002
+      value: '[Cc]ompare the current PF10'
+    - rule_id: INV-003
+      value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+    - rule_id: SRC-001
+      value: (?<![.\w/-])glow-hde-devops(?![\w-])
+    - rule_id: CTR-001
+      value: CONTROL_NOTION
+    - rule_id: CTR-001
+      value: (?i)operational state[^.\n]{0,80}\b(?:remains?|lives?|stays?)\b[^.\n]{0,40}\bNotion\b
+    - rule_id: TOP-001
+      value: (?<!\bno )(?<!\bno `)NEXT_PROMPT_HANDOFF(?:[^\n]|\n(?![ \t]*\n|[ \t]*#)){0,1500}?(?<!\bno
+        )(?:(?<![/\w-])worktree\b|\bworking branch\b|\bbranch name\b|\bgit branch\b|\bhead (?:commit|SHA)\b|\bcommit
+        (?:SHA|hash|identity|id)\b|\bremote head\b)
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Prompt [Vv]ersion(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: INV-003
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Ecosystem release(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: SRC-001
+      value: '(?m)^[ \t>*_|`#-]*(?:\d+\.[ \t]+)?(?:\*\*|__)?`?Set(?:\*\*|__|`){0,2}[ \t]*:'
+    - rule_id: CTR-001
+      value: Proceed[;,]\s+(?:the\s+)?(?:same\s+)?dedicated PR-development session
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!n't )\b(?:run|execute|invoke|dispatch|start|launch|spawn|hand)(?:s|es|ed|ing)?\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)(?!['’]s\b)\b[^.\n]{0,40}?\b(?:as|in|to|via)\s+an?\s+(?:sub-?agent|forked
+        agent|workflow agent)\b
+    - rule_id: CTR-001
+      value: (?i)(?<!never )(?<!not )(?<!no )(?<!n't )(?<!Nathan )\b(?:launch|spawn|auto-?start|open|create|start|schedule)(?:s|es|ed|ing)?\s+(?:a\s+|the\s+)?(?:new\s+)?(?:[\w-]+\s+)?session\s+(?:for|to\s+run|running)\s+(?:the\s+)?(?:(?:PR|QA|RS|IA|OPS|DOC|CL|CL-C|CL-E|CF-C|CF-E|CF-PO|ESC|MGR|UTIL)-\d+|this
+        prompt|the next prompt|the destination prompt|a main-ecosystem prompt)
+    - rule_id: CTR-001
+      value: (?:create_session|create_trigger|fire_trigger|spawn[-_]session)\b
+    - rule_id: TOP-001
+      value: (?:metadata|lineage) or (?:the |returned |the returned )?handoff\b|artifact/handoff metadata|,
+        in (?:the )?returned handoff\b
+    - rule_id: TOP-001
+      value: 'substantive artifact(?: metadata/content)? and handoffs?\b|through (?:all next/recovery
+        packages|every next and recovery package)\b|review result and every native return\b|and every
+        return package\b|receipt, review and handoff metadata|receipt and handoff when applicable'
+    - rule_id: TOP-001
+      value: current status and lineage; decisions already made|Carry complete native inputs rather than
+        referring to
+    - rule_id: TOP-001
+      value: unresolved items/owners, next action, and expected (?:output|review state)
+    - rule_id: CTR-001
+      value: Nathan's (?:later )?(?:manual )?(?:PR-40 )?invocation asserts\b|PR-40 independently verifies
+        the later asserted merge\b|usable only after Nathan later manually merges the identified PR\.|merge-approval
+        effect is defined above
+    - rule_id: CTR-001
+      value: Reviewers remain read-only(?! toward the work they review)
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?!(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(no|not|never|nothing|nor|without|neither)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(recommend\w*|advice|advis\w*|guidance|suggest\w*|rank\w*)\b))(?=(?:[^.!?\n]|[.!?](?!\s))*(?i:\b(model|models|reasoning|effort|strength)\b))
+      guard: G-TS-3
+    - rule_id: CTR-001
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:GCFPE-MGMT-10[^.\n]{0,80}\b(?!100926\.1)\d{6}\.\d|GCFPE_ECOSYSTEM_CHANGE_REPORT|READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION))
+      guard: G-MGMT-1
+    required_literals:
+    - rule_id: CTR-002
+      value: PF10
+    - rule_id: TOP-001
+      value: NEXT_PROMPT_HANDOFF
+    - rule_id: AF-026
+      value: Role and artifact continuity
+    required_regex:
+    - rule_id: CTR-002
+      value: docs/pfcanon/
+    - rule_id: CTR-002
+      value: never\s+carries\s+the\s+only\s+copy
+    - rule_id: TOP-001
+      value: The final response ends with the `?NEXT_PROMPT_HANDOFF`? block\.
+    - rule_id: CTR-002
+      value: never\s+as\s+a\s+subagent\s+of\s+another\s+session
+    - rule_id: CTR-002
+      value: (?m)(?:^|(?<=[.!?])\s+)(?=(?:[^.!?\n]|[.!?](?!\s))*(?:No agent gives its own recommendation,
+        assessment or ranking of model, reasoning level or effort\.))
+      guard: G-TS-1
+    - rule_id: CTR-002
+      value: '(?m)^(?=.*(?i:name the TypeSafe reading and the surface advice for the receiving session,
+        with the output artifact''s path))(?=.*(?i:run the installed TypeSafe scoring skill''s script
+        once))(?=.*(?i:do not paste its line into the block or write its Notion row))(?=.*(?i:holds the
+        reading as the skill prints it, with its cell, every probability and its flags))(?=.*(?:`TypeSafe:
+        not read` with the reason))(?=.*(?i:advice on execution surface, with no model, reasoning-level
+        or effort content))(?=.*(?i:When Nathan states the model and setting chosen for this session,
+        record that pick in this session''s output artifact))'
+      guard: G-TS-2
 global_literals:
   approval_request: ASK OK?
   approved: ASK OK.
 audit_contracts:
   selected_binding:
-    release: GCFPE-20260914.1
-    version_family: '091426.1'
+    release: GCFPE-20261009.1
+    version_family: '100926.1'
     member_count: 55
   pfcanon_source:
     required_literal: select only the controlled Markdown lane

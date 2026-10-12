@@ -1,0 +1,155 @@
+{
+ "mode": "x20_check",
+ "fetched_after": "2026-10-12T17:34:05.000Z",
+ "pages": [
+  {
+   "page": "3ce4590a05eb814f8892f88ff8539308",
+   "name": "Glow Operations Hub",
+   "as_of": "2026-10-12T17:34:47.554Z",
+   "written_present": 8,
+   "written_expected": 8,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 9,
+   "their_sections": [
+    "Current GCFPE PF10 drafting and reference controls — 091426.1",
+    "Current GCFPE execution and transport boundary — 091426.1",
+    "Current GCFPE invocation and session continuity control — 091426.1",
+    "Current GCFPE prompt and artifact categories — 091426.1",
+    "Current selection — GCFPE-20261009.1 / 100926.1",
+    "Independence and authority",
+    "Mandatory PR and PF-document authority boundaries — Product Owner, 2026-09-05",
+    "PF10 build-notes addendum format — canonical"
+   ],
+   "ok": true
+  },
+  {
+   "page": "3c74590a05eb811d8433e7022629e213",
+   "name": "HDE Change Flow Overview",
+   "as_of": "2026-10-12T17:34:33.909Z",
+   "written_present": 6,
+   "written_expected": 6,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 2,
+   "their_sections": [
+    "Current GCFPE selection — GCFPE-20261009.1 / 100926.1 / 55",
+    "Find a selected GCFPE prompt — 100926.1"
+   ],
+   "ok": true
+  },
+  {
+   "page": "3cc4590a05eb8101b5ded32c12616eb6",
+   "name": "Glow HDE Prompt Flow Index (un-versioned)",
+   "as_of": "2026-10-12T17:34:39.656Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 0,
+   "their_sections": [],
+   "ok": true
+  },
+  {
+   "page": "3d94590a05eb81c6ab8fe343b9d2ae67",
+   "name": "GCFPE Next Iteration — Alpha Feedback Update Plan — 20260912.1",
+   "as_of": "2026-10-12T17:34:39.656Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 0,
+   "their_sections": [],
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb8182ade0c1eb46c7e80f",
+   "name": "GCFPE — Epic Alpha Run Notes — HDE-EPIC040 — 20260914.1",
+   "as_of": "2026-10-12T17:34:42.176Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 6,
+   "their_sections": [
+    "<frontmatter>",
+    "Alpha state — this page does not hold it",
+    "GCFPE — Epic Alpha Run Notes — HDE-EPIC040"
+   ],
+   "ok": true
+  },
+  {
+   "page": "3e34590a05eb811b93d2da9b4ef8106d",
+   "name": "GCFPE-MGMT-10 — PROPOSED BODY (D20 redesign)",
+   "as_of": "2026-10-12T17:34:44.723Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 3,
+   "their_sections": [
+    "<top>"
+   ],
+   "ok": true
+  },
+  {
+   "page": "3e34590a05eb81e7927efe0541258916",
+   "name": "GCFPE MGMT Change-Process Redesign — Tracking",
+   "as_of": "2026-10-12T17:34:47.554Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 5,
+   "their_sections": [
+    "Records",
+    "Stages",
+    "Where things actually stand"
+   ],
+   "ok": true
+  },
+  {
+   "page": "3df4590a05eb81e09144c1c36ffad28b",
+   "name": "GCFPE Workflow Skill Repair — Round Tracking — 091426.1",
+   "as_of": "2026-10-12T17:38:30.348Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 12,
+   "their_sections": [
+    "<top>",
+    "Deferred, not in scope for any round",
+    "PROMOTED — GCFPE-20260914.1 / 091426.1 / 55 is the selected release (2026-09-21)",
+    "Package and scope",
+    "Round 27 §10 — `SKILL_FIT_CONFIRMED`, three non-blocking findings (2026-09-21)",
+    "The most significant finding — CL-20 is stale in the bundled contract",
+    "The nine remaining findings — all verified, none caused by the repair",
+    "The pattern, stated plainly",
+    "Two things recorded rather than quietly performed"
+   ],
+   "ok": true
+  },
+  {
+   "page": "3df4590a05eb8111a6a5f67cb82f96f6",
+   "name": "GCFPE Alpha Feedback — Deferred Items — 091426.1",
+   "as_of": "2026-10-12T17:34:49.903Z",
+   "written_present": 1,
+   "written_expected": 1,
+   "missing": [],
+   "replaced_still_present": [],
+   "retired_value_lines_outside_historical": 9,
+   "their_sections": [
+    "<top>",
+    "AF-001 — Contract-driven expectations in `validate_gcfpe_20260914.py` no longer match the rebuilt handoff contract — WON'T DO",
+    "AF-004 — 40 of 55 prompt bodies have never been scanned for a decorated governance line — RESOLVED",
+    "AF-012 — Version bumping without sibling creation — RESOLVED FOR GCFPE; OPEN FOR TW AND OTHER ECOSYSTEMS",
+    "Cycle disposition — 2026-10-09",
+    "What is there"
+   ],
+   "ok": true
+  }
+ ],
+ "ok": true,
+ "note": "Written 2026-10-12 17:34-17:38Z by update_content/insert_content, one call per page; re-read by fetch-only workers after each write. retired_value_lines_outside_historical is control_check.py's scan, reported for information: on these pages the remaining lines are dated text, the notes written here, or (Glow Operations Hub) its policy sections written for 091426.1, listed as LR-7."
+}

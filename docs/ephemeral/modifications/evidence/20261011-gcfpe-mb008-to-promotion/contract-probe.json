@@ -1,0 +1,23 @@
+{
+ "candidate": {
+  "contract_bytes": 633702,
+  "contract_sha256": "8e1c169e40e31262e5b08eac2dfe7946eddd4a9ec2b756739bdaab2a34a3b3f6",
+  "graph_contract_errors": [
+   "GRAPH_BASELINE_PROFILE",
+   "GRAPH_CANDIDATE_PROFILE",
+   "GRAPH_IDENTITY",
+   "GRAPH_PROOFS"
+  ],
+  "contract_error_classes": {
+   "MEMBER_BINDING": 55,
+   "PF10_ADDENDUM_CONTRACT": 1,
+   "PRODUCTION_SELECTION_EVIDENCE": 1,
+   "ROUTING_SURFACE_CHANGED": 1
+  },
+  "contract_error_count": 58
+ },
+ "control_selected": {
+  "graph_contract_errors": [],
+  "contract_error_count": 0
+ }
+}

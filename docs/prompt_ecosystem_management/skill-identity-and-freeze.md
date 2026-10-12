@@ -1,7 +1,8 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CONTROLLED_CONVENTION
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-21
+revised_date: 2026-10-12 — D28, a skill's name line reads the same quoted or plain
 status: BINDING
 authority: Product Owner direction 2026-09-21; derived from findings F2 (round 23), the wrong-package install, and the round-27 §10 review
 supersedes_location: docs/ephemeral/gcfpe.round23/freeze.py — the script previously lived there, which was the wrong home
@@ -16,7 +17,8 @@ than in `docs/ephemeral/`.
 ## The digest recipe
 
 `freeze.py` in this directory. Walk regular files, skip the `EXCLUDE` set, sort paths by their UTF-8
-bytes, and sha256 the concatenation of `"<path>\n<sha256-of-contents>\n"` for each.
+bytes, and sha256 the concatenation of `"<path>\n<sha256-of-contents>\n"` for each. The root
+`SKILL.md` is hashed with its frontmatter name line plain (`D28`, below).
 
 ```
 python3 docs/prompt_ecosystem_management/freeze.py <directory>
@@ -38,12 +40,27 @@ hostage to strangers.** Quote per-skill digests.
 reproduce in another container or, once a sync touched the file, in the same one. **A freeze digest
 covers skill content and never the machinery that delivers it.**
 
+**The name line is read plain (`D28`, Nathan, 2026-10-12).** The *Save skill* install writes each
+skill's name line as `name: "<skill>"`; the package carries `name: <skill>`. YAML reads both as the
+same string, so `freeze.py` hashes `name: "<skill>"` and `name: '<skill>'` as `name: <skill>`, in the
+root `SKILL.md`'s frontmatter only, and changes nothing else. An installed tree then measures the
+digest of the package it came from. A plain tree hashes exactly as before, so every digest recorded
+for one still reproduces; a digest recorded before 2026-10-12 for a quoted tree was taken over the
+raw quoted bytes and does not. MB-008's X17 is why: all six installed packages differed from their
+reviewed digests by that one line, and no gate before delivery could see it.
+
+**Both forms are tested on every run.** Before it prints a digest, `freeze.py` digests a quoted and a
+plain tree in memory through the same code, and prints nothing and exits 2 if they differ.
+`python3 docs/prompt_ecosystem_management/freeze.py --selftest` runs only that test. Any check that
+reads a skill's name or hashes a skill's files must give the same result on both forms; a check that
+does not is a defect, whichever skill or script it lives in.
+
 ## What each identity proves
 
 | identity | answers | does **not** answer |
 |---|---|---|
 | freeze digest of a skill directory | what are these bytes? | whether they are the bytes anyone approved |
-| `SKILL_TREE_SHA256`, declared in `SKILL.md` and checked at runtime | have these bytes changed since packaging? | **whether this is the version that was approved** |
+| `SKILL_TREE_SHA256`, declared in `SKILL.md` and checked at runtime (name line read plain, `D28`) | have these bytes changed since packaging? | **whether this is the version that was approved** |
 | the digest named in a §10 verdict | which bytes were authorised | nothing about what is installed |
 
 **A coherently built wrong package self-certifies.** Measured on 2026-09-21: a superseded package,
@@ -62,6 +79,8 @@ The comparison is one command and it is the only control for the wrong-package c
 ```
 python3 docs/prompt_ecosystem_management/freeze.py <installed>/<skill>   # equals the verdict's digest?
 ```
+
+The install's quoted name line does not move this digest (`D28`). Any other difference does.
 
 Check every skill the change touched, **and every skill it deliberately did not** — an unchanged
 skill proving unchanged is evidence; assuming it is not. A mismatch is reported, never reconciled:

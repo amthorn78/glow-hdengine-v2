@@ -1,0 +1,81 @@
+{
+ "record_type": "MB008_D24_REPAIR_REDLINES",
+ "modification": "MODIFICATION-20261011-gcfpe-mb008-to-promotion",
+ "date": "2026-10-12",
+ "authority": "D24 condition 5 and D26-A rule 2: a SKILL_REPAIR_REQUIRED finding is repaired and re-reviewed by fresh reviewers on the new bytes; PLAN §5 X10 (rollback: repair and re-review on new bytes, within D26-A's bounds).",
+ "scope": "The two REQUIRED findings of execute/REVIEW-D24-A.md (R-1, R-2) in amthor-workspace-governance-audit, a guard that fails if either retired rule returns (D26-E), and the revision moved to an unspent value. Applied by execute/package_build.py after plan/package-redlines.json; each old text must occur exactly `count` times. No LISTED finding is repaired (D26-A rule 4). DR-REV and DR-REV-FX supersede the approved AU-REV and AU-REV-FX values, so package_apply.py --check on the built tree reports those two as not landed.",
+ "ops": [
+  {
+   "id": "DR-R1a",
+   "finding": "REVIEW-D24-A R-1",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "SKILL.md",
+   "count": 1,
+   "old": "The producer does not edit PF10, allocate canon numbering, or claim adoption.",
+   "new": "The producer does not edit PF10 or claim adoption; it numbers the addendum at creation from the current controlled PF10 Markdown (`PF06-Canon-Change-Process-Guide` §0.1A)."
+  },
+  {
+   "id": "DR-R1b",
+   "finding": "REVIEW-D24-A R-1",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "references/interoperability-contracts.md",
+   "count": 1,
+   "old": "- Addendum production does not edit PF10, allocate canon numbering, or claim adoption.",
+   "new": "- Addendum production does not edit PF10 or claim adoption; the producer numbers the addendum at creation from the current controlled PF10 Markdown (`PF06-Canon-Change-Process-Guide` §0.1A)."
+  },
+  {
+   "id": "DR-R2a",
+   "finding": "REVIEW-D24-A R-2",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "SKILL.md",
+   "count": 1,
+   "old": "DevOps owns bounded Ops and QA execution, not PR-development workflow control.",
+   "new": "DevOps owns bounded Ops execution, not PR-development workflow control; QA execution follows the arrangement the Product Owner chooses (`D27`)."
+  },
+  {
+   "id": "DR-R2b",
+   "finding": "REVIEW-D24-A R-2",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "references/interoperability-contracts.md",
+   "count": 1,
+   "old": "- DevOps executes bounded Ops and QA instructions.",
+   "new": "- DevOps executes bounded Ops instructions; QA execution follows the arrangement the Product Owner chooses (`D27`)."
+  },
+  {
+   "id": "DR-R2c",
+   "finding": "REVIEW-D24-A R-2",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "references/project-prompt-registry-schema.md",
+   "count": 1,
+   "old": "DevOps executes bounded Ops and QA tasks;",
+   "new": "DevOps executes bounded Ops tasks; QA execution follows the arrangement the Product Owner chooses (`D27`);"
+  },
+  {
+   "id": "DR-GUARD",
+   "finding": "REVIEW-D24-A R-1 smallest correction (optional guard), D26-E",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "scripts/run_fixture_suite.py",
+   "count": 1,
+   "old": "    def test_exact_fenced_text_handoff_parity(self) -> None:\n",
+   "new": "    def test_retired_mb008_role_and_numbering_rules_absent(self) -> None:\n        # MB-008, D24 review round 1 (R-1, R-2): the retired F05 rule (the producer allocates no numbering) and the\n        # pre-D27 rule (DevOps executes QA) must not survive anywhere in this skill's text.\n        for path in sorted(SKILL_ROOT.rglob(\"*.md\")):\n            text = path.read_text(encoding=\"utf-8\")\n            for phrase in (\"allocate canon numbering\", \"DevOps owns bounded Ops and QA execution\",\n                           \"DevOps executes bounded Ops and QA\"):\n                self.assertNotIn(phrase, text, f\"{path.relative_to(SKILL_ROOT)}: {phrase}\")\n\n    def test_exact_fenced_text_handoff_parity(self) -> None:\n"
+  },
+  {
+   "id": "DR-REV",
+   "finding": "skill-identity-and-freeze.md, advertised identity must be unspent: 1.14.0 is bound to the round-1 verdicts",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "SKILL.md",
+   "count": 1,
+   "old": "**WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.14.0",
+   "new": "**WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.14.1"
+  },
+  {
+   "id": "DR-REV-FX",
+   "finding": "the same",
+   "skill": "amthor-workspace-governance-audit",
+   "file": "scripts/run_fixture_suite.py",
+   "count": 1,
+   "old": "self.assertIn(\"WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.14.0\", skill)",
+   "new": "self.assertIn(\"WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.14.1\", skill)"
+  }
+ ]
+}

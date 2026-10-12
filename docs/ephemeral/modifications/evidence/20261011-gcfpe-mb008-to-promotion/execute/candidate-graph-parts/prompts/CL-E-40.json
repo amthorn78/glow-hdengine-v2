@@ -1,0 +1,180 @@
+{
+  "edge_indices": [
+    61,
+    62,
+    63,
+    64
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MAINTENANCE_PENDING"
+          ],
+          "branch_id": "final_scan",
+          "condition": "every selected post-closure author/reviewer branch and CL-20 work has a truthful disposition",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MAINTENANCE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "MAINTENANCE_PENDING"
+      ],
+      "to": "CL-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MAINTENANCE_PENDING"
+          ],
+          "branch_id": "selected_evidence_gap",
+          "condition": "a selected evidence gap requires PF09 revalidation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MAINTENANCE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "MAINTENANCE_PENDING"
+      ],
+      "to": "CL-E-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MAINTENANCE_PENDING"
+          ],
+          "branch_id": "maintenance_terminal",
+          "condition": "manual/TW receiver, source, closure, or authority remains unresolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MAINTENANCE_PENDING",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "MAINTENANCE_PENDING"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MAINTENANCE_PENDING"
+          ],
+          "branch_id": "manual_tw_route",
+          "condition": "the exact authorized manual/TW maintenance receiver is resolved",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MAINTENANCE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "MAINTENANCE_PENDING"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    }
+  ],
+  "id": "CL-E-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8101a264f9fa702b8a6e?pvs=204",
+    "candidate_version": "100926.1",
+    "id": "CL-E-40",
+    "lane": "CL-E",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Prepare Post-Epic PF09 Maintenance for the exact supplied change.",
+    "output_artifacts": [
+      "PF09_MAINTENANCE_CANDIDATE"
+    ],
+    "predecessor": {
+      "notion_page_id": "3db4590a05eb81e78e82f83a5f2e4b68",
+      "release": "GCFPE-20260914.1",
+      "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68?pvs=204",
+      "version": "091426.1"
+    },
+    "predecessor_union_destinations": [
+      "CL-E-20",
+      "CL-E-30",
+      "CL-20",
+      "CL-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the assigned Lead Developer maintenance author.",
+    "result_states": [
+      "MAINTENANCE_PENDING"
+    ],
+    "sequence": 40,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 100926.1"
+  },
+  "state_route_order": [
+    "selected_evidence_gap",
+    "final_scan",
+    "manual_tw_route",
+    "maintenance_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

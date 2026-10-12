@@ -138,8 +138,8 @@
   "id": "CL-E-40",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb8101a264f9fa702b8a6e?pvs=204",
+    "candidate_version": "100926.1",
     "id": "CL-E-40",
     "lane": "CL-E",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -148,11 +148,11 @@
       "PF09_MAINTENANCE_CANDIDATE"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb8148a9cad59ae5bf98ae",
-      "release": "GCFPE-20260913.1",
-      "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb8148a9cad59ae5bf98ae",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb81e78e82f83a5f2e4b68",
+      "release": "GCFPE-20260914.1",
+      "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "CL-E-20",
@@ -167,7 +167,7 @@
     ],
     "sequence": 40,
     "session_class": "DEDICATED_ONE_OFF",
-    "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1"
+    "title": "CL-E-40 — Prepare Post-Epic PF09 Maintenance — 100926.1"
   },
   "state_route_order": [
     "selected_evidence_gap",

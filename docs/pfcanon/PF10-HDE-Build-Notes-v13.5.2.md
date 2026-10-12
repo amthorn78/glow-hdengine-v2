@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.5.1**  
-Effective Date: 2026.10.09  
+**Version: v13.5.2**  
+Effective Date: 2026.10.11  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -183,8 +183,42 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 
 ## **1.1 Addendum Index**
 
-No current addenda.
+2.1 GCFPE model and reasoning-level guidance is the TypeSafe reading; no AI recommendation is given
 
 # **2\) Numbered Addenda**
+
+## **2.1 GCFPE model and reasoning-level guidance is the TypeSafe reading; no AI recommendation is given**
+
+Timestamp: 101126 20:47 (UTC) Details: Establishes that, in the Glow Change Flow Prompt Ecosystem, the model and reasoning-level guidance for a downstream session is the reading of the installed TypeSafe scoring skill, and that no agent gives its own model, reasoning-level or effort recommendation. Determines the question addendum 2.38 of the previous PF10 version left open for Product Owner determination.
+
+### **Source and authority**
+
+This addendum records the Product Owner's directions of 2026-10-11:
+
+* "My whole point with this was to add typesafe scoring system to the GCFPE. random model advice is useless"  
+* "I absolutely do not want a claude recommendation. No research I have found has demonstrated that an AI model is able to effectively choose model scoring ... I have found the typesafe scoring to deliver highly reliable results."
+
+Where this addendum conflicts with earlier PF-Canon, this addendum governs for the scope below.
+
+### **Rule**
+
+1. Scope. Every GCFPE downstream-session prompt and handoff, and every management or facilitation relay that hands GCFPE work to a session.  
+2. The reading. The model and reasoning-level guidance for that session is the TypeSafe reading produced by the installed TypeSafe scoring skill, reported as the skill prints it: its cell, every probability and its flags. The Product Owner picks the model and setting, and the pick is recorded with the reading.  
+3. No AI recommendation. No agent gives its own recommendation, assessment or ranking of model, reasoning level or effort, beside the reading or in place of it.  
+4. No reading. A reading that cannot be obtained is reported as not read, with the reason. No substitute recommendation is given.  
+5. Provider neutrality. HDE Governance §9.1.3's rule that no governance rule requires a specific AI provider, product, model or effort level does not apply to the TypeSafe scoring skill within this scope. It continues to apply to the model and surface that perform the work: the reading informs the Product Owner's pick and requires no model.
+
+### **Superseded passages and drain targets**
+
+| Document and section | Superseded scope |
+| :---- | :---- |
+| HDE Governance §9.1.3, the sentence beginning "Every downstream-session prompt must receive task-specific human advice" | For the GCFPE, advice on model and reasoning level is replaced by rules 2 to 4\. Advice on execution surface is unchanged. |
+| HDE Governance §9.1.6 | The Managing Prompt Engineer's "model guidance" for the GCFPE is the reading in rule 2\. |
+
+### **Status, effects and nonclaims**
+
+* No epic, task or PF09 row changes status by this addendum.  
+* The GCFPE prompt and skill changes that implement it are unperformed.  
+* This addendum does not extend to other ecosystems, select any model, or make a reading an approval or gate.
 
 \<eof\>

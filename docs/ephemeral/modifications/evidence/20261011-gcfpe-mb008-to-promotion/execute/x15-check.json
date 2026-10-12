@@ -1,0 +1,154 @@
+{
+ "mode": "check",
+ "pages": [
+  {
+   "page": "3db4590a05eb81de9736ea69bac61016",
+   "step": "X15(c)",
+   "name": "Flow Index",
+   "as_of": "2026-10-12T13:37:58.821Z",
+   "ops_listed": 33,
+   "ops_generated": 1,
+   "landed": 31,
+   "not_landed": [
+    "FI-ACT-1",
+    "FI-BIND-P"
+   ],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true,
+    "successors_missing": 0
+   },
+   "ok": false
+  },
+  {
+   "page": "3db4590a05eb81d59059eb6b95ed5fcf",
+   "step": "X15(d)",
+   "name": "hub",
+   "as_of": "2026-10-12T13:35:47.375Z",
+   "ops_listed": 2,
+   "ops_generated": 1,
+   "landed": 2,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true,
+    "successors_missing": 0
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb8195a2ccf7c0959a8b6e",
+   "step": "X15(d)",
+   "name": "hub",
+   "as_of": "2026-10-12T13:36:35.304Z",
+   "ops_listed": 2,
+   "ops_generated": 1,
+   "landed": 2,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true,
+    "successors_missing": 0
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb814d96d3dcfa8835f96d",
+   "step": "X15(d)",
+   "name": "hub",
+   "as_of": "2026-10-12T13:37:02.911Z",
+   "ops_listed": 2,
+   "ops_generated": 1,
+   "landed": 2,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true,
+    "successors_missing": 0
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb81cd938de84cfffead9c",
+   "step": "X15(d)",
+   "name": "hub",
+   "as_of": "2026-10-12T13:37:22.723Z",
+   "ops_listed": 2,
+   "ops_generated": 1,
+   "landed": 2,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true,
+    "successors_missing": 0
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb811b9c14f2ae89c28df7",
+   "step": "X15(d)",
+   "name": "hub",
+   "as_of": "2026-10-12T13:37:45.218Z",
+   "ops_listed": 3,
+   "ops_generated": 1,
+   "landed": 3,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true,
+    "successors_missing": 0
+   },
+   "ok": true
+  },
+  {
+   "page": "3db4590a05eb812f87caed515836687f",
+   "step": "X15(e)",
+   "name": "Alpha checklist",
+   "as_of": "2026-10-12T13:37:58.821Z",
+   "ops_listed": 2,
+   "ops_generated": 1,
+   "landed": 2,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true
+   },
+   "ok": true
+  },
+  {
+   "page": "3f44590a05eb81f98b76c83465dc1960",
+   "step": "X15(b)",
+   "name": "PE Metaprompt 100926.1",
+   "as_of": "2026-10-12T13:32:38.514Z",
+   "ops_listed": 5,
+   "ops_generated": 0,
+   "landed": 5,
+   "not_landed": [],
+   "revision_moved": true,
+   "findings_after": 0,
+   "finding_sections": [],
+   "positives": {
+    "title_ok": true
+   },
+   "ok": true
+  }
+ ],
+ "new_pages": {},
+ "ok": false,
+ "d22": "transient reads of this session's harness records; control pages only; counts, ids and booleans",
+ "fetched_after": "2026-10-12T13:39:10.411Z"
+}

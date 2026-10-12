@@ -216,7 +216,7 @@
             "BLOCKED"
           ],
           "branch_id": "material_delta",
-          "condition": "evidence proves a bounded material delta",
+          "condition": "evidence proves a bounded material delta; a lawful originating PR implementation author is identified, independent of the IA reviewer; otherwise return the unresolved assignment to the Product Owner",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "CONDITIONAL_RECOVERY",
@@ -242,8 +242,8 @@
   "id": "DOC-20",
   "node": {
     "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
-    "candidate_url": "https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25?pvs=204",
-    "candidate_version": "091426.1",
+    "candidate_url": "https://app.notion.com/p/3f44590a05eb81d8a582eec0e93e6ee7?pvs=204",
+    "candidate_version": "100926.1",
     "id": "DOC-20",
     "lane": "DOC",
     "lifecycle": "SELECTED_PRODUCTION",
@@ -252,11 +252,11 @@
       "DOCUMENTATION_COMPLETION"
     ],
     "predecessor": {
-      "notion_page_id": "3da4590a05eb81a4bf2ad969439c8ffe",
-      "release": "GCFPE-20260913.1",
-      "title": "DOC-20 — Verify Final Repository Documentation Completion — 091326.2",
-      "url": "https://app.notion.com/p/3da4590a05eb81a4bf2ad969439c8ffe",
-      "version": "091326.2"
+      "notion_page_id": "3db4590a05eb8164ac09e722dc967f25",
+      "release": "GCFPE-20260914.1",
+      "title": "DOC-20 — Verify Final Repository Documentation Completion — 091426.1",
+      "url": "https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25?pvs=204",
+      "version": "091426.1"
     },
     "predecessor_union_destinations": [
       "QA-10"
@@ -271,7 +271,7 @@
     ],
     "sequence": 20,
     "session_class": "CHANGE_LIFETIME",
-    "title": "DOC-20 — Verify Final Repository Documentation Completion — 091426.1"
+    "title": "DOC-20 — Verify Final Repository Documentation Completion — 100926.1"
   },
   "state_route_order": [
     "complete",
