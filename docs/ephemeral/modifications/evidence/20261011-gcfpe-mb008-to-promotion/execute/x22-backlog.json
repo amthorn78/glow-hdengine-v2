@@ -1,0 +1,14 @@
+{
+ "record_type": "MB008_X22_BACKLOG",
+ "page": "3e54590a05eb81eb818fd0f42045167a",
+ "as_of": "2026-10-12T18:04:46.555Z",
+ "present": 10,
+ "expected": 10,
+ "missing": [],
+ "absent_violations": [],
+ "headings_closed": [
+  "## MB-003 — The governance audit's Epic re-engineering reference still describes an Analyzer and model advice — CLOSED",
+  "## MB-008 — The candidate's package repairs (F02, F04, F05, F07) and F06 have no Modification yet — CLOSED"
+ ],
+ "ok": true
+}
