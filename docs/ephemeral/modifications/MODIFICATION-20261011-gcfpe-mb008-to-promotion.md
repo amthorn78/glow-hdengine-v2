@@ -679,3 +679,11 @@ Before spending X18's 55 fresh body reads, the installed gates were run locally 
 - **Where.** flowmaster-validate `scripts/validate_flowmaster.py` reads a skill's name with `NAME_RE = (?m)^name:\s*([a-z0-9-]+)\s*$`, which accepts no quoted name. The profile's skill lookup and the self-identity check (`SKILL_TREE_SHA256` covers `SKILL.md`) fail on the same line. The installed flowmaster-validate therefore cannot validate the installed suite, and X18's verification cannot be met.
 - Nothing was written to Notion, the packages or the install for this check. X18 has not started.
 - **The smallest fix sits in one package.** Every skill-name parser is in flowmaster-validate: `NAME_RE` in `scripts/validate_flowmaster.py`, and one name pattern each in `scripts/validate_gcfpe_20261009.py`, `validate_gcfpe_20260914.py` and `validate_gcfpe_current.py`. No other package parses skill names. flowmaster-validate's revision `3.4.0` is pinned only inside its own package (its `SKILL.md`, scripts and validation profile), never by a contract or the registry. So a fix that also accepts the quoted form, with the revision moved to `3.4.1` and `SKILL_TREE_SHA256` re-declared, changes that package alone, and Nathan reinstalls only it. Returned to Nathan for decision.
+
+### Stop — 2026-10-12, Nathan's direction
+
+Nathan's words:
+
+> give me a brief that includes a detail of your failure. I am NOT going to waste reviews and further fix cycles on semantics
+
+EXECUTE stops after X17. X18–X22 are not done, and no review or fix cycle follows. The brief, with the live state, the defects left in place and the authoring session's failures in detail, is [execute/STOP-BRIEF.md](evidence/20261011-gcfpe-mb008-to-promotion/execute/STOP-BRIEF.md). The Modification stays `EXECUTING`; resuming any step is Nathan's call. PR #607 is the record pull request.
