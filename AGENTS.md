@@ -1,5 +1,13 @@
 # AGENTS.md — Glow HD Engine (agent rules)
 
+## Code review guidelines
+
+- **Codex code review MUST NOT review Markdown files anywhere in this repository.** Exclude every file whose extension is `.md`, `.markdown`, or `.mdown` (case-insensitive), including `AGENTS.md`, `README.md`, and Markdown under source, test, audit, and documentation directories.
+- Apply this exclusion before inspecting changed-file diffs or generating findings. Do not report Markdown issues, request Markdown changes, or attach a Markdown-only concern to an otherwise in-scope code line.
+- For mixed changes, review only the remaining in-scope non-Markdown files. A code change does not bring accompanying Markdown into review scope. If all changed files are excluded, return no findings and state that the change has no files in code-review scope.
+- Markdown may be read as governing instructions or necessary context for reviewing in-scope code; reading it does not authorize reviewing it. This exclusion applies to automated Codex code review; it does not prevent an explicitly requested documentation edit or a separately assigned governance, Plan, or QA review.
+- Preserve the additional CI-exempt path exclusions below. These instructions define review scope; they do not disable the external review trigger or waive artifact requirements.
+
 ## Canon-first rule (every agent, every task)
 - PF-Canon in `docs/pfcanon/` governs all work in this repository. A change's in-flight documents in `docs/ephemeral/` (its approved Specification, its approved Plans, and the decisions in its reviews and Product Owner dispositions; file names start with the change ID) are canon for that change: they modify canon during the implementation flow. A Specification is a permanent governed record; a Plan is working direction. Where an in-flight document conflicts with PF-Canon, PF-Canon governs unless an applicable PF10 rule supersedes it for that exact scope, or a formally approved bounded Product Owner rescope supersedes it for the exact decision it adjudicates. Prompts, handoffs and skills do not list which documents apply; finding them is the agent's job.
 - At the start of every task, and whenever its subject changes, search all of `docs/pfcanon/`, and the change's documents in `docs/ephemeral/`, for material relevant to the task: its terms, the surfaces and environments it touches, and the section headings (for example `grep -n -i -E '<terms>' docs/pfcanon/*.md docs/ephemeral/<CHANGE-ID>-*.md`). Governing canon is the version on `main`: when the working branch changes `docs/pfcanon/`, search and read canon from `main` (for example `git grep -n -i -E '<terms>' origin/main -- docs/pfcanon/`), and treat the branch's own canon edits as an unmerged proposal. Read every governing section the search finds in full, and apply it. Use the current version of each in-flight document, never a superseded or rejected one. Search; do not load all of canon into context.
@@ -58,7 +66,8 @@
   `_DOCUMENTATION_PREFIXES` in `ci/checks/classify_ci_changes.py`, where a path under any of them
   returns no lanes at all, whatever its suffix — a `.py` file there is exempt too. **Automated code
   review must not raise findings on a change confined to these prefixes.** A change that also
-  touches any other path is reviewed normally, on those other paths.
+  touches any other path is reviewed only on those other paths, subject to the repository-wide
+  Markdown exclusion in **Code review guidelines** above.
   - This addresses **who reviews these artifacts, not what they must contain.** Every evidence,
     attribution and no-hand-editing rule in this file still applies to them in full; a path being
     out of review scope is not permission to lower its standard.
