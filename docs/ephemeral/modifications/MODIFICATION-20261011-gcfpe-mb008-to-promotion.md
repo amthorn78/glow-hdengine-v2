@@ -518,3 +518,11 @@ Nathan's words:
 **Result: `PROMOTION_CHECKPOINT_REQUIRED`.** The snapshot is in [execute/PROMOTION-PACKET.md](evidence/20261011-gcfpe-mb008-to-promotion/execute/PROMOTION-PACKET.md) at `31c14f1`. Predicate 1 (complete behaviour validation) and predicate 2 (independent post-flight, `PASS WITH WARNINGS` twice after AM-2, no mandatory open finding) are met; predicate 3 is Nathan's exact approval of that snapshot. On approval, PART-08 runs X15–X22 as PLAN §7 and §8 state, with AM-2; the six packages are installed by Nathan at X17 and not before. Every listed finding is in the packet's §6 as an accepted risk, including PFC-L1/W-1, whose one-line correction Nathan may opt into.
 
 **Spend since Nathan's decisions after X13.** About 25 minutes (12:30Z to 12:55Z). Subagent tokens: the two focused post-flight reviewers, 0.32M and 0.39M. Since X8 in all, about 3.1M; inside the EXECUTE estimate.
+
+### Promotion approval — 2026-10-12
+
+Nathan's words:
+
+> Nathan approves promotion of GCFPE-20261009.1 / 100926.1 as the snapshot in execute/PROMOTION-PACKET.md at 31c14f1, accepting the listed risks in its §6, including PFC-L1 / W-1. Go on to PART-08.
+
+This is predicate 3 (DN-D). It authorizes PART-08 (X15–X22) as PLAN §7 and §8 state, with PIN-1-A and AM-2. Marker values set from it: `@PROMOTION_APPROVED_AT` = `2026-10-12`; `@ACTIVATION_DATE` = `2026-10-12`, the UTC date X15 starts. PFC-L1 / W-1 is accepted as written; the catalog's `validation_evidence` line is not changed.
