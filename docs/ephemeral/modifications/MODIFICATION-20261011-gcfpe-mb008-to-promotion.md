@@ -2,12 +2,12 @@
 artifact_type: "GCFPE_MODIFICATION_RECORD"
 format: "2.1"
 modification_id: "MODIFICATION-20261011-gcfpe-mb008-to-promotion"
-status: "PLANNED"
+status: "PLANNING"
 targets: ["prompt", "skill", "rule", "graph", "registry", "notion_control", "tool"]
 gate_tier: 2
 closure: {"upstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "GCFPE-MGMT-10", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "MGR-10", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "downstream": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CF-PO-10", "CL-20", "CL-30", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "CL-E-40", "DOC-10", "DOC-20", "ESC-10", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-50", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-10", "QA-100", "QA-110", "QA-120", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40"], "state_sharers": ["CF-C-10", "CF-C-20", "CF-C-30", "CF-C-40", "CF-E-10", "CF-E-20", "CF-E-30", "CF-E-40", "CL-40", "CL-C-10", "CL-E-10", "CL-E-20", "CL-E-30", "DOC-10", "DOC-20", "ESC-25", "ESC-30", "ESC-40", "IA-10", "IA-20", "IA-30", "IA-40", "IA-60", "OPS-10", "OPS-20", "OPS-30", "PR-10", "PR-20", "PR-30", "PR-35", "PR-40", "QA-100", "QA-110", "QA-20", "QA-50", "QA-60", "QA-70", "QA-80", "QA-90", "RS-10", "RS-20", "RS-30", "RS-40", "UTIL-10"]}
 readiness: "NEEDS_RULING"
-override: {"by": "", "overrides": [], "reason": ""}
+override: {"by": "Nathan", "overrides": ["review_cap"], "reason": "2026-10-12: after PLAN's diff check left four required findings open, Nathan opted into one bounded repair of P-B1-R, DIFF-1, DIFF-2, DIFF-3 and L-2, L-3, L-5, L-6, L-9, with one fresh check of its diff beyond D26-A's cap, then a return of the plan for approval."}
 interaction_cost_predicted: 19
 interaction_cost_actual:
 estimate: {"plan": "6–10 h and 4–7M aggregate tokens: fresh reads of about 56 pages for the dry run, operations for about 54 bodies and PE, redlines for six packages, the F06 profile and contract design, the registry guards, the qualification procedure and the promotion transaction plan, then one FULL round of two reviewers and at most one DIFF_CHECK", "execute": "12–20 h and 6–10M aggregate tokens, excluding Product Owner waiting time: about 70 Notion body operations with fresh-read checks, six packages through one D24 cycle, the qualification gates and post-flight, and the promotion transaction of about 70 Notion writes and moves plus the literal sweep"}
@@ -378,3 +378,9 @@ Three pronouns in §A.10 and §A.12 were replaced with Nathan's name during PLAN
   - Reviewer C: 0.47M.
 - **Coordinator:** the session counter fell by about 1.3M from 22:25Z, when it was reset; the 13 minutes before that are not counted.
 - **Total:** about 4.2M, inside the frontmatter estimate of 6–10 h and 4–7M.
+
+### Repair opt-in — 2026-10-12
+
+Nathan, deciding: “Nathan opts into one bounded repair of P-B1-R, DIFF-1, DIFF-2 and DIFF-3, and of L-2, L-3, L-5, L-6 and L-9 in the same files, in MODIFICATION-20261011-gcfpe-mb008-to-promotion, with one fresh check of its diff, then return the plan for approval. I override the review cap (review_cap) for that one check.”
+
+This is option 2 of the return above, with the check of the repair's diff included. The override, recorded in the frontmatter, lifts D26-A rule 2's cap for that one check only; rule 5's stop conditions and every other exit rule stand as written. The repair is bounded to the nine findings named. The other listed findings stay accepted as risks. Status returns to `PLANNING` until the plan is returned again.
