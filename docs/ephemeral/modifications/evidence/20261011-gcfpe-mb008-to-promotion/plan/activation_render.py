@@ -142,7 +142,7 @@ def catalog_text(parts: dict, values: dict) -> str:
         "predecessor_catalog: 3db4590a05eb81738ef1d846e3c0df8c", "mutation_posture: SELECTED_PRODUCTION",
         "source_modification: MODIFICATION-20261011-gcfpe-mb008-to-promotion", "promotion_authorized: true",
         "validation_status: VALIDATED",
-        'validation_evidence: "D24 SKILL_FIT_CONFIRMED and the independent post-flight @POSTFLIGHT_VERDICT, MODIFICATION-20261011-gcfpe-mb008-to-promotion"',
+        'validation_evidence: "the D24 skill review and the independent post-flight recorded in MODIFICATION-20261011-gcfpe-mb008-to-promotion; the register states their verdicts and records"',
         "---", "# Glow HDE Complete Prompt Set — GCFPE-20261009.1", "Release: `GCFPE-20261009.1`  ",
         "Prompt version family: `100926.1`  ", "Exact selected member count: `55`  ",
         'Selection status: `REGISTER_CONTROLLED` — resolve selection from <mention-page url="https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1"/>. This page does not assert its own selection.',
