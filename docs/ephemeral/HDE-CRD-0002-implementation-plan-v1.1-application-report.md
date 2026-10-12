@@ -131,10 +131,10 @@ It needs no live vendor, production or database access. It writes only its revie
 ## Canon relied on
 
 As listed in Plan v1.1 under "IA-40 revision reads", read on `main` at `ffdba6a`:
-- PF04-Canon-HDE-Governance v2.8.7 §9.1.2;
-- PF05-Canon-HDE-CLI-API-Vendor-Ref v2.5.3 §5.6 (`/reader` row);
+- PF04-Canon-HDE-Governance v2.8.7 §9.1.2 (closing Notion-board paragraph not relied on);
+- PF05-Canon-HDE-CLI-API-Vendor-Ref v2.5.3 §5.6 (`/reader` row only);
 - PF06-Canon-Change-Process-Guide v2.5.4 §1.0.4–§1.0.6, §3.5.1, §3.5.2.1, §3.5.2.3;
-- PF12-Canon-HDE-Schemas-and-Artifacts v2.9.6 §1.2 "Close-pack artifacts" and "Change-container compatibility (normative)", and Endpoint Catalog "Reader surface routes and distinct contracts (normative)";
+- PF12-Canon-HDE-Schemas-and-Artifacts v2.9.6 §1.2 "Close-pack artifacts" and "Change-container compatibility (normative)", and Endpoint Catalog "Reader surface routes and distinct contracts (normative)" (the `/reader` passage only);
 - PF19-Canon-Glow-QA-Guide v3.0.6 "Close-pack truthfulness and same-run execution (normative)" and "Close report requirements";
 - PF27-Canon-Plan-Templates v2.0.5 "Materiality-based blocker discipline (required for Epic Specification and Implementation Plan review)";
 - PF30.1-Canon-HDE-CRD-Records v0.9.1, CRD ID syntax;
