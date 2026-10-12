@@ -8,6 +8,7 @@
 directory). The six packages are written to <out-dir>, which must not exist. In order:
 
   A   copy the six skills; apply plan/package_apply.py's redlines; apply the glow-graph-contract patch;
+  A2  apply execute/d24-repair-redlines.json, the repair of the D24 round-1 REQUIRED findings (X10);
   B   bundle the production contract and graph into change-flow and flowmaster-validate;
   F   write the 100926.1 fixtures: the 091426.1 scenarios with their release fields moved, plus 17 cases
       for F01, F02, F05, F07, F08 and F09;
@@ -925,6 +926,13 @@ def build(installed: Path, out: Path, contract: Path, graph: Path, plan: Path) -
     if patched.returncode != 0:
         raise SystemExit(f"patch: {patched.stdout}{patched.stderr}")
     report.append({"step": "A glow-graph-contract patch", "files": patched.stdout.count("patching file")})
+    # A2: the D24 round-1 repair (REVIEW-D24-A R-1, R-2), after the approved redlines have all landed
+    landed = subprocess.run([sys.executable, PLAN_DIR / "package_apply.py", out, "--check"], capture_output=True, text=True, env=ENV)
+    if landed.returncode != 0 or any(r["state"] != "LANDED" for r in json.loads(landed.stdout)["rows"]):
+        raise SystemExit("package_apply --check: not every approved redline landed before the repair")
+    repair = json.loads((HERE / "d24-repair-redlines.json").read_text(encoding="utf-8"))["ops"]
+    for op in repair:
+        substitute(out / op["skill"] / op["file"], [(op["id"], op["old"], op["new"], op["count"])], report)
     cf, fv, pr, gg = out / "change-flow", out / "flowmaster-validate", out / "glow-hde-pr-development", out / "glow-graph-contract"
     # B: bundle
     for k in (cf, fv):

@@ -1,0 +1,154 @@
+{
+ "record_type": "MB008_X8_GATES",
+ "ok": true,
+ "gates": {
+  "redlines_check": {
+   "exit": 1,
+   "ok": false,
+   "landed": 44,
+   "ops": 46,
+   "not_landed": [
+    "AU-REV",
+    "AU-REV-FX"
+   ],
+   "superseded_by_d24_repair": true
+  },
+  "package_build_check": {
+   "exit": 0,
+   "equal": true,
+   "files": 95
+  },
+  "flowmaster_suite": {
+   "exit": 0,
+   "verdict": "FLOWMASTER_SUITE_PASS",
+   "suite_ok": true,
+   "finding_counts": {
+    "ADVISORY": 0,
+    "BLOCKER": 0,
+    "ERROR": 0,
+    "WARNING": 0
+   },
+   "self_identity": "OK",
+   "skills": {
+    "change-flow": "PASS",
+    "flowmaster-primary": "PASS",
+    "flowmaster-validate": "PASS",
+    "session-branch-flowmaster": "PASS",
+    "session-relay-flowmaster": "PASS",
+    "tw-flowmaster": "PASS"
+   },
+   "rows_exact": true,
+   "interfaces_closed": true,
+   "current_overlay": {
+    "ok": true,
+    "profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+    "target_release": "GCFPE-20261009.1",
+    "contract_status": "SELECTED_PRODUCTION",
+    "frozen_graph_edge_count": 235
+   },
+   "current_fixtures": {
+    "fixture_suite_ok": true,
+    "section_13_fixture_count": 54,
+    "section_13_passed": 54,
+    "section_13_variant_count": 55,
+    "section_13_variants_passed": 55,
+    "case_count": 283
+   },
+   "dependency_cases": 13,
+   "change_flow_fixtures": {
+    "total": 34,
+    "positive_count": 14,
+    "negative_count": 20,
+    "passed_expectations": 34,
+    "fixture_suite_ok": true
+   }
+  },
+  "flowmaster_suite_explicit_100926": {
+   "exit": 0,
+   "verdict": "FLOWMASTER_SUITE_PASS",
+   "candidate_ok": true,
+   "candidate_profile": "GCFPE-20261009.1-100926.1-VALIDATION",
+   "candidate_fixtures_ok": true
+  },
+  "profile_100926_direct": {
+   "exit": 0,
+   "ok": true,
+   "errors": [],
+   "profile": "GCFPE-20261009.1-100926.1-VALIDATION"
+  },
+  "fixtures_100926_direct": {
+   "exit": 0,
+   "fixture_suite_ok": true,
+   "fixtures": 54,
+   "passed": 54,
+   "variants": 55,
+   "cases": 283
+  },
+  "change_flow_fixtures": {
+   "exit": 0,
+   "total": 34,
+   "passed": 34,
+   "ok": true
+  },
+  "change_flow_validate_100926": {
+   "exit": 0,
+   "line": "PASS: change-flow GCFPE-20261009.1 contract and Markdown-only source policy"
+  },
+  "change_flow_validate_091426_history": {
+   "exit": 1,
+   "line": "FAIL: specialization revision",
+   "expected": "fails by design on the new revision (PLAN \u00a76)"
+  },
+  "pr_development_validator": {
+   "exit": 0,
+   "line": "PASS: Glow HDE PR development skill structural contract"
+  },
+  "audit_fixture_suite": {
+   "exit": 0,
+   "line": "OK"
+  },
+  "relay_self_test": {
+   "exit": 0,
+   "status": "PASS"
+  },
+  "regenerator_shipped_091426": {
+   "exit": 0,
+   "equal_lines": 2
+  },
+  "regenerator_candidate_100926": {
+   "exit": 0,
+   "equal_to_x7": true
+  },
+  "regenerator_production_100926": {
+   "exit": 0,
+   "equal_to_x7": true
+  },
+  "digests": {
+   "change-flow": {
+    "base": "22 9a551af36e042e56a48045297ac316b4102a4eb21f31622853c8be700e223f47",
+    "built": "25 c9b0927f327c31328c4b64a0408a946619c985a492702a70a2cd88e216cf22c2"
+   },
+   "flowmaster-validate": {
+    "base": "31 90c15e985a0c4b78d24298fe8187e8a50576689ddfc509d09fa11187ab97fcc2",
+    "built": "37 02a69b8a99181e79e554299a51dcc31e8b6b629d4974d05c96b191cf948fa200"
+   },
+   "glow-hde-pr-development": {
+    "base": "4 265f9170d8459fc477287c320f0bbdd8eaaf0e6ba1dd4ee513275a76a22f8f7a",
+    "built": "4 f0880ceb6c5d8104a79fb37260ce2cdd90cac110878eaabc2a12106f8b6bbaf0"
+   },
+   "glow-graph-contract": {
+    "base": "9 e241bb9a67c4470895fc666a25d0f97d8df7e8e2df06539de5deaf12bc46467c",
+    "built": "9 d00c8d1705e3aa181b22c151f103edc9a0f9eccdcfe593fd3a92b90cb0fec6b9"
+   },
+   "session-relay-flowmaster": {
+    "base": "5 c8a5b22432a44f57fb12bc508169f85aa3d0ca3298b793590c364eb9a2afc8e4",
+    "built": "5 33d8b9be98288b1ba698a403964409fb65f5cc53d81cbd94a348ff5b3ce4b52c"
+   },
+   "amthor-workspace-governance-audit": {
+    "base": "15 c214e8741e9c54d395cfbd1379cbc7947e6c07beee5bd03aca433dc5dda937ab",
+    "built": "15 f0f00820a1df24d20974dd3ad1a58bc4cb8d358d6e7b9a77ccd9ec26329e45f8"
+   }
+  },
+  "pycache_in_out": 0
+ }
+}

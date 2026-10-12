@@ -19,7 +19,13 @@ out, base = S / "out", S / "base"
 contract = E / "execute/contracts/gcfpe-20261009.1-100926.1-production-contract.json"
 g = {}
 c, o, _ = run([sys.executable, E / "plan/package_apply.py", out, "--check"]); d = js(o)
-g["redlines_check"] = {"exit": c, "ok": d.get("ok"), "landed": sum(r["state"] == "LANDED" for r in d.get("rows", [])), "ops": len(d.get("rows", []))}
+g["redlines_check"] = {"exit": c, "ok": d.get("ok"), "landed": sum(r["state"] == "LANDED" for r in d.get("rows", [])), "ops": len(d.get("rows", [])),
+    "not_landed": sorted(r["id"] for r in d.get("rows", []) if r["state"] != "LANDED")}
+# X10 repair: DR-REV and DR-REV-FX (execute/d24-repair-redlines.json) supersede AU-REV and AU-REV-FX's value 1.14.0 with 1.14.1
+_audit = out / "amthor-workspace-governance-audit"
+g["redlines_check"]["superseded_by_d24_repair"] = (g["redlines_check"]["not_landed"] == ["AU-REV", "AU-REV-FX"]
+    and "WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.14.1" in (_audit / "SKILL.md").read_text(encoding="utf-8")
+    and "WORKSPACE_GOVERNANCE_AUDITOR_REVISION:** 1.14.1" in (_audit / "scripts/run_fixture_suite.py").read_text(encoding="utf-8"))
 c, o, _ = run([sys.executable, E / "execute/package_build.py", base, out, "--contract", contract, "--graph", S / "graph/production-graph.json", "--plan", E / "PLAN-20261011.md", "--check"]); d = js(o)
 g["package_build_check"] = {"exit": c, "equal": d.get("equal"), "files": d.get("files")}
 suite = S / "suite"
@@ -64,7 +70,7 @@ for n in ("candidate", "production"):
 def freeze(p): return run([sys.executable, REPO / "docs/prompt_ecosystem_management/freeze.py", p])[1].strip().splitlines()[-1]
 g["digests"] = {k: {"base": freeze(base / k), "built": freeze(out / k)} for k in PK}
 g["pycache_in_out"] = sum(1 for _ in out.rglob("__pycache__"))
-ok = (g["redlines_check"]["landed"] == 46 and g["package_build_check"]["equal"] and g["flowmaster_suite"]["verdict"] == "FLOWMASTER_SUITE_PASS"
+ok = ((g["redlines_check"]["landed"] == 46 or (g["redlines_check"]["landed"] == 44 and g["redlines_check"]["superseded_by_d24_repair"])) and g["package_build_check"]["equal"] and g["flowmaster_suite"]["verdict"] == "FLOWMASTER_SUITE_PASS"
       and g["flowmaster_suite_explicit_100926"]["verdict"] == "FLOWMASTER_SUITE_PASS" and g["profile_100926_direct"]["ok"] and g["fixtures_100926_direct"]["fixture_suite_ok"]
       and g["change_flow_fixtures"]["ok"] and g["change_flow_validate_100926"]["exit"] == 0 and g["pr_development_validator"]["exit"] == 0
       and g["audit_fixture_suite"]["exit"] == 0 and g["relay_self_test"]["status"] == "PASS" and g["regenerator_shipped_091426"]["equal_lines"] == 2
