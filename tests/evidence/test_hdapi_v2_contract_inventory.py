@@ -1273,6 +1273,10 @@ def test_epic034_pr04_superseded_rows_are_removed_when_outputs_absent(monkeypatc
     human_index.write_text(json.dumps(stale_rows) + "\n", encoding="utf-8")
     monkeypatch.setattr(indexer, "ROOT", tmp_path)
     monkeypatch.setattr(indexer, "HUMAN_INDEX", human_index)
+    # tmp_path has no catalog/manifest.json, from which the updater derives the
+    # release label (and refuses without one); this test concerns supersession.
+    label = "current-release capture: release 0.0.0, release_id " + "0" * 64
+    monkeypatch.setattr(indexer, "_current_release_label", lambda: label)
     rows = indexer._load_human_index()
     row_keys = {(row["artifact_key"], row["discovered_physical_path"]) for row in rows}
     assert not row_keys & indexer.EPIC034_PR04_SUPERSEDED_INDEX_KEYS
