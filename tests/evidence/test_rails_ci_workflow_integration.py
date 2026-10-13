@@ -1156,6 +1156,25 @@ def test_full_validation_inputs_run_the_supplemental_behavioral_gap() -> None:
             classifier.changed_test_targets(ROOT, (path,))
 
 
+def test_inactive_test_refusal_rejects_a_synthetic_inactive_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The inactive set is empty, so the loop above asserts nothing. A
+    synthetic member proves that a direct change to an inactive test still
+    fails closed, alone and beside a full-validation input."""
+
+    synthetic = "tests/synthetic/test_inactive_disposition_probe.py"
+    assert not (ROOT / synthetic).exists()
+    assert synthetic not in classifier._FULL_VALIDATION_INACTIVE_TESTS
+    monkeypatch.setattr(
+        classifier, "_FULL_VALIDATION_INACTIVE_TESTS", {synthetic}
+    )
+    expected = f"^CI_INACTIVE_TEST_REQUIRES_DISPOSITION:{re.escape(synthetic)}$"
+    for paths in ((synthetic,), ("requirements.txt", synthetic)):
+        with pytest.raises(ValueError, match=expected):
+            classifier.changed_test_targets(ROOT, paths)
+
+
 def test_every_current_governed_primary_selects_evidence() -> None:
     governed = classifier._load_governed_primary_paths(ROOT)
     assert {
