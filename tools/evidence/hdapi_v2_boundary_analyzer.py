@@ -2155,6 +2155,78 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 for node in helper_nodes
             ):
                 return None
+
+            # Fail closed on how presenter-derived values are used. A call of a bound
+            # parameter, a response built in the helper, and any local holding one may
+            # only feed a response constructor or len(), be assigned once to a local
+            # (calls only, never name to name), reach `.headers`, be returned, or go
+            # to a statement call of a module helper whose parameter is used only for
+            # `.headers` and its return.
+            def is_response_ctor(node: ast.AST) -> bool:
+                if not isinstance(node, ast.Call):
+                    return False
+                chain = _attribute_chain(node.func)
+                root = chain.split(".", 1)[0]
+                return chain.rsplit(".", 1)[-1] in {"Response", "make_response"} and root in aliases and module_binding_counts.get(root, 0) == 1
+
+            def header_only_helper_param(name: str, index: int) -> bool:
+                keys = simple_names.get(name, [])
+                if len(keys) != 1 or module_binding_counts.get(name, 0) != 1:
+                    return False
+                header_helper = function_defs[keys[0]]
+                if header_helper.decorator_list or ast_parents.get(header_helper) is not tree or header_helper.args.vararg is not None:
+                    return False
+                if any(
+                    (isinstance(node, ast.Name) and node.id == name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                    or (isinstance(node, ast.Attribute) and node.attr == name)
+                    for node in ast.walk(tree)
+                ):
+                    return False
+                params = list(header_helper.args.posonlyargs) + list(header_helper.args.args)
+                if index >= len(params):
+                    return False
+                param = params[index].arg
+                nodes = [node for stmt in header_helper.body for node in ast.walk(stmt)]
+                if binding_site_counts(nodes).get(param, 0):
+                    return False
+                return all(
+                    (isinstance(ast_parents.get(node), ast.Attribute) and ast_parents[node].attr == "headers") or isinstance(ast_parents.get(node), ast.Return)
+                    for node in nodes
+                    if isinstance(node, ast.Name) and node.id == param
+                )
+
+            def derived_use_is_safe(node: ast.AST, *, may_assign: bool) -> bool:
+                parent = ast_parents.get(node)
+                if isinstance(parent, ast.keyword):
+                    return is_response_ctor(ast_parents.get(parent))
+                if isinstance(parent, ast.Return):
+                    return True
+                if isinstance(parent, ast.Tuple) and isinstance(ast_parents.get(parent), ast.Return):
+                    return bool(parent.elts) and parent.elts[0] is node
+                if may_assign and isinstance(parent, (ast.Assign, ast.AnnAssign)) and parent.value is node:
+                    targets = parent.targets if isinstance(parent, ast.Assign) else [parent.target]
+                    return len(targets) == 1 and isinstance(targets[0], ast.Name)
+                if isinstance(parent, ast.Attribute) and parent.value is node:
+                    return parent.attr == "headers"
+                if isinstance(parent, ast.Call) and node in parent.args:
+                    if is_response_ctor(parent) or (isinstance(parent.func, ast.Name) and parent.func.id == "len" and "len" not in module_binding_counts):
+                        return True
+                    return isinstance(parent.func, ast.Name) and isinstance(ast_parents.get(parent), ast.Expr) and header_only_helper_param(parent.func.id, parent.args.index(node))
+                return False
+
+            derived_names: set[str] = set()
+            for node in helper_nodes:
+                if isinstance(node, ast.Call) and ((isinstance(node.func, ast.Name) and node.func.id in bound) or is_response_ctor(node)):
+                    if not derived_use_is_safe(node, may_assign=True):
+                        return None
+                    parent = ast_parents.get(node)
+                    if isinstance(parent, (ast.Assign, ast.AnnAssign)):
+                        derived_names.add((parent.targets[0] if isinstance(parent, ast.Assign) else parent.target).id)
+            if any(
+                isinstance(node, ast.Name) and node.id in derived_names and isinstance(node.ctx, ast.Load) and not derived_use_is_safe(node, may_assign=False)
+                for node in helper_nodes
+            ):
+                return None
             key = f"{candidate}#presenter_bound:{','.join(sorted(bound))}"
             function_defs[key] = fn
             presenter_bound_params_by_key[key] = frozenset(bound)

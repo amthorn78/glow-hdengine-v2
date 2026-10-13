@@ -2538,8 +2538,9 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     a decorated helper whose wrapper replaces it, a helper whose defaults are
     replaced after definition, a helper replaced through the module namespace,
     a helper that overwrites its emitter, its body or its response data in a
-    branch, a presenter name rebound at module level, and a view that alters the
-    helper's result or rebinds the bound argument."""
+    branch, a helper that mutates or hands on its response, a presenter name
+    rebound at module level, and a view that alters the helper's result or
+    rebinds the bound argument."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2558,6 +2559,8 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         "body_overwritten_in_branch": ("def _respond(emit_fn):\n    body = emit_fn({'ok': False})\n    if SAFE_MODE:\n        body = b'raw'\n    return Response(body, status=200)", "_respond(emit_fn)"),
         "response_data_replaced": ("def _respond(emit_fn):\n    resp = Response(emit_fn({'ok': False}), status=200)\n    resp.data = b'raw'\n    return resp", "_respond(emit_fn)"),
         "presenter_name_rebound_at_module": ("emit_reader_public_bytes = _plain\ndef _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
+        "response_body_mutated_in_place": ("def _respond(emit_fn):\n    resp = Response(emit_fn({'ok': False}), status=200)\n    resp.response.clear()\n    resp.response.append(b'raw')\n    return resp", "_respond(emit_fn)"),
+        "response_passed_to_mutating_helper": ("def _clear(resp):\n    resp.response.clear()\n    return resp\ndef _respond(emit_fn):\n    resp = Response(emit_fn({'ok': False}), status=200)\n    _clear(resp)\n    return resp", "_respond(emit_fn)"),
     }
     modules = {name: _PRESENTER_HELPER_MODULE.format(helper=helper, call=call) for name, (helper, call) in shapes.items()}
     view_module = _PRESENTER_HELPER_MODULE.replace("        return {call}\n", "{view}\n")

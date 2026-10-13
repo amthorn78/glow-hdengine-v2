@@ -12,7 +12,8 @@ SEARCH_ROOTS = ("adapter","engine","cli","scripts")
 def _imports_legacy_tree(txt, rx):
     # Import statements by AST: a qualified current import such as
     # `from engine.core import core` is not an import of the legacy `core` tree,
-    # while `try: import core` on one line still is.
+    # while `try: import core` on one line still is. A string holding import text
+    # (for `exec`) or a dynamic import of a legacy root also counts.
     try:
         tree = ast.parse(txt)
     except SyntaxError:
@@ -22,6 +23,14 @@ def _imports_legacy_tree(txt, rx):
             return True
         if isinstance(node, ast.ImportFrom) and node.level == 0 and (node.module or "").split(".", 1)[0] in LEGACY_ROOTS:
             return True
+        if isinstance(node, ast.Call) and node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+            func = node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
+            if func in ("__import__", "import_module") and node.args[0].value.split(".", 1)[0] in LEGACY_ROOTS:
+                return True
+        if isinstance(node, ast.Constant) and isinstance(node.value, (str, bytes)):
+            text = node.value.decode("latin-1") if isinstance(node.value, bytes) else node.value
+            if any(r.search(text) for r in rx):
+                return True
     return False
 
 def test_legacy_imports_denied():
@@ -39,5 +48,5 @@ def test_legacy_imports_denied():
 
 def test_legacy_import_check_flags_statements_not_mentions():
     rx = [re.compile(p) for p in FORBIDDEN]
-    assert all(_imports_legacy_tree(t, rx) for t in ("import core\n", "try: import core\nexcept ImportError: pass\n", "x = 1; from adapters import a\n", "- note: import server\n```\n"))
-    assert not any(_imports_legacy_tree(t, rx) for t in ("from engine.core import core\n", "# import core\n", "s = 'import server'\n"))
+    assert all(_imports_legacy_tree(t, rx) for t in ("import core\n", "try: import core\nexcept ImportError: pass\n", "x = 1; from adapters import a\n", "- note: import server\n```\n", "exec('import core')\n", "__import__('server')\n"))
+    assert not any(_imports_legacy_tree(t, rx) for t in ("from engine.core import core\n", "# import core\n", "from .core import x\n"))
