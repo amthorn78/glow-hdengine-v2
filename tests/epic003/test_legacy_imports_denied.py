@@ -1,13 +1,15 @@
 from pathlib import Path
 import re
 
-FORBIDDEN = (r"\bfrom\s+core\b", r"\bimport\s+core\b",
-             r"\bfrom\s+server\b", r"\bimport\s+server\b",
-             r"\bfrom\s+adapters\b", r"\bimport\s+adapters\b")
+# Anchored to the start of an import statement: a qualified current import such
+# as `from engine.core import core` is not an import of the legacy `core` tree.
+FORBIDDEN = (r"^\s*from\s+core\b", r"^\s*import\s+core\b",
+             r"^\s*from\s+server\b", r"^\s*import\s+server\b",
+             r"^\s*from\s+adapters\b", r"^\s*import\s+adapters\b")
 SEARCH_ROOTS = ("adapter","engine","cli","scripts")
 
 def test_legacy_imports_denied():
-    rx = [re.compile(p) for p in FORBIDDEN]
+    rx = [re.compile(p, re.MULTILINE) for p in FORBIDDEN]
     hits = []
     for root in SEARCH_ROOTS:
         p = Path(root)

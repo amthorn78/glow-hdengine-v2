@@ -1866,6 +1866,8 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for node in fn.body:
                 yield node
 
+        presenter_bound_params_by_key: dict[str, frozenset[str]] = {}
+
         def presenter_callable_names_for(owner: str) -> set[str]:
             def is_none_constant(value: ast.AST) -> bool:
                 return isinstance(value, ast.Constant) and value.value is None
@@ -1930,6 +1932,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             names = set(imported_presenter_callable_names)
             for key in reversed(chain):
                 fn = function_defs[key]
+                names.update(presenter_bound_params_by_key.get(key, frozenset()))
                 for node in direct_body_nodes(fn):
                     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names:
                         names.remove(node.name)
@@ -2015,6 +2018,69 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for name in names:
                 candidates.update(simple_names.get(name, []))
             return candidates
+
+        def name_is_bound_in(node: ast.AST, name: str) -> bool:
+            for child in ast.walk(node):
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and child.name == name:
+                    return True
+                if isinstance(child, (ast.Global, ast.Nonlocal)) and name in child.names:
+                    return True
+                if _effect_binds_or_unbinds_name(child, name) or _import_binds_name(child, name):
+                    return True
+            return False
+
+        def presenter_bound_helper_key(call: ast.Call, owner: str, candidate: str) -> str | None:
+            """Prove a call to a module-level helper of this module that receives a
+            sanctioned presenter callable: the argument's bound value in the caller, or,
+            when the argument is omitted, the helper parameter's default.  Returns the
+            key under which the helper is proven with exactly those parameters treated
+            as presenter callables, or ``None`` when the shape does not apply."""
+
+            fn = function_defs.get(candidate)
+            if fn is None or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+                return None
+            helper_name = call.func.id
+            if any(name_is_bound_in(stmt, helper_name) for stmt in tree.body if stmt is not fn):
+                return None
+            scope: str | None = owner
+            while scope is not None:
+                scope_fn = function_defs[scope]
+                scope_params = scope_fn.args.posonlyargs + scope_fn.args.args + scope_fn.args.kwonlyargs
+                if any(param.arg == helper_name for param in scope_params) or any(name_is_bound_in(stmt, helper_name) for stmt in scope_fn.body):
+                    return None
+                scope = parent_function_by_key.get(scope)
+            if fn.args.vararg is not None or fn.args.kwarg is not None or _has_expanded_kwargs(call) or any(isinstance(arg, ast.Starred) for arg in call.args):
+                return None
+            positional = list(fn.args.posonlyargs) + list(fn.args.args)
+            if len(call.args) > len(positional):
+                return None
+            bound_args: dict[str, ast.AST] = {param.arg: arg for param, arg in zip(positional, call.args)}
+            keyword_params = {param.arg for param in fn.args.args + fn.args.kwonlyargs}
+            for keyword in call.keywords:
+                if keyword.arg not in keyword_params or keyword.arg in bound_args:
+                    return None
+                bound_args[keyword.arg] = keyword.value
+            defaults: dict[str, ast.AST] = dict(zip([param.arg for param in positional][len(positional) - len(fn.args.defaults) :], fn.args.defaults))
+            defaults.update({param.arg: default for param, default in zip(fn.args.kwonlyargs, fn.args.kw_defaults) if default is not None})
+            caller_presenter_names = presenter_callable_names_for(owner)
+            bound: set[str] = set()
+            for param in positional + list(fn.args.kwonlyargs):
+                if param.arg in bound_args:
+                    value = bound_args[param.arg]
+                    if (isinstance(value, ast.Name) and value.id in caller_presenter_names) or (
+                        isinstance(value, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(value), aliases)
+                    ):
+                        bound.add(param.arg)
+                elif param.arg in defaults:
+                    default = defaults[param.arg]
+                    if isinstance(default, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(default), aliases):
+                        bound.add(param.arg)
+            if not bound or any(name_is_bound_in(stmt, name) for stmt in fn.body for name in bound):
+                return None
+            key = f"{candidate}#presenter_bound:{','.join(sorted(bound))}"
+            function_defs[key] = fn
+            presenter_bound_params_by_key[key] = frozenset(bound)
+            return key
 
         def helper_passthrough_params(name: str) -> set[str]:
             fn = function_defs.get(name)
@@ -2170,6 +2236,9 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                             if index < len(positional_params) and positional_params[index] in passthrough and value_has_presenter(arg, owner, assigned_good, seen):
                                 return True
                     if function_returns_presenter(candidate, seen):
+                        return True
+                    bound_key = presenter_bound_helper_key(value, owner, candidate)
+                    if bound_key is not None and function_returns_presenter(bound_key, seen):
                         return True
             return False
 

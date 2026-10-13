@@ -40,10 +40,13 @@ def test_healthz_headers_and_identity():
     assert h2["X-Correlation-Id"] == corr
     assert b2 == b1  # byte identity across calls (dev)
 
-def _call_with_env(path="/internal/healthz", headers=None, env_overrides=None):
-    import os
+def _call_with_env(monkeypatch, path="/internal/healthz", headers=None, env_overrides=None):
     from wsgiref.util import setup_testing_defaults
-    if env_overrides: os.environ.update(env_overrides)
+    # APP_ENV takes precedence over ENGINE_ENV in adapter/wsgi.py; clear it so the
+    # ENGINE_ENV override is the effective environment, and restore after the test.
+    monkeypatch.delenv("APP_ENV", raising=False)
+    for k, v in (env_overrides or {}).items():
+        monkeypatch.setenv(k, v)
     environ = {}; setup_testing_defaults(environ)
     environ["REQUEST_METHOD"] = "GET"; environ["PATH_INFO"] = path
     headers = headers or {}
@@ -56,22 +59,23 @@ def _call_with_env(path="/internal/healthz", headers=None, env_overrides=None):
     body = b"".join(app(environ, start_response))
     return status_meta["status"], status_meta["headers"], body
 
-def test_hsts_header_prod_only():
+def test_hsts_header_prod_only(monkeypatch):
     # dev -> no HSTS
-    st, h, b = _call_with_env(env_overrides={"ENGINE_ENV": "dev"})
+    st, h, b = _call_with_env(monkeypatch, env_overrides={"ENGINE_ENV": "dev"})
     assert "Strict-Transport-Security" not in h
     # prod -> HSTS present
-    st2, h2, b2 = _call_with_env(env_overrides={"ENGINE_ENV": "prod"})
+    st2, h2, b2 = _call_with_env(monkeypatch, env_overrides={"ENGINE_ENV": "prod"})
     assert h2.get("Strict-Transport-Security") == "max-age=31536000; includeSubDomains"
 
-def test_access_log_one_line_per_request(capsys):
-    # Capture stdout while making one request; expect exactly one non-empty line of JSON
-    st, h, b = _call_with_env(env_overrides={"ENGINE_ENV": "dev"})
-    out = capsys.readouterr().out.strip().splitlines()
-    lines = [ln for ln in out if ln.strip()]
-    assert len(lines) == 1
-    rec = json.loads(lines[0])
-    # Required keys present; correlation id should match header
-    for k in ("ts","method","path","status","latency_ms","correlation_id"):
-        assert k in rec
-    assert rec["correlation_id"] == h["X-Correlation-Id"]
+def test_access_log_one_line_per_request(monkeypatch):
+    # adapter/logging_filter.py emits exactly one keys-only line per request to the
+    # app's LOG_SINK (and the "engine.app" logger); no correlation id or path is logged.
+    sink = []
+    monkeypatch.setitem(app.config, "LOG_SINK", sink)
+    st, h, b = _call_with_env(monkeypatch, env_overrides={"ENGINE_ENV": "dev"})
+    assert st.startswith("200")
+    assert len(sink) == 1
+    rec = json.loads(sink[0])
+    assert set(rec) == {"at", "route", "status", "duration_ms", "idempotence_hash", "release_id"}
+    assert rec["status"] == 200
+    assert rec["route"] == "internal_healthz"

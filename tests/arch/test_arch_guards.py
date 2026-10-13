@@ -11,9 +11,10 @@ def test_no_legacy_imports_in_active_code():
     bad = []
     for p in ACTIVE_PY:
         t = read(p)
-        if re.search(r"\b(from|import)\s+adapters\b", t): bad.append(str(p))
-        if re.search(r"\b(from|import)\s+core\b", t):     bad.append(str(p))
-        if re.search(r"\b(from|import)\s+server\b", t):   bad.append(str(p))
+        # Statement-anchored: `from engine.core import core` is not a legacy import.
+        if re.search(r"^\s*(from|import)\s+adapters\b", t, re.M): bad.append(str(p))
+        if re.search(r"^\s*(from|import)\s+core\b", t, re.M):     bad.append(str(p))
+        if re.search(r"^\s*(from|import)\s+server\b", t, re.M):   bad.append(str(p))
     assert not bad, f"Legacy imports found:\n" + "\n".join(bad)
 
 def test_handlers_cli_use_single_emitter_path():
@@ -22,7 +23,9 @@ def test_handlers_cli_use_single_emitter_path():
     bad = []
     for p in scope:
         t = read(p)
-        if "engine/http" in str(p) or "/cli/" in str(p):
+        # Product handler and CLI homes only; tools/cli and scripts/cli are
+        # evidence/harness generators that build CLI stdin, not public bytes.
+        if p.relative_to(ROOT).as_posix().startswith(("engine/http/", "engine/cli/")):
             if re.search(r"\bjson\.dumps\s*\(", t): bad.append(str(p))
             if re.search(r"\bjsonify\s*\(", t):     bad.append(str(p))
     assert not bad, "Ad-hoc emitters/jsonify detected:\n" + "\n".join(bad)
@@ -32,7 +35,8 @@ def test_blueprints_only_in_adapter():
     hits = []
     for p in ACTIVE_PY:
         t = read(p)
-        if re.search(r"add_url_rule|register_blueprint", t):
+        # A registration call, not the bare name (static analyzers mention it).
+        if re.search(r"\.\s*(add_url_rule|register_blueprint)\s*\(", t):
             if "adapter" not in p.parts:
                 hits.append(str(p))
     assert not hits, "Route registration found outside adapter/: \n" + "\n".join(hits)

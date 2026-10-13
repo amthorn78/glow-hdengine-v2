@@ -2,19 +2,35 @@ name: ci
 
 on:
   pull_request:
-    paths-ignore:
-      - 'docs/pfcanon/**'
-      - 'docs/ephemeral/**'
-      - 'docs/graph/**'
-      - 'docs/prompt_ecosystem_management/**'
+    paths:
+      - '**'
+      - '!docs/crd/**'
+      - '!docs/ephemeral/**'
+      - '!docs/graph/**'
+      - '!docs/pfcanon/**'
+      - '!docs/plans/**'
+      - '!docs/prompt_ecosystem_management/**'
+      - '!docs/qa/**'
+      - '!docs/run/**'
+      - '**.path_proof.txt'
+      - 'docs/run/EPIC011_TEST_IDENTITIES.md'
+      - 'docs/run/PROD_ENDPOINTS.json'
   push:
     branches:
       - main
-    paths-ignore:
-      - 'docs/pfcanon/**'
-      - 'docs/ephemeral/**'
-      - 'docs/graph/**'
-      - 'docs/prompt_ecosystem_management/**'
+    paths:
+      - '**'
+      - '!docs/crd/**'
+      - '!docs/ephemeral/**'
+      - '!docs/graph/**'
+      - '!docs/pfcanon/**'
+      - '!docs/plans/**'
+      - '!docs/prompt_ecosystem_management/**'
+      - '!docs/qa/**'
+      - '!docs/run/**'
+      - '**.path_proof.txt'
+      - 'docs/run/EPIC011_TEST_IDENTITIES.md'
+      - 'docs/run/PROD_ENDPOINTS.json'
 
 permissions:
   contents: read

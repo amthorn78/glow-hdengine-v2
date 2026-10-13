@@ -8,6 +8,7 @@ def _unset(monkeypatch, *names):
 
 def test_vendor_refuses_in_safe_mode(tmp_path, monkeypatch):
     # Empty secrets so env path is exercised
+    monkeypatch.chdir(tmp_path)  # decision.txt is written relative to CWD; keep it out of the repo
     monkeypatch.setenv("ENGINE_SECRETS_DIR", str(tmp_path))
     _unset(monkeypatch, "APP_ENV", "ENGINE_ENV", "ENGINE_PROVIDER", "SAFE_MODE")
     monkeypatch.setenv("ENGINE_ENV", "dev")
@@ -19,6 +20,7 @@ def test_vendor_refuses_in_safe_mode(tmp_path, monkeypatch):
     assert e.value.code == "PROVIDER_UNAVAILABLE"
 
 def test_vendor_constructs_when_safe_mode_off_but_call_raises(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)  # decision.txt is written relative to CWD; keep it out of the repo
     monkeypatch.setenv("ENGINE_SECRETS_DIR", str(tmp_path))
     _unset(monkeypatch, "APP_ENV", "ENGINE_ENV", "ENGINE_PROVIDER", "SAFE_MODE")
     monkeypatch.setenv("ENGINE_ENV", "dev")

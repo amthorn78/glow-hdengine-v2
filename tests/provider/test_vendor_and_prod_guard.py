@@ -3,6 +3,14 @@ import pytest
 
 from engine.config import provider_loader
 
+@pytest.fixture(autouse=True)
+def _isolate_cwd_and_env(monkeypatch, tmp_path):
+    # secrets/ and artifacts/provider/decision.txt resolve relative to CWD; keep them out of the repo.
+    monkeypatch.chdir(tmp_path)
+    # Record and restore the rails/env keys that _unset() pops, so they do not leak to later tests.
+    for n in ("ENGINE_ENV", "APP_ENV", "ENGINE_PROVIDER", "SAFE_MODE", "ENGINE_SECRETS_DIR"):
+        monkeypatch.delenv(n, raising=False)
+
 def _unset(*names):
     for n in names:
         os.environ.pop(n, None)

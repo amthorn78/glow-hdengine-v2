@@ -9,10 +9,10 @@ def _write(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def test_pr04_identity_status_fails_when_ab_ba_hashes_differ(monkeypatch):
+def test_pr04_identity_status_fails_when_ab_ba_hashes_differ(monkeypatch, tmp_path):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr04_band_thresholds_evidence")
 
-    test_root = mod.ROOT / "tmp" / "pytest_epic030_pr04_identity_status"
+    test_root = tmp_path
     out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-04"
     _write(test_root / "artifacts" / "compat" / "AB.json", '{"k":"ab"}\n')
     _write(test_root / "artifacts" / "compat" / "BA.json", '{"k":"ba"}\n')
@@ -21,6 +21,7 @@ def test_pr04_identity_status_fails_when_ab_ba_hashes_differ(monkeypatch):
         '{"bands":["Cool","Open","Warm","Glow"],"clamp":[0,100],"edges":[24,49,74,100],"rounding":"ROUND_HALF_UP","schema":"band_edges.v1","source":"math/thresholds.json","version":"1"}\n',
     )
 
+    monkeypatch.setattr(mod, "ROOT", test_root)
     monkeypatch.setattr(mod, "OUT_DIR", out_dir)
     monkeypatch.setattr(mod, "COMPAT_AB_PATH", test_root / "artifacts" / "compat" / "AB.json")
     monkeypatch.setattr(mod, "COMPAT_BA_PATH", test_root / "artifacts" / "compat" / "BA.json")
