@@ -2032,15 +2032,22 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
         def presenter_bound_helper_key(call: ast.Call, owner: str, candidate: str) -> str | None:
             """Prove a call to a module-level helper of this module that receives a
             sanctioned presenter callable: the argument's bound value in the caller, or,
-            when the argument is omitted, the helper parameter's default.  Returns the
+            when the argument is omitted, the helper parameter's default.  The helper
+            must be undecorated and referenced only as the callee of a call, so that
+            the call runs the analyzed definition with its own defaults.  Returns the
             key under which the helper is proven with exactly those parameters treated
             as presenter callables, or ``None`` when the shape does not apply."""
 
             fn = function_defs.get(candidate)
-            if fn is None or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+            if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
                 return None
             helper_name = call.func.id
             if any(name_is_bound_in(stmt, helper_name) for stmt in tree.body if stmt is not fn):
+                return None
+            if any(
+                isinstance(node, ast.Name) and node.id == helper_name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node)
+                for node in ast.walk(tree)
+            ):
                 return None
             scope: str | None = owner
             while scope is not None:

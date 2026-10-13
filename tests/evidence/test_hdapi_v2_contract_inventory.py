@@ -2534,14 +2534,20 @@ def test_epic034_adapter_boundary_accepts_presenter_passed_to_module_helper(monk
 def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_provenance(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """A helper whose emitter is not a sanctioned presenter callable stays reported:
     a non-presenter default, a non-presenter bound value, a parameter with neither,
-    a helper that emits through another path, and a helper that rebinds the parameter."""
+    a helper that emits through another path, a helper that rebinds the parameter,
+    a decorated helper whose wrapper replaces it, and a helper whose defaults are
+    replaced after definition."""
 
+    raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
         "non_presenter_default": ("def _respond(emit_fn=_plain):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
         "non_presenter_bound_value": ("def _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(_plain)"),
         "no_sanctioned_default_or_value": ("def _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(payload_fn)"),
         "emits_through_other_path": ("def _respond(emit_fn):\n    return Response(_plain({'ok': False}), status=200)", "_respond(emit_fn)"),
         "rebinds_parameter": ("def _respond(emit_fn):\n    emit_fn = _plain\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "decorated_sanctioned_default": (raw_decorator + "@_raw\ndef _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
+        "decorated_bound_value": (raw_decorator + "@_raw\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "defaults_replaced": ("def _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)\n_respond.__defaults__ = (_plain,)", "_respond()"),
     }
     for name, (helper, call) in shapes.items():
         adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", _PRESENTER_HELPER_MODULE.format(helper=helper, call=call))
