@@ -2193,6 +2193,50 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for node in ast.walk(tree)
         )
 
+        # Flask's response path beyond the analyzed decorators fails closed for the
+        # shape. A per-request callback, an after-request hook, error handler or
+        # endpoint registered other than by a decorator, a replaced view map, a
+        # response-processing override, WSGI middleware or a request-finished
+        # receiver can each change what the view returned. A `before_request` hook
+        # registered by call runs before every view alike, so it is outside this
+        # rule, as it is outside the general return proof.
+        response_path_names = {
+            "after_this_request", "_after_request_functions", "after_request_funcs", "view_functions", "error_handler_spec",
+            "register_error_handler", "process_response", "finalize_request", "full_dispatch_request", "handle_user_exception",
+            "handle_http_exception", "handle_exception", "wsgi_app", "request_finished",
+        }
+        decorator_only_hooks = {"after_request", "after_app_request", "errorhandler", "app_errorhandler"}
+
+        def in_decorator_position(node: ast.AST) -> bool:
+            parent = ast_parents.get(node)
+            target = parent if isinstance(parent, ast.Call) and parent.func is node else node
+            holder = ast_parents.get(target)
+            return isinstance(holder, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and target in holder.decorator_list
+
+        def touches_response_path(node: ast.AST) -> bool:
+            if isinstance(node, ast.Name):
+                return node.id in response_path_names
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                return any(alias.name.rsplit(".", 1)[-1] in response_path_names or alias.asname in response_path_names for alias in node.names)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"} and len(node.args) >= 2:
+                name_arg = node.args[1]
+                return isinstance(name_arg, ast.Constant) and name_arg.value in response_path_names | decorator_only_hooks | {"endpoint"}
+            if not isinstance(node, ast.Attribute):
+                return False
+            if node.attr in response_path_names:
+                return True
+            if node.attr == "endpoint":
+                parent = ast_parents.get(node)
+                return (isinstance(parent, ast.Call) and parent.func is node) or in_decorator_position(node)
+            return node.attr in decorator_only_hooks and not in_decorator_position(node)
+
+        module_alters_response_path = any(touches_response_path(node) for node in ast.walk(tree))
+
+        def defines_nothing(body_fn: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            # No nested function, class or lambda: nothing in the body carries code
+            # that runs outside the returns the proof checks.
+            return not any(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)) for stmt in body_fn.body for node in ast.walk(stmt))
+
         def header_only_helper_param(name: str, index: int) -> bool:
             keys = simple_names.get(name, [])
             if len(keys) != 1 or module_binding_counts.get(name, 0) != 1:
@@ -2246,11 +2290,14 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
 
         def own_body_is_exact(body_fn: ast.FunctionDef | ast.AsyncFunctionDef, presenter_params: frozenset[str]) -> bool:
             """The flow-independent body rules for the helper and for a function it
-            returns through: a presenter parameter is only ever called (never aliased
+            returns through: the body defines no nested function, class or lambda
+            (see ``defines_nothing``), a presenter parameter is only ever called (never aliased
             or passed on), every local name has one binding site, no response
             content or status is replaced after construction, every response is
             built with an exact response class (see ``is_response_ctor``), and
             presenter-derived values are used only as ``derived_use_is_safe`` allows."""
+            if not defines_nothing(body_fn):
+                return False
             nodes = [node for stmt in body_fn.body for node in ast.walk(stmt)]
             if any(isinstance(node, ast.Name) and node.id in presenter_params and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node) for node in nodes):
                 return False
@@ -2314,10 +2361,12 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             must be undecorated, its name must appear only as the callee of a call
             (never as a value or an attribute name, such as ``module._respond``), and the
             module must be free of reflection (see ``is_reflection``), of relative and
-            star imports and of same-module patching of what the proof trusts (see
-            ``module_patches_trusted_names``), so that the call runs the analyzed
-            definition with its own defaults.  The view must return the call directly,
-            the view and the helper must return a value on every exit (see
+            star imports, of same-module patching of what the proof trusts (see
+            ``module_patches_trusted_names``) and of Flask response-path registration
+            outside the analyzed decorators (see ``touches_response_path``), so that the
+            call runs the analyzed definition with its own defaults and its return is
+            what Flask serves.  The view must return the call directly and define
+            nothing nested, the view and the helper must return a value on every exit (see
             ``exits_return_values``), each imported presenter name the proof trusts must
             be bound only by its import, to what that import names, and a value bound
             in the caller must not be rebound on its way to the call.  The helper's own
@@ -2327,11 +2376,11 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             presenter callables, or ``None`` when the shape does not apply."""
 
             fn = function_defs.get(candidate)
-            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names:
+            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names or module_alters_response_path:
                 return None
             if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
                 return None
-            if not isinstance(ast_parents.get(call), ast.Return) or not exits_return_values(fn) or not exits_return_values(function_defs[owner]):
+            if not isinstance(ast_parents.get(call), ast.Return) or not exits_return_values(fn) or not exits_return_values(function_defs[owner]) or not defines_nothing(function_defs[owner]):
                 return None
             if any(module_binding_counts.get(name, 0) != 1 or exact_import_targets.get(name) != aliases.get(name) for name in presenter_trust_names):
                 return None

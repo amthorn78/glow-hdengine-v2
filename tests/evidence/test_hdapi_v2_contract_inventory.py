@@ -2544,8 +2544,11 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     replaced through frame globals, a response constructor that is another
     callable under the name ``Response``, a helper or view that can exit
     without a value, a generator helper, a response class or presenter module
-    patched in the module, a star import, and a return handed off to a
-    function that alters its response."""
+    patched in the module, a star import, a return handed off to a
+    function that alters its response, a per-request callback registered
+    by the helper or a function it calls, an after-request hook registered
+    by call, a request-finished receiver, and a nested definition in the
+    helper."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2574,6 +2577,11 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         "presenter_module_patched": ("import engine.presenter.emitter as _em\n_em.emit_public = _plain\ndef _respond(emit_fn=_em.emit_public):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
         "star_import": ("from engine.compat import *\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
         "hands_off_to_mutating_function": ("def _err():\n    resp = Response(emit_public({'ok': False}), status=400)\n    resp.data = b'raw'\n    return resp\ndef _respond(emit_fn):\n    if SAFE_MODE:\n        return _err()\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "registers_after_this_request_callback": ("from flask import after_this_request\ndef _respond(emit_fn):\n    @after_this_request\n    def _raw(resp):\n        return Response(b'raw', status=200)\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "calls_function_registering_callback": ("from flask import after_this_request\ndef _raw(resp):\n    return Response(b'raw', status=200)\ndef _install():\n    after_this_request(_raw)\ndef _respond(emit_fn):\n    _install()\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "after_request_hook_registered_by_call": ("def _raw(resp):\n    return Response(b'raw', status=200)\ndef _install(app):\n    app.after_request(_raw)\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "request_finished_receiver": ("from flask import request_finished\ndef _rx(sender, response, **extra):\n    response.set_data(b'raw')\nrequest_finished.connect(_rx)\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "nested_definition_in_helper": ("def _respond(emit_fn):\n    def _unused():\n        return b'raw'\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
     }
     modules = {name: _PRESENTER_HELPER_MODULE.format(helper=helper, call=call) for name, (helper, call) in shapes.items()}
     view_module = _PRESENTER_HELPER_MODULE.replace("        return {call}\n", "{view}\n")
