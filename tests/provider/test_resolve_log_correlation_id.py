@@ -2,6 +2,7 @@ import json, logging, re
 from engine.config import provider_loader
 
 def test_resolve_log_has_correlation_id(caplog, monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)  # decision.txt is written relative to CWD; keep it out of the repo
     # Ensure empty secrets to fall through to env/default cleanly
     monkeypatch.setenv("ENGINE_SECRETS_DIR", str(tmp_path))
     with caplog.at_level(logging.INFO):

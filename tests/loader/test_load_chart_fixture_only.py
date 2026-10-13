@@ -1,7 +1,13 @@
 
 from __future__ import annotations
 import pytest
+import engine.charts.loader as L
 from engine.charts.loader import load_chart, LoaderInputError
+
+@pytest.fixture(autouse=True)
+def _loader_log_to_tmp(monkeypatch, tmp_path):
+    # engine/charts/loader.py:69 writes artifacts/logs/loader_call.jsonl relative to CWD; redirect it.
+    monkeypatch.setattr(L, "_Path", lambda p: tmp_path / p)
 
 def test_fixture_path_requires_tz_and_returns_normalized_chart():
     out = load_chart("1990-01-01","12:34","Amsterdam, NL", tz="Europe/Amsterdam", correlation_id="CID-deadbeefdeadbeef")

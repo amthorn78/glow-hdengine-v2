@@ -12,10 +12,10 @@ def test_rejects_numeric_without_admin(tmp_path):
     assert p.returncode != 0
     err = p.stderr.decode("utf-8")
     assert '"ADMIN_FLAG_REQUIRED"' in err
-    # stdout stays numeric-free JSON and LF-terminated
-    out = p.stdout
-    assert out.endswith(b"\n")
-    json.loads(out.decode("utf-8"))
+    # The admin gate runs before any stdout (scripts/hd_cli.py main): exit 2,
+    # typed JSON on stderr, and nothing on stdout.
+    assert p.returncode == 2
+    assert p.stdout == b""
 
 def test_accepts_with_admin_and_writes_sidecar_atomic_0600_and_stdout_invariant(tmp_path, monkeypatch):
     # Baseline stdout

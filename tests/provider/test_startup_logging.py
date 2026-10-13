@@ -19,6 +19,7 @@ def _json_messages(records):
             continue
 
 def test_provider_startup_logs_once(caplog, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)  # decision.txt is written relative to CWD; keep it out of the repo
     # fresh env & artifact
     for k in ("ENGINE_PROVIDER", "APP_ENV", "ENGINE_ENV", "SAFE_MODE", "KEEP_REAL_SECRETS"):
         monkeypatch.delenv(k, raising=False)

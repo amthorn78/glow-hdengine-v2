@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import pytest
 
@@ -664,9 +664,11 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
     ) == (
         "tests/adapter/test_dev_sampler_http.py",
         "tests/adapter/test_diagnostic_writer.py",
+        "tests/adapter/test_gate_auth.py",
         "tests/cli/test_aux_preview.py",
         "tests/compat/test_abba_parity.py",
         "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+        "tests/evidence/test_hdapi_v2_contract_inventory.py",
         guard,
         "tests/http/test_dev_conjunction_http.py",
         "tests/http/test_endpoint_catalog.py",
@@ -805,7 +807,7 @@ def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
         for path in (ROOT / "tools/qa").rglob("*")
         if path.is_file()
         and not path.is_symlink()
-        and path.suffix.lower() == ".py"
+        and path.suffix.lower() in classifier._UNKNOWN_SOURCE_SUFFIXES
     }
     assert (
         set(classifier._QA_TOOL_TEST_OWNERS)
@@ -873,6 +875,16 @@ def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
         classifier.changed_test_targets(
             tmp_path / "repo", ("tools/qa/new_harness.PY",)
         )
+    for suffix in (".sh", ".sql", ".SH", ".SQL"):
+        unowned_source = unowned.with_suffix(suffix)
+        unowned_source.write_text("true\n", encoding="utf-8")
+        relative = unowned_source.relative_to(tmp_path / "repo").as_posix()
+        assert classifier.classify_paths((relative,)).flags["qa"]
+        with pytest.raises(ValueError, match="CI_QA_OWNER_TEST_MISSING"):
+            classifier.changed_test_targets(tmp_path / "repo", (relative,))
+    assert classifier._qa_tool_owner_targets(
+        ROOT, "tools/qa/fixtures/notes.md"
+    ) == ()
 
     with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_DELETED"):
         classifier.changed_test_targets(
@@ -1320,7 +1332,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     }
     assert product.test_targets == ()
 
-    changed_test = repo / "tests/adapter/test_env_guard_prod_variants.py"
+    changed_test = repo / "tests/adapter/test_unlisted_adapter_regression.py"
     changed_test.parent.mkdir(parents=True, exist_ok=True)
     changed_test.write_text("def test_guard(): pass\n", encoding="utf-8")
     _git(repo, "add", changed_test.relative_to(repo).as_posix())
@@ -1336,7 +1348,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         lane for lane in classifier.LANES if changed_test_result.flags[lane]
     } == {"product", "compat", "release"}
     assert changed_test_result.test_targets == (
-        "tests/adapter/test_env_guard_prod_variants.py",
+        "tests/adapter/test_unlisted_adapter_regression.py",
     )
 
     reader_consumer = repo / "tests/http/test_new_reader_case.py"
@@ -2003,3 +2015,104 @@ def test_pr03_missing_owner_still_fails_closed(tmp_path, source, owner, error):
     (tmp_path / owner).unlink()
     with pytest.raises(ValueError, match=error):
         classifier.changed_test_targets(tmp_path, (source,))
+
+
+def _workflow_path_filters(text: str) -> dict[str, list[str]]:
+    filters: dict[str, list[str]] = {}
+    for event in ("pull_request", "push"):
+        event_start = text.index(f"\n  {event}:\n")
+        block_start = text.index("\n    paths:\n", event_start) + len("\n    paths:\n")
+        patterns: list[str] = []
+        for line in text[block_start:].splitlines():
+            if not line.startswith("      - "):
+                break
+            value = line[len("      - "):].strip()
+            assert value.startswith("'") and value.endswith("'"), line
+            patterns.append(value[1:-1])
+        filters[event] = patterns
+    return filters
+
+
+def _github_path_filter_selects(patterns: list[str], path: str) -> bool:
+    """Model GitHub's ordered path filter: the last matching pattern decides."""
+    selected = False
+    for raw in patterns:
+        negated = raw.startswith("!")
+        pattern = raw[1:] if negated else raw
+        assert not set(pattern) & set("?[]+"), pattern
+        regex = "".join(
+            ".*" if token == "**" else "[^/]*" if token == "*" else re.escape(token)
+            for token in re.split(r"(\*\*|\*)", pattern)
+            if token
+        )
+        if re.fullmatch(regex, path):
+            selected = not negated
+    return selected
+
+
+def test_workflow_path_filter_skips_exactly_the_classifier_no_lane_documentation_paths() -> None:
+    text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "paths-ignore:" not in text
+    governed = classifier._load_governed_primary_paths(ROOT)
+    governed_under_prefixes = sorted(
+        path for path in governed if path.startswith(classifier._DOCUMENTATION_PREFIXES)
+    )
+    assert governed_under_prefixes
+    expected = [
+        "**",
+        *(f"!{prefix}**" for prefix in classifier._DOCUMENTATION_PREFIXES),
+        "**.path_proof.txt",
+        *governed_under_prefixes,
+    ]
+    filters = _workflow_path_filters(text)
+    assert filters == {"pull_request": expected, "push": expected}
+
+    tracked = [
+        path
+        for path in subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True, text=True
+        ).stdout.split("\0")
+        if path
+    ]
+    no_lane: list[str] = []
+    for path in tracked:
+        selected = _github_path_filter_selects(expected, path)
+        if not path.startswith(classifier._DOCUMENTATION_PREFIXES):
+            assert selected, path
+            continue
+        result = classifier.classify_paths((path,), governed_paths=governed)
+        lanes = {lane for lane in classifier.LANES if result.flags[lane]}
+        assert selected is bool(lanes), (path, sorted(lanes))
+        if not lanes:
+            no_lane.append(path)
+    assert no_lane
+    dry_run = classifier.classify_paths(no_lane, governed_paths=governed)
+    assert dry_run.reason == "documentation_only"
+    assert not any(dry_run.flags[lane] for lane in classifier.LANES)
+    assert dry_run.flags["needs_python"] is False
+
+
+def _ci_lane_test_tokens() -> set[str]:
+    text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    return set(re.findall(r"tests/[A-Za-z0-9_./-]+", text))
+
+
+def _reached(path: str, roots: set[str]) -> bool:
+    return any(path == root or path.startswith(f"{root.rstrip('/')}/") for root in roots)
+
+
+def test_every_tracked_test_module_is_reached_by_a_lane_or_full_validation_target() -> None:
+    tracked = [
+        path
+        for path in subprocess.run(
+            ["git", "ls-files", "-z", "--", "tests"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.split("\0")
+        if path and PurePosixPath(path).name.startswith("test_") and path.endswith(".py")
+    ]
+    assert tracked
+    roots = _ci_lane_test_tokens() | set(classifier._full_validation_test_targets())
+    assert [path for path in tracked if not _reached(path, roots)] == []

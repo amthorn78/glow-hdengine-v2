@@ -12,10 +12,10 @@ def _write(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def test_pr01_fails_closed_when_valid_prefs_are_rejected(monkeypatch):
+def test_pr01_fails_closed_when_valid_prefs_are_rejected(monkeypatch, tmp_path):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr01_normalization_evidence")
 
-    test_root = mod.ROOT / "tmp" / "pytest_epic030_pr01_fail_closed"
+    test_root = tmp_path
     out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-01"
 
     monkeypatch.setattr(mod, "OUT_DIR", out_dir)
@@ -27,10 +27,10 @@ def test_pr01_fails_closed_when_valid_prefs_are_rejected(monkeypatch):
         mod.generate()
 
 
-def test_pr02_fails_closed_when_two_run_identity_is_contradicted(monkeypatch):
+def test_pr02_fails_closed_when_two_run_identity_is_contradicted(monkeypatch, tmp_path):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr02_sampler_harness_evidence")
 
-    test_root = mod.ROOT / "tmp" / "pytest_epic030_pr02_fail_closed"
+    test_root = tmp_path
     out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-02"
 
     def payload(seed: str, candidate_ids: list[str]) -> bytes:
@@ -82,10 +82,10 @@ def test_pr02_fails_closed_when_two_run_identity_is_contradicted(monkeypatch):
         mod.main()
 
 
-def test_pr03_identity_binding_fails_when_identity_hash_is_stale(monkeypatch):
+def test_pr03_identity_binding_fails_when_identity_hash_is_stale(monkeypatch, tmp_path):
     mod = importlib.import_module("tools.evidence.generate_epic030_pr03_compat_evidence")
 
-    test_root = mod.ROOT / "tmp" / "pytest_epic030_pr03_fail_closed_identity"
+    test_root = tmp_path
     out_dir = test_root / "audit" / "qa" / "hde-epic030" / "pr-03"
 
     compat_payload = {
@@ -119,6 +119,7 @@ def test_pr03_identity_binding_fails_when_identity_hash_is_stale(monkeypatch):
         + "\n",
     )
 
+    monkeypatch.setattr(mod, "ROOT", test_root)
     monkeypatch.setattr(mod, "OUT_DIR", out_dir)
     monkeypatch.setattr(mod, "AB_PATH", test_root / "artifacts" / "compat" / "AB.json")
     monkeypatch.setattr(mod, "BA_PATH", test_root / "artifacts" / "compat" / "BA.json")

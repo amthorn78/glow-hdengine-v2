@@ -9,9 +9,10 @@ CID_RE = re.compile(r"^CID-[a-f0-9]{16}$")
 def test_loader_emits_keys_only_log(monkeypatch, tmp_path):
     # Ensure SAFE_MODE=1 so log shows safe_mode True
     monkeypatch.setenv("SAFE_MODE", "1")
-    logf = Path("artifacts/logs/loader_call.jsonl")
-    if logf.exists():
-        logf.unlink()
+    import engine.charts.loader as L
+    # engine/charts/loader.py:69 writes artifacts/logs/loader_call.jsonl relative to CWD; redirect it.
+    monkeypatch.setattr(L, "_Path", lambda p: tmp_path / p)
+    logf = tmp_path / "artifacts/logs/loader_call.jsonl"
 
     load_chart("1990-01-01","12:34","Amsterdam, NL", tz="Europe/Amsterdam", correlation_id="CID-0123456789abcdef")
 

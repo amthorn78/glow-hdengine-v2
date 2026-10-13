@@ -37,17 +37,26 @@ def _run(*args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_presenter_history_is_exact_fixed_point_and_check_is_read_only():
-    _run("tools/evidence/generate_presenter_history.py")
-    first = SHARED.read_bytes()
+def test_presenter_history_is_exact_fixed_point_and_check_is_read_only(tmp_path, monkeypatch):
+    governed = SHARED.read_bytes()
+    governed_mode = stat.S_IMODE(SHARED.stat().st_mode)
+    _run("tools/evidence/generate_presenter_history.py", "--check")
+    assert SHARED.read_bytes() == governed
+    assert stat.S_IMODE(SHARED.stat().st_mode) == governed_mode
+    # Write mode runs against an isolated destination; the checkout is never written.
+    destination = tmp_path / "artifacts/presenter/json_canon_compare.log"
+    monkeypatch.setattr(history_generator, "DESTINATION", destination)
+    history_generator.generate()
+    first = destination.read_bytes()
+    assert first == governed
     assert len(first) == 1559
     assert hashlib.sha256(first).hexdigest() == "64980228d042249a10ecc89ebddcff00be27aae9c79ba2330a24a28b0c59676c"
     assert len(first.splitlines()) == 4
-    _run("tools/evidence/generate_presenter_history.py")
-    assert SHARED.read_bytes() == first
-    _run("tools/evidence/generate_presenter_history.py", "--check")
-    assert SHARED.read_bytes() == first
-    assert stat.S_IMODE(SHARED.stat().st_mode) == 0o644
+    history_generator.generate()
+    assert destination.read_bytes() == first
+    history_generator.generate(check=True)
+    assert destination.read_bytes() == first
+    assert stat.S_IMODE(destination.stat().st_mode) == 0o644
 
 
 def test_presenter_history_atomic_failure_preserves_destination(tmp_path, monkeypatch):

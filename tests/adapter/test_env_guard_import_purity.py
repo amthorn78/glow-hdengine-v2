@@ -1,5 +1,5 @@
 from __future__ import annotations
-import sys, pytest
+import sys
 
 def test_env_guard_import_is_pure(monkeypatch):
     # Any accidental I/O at import should blow up this test.
@@ -19,12 +19,12 @@ def test_env_guard_import_is_pure(monkeypatch):
     monkeypatch.setattr("socket.socket", bomb, raising=False)
     monkeypatch.setattr("subprocess.Popen", bomb, raising=False)
 
-    # Force a fresh import under the patches
-    sys.modules.pop("adapter.env_guard", None)
+    # Force a fresh import under the patches; monkeypatch restores the original
+    # module object (sys.modules entry and package attribute) after the test.
+    import adapter
+    monkeypatch.setattr(adapter, "env_guard", getattr(adapter, "env_guard", None), raising=False)
+    monkeypatch.delitem(sys.modules, "adapter.env_guard", raising=False)
     import adapter.env_guard  # noqa: F401
 
-def test_wsgi_import_collects_or_skips():
-    try:
-        import adapter.wsgi  # noqa: F401
-    except ModuleNotFoundError:
-        pytest.skip("adapter.wsgi not present; skip collect test")
+def test_wsgi_import_collects():
+    import adapter.wsgi  # noqa: F401
