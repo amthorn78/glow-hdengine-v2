@@ -2547,8 +2547,9 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     patched in the module, a star import, a return handed off to a
     function that alters its response, a per-request callback registered
     by the helper or a function it calls, an after-request hook registered
-    by call, a request-finished receiver, and a nested definition in the
-    helper."""
+    by call, a request-finished receiver, a nested definition in the
+    helper, and a view whose route decorator belongs to an object other than
+    a Flask app or Blueprint, or whose registrar's route method is patched."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2603,6 +2604,19 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     modules["constructor_is_another_callable"] = _PRESENTER_HELPER_MODULE.replace(
         "from flask import Blueprint, Flask, Response\n", "from flask import Blueprint, Flask, redirect as Response\n"
     ).format(helper=sanctioned_helper, call="_respond(emit_fn)")
+    foreign_registrar = (
+        "class _Registrar:\n    def route(self, *args, **kwargs):\n        def deco(fn):\n            def wrapper(*a, **k):\n"
+        "                return Response(b'raw', status=200)\n            return wrapper\n        return deco\n_evil = _Registrar()\n"
+    )
+    modules["foreign_route_decorator_under_blueprint_route"] = view_module.replace("    def reader_post():", "    @_evil.route('/x')\n    def reader_post():").format(
+        helper=foreign_registrar + sanctioned_helper, view="        return _respond(emit_fn)"
+    )
+    modules["blueprint_from_foreign_constructor"] = view_module.replace("    bp = Blueprint('helper_bp', __name__)\n", "    bp = _Registrar()\n").format(
+        helper=foreign_registrar + sanctioned_helper, view="        return _respond(emit_fn)"
+    )
+    modules["registrar_route_method_patched"] = view_module.format(
+        helper=foreign_registrar + "Blueprint.route = _Registrar.route\n" + sanctioned_helper, view="        return _respond(emit_fn)"
+    )
     for name, module in modules.items():
         adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", module)
         assert boundary_analyzer._adapter_routes_without_presenter((adapter,)) == [f"{adapter}:reader_post"], name

@@ -2148,7 +2148,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
         # one resolving through its import to such a class or module, or to a module
         # above one), is only called, subclassed, annotated or read through; and no
         # attribute store, attribute delete or getattr names a trusted presenter or
-        # response name.
+        # response name or a route-registration method.
         trusted_modules = (
             {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
             | {aliases[name].rsplit(".", 1)[0] for name in presenter_trust_names if _is_sanctioned_presenter_call(name, aliases)}
@@ -2181,7 +2181,12 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             )
 
         def is_trusted_name(name: str) -> bool:
-            return name in presenter_trust_names or name in {"Response", "response_class", "make_response"} or _is_sanctioned_presenter_call(f"presenter.{name}", {"presenter": "engine.presenter"})
+            # A trusted presenter or response name, or a route-registration method.
+            return (
+                name in presenter_trust_names
+                or name in {"Response", "response_class", "make_response", "route", "get", "post", "put", "patch", "delete", "add_url_rule"}
+                or _is_sanctioned_presenter_call(f"presenter.{name}", {"presenter": "engine.presenter"})
+            )
 
         module_patches_trusted_names = any(
             (holds_trusted_object(node) and not is_inert_use(node))
@@ -2231,6 +2236,35 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             return node.attr in decorator_only_hooks and not in_decorator_position(node)
 
         module_alters_response_path = any(touches_response_path(node) for node in ast.walk(tree))
+
+        sanctioned_registrars = {"flask.Blueprint", "flask.Flask", "flask.blueprints.Blueprint", "flask.app.Flask"}
+
+        def is_route_registration(deco: ast.AST, owner: str) -> bool:
+            """``<name>.route(...)`` (or ``.get``, ``.post``, ``.put``, ``.patch`` or
+            ``.delete``), where ``<name>`` is not bound in the view and is bound exactly
+            once, in the nearest enclosing scope that binds it, by constructing an
+            imported Flask app or Blueprint."""
+            if not (isinstance(deco, ast.Call) and isinstance(deco.func, ast.Attribute) and deco.func.attr in {"route", "get", "post", "put", "patch", "delete"} and isinstance(deco.func.value, ast.Name)):
+                return False
+            name = deco.func.value.id
+            owner_fn = function_defs[owner]
+            if binding_site_counts([*ast.walk(owner_fn.args), *(node for stmt in owner_fn.body for node in ast.walk(stmt))]).get(name, 0):
+                return False
+            scope = parent_function_by_key.get(owner)
+            while scope is not None:
+                scope_fn = function_defs[scope]
+                count = binding_site_counts([*ast.walk(scope_fn.args), *(node for stmt in scope_fn.body for node in ast.walk(stmt))]).get(name, 0)
+                if count:
+                    statements = scope_fn.body
+                    break
+                scope = parent_function_by_key.get(scope)
+            else:
+                count, statements = module_binding_counts.get(name, 0), tree.body
+            return count == 1 and any(
+                isinstance(stmt, ast.Assign) and len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name) and stmt.targets[0].id == name
+                and isinstance(stmt.value, ast.Call) and resolved_import_chain(stmt.value.func) in sanctioned_registrars
+                for stmt in statements
+            )
 
         def defines_nothing(body_fn: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
             # No nested function, class or lambda: nothing in the body carries code
@@ -2365,8 +2399,10 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             ``module_patches_trusted_names``) and of Flask response-path registration
             outside the analyzed decorators (see ``touches_response_path``), so that the
             call runs the analyzed definition with its own defaults and its return is
-            what Flask serves.  The view must return the call directly and define
-            nothing nested, the view and the helper must return a value on every exit (see
+            what Flask serves.  The view must be registered only by route decorators on
+            a Flask app or Blueprint the module constructs (see ``is_route_registration``),
+            return the call directly and define nothing nested, the view and the helper
+            must return a value on every exit (see
             ``exits_return_values``), each imported presenter name the proof trusts must
             be bound only by its import, to what that import names, and a value bound
             in the caller must not be rebound on its way to the call.  The helper's own
@@ -2384,13 +2420,21 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 return None
             if any(module_binding_counts.get(name, 0) != 1 or exact_import_targets.get(name) != aliases.get(name) for name in presenter_trust_names):
                 return None
-            # The view carries only its route decorators and every enclosing function
-            # is undecorated, so what Flask serves is the analyzed view's own return.
+            # The view is registered by its own decorators, each a route registration on
+            # a Flask app or Blueprint the module constructs (see
+            # ``is_route_registration``); its name is used nowhere else; and every
+            # enclosing function is undecorated. So what Flask serves for the route is
+            # the analyzed view's own return.
+            owner_fn = function_defs[owner]
+            if not owner_fn.decorator_list or any(
+                (isinstance(node, ast.Name) and node.id == owner_fn.name) or (isinstance(node, ast.Attribute) and node.attr == owner_fn.name)
+                for node in ast.walk(tree)
+            ):
+                return None
             chain_scope: str | None = owner
             while chain_scope is not None:
                 for deco in function_defs[chain_scope].decorator_list:
-                    deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
-                    if chain_scope != owner or not deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete")):
+                    if chain_scope != owner or not is_route_registration(deco, owner):
                         return None
                 chain_scope = parent_function_by_key.get(chain_scope)
             helper_name = call.func.id
