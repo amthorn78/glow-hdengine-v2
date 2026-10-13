@@ -2247,7 +2247,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             return node.attr in decorator_only_hooks and not in_decorator_position(node)
 
         module_touches_response_path = any(touches_response_path(node) for node in ast.walk(tree))
-        before_hooks_proven: list[bool] = []
+        registered_hooks_proven: list[bool] = []
 
         def before_hook_is_proven(argument: ast.Name) -> bool:
             """A hook registered by call is one undecorated function of this module,
@@ -2274,12 +2274,53 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             hook_kind_by_key[hook_key] = "before_request"
             return function_returns_presenter(hook_key)
 
+        # A decorated after-request hook receives the response the view returned and
+        # can change it in place. For the shape, its response parameter may only be
+        # read through a body-free attribute or a constant getattr of one, reach
+        # `.headers`, be returned, or go to a statement call of a header-only helper.
+        body_free_response_attributes = {"headers", "status_code", "status", "mimetype", "content_type", "content_length", "request"}
+
+        def after_hook_is_header_only(hook: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            params = list(hook.args.posonlyargs) + list(hook.args.args)
+            if not params:
+                return True
+            param = params[0].arg
+            if not defines_nothing(hook):
+                return False
+            nodes = [node for stmt in hook.body for node in ast.walk(stmt)]
+            if binding_site_counts(nodes).get(param, 0):
+                return False
+            for node in nodes:
+                if not (isinstance(node, ast.Name) and node.id == param):
+                    continue
+                parent = ast_parents.get(node)
+                if isinstance(parent, ast.Attribute) and parent.value is node:
+                    if parent.attr not in body_free_response_attributes or not isinstance(parent.ctx, ast.Load):
+                        return False
+                    continue
+                if isinstance(parent, ast.Return) and parent.value is node:
+                    continue
+                if isinstance(parent, ast.Call) and node in parent.args:
+                    if (
+                        isinstance(parent.func, ast.Name) and parent.func.id == "getattr" and "getattr" not in module_binding_counts
+                        and parent.args[0] is node and len(parent.args) >= 2
+                        and isinstance(parent.args[1], ast.Constant) and parent.args[1].value in body_free_response_attributes
+                    ):
+                        continue
+                    if isinstance(parent.func, ast.Name) and isinstance(ast_parents.get(parent), ast.Expr) and header_only_helper_param(parent.func.id, parent.args.index(node)):
+                        continue
+                return False
+            return True
+
         def module_alters_response_path() -> bool:
             if module_touches_response_path:
                 return True
-            if not before_hooks_proven:
-                before_hooks_proven.append(all(before_hook_is_proven(argument) for argument in call_registered_before_hooks))
-            return not before_hooks_proven[0]
+            if not registered_hooks_proven:
+                registered_hooks_proven.append(
+                    all(before_hook_is_proven(argument) for argument in call_registered_before_hooks)
+                    and all(after_hook_is_header_only(function_defs[key]) for key, kind in list(hook_kind_by_key.items()) if kind == "after_request")
+                )
+            return not registered_hooks_proven[0]
 
         sanctioned_registrars = {"flask.Blueprint", "flask.Flask", "flask.blueprints.Blueprint", "flask.app.Flask"}
 
@@ -2441,7 +2482,9 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             module must be free of reflection (see ``is_reflection``), of relative and
             star imports, of same-module patching of what the proof trusts (see
             ``module_patches_trusted_names``) and of Flask response-path registration
-            outside the analyzed decorators (see ``touches_response_path``), so that the
+            outside the analyzed decorators (see ``touches_response_path``), and every
+            decorated after-request hook must leave the body alone (see
+            ``after_hook_is_header_only``), so that the
             call runs the analyzed definition with its own defaults and its return is
             what Flask serves.  The view must be registered only by route decorators on
             a Flask app or Blueprint the module constructs (see ``is_route_registration``),
