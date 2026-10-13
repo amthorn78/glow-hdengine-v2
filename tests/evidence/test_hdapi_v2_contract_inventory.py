@@ -2550,10 +2550,10 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     by call, a request-finished receiver, a nested definition in the
     helper, a view whose route decorator belongs to an object other than
     a Flask app or Blueprint, or whose registrar's route method is patched,
-    a before-request hook registered by call that serves a raw response or
-    is a generator, an after-request hook that rewrites the body in place or
-    is wrapped by a second decorator, and a view that aborts through an
-    aliased ``abort``."""
+    a before-request hook registered by call that serves a raw response, is
+    a generator or rebinds its body in a branch, an after-request hook that
+    rewrites the body in place or is wrapped by a second decorator, and a
+    view that aborts through an aliased ``abort``."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2635,6 +2635,10 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         "    return bp\n",
         "    @bp.after_request\n    def _after(resp):\n        resp.response.clear()\n        resp.response.append(b'raw')\n        return resp\n    return bp\n",
     ).format(helper=sanctioned_helper, view="        return _respond(emit_fn)")
+    modules["before_request_hook_rebinds_body_in_branch"] = view_module.replace("    return bp\n", "    bp.before_request(_rebinding_hook)\n    return bp\n").format(
+        helper="def _rebinding_hook():\n    body = emit_public({'ok': False})\n    if SAFE_MODE:\n        body = b'raw'\n    return Response(body, status=200)\n" + sanctioned_helper,
+        view="        return _respond(emit_fn)",
+    )
     modules["view_aborts_through_alias"] = view_module.format(
         helper="from flask import abort as deny\n" + sanctioned_helper, view="        if SAFE_MODE:\n            deny(403)\n        return _respond(emit_fn)"
     )

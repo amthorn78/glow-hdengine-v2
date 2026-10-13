@@ -2370,7 +2370,8 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             # A decorated hook is one the hook map analyzes (an app-wide hook on a
             # Blueprint under a non-public prefix is not) and carries exactly one
             # decorator, its registration on a registrar, so what Flask runs is the
-            # analyzed hook itself.
+            # analyzed hook itself. Every before- and after-request hook keeps the
+            # helper's body rules (see ``hook_body_is_exact``).
             if module_touches_response_path:
                 return True
             if not registered_hooks_proven:
@@ -2382,6 +2383,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                     )
                     and all(before_hook_is_proven(argument) for argument in call_registered_before_hooks)
                     and all(after_hook_is_header_only(function_defs[key]) for key, kind in list(hook_kind_by_key.items()) if kind == "after_request")
+                    and all(hook_body_is_exact(function_defs[key]) for key, kind in list(hook_kind_by_key.items()) if kind in {"before_request", "after_request"})
                 )
             return not registered_hooks_proven[0]
 
@@ -2551,6 +2553,19 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 return False
             return not any(isinstance(node, ast.Return) and delegated_call(node, frozenset()) is not None for node in iter_body_nodes(callee))
 
+        def hook_body_is_exact(hook: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            """A before- or after-request hook, whose return Flask can serve in place
+            of the view's, keeps the helper's body rules (``own_body_is_exact``): each
+            local name has one binding site, so the general return proof's
+            flow-independent reading of assignments holds. A return that hands off
+            must satisfy ``delegate_is_exact``."""
+            if not own_body_is_exact(hook, frozenset()):
+                return False
+            return not any(
+                isinstance(node, ast.Return) and delegated_call(node, frozenset()) is not None and not delegate_is_exact(delegated_call(node, frozenset()), hook)
+                for node in iter_body_nodes(hook)
+            )
+
         def presenter_bound_helper_key(call: ast.Call, owner: str, candidate: str) -> str | None:
             """Prove a call to a module-level helper of this module that receives a
             sanctioned presenter callable: the argument's bound value in the caller, or,
@@ -2563,8 +2578,10 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             outside the analyzed decorators (see ``touches_response_path``) and of
             HTTP exceptions (see ``raises_http_exception``), every decorated hook must
             be registered by its one decorator on a registrar (see
-            ``is_hook_registration``), and every decorated after-request hook must
-            leave the body alone (see ``after_hook_is_header_only``), so that the
+            ``is_hook_registration``), every decorated after-request hook must
+            leave the body alone (see ``after_hook_is_header_only``), and every
+            before- and after-request hook must keep the helper's body rules (see
+            ``hook_body_is_exact``), so that the
             call runs the analyzed definition with its own defaults and its return is
             what Flask serves.  The view must be registered only by route decorators on
             a Flask app or Blueprint the module constructs (see ``is_route_registration``),
