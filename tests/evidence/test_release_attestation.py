@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -165,6 +166,7 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
             console.chmod(0o755)
         return subprocess.CompletedProcess(args=command, returncode=0)
 
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: False)
     monkeypatch.setattr(builder.subprocess, "run", run)
     transcript: list[str] = []
     scripts = builder._install_packaged_console_entrypoint(
@@ -663,7 +665,7 @@ def _fake_setuptools(root: Path, install_lib_source: str) -> SimpleNamespace:
     ids=["system-mod-present", "patched-backend", "unpatched-backend", "no-setuptools"],
 )
 def test_wheel_layout_compat_is_required_only_for_a_distribution_patched_backend(
-    tmp_path, monkeypatch, system_mod, install_lib, expected
+    tmp_path, monkeypatch, capsys, system_mod, install_lib, expected
 ):
     setuptools_spec = None if install_lib is None else _fake_setuptools(tmp_path, install_lib)
 
@@ -673,18 +675,51 @@ def test_wheel_layout_compat_is_required_only_for_a_distribution_patched_backend
         assert name == "setuptools"
         return setuptools_spec
 
-    monkeypatch.setattr(builder.importlib.util, "find_spec", find_spec)
-    assert builder._distribution_layout_compat_required() is expected
+    monkeypatch.setattr(importlib.util, "find_spec", find_spec)
+    exec(compile(builder._LAYOUT_COMPAT_PROBE, "layout-compat-probe", "exec"), {"__name__": "probe"})
+    assert capsys.readouterr().out == ("required\n" if expected else "not-required\n")
+
+
+@pytest.mark.parametrize(
+    "returncode,stdout,expected",
+    [(0, "required\n", True), (0, "not-required\n", False), (1, "required\n", False), (0, "", False)],
+    ids=["required", "not-required", "probe-failed", "no-answer"],
+)
+def test_layout_compat_probe_runs_in_the_wheel_child_interpreter_and_environment(
+    tmp_path, monkeypatch, returncode, stdout, expected
+):
+    monkeypatch.setenv("PYTHONPATH", "/ambient/unpatched/setuptools")
+    monkeypatch.setenv("PYTHONUSERBASE", "/ambient/user/base")
+    calls: list[tuple[list[str], dict[str, object]]] = []
+
+    def run(argv, **kwargs):
+        calls.append((list(argv), kwargs))
+        return subprocess.CompletedProcess(args=argv, returncode=returncode, stdout=stdout)
+
+    monkeypatch.setattr(builder.subprocess, "run", run)
+    child_env = builder._clean_child_env()
+    assert builder._distribution_layout_compat_required(child_env, tmp_path) is expected
+    (argv, kwargs), = calls
+    assert argv == [sys.executable, "-c", builder._LAYOUT_COMPAT_PROBE]
+    assert kwargs["env"] == child_env and kwargs["cwd"] == tmp_path
+    assert not {"PYTHONPATH", "PYTHONUSERBASE"} & set(kwargs["env"])
 
 
 def test_wheel_build_env_adds_only_the_builder_owned_compat_path(tmp_path, monkeypatch):
     monkeypatch.setenv("PYTHONPATH", "/ambient/should/not/leak")
-    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda: False)
+    probed: list[tuple[dict[str, str], Path]] = []
+
+    def not_required(env, cwd):
+        probed.append((dict(env), cwd))
+        return False
+
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", not_required)
     env, applied = builder._wheel_build_env(tmp_path)
     assert applied is False and env == builder._clean_child_env()
+    assert probed == [(builder._clean_child_env(), tmp_path)]
     assert not (tmp_path / "build-backend-compat").exists()
 
-    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda: True)
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: True)
     env, applied = builder._wheel_build_env(tmp_path)
     compat = tmp_path / "build-backend-compat"
     assert applied is True
@@ -694,7 +729,7 @@ def test_wheel_build_env_adds_only_the_builder_owned_compat_path(tmp_path, monke
 
 
 def test_wheel_layout_compat_supplies_neutral_install_options(tmp_path, monkeypatch):
-    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda: True)
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: True)
     env, _ = builder._wheel_build_env(tmp_path)
     probe = (
         "import setuptools, _distutils_system_mod\n"
@@ -730,7 +765,7 @@ def test_wheel_stage_records_and_scopes_the_layout_compat(tmp_path, monkeypatch)
             console.chmod(0o755)
         return subprocess.CompletedProcess(args=command, returncode=0)
 
-    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda: True)
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: True)
     monkeypatch.setattr(builder.subprocess, "run", run)
     transcript: list[str] = []
     builder._install_packaged_console_entrypoint(package_source, tmp_path, transcript)

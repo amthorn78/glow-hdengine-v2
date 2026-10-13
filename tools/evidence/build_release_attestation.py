@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import os
 import shutil
@@ -362,23 +361,48 @@ _install.install = install
 """
 
 
-def _distribution_layout_compat_required() -> bool:
-    if importlib.util.find_spec(_DISTUTILS_SYSTEM_MOD) is not None:
+_LAYOUT_COMPAT_PROBE = f"""\
+import importlib.util
+import pathlib
+
+
+def _required():
+    if importlib.util.find_spec({_DISTUTILS_SYSTEM_MOD!r}) is not None:
         return False
     spec = importlib.util.find_spec("setuptools")
     if spec is None or spec.origin is None:
         return False
-    install_lib = Path(spec.origin).parent / "command" / "install_lib.py"
+    install_lib = pathlib.Path(spec.origin).parent / "command" / "install_lib.py"
     try:
         text = install_lib.read_text(encoding="utf-8")
     except OSError:
         return False
-    return _DISTRIBUTION_LAYOUT_MARKER in text
+    return {_DISTRIBUTION_LAYOUT_MARKER!r} in text
+
+
+print("required" if _required() else "not-required")
+"""
+
+
+def _distribution_layout_compat_required(env: Mapping[str, str], cwd: Path) -> bool:
+    # Decide in the wheel child's own interpreter, environment and directory:
+    # the caller's PYTHONPATH or user site can resolve a different setuptools
+    # than the cleaned child does.  A failed probe applies nothing.
+    probe = subprocess.run(
+        [sys.executable, "-c", _LAYOUT_COMPAT_PROBE],
+        cwd=cwd,
+        env=dict(env),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    return probe.returncode == 0 and probe.stdout == "required\n"
 
 
 def _wheel_build_env(install_root: Path) -> tuple[dict[str, str], bool]:
     env = _clean_child_env()
-    if not _distribution_layout_compat_required():
+    if not _distribution_layout_compat_required(env, install_root):
         return env, False
     compat = install_root / "build-backend-compat"
     compat.mkdir()
