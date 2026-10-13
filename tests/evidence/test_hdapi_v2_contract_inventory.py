@@ -2548,8 +2548,9 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     function that alters its response, a per-request callback registered
     by the helper or a function it calls, an after-request hook registered
     by call, a request-finished receiver, a nested definition in the
-    helper, and a view whose route decorator belongs to an object other than
-    a Flask app or Blueprint, or whose registrar's route method is patched."""
+    helper, a view whose route decorator belongs to an object other than
+    a Flask app or Blueprint, or whose registrar's route method is patched,
+    and a before-request hook registered by call that serves a raw response."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2617,6 +2618,13 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     modules["registrar_route_method_patched"] = view_module.format(
         helper=foreign_registrar + "Blueprint.route = _Registrar.route\n" + sanctioned_helper, view="        return _respond(emit_fn)"
     )
+    raw_hook = "def _raw_hook():\n    return Response(b'raw', status=200)\n"
+    modules["before_request_hook_registered_by_call"] = view_module.replace("    return bp\n", "    bp.before_request(_raw_hook)\n    return bp\n").format(
+        helper=raw_hook + sanctioned_helper, view="        return _respond(emit_fn)"
+    )
+    modules["before_request_hook_lambda"] = view_module.replace(
+        "    return bp\n", "    bp.before_request(lambda: Response(b'raw', status=200))\n    return bp\n"
+    ).format(helper=sanctioned_helper, view="        return _respond(emit_fn)")
     for name, module in modules.items():
         adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", module)
         assert boundary_analyzer._adapter_routes_without_presenter((adapter,)) == [f"{adapter}:reader_post"], name

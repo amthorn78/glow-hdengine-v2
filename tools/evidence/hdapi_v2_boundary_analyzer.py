@@ -2200,16 +2200,19 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
 
         # Flask's response path beyond the analyzed decorators fails closed for the
         # shape. A per-request callback, an after-request hook, error handler or
-        # endpoint registered other than by a decorator, a replaced view map, a
-        # response-processing override, WSGI middleware or a request-finished
+        # endpoint registered other than by a decorator, a replaced view or hook map,
+        # a response-processing override, WSGI middleware or a request-finished
         # receiver can each change what the view returned. A `before_request` hook
-        # registered by call runs before every view alike, so it is outside this
-        # rule, as it is outside the general return proof.
+        # registered by call is accepted only as `<registrar>.before_request(<name>)`
+        # whose argument is a module function proven as a before-request hook (see
+        # ``before_hook_is_proven``).
         response_path_names = {
-            "after_this_request", "_after_request_functions", "after_request_funcs", "view_functions", "error_handler_spec",
-            "register_error_handler", "process_response", "finalize_request", "full_dispatch_request", "handle_user_exception",
-            "handle_http_exception", "handle_exception", "wsgi_app", "request_finished",
+            "after_this_request", "_after_request_functions", "after_request_funcs", "before_request_funcs", "view_functions",
+            "error_handler_spec", "register_error_handler", "process_response", "preprocess_request", "finalize_request",
+            "full_dispatch_request", "handle_user_exception", "handle_http_exception", "handle_exception", "wsgi_app",
+            "request_finished",
         }
+        call_registered_before_hooks: list[ast.Name] = []
         decorator_only_hooks = {"after_request", "after_app_request", "errorhandler", "app_errorhandler"}
 
         def in_decorator_position(node: ast.AST) -> bool:
@@ -2233,9 +2236,47 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if node.attr == "endpoint":
                 parent = ast_parents.get(node)
                 return (isinstance(parent, ast.Call) and parent.func is node) or in_decorator_position(node)
+            if node.attr in {"before_request", "before_app_request"}:
+                if in_decorator_position(node):
+                    return False
+                parent = ast_parents.get(node)
+                if isinstance(parent, ast.Call) and parent.func is node and len(parent.args) == 1 and not parent.keywords and isinstance(parent.args[0], ast.Name):
+                    call_registered_before_hooks.append(parent.args[0])
+                    return False
+                return True
             return node.attr in decorator_only_hooks and not in_decorator_position(node)
 
-        module_alters_response_path = any(touches_response_path(node) for node in ast.walk(tree))
+        module_touches_response_path = any(touches_response_path(node) for node in ast.walk(tree))
+        before_hooks_proven: list[bool] = []
+
+        def before_hook_is_proven(argument: ast.Name) -> bool:
+            """A hook registered by call is one undecorated, non-async function of
+            this module, bound once, defining nothing nested and named only as this
+            argument or as a callee, that the general return proof proves as a
+            before-request hook: each return is ``None`` or presenter-backed."""
+            keys = simple_names.get(argument.id, [])
+            if len(keys) != 1 or argument.id in aliases or module_binding_counts.get(argument.id, 0) != 1:
+                return False
+            hook = function_defs[keys[0]]
+            if hook.decorator_list or isinstance(hook, ast.AsyncFunctionDef) or not defines_nothing(hook):
+                return False
+            if any(
+                (isinstance(node, ast.Name) and node.id == argument.id and node is not argument and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == argument.id)
+                for node in ast.walk(tree)
+            ):
+                return False
+            hook_key = f"{keys[0]}#before_request_by_call"
+            function_defs[hook_key] = hook
+            hook_kind_by_key[hook_key] = "before_request"
+            return function_returns_presenter(hook_key)
+
+        def module_alters_response_path() -> bool:
+            if module_touches_response_path:
+                return True
+            if not before_hooks_proven:
+                before_hooks_proven.append(all(before_hook_is_proven(argument) for argument in call_registered_before_hooks))
+            return not before_hooks_proven[0]
 
         sanctioned_registrars = {"flask.Blueprint", "flask.Flask", "flask.blueprints.Blueprint", "flask.app.Flask"}
 
@@ -2412,7 +2453,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             presenter callables, or ``None`` when the shape does not apply."""
 
             fn = function_defs.get(candidate)
-            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names or module_alters_response_path:
+            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names or module_alters_response_path():
                 return None
             if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
                 return None
