@@ -1207,6 +1207,19 @@ def test_incoherent_capture_labels_are_refused_before_any_write(tmp_path):
     assert _whole_tree_state(repo, metadata=True) == before
 
 
+def test_release_label_refuses_a_manifest_that_fails_full_validation(tmp_path):
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    member = repo / "migrations/005_identity.sql"
+    member.write_bytes(member.read_bytes() + b"-- member changed without a re-cut\n")
+    before = _whole_tree_state(repo, metadata=True)
+    for args in ((), ("--check",)):
+        result = _run(repo, "tools/evidence/update_evidence_index.py", *args)
+        assert result.returncode != 0
+        assert "CURRENT_RELEASE_LABEL_MANIFEST_INVALID" in result.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
 def test_config_publication_lets_only_a_regenerated_capture_label_move():
     from tools.evidence import update_evidence_index as writer
 

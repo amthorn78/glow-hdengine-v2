@@ -3817,8 +3817,14 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 def _current_release_label() -> str:
     from engine.serializer import canon
+    from scripts.release_id_recompute import manifest_only_problems
 
-    raw = _read_bytes(ROOT / "catalog/manifest.json")
+    manifest_path = ROOT / "catalog/manifest.json"
+    # The repository's full manifest validation (canonical bytes, schema and
+    # every member's bytes and size): no label names an invalid release.
+    if manifest_only_problems(manifest_path):
+        raise SystemExit("CURRENT_RELEASE_LABEL_MANIFEST_INVALID")
+    raw = _read_bytes(manifest_path)
     try:
         manifest = json.loads(raw.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError) as exc:
