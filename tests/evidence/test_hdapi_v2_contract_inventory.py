@@ -2539,8 +2539,9 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     replaced after definition, a helper replaced through the module namespace,
     a helper that overwrites its emitter, its body or its response data in a
     branch, a helper that mutates or hands on its response, a presenter name
-    rebound at module level, and a view that alters the helper's result or
-    rebinds the bound argument."""
+    rebound at module level, a view that alters the helper's result or rebinds
+    the bound argument, a view wrapped by an extra decorator, and a helper
+    replaced through frame globals."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2570,6 +2571,14 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         "view_rebinds_argument_in_branch": "        if SAFE_MODE:\n            emit_fn = _plain\n        return _respond(emit_fn)",
     }
     modules.update({name: view_module.format(helper=sanctioned_helper, view=view) for name, view in view_shapes.items()})
+    modules["view_wrapped_by_extra_decorator"] = view_module.replace("    def reader_post():", "    @_raw_view\n    def reader_post():").format(
+        helper="def _raw_view(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n" + sanctioned_helper,
+        view="        return _respond(emit_fn)",
+    )
+    modules["replaced_through_frame_globals"] = view_module.format(
+        helper="import inspect\n" + sanctioned_helper,
+        view="        inspect.currentframe().f_globals['_respond'] = _plain\n        return _respond(emit_fn)",
+    )
     for name, module in modules.items():
         adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", module)
         assert boundary_analyzer._adapter_routes_without_presenter((adapter,)) == [f"{adapter}:reader_post"], name

@@ -1867,12 +1867,32 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 yield node
 
         presenter_bound_params_by_key: dict[str, frozenset[str]] = {}
-        dynamic_namespace_names = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "__builtins__"}
-        module_has_dynamic_namespace_access = any(
-            (isinstance(node, ast.Name) and node.id in dynamic_namespace_names)
-            or (isinstance(node, ast.Attribute) and (node.attr in {"__dict__", "__globals__", "__setattr__", "__delattr__"} or (node.attr == "modules" and aliases.get(_attribute_chain(node.value)) == "sys")))
-            for node in ast.walk(tree)
-        ) or any(target == "sys.modules" or target.split(".", 1)[0] in {"builtins", "importlib"} for target in aliases.values())
+        # Reflection fails closed for the presenter-bound helper shape: a module may
+        # use it only if it imports from an allowlist of project and plain modules,
+        # reaches no dunder attribute but `__init__` and no frame, generator or
+        # traceback attribute, names no reflective builtin, and calls getattr or
+        # hasattr only with a constant ordinary attribute name.
+        reflection_free_import_roots = {"adapter", "engine", "presenter", "flask", "werkzeug", "__future__", "collections", "datetime", "hashlib", "json", "os", "pathlib", "threading", "typing"}
+        frame_attributes = {"f_globals", "f_locals", "f_back", "f_builtins", "f_code", "f_trace", "gi_frame", "gi_code", "cr_frame", "cr_code", "ag_frame", "ag_code", "tb_frame", "tb_next"}
+        reflective_builtins = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "breakpoint"}
+
+        def is_reflection(node: ast.AST) -> bool:
+            if isinstance(node, ast.Import):
+                return any(alias.name.split(".", 1)[0] not in reflection_free_import_roots for alias in node.names)
+            if isinstance(node, ast.ImportFrom):
+                return node.level == 0 and (node.module or "").split(".", 1)[0] not in reflection_free_import_roots
+            if isinstance(node, ast.Attribute):
+                return (node.attr.startswith("__") and node.attr.endswith("__") and node.attr != "__init__") or node.attr in frame_attributes
+            if isinstance(node, ast.Name):
+                return node.id in reflective_builtins or (node.id.startswith("__") and node.id.endswith("__") and node.id not in {"__name__", "__file__"})
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"}:
+                name_arg = node.args[1] if len(node.args) >= 2 else None
+                if not (isinstance(name_arg, ast.Constant) and isinstance(name_arg.value, str)):
+                    return True
+                return (name_arg.value.startswith("__") and name_arg.value.endswith("__")) or name_arg.value in frame_attributes
+            return False
+
+        module_has_dynamic_namespace_access = any(is_reflection(node) for node in ast.walk(tree))
 
         def presenter_callable_names_for(owner: str) -> set[str]:
             def is_none_constant(value: ast.AST) -> bool:
@@ -2069,8 +2089,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             when the argument is omitted, the helper parameter's default.  The helper
             must be undecorated, its name must appear only as the callee of a call
             (never as a value or an attribute name, such as ``module._respond``), and the
-            module must have no dynamic namespace access (``globals()``, ``setattr``,
-            ``exec``, ``sys.modules`` and the like), so that the call runs the analyzed
+            module must be free of reflection (see ``is_reflection``), so that the call runs the analyzed
             definition with its own defaults.  The view must return the call directly,
             each imported presenter name the proof trusts must be bound only by its
             import, and a value bound in the caller must not be rebound on its way to
@@ -2083,6 +2102,15 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 return None
             if not isinstance(ast_parents.get(call), ast.Return) or any(module_binding_counts.get(name, 0) != 1 for name in presenter_trust_names):
                 return None
+            # The view carries only its route decorators and every enclosing function
+            # is undecorated, so what Flask serves is the analyzed view's own return.
+            chain_scope: str | None = owner
+            while chain_scope is not None:
+                for deco in function_defs[chain_scope].decorator_list:
+                    deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
+                    if chain_scope != owner or not deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete")):
+                        return None
+                chain_scope = parent_function_by_key.get(chain_scope)
             helper_name = call.func.id
             if any(name_is_bound_in(stmt, helper_name) for stmt in tree.body if stmt is not fn):
                 return None
