@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.5.3**  
-Effective Date: 2026.10.12  
+**Version: v13.5.4**  
+Effective Date: 2026.10.13  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -184,7 +184,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 ## **1.1 Addendum Index**
 
 * 2.1 GCFPE model and reasoning-level guidance is the TypeSafe reading; no AI recommendation is given  
-* 2.2 HDE-CRD-0002 WU-PR-01: two HDAPI v2 contract-inventory evidence tools join the CI-coverage work unit for bounded corrections; the legacy chart-loader test is retired with its defect routed to the Product Owner
+* 2.2 HDE-CRD-0002 WU-PR-01: two HDAPI v2 contract-inventory evidence tools join the CI-coverage work unit for bounded corrections; the legacy chart-loader test is retired with its defect routed to the Product Owner  
+* 2.3 Codex security review is deprecated: it is no longer a step of the HDE pull-request review chain
 
 # **2\) Numbered Addenda**
 
@@ -301,5 +302,63 @@ NONE. The CANON\_CONFLICT\_REGISTER entries CR-1 to CR-3 of HDE-CRD-0002 are car
 ### Status and consequences
 
 Completed: the review decision and this overlay. Not yet done: plan v1.1, the Product Owner's Proceed, implementation, reviews and merge of WU-PR-01; the WU-PR-03 and WU-PR-06 instructions that carry the downstream obligations. Unproven: that the analyzer change can be made without weakening bypass detection, pending the prototype. Consequence: when WU-PR-01 lands under this overlay, every tracked test file runs in a CI lane or is retired with a recorded reason, the two HDAPI v2 contract-inventory tools regain a registered owner test that runs on their change, and the loader defect remains recorded and owned rather than hidden.
+
+## 2.3 Codex security review is deprecated: it is no longer a step of the HDE pull-request review chain
+
+Timestamp: 101326 02:55 (UTC). Details: records the Product Owner's deprecation of the automated Codex security review, which is no longer available. Origin: the HDE-CRD-0002 WU-PR-01 PR-35 session for pull request [amthorn78/glow-hdengine-v2\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627). Evidence: the Codex review summary of [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627) and the precedent of [\#501](https://github.com/amthorn78/glow-hdengine-v2/issues/501) (below).
+
+### Source and authority
+
+This addendum records the Product Owner's directions of 2026-10-13, given in the HDE-CRD-0002 WU-PR-01 PR-35 session:
+
+* "This feature (security review) is no longer available. We will need to deprecate it. You may create a PF10 build notes addendum to specify its deprecation."  
+* Before that direction, the Product Owner's decision for [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627) was "Waive it for [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627)", given in answer to the question of how PR-35 should treat the security review that the HDE-CRD-0002 Implementation Plan names in its reviewer chain and that never ran on [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627).
+
+Where this addendum conflicts with earlier PF-Canon or with an in-flight change document, this addendum governs for the scope below.
+
+### Rule
+
+1. Scope. The automated Codex security review of a pull request: the "Security Review" row of the Codex review summary, produced when a pull request opens or requested by an @codex security review comment. It is covered wherever HDE canon, an in-flight change document, a GCFPE prompt or a skill names it as part of a pull request's review chain.  
+2. Deprecation. The Codex security review is not part of the HDE pull-request review chain. It is not obtained or waited on, and its absence is not treated as a review gap, finding, blocker or waiver need, by any of: a pull request, a work unit, a merge-readiness decision, a lineage review, a QA readiness decision or a closure decision. A MERGE\_PENDING result does not depend on it.  
+3. Unchanged. The Codex code review remains part of the pull-request review chain and is read and resolved as before. Every other security obligation is unchanged, including:  
+   * security constraints in permanent canon;  
+   * security constraints in approved Specifications and Implementation Plans;  
+   * security constraints in the repository's agent instructions;  
+   * security deliverables of a work unit, such as the recorded code security review that HDE-CRD-0002 requirement S19 assigns to WU-PR-05, a recorded review that adds no review tooling.  
+4. No substitute. This addendum creates no replacement review tool, review step, approval or gate.  
+5. Historical records. Records of security reviews that ran or were missed on earlier pull requests keep their wording and remain historical statements, for example the HDE Phased Epics §2.26.7 RA-09 security-coverage limitation and the Reality Audits finding RA-09.
+
+### Passages read under this rule
+
+These passages are not rewritten. From the turn this addendum is created, each is read without the Codex security review:
+
+| Location | Passage | Reading under this addendum |
+| :---- | :---- | :---- |
+| HDE-CRD-0002 Implementation Plan v1.1, §7 "Ordered work units", common to every PR unit (docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md) | "reviewer chain \= Codex code review and security review on the PR" | reviewer chain \= Codex code review on the PR, PR-35 for review resolution, PR-40 lineage review |
+| HDE-CRD-0002 WU-PR-01 PR instruction v1.0, §12 (docs/ephemeral/HDE-CRD-0002-WU-PR-01-pr-instruction-v1.0.md) | PR-35 "retrieves and resolves review findings (Codex code review and security review on the PR)" | PR-35 retrieves and resolves the Codex code review findings |
+| HDE-CRD-0002 WU-PR-01 detailed PR plan v1.1, §19 (docs/ephemeral/HDE-CRD-0002-WU-PR-01-pr-implementation-plan-v1.1.md) | "(Codex code review and security review)" | the Codex code review |
+| Later HDE-CRD-0002 PR instructions and detailed plans issued under Implementation Plan v1.1 | the same reviewer chain | the same reading |
+| HDE-CRD-0002 Specification v1.1, routed decision RD-1 (docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md) | the residual of item 6(a), "security-review coverage of pushes after the first", routed to GCFPE-MGMT-10 and the Product Owner | the residual concerned the deprecated review, and no coverage of that review remains to be provided |
+| GCFPE prompts that direct reading a pull request's security reviews (PR-35 — Resolve PR Reviews and Reach Merge Readiness) and the PR development skill that names "Codex code and security reviews" | reading "applicable" security reviews | no Codex security review is applicable |
+
+Permanent PF canon names no Codex security review. The HDE Governance §9.1.1 authority table entry for PR implementation, "Normal substantive code/security/review and evidence chain", is not reworded by this addendum.
+
+### Evidence
+
+* On [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627) the Codex review summary showed only a "Code Review" row through six heads, from 2026-10-13T00:55Z to 02:47Z. No "Security Review" row appeared.  
+* One @codex security review comment on [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627) (comment 6135990857, 01:19:59Z) was answered by a Code Review run with trigger "Manual request", and still no "Security Review" row appeared.  
+* On [\#501](https://github.com/amthorn78/glow-hdengine-v2/issues/501) the "Security Review" row came only from "PR opened", and a later @codex security review comment was answered by a code-review comment.
+
+### Status, effects and nonclaims
+
+* No epic, CRD, task, PF09 or PF30 row changes status by this addendum.  
+* The wording changes to GCFPE prompts and skills that implement this addendum are unperformed.  
+* This addendum does not change the Codex code review or any security requirement of canon or of a change. It does not waive a security finding, and it establishes no QA, acceptance, merge or closure.  
+* For [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627), the Product Owner's earlier waiver and this deprecation agree: [\#627](https://github.com/amthorn78/glow-hdengine-v2/pull/627) has no Codex security review to obtain.
+
+### Unresolved obligations and owners
+
+* Whether the HDE pull-request review chain needs another source of security review is not decided by this addendum. That includes the wording of HDE Governance §9.1.1's chain entry. Owner: the Product Owner.  
+* The wording of the GCFPE prompts and skills that name the Codex security review. Owner: GCFPE-MGMT-10 and the Product Owner.
 
 \<eof\>
