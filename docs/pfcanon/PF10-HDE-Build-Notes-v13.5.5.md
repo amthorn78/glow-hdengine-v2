@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.5.4**  
+**Version: v13.5.5**  
 Effective Date: 2026.10.13  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -185,7 +185,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 
 * 2.1 GCFPE model and reasoning-level guidance is the TypeSafe reading; no AI recommendation is given  
 * 2.2 HDE-CRD-0002 WU-PR-01: two HDAPI v2 contract-inventory evidence tools join the CI-coverage work unit for bounded corrections; the legacy chart-loader test is retired with its defect routed to the Product Owner  
-* 2.3 Codex security review is deprecated: it is no longer a step of the HDE pull-request review chain
+* 2.3 Codex security review is deprecated: it is no longer a step of the HDE pull-request review chain  
+* 2.4 HDE-CRD-0002 WU-PR-01: PR work-unit lineage review v2.0 accepts the unit across pull requests \#627 and \#630
 
 # **2\) Numbered Addenda**
 
@@ -360,5 +361,72 @@ Permanent PF canon names no Codex security review. The HDE Governance §9.1.1 au
 
 * Whether the HDE pull-request review chain needs another source of security review is not decided by this addendum. That includes the wording of HDE Governance §9.1.1's chain entry. Owner: the Product Owner.  
 * The wording of the GCFPE prompts and skills that name the Codex security review. Owner: GCFPE-MGMT-10 and the Product Owner.
+
+## 2.4 HDE-CRD-0002 WU-PR-01: PR work-unit lineage review v2.0 accepts the unit across pull requests [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) and [\#630](https://github.com/amthorn78/glow-hdengine-v2/pull/630)
+
+Timestamp: 101326 14:24 (UTC). Details: Records the PR-40 lineage review v2.0 of work unit WU-PR-01 (CI coverage of every test file; requirements S03, S04, S05) of the approved HDE-CRD-0002 Implementation Plan v1.1: decision ACCEPT across the ordered lineage [amthorn78/glow-hdengine-v2\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) and \#630, closure of findings LR-1 to LR-5, the canon-conflict register, and the next approved Plan stage. Origin: the review artifact named below. Evidence: the review's own reproduction on a scratch clone, GitHub merge facts and hosted CI.
+
+### Approval and source record
+
+* Artifact: PR\_WORK\_UNIT\_LINEAGE\_REVIEW v2.0, HDE-CRD-0002-WU-PR-01-PR-WORK-UNIT-LINEAGE-REVIEW, docs/ephemeral/HDE-CRD-0002-WU-PR-01-pr-work-unit-lineage-review-v2.0.md, created 2026-10-13T14:19:56Z. Change: CRD HDE-CRD-0002; work unit WU-PR-01. Decision: ACCEPT.  
+* Predecessor: review v1.0 (docs/ephemeral/HDE-CRD-0002-WU-PR-01-pr-work-unit-lineage-review-v1.0.md; decision REJECT on LR-1; blob 2cfbb5ec33d8; landed at dc701f2, [\#628](https://github.com/amthorn78/glow-hdengine-v2/issues/628)), preserved unchanged. Its evidence on [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) (its §3 to §5) is reused by this review and is not restated here.  
+* Reviewer: the continuing whole-change HDE-CRD-0002 Implementation Agent, in the read-only PR-40 role; session https\://claude.ai/code/session\_01CCKsYD2yX5WgU3biWKb59j, the session of review v1.0. Return owner: the same Implementation Agent. Posture MANUAL\_PROMPT\_EXECUTION.  
+* Prompt: PR-40 — Review PR Work-Unit Lineage — 100926.1 (https\://app.notion.com/p/3f44590a05eb81088487e918fd642a7f); release GCFPE-20261009.1 / 100926.1.  
+* Governing records: PR instruction HDE-CRD-0002-WU-PR-01-pr-instruction-v1.0.md (INSTRUCTION\_READY). Cycle 1: PR implementation plan v1.1 (Proceeded; spent), PR-30 result v1.0, PR-35 result v1.15. Cycle 2 (the corrective plan): PR implementation plan v2.0 (Proceeded), PR-30 result v2.0 (PR\_CANDIDATE\_PUBLISHED), PR-35 result v2.1 (MERGE\_PENDING; historical pre-merge evidence). Sessions: cycle 1 PR-30 session\_011q4bUbzJCYk2KAF7eAceF8, PR-35 session\_013LyxHxzJP2ohvmmNFamZt2; cycle 2 PR-20/PR-30 session\_012kGFYdD1BYJnXh3TagQetg, PR-35 session\_019rRACrhsBBtEbBGujNsEbR.  
+* Lineage: [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) (cycle 1, merged as 7136040\) then \#630 (cycle 2, the LR-1 correction, merged as bf7ad8c). Entry event: MERGE\_OBSERVED for [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630), delivered by the cycle-2 PR-35 session in a pasted handoff; no saved MERGE\_OBSERVED artifact exists (NOT PRODUCED); the merge was verified independently by the review.  
+* Repository state reviewed: origin/main at bf7ad8cf2a9a42d28d74ef4ffceb3f0cdb0cede8 (tree d04d3cf95c4d); no commit after it at review time. HDE Build Notes read: the then-current version with addenda 2.1, 2.2, 2.3, unchanged since review v1.0. The review created no HDE Build Notes addendum (PR-40 is not a qualifying approval prompt).  
+* Canon relied on: PR-40 — Review PR Work-Unit Lineage — 100926.1 (steps 1 to 10; "Resolve the next approved Plan stage"; "Accepted-final lineage protection"); HDE Governance §9.1.1 and §9.1.2; Plan Templates "Source-bound review authority and exact-fix limits" and "CI lane classification and automated budget-control discipline"; Change Process Guide §0.2 (traceability through base, head and merge; Product Owner squash; classifier lane set as sufficient CI scope); HDE Build Notes addenda 2.2 and 2.3 (Rules 2 and 3); the CR-4/CR-5 Product Owner disposition HDE-CRD-0002-WU-PR-01-po-disposition-cr-4-cr-5-v1.0.md; AGENTS.md (canon-first rule, evidence attribution, PR descriptions, closed rails, pytest readiness).
+
+### Retained decisions and requirements
+
+* Decision. WU-PR-01 is delivered with sufficient attributable evidence across the ordered lineage [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) then \#630. Review v1.0 established every obligation of the unit except LR-1 and that evidence still holds. [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630) closes LR-1 exactly as review v1.0 §10 bounded it; its record corrections close LR-2 and LR-3. Cycle 2 raised no review finding, its final-head CI is green on all seven lanes, and nothing remains unresolved inside the unit.  
+* Reuse of review v1.0. Valid because git diff 7136040 bf7ad8c outside docs/ephemeral/ changes only tests/evidence/test\_rails\_ci\_workflow\_integration.py (+19 lines, a new function; no existing line changed), and docs/pfcanon/ and every other code, workflow, classifier, tool and test file are byte-identical to 7136040\.  
+* Merge state and landed lineage. [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630): merged=true, merged by amthorn78 at 2026-10-13T14:17:02Z, base afc333e, head 1cbb2edb6345327aeb4e9da0140a704c87476709, 3 commits (1ae422d the test C-1, b3645b9 result v2.0, 1cbb2ed result v2.1); method SQUASH: bf7ad8c has one parent afc333e, bf7ad8c^{tree} equals 1cbb2ed^{tree} equals d04d3cf95c4dc7e4420c0aa3600ec4fb58e421ee, and afc333e is an ancestor of 1cbb2ed. [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) merged as 7136040, an ancestor of bf7ad8c. Interstage commits dc701f2 ([\#628](https://github.com/amthorn78/glow-hdengine-v2/issues/628): review v1.0 and the CR-4/CR-5 disposition) and afc333e ([\#629](https://github.com/amthorn78/glow-hdengine-v2/issues/629): plan v2.0) touch docs/ephemeral/ only and are classified non-lineage committed divergence outside the attributable delta. Later divergence: none. Attributable landed delta: [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) as review v1.0 §3 (EXACT); \#630 is tests/evidence/test\_rails\_ci\_workflow\_integration.py (+19), results v2.0 and v2.1 (new), with direct delta equal to landed delta (identical trees). The glow-merged-change-attribution-lock collector ran for [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) in review v1.0 (EXACT, VALIDATED) and was not re-run for [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630); the \#630 attribution is native (base ancestry, single-parent squash, head and landing tree equality, the skill's EXACT condition for a squash); no unproven item.  
+* The correction (LR-1) and its proof.  
+  * The landed test equals plan v2.0 §6.1: test\_inactive\_test\_refusal\_rejects\_a\_synthetic\_inactive\_path, inserted after line 1156 of the integration file, the existing loop unchanged.  
+  * On bf7ad8c in a scratch clone (Python 3.12.3, CI's install, closed rails) the integration file gives 138 passed (137 at 7136040); the new test alone passes. Negative control by the review: with the refusal at ci/checks/classify\_ci\_changes.py line 1533 replaced by pass, the new test fails; the classifier was restored and the clone git diff was clean.  
+  * Plan v2.0 §10 local validation (results v2.0 §5, v2.1 §4): citations and env-pins exit 0; rails lane as ci.yml runs it, 138 passed; changed-test step 3,264 passed with a clean tree; classifier dry run seven lanes, 163 targets; release\_id\_recompute.py \--check-manifest-only exit 0; diff against base is the test file only.  
+  * Hosted CI on final head 1cbb2ed: check test, run 38409638847, success (14:00:19Z to 14:14:23Z); the applicability step shows PRODUCT, COMPAT, DB, RAILS, EVIDENCE, QA, RELEASE true and success and prints CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK (job 115338249358). Earlier cycle-2 runs: 38406204161 on 1ae422d cancelled by cancel-in-progress; 38406489803 on b3645b9 success with rails lane 138 passed. Post-merge push CI on bf7ad8c, run 38412030631, was in progress at review time and is not relied on.  
+  * Codex code review: final head 1cbb2ed completed 2026-10-13T14:01:38Z (summary comment 6146788079); 0 reviews, 0 threads, 0 findings across the PR. The Codex security review is not part of the chain (addendum 2.3) and is not a gap.  
+* Record corrections (LR-2, LR-3). Result v2.0 §6 corrects, from a fresh GitHub Actions read of the 17 cycle-1 runs, the three statements review v1.0 named: LR-2 no inactive-refusal test was added in cycle 1 and \#630 adds it; LR-3(a) run 38336691078 on bb0f85c concluded success at 02:35:56Z and was neither superseded nor cancelled; LR-3(b) the runs on 26140fe and e13516b were cancelled, so the close-pack statement holds only for the six completed heads. These equal what the review's evidence workers read in cycle 1\. The historical records and [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627)'s description stay unchanged, as review v1.0 §10 required.  
+* Requirement coverage across the work unit. All MET: S03, S04, S05 and the whole-change Plan acceptance (1) to (5) (review v1.0 §5; unchanged by [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630); (5) re-shown on 1cbb2ed); deliverables (instruction §6; plan v1.1 §8), the plan v1.1 §5.4, §5.5 and §8 synthetic inactive-refusal case being delivered by [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630); interface contracts C-1 to C-6, disposition rules, exclusions, the addendum 2.2 bounds, security (instruction §11; addendum 2.3 Rule 3), migration and nonclaims ([\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630) changes no classifier, workflow, tool, member, governed artifact or canon); corrective scope (review v1.0 §10; plan v2.0 §5), C-1 and C-2 exactly with no other file; evidence obligations (plan v2.0 §12); the PR description under AGENTS.md ([\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630) carries the template headings, checks with counts, the D21-C statement and nonclaims, and claims nothing of [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627)'s as its own); review and CI (instruction §12 read under addendum 2.3) for both PRs. Recovery: none open; IF-1 (result v2.0) and IF-35-1 (result v2.1; the Product Owner chose "Push to \#630's branch") are recorded vehicle decisions with read-back.  
+* Findings. LR-1 closed by [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630); LR-2 and LR-3 closed by result v2.0 §6; LR-4 (R-14) closed by CR-4 APPROVED (Product Owner); LR-5 (HDE Build Notes edit in an implementation PR) closed by CR-5 APPROVED\_AS\_CHANGED (Product Owner). No new finding. Observations O-1 to O-6 and the carried items stay with the owners review v1.0 §6 names, with one partial update: O-6's hosted ruby is shown present on the ubuntu-24.04 runner (the contract-inventory file passed), its version still unprinted (result v2.1 §3).
+
+### Epic, task, and status effects
+
+* WU-PR-01 is accepted as a work unit by this lineage review. ACCEPT is this review's lineage result only. No second acceptance receipt exists for the unit. No epic, CRD, task, PF09 or PF30 row changes status.  
+* Next approved Plan stage: WU-PR-02 through PR-10 — Create PR Work-Unit Instructions — 100926.1, by the whole-change Implementation Agent. Basis: whole-change Plan v1.1 §7 order WU-PR-01, WU-PR-02, WU-PR-03 and onward; WU-PR-02 is "Evidence tooling: attestation on Debian, closure probe, engine-core currency, Mirror labels, CRD admission (PR; Distillation)", an ordinary PR unit; its dependency is "Second; no code dependency on WU-PR-01; lands before WU-PR-07 … and before any member-changing unit's convergence relabels rows", with WU-PR-01 now accepted and nothing upstream open; addendum 2.2 is scoped to WU-PR-01 (its downstream items go to the WU-PR-03 and WU-PR-06 instructions), addendum 2.3 sets the reviewer chain, addendum 2.1 governs TypeSafe readings, and none adds a WU-PR-02 prerequisite; AQ-1 gates only WU-PR-07's merge (Plan v1.1 §13); no HDE-CRD-0002-WU-PR-02-\* file existed on main.  
+* Carried into the WU-PR-02 instruction by its author, from the records: the merge's effect on tools/evidence/regenerate\_identity\_closure.py selection and tests/evidence/test\_release\_attestation.py lines 617 and 618 (review v1.0 workers, K-2); OBS-17 as a CI risk for the qa lane; O-6.  
+* Receiving-session advice for PR-10 (WU-PR-02), recorded as the review gave it. TypeSafe v6 reading: Opus 5.5, high; effort score 2.34 (confidence 0.67); rung probabilities low 0.01, medium 0.06, high 0.56, extra high 0.33, max 0.04, ultracode 0.00; model probabilities Fable 5.1 0.12, Opus 5.5 0.88 (confidence 0.76); flags none; sent 2026-10-13T14:19:55Z, jev-1.13.0, HTTP 200\. The Product Owner's pick for PR-10 and for the PR-40 session is not stated; the Notion row was not written, as PR-40 directs. Surface advice: a top-level Claude Code cloud session on amthorn78/glow-hdengine-v2 in the continuing whole-change Implementation Agent lineage with Notion read access, reading docs/pfcanon/, the HDE-CRD-0002 records on main and the files WU-PR-02 names (tools/evidence/build\_release\_attestation.py, tools/evidence/regenerate\_identity\_closure.py, tools/evidence/update\_evidence\_index.py, tests/evidence/test\_engine\_core\_evidence.py, tests/evidence/test\_evidence\_index\_missing\_state.py); re-verifying the Debian setuptools failure (O-10) needs the distribution-patched setuptools, present in the cloud container (Ubuntu 24.04.5, python3-setuptools 68.1.2-2ubuntu1.2 under /usr/bin/python3.12, observed by the review); no live vendor, production or database access is needed; it writes only its instruction under docs/ephemeral/; this review's pull request should be merged first.
+
+### Canon-conflict register
+
+CR-1, CR-2, CR-3: APPROVED\_AS\_CHANGED (Thoth, Specification lineage). CR-4: APPROVED (Product Owner, HDE-CRD-0002-WU-PR-01-po-disposition-cr-4-cr-5-v1.0.md §2). CR-5: APPROVED\_AS\_CHANGED (Product Owner, same record §3). No new conflict: cycle 2 changed one test and two records and no canon.
+
+### Required canon drainage
+
+None is stated in the source. The review records no canon-drain candidate and no drainage target.
+
+### Deferred obligations and unresolved work
+
+* Pending, not relied on: post-merge push CI run 38412030631 on bf7ad8c.  
+* The WU-PR-02 instruction (PR-10) and the carried items K-2, OBS-17 and O-6 above; owner, the whole-change Implementation Agent.  
+* Observations O-1 to O-6 and the carried items named in review v1.0 §6, with their owners; O-6's hosted ruby version remains unprinted.  
+* Prompt-use provenance: the installed writer is absent; usage is recorded in the review only (pending, non-gating). Usage: HDE-CRD-0002 / WU-PR-01 / PR-40 / lineage review 2 (plan cycle 2); role whole-change Implementation Agent, PR-40 lineage review; Specification HDE-CRD-0002-specification-v1.1-approved.md v1.1; release GCFPE-20261009.1 / 100926.1; capture time 2026-10-13T14:19:56Z.
+
+### Scope boundaries and nonclaims
+
+* NOT PRODUCED: a saved MERGE\_OBSERVED artifact for [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630); any QA, Ops, acceptance or closure artifact; a HDE Build Notes addendum by the review.  
+* NOT EXECUTED by the review: the changed-test step on bf7ad8c (run by PR-30 on the identical code tree 63e8a69 and by hosted CI on b3645b9; \#630 changed no file among its 163 targets); the attribution collector for [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630); the Codex security review (deprecated).  
+* ACCEPT is not QA, acceptance of HDE-CRD-0002, Ops, PF09 or PF30 movement, release activation, merge authority or closure.
+
+### Evidence anchors
+
+* Review v2.0 docs/ephemeral/HDE-CRD-0002-WU-PR-01-pr-work-unit-lineage-review-v2.0.md (landed by [\#631](https://github.com/amthorn78/glow-hdengine-v2/issues/631), commit 4fc9fea); review v1.0 (blob 2cfbb5ec33d8, [\#628](https://github.com/amthorn78/glow-hdengine-v2/issues/628), dc701f2).  
+* [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) merged as 7136040; \#630 merged as bf7ad8c, head 1cbb2edb6345327aeb4e9da0140a704c87476709, tree d04d3cf95c4dc7e4420c0aa3600ec4fb58e421ee; hosted CI run 38409638847 (job 115338249358); Codex summary comment 6146788079; results v2.0 and v2.1; plan v2.0.
+
+### Relationship to existing HDE Build Notes guidance
+
+This addendum records a lineage review under the bounds of addendum 2.2 and applies the review chain of addendum 2.3 without changing either; addendum 2.1 governs the TypeSafe reading cited above. It supersedes no addendum.
 
 \<eof\>
