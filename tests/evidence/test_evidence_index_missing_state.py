@@ -214,21 +214,16 @@ def test_manifest_only_release_cut_stays_outside_the_evidence_graph(
             for entry in entries
         )
 
-    # HDE-CRD-0002 S12: the cut changes the release the current-release labels
-    # name. The updater alone relabels those rows; nothing else in the graph moves.
-    from tools.evidence import update_evidence_index as writer
-
-    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
-    relabeled = json.loads((repo / "docs/evidence/INDEX.json").read_text(encoding="utf-8"))
-    strip = writer._strip_current_release_label
-    assert [strip(entry) for entry in relabeled] == [strip(entry) for entry in human_entries]
-    raw = manifest.read_bytes()
-    label = f"current-release capture: release 1.0.1, release_id {hashlib.sha256(raw).hexdigest()}"
-    labeled = [entry for entry in relabeled if entry["discovered_physical_path"] in writer.CURRENT_RELEASE_CAPTURE_PATHS]
-    assert labeled and all(entry["notes"].endswith(label) for entry in labeled)
-    assert not any(entry["discovered_physical_path"] == "catalog/manifest.json" for entry in relabeled)
     _checks(repo)
+    assert _snapshot(repo) == skeleton_before
     assert historical_proof.read_bytes() == proof_before
+
+    # HDE-CRD-0002 S12: no capture owner has rerun, so the updater publishes no
+    # new-release label; every capture keeps the release that produced it.
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(repo) == skeleton_before
+    assert "release 1.0.1" not in (repo / "artifacts/evidence_index.jsonl").read_text(encoding="utf-8")
+    _checks(repo)
 
 
 def test_updater_recovers_complete_missing_state_in_one_write(tmp_path: Path) -> None:
@@ -1137,23 +1132,94 @@ def test_release_label_strip_preserves_origin_notes():
     assert writer._strip_current_release_label({"notes": "origin"}) == {"notes": "origin"}
 
 
-def test_release_labels_follow_the_manifest_through_the_updater_alone(tmp_path):
+NEXT_RELEASE_LABEL = "current-release capture: release 9.9.9, release_id " + "b" * 64
+NEXT_RELEASE_UPDATER = (
+    "from tools.evidence import update_evidence_index as writer\n"
+    f"writer._current_release_label = lambda: {NEXT_RELEASE_LABEL!r}\n"
+    "writer.main([])\n"
+)
+
+
+def test_release_labels_follow_regenerated_captures_through_the_updater_alone(tmp_path):
     repo = tmp_path / "repo"
     shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
-    original = (repo / "docs/evidence/INDEX.json").read_bytes()
-    relabel = (
-        "from tools.evidence import update_evidence_index as writer\n"
-        "writer._current_release_label = lambda: 'current-release capture: release 9.9.9, release_id ' + 'b' * 64\n"
-        "writer.main([])\n"
-    )
-    _success(subprocess.run([sys.executable, "-c", relabel], cwd=repo, env=ENV, capture_output=True, text=True, check=False))
-    rows = json.loads((repo / "docs/evidence/INDEX.json").read_bytes())
-    labeled = [row for row in rows if "current-release capture:" in row.get("notes", "")]
-    assert labeled and all(row["notes"].endswith("release 9.9.9, release_id " + "b" * 64) for row in labeled)
-    assert all(row["notes"].count("current-release capture:") == 1 for row in labeled)
+    index = repo / "docs/evidence/INDEX.json"
+    original, skeleton = index.read_bytes(), _snapshot(repo)
+    label = _release_label()
+
+    def updater_for_next_release() -> None:
+        _success(subprocess.run(
+            [sys.executable, "-c", NEXT_RELEASE_UPDATER], cwd=repo, env=ENV, capture_output=True, text=True, check=False,
+        ))
+
+    # A release change alone relabels nothing: no capture has been regenerated.
+    updater_for_next_release()
+    assert _snapshot(repo) == skeleton
+
+    # The owner regenerates one capture (two rows): only its rows move, once.
+    capture = "artifacts/proofs/success_get.txt"
+    capture_bytes = (repo / capture).read_bytes()
+    (repo / capture).write_bytes(capture_bytes + b"regenerated=true\n")
+    updater_for_next_release()
+    rows = [row for row in json.loads(index.read_bytes()) if "current-release capture:" in row.get("notes", "")]
+    moved = [row for row in rows if row["discovered_physical_path"] == capture]
+    assert len(moved) == 2 and all(row["notes"].endswith(NEXT_RELEASE_LABEL) for row in moved)
+    assert all(row["notes"].endswith(label) for row in rows if row["discovered_physical_path"] != capture)
+    assert all(row["notes"].count("current-release capture:") == 1 for row in rows)
+    mirror = [json.loads(line) for line in (repo / "artifacts/evidence_index.jsonl").read_bytes().splitlines()]
+    assert {row["sha256"] for row in mirror if row["discovered_physical_path"] == capture} == {
+        hashlib.sha256((repo / capture).read_bytes()).hexdigest()
+    }
+
+    # Regenerated again under the admitted release, it takes that release back.
+    (repo / capture).write_bytes(capture_bytes)
     _success(_run(repo, "tools/evidence/update_evidence_index.py"))
-    assert (repo / "docs/evidence/INDEX.json").read_bytes() == original
+    assert index.read_bytes() == original
     _checks(repo)
+
+
+def test_unlabeled_capture_rows_take_the_admitted_release_on_adoption(tmp_path):
+    from tools.evidence import update_evidence_index as writer
+
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    index = repo / "docs/evidence/INDEX.json"
+    original = index.read_bytes()
+    unlabeled = [writer._strip_current_release_label(row) for row in json.loads(original)]
+    index.write_bytes((json.dumps(unlabeled, separators=(",", ":"), sort_keys=True) + "\n").encode())
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert index.read_bytes() == original
+    _checks(repo)
+
+
+def test_incoherent_capture_labels_are_refused_before_any_write(tmp_path):
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    index = repo / "docs/evidence/INDEX.json"
+    rows = json.loads(index.read_bytes())
+    row = next(row for row in rows if row["artifact_key"] == "a7.success_get")
+    row["notes"] = NEXT_RELEASE_LABEL
+    index.write_bytes((json.dumps(rows, separators=(",", ":"), sort_keys=True) + "\n").encode())
+    before = _whole_tree_state(repo, metadata=True)
+    result = _run(repo, "tools/evidence/update_evidence_index.py")
+    assert result.returncode != 0
+    assert "CURRENT_RELEASE_LABEL_INCOHERENT:artifacts/proofs/success_get.txt" in result.stderr
+    assert _whole_tree_state(repo, metadata=True) == before
+
+
+def test_config_publication_lets_only_a_regenerated_capture_label_move():
+    from tools.evidence import update_evidence_index as writer
+
+    identity = ("catalog.catalog_schema_validation", "artifacts/catalog/catalog_schema_validation.log")
+    row = {"artifact_key": identity[0], "discovered_physical_path": identity[1], "record_type": "catalog_validation"}
+    before = {identity: {**row, "notes": _release_label()}}
+    after = {identity: {**row, "notes": NEXT_RELEASE_LABEL}}
+    writer._config_logical_delta(before, after, changed_primaries=frozenset({identity[1]}), mirror=False)
+    with pytest.raises(ValueError, match="CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT"):
+        writer._config_logical_delta(before, after, changed_primaries=frozenset(), mirror=False)
+    drifted = {identity: {**row, "record_type": "other", "notes": NEXT_RELEASE_LABEL}}
+    with pytest.raises(ValueError, match="CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT"):
+        writer._config_logical_delta(before, drifted, changed_primaries=frozenset({identity[1]}), mirror=False)
 
 
 def test_index_normalizer_keeps_crd_id_and_refuses_epic_and_crd_together():

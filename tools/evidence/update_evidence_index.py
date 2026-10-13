@@ -55,7 +55,9 @@ ADMITTED_CRD_QA: Mapping[str, tuple[str, str]] = {
 
 # HDE-CRD-0002 IF-7: Mirror rows for primaries whose bytes the admitted release
 # determines carry a release label inside the PF12 §8.3 allowed key set (notes).
-# The label is derived from catalog/manifest.json at every run; frozen
+# A capture takes the label of the release in catalog/manifest.json only when
+# its owner has regenerated it (its bytes differ from those the Mirror last
+# recorded); a release change alone never relabels a capture. Frozen
 # capture-time families are not listed and keep their labels.
 CURRENT_RELEASE_CAPTURE_PATHS = frozenset({
     "artifacts/catalog/catalog_schema_validation.log",
@@ -83,7 +85,7 @@ CURRENT_RELEASE_CAPTURE_PATHS = frozenset({
     "audit/gates/parity/reader_cli/summary.json",
 })
 _CURRENT_RELEASE_LABEL_RE = re.compile(
-    r"(?:^|; )current-release capture: release [^\s,;]+, release_id [0-9a-f]{64}$"
+    r"(?:^|; )(?P<label>current-release capture: release [^\s,;]+, release_id [0-9a-f]{64})$"
 )
 
 
@@ -3845,14 +3847,78 @@ def _strip_current_release_label(entry: object) -> object:
     return stripped
 
 
+def _retained_release_labels(entries: Iterable[object]) -> dict[str, set[str]]:
+    labels: dict[str, set[str]] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        path, notes = entry.get("discovered_physical_path"), entry.get("notes")
+        if path in CURRENT_RELEASE_CAPTURE_PATHS and isinstance(notes, str):
+            match = _CURRENT_RELEASE_LABEL_RE.search(notes)
+            if match:
+                labels.setdefault(path, set()).add(match["label"])
+    return labels
+
+
+def _recorded_capture_digests() -> dict[str, set[str]]:
+    """Return the sha256 the Mirror recorded per capture at the last updater run."""
+    if not _path_exists(MIRROR_PATH):
+        return {}
+    try:
+        rows = [json.loads(line) for line in _read_bytes(MIRROR_PATH).decode("utf-8").splitlines() if line]
+    except (UnicodeError, json.JSONDecodeError):
+        # No readable record means no regeneration evidence: labels are kept.
+        return {}
+    digests: dict[str, set[str]] = {}
+    for row in rows:
+        if (
+            isinstance(row, dict)
+            and row.get("discovered_physical_path") in CURRENT_RELEASE_CAPTURE_PATHS
+            and isinstance(row.get("sha256"), str)
+        ):
+            digests.setdefault(row["discovered_physical_path"], set()).add(row["sha256"])
+    return digests
+
+
+def _current_release_labels(retained: Mapping[str, set[str]]) -> dict[str, str]:
+    """Label each capture with the release that produced it (HDE-CRD-0002 IF-7).
+
+    A capture takes the admitted release's label when it has no label yet
+    (initial adoption) or when its bytes differ from those the Mirror last
+    recorded, i.e. its owner regenerated it. Otherwise it keeps its label, so
+    a manifest cut before the owners rerun publishes no new-release claim.
+    """
+    current = _current_release_label()
+    recorded: dict[str, set[str]] | None = None
+    labels: dict[str, str] = {}
+    for path in sorted(CURRENT_RELEASE_CAPTURE_PATHS):
+        prior = retained.get(path, set())
+        if len(prior) > 1:
+            raise ValueError(f"CURRENT_RELEASE_LABEL_INCOHERENT:{path}")
+        if not prior or prior == {current}:
+            labels[path] = current
+            continue
+        if recorded is None:
+            recorded = _recorded_capture_digests()
+        capture = ROOT / path
+        regenerated = (
+            path in recorded
+            and _path_exists(capture)
+            and _sha256_bytes(_read_bytes(capture)) not in recorded[path]
+        )
+        labels[path] = current if regenerated else next(iter(prior))
+    return labels
+
+
 def _apply_current_release_label(
     entries: Sequence[dict[str, object]],
+    labels: Mapping[str, str],
 ) -> list[dict[str, object]]:
-    label = _current_release_label()
     labeled = []
     for entry in entries:
         entry = dict(entry)
-        if entry["discovered_physical_path"] in CURRENT_RELEASE_CAPTURE_PATHS:
+        label = labels.get(entry["discovered_physical_path"])
+        if label is not None:
             notes = entry.get("notes")
             entry["notes"] = f"{notes}; {label}" if notes else label
         labeled.append(entry)
@@ -3977,6 +4043,7 @@ def _catalog_validation_entries(
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = qa_harness._loads_json_strict(_read_bytes(HUMAN_INDEX).decode("utf-8"))
+    release_labels = _retained_release_labels(payload)
     payload = [_strip_current_release_label(entry) for entry in payload]
     catalog_entries = _catalog_validation_entries(payload)
     payload, crd_entries = _load_crd_qa_entries(payload)
@@ -4069,7 +4136,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *CLI_CONFORMANCE_ARTIFACTS,
             *CONJUNCTION_WRITER_ARTIFACTS,
         ]
-    ))
+    ), _current_release_labels(release_labels))
 
 
 def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
@@ -4900,6 +4967,9 @@ def _config_logical_delta(
             mutable.add("produced_at_utc")
         prior = {key: value for key, value in before[identity].items() if key not in mutable}
         current = {key: value for key, value in row.items() if key not in mutable}
+        if identity[1] in changed_primaries:
+            # A regenerated current-release capture's label follows its new bytes.
+            prior, current = _strip_current_release_label(prior), _strip_current_release_label(current)
         if prior != current:
             raise ValueError(f"CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT:{identity}")
 
