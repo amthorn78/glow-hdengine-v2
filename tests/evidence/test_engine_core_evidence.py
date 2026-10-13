@@ -29,6 +29,41 @@ ARTIFACT_SCHEMA_MAPPING = {
 }
 
 
+# Payloads that record the admitted release; the purity report carries no release_id.
+RELEASE_ID_CARRIERS = (
+    "engine_core_two_run_logs",
+    "engine_core_abba_logs",
+    "engine_core_json_compare_logs",
+)
+
+
+def _nested_release_ids(value: object) -> list[object]:
+    found: list[object] = []
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key == "release_id":
+                found.append(item)
+            found.extend(_nested_release_ids(item))
+    elif isinstance(value, list):
+        for item in value:
+            found.extend(_nested_release_ids(item))
+    return found
+
+
+def _assert_payload_release_ids_are_admitted() -> None:
+    from engine.runtime import identity
+
+    admitted = identity.identity_meta()["release_id"]
+    for key, artifact in CORE_ARTIFACTS.items():
+        found = _nested_release_ids(_load_json(artifact))
+        if key in RELEASE_ID_CARRIERS:
+            assert found, f"{artifact} records no release_id"
+        else:
+            assert found == [], f"{artifact} unexpectedly records release_id"
+        for value in found:
+            assert value == admitted, f"{artifact} release_id drifted from the admitted release"
+
+
 def _load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -143,3 +178,16 @@ def test_writer_refuses_a_schema_valid_wrong_g004_before_publication(monkeypatch
     monkeypatch.setattr(writer, "compute_core", wrong)
     with pytest.raises(ValueError, match="fixed G004 oracle mismatch"):
         writer._build_payloads()
+
+
+def test_core_evidence_binds_the_admitted_release_id():
+    _assert_payload_release_ids_are_admitted()
+
+
+def test_core_evidence_release_check_fails_when_the_admitted_release_id_differs(monkeypatch):
+    from engine.runtime import identity
+
+    real = identity.identity_meta()
+    monkeypatch.setattr(identity, "identity_meta", lambda: {**real, "release_id": "0" * 64})
+    with pytest.raises(AssertionError, match="drifted from the admitted release"):
+        _assert_payload_release_ids_are_admitted()

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import shutil
@@ -338,6 +339,56 @@ def _clean_child_env(attestation_bin: Path | None = None) -> dict[str, str]:
     return env
 
 
+# A distribution-patched setuptools (Debian/Ubuntu ``python3-setuptools``)
+# reads an ``install_layout`` and ``prefix_option`` from the distutils
+# ``install`` command; only the distribution's own interpreter supplies them,
+# through its stdlib ``_distutils_system_mod``.  For any other interpreter that
+# imports the patched backend, the wheel stage supplies those two options with
+# their neutral default so the backend builds the ordinary layout.
+_DISTUTILS_SYSTEM_MOD = "_distutils_system_mod"
+_DISTRIBUTION_LAYOUT_MARKER = "install_layout"
+_BUILD_BACKEND_COMPAT_SOURCE = """\
+import distutils.command.install as _install
+
+
+class install(_install.install):
+    def initialize_options(self):
+        super().initialize_options()
+        self.install_layout = None
+        self.prefix_option = None
+
+
+_install.install = install
+"""
+
+
+def _distribution_layout_compat_required() -> bool:
+    if importlib.util.find_spec(_DISTUTILS_SYSTEM_MOD) is not None:
+        return False
+    spec = importlib.util.find_spec("setuptools")
+    if spec is None or spec.origin is None:
+        return False
+    install_lib = Path(spec.origin).parent / "command" / "install_lib.py"
+    try:
+        text = install_lib.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return _DISTRIBUTION_LAYOUT_MARKER in text
+
+
+def _wheel_build_env(install_root: Path) -> tuple[dict[str, str], bool]:
+    env = _clean_child_env()
+    if not _distribution_layout_compat_required():
+        return env, False
+    compat = install_root / "build-backend-compat"
+    compat.mkdir()
+    (compat / f"{_DISTUTILS_SYSTEM_MOD}.py").write_text(
+        _BUILD_BACKEND_COMPAT_SOURCE, encoding="utf-8"
+    )
+    env["PYTHONPATH"] = str(compat)
+    return env, True
+
+
 def _install_packaged_console_entrypoint(
     package_source: Path,
     install_root: Path,
@@ -347,6 +398,7 @@ def _install_packaged_console_entrypoint(
 
     wheelhouse = install_root / "wheelhouse"
     wheelhouse.mkdir()
+    wheel_env, layout_compat = _wheel_build_env(install_root)
     build = subprocess.run(
         [
             sys.executable,
@@ -363,7 +415,7 @@ def _install_packaged_console_entrypoint(
             str(package_source),
         ],
         cwd=install_root,
-        env=_clean_child_env(),
+        env=wheel_env,
         check=False,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -385,6 +437,7 @@ def _install_packaged_console_entrypoint(
         [
             "stage=build_packaged_wheel",
             "source=tracked_source_copy",
+            *(("build_backend_compat=distribution_install_layout",) if layout_compat else ()),
             "exit_code=0",
             "stdout_recorded=false",
             "stderr_recorded=false",
