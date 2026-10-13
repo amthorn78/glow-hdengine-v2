@@ -2540,8 +2540,12 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     a helper that overwrites its emitter, its body or its response data in a
     branch, a helper that mutates or hands on its response, a presenter name
     rebound at module level, a view that alters the helper's result or rebinds
-    the bound argument, a view wrapped by an extra decorator, and a helper
-    replaced through frame globals."""
+    the bound argument, a view wrapped by an extra decorator, a helper
+    replaced through frame globals, a response constructor that is another
+    callable under the name ``Response``, a helper or view that can exit
+    without a value, a generator helper, a response class or presenter module
+    patched in the module, a star import, and a return handed off to a
+    function that alters its response."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2562,6 +2566,14 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         "presenter_name_rebound_at_module": ("emit_reader_public_bytes = _plain\ndef _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
         "response_body_mutated_in_place": ("def _respond(emit_fn):\n    resp = Response(emit_fn({'ok': False}), status=200)\n    resp.response.clear()\n    resp.response.append(b'raw')\n    return resp", "_respond(emit_fn)"),
         "response_passed_to_mutating_helper": ("def _clear(resp):\n    resp.response.clear()\n    return resp\ndef _respond(emit_fn):\n    resp = Response(emit_fn({'ok': False}), status=200)\n    _clear(resp)\n    return resp", "_respond(emit_fn)"),
+        "falls_through_conditionally": ("def _respond(emit_fn):\n    if SAFE_MODE:\n        return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "returns_without_value": ("def _respond(emit_fn):\n    if not SAFE_MODE:\n        return\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "generator_helper": ("def _respond(emit_fn):\n    yield b'raw'\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "response_class_patched": ("def _raw_set_data(self, value):\n    self.response = [b'raw']\nResponse.set_data = _raw_set_data\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "response_class_patched_through_type": ("def _raw_set_data(self, value):\n    self.response = [b'raw']\ntype(Response(b'')).set_data = _raw_set_data\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "presenter_module_patched": ("import engine.presenter.emitter as _em\n_em.emit_public = _plain\ndef _respond(emit_fn=_em.emit_public):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
+        "star_import": ("from engine.compat import *\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "hands_off_to_mutating_function": ("def _err():\n    resp = Response(emit_public({'ok': False}), status=400)\n    resp.data = b'raw'\n    return resp\ndef _respond(emit_fn):\n    if SAFE_MODE:\n        return _err()\n    return Response(emit_fn({'ok': False}), status=200)", "_respond(emit_fn)"),
     }
     modules = {name: _PRESENTER_HELPER_MODULE.format(helper=helper, call=call) for name, (helper, call) in shapes.items()}
     view_module = _PRESENTER_HELPER_MODULE.replace("        return {call}\n", "{view}\n")
@@ -2569,6 +2581,7 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     view_shapes = {
         "view_mutates_result": "        r = _respond(emit_fn)\n        r.data = b'raw'\n        return r",
         "view_rebinds_argument_in_branch": "        if SAFE_MODE:\n            emit_fn = _plain\n        return _respond(emit_fn)",
+        "view_falls_through_conditionally": "        if SAFE_MODE:\n            return _respond(emit_fn)",
     }
     modules.update({name: view_module.format(helper=sanctioned_helper, view=view) for name, view in view_shapes.items()})
     modules["view_wrapped_by_extra_decorator"] = view_module.replace("    def reader_post():", "    @_raw_view\n    def reader_post():").format(
@@ -2579,6 +2592,9 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         helper="import inspect\n" + sanctioned_helper,
         view="        inspect.currentframe().f_globals['_respond'] = _plain\n        return _respond(emit_fn)",
     )
+    modules["constructor_is_another_callable"] = _PRESENTER_HELPER_MODULE.replace(
+        "from flask import Blueprint, Flask, Response\n", "from flask import Blueprint, Flask, redirect as Response\n"
+    ).format(helper=sanctioned_helper, call="_respond(emit_fn)")
     for name, module in modules.items():
         adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", module)
         assert boundary_analyzer._adapter_routes_without_presenter((adapter,)) == [f"{adapter}:reader_post"], name

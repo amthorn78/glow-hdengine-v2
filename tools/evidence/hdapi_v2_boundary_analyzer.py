@@ -1869,12 +1869,14 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
         presenter_bound_params_by_key: dict[str, frozenset[str]] = {}
         # Reflection fails closed for the presenter-bound helper shape: a module may
         # use it only if it imports from an allowlist of project and plain modules,
-        # reaches no dunder attribute but `__init__` and no frame, generator or
-        # traceback attribute, names no reflective builtin, and calls getattr or
-        # hasattr only with a constant ordinary attribute name.
+        # reaches no dunder attribute but `__init__`, no frame, generator or
+        # traceback attribute and nothing that hands back a class from an object
+        # or an annotation (`type()`, `mro()`, typing introspection), names no
+        # reflective builtin, and calls getattr or hasattr only with a constant
+        # ordinary attribute name.
         reflection_free_import_roots = {"adapter", "engine", "presenter", "flask", "werkzeug", "__future__", "collections", "datetime", "hashlib", "json", "os", "pathlib", "threading", "typing"}
-        frame_attributes = {"f_globals", "f_locals", "f_back", "f_builtins", "f_code", "f_trace", "gi_frame", "gi_code", "cr_frame", "cr_code", "ag_frame", "ag_code", "tb_frame", "tb_next"}
-        reflective_builtins = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "breakpoint"}
+        frame_attributes = {"f_globals", "f_locals", "f_back", "f_builtins", "f_code", "f_trace", "gi_frame", "gi_code", "cr_frame", "cr_code", "ag_frame", "ag_code", "tb_frame", "tb_next", "mro", "get_type_hints", "get_args", "get_origin"}
+        reflective_builtins = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "breakpoint", "type", "get_type_hints", "get_args", "get_origin"}
 
         def is_reflection(node: ast.AST) -> bool:
             if isinstance(node, ast.Import):
@@ -2083,24 +2085,255 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if _is_sanctioned_presenter_call(name, aliases) or target in {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
         }
 
+        # Exact identity for the presenter-bound helper shape. `aliases` maps a plain
+        # `import a.b` to `a.b` although the statement binds `a`, and it ignores
+        # relative-import levels; `exact_import_targets` records what each import
+        # binds. A relative or star import leaves the module out of the shape.
+        exact_import_targets: dict[str, str] = {}
+        module_has_inexact_import = False
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    root_name = alias.name.split(".", 1)[0]
+                    exact_import_targets[alias.asname or root_name] = alias.name if alias.asname else root_name
+            elif isinstance(node, ast.ImportFrom):
+                module_has_inexact_import = module_has_inexact_import or bool(node.level) or any(alias.name == "*" for alias in node.names)
+                for alias in node.names:
+                    exact_import_targets[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+        sanctioned_response_classes = {"flask.Response", "flask.wrappers.Response", "werkzeug.Response", "werkzeug.wrappers.Response", "werkzeug.wrappers.response.Response"}
+
+        def is_pure_chain(node: ast.AST) -> bool:
+            while isinstance(node, ast.Attribute):
+                node = node.value
+            return isinstance(node, ast.Name)
+
+        def resolved_import_chain(node: ast.AST) -> str | None:
+            """The dotted target a pure name chain reaches through the import that is
+            the only binding of its root, or ``None``."""
+            if not isinstance(node, (ast.Name, ast.Attribute)) or not is_pure_chain(node):
+                return None
+            root, _, rest = _attribute_chain(node).partition(".")
+            target = exact_import_targets.get(root)
+            if target is None or aliases.get(root) != target or module_binding_counts.get(root, 0) != 1:
+                return None
+            return f"{target}.{rest}" if rest else target
+
+        def is_response_ctor(node: ast.AST) -> bool:
+            # A call of an imported Flask or Werkzeug Response class, resolved through
+            # its import rather than by the local name.
+            return isinstance(node, ast.Call) and resolved_import_chain(node.func) in sanctioned_response_classes
+
+        def looks_like_response_ctor(node: ast.Call) -> bool:
+            # What the general return proof treats as building a response.
+            chain = _attribute_chain(node.func)
+            return chain in {"Response", "make_response"} or chain.endswith((".Response", ".make_response", "TransportResponse"))
+
+        def is_presenter_value_call(node: ast.AST, presenter_params: frozenset[str]) -> bool:
+            return isinstance(node, ast.Call) and (
+                (isinstance(node.func, ast.Name) and node.func.id in presenter_params)
+                or (is_pure_chain(node.func) and _is_sanctioned_presenter_call(_attribute_chain(node.func), aliases))
+            )
+
+        def exits_return_values(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            """Every way out of ``fn`` but an exception returns a value: ``fn`` is
+            neither async nor a generator, each ``return`` in its own body carries a
+            value, and its body ends in one, so no path falls through to ``None``."""
+            if isinstance(fn, ast.AsyncFunctionDef) or not fn.body or not isinstance(fn.body[-1], ast.Return) or fn.body[-1].value is None:
+                return False
+            return not any(isinstance(node, (ast.Yield, ast.YieldFrom, ast.Await)) or (isinstance(node, ast.Return) and node.value is None) for node in iter_body_nodes(fn))
+
+        # Same-module patching of what the shape trusts fails closed. An object that
+        # holds a response class, or a module that a response class or a trusted
+        # presenter lives in (any chain ending in `Response` or `response_class`, or
+        # one resolving through its import to such a class or module, or to a module
+        # above one), is only called, subclassed, annotated or read through; and no
+        # attribute store, attribute delete or getattr names a trusted presenter or
+        # response name.
+        trusted_modules = (
+            {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
+            | {aliases[name].rsplit(".", 1)[0] for name in presenter_trust_names if _is_sanctioned_presenter_call(name, aliases)}
+            | {cls.rsplit(".", 1)[0] for cls in sanctioned_response_classes}
+        )
+
+        def holds_trusted_object(node: ast.AST) -> bool:
+            if not isinstance(node, (ast.Name, ast.Attribute)):
+                return False
+            if (node.id if isinstance(node, ast.Name) else node.attr) in {"Response", "response_class"}:
+                return True
+            resolved = resolved_import_chain(node)
+            return resolved is not None and (resolved in sanctioned_response_classes or any(module == resolved or module.startswith(f"{resolved}.") for module in trusted_modules))
+
+        def is_annotation(node: ast.AST) -> bool:
+            current, parent = node, ast_parents.get(node)
+            while parent is not None and not isinstance(parent, ast.stmt):
+                if isinstance(parent, ast.arg):
+                    return parent.annotation is current
+                current, parent = parent, ast_parents.get(parent)
+            return (isinstance(parent, (ast.FunctionDef, ast.AsyncFunctionDef)) and parent.returns is current) or (isinstance(parent, ast.AnnAssign) and parent.annotation is current)
+
+        def is_inert_use(node: ast.AST) -> bool:
+            parent = ast_parents.get(node)
+            return (
+                (isinstance(node.ctx, ast.Load) and isinstance(parent, ast.Call) and parent.func is node)
+                or (isinstance(parent, ast.ClassDef) and node in parent.bases)
+                or (isinstance(parent, ast.Attribute) and parent.value is node and isinstance(parent.ctx, ast.Load))
+                or is_annotation(node)
+            )
+
+        def is_trusted_name(name: str) -> bool:
+            return name in presenter_trust_names or name in {"Response", "response_class", "make_response"} or _is_sanctioned_presenter_call(f"presenter.{name}", {"presenter": "engine.presenter"})
+
+        module_patches_trusted_names = any(
+            (holds_trusted_object(node) and not is_inert_use(node))
+            or (isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)) and any(is_trusted_name(part) for part in _attribute_chain(node).split(".")))
+            or (
+                isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"}
+                and len(node.args) >= 2 and isinstance(node.args[1], ast.Constant) and isinstance(node.args[1].value, str) and is_trusted_name(node.args[1].value)
+            )
+            for node in ast.walk(tree)
+        )
+
+        def header_only_helper_param(name: str, index: int) -> bool:
+            keys = simple_names.get(name, [])
+            if len(keys) != 1 or module_binding_counts.get(name, 0) != 1:
+                return False
+            header_helper = function_defs[keys[0]]
+            if header_helper.decorator_list or ast_parents.get(header_helper) is not tree or header_helper.args.vararg is not None:
+                return False
+            if any(
+                (isinstance(node, ast.Name) and node.id == name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == name)
+                for node in ast.walk(tree)
+            ):
+                return False
+            params = list(header_helper.args.posonlyargs) + list(header_helper.args.args)
+            if index >= len(params):
+                return False
+            param = params[index].arg
+            nodes = [node for stmt in header_helper.body for node in ast.walk(stmt)]
+            if binding_site_counts(nodes).get(param, 0):
+                return False
+            return all(
+                (isinstance(ast_parents.get(node), ast.Attribute) and ast_parents[node].attr == "headers") or isinstance(ast_parents.get(node), ast.Return)
+                for node in nodes
+                if isinstance(node, ast.Name) and node.id == param
+            )
+
+        # Fail closed on how presenter-derived values are used. A presenter call, a
+        # response built in the function, and any local holding one may only feed a
+        # response constructor or len(), be assigned once to a local (calls only,
+        # never name to name), reach `.headers`, be returned, or go to a statement
+        # call of a module helper whose parameter is used only for `.headers` and
+        # its return.
+        def derived_use_is_safe(node: ast.AST, *, may_assign: bool) -> bool:
+            parent = ast_parents.get(node)
+            if isinstance(parent, ast.keyword):
+                return is_response_ctor(ast_parents.get(parent))
+            if isinstance(parent, ast.Return):
+                return True
+            if isinstance(parent, ast.Tuple) and isinstance(ast_parents.get(parent), ast.Return):
+                return bool(parent.elts) and parent.elts[0] is node
+            if may_assign and isinstance(parent, (ast.Assign, ast.AnnAssign)) and parent.value is node:
+                targets = parent.targets if isinstance(parent, ast.Assign) else [parent.target]
+                return len(targets) == 1 and isinstance(targets[0], ast.Name)
+            if isinstance(parent, ast.Attribute) and parent.value is node:
+                return parent.attr == "headers"
+            if isinstance(parent, ast.Call) and node in parent.args:
+                if is_response_ctor(parent) or (isinstance(parent.func, ast.Name) and parent.func.id == "len" and "len" not in module_binding_counts):
+                    return True
+                return isinstance(parent.func, ast.Name) and isinstance(ast_parents.get(parent), ast.Expr) and header_only_helper_param(parent.func.id, parent.args.index(node))
+            return False
+
+        def own_body_is_exact(body_fn: ast.FunctionDef | ast.AsyncFunctionDef, presenter_params: frozenset[str]) -> bool:
+            """The flow-independent body rules for the helper and for a function it
+            returns through: a presenter parameter is only ever called (never aliased
+            or passed on), every local name has one binding site, no response
+            content or status is replaced after construction, every response is
+            built with an exact response class (see ``is_response_ctor``), and
+            presenter-derived values are used only as ``derived_use_is_safe`` allows."""
+            nodes = [node for stmt in body_fn.body for node in ast.walk(stmt)]
+            if any(isinstance(node, ast.Name) and node.id in presenter_params and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node) for node in nodes):
+                return False
+            if any(count > 1 for count in binding_site_counts(nodes).values()):
+                return False
+            if any(
+                (isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)) and node.attr in {"data", "response", "status", "status_code"})
+                or (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr in {"set_data", "set_json"})
+                or (isinstance(node, ast.Call) and looks_like_response_ctor(node) and not is_response_ctor(node))
+                for node in nodes
+            ):
+                return False
+            derived_names: set[str] = set()
+            for node in nodes:
+                if is_presenter_value_call(node, presenter_params) or is_response_ctor(node):
+                    if not derived_use_is_safe(node, may_assign=True):
+                        return False
+                    parent = ast_parents.get(node)
+                    if isinstance(parent, (ast.Assign, ast.AnnAssign)):
+                        derived_names.add((parent.targets[0] if isinstance(parent, ast.Assign) else parent.target).id)
+            return not any(
+                isinstance(node, ast.Name) and node.id in derived_names and isinstance(node.ctx, ast.Load) and not derived_use_is_safe(node, may_assign=False)
+                for node in nodes
+            )
+
+        def delegated_call(node: ast.Return, presenter_params: frozenset[str]) -> ast.Call | None:
+            # A return that hands off to another call rather than returning a
+            # presenter value or a response the function builds itself.
+            value = node.value
+            if isinstance(value, ast.Tuple) and value.elts:
+                value = value.elts[0]
+            if isinstance(value, ast.Call) and not is_response_ctor(value) and not is_presenter_value_call(value, presenter_params):
+                return value
+            return None
+
+        def delegate_is_exact(value: ast.Call, helper: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+            """A helper's return may hand off only to another undecorated module-level
+            function of this module, named only as a callee, that returns a value on
+            every exit, keeps the helper's body rules and hands off no further."""
+            if not isinstance(value.func, ast.Name):
+                return False
+            name = value.func.id
+            keys = simple_names.get(name, [])
+            if len(keys) != 1 or name in aliases or module_binding_counts.get(name, 0) != 1:
+                return False
+            callee = function_defs[keys[0]]
+            if callee is helper or callee.decorator_list or ast_parents.get(callee) is not tree or not exits_return_values(callee) or not own_body_is_exact(callee, frozenset()):
+                return False
+            if any(
+                (isinstance(node, ast.Name) and node.id == name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == name)
+                for node in ast.walk(tree)
+            ):
+                return False
+            return not any(isinstance(node, ast.Return) and delegated_call(node, frozenset()) is not None for node in iter_body_nodes(callee))
+
         def presenter_bound_helper_key(call: ast.Call, owner: str, candidate: str) -> str | None:
             """Prove a call to a module-level helper of this module that receives a
             sanctioned presenter callable: the argument's bound value in the caller, or,
             when the argument is omitted, the helper parameter's default.  The helper
             must be undecorated, its name must appear only as the callee of a call
             (never as a value or an attribute name, such as ``module._respond``), and the
-            module must be free of reflection (see ``is_reflection``), so that the call runs the analyzed
+            module must be free of reflection (see ``is_reflection``), of relative and
+            star imports and of same-module patching of what the proof trusts (see
+            ``module_patches_trusted_names``), so that the call runs the analyzed
             definition with its own defaults.  The view must return the call directly,
-            each imported presenter name the proof trusts must be bound only by its
-            import, and a value bound in the caller must not be rebound on its way to
-            the call.  Returns the key under which the helper is proven with exactly
-            those parameters treated as presenter callables, or ``None`` when the
-            shape does not apply."""
+            the view and the helper must return a value on every exit (see
+            ``exits_return_values``), each imported presenter name the proof trusts must
+            be bound only by its import, to what that import names, and a value bound
+            in the caller must not be rebound on its way to the call.  The helper's own
+            body is held to ``own_body_is_exact``, and a return that hands off to
+            another call must satisfy ``delegate_is_exact``.  Returns the key under
+            which the helper is proven with exactly those parameters treated as
+            presenter callables, or ``None`` when the shape does not apply."""
 
             fn = function_defs.get(candidate)
-            if module_has_dynamic_namespace_access or fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names:
                 return None
-            if not isinstance(ast_parents.get(call), ast.Return) or any(module_binding_counts.get(name, 0) != 1 for name in presenter_trust_names):
+            if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+                return None
+            if not isinstance(ast_parents.get(call), ast.Return) or not exits_return_values(fn) or not exits_return_values(function_defs[owner]):
+                return None
+            if any(module_binding_counts.get(name, 0) != 1 or exact_import_targets.get(name) != aliases.get(name) for name in presenter_trust_names):
                 return None
             # The view carries only its route decorators and every enclosing function
             # is undecorated, so what Flask serves is the analyzed view's own return.
@@ -2145,7 +2378,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for param in positional + list(fn.args.kwonlyargs):
                 if param.arg in bound_args:
                     value = bound_args[param.arg]
-                    if isinstance(value, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(value), aliases):
+                    if isinstance(value, (ast.Name, ast.Attribute)) and is_pure_chain(value) and _is_sanctioned_presenter_call(_attribute_chain(value), aliases):
                         bound.add(param.arg)
                     elif isinstance(value, ast.Name) and value.id in caller_presenter_names:
                         # Not bound in the view (parameters included), and bound at
@@ -2164,97 +2397,17 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                             bound.add(param.arg)
                 elif param.arg in defaults:
                     default = defaults[param.arg]
-                    if isinstance(default, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(default), aliases):
+                    if isinstance(default, (ast.Name, ast.Attribute)) and is_pure_chain(default) and _is_sanctioned_presenter_call(_attribute_chain(default), aliases):
                         bound.add(param.arg)
             if not bound or any(name_is_bound_in(stmt, name) for stmt in fn.body for name in bound):
                 return None
-            # The helper body is held to a stricter, flow-independent shape than the
-            # general return proof: a bound parameter is only ever called (never
-            # aliased or passed on), every local name has one binding site, and no
-            # response content or status is replaced after construction.
-            helper_nodes = [node for stmt in fn.body for node in ast.walk(stmt)]
-            if any(isinstance(node, ast.Name) and node.id in bound and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node) for node in helper_nodes):
+            if not own_body_is_exact(fn, frozenset(bound)):
                 return None
-            if any(count > 1 for count in binding_site_counts(helper_nodes).values()):
-                return None
-            if any(
-                (isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)) and node.attr in {"data", "response", "status", "status_code"})
-                or (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr in {"set_data", "set_json"})
-                for node in helper_nodes
-            ):
-                return None
-
-            # Fail closed on how presenter-derived values are used. A call of a bound
-            # parameter, a response built in the helper, and any local holding one may
-            # only feed a response constructor or len(), be assigned once to a local
-            # (calls only, never name to name), reach `.headers`, be returned, or go
-            # to a statement call of a module helper whose parameter is used only for
-            # `.headers` and its return.
-            def is_response_ctor(node: ast.AST) -> bool:
-                if not isinstance(node, ast.Call):
-                    return False
-                chain = _attribute_chain(node.func)
-                root = chain.split(".", 1)[0]
-                return chain.rsplit(".", 1)[-1] in {"Response", "make_response"} and root in aliases and module_binding_counts.get(root, 0) == 1
-
-            def header_only_helper_param(name: str, index: int) -> bool:
-                keys = simple_names.get(name, [])
-                if len(keys) != 1 or module_binding_counts.get(name, 0) != 1:
-                    return False
-                header_helper = function_defs[keys[0]]
-                if header_helper.decorator_list or ast_parents.get(header_helper) is not tree or header_helper.args.vararg is not None:
-                    return False
-                if any(
-                    (isinstance(node, ast.Name) and node.id == name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
-                    or (isinstance(node, ast.Attribute) and node.attr == name)
-                    for node in ast.walk(tree)
-                ):
-                    return False
-                params = list(header_helper.args.posonlyargs) + list(header_helper.args.args)
-                if index >= len(params):
-                    return False
-                param = params[index].arg
-                nodes = [node for stmt in header_helper.body for node in ast.walk(stmt)]
-                if binding_site_counts(nodes).get(param, 0):
-                    return False
-                return all(
-                    (isinstance(ast_parents.get(node), ast.Attribute) and ast_parents[node].attr == "headers") or isinstance(ast_parents.get(node), ast.Return)
-                    for node in nodes
-                    if isinstance(node, ast.Name) and node.id == param
-                )
-
-            def derived_use_is_safe(node: ast.AST, *, may_assign: bool) -> bool:
-                parent = ast_parents.get(node)
-                if isinstance(parent, ast.keyword):
-                    return is_response_ctor(ast_parents.get(parent))
-                if isinstance(parent, ast.Return):
-                    return True
-                if isinstance(parent, ast.Tuple) and isinstance(ast_parents.get(parent), ast.Return):
-                    return bool(parent.elts) and parent.elts[0] is node
-                if may_assign and isinstance(parent, (ast.Assign, ast.AnnAssign)) and parent.value is node:
-                    targets = parent.targets if isinstance(parent, ast.Assign) else [parent.target]
-                    return len(targets) == 1 and isinstance(targets[0], ast.Name)
-                if isinstance(parent, ast.Attribute) and parent.value is node:
-                    return parent.attr == "headers"
-                if isinstance(parent, ast.Call) and node in parent.args:
-                    if is_response_ctor(parent) or (isinstance(parent.func, ast.Name) and parent.func.id == "len" and "len" not in module_binding_counts):
-                        return True
-                    return isinstance(parent.func, ast.Name) and isinstance(ast_parents.get(parent), ast.Expr) and header_only_helper_param(parent.func.id, parent.args.index(node))
-                return False
-
-            derived_names: set[str] = set()
-            for node in helper_nodes:
-                if isinstance(node, ast.Call) and ((isinstance(node.func, ast.Name) and node.func.id in bound) or is_response_ctor(node)):
-                    if not derived_use_is_safe(node, may_assign=True):
+            for node in iter_body_nodes(fn):
+                if isinstance(node, ast.Return):
+                    handed_off = delegated_call(node, frozenset(bound))
+                    if handed_off is not None and not delegate_is_exact(handed_off, fn):
                         return None
-                    parent = ast_parents.get(node)
-                    if isinstance(parent, (ast.Assign, ast.AnnAssign)):
-                        derived_names.add((parent.targets[0] if isinstance(parent, ast.Assign) else parent.target).id)
-            if any(
-                isinstance(node, ast.Name) and node.id in derived_names and isinstance(node.ctx, ast.Load) and not derived_use_is_safe(node, may_assign=False)
-                for node in helper_nodes
-            ):
-                return None
             key = f"{candidate}#presenter_bound:{','.join(sorted(bound))}"
             function_defs[key] = fn
             presenter_bound_params_by_key[key] = frozenset(bound)
