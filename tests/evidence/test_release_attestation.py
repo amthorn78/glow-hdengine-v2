@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -163,6 +166,7 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
             console.chmod(0o755)
         return subprocess.CompletedProcess(args=command, returncode=0)
 
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: False)
     monkeypatch.setattr(builder.subprocess, "run", run)
     transcript: list[str] = []
     scripts = builder._install_packaged_console_entrypoint(
@@ -640,3 +644,227 @@ def test_magic10_thresholds_are_available_to_the_installed_console():
     assert 'math = ["*.json"]' in pyproject
     assert Path("catalog/manifest.json").is_file()
     assert not Path("engine/runtime/catalog_manifest.json").exists()
+
+
+def _fake_setuptools(root: Path, install_lib_source: str) -> SimpleNamespace:
+    package = root / "setuptools"
+    (package / "command").mkdir(parents=True)
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "command" / "install_lib.py").write_text(install_lib_source, encoding="utf-8")
+    return SimpleNamespace(origin=str(package / "__init__.py"))
+
+
+@pytest.mark.parametrize(
+    "system_mod,install_lib,expected",
+    [
+        (True, "self.set_undefined_options('install',('install_layout','install_layout'))\n", False),
+        (False, "self.set_undefined_options('install',('install_layout','install_layout'))\n", True),
+        (False, "class install_lib: pass\n", False),
+        (False, None, False),
+    ],
+    ids=["system-mod-present", "patched-backend", "unpatched-backend", "no-setuptools"],
+)
+def test_wheel_layout_compat_is_required_only_for_a_distribution_patched_backend(
+    tmp_path, monkeypatch, capsys, system_mod, install_lib, expected
+):
+    setuptools_spec = None if install_lib is None else _fake_setuptools(tmp_path, install_lib)
+
+    def find_spec(name):
+        if name == "_distutils_system_mod":
+            return object() if system_mod else None
+        assert name == "setuptools"
+        return setuptools_spec
+
+    monkeypatch.setattr(importlib.util, "find_spec", find_spec)
+    exec(compile(builder._LAYOUT_COMPAT_PROBE, "layout-compat-probe", "exec"), {"__name__": "probe"})
+    assert capsys.readouterr().out == ("required\n" if expected else "not-required\n")
+
+
+@pytest.mark.parametrize(
+    "returncode,stdout,expected",
+    [(0, "required\n", True), (0, "not-required\n", False), (1, "required\n", False), (0, "", False)],
+    ids=["required", "not-required", "probe-failed", "no-answer"],
+)
+def test_layout_compat_probe_runs_in_the_wheel_child_interpreter_and_environment(
+    tmp_path, monkeypatch, returncode, stdout, expected
+):
+    monkeypatch.setenv("PYTHONPATH", "/ambient/unpatched/setuptools")
+    monkeypatch.setenv("PYTHONUSERBASE", "/ambient/user/base")
+    calls: list[tuple[list[str], dict[str, object]]] = []
+
+    def run(argv, **kwargs):
+        calls.append((list(argv), kwargs))
+        return subprocess.CompletedProcess(args=argv, returncode=returncode, stdout=stdout)
+
+    monkeypatch.setattr(builder.subprocess, "run", run)
+    child_env = builder._clean_child_env()
+    assert builder._distribution_layout_compat_required(child_env, tmp_path) is expected
+    (argv, kwargs), = calls
+    assert argv == [sys.executable, "-c", builder._LAYOUT_COMPAT_PROBE]
+    assert kwargs["env"] == child_env and kwargs["cwd"] == tmp_path
+    assert not {"PYTHONPATH", "PYTHONUSERBASE"} & set(kwargs["env"])
+
+
+def test_wheel_build_env_adds_only_the_builder_owned_compat_path(tmp_path, monkeypatch):
+    monkeypatch.setenv("PYTHONPATH", "/ambient/should/not/leak")
+    probed: list[tuple[dict[str, str], Path]] = []
+
+    def not_required(env, cwd):
+        probed.append((dict(env), cwd))
+        return False
+
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", not_required)
+    env, applied = builder._wheel_build_env(tmp_path)
+    assert applied is False and env == builder._clean_child_env()
+    assert probed == [(builder._clean_child_env(), tmp_path)]
+    assert not (tmp_path / "build-backend-compat").exists()
+
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: True)
+    env, applied = builder._wheel_build_env(tmp_path)
+    compat = tmp_path / "build-backend-compat"
+    assert applied is True
+    assert env == {**builder._clean_child_env(), "PYTHONPATH": str(compat)}
+    assert sorted(path.name for path in compat.iterdir()) == ["_distutils_system_mod.py"]
+    compile((compat / "_distutils_system_mod.py").read_text(encoding="utf-8"), "shim", "exec")
+
+
+def test_wheel_layout_compat_supplies_neutral_install_options(tmp_path, monkeypatch):
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: True)
+    env, _ = builder._wheel_build_env(tmp_path)
+    probe = (
+        "import setuptools, _distutils_system_mod\n"
+        "from distutils.dist import Distribution\n"
+        "import distutils.command.install as install\n"
+        "command = install.install(Distribution())\n"
+        "assert command.install_layout is None and command.prefix_option is None\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", probe], cwd=tmp_path, env=env, capture_output=True, text=True, check=False
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_wheel_stage_records_and_scopes_the_layout_compat(tmp_path, monkeypatch):
+    package_source = tmp_path / "package-source"
+    package_source.mkdir()
+    envs: list[dict[str, str]] = []
+
+    def run(argv, **kwargs):
+        command = list(argv)
+        envs.append(dict(kwargs["env"]))
+        if command[1:4] == ["-m", "pip", "wheel"]:
+            wheelhouse = Path(command[command.index("--wheel-dir") + 1])
+            (wheelhouse / "glow_hdengine-0.0.0-py3-none-any.whl").write_bytes(b"wheel")
+        elif command[1:3] == ["-m", "venv"]:
+            scripts = tmp_path / "venv" / ("Scripts" if builder.os.name == "nt" else "bin")
+            scripts.mkdir(parents=True)
+            (scripts / ("python.exe" if builder.os.name == "nt" else "python")).write_text("")
+        else:
+            console = tmp_path / "venv" / ("Scripts/hdctl.exe" if builder.os.name == "nt" else "bin/hdctl")
+            console.write_text("#!/bin/sh\n")
+            console.chmod(0o755)
+        return subprocess.CompletedProcess(args=command, returncode=0)
+
+    monkeypatch.setattr(builder, "_distribution_layout_compat_required", lambda env, cwd: True)
+    monkeypatch.setattr(builder.subprocess, "run", run)
+    transcript: list[str] = []
+    builder._install_packaged_console_entrypoint(package_source, tmp_path, transcript)
+
+    assert envs[0]["PYTHONPATH"] == str(tmp_path / "build-backend-compat")
+    assert all("PYTHONPATH" not in env for env in envs[1:])
+    assert transcript[:3] == [
+        "stage=build_packaged_wheel",
+        "source=tracked_source_copy",
+        "build_backend_compat=distribution_install_layout",
+    ]
+    assert not any(package_source.iterdir())
+
+
+_STUB_LOADER = """
+class SchemaValidationError(Exception):
+    def __init__(self, code, message=""):
+        super().__init__(message)
+        self.code = code
+
+
+def load_active_mechanics_bundle():
+    {body}
+"""
+_REFUSES = 'raise SchemaValidationError("INCOMPLETE_RELEASE_ROSTER", "stub")'
+_ADMITS = "return object()"
+
+
+def _stub_engine(root: Path, body: str) -> None:
+    config = root / "engine" / "config"
+    config.mkdir(parents=True)
+    (root / "engine" / "__init__.py").write_text("", encoding="utf-8")
+    (config / "__init__.py").write_text("", encoding="utf-8")
+    (config / "registry_loader.py").write_text(_STUB_LOADER.format(body=body), encoding="utf-8")
+
+
+def _isolated_copy(tmp_path: Path, body: str) -> Path:
+    copy = tmp_path / "copy"
+    (copy / "tools" / "evidence").mkdir(parents=True)
+    (copy / "tools" / "evidence" / "regenerate_identity_closure.py").write_bytes(
+        Path("tools/evidence/regenerate_identity_closure.py").read_bytes()
+    )
+    _stub_engine(copy, body)
+    return copy / "tools" / "evidence" / "regenerate_identity_closure.py"
+
+
+_PROBE = (
+    "import runpy, sys\n"
+    "{preimport}"
+    "ns = runpy.run_path(sys.argv[1], run_name='probe')\n"
+    "print(ns['release_not_admitted_observed']())\n"
+)
+
+
+def _probe(script: Path, cwd: Path, *, ambient: Path | None = None, preimport: str = ""):
+    env = {"PATH": "/usr/bin:/bin", "HDE_ISOLATED_RELEASE_BUILD": "1"}
+    if ambient is not None:
+        env["PYTHONPATH"] = str(ambient)
+    return subprocess.run(
+        [sys.executable, "-S", "-c", _PROBE.format(preimport=preimport), str(script)],
+        cwd=cwd, env=env, capture_output=True, text=True, check=False,
+    )
+
+
+def test_closure_probe_follows_the_isolated_copy_with_no_ambient_engine(tmp_path):
+    script = _isolated_copy(tmp_path, _REFUSES)
+    neutral = tmp_path / "neutral"
+    neutral.mkdir()
+    result = subprocess.run(
+        [sys.executable, "-I", "-S", str(script), "--in-place-isolated"],
+        cwd=neutral, env={"PATH": "/usr/bin:/bin", "HDE_ISOLATED_RELEASE_BUILD": "1"},
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == closure.RELEASE_NOT_ADMITTED_EXIT_CODE, result.stderr
+    assert result.stdout == closure.NOT_ADMITTED_LINE + "\n"
+
+
+@pytest.mark.parametrize(
+    "copy_body,ambient_body,expected",
+    [(_REFUSES, _ADMITS, "True"), (_ADMITS, _REFUSES, "False")],
+    ids=["copy-refuses-ambient-admits", "copy-admits-ambient-refuses"],
+)
+def test_closure_probe_ignores_a_different_ambient_engine(tmp_path, copy_body, ambient_body, expected):
+    script = _isolated_copy(tmp_path, copy_body)
+    ambient = tmp_path / "ambient"
+    _stub_engine(ambient, ambient_body)
+    neutral = tmp_path / "neutral"
+    neutral.mkdir()
+    result = _probe(script, neutral, ambient=ambient)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == expected + "\n"
+
+
+def test_closure_probe_fails_closed_when_engine_was_imported_from_elsewhere(tmp_path):
+    script = _isolated_copy(tmp_path, _REFUSES)
+    ambient = tmp_path / "ambient"
+    _stub_engine(ambient, _ADMITS)
+    neutral = tmp_path / "neutral"
+    neutral.mkdir()
+    result = _probe(script, neutral, ambient=ambient, preimport="import engine.config.registry_loader\n")
+    assert result.returncode != 0
+    assert "IDENTITY_CLOSURE:ADMISSION_PROBE_NOT_ROOT_BOUND" in result.stderr

@@ -16,6 +16,7 @@ REQUIRED_KEYS = {
 }
 
 OPTIONAL_KEYS = {
+    "crd_id",
     "epic_id",
     "notes",
     "record_type",
@@ -100,6 +101,10 @@ def main():
             ok = False
         if extra_keys:
             print(f"KEYS_EXTRA:{i}:{sorted(extra_keys)}", file=sys.stderr)
+            ok = False
+
+        if "epic_id" in obj and "crd_id" in obj:
+            print(f"EPIC_CRD_EXCLUSIVE:{i}", file=sys.stderr)
             ok = False
 
         key_pair = (obj["artifact_key"], obj["discovered_physical_path"])
