@@ -2250,15 +2250,18 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
         before_hooks_proven: list[bool] = []
 
         def before_hook_is_proven(argument: ast.Name) -> bool:
-            """A hook registered by call is one undecorated, non-async function of
-            this module, bound once, defining nothing nested and named only as this
-            argument or as a callee, that the general return proof proves as a
-            before-request hook: each return is ``None`` or presenter-backed."""
+            """A hook registered by call is one undecorated function of this module,
+            neither async nor a generator, bound once, defining nothing nested and
+            named only as this argument or as a callee, that the general return proof
+            proves as a before-request hook: each return is ``None`` or
+            presenter-backed."""
             keys = simple_names.get(argument.id, [])
             if len(keys) != 1 or argument.id in aliases or module_binding_counts.get(argument.id, 0) != 1:
                 return False
             hook = function_defs[keys[0]]
             if hook.decorator_list or isinstance(hook, ast.AsyncFunctionDef) or not defines_nothing(hook):
+                return False
+            if any(isinstance(node, (ast.Yield, ast.YieldFrom, ast.Await)) for node in iter_body_nodes(hook)):
                 return False
             if any(
                 (isinstance(node, ast.Name) and node.id == argument.id and node is not argument and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))

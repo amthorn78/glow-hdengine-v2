@@ -2550,7 +2550,8 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     by call, a request-finished receiver, a nested definition in the
     helper, a view whose route decorator belongs to an object other than
     a Flask app or Blueprint, or whose registrar's route method is patched,
-    and a before-request hook registered by call that serves a raw response."""
+    and a before-request hook registered by call that serves a raw response
+    or is a generator."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2625,6 +2626,9 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     modules["before_request_hook_lambda"] = view_module.replace(
         "    return bp\n", "    bp.before_request(lambda: Response(b'raw', status=200))\n    return bp\n"
     ).format(helper=sanctioned_helper, view="        return _respond(emit_fn)")
+    modules["before_request_hook_generator"] = view_module.replace("    return bp\n", "    bp.before_request(_raw_stream)\n    return bp\n").format(
+        helper="def _raw_stream():\n    yield b'raw'\n" + sanctioned_helper, view="        return _respond(emit_fn)"
+    )
     for name, module in modules.items():
         adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", module)
         assert boundary_analyzer._adapter_routes_without_presenter((adapter,)) == [f"{adapter}:reader_post"], name
