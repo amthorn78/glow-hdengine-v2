@@ -32,7 +32,8 @@ def has_legacy_import(t):
 
 def has_route_registration(t):
     # Any use of a registration method: a call, an alias such as
-    # `register = app.register_blueprint`, or a getattr-family lookup by name.
+    # `register = app.register_blueprint`, a getattr-family lookup by name, or a
+    # string-keyed lookup such as `vars(type(app))["register_blueprint"]`.
     # A string that only mentions the name, as the static analyzers' do, is not one;
     # text that is not Python keeps the unanchored pattern.
     tree = parse(t)
@@ -40,6 +41,8 @@ def has_route_registration(t):
         return re.search(r"add_url_rule|register_blueprint", t) is not None
     for node in ast.walk(tree):
         if isinstance(node, ast.Attribute) and node.attr in REGISTRATION_METHODS:
+            return True
+        if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and node.slice.value in REGISTRATION_METHODS:
             return True
         if isinstance(node, ast.Call):
             func = node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
@@ -76,3 +79,20 @@ def test_blueprints_only_in_adapter():
             if "adapter" not in p.parts:
                 hits.append(str(p))
     assert not hits, "Route registration found outside adapter/: \n" + "\n".join(hits)
+
+def test_guard_patterns_flag_real_violations_not_mentions():
+    real_imports = ("import core\n", "from server import app\n", "try: import core\nexcept ImportError: pass\n", "x = 1; import adapters\n", "import os, core\n")
+    clean_imports = ("from engine.core import core\n", "# import core\n", "s = 'from core import x'\n", "from .core import x\n")
+    real_registrations = (
+        "app.register_blueprint(bp)\n",
+        "register = app.register_blueprint\nregister(bp)\n",
+        "getattr(app, 'add_url_rule')('/x', 'x', f)\n",
+        "app.__class__.__dict__['register_blueprint'](app, bp)\n",
+    )
+    clean_registrations = ("NAMES = {'register_blueprint', 'add_url_rule'}\n", "ok = chain.endswith('.add_url_rule')\n", "# app.register_blueprint(bp)\n", "Rec(kind='add_url_rule')\n")
+    assert all(has_legacy_import(t) for t in real_imports)
+    assert not any(has_legacy_import(t) for t in clean_imports)
+    assert all(has_route_registration(t) for t in real_registrations)
+    assert not any(has_route_registration(t) for t in clean_registrations)
+    # Text that is not Python keeps the base's unanchored patterns.
+    assert has_legacy_import("- note: import core\n```\n") and has_route_registration("- note: app.register_blueprint(\n```\n")

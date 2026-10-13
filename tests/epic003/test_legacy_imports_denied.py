@@ -36,3 +36,8 @@ def test_legacy_imports_denied():
             if _imports_legacy_tree(txt, rx):
                 hits.append(f"{f}")
     assert not hits, f"Legacy imports found: {hits}"
+
+def test_legacy_import_check_flags_statements_not_mentions():
+    rx = [re.compile(p) for p in FORBIDDEN]
+    assert all(_imports_legacy_tree(t, rx) for t in ("import core\n", "try: import core\nexcept ImportError: pass\n", "x = 1; from adapters import a\n", "- note: import server\n```\n"))
+    assert not any(_imports_legacy_tree(t, rx) for t in ("from engine.core import core\n", "# import core\n", "s = 'import server'\n"))

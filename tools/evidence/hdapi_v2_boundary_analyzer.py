@@ -1870,7 +1870,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
         dynamic_namespace_names = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "__builtins__"}
         module_has_dynamic_namespace_access = any(
             (isinstance(node, ast.Name) and node.id in dynamic_namespace_names)
-            or (isinstance(node, ast.Attribute) and (node.attr in {"__dict__", "__globals__"} or (node.attr == "modules" and aliases.get(_attribute_chain(node.value)) == "sys")))
+            or (isinstance(node, ast.Attribute) and (node.attr in {"__dict__", "__globals__", "__setattr__", "__delattr__"} or (node.attr == "modules" and aliases.get(_attribute_chain(node.value)) == "sys")))
             for node in ast.walk(tree)
         ) or any(target == "sys.modules" or target.split(".", 1)[0] in {"builtins", "importlib"} for target in aliases.values())
 
@@ -2035,25 +2035,60 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                     return True
             return False
 
+        def binding_site_counts(nodes) -> dict[str, int]:
+            counts: dict[str, int] = {}
+            for node in nodes:
+                bound_names: list[str] = []
+                if isinstance(node, ast.Name) and isinstance(node.ctx, (ast.Store, ast.Del)):
+                    bound_names = [node.id]
+                elif isinstance(node, ast.arg):
+                    bound_names = [node.arg]
+                elif isinstance(node, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar)) and node.name:
+                    bound_names = [node.name]
+                elif isinstance(node, ast.MatchMapping) and node.rest:
+                    bound_names = [node.rest]
+                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    bound_names = [node.name]
+                elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                    bound_names = [(alias.asname or alias.name).split(".", 1)[0] for alias in node.names]
+                elif isinstance(node, (ast.Global, ast.Nonlocal)):
+                    bound_names = list(node.names)
+                for bound_name in bound_names:
+                    counts[bound_name] = counts.get(bound_name, 0) + 1
+            return counts
+
+        module_binding_counts = binding_site_counts(ast.walk(tree))
+        presenter_trust_names = {
+            name for name, target in aliases.items()
+            if _is_sanctioned_presenter_call(name, aliases) or target in {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
+        }
+
         def presenter_bound_helper_key(call: ast.Call, owner: str, candidate: str) -> str | None:
             """Prove a call to a module-level helper of this module that receives a
             sanctioned presenter callable: the argument's bound value in the caller, or,
             when the argument is omitted, the helper parameter's default.  The helper
-            must be undecorated and referenced only as the callee of a call, and the
+            must be undecorated, its name must appear only as the callee of a call
+            (never as a value or an attribute name, such as ``module._respond``), and the
             module must have no dynamic namespace access (``globals()``, ``setattr``,
             ``exec``, ``sys.modules`` and the like), so that the call runs the analyzed
-            definition with its own defaults.  Returns the key under which the helper
-            is proven with exactly those parameters treated as presenter callables, or
-            ``None`` when the shape does not apply."""
+            definition with its own defaults.  The view must return the call directly,
+            each imported presenter name the proof trusts must be bound only by its
+            import, and a value bound in the caller must not be rebound on its way to
+            the call.  Returns the key under which the helper is proven with exactly
+            those parameters treated as presenter callables, or ``None`` when the
+            shape does not apply."""
 
             fn = function_defs.get(candidate)
             if module_has_dynamic_namespace_access or fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+                return None
+            if not isinstance(ast_parents.get(call), ast.Return) or any(module_binding_counts.get(name, 0) != 1 for name in presenter_trust_names):
                 return None
             helper_name = call.func.id
             if any(name_is_bound_in(stmt, helper_name) for stmt in tree.body if stmt is not fn):
                 return None
             if any(
-                isinstance(node, ast.Name) and node.id == helper_name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node)
+                (isinstance(node, ast.Name) and node.id == helper_name and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node))
+                or (isinstance(node, ast.Attribute) and node.attr == helper_name)
                 for node in ast.walk(tree)
             ):
                 return None
@@ -2082,15 +2117,43 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for param in positional + list(fn.args.kwonlyargs):
                 if param.arg in bound_args:
                     value = bound_args[param.arg]
-                    if (isinstance(value, ast.Name) and value.id in caller_presenter_names) or (
-                        isinstance(value, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(value), aliases)
-                    ):
+                    if isinstance(value, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(value), aliases):
                         bound.add(param.arg)
+                    elif isinstance(value, ast.Name) and value.id in caller_presenter_names:
+                        # Not bound in the view (parameters included), and bound at
+                        # most once in each enclosing function's body.
+                        owner_fn = function_defs[owner]
+                        if binding_site_counts([*ast.walk(owner_fn.args), *(node for stmt in owner_fn.body for node in ast.walk(stmt))]).get(value.id, 0):
+                            continue
+                        chain_scope = parent_function_by_key.get(owner)
+                        rebound = False
+                        while chain_scope is not None:
+                            if binding_site_counts(node for stmt in function_defs[chain_scope].body for node in ast.walk(stmt)).get(value.id, 0) > 1:
+                                rebound = True
+                                break
+                            chain_scope = parent_function_by_key.get(chain_scope)
+                        if not rebound:
+                            bound.add(param.arg)
                 elif param.arg in defaults:
                     default = defaults[param.arg]
                     if isinstance(default, (ast.Name, ast.Attribute)) and _is_sanctioned_presenter_call(_attribute_chain(default), aliases):
                         bound.add(param.arg)
             if not bound or any(name_is_bound_in(stmt, name) for stmt in fn.body for name in bound):
+                return None
+            # The helper body is held to a stricter, flow-independent shape than the
+            # general return proof: a bound parameter is only ever called (never
+            # aliased or passed on), every local name has one binding site, and no
+            # response content or status is replaced after construction.
+            helper_nodes = [node for stmt in fn.body for node in ast.walk(stmt)]
+            if any(isinstance(node, ast.Name) and node.id in bound and not (isinstance(ast_parents.get(node), ast.Call) and ast_parents[node].func is node) for node in helper_nodes):
+                return None
+            if any(count > 1 for count in binding_site_counts(helper_nodes).values()):
+                return None
+            if any(
+                (isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)) and node.attr in {"data", "response", "status", "status_code"})
+                or (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr in {"set_data", "set_json"})
+                for node in helper_nodes
+            ):
                 return None
             key = f"{candidate}#presenter_bound:{','.join(sorted(bound))}"
             function_defs[key] = fn

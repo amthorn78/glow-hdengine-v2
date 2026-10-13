@@ -2536,7 +2536,10 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
     a non-presenter default, a non-presenter bound value, a parameter with neither,
     a helper that emits through another path, a helper that rebinds the parameter,
     a decorated helper whose wrapper replaces it, a helper whose defaults are
-    replaced after definition, and a helper replaced through the module namespace."""
+    replaced after definition, a helper replaced through the module namespace,
+    a helper that overwrites its emitter, its body or its response data in a
+    branch, a presenter name rebound at module level, and a view that alters the
+    helper's result or rebinds the bound argument."""
 
     raw_decorator = "def _raw(fn):\n    def wrapper(*args, **kwargs):\n        return Response(b'raw', status=200)\n    return wrapper\n"
     shapes = {
@@ -2550,9 +2553,22 @@ def test_epic034_adapter_boundary_rejects_module_helper_without_presenter_proven
         "defaults_replaced": ("def _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)\n_respond.__defaults__ = (_plain,)", "_respond()"),
         "replaced_through_globals": ("def _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)\nglobals()['_respond'] = lambda emit_fn: Response(b'raw', status=200)", "_respond(emit_fn)"),
         "replaced_through_module_setattr": ("import sys\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)\nsetattr(sys.modules[__name__], '_respond', _plain)", "_respond(emit_fn)"),
+        "replaced_through_module_attribute": ("import presenter_helper_self as _self\ndef _respond(emit_fn):\n    return Response(emit_fn({'ok': False}), status=200)\n_self._respond = _plain", "_respond(emit_fn)"),
+        "alias_overwritten_in_branch": ("def _respond(emit_fn):\n    f = emit_fn\n    if SAFE_MODE:\n        f = _plain\n    return Response(f({'ok': False}), status=200)", "_respond(emit_fn)"),
+        "body_overwritten_in_branch": ("def _respond(emit_fn):\n    body = emit_fn({'ok': False})\n    if SAFE_MODE:\n        body = b'raw'\n    return Response(body, status=200)", "_respond(emit_fn)"),
+        "response_data_replaced": ("def _respond(emit_fn):\n    resp = Response(emit_fn({'ok': False}), status=200)\n    resp.data = b'raw'\n    return resp", "_respond(emit_fn)"),
+        "presenter_name_rebound_at_module": ("emit_reader_public_bytes = _plain\ndef _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)", "_respond()"),
     }
-    for name, (helper, call) in shapes.items():
-        adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", _PRESENTER_HELPER_MODULE.format(helper=helper, call=call))
+    modules = {name: _PRESENTER_HELPER_MODULE.format(helper=helper, call=call) for name, (helper, call) in shapes.items()}
+    view_module = _PRESENTER_HELPER_MODULE.replace("        return {call}\n", "{view}\n")
+    sanctioned_helper = "def _respond(emit_fn=emit_reader_public_bytes):\n    return Response(emit_fn({'ok': False}), status=200)"
+    view_shapes = {
+        "view_mutates_result": "        r = _respond(emit_fn)\n        r.data = b'raw'\n        return r",
+        "view_rebinds_argument_in_branch": "        if SAFE_MODE:\n            emit_fn = _plain\n        return _respond(emit_fn)",
+    }
+    modules.update({name: view_module.format(helper=sanctioned_helper, view=view) for name, view in view_shapes.items()})
+    for name, module in modules.items():
+        adapter = _write_boundary_temp(tmp_path, f"presenter_helper_{name}.py", module)
         assert boundary_analyzer._adapter_routes_without_presenter((adapter,)) == [f"{adapter}:reader_post"], name
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer.discover_route_registrations((adapter,))))
