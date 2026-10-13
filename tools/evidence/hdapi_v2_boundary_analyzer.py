@@ -1867,6 +1867,12 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 yield node
 
         presenter_bound_params_by_key: dict[str, frozenset[str]] = {}
+        dynamic_namespace_names = {"globals", "vars", "locals", "exec", "eval", "compile", "setattr", "delattr", "__import__", "__builtins__"}
+        module_has_dynamic_namespace_access = any(
+            (isinstance(node, ast.Name) and node.id in dynamic_namespace_names)
+            or (isinstance(node, ast.Attribute) and (node.attr in {"__dict__", "__globals__"} or (node.attr == "modules" and aliases.get(_attribute_chain(node.value)) == "sys")))
+            for node in ast.walk(tree)
+        ) or any(target == "sys.modules" or target.split(".", 1)[0] in {"builtins", "importlib"} for target in aliases.values())
 
         def presenter_callable_names_for(owner: str) -> set[str]:
             def is_none_constant(value: ast.AST) -> bool:
@@ -2033,13 +2039,15 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             """Prove a call to a module-level helper of this module that receives a
             sanctioned presenter callable: the argument's bound value in the caller, or,
             when the argument is omitted, the helper parameter's default.  The helper
-            must be undecorated and referenced only as the callee of a call, so that
-            the call runs the analyzed definition with its own defaults.  Returns the
-            key under which the helper is proven with exactly those parameters treated
-            as presenter callables, or ``None`` when the shape does not apply."""
+            must be undecorated and referenced only as the callee of a call, and the
+            module must have no dynamic namespace access (``globals()``, ``setattr``,
+            ``exec``, ``sys.modules`` and the like), so that the call runs the analyzed
+            definition with its own defaults.  Returns the key under which the helper
+            is proven with exactly those parameters treated as presenter callables, or
+            ``None`` when the shape does not apply."""
 
             fn = function_defs.get(candidate)
-            if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
+            if module_has_dynamic_namespace_access or fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
                 return None
             helper_name = call.func.id
             if any(name_is_bound_in(stmt, helper_name) for stmt in tree.body if stmt is not fn):

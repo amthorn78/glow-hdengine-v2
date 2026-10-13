@@ -1,23 +1,38 @@
 from pathlib import Path
+import ast
 import re
 
-# Anchored to the start of an import statement: a qualified current import such
-# as `from engine.core import core` is not an import of the legacy `core` tree.
-FORBIDDEN = (r"^\s*from\s+core\b", r"^\s*import\s+core\b",
-             r"^\s*from\s+server\b", r"^\s*import\s+server\b",
-             r"^\s*from\s+adapters\b", r"^\s*import\s+adapters\b")
+LEGACY_ROOTS = ("core", "server", "adapters")
+# Text that is not Python keeps the unanchored patterns.
+FORBIDDEN = (r"\bfrom\s+core\b", r"\bimport\s+core\b",
+             r"\bfrom\s+server\b", r"\bimport\s+server\b",
+             r"\bfrom\s+adapters\b", r"\bimport\s+adapters\b")
 SEARCH_ROOTS = ("adapter","engine","cli","scripts")
 
+def _imports_legacy_tree(txt, rx):
+    # Import statements by AST: a qualified current import such as
+    # `from engine.core import core` is not an import of the legacy `core` tree,
+    # while `try: import core` on one line still is.
+    try:
+        tree = ast.parse(txt)
+    except SyntaxError:
+        return any(r.search(txt) for r in rx)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import) and any(alias.name.split(".", 1)[0] in LEGACY_ROOTS for alias in node.names):
+            return True
+        if isinstance(node, ast.ImportFrom) and node.level == 0 and (node.module or "").split(".", 1)[0] in LEGACY_ROOTS:
+            return True
+    return False
+
 def test_legacy_imports_denied():
-    rx = [re.compile(p, re.MULTILINE) for p in FORBIDDEN]
+    rx = [re.compile(p) for p in FORBIDDEN]
     hits = []
     for root in SEARCH_ROOTS:
         p = Path(root)
-        if not p.exists(): 
+        if not p.exists():
             continue
         for f in p.rglob("*.py"):
             txt = f.read_text(encoding="utf-8", errors="ignore")
-            for r in rx:
-                if r.search(txt):
-                    hits.append(f"{f}")
+            if _imports_legacy_tree(txt, rx):
+                hits.append(f"{f}")
     assert not hits, f"Legacy imports found: {hits}"
