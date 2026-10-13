@@ -2198,6 +2198,58 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             for node in ast.walk(tree)
         )
 
+        # An HTTP exception the module raises is served as Werkzeug's own error page,
+        # not presenter bytes, so for the shape it fails closed wherever it sits: the
+        # module names nothing `abort` or `Aborter` (by import, name, attribute or
+        # constant getattr), uses a name it imports from Werkzeug, other than an exact
+        # response class, only as the class isinstance() tests or an except clause
+        # catches, reads `routing_exception` only as the object isinstance() tests,
+        # and raises nothing reached through a Flask or Werkzeug import.
+        http_exit_names = {"abort", "Aborter"}
+        werkzeug_names = {
+            name for name, target in exact_import_targets.items()
+            if (target == "werkzeug" or target.startswith("werkzeug.")) and target not in sanctioned_response_classes
+        }
+
+        def isinstance_argument(node: ast.AST, index: int) -> bool:
+            parent = ast_parents.get(node)
+            if index == 1 and isinstance(parent, ast.Tuple):
+                node, parent = parent, ast_parents.get(parent)
+            if index == 1 and isinstance(parent, ast.ExceptHandler) and parent.type is node:
+                return True
+            return (
+                isinstance(parent, ast.Call) and isinstance(parent.func, ast.Name) and parent.func.id == "isinstance"
+                and "isinstance" not in module_binding_counts and len(parent.args) == 2 and not parent.keywords and parent.args[index] is node
+            )
+
+        def raises_http_exception(node: ast.AST) -> bool:
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                return any(alias.name.rsplit(".", 1)[-1] in http_exit_names or alias.asname in http_exit_names for alias in node.names)
+            if isinstance(node, ast.Name):
+                if node.id in http_exit_names:
+                    return True
+                if node.id not in werkzeug_names:
+                    return False
+                top: ast.AST = node
+                while isinstance(ast_parents.get(top), ast.Attribute) and ast_parents[top].value is top:
+                    top = ast_parents[top]
+                rest = _attribute_chain(top).partition(".")[2]
+                resolved = f"{exact_import_targets[node.id]}.{rest}" if rest else exact_import_targets[node.id]
+                return resolved not in sanctioned_response_classes and not isinstance_argument(top, 1)
+            if isinstance(node, ast.Attribute):
+                return node.attr in http_exit_names or (node.attr == "routing_exception" and not isinstance_argument(node, 0))
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"getattr", "hasattr"} and len(node.args) >= 2:
+                return isinstance(node.args[1], ast.Constant) and node.args[1].value in http_exit_names | {"routing_exception"}
+            if isinstance(node, ast.Raise) and node.exc is not None:
+                raised = node.exc.func if isinstance(node.exc, ast.Call) else node.exc
+                if not is_pure_chain(raised):
+                    return False
+                target = exact_import_targets.get(_attribute_chain(raised).split(".", 1)[0], "")
+                return target.split(".", 1)[0] in {"flask", "werkzeug"}
+            return False
+
+        module_raises_http_exceptions = any(raises_http_exception(node) for node in ast.walk(tree))
+
         # Flask's response path beyond the analyzed decorators fails closed for the
         # shape. A per-request callback, an after-request hook, error handler or
         # endpoint registered other than by a decorator, a replaced view or hook map,
@@ -2312,12 +2364,23 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 return False
             return True
 
+        hook_decorator_suffixes = (".errorhandler", ".app_errorhandler", ".before_request", ".before_app_request", ".after_request", ".after_app_request")
+
         def module_alters_response_path() -> bool:
+            # A decorated hook is one the hook map analyzes (an app-wide hook on a
+            # Blueprint under a non-public prefix is not) and carries exactly one
+            # decorator, its registration on a registrar, so what Flask runs is the
+            # analyzed hook itself.
             if module_touches_response_path:
                 return True
             if not registered_hooks_proven:
                 registered_hooks_proven.append(
-                    all(before_hook_is_proven(argument) for argument in call_registered_before_hooks)
+                    all(
+                        key in hook_kind_by_key and len(fn.decorator_list) == 1 and is_hook_registration(fn.decorator_list[0], key)
+                        for key, fn in list(function_defs.items())
+                        if "#" not in key and any(_attribute_chain(deco.func if isinstance(deco, ast.Call) else deco).endswith(hook_decorator_suffixes) for deco in fn.decorator_list)
+                    )
+                    and all(before_hook_is_proven(argument) for argument in call_registered_before_hooks)
                     and all(after_hook_is_header_only(function_defs[key]) for key, kind in list(hook_kind_by_key.items()) if kind == "after_request")
                 )
             return not registered_hooks_proven[0]
@@ -2326,12 +2389,27 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
 
         def is_route_registration(deco: ast.AST, owner: str) -> bool:
             """``<name>.route(...)`` (or ``.get``, ``.post``, ``.put``, ``.patch`` or
-            ``.delete``), where ``<name>`` is not bound in the view and is bound exactly
-            once, in the nearest enclosing scope that binds it, by constructing an
-            imported Flask app or Blueprint."""
+            ``.delete``) on a registrar (see ``is_registrar``)."""
             if not (isinstance(deco, ast.Call) and isinstance(deco.func, ast.Attribute) and deco.func.attr in {"route", "get", "post", "put", "patch", "delete"} and isinstance(deco.func.value, ast.Name)):
                 return False
-            name = deco.func.value.id
+            return is_registrar(deco.func.value.id, owner)
+
+        def is_hook_registration(deco: ast.AST, owner: str) -> bool:
+            """``<name>.after_request`` (or ``.after_app_request``, ``.before_request``
+            or ``.before_app_request``) or ``<name>.errorhandler(<key>)`` (or
+            ``.app_errorhandler``) on a registrar (see ``is_registrar``)."""
+            if isinstance(deco, ast.Attribute) and deco.attr in {"after_request", "after_app_request", "before_request", "before_app_request"}:
+                target = deco.value
+            elif isinstance(deco, ast.Call) and isinstance(deco.func, ast.Attribute) and deco.func.attr in {"errorhandler", "app_errorhandler"} and len(deco.args) == 1 and not deco.keywords:
+                target = deco.func.value
+            else:
+                return False
+            return isinstance(target, ast.Name) and is_registrar(target.id, owner)
+
+        def is_registrar(name: str, owner: str) -> bool:
+            """``<name>`` is not bound in the decorated function and is bound exactly
+            once, in the nearest enclosing scope that binds it, by constructing an
+            imported Flask app or Blueprint."""
             owner_fn = function_defs[owner]
             if binding_site_counts([*ast.walk(owner_fn.args), *(node for stmt in owner_fn.body for node in ast.walk(stmt))]).get(name, 0):
                 return False
@@ -2482,9 +2560,11 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             module must be free of reflection (see ``is_reflection``), of relative and
             star imports, of same-module patching of what the proof trusts (see
             ``module_patches_trusted_names``) and of Flask response-path registration
-            outside the analyzed decorators (see ``touches_response_path``), and every
-            decorated after-request hook must leave the body alone (see
-            ``after_hook_is_header_only``), so that the
+            outside the analyzed decorators (see ``touches_response_path``) and of
+            HTTP exceptions (see ``raises_http_exception``), every decorated hook must
+            be registered by its one decorator on a registrar (see
+            ``is_hook_registration``), and every decorated after-request hook must
+            leave the body alone (see ``after_hook_is_header_only``), so that the
             call runs the analyzed definition with its own defaults and its return is
             what Flask serves.  The view must be registered only by route decorators on
             a Flask app or Blueprint the module constructs (see ``is_route_registration``),
@@ -2499,7 +2579,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             presenter callables, or ``None`` when the shape does not apply."""
 
             fn = function_defs.get(candidate)
-            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names or module_alters_response_path():
+            if module_has_dynamic_namespace_access or module_has_inexact_import or module_patches_trusted_names or module_raises_http_exceptions or module_alters_response_path():
                 return None
             if fn is None or fn.decorator_list or ast_parents.get(fn) is not tree or not isinstance(call.func, ast.Name) or call.func.id in aliases:
                 return None
