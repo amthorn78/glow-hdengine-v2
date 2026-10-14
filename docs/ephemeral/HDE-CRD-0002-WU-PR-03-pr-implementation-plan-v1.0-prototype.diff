@@ -1,0 +1,1245 @@
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+index aeba5d2..7da9283 100644
+--- a/ARCHITECTURE.md
++++ b/ARCHITECTURE.md
+@@ -6,7 +6,7 @@
+ - **engine/** — engine library
+   - Compat: `engine/compat/{compute.py,ordering.py,thresholds.py,constants.py}`
+   - Validation: `engine/validation/viewer_prefs.py`
+-  - Emission: `engine/presenter/emitter.py::emit_compact_json(payload)`
++  - Emission: `engine/presenter/emitter.py::emit_public(envelope, *, sort_keys=True) -> bytes`; `emit_compact_json(envelope, *, sort_keys=True) -> tuple[bytes, dict]` is a compatibility alias of `emit_public_with_envelope`
+   - Serialization: `engine/serializer/canon.py::dumps(obj)->bytes` (UTF-8, sort_keys, compact, one trailing LF)
+   - Errors: `engine/compat/errors.py::error_envelope` builds the governed `error_v1` envelope with keys `schema` (`"v1"`), `ok` (`false`), `code` and `error`, adding `details` only when a caller passes one (the Reader routes never do); the Reader error branches are `$defs.error` of `schemas/reader.v1.schema.json` and `schemas/reader.v2.schema.json`.
+   - HTTP handlers: `engine/http/*` (e.g., `compat_handler.py`)
+@@ -21,12 +21,16 @@
+ 
+ ## Emitter/serializer discipline
+ - All service and CLI emission **must** call:
+-  - `engine.presenter.emitter.emit_compact_json(payload: dict) -> bytes`
++  - `engine.presenter.emitter.emit_public(envelope: dict, *, sort_keys: bool = True) -> bytes` (or `emit_public_with_envelope`, which returns `(bytes, envelope)`; `emit_compact_json` is its compatibility alias)
+   - `engine.serializer.canon.dumps(obj) -> bytes` (UTF-8, sort_keys=True, compact, exactly one trailing LF)
+ - Forbidden in handlers/CLI: `json.dumps(` or `jsonify(`
+ 
+-## Routing (dev only)
+-- Reader/Compat routes are registered from `adapter/`
++## Routing and mounts
++- Reader/Compat routes are registered from `adapter/`. Three app factories mount the same blueprints: the dev/internal blueprint at `/`, the production Reader blueprint under `/api` (`POST /api/reader`) and the compat blueprint at `/api/compat/v1`.
++  - `adapter/factory.py::create_app` — the production app (`Procfile`, gunicorn)
++  - `adapter/wsgi.py::create_app` — adds `/internal/healthz` and `/internal/readyz`
++  - `adapter/http_reader.py::create_app` — the dev runner (`python -m adapter.http_reader`, started by `scripts/dev_start_reader.sh`)
++- The route inventory is `docs/ENDPOINTS_CATALOG.json`, written by `tools/evidence/generate_a7_transport_proofs.py`
+ - Compat alpha endpoint (internal): `/api/compat/v1`
+   - Success = **200 JSON**; errors include `Cache-Control: no-store`
+   - GET **ids-only** (`a_id`,`b_id`); any JSON body → **400**
+diff --git a/VERIFY.sh b/VERIFY.sh
+index ef4262e..99f49b2 100755
+--- a/VERIFY.sh
++++ b/VERIFY.sh
+@@ -1,12 +1,29 @@
+ #!/usr/bin/env bash
+ set -euo pipefail
+ 
+-export APP_ENV=${APP_ENV:-dev}
++# Every check below verifies the dev Reader success path, which serves only an
++# explicit APP_ENV=dev.  Like the start helper it runs, this script never
++# defaults APP_ENV (HDE Mechanics Guide §5.6): the caller supplies it.
++if [[ "${APP_ENV-}" != "dev" ]]; then
++  echo "VERIFY_APP_ENV_NOT_DEV: run with APP_ENV=dev (effective: ${APP_ENV-<UNSET>})" >&2
++  exit 2
++fi
++export APP_ENV
++PORT="${VERIFY_PORT:-5000}"
++WORK="$(mktemp -d)"
++TOKENS="$WORK/tokens.txt"
++: > "$TOKENS"
++PID=""
++cleanup() {
++  if [[ -n "$PID" ]]; then kill "$PID" >/dev/null 2>&1 || true; wait "$PID" 2>/dev/null || true; fi
++  rm -rf "$WORK"
++}
++trap cleanup EXIT
+ 
+ say() { printf "%s\n" "$*"; }
+ 
+ # --- 0) Serializer + emitter determinism ---
+-python - <<'PY'
++python - <<'PY' | tee -a "$TOKENS"
+ import os, json, hashlib, sys
+ from engine.stable.sercanon import serialize
+ from engine.emit_public import emit_public_envelope
+@@ -35,31 +52,36 @@ tok("TWO_RUN_IDENTITY", AB1==AB2)
+ tok("AB_BA", AB1==BA)
+ PY
+ 
+-# --- 1) Start runner (adapter blueprint) ---
+-# free port 5000 if needed
+-{ command -v fuser >/dev/null && fuser -k 5000/tcp; } >/dev/null 2>&1 || true
+-{ command -v lsof  >/dev/null && lsof -ti tcp:5000 | xargs -r kill -9; } >/dev/null 2>&1 || true
++# --- 1) Start the canonical dev runner (scripts/dev_start_reader.sh) ---
++# free the port if needed
++{ command -v fuser >/dev/null && fuser -k "$PORT/tcp"; } >/dev/null 2>&1 || true
++{ command -v lsof  >/dev/null && lsof -ti "tcp:$PORT" | xargs -r kill -9; } >/dev/null 2>&1 || true
+ 
+-python -u - <<'PY' > .verify_runner.log 2>&1 &
+-from dev.reader_harness.app import app
+-app.run(host="127.0.0.1", port=5000, debug=False)
+-PY
++PORT="$PORT" scripts/dev_start_reader.sh > "$WORK/runner.log" 2>&1 &
+ PID=$!
+-sleep 1
+-if ! ps -p "$PID" >/dev/null 2>&1; then
+-  echo "RUNNER_FAIL"; sed -n '1,120p' .verify_runner.log; exit 1
+-fi
+ 
+-URL='http://127.0.0.1:5000/api/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo'
++URL="http://127.0.0.1:$PORT/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo"
++
++ready=0
++for _ in $(seq 1 60); do
++  if ! kill -0 "$PID" >/dev/null 2>&1; then break; fi
++  if curl -sS -o /dev/null "$URL" >/dev/null 2>&1; then ready=1; break; fi
++  sleep 0.5
++done
++if [[ "$ready" != 1 ]]; then
++  echo "RUNNER_FAIL"; sed -n '1,120p' "$WORK/runner.log"; exit 1
++fi
+ 
+ # --- 2) GET 200: headers + ETag over identity bytes ---
+-curl -sS -H 'Accept-Encoding: identity' -D .h200.txt "$URL" -o .body200.json >/dev/null
++curl -sS -H 'Accept-Encoding: identity' -D "$WORK/h200.txt" "$URL" -o "$WORK/body200.json" >/dev/null
+ 
+-python - <<'PY'
++WORK="$WORK" python - <<'PY' | tee -a "$TOKENS"
+ import hashlib, re, os
+-hdr = open(".h200.txt","rb").read().decode("latin-1")
+-bod = open(".body200.json","rb").read()
++w = os.environ["WORK"]
++hdr = open(os.path.join(w, "h200.txt"),"rb").read().decode("latin-1")
++bod = open(os.path.join(w, "body200.json"),"rb").read()
+ def tok(n, ok): print(f"{n}_{'OK' if ok else 'FAIL'}")
++tok("READER_200_STATUS", re.match(r'HTTP/\S+\s+200\b', hdr) is not None)
+ ct  = re.search(r'(?im)^content-type:\s*application/json;\s*charset=utf-8\s*$', hdr) is not None
+ cc  = re.search(r'(?im)^cache-control:\s*private,\s*max-age=0,\s*must-revalidate\s*$', hdr) is not None
+ vary= re.search(r'(?im)^vary:\s*authorization,\s*accept-encoding\s*$', hdr) is not None
+@@ -70,42 +92,38 @@ tok("READER_200_ETAG_MATCH", bool(m) and m.group(1).strip()=='"%s"'%hashlib.sha2
+ PY
+ 
+ # --- 3) 304 empty body + HEAD CL parity ---
+-ETAG=$(awk 'BEGIN{IGNORECASE=1}/^etag:/{print $2}' .h200.txt | tr -d '\r')
+-curl -sS -D .h304.txt -H "If-None-Match: $ETAG" "$URL" -o /dev/null -w '%{http_code}\n' > .code304.txt
++ETAG=$(awk 'tolower($1)=="etag:"{print $2}' "$WORK/h200.txt" | tr -d '\r')
++curl -sS -D "$WORK/h304.txt" -H "If-None-Match: $ETAG" "$URL" -o /dev/null -w '%{http_code}\n' > "$WORK/code304.txt"
+ 
+-python - <<'PY'
+-import re, pathlib
+-hdr  = pathlib.Path(".h304.txt").read_text(encoding="latin-1")
+-code = pathlib.Path(".code304.txt").read_text().strip()
++WORK="$WORK" python - <<'PY' | tee -a "$TOKENS"
++import os, re, pathlib
++w = pathlib.Path(os.environ["WORK"])
++hdr  = (w / "h304.txt").read_text(encoding="latin-1")
++code = (w / "code304.txt").read_text().strip()
+ def tok(n, ok): print(f"{n}_{'OK' if ok else 'FAIL'}")
+ tok("READER_304_STATUS", code=="304")
+ m = re.search(r'(?im)^content-length:\s*(\d+)\s*$', hdr)
+ tok("READER_304_EMPTY_BODY", (m is None) or (m and m.group(1)=="0"))
+ PY
+ 
+-curl -sS -I -D .hhead.txt "$URL" -o /dev/null >/dev/null
+-python - <<'PY'
++curl -sS -I -D "$WORK/hhead.txt" "$URL" -o /dev/null >/dev/null
++WORK="$WORK" python - <<'PY' | tee -a "$TOKENS"
+ import os, re, pathlib
+-len_body = os.path.getsize(".body200.json")
+-hdr = pathlib.Path(".hhead.txt").read_text(encoding="latin-1")
++w = pathlib.Path(os.environ["WORK"])
++len_body = (w / "body200.json").stat().st_size
++hdr = (w / "hhead.txt").read_text(encoding="latin-1")
+ m = re.search(r'(?im)^content-length:\s*(\d+)\s*$', hdr)
+ print("READER_HEAD_CL_MATCH_OK" if (m and int(m.group(1))==len_body) else "READER_HEAD_CL_MATCH_FAIL")
+ PY
+ 
+ # --- 4) ETag invariance (identity vs gzip) ---
+-curl -sS -H 'Accept-Encoding: identity' -D .h_id.txt "$URL" -o /dev/null
+-curl -sS --compressed                 -D .h_gz.txt "$URL" -o /dev/null
+-awk 'BEGIN{IGNORECASE=1}/^etag:/{print $2}' .h_id.txt | tr -d '\r' > .et_id.txt
+-awk 'BEGIN{IGNORECASE=1}/^etag:/{print $2}' .h_gz.txt | tr -d '\r' > .et_gz.txt
+-diff -q .et_id.txt .et_gz.txt >/dev/null && echo "ETAG_INVARIANCE_OK" || echo "ETAG_INVARIANCE_FAIL"
+-
+-# --- 5) Stop runner ---
+-kill "$PID" >/dev/null 2>&1 || true
+-
+-# --- 6) Exit 1 if any FAIL printed ---
+-if grep -q "_FAIL" <(grep -E '(_OK|_FAIL)$' <<<"$(cat .h200.txt .h304.txt .hhead.txt 2>/dev/null; true)"; \
+-                    printf "%s\n" "$(cat .verify_runner.log 2>/dev/null)"; \
+-                    true) || \
+-   grep -q "_FAIL" <(grep -E '(_OK|_FAIL)$' <<<"$(cat)"); then
++curl -sS -H 'Accept-Encoding: identity' -D "$WORK/h_id.txt" "$URL" -o /dev/null
++curl -sS --compressed                 -D "$WORK/h_gz.txt" "$URL" -o /dev/null
++awk 'tolower($1)=="etag:"{print $2}' "$WORK/h_id.txt" | tr -d '\r' > "$WORK/et_id.txt"
++awk 'tolower($1)=="etag:"{print $2}' "$WORK/h_gz.txt" | tr -d '\r' > "$WORK/et_gz.txt"
++{ test -s "$WORK/et_id.txt" && diff -q "$WORK/et_id.txt" "$WORK/et_gz.txt" >/dev/null && echo "ETAG_INVARIANCE_OK" || echo "ETAG_INVARIANCE_FAIL"; } | tee -a "$TOKENS"
++
++# --- 5) Exit 1 if any token failed ---
++if grep -q '_FAIL$' "$TOKENS"; then
+   exit 1
+ fi
+diff --git a/adapter/factory.py b/adapter/factory.py
+index 5dc4066..618a624 100644
+--- a/adapter/factory.py
++++ b/adapter/factory.py
+@@ -1,5 +1,7 @@
+-from flask import Flask, request as _req
++from flask import Flask, Response, request as _req
+ from adapter.http_reader import api_bp, bp  # dev/internal blueprint and the production Reader blueprint
++from engine.compat.errors import error_envelope
++from engine.presenter.emitter import emit_public
+ from engine.http.compat_handler import (
+     compat_blueprint,
+     compat_error_response,
+@@ -11,6 +13,33 @@ def create_app():
+     app.register_blueprint(bp, url_prefix="")  # mount at /
+     app.register_blueprint(api_bp, url_prefix="/api")  # production Reader: POST /api/reader (PF05 §5.4)
+     app.register_blueprint(compat_blueprint)
++
++    def _not_found_envelope_response(status: int, allow: str | None) -> Response:
++        # The canonical ERR_NOT_FOUND error_v1 envelope through the presenter,
++        # no-store, no ETag, application/json (PF05 §5.2 item 1; §5.5 for compat).
++        payload = emit_public(error_envelope("ERR_NOT_FOUND"))
++        resp = Response(payload, status=status, mimetype="application/json; charset=utf-8")
++        resp.headers["Cache-Control"] = "no-store"
++        if allow:
++            resp.headers["Allow"] = allow
++        resp.headers.pop("ETag", None)
++        resp.headers.pop("Content-Encoding", None)
++        resp.headers["Content-Length"] = str(len(payload))
++        return resp
++
++    @app.errorhandler(404)
++    def _governed_not_found(err):  # type: ignore[override]
++        # An unknown path, compat or not, answers the governed envelope.
++        return _not_found_envelope_response(404, None)
++
++    @app.errorhandler(405)
++    def _governed_method_not_allowed(err):  # type: ignore[override]
++        if is_compat_request_path(_req.path):
++            # PF05 §5.5: a converted compat 405 keeps Flask's Allow as Flask built it.
++            return _not_found_envelope_response(405, err.get_response().headers.get("Allow"))
++        # Elsewhere the routing Allow is sorted for deterministic bytes.
++        return _not_found_envelope_response(405, ", ".join(sorted(err.valid_methods or ())))
++
+     @app.after_request
+     def _strip_etag_on_internal(resp):
+         if (
+diff --git a/adapter/http_reader.py b/adapter/http_reader.py
+index babd991..235bfa4 100644
+--- a/adapter/http_reader.py
++++ b/adapter/http_reader.py
+@@ -375,6 +375,15 @@ def _error(token: str, code: int = 400):
+ _READER_VERSIONS = {"1": "v1", "2": "v2"}
+ 
+ 
++def _reader_dev_env_explicit() -> bool:
++    """Dev ``GET /reader`` gate (PF05 §5.4 and §5.6; PF12 §8.8): served only when
++    ``APP_ENV`` is explicitly ``dev``.  Unset, empty, ``test``, ``local`` and
++    every other value refuse; an unset environment is not development."""
++
++    raw_app_env = os.environ.get("APP_ENV")
++    return raw_app_env is not None and raw_app_env.strip().lower() == "dev"
++
++
+ def _select_reader_version(allowed: tuple[str, ...]) -> str:
+     """PF05 §5.1.0 strict version selection.
+ 
+@@ -600,7 +609,7 @@ def get_reader_bp(emit_fn=None):
+             _select_reader_version(("1",))
+         except _ReaderFailure as exc:
+             return _error(exc.token, exc.status)
+-        if os.environ.get("APP_ENV", "dev") != "dev":
++        if not _reader_dev_env_explicit():
+             return _error("ERR_READER_FORBIDDEN", 403)
+ 
+         a_path = request.args.get("a"); b_path = request.args.get("b")
+@@ -1184,17 +1193,32 @@ def create_app():
+         resp.headers["Content-Length"] = str(len(payload))
+         return resp
+ 
++    def _governed_error_response(err) -> Response:
++        # App-level 404/405 for an unknown path or method (PF05 §5.2 item 1):
++        # the canonical ERR_NOT_FOUND error_v1 envelope through the presenter,
++        # no-store, no ETag, never framework HTML.  A 405 keeps the routing
++        # Allow header, sorted for deterministic bytes.
++        payload = emit_public(error_envelope("ERR_NOT_FOUND"))
++        resp = Response(payload, status=err.code, mimetype="application/json; charset=utf-8")
++        resp.headers["Cache-Control"] = "no-store"
++        if err.code == 405 and getattr(err, "valid_methods", None):
++            resp.headers["Allow"] = ", ".join(sorted(err.valid_methods))
++        resp.headers.pop("ETag", None)
++        resp.headers.pop("Content-Encoding", None)
++        resp.headers["Content-Length"] = str(len(payload))
++        return resp
++
+     @app.errorhandler(404)
+-    def _compat_scoped_not_found(err):  # type: ignore[override]
++    def _governed_not_found(err):  # type: ignore[override]
+         if request.path.rstrip("/").startswith("/api/compat/v1"):
+             return _compat_error_response(404)
+-        return err
++        return _governed_error_response(err)
+ 
+     @app.errorhandler(405)
+-    def _compat_scoped_method_not_allowed(err):  # type: ignore[override]
++    def _governed_method_not_allowed(err):  # type: ignore[override]
+         if request.path.rstrip("/").startswith("/api/compat/v1"):
+             return _compat_error_response(405)
+-        return err
++        return _governed_error_response(err)
+ 
+     @app.after_request
+     def _strip_etag_on_internal(resp):
+diff --git a/ci/checks/classify_ci_changes.py b/ci/checks/classify_ci_changes.py
+index 8271a50..3f276e4 100644
+--- a/ci/checks/classify_ci_changes.py
++++ b/ci/checks/classify_ci_changes.py
+@@ -256,6 +256,11 @@ _WORKFLOW_CONTROL_PATH_LANES = {
+     "tools/cli/emitter_symbol_proof.py": {"compat"},
+     "tools/cli/serializer_grep_guard.py": {"compat"},
+     "tools/order/generate_ordering_artifacts.py": {"product"},
++    # HDE-CRD-0002 WU-PR-03 (S09): the operator verification script, which now
++    # drives the canonical dev runner, and the retired dev Reader harness.
++    "VERIFY.sh": {"product"},
++    "dev/reader_harness/__init__.py": {"product"},
++    "dev/reader_harness/app.py": {"product"},
+ }
+ _RAILS_MARKERS = (
+     "open_rails",
+@@ -573,6 +578,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
+         "tests/bodygraph/test_bg_resolve_route_policy.py",
+     ),
+     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
++    "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
+     "scripts/emit_env_guard_artifact.py": (
+         "tests/artifacts/test_env_guard_artifact_bytes.py",
+     ),
+diff --git a/dev/reader_harness/__init__.py b/dev/reader_harness/__init__.py
+deleted file mode 100644
+index 5bb534f..0000000
+--- a/dev/reader_harness/__init__.py
++++ /dev/null
+@@ -1 +0,0 @@
+-# package
+diff --git a/dev/reader_harness/app.py b/dev/reader_harness/app.py
+deleted file mode 100644
+index f8d0555..0000000
+--- a/dev/reader_harness/app.py
++++ /dev/null
+@@ -1,20 +0,0 @@
+-from __future__ import annotations
+-import os
+-from flask import Flask
+-from adapter.http_reader import get_reader_bp
+-from engine.emit_public import emit_public_envelope
+-
+-def create_app() -> Flask:
+-    if os.environ.get("APP_ENV","dev") != "dev":
+-        raise SystemExit("DEV HARNESS ONLY: set APP_ENV=dev")
+-    app = Flask(__name__)
+-    bp = get_reader_bp(emit_public_envelope)
+-    app.getattr(app,"register_"+"blueprint")(bp, url_prefix="/api")
+-    @app.get("/health")
+-    def health(): return ("ok\n", 200, {"Content-Type":"text/plain; charset=utf-8"})
+-    return app
+-
+-app = create_app()
+-
+-if __name__ == "__main__":
+-    app.run(host=os.environ.get("HOST","127.0.0.1"), port=int(os.environ.get("PORT","5000")), debug=False)
+diff --git a/docs/ADAPTER_009.md b/docs/ADAPTER_009.md
+index 0fdaeb1..86d0195 100644
+--- a/docs/ADAPTER_009.md
++++ b/docs/ADAPTER_009.md
+@@ -171,7 +171,7 @@ All predicates below remain required within this document's stated scope. The re
+   validators equal 200.
+ - `HTTP_ERRORS_NOSTORE_NOETAG_OK` — Errors/writers are JSON, **no-store**, **no ETag**.
+ - `HTTP_POST_METHOD_POSTURE_OK` — Reader POST ⇒ 405 typed JSON (`no-store`, no ETag); Compat POST ⇒ 200 non-conditional.
+-- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `{"error":"body_not_allowed"}`, `no-store`, no ETag.
++- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 error_v1 envelope built from the `invalid_json` alias (emitted `code`: `ERR_COMPAT_INVALID_JSON`), `no-store`, no ETag.
+ 
+ Current routes (HDE-EPIC040): the 200, 304 and HEAD predicates above apply to the dev Reader `GET /reader`, the route the A7 transport proofs select from `docs/ENDPOINTS_CATALOG.json`. `HTTP_POST_METHOD_POSTURE_OK` keeps its original meaning, which now holds for the unprefixed `POST /reader`: it returns the governed 405 (`ERR_NOT_FOUND`, `Allow: GET, HEAD`, `no-store`, no ETag). The production Reader is `POST /api/reader?v=1` or `?v=2`: a success is 200, non-conditional and carries no ETag; its errors are `no-store` without ETag; every other method on `/api/reader` returns 405 with `Allow: POST`. See `docs/contracts/reader_v2_public_bytes.md`.
+ 
+diff --git a/docs/CLI_commands.md b/docs/CLI_commands.md
+index a553d8b..6cc983f 100644
+--- a/docs/CLI_commands.md
++++ b/docs/CLI_commands.md
+@@ -22,7 +22,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
+ 
+ `showcompat --conjunction` emits canonical JSON to stdout. Side effects depend on input mode and rails: payload-based invocation (`--pair-file`, `--a-file` + `--b-file`, or stdin with `left`/`right`) is computation-only, while unresolved `--user-a/--user-b` inputs can trigger bodygraph resolution and vendor ingest under open rails (for example with `--source vendor`), which may persist resolved records. Required conjunction inputs must be present for both parties, either through `--user-a/--user-b` or through payload input. Single-party file input (only `--a-file` or only `--b-file`), mixed file modes, or unresolved auto source paths fail with CLI usage errors; `--dump-reader`/`--dump-admin-dir` are not supported with `--conjunction`.
+ 
+-Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout (non-conjunction) is the canonical `magic10_compat_result.v1` document (`schemas/magic10_compat_result_v1.schema.json`); it carries numeric scores and signals and is not a public Reader body. Conjunction mode emits the conjunction contract. Reader v1 bytes are emitted only via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and match dev `GET /reader` bytes for the same charts. Known gap: the one-line `hdctl --help` summary for `showcompat` still reads "Emit canonical Reader v1 bytes from vendor JSON"; the stdout contract above is current. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
++Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout (non-conjunction) is the canonical `magic10_compat_result.v1` document (`schemas/magic10_compat_result_v1.schema.json`); it carries numeric scores and signals and is not a public Reader body. Conjunction mode emits the conjunction contract. Reader v1 bytes are emitted only via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and match dev `GET /reader` bytes for the same charts. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
+ 
+ ## Guards
+ - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
+diff --git a/docs/acceptance/reader_a7_crib.md b/docs/acceptance/reader_a7_crib.md
+index 6febc53..a693648 100644
+--- a/docs/acceptance/reader_a7_crib.md
++++ b/docs/acceptance/reader_a7_crib.md
+@@ -1,7 +1,9 @@
+ # Reader v1 — HTTP Transport Evidence crib sheet (dev)
+ 
+-Dev runner (APP_ENV=dev):
+-  python dev/reader_harness/app.py
++Dev runner (canonical; the caller supplies APP_ENV=dev, which the script propagates unchanged):
++  APP_ENV=dev scripts/dev_start_reader.sh
++  then probe http://127.0.0.1:8000/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=UTC&b_tz=UTC
++  (`VERIFY.sh` runs these probes against the same runner.)
+ 
+ Probes (use curl):
+ 1) 200 OK: strong quoted ETag over identity bytes (with the trailing LF). Body matches CLI `--dump-reader` bytes.
+diff --git a/docs/server/reader_v1.md b/docs/server/reader_v1.md
+index 71d8900..733c681 100644
+--- a/docs/server/reader_v1.md
++++ b/docs/server/reader_v1.md
+@@ -14,14 +14,14 @@ Everything below this section is retained history. Where it disagrees with this
+ 
+ - Production Reader: `POST /api/reader?v=1` (Reader v1) and `POST /api/reader?v=2` (Reader v2). The production blueprint (`get_reader_api_bp` in `adapter/http_reader.py`) is mounted under `/api` by every app factory: `adapter/factory.py`, `adapter/wsgi.py` and `adapter/http_reader.py::create_app`. Version selection, request body, lookup, transport and error rules are shared by both versions; see `docs/contracts/reader_v2_public_bytes.md`.
+ - Every method other than `POST` on `/api/reader` returns the governed 405 (`ERR_NOT_FOUND`, `Allow: POST`, `no-store`).
+-- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. When `APP_ENV` is set to a value other than `dev`, it returns 403 `ERR_READER_FORBIDDEN`; an unset `APP_ENV` is treated as `dev`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
++- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. It is served only when `APP_ENV` is explicitly `dev` (surrounding whitespace and letter case ignored); unset, empty and every other value, including `test` and `local`, return 403 `ERR_READER_FORBIDDEN`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
+ - `POST /reader` (unprefixed) is not the production Reader: it returns the governed 405 with `Allow: GET, HEAD`.
+-- Local start: `scripts/dev_start_reader.sh` runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`). Run it from the repository root. The legacy notice below names `dev/reader_harness/app.py`; as of HDE-EPIC040-PR07 that file raises `AttributeError` at import, so it is not a start path.
+-- Known limitation: a path that no route serves receives the framework's HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`; `adapter/wsgi.py` answers with the JSON `ERR_NOT_FOUND` envelope.
++- Local start: `APP_ENV=dev scripts/dev_start_reader.sh`. The script propagates `APP_ENV` exactly as the caller supplies it (it never defaults it, so an unset or empty value starts a runner that refuses `/reader`) and runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`). Run it from the repository root. `VERIFY.sh` starts the same runner with its own `APP_ENV` (default `dev`). The former dev Reader harness was removed in HDE-CRD-0002; this runner is the dev Reader harness.
++- Unknown paths: a path that no route serves returns 404, and a method a route does not serve returns 405 with `Allow`, as the governed `ERR_NOT_FOUND` envelope (`no-store`, no ETag, `application/json; charset=utf-8`) from every app factory; `adapter/wsgi.py`'s 405 carries no `Allow`.
+ 
+ ---
+ 
+-> **Legacy notice (to be removed):** This page describes a deprecated server/ path. The canonical HTTP adapter is `adapter/http_reader.py`. For local runs use the dev runner `dev/reader_harness/app.py` with `APP_ENV=dev`. Update examples and imports accordingly.
++> **Legacy notice (to be removed):** This page describes a deprecated server/ path. The canonical HTTP adapter is `adapter/http_reader.py`. For local runs use `APP_ENV=dev scripts/dev_start_reader.sh`. Update examples and imports accordingly.
+ 
+ docs/server/reader_v1.md  
+ 
+diff --git a/engine/cli/main.py b/engine/cli/main.py
+index eb14a3d..58dc412 100644
+--- a/engine/cli/main.py
++++ b/engine/cli/main.py
+@@ -76,7 +76,7 @@ def _build_parser() -> argparse.ArgumentParser:
+     sub = parser.add_subparsers(dest="command", required=True)
+     show = sub.add_parser(
+         "showcompat",
+-        help="Emit canonical Reader v1 bytes from vendor JSON (stdin or files)",
++        help="Emit the canonical magic10_compat_result.v1 document for a pair (stdin or files); Reader v1 bytes only via --dump-reader",
+         allow_abbrev=False,
+     )
+     show.add_argument("--pair-file", help="Path to JSON with left/right payloads")
+diff --git a/engine/emit_public.py b/engine/emit_public.py
+index e82036f..4fdcd8d 100644
+--- a/engine/emit_public.py
++++ b/engine/emit_public.py
+@@ -17,9 +17,9 @@ def emit_public_envelope(
+     """Legacy helper retained for harnesses; routes through presenter emitter.
+ 
+     ``eligible`` and ``harmony_band`` carry the current emitter contract, in both
+-    directions this helper is used: ``VERIFY.sh`` calls it with the five positional
+-    arguments only, while ``dev/reader_harness/app.py`` injects it as the Reader
+-    blueprint's ``emit_fn``, which the routes call with both keywords.
++    ways this helper can be used: ``VERIFY.sh`` calls it with the five positional
++    arguments only, and a caller may inject it as the Reader blueprint's
++    ``emit_fn``, which the routes call with both keywords.
+ 
+     The default is the ineligible envelope (``categories: []``) rather than a
+     fabricated eligible one: an eligible pair must supply its band, and the band
+diff --git a/tests/cli/test_cli_usage_and_errors.py b/tests/cli/test_cli_usage_and_errors.py
+index be50054..f36dd0c 100644
+--- a/tests/cli/test_cli_usage_and_errors.py
++++ b/tests/cli/test_cli_usage_and_errors.py
+@@ -114,3 +114,13 @@ def test_admission_refusal_is_a_single_stderr_token(monkeypatch, capsys, tmp_pat
+     captured = capsys.readouterr()
+     assert captured.out == ""
+     assert captured.err == "INCOMPLETE_RELEASE_ROSTER\n"
++
++
++def test_top_level_help_names_the_showcompat_stdout_contract(capsys):
++    # HDE-CRD-0002 S07: the one-line summary matches the stdout contract
++    # (docs/CLI_commands.md); Reader v1 bytes come only from --dump-reader.
++    assert cli(["--help"]) == 0
++    out = capsys.readouterr().out
++    assert "magic10_compat_result.v1" in out
++    assert "--dump-reader" in out
++    assert "Emit canonical Reader v1 bytes from vendor JSON" not in out
+diff --git a/tests/http/test_endpoint_catalog.py b/tests/http/test_endpoint_catalog.py
+index b53ef95..ef71076 100644
+--- a/tests/http/test_endpoint_catalog.py
++++ b/tests/http/test_endpoint_catalog.py
+@@ -89,3 +89,179 @@ def test_production_reader_route_refuses_get_with_the_governed_405(monkeypatch):
+     assert resp.status_code == 405
+     assert resp.headers.get("Allow") == "POST"
+     assert json.loads(resp.data)["code"] == "ERR_NOT_FOUND"
++
++
++# --- HDE-CRD-0002 S15 (IF-6; ID-1): the catalog covers every served pair ----------
++#
++# Every (method, path) a factory serves as endpoint behavior has exactly one
++# catalog row.  The pairs below are excluded, each for one reason:
++#   (a) governed refusal of a catalogued record (PF05 §5.4 "Production mount";
++#       PF12 §8.8: the production route's other methods are part of its record);
++#   (b) alias spelling of a canonical record, carried by its ``aliases`` (PF05 §5.6);
++#   (c) a method Flask adds automatically (HEAD for a GET view; OPTIONS) whose
++#       behavior neither PF05 §5.6 nor the route's own view defines.
++_GOVERNED_REFUSAL = "a"
++_ALIAS = "b"
++_FRAMEWORK_IMPLICIT = "c"
++_EXCLUDED_PAIRS = {
++    **{("/api/reader", m): _GOVERNED_REFUSAL for m in ("DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "PUT")},
++    ("/reader", "POST"): _GOVERNED_REFUSAL,
++    ("/api/aux/narrative", "GET"): _ALIAS,
++    ("/api/aux/narrative", "HEAD"): _FRAMEWORK_IMPLICIT,
++    ("/api/aux/narrative", "OPTIONS"): _FRAMEWORK_IMPLICIT,
++    ("/reader", "OPTIONS"): _FRAMEWORK_IMPLICIT,
++    ("/internal/version", "OPTIONS"): _FRAMEWORK_IMPLICIT,
++    **{
++        (path, m): _FRAMEWORK_IMPLICIT
++        for path in (
++            "/aux/narrative",
++            "/dev/reader/conjunction",
++            "/dev/sampler/conjunction",
++            "/dev/writer/conjunction",
++            "/internal/healthz",
++            "/internal/readyz",
++            "/ops/db/unavailable",
++            "/ops/probe/env",
++            "/ops/rails/refusal",
++        )
++        for m in ("HEAD", "OPTIONS")
++    },
++}
++
++
++def _served_pairs():
++    served = set()
++    for factory in _factories().values():
++        for rule in factory().url_map.iter_rules():
++            if rule.endpoint != "static":
++                served.update((rule.rule, method) for method in rule.methods)
++    return served
++
++
++def test_every_served_pair_has_one_catalog_row_or_a_reasoned_exclusion(monkeypatch):
++    monkeypatch.setenv("APP_ENV", "dev")
++    served = _served_pairs()
++    catalogued = {(e["path"], e["method"]) for e in _catalog()["endpoints"]}
++    excluded = set(_EXCLUDED_PAIRS)
++    assert not catalogued & excluded
++    assert sorted(served - catalogued - excluded) == []  # an uncatalogued route fails
++    assert sorted(excluded - served) == []  # a stale exclusion fails
++    assert sorted(catalogued - served) == []  # no row for an unmounted route (PF12 §8.8)
++    aux = next(e for e in _catalog()["endpoints"] if e["path"] == "/aux/narrative")
++    assert [p for (p, m), why in _EXCLUDED_PAIRS.items() if why == _ALIAS and m == aux["method"]] == aux["aliases"]
++
++
++def test_aux_record_follows_the_pf05_projection():
++    rows = [e for e in _catalog()["endpoints"] if e["path"] == "/aux/narrative"]
++    assert rows == [
++        {
++            "a7_eligible": False,
++            "aliases": ["/api/aux/narrative"],
++            "blueprint_module": create_app.__module__,
++            "classification": "public_aux",
++            "description": rows[0]["description"],
++            "env_gate": "not_applicable_public",
++            "internal": False,
++            "method": "GET",
++            "path": "/aux/narrative",
++            "rails_profile": "public-read-only; vendor-network-disabled",
++        }
++    ]
++    assert [e for e in _catalog()["endpoints"] if "aliases" in e] == rows
++
++
++def test_validator_rejects_aliases_off_the_aux_record_and_alias_collisions():
++    import copy
++
++    import pytest
++
++    cat = catalog_obj()
++    bad = copy.deepcopy(cat)
++    next(e for e in bad["endpoints"] if e["path"] == "/internal/version")["aliases"] = ["/x"]
++    with pytest.raises(ValueError):
++        validate_catalog(bad)
++    bad = copy.deepcopy(cat)
++    next(e for e in bad["endpoints"] if e["path"] == "/aux/narrative")["aliases"] = ["/reader"]
++    with pytest.raises(ValueError):
++        validate_catalog(bad)
++    bad = copy.deepcopy(cat)
++    next(e for e in bad["endpoints"] if e["path"] == "/ops/probe/env")["classification"] = "public_ops"
++    with pytest.raises(ValueError):
++        validate_catalog(bad)
++
++
++# --- HDE-CRD-0002 S02 (IF-11): unknown paths answer the governed envelope ----------
++
++_NOT_FOUND_BODY = b'{"code":"ERR_NOT_FOUND","error":"not found","ok":false,"schema":"v1"}\n'
++
++
++def _factories():
++    # Bind each factory function directly: another test may reload the
++    # ``adapter`` package, after which its submodule attributes are unset.
++    from adapter.factory import create_app as production_app
++    from adapter.wsgi import create_app as wsgi_app
++
++    return {
++        "factory": production_app,
++        "http_reader": create_app,
++        "wsgi": wsgi_app,
++    }
++
++
++def _assert_governed(resp, status, *, head=False):
++    assert resp.status_code == status
++    assert resp.headers.get("Content-Type") == "application/json; charset=utf-8"
++    assert resp.headers.get("Cache-Control") == "no-store"
++    assert "ETag" not in resp.headers
++    assert resp.data == (b"" if head else _NOT_FOUND_BODY)
++
++
++import pytest as _pytest
++
++
++@_pytest.mark.parametrize("factory_name", ["factory", "http_reader", "wsgi"])
++@_pytest.mark.parametrize("path", ["/nope", "/reader/x", "/api/reader/x", "/internal/nope", "/aux/narrative/x"])
++@_pytest.mark.parametrize("method", ["GET", "HEAD", "POST", "OPTIONS", "PUT", "DELETE"])
++@_pytest.mark.parametrize("app_env", ["dev", "prod"])
++def test_unknown_paths_return_the_governed_not_found_envelope(monkeypatch, factory_name, path, method, app_env):
++    monkeypatch.setenv("APP_ENV", app_env)
++    resp = _factories()[factory_name]().test_client().open(path, method=method)
++    _assert_governed(resp, 404, head=method == "HEAD")
++
++
++@_pytest.mark.parametrize("factory_name", ["factory", "http_reader"])
++@_pytest.mark.parametrize(
++    ("method", "path", "allow"),
++    [
++        ("PUT", "/reader", "GET, HEAD, OPTIONS, POST"),
++        ("DELETE", "/aux/narrative", "GET, HEAD, OPTIONS"),
++        ("PUT", "/internal/version", "GET, HEAD, OPTIONS"),
++        ("GET", "/ops/writer/diagnostic", "HEAD, OPTIONS, POST"),
++    ],
++)
++def test_unrouted_methods_return_the_governed_405_with_allow(monkeypatch, factory_name, method, path, allow):
++    monkeypatch.setenv("APP_ENV", "dev")
++    resp = _factories()[factory_name]().test_client().open(path, method=method)
++    _assert_governed(resp, 405)
++    assert resp.headers.get("Allow") == allow
++
++
++@_pytest.mark.parametrize("factory_name", ["factory", "http_reader"])
++def test_compat_and_production_reader_shaping_is_unchanged(monkeypatch, factory_name):
++    monkeypatch.setenv("APP_ENV", "dev")
++    client = _factories()[factory_name]().test_client()
++    descendant = client.get("/api/compat/v1/zzz")
++    assert descendant.status_code == 404 and descendant.data == _NOT_FOUND_BODY
++    put = client.put("/api/compat/v1")
++    assert put.status_code == 405 and put.data == _NOT_FOUND_BODY
++    # PF05 §5.5: the production factory keeps Flask's Allow on a converted compat 405.
++    if factory_name == "factory":
++        assert set(put.headers.get("Allow", "").split(", ")) == {"GET", "HEAD", "OPTIONS", "POST"}
++    head = client.head("/api/compat/v1")
++    assert head.status_code == 405 and head.headers.get("Allow") == "POST, OPTIONS"
++    for method in ("GET", "HEAD", "OPTIONS", "PUT", "PATCH", "DELETE", "TRACE"):
++        refused = client.open("/api/reader", method=method)
++        assert refused.status_code == 405
++        assert refused.headers.get("Allow") == "POST"
++    unprefixed = client.post("/reader")
++    assert unprefixed.status_code == 405 and unprefixed.headers.get("Allow") == "GET, HEAD"
+diff --git a/tests/http/test_reader_a7_transport.py b/tests/http/test_reader_a7_transport.py
+index 7c8883a..b7ca86b 100644
+--- a/tests/http/test_reader_a7_transport.py
++++ b/tests/http/test_reader_a7_transport.py
+@@ -134,3 +134,36 @@ def test_reader_a7_transport_invariants(monkeypatch):
+     conditional_post = client.post("/api/reader", query_string=params, headers={"If-None-Match": etag})
+     assert conditional_post.status_code == 422
+     assert conditional_post.data == api_post.data
++
++
++@pytest.mark.parametrize("app_env", ["dev", " DEV ", "Dev"])
++def test_dev_reader_is_served_only_for_explicit_dev(monkeypatch, app_env):
++    # HDE-CRD-0002 S10 / IF-10 (PF05 §5.4, §5.6): explicit APP_ENV=dev serves.
++    monkeypatch.setenv("APP_ENV", app_env)
++    client = _client()
++    params = _reader_query_params()
++    assert client.get("/reader", query_string=params).status_code == 200
++    head = client.head("/reader", query_string=params)
++    assert head.status_code == 200 and head.data == b""
++
++
++@pytest.mark.parametrize("app_env", [None, "", "  ", "test", "local", "prod", "production", "live", "staging", "development", "dev1"])
++def test_dev_reader_refuses_every_other_environment(monkeypatch, app_env):
++    # Unset, empty and every non-dev value refuse with ERR_READER_FORBIDDEN 403,
++    # the governed error headers, and no ETag; HEAD carries no body.
++    if app_env is None:
++        monkeypatch.delenv("APP_ENV", raising=False)
++    else:
++        monkeypatch.setenv("APP_ENV", app_env)
++    client = _client()
++    params = _reader_query_params()
++    resp = client.get("/reader", query_string=params)
++    assert resp.status_code == 403
++    assert json.loads(resp.data)["code"] == "ERR_READER_FORBIDDEN"
++    assert resp.headers.get("Cache-Control") == "no-store"
++    assert resp.headers.get("Content-Type") == "application/json; charset=utf-8"
++    assert "ETag" not in resp.headers
++    head = client.head("/reader", query_string=params)
++    assert head.status_code == 403 and head.data == b""
++    # Version validation still precedes the environment gate.
++    assert json.loads(client.get("/reader", query_string={"v": "2"}).data)["code"] == "ERR_READER_INVALID_VERSION"
+diff --git a/tests/runtime/test_emit_public_legacy_helper.py b/tests/runtime/test_emit_public_legacy_helper.py
+index d513550..8c783f3 100644
+--- a/tests/runtime/test_emit_public_legacy_helper.py
++++ b/tests/runtime/test_emit_public_legacy_helper.py
+@@ -2,9 +2,10 @@
+ 
+ The helper is used two ways, and PR04 broke both by making ``eligible`` a required
+ keyword-only argument of ``emit_reader_public_bytes``: ``VERIFY.sh`` calls it with
+-five positional arguments, and ``dev/reader_harness/app.py`` injects it as the
+-Reader blueprint's ``emit_fn``, which the routes call with ``eligible=`` and
+-``harmony_band=``. Neither shape reaches CI, so these tests own that contract.
++five positional arguments, and a caller may inject it as the Reader blueprint's
++``emit_fn``, which the routes call with ``eligible=`` and ``harmony_band=``. The
++former dev harness that did so was removed (HDE-CRD-0002 S09); these tests own
++that contract.
+ """
+ from __future__ import annotations
+ 
+diff --git a/tests/scripts/test_dev_start_reader.py b/tests/scripts/test_dev_start_reader.py
+new file mode 100644
+index 0000000..56aedd4
+--- /dev/null
++++ b/tests/scripts/test_dev_start_reader.py
+@@ -0,0 +1,150 @@
++"""Owner tests for the canonical dev runner start script and VERIFY.sh.
++
++HDE-CRD-0002 S09/S10 (IF-10; EC-2): ``scripts/dev_start_reader.sh`` propagates
++``APP_ENV`` exactly as the caller supplies it, including unset and empty, and
++never defaults it (HDE Architecture §3.8.1; HDE-Mechanics Guide "Dev Reader
++start helpers"); the runner it starts serves the dev ``GET /reader`` only for an
++explicit ``APP_ENV=dev``.  ``VERIFY.sh`` drives that runner and must pass.
++Loopback only, closed rails.
++"""
++
++from __future__ import annotations
++
++import json
++import os
++import shutil
++import socket
++import subprocess
++import sys
++import time
++import urllib.error
++import urllib.request
++from pathlib import Path
++
++import pytest
++
++ROOT = Path(__file__).resolve().parents[2]
++SCRIPT = ROOT / "scripts" / "dev_start_reader.sh"
++VERIFY = ROOT / "VERIFY.sh"
++_RAILS = {"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0"}
++
++
++def _free_port() -> int:
++    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
++        sock.bind(("127.0.0.1", 0))
++        return sock.getsockname()[1]
++
++
++def _env(tmp_path: Path, **extra: str) -> dict[str, str]:
++    # ``python`` on PATH runs this interpreter (an exec wrapper keeps a virtual
++    # environment), so the runner imports this checkout with the test's packages.
++    bin_dir = tmp_path / "bin"
++    bin_dir.mkdir(exist_ok=True)
++    wrapper = bin_dir / "python"
++    wrapper.write_text(f'#!/bin/sh\nexec "{sys.executable}" "$@"\n', encoding="utf-8")
++    wrapper.chmod(0o755)
++    env = {key: value for key, value in os.environ.items() if key != "APP_ENV"}
++    env.update(_RAILS)
++    env["PATH"] = f"{bin_dir}{os.pathsep}{env.get('PATH', '')}"
++    env["PYTHONPATH"] = str(ROOT)
++    env.update(extra)
++    return env
++
++
++def _reader_url(port: int) -> str:
++    query = (
++        f"v=1&a={ROOT / 'fixtures/charts/alice.json'}&b={ROOT / 'fixtures/charts/bob.json'}"
++        "&a_tz=UTC&b_tz=UTC"
++    )
++    return f"http://127.0.0.1:{port}/reader?{query}"
++
++
++def _get(url: str) -> tuple[int, bytes]:
++    try:
++        with urllib.request.urlopen(url, timeout=5) as resp:  # noqa: S310 - loopback only
++            return resp.status, resp.read()
++    except urllib.error.HTTPError as exc:
++        return exc.code, exc.read()
++
++
++def _start_and_get(env: dict[str, str], port: int) -> tuple[str, int, bytes]:
++    proc = subprocess.Popen(
++        ["bash", str(SCRIPT)],
++        cwd=ROOT,
++        env={**env, "PORT": str(port)},
++        stdout=subprocess.PIPE,
++        stderr=subprocess.STDOUT,
++    )
++    try:
++        deadline = time.monotonic() + 60
++        while True:
++            assert proc.poll() is None, proc.stdout.read().decode("utf-8", "replace")
++            try:
++                status, body = _get(_reader_url(port))
++                break
++            except (ConnectionError, urllib.error.URLError, OSError):
++                assert time.monotonic() < deadline, "runner did not start"
++                time.sleep(0.25)
++    finally:
++        proc.terminate()
++        try:
++            out, _ = proc.communicate(timeout=10)
++        except subprocess.TimeoutExpired:
++            proc.kill()
++            out, _ = proc.communicate()
++    return out.decode("utf-8", "replace"), status, body
++
++
++def test_runner_with_explicit_dev_serves_reader(tmp_path: Path) -> None:
++    banner, status, body = _start_and_get(_env(tmp_path, APP_ENV="dev"), _free_port())
++    assert "[dev-start] APP_ENV=dev " in banner
++    assert status == 200, body
++    assert body.endswith(b"\n")
++
++
++def test_runner_propagates_an_unset_app_env_and_the_gate_refuses(tmp_path: Path) -> None:
++    banner, status, body = _start_and_get(_env(tmp_path), _free_port())
++    assert "[dev-start] APP_ENV=<UNSET> " in banner
++    assert status == 403
++    assert json.loads(body)["code"] == "ERR_READER_FORBIDDEN"
++
++
++@pytest.mark.parametrize("app_env", ["test", "local", "prod", ""])
++def test_runner_keeps_an_explicit_app_env_and_the_gate_refuses_it(tmp_path: Path, app_env: str) -> None:
++    banner, status, body = _start_and_get(_env(tmp_path, APP_ENV=app_env), _free_port())
++    assert f"[dev-start] APP_ENV={app_env} " in banner
++    assert status == 403
++    assert json.loads(body)["code"] == "ERR_READER_FORBIDDEN"
++
++
++def test_verify_script_passes_against_the_canonical_runner(tmp_path: Path) -> None:
++    assert shutil.which("curl"), "VERIFY.sh requires curl"
++    result = subprocess.run(
++        ["bash", str(VERIFY)],
++        cwd=ROOT,
++        env=_env(tmp_path, APP_ENV="dev", VERIFY_PORT=str(_free_port())),
++        capture_output=True,
++        text=True,
++        timeout=180,
++    )
++    tokens = [line for line in result.stdout.splitlines() if line.endswith(("_OK", "_FAIL"))]
++    assert result.returncode == 0, result.stdout + result.stderr
++    assert tokens and all(line.endswith("_OK") for line in tokens), tokens
++    assert "READER_200_STATUS_OK" in tokens
++    assert "READER_304_STATUS_OK" in tokens
++
++
++@pytest.mark.parametrize("app_env", [None, "", "test"])
++def test_verify_script_refuses_without_an_explicit_dev(tmp_path: Path, app_env: str | None) -> None:
++    extra = {} if app_env is None else {"APP_ENV": app_env}
++    result = subprocess.run(
++        ["bash", str(VERIFY)],
++        cwd=ROOT,
++        env=_env(tmp_path, VERIFY_PORT=str(_free_port()), **extra),
++        capture_output=True,
++        text=True,
++        timeout=60,
++    )
++    assert result.returncode == 2
++    assert "VERIFY_APP_ENV_NOT_DEV" in result.stderr
++    assert result.stdout == ""
+diff --git a/tools/evidence/generate_a7_transport_proofs.py b/tools/evidence/generate_a7_transport_proofs.py
+index 8770456..c033d3c 100755
+--- a/tools/evidence/generate_a7_transport_proofs.py
++++ b/tools/evidence/generate_a7_transport_proofs.py
+@@ -30,7 +30,9 @@ TS=json.loads((ROOT/'catalog/manifest.json').read_text()).get('built_at_utc','20
+ DOC=ROOT/'docs/ENDPOINTS_CATALOG.json'; DOCSHA=ROOT/'docs/ENDPOINTS_CATALOG.json.sha256'; AUD=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json'; AUDSHA=ROOT/'artifacts/audit/ENDPOINTS_CATALOG.json.sha256'; SNAP=ROOT/'artifacts/reader/endpoints_snapshot.json'
+ PROOFS=[ROOT/'artifacts/proofs/endpoints_env_gate_proof.log',ROOT/'artifacts/proofs/success_get.txt',ROOT/'artifacts/proofs/success_head.txt',ROOT/'artifacts/proofs/success_304.txt',ROOT/'artifacts/proofs/success_writers_errors.txt',ROOT/'artifacts/proofs/success_encoding_invariance.txt',ROOT/'artifacts/proofs/reader_success_get_head_304.json']
+ ALL=[DOC,DOCSHA,AUD,AUDSHA,SNAP,*PROOFS]
+-CLASS={'internal_admin','dev_harness','internal_identity','public_reader'}
++# PF12 §8.8 closed class set, plus PF05 §5.6's projected public_aux (not yet PF12-registered; no conformance claim).
++CLASS={'public_reader','public_compat','internal_identity','internal_admin','ops','dev_harness','public_aux'}
++AUX_PATH='/aux/narrative'; AUX_ALIASES=['/api/aux/narrative']
+ def sha(b): return hashlib.sha256(b).hexdigest()
+ def cjson(o): return json.dumps(o,separators=(',',':'),sort_keys=True).encode()+b'\n'
+ def catalog_obj():
+@@ -44,7 +46,20 @@ def catalog_obj():
+  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'internal_identity','description':'Internal version endpoint for ops evidence','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/version','rails_profile':'ops-only no-store'},
+  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'internal_identity','description':'Internal version endpoint for ops evidence','env_gate':'operator-network-only','internal':True,'method':'HEAD','path':'/internal/version','rails_profile':'ops-only no-store'},
+  {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'GET','path':'/reader','rails_profile':'dev-harness reader a7'},
+- {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'HEAD','path':'/reader','rails_profile':'dev-harness reader a7'},]
++ {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'HEAD','path':'/reader','rails_profile':'dev-harness reader a7'},
++ {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat ids-only probe (internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'GET','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
++ {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat HEAD (writer transport 405, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'HEAD','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
++ {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat OPTIONS (writer transport 204, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'OPTIONS','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
++ {'a7_eligible':False,'aliases':AUX_ALIASES,'blueprint_module':'adapter.http_reader','classification':'public_aux','description':'Aux narrative public bytes (text/plain)','env_gate':'not_applicable_public','internal':False,'method':'GET','path':AUX_PATH,'rails_profile':'public-read-only; vendor-network-disabled'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Forced database-unavailable diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/db/unavailable','rails_profile':'ops diagnostic no-io writer no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Process and rails-state probe (names-only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/probe/env','rails_profile':'ops probe no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer (admin bearer scope)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store','route_id':'ops.writer.diagnostic.v1'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer HEAD (writer transport 405, Allow POST, OPTIONS)','env_gate':'operator-network-only','internal':True,'method':'HEAD','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer OPTIONS (writer transport 204, Allow POST, OPTIONS)','env_gate':'operator-network-only','internal':True,'method':'OPTIONS','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Liveness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/healthz','rails_profile':'ops-only no-store'},
++ {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Readiness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/readyz','rails_profile':'ops-only no-store'},]
+  return {'endpoints':eps,'generated_at_utc':TS,'success_endpoints':[{'method':'GET','path':'/reader'}]}
+ def validate_catalog(cat):
+  if set(cat)!={'endpoints','generated_at_utc','success_endpoints'}: raise ValueError('catalog top-level keys invalid')
+@@ -54,19 +69,24 @@ def validate_catalog(cat):
+  for e in cat['endpoints']:
+   for k in ['a7_eligible','blueprint_module','classification','description','env_gate','internal','method','path','rails_profile']:
+    if k not in e: raise ValueError(f'missing {k}')
+-  if set(e)-{'a7_eligible','blueprint_module','classification','description','env_gate','internal','method','path','rails_profile','route_id'}: raise ValueError('unknown endpoint key')
++  if set(e)-{'a7_eligible','aliases','blueprint_module','classification','description','env_gate','internal','method','path','rails_profile','route_id'}: raise ValueError('unknown endpoint key')
+   if not isinstance(e['method'],str) or e['method']!=e['method'].upper(): raise ValueError('method must be uppercase string')
+   if not all(isinstance(e[k],str) for k in ['blueprint_module','classification','description','env_gate','path','rails_profile']): raise ValueError('endpoint string fields required')
+   if not isinstance(e['internal'],bool): raise ValueError('internal boolean required')
+   if not isinstance(e['a7_eligible'],bool): raise ValueError('a7_eligible boolean required')
+   if e['classification'] not in CLASS: raise ValueError('invalid classification')
+-  key=(e['method'],e['path'])
+-  if key in seen: raise ValueError('duplicate method/path')
+-  seen.add(key)
++  if 'aliases' in e and (not isinstance(e['aliases'],list) or not e['aliases'] or any(not isinstance(a,str) or not a.startswith('/') or '?' in a or a==e['path'] for a in e['aliases']) or len(set(e['aliases']))!=len(e['aliases'])): raise ValueError('aliases invalid')
++  for key in [(e['method'],p) for p in [e['path'],*e.get('aliases',[])]]:
++   if key in seen: raise ValueError('duplicate method/path')
++   seen.add(key)
+   if 'writer' in e['path'] and e['path']=='/dev/writer/conjunction' and e.get('route_id')!='dev.writer.conjunction.v1': raise ValueError('writer route_id invalid')
+  sampler=[e for e in cat['endpoints'] if e['path']=='/internal/dev/sampler']
+  if len(sampler)!=1 or sampler[0]['method']!='POST' or sampler[0]['classification']!='dev_harness' or sampler[0]['internal'] is not True or sampler[0]['a7_eligible'] is not False or sampler[0]['env_gate']!='APP_ENV in {dev,test,local}': raise ValueError('internal dev sampler catalog invalid')
+  if any(e['path']=='/internal/dev/sampler' and e['method']=='GET' for e in cat['endpoints']): raise ValueError('GET internal dev sampler must not be cataloged')
++ aux=[e for e in cat['endpoints'] if e['path']==AUX_PATH]
++ if len(aux)!=1 or aux[0]['classification']!='public_aux' or aux[0]['method']!='GET' or aux[0].get('aliases')!=AUX_ALIASES or aux[0]['internal'] is not False or aux[0]['a7_eligible'] is not False or aux[0]['env_gate']!='not_applicable_public': raise ValueError('aux narrative catalog invalid')
++ if any('aliases' in e for e in cat['endpoints'] if e['classification']!='public_aux'): raise ValueError('aliases only on the aux record')
++ if any(e['env_gate']=='not_applicable_public' and e['internal'] is not False for e in cat['endpoints']): raise ValueError('public env_gate sentinel on internal record')
+  production=[e for e in cat['endpoints'] if e['path']==PRODUCTION_READER_PATH]
+  if len(production)!=1 or production[0]['method']!='POST' or production[0]['classification']!='public_reader' or production[0]['internal'] is not False or production[0]['a7_eligible'] is not False: raise ValueError('production reader catalog invalid')
+  des=cat['success_endpoints']
+diff --git a/tools/evidence/generate_hdapi_v2_contract_inventory.py b/tools/evidence/generate_hdapi_v2_contract_inventory.py
+index 003d996..cdd83f5 100755
+--- a/tools/evidence/generate_hdapi_v2_contract_inventory.py
++++ b/tools/evidence/generate_hdapi_v2_contract_inventory.py
+@@ -133,6 +133,206 @@ ADAPTER_BOUNDARY_PRESENTER_LOCI = ("engine/presenter/emitter.py", "presenter/rea
+ ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI = ("engine/bodygraph/vendor_client.py", "engine/bodygraph/ingest.py", "engine/bodygraph/resolver.py")
+ ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI = ("engine/compat/compute.py",)
+ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix': '',
++  'blueprint_name': '',
++  'decorator_path': 'app.errorhandler',
++  'endpoint': '_governed_not_found',
++  'errorhandler_key': '404',
++  'fail_closed_reason': '',
++  'http_methods': (),
++  'imported_view_target': '',
++  'owner_expression': 'app',
++  'parser_status': 'supported',
++  'proof_contract': {'final_gate': 'supported',
++                     'proven_fields': ('route_path_source',
++                                       'endpoint_source',
++                                       'method_source',
++                                       'blueprint_constructor_state',
++                                       'blueprint_register_state',
++                                       'owner_binding',
++                                       'view_binding',
++                                       'classification_inputs'),
++                     'required_fields': ('route_path_source',
++                                         'endpoint_source',
++                                         'method_source',
++                                         'blueprint_constructor_state',
++                                         'blueprint_register_state',
++                                         'owner_binding',
++                                         'view_binding',
++                                         'classification_inputs'),
++                     'unproven_fields': ()},
++  'proof_inputs': ({'field': 'route_path_source',
++                    'reason': '',
++                    'source': 'decorator_route_arg',
++                    'state': 'literal',
++                    'value': '404'},
++                   {'field': 'blueprint_register_state',
++                    'reason': '',
++                    'source': 'blueprint_registration_lookup',
++                    'state': 'missing',
++                    'value': ''}),
++  'proof_states': ({'field': 'route_path_source',
++                    'reason': '',
++                    'source': 'decorator_route_arg',
++                    'state': 'literal',
++                    'value': '404'},
++                   {'field': 'endpoint_source',
++                    'reason': '',
++                    'source': 'endpoint_source',
++                    'state': 'literal',
++                    'value': '_governed_not_found'},
++                   {'field': 'method_source',
++                    'reason': '',
++                    'source': 'http_methods',
++                    'state': 'proven',
++                    'value': ''},
++                   {'field': 'blueprint_constructor_state',
++                    'reason': '',
++                    'source': 'blueprint_constructor_state',
++                    'state': 'missing',
++                    'value': ''},
++                   {'field': 'blueprint_register_state',
++                    'reason': '',
++                    'source': 'blueprint_registration_lookup',
++                    'state': 'missing',
++                    'value': ''},
++                   {'field': 'owner_binding',
++                    'reason': '',
++                    'source': 'owner_binding',
++                    'state': 'literal',
++                    'value': 'Flask'},
++                   {'field': 'view_binding',
++                    'reason': '',
++                    'source': 'view_binding',
++                    'state': 'literal',
++                    'value': '_governed_not_found'},
++                   {'field': 'classification_inputs',
++                    'reason': '',
++                    'source': 'classification_inputs',
++                    'state': 'literal',
++                    'value': 'public'}),
++  'proven_owner_type': 'Flask',
++  'public_internal_classification': 'public',
++  'register_blueprint_prefix': '',
++  'registration_kind': 'errorhandler_decorator',
++  'route_path': '404',
++  'routing_keywords': (),
++  'signed_fields': (('source_locus', 'adapter/factory.py'),
++                    ('registration_kind', 'errorhandler_decorator'),
++                    ('owner_expression', 'app'),
++                    ('proven_owner_type', 'Flask'),
++                    ('decorator_path', 'app.errorhandler'),
++                    ('route_path', '404'),
++                    ('http_methods', ()),
++                    ('endpoint', '_governed_not_found'),
++                    ('view_identity', '_governed_not_found'),
++                    ('blueprint_name', ''),
++                    ('blueprint_constructor_prefix', ''),
++                    ('errorhandler_key', '404'),
++                    ('routing_keywords', ()),
++                    ('public_internal_classification', 'public')),
++  'source_locus': 'adapter/factory.py',
++  'view_identity': '_governed_not_found'},
++ {'blueprint_constructor_prefix': '',
++  'blueprint_name': '',
++  'decorator_path': 'app.errorhandler',
++  'endpoint': '_governed_method_not_allowed',
++  'errorhandler_key': '405',
++  'fail_closed_reason': '',
++  'http_methods': (),
++  'imported_view_target': '',
++  'owner_expression': 'app',
++  'parser_status': 'supported',
++  'proof_contract': {'final_gate': 'supported',
++                     'proven_fields': ('route_path_source',
++                                       'endpoint_source',
++                                       'method_source',
++                                       'blueprint_constructor_state',
++                                       'blueprint_register_state',
++                                       'owner_binding',
++                                       'view_binding',
++                                       'classification_inputs'),
++                     'required_fields': ('route_path_source',
++                                         'endpoint_source',
++                                         'method_source',
++                                         'blueprint_constructor_state',
++                                         'blueprint_register_state',
++                                         'owner_binding',
++                                         'view_binding',
++                                         'classification_inputs'),
++                     'unproven_fields': ()},
++  'proof_inputs': ({'field': 'route_path_source',
++                    'reason': '',
++                    'source': 'decorator_route_arg',
++                    'state': 'literal',
++                    'value': '405'},
++                   {'field': 'blueprint_register_state',
++                    'reason': '',
++                    'source': 'blueprint_registration_lookup',
++                    'state': 'missing',
++                    'value': ''}),
++  'proof_states': ({'field': 'route_path_source',
++                    'reason': '',
++                    'source': 'decorator_route_arg',
++                    'state': 'literal',
++                    'value': '405'},
++                   {'field': 'endpoint_source',
++                    'reason': '',
++                    'source': 'endpoint_source',
++                    'state': 'literal',
++                    'value': '_governed_method_not_allowed'},
++                   {'field': 'method_source',
++                    'reason': '',
++                    'source': 'http_methods',
++                    'state': 'proven',
++                    'value': ''},
++                   {'field': 'blueprint_constructor_state',
++                    'reason': '',
++                    'source': 'blueprint_constructor_state',
++                    'state': 'missing',
++                    'value': ''},
++                   {'field': 'blueprint_register_state',
++                    'reason': '',
++                    'source': 'blueprint_registration_lookup',
++                    'state': 'missing',
++                    'value': ''},
++                   {'field': 'owner_binding',
++                    'reason': '',
++                    'source': 'owner_binding',
++                    'state': 'literal',
++                    'value': 'Flask'},
++                   {'field': 'view_binding',
++                    'reason': '',
++                    'source': 'view_binding',
++                    'state': 'literal',
++                    'value': '_governed_method_not_allowed'},
++                   {'field': 'classification_inputs',
++                    'reason': '',
++                    'source': 'classification_inputs',
++                    'state': 'literal',
++                    'value': 'public'}),
++  'proven_owner_type': 'Flask',
++  'public_internal_classification': 'public',
++  'register_blueprint_prefix': '',
++  'registration_kind': 'errorhandler_decorator',
++  'route_path': '405',
++  'routing_keywords': (),
++  'signed_fields': (('source_locus', 'adapter/factory.py'),
++                    ('registration_kind', 'errorhandler_decorator'),
++                    ('owner_expression', 'app'),
++                    ('proven_owner_type', 'Flask'),
++                    ('decorator_path', 'app.errorhandler'),
++                    ('route_path', '405'),
++                    ('http_methods', ()),
++                    ('endpoint', '_governed_method_not_allowed'),
++                    ('view_identity', '_governed_method_not_allowed'),
++                    ('blueprint_name', ''),
++                    ('blueprint_constructor_prefix', ''),
++                    ('errorhandler_key', '405'),
++                    ('routing_keywords', ()),
++                    ('public_internal_classification', 'public')),
++  'source_locus': 'adapter/factory.py',
++  'view_identity': '_governed_method_not_allowed'},
++ {'blueprint_constructor_prefix': '',
+   'blueprint_name': '',
+   'decorator_path': 'app.after_request',
+   'endpoint': '_strip_etag_on_internal',
+@@ -413,7 +613,7 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+  {'blueprint_constructor_prefix': '',
+   'blueprint_name': '',
+   'decorator_path': 'app.errorhandler',
+-  'endpoint': '_compat_scoped_not_found',
++  'endpoint': '_governed_not_found',
+   'errorhandler_key': '404',
+   'fail_closed_reason': '',
+   'http_methods': (),
+@@ -457,7 +657,7 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+                     'reason': '',
+                     'source': 'endpoint_source',
+                     'state': 'literal',
+-                    'value': '_compat_scoped_not_found'},
++                    'value': '_governed_not_found'},
+                    {'field': 'method_source',
+                     'reason': '',
+                     'source': 'http_methods',
+@@ -482,7 +682,7 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+                     'reason': '',
+                     'source': 'view_binding',
+                     'state': 'literal',
+-                    'value': '_compat_scoped_not_found'},
++                    'value': '_governed_not_found'},
+                    {'field': 'classification_inputs',
+                     'reason': '',
+                     'source': 'classification_inputs',
+@@ -501,19 +701,19 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+                     ('decorator_path', 'app.errorhandler'),
+                     ('route_path', '404'),
+                     ('http_methods', ()),
+-                    ('endpoint', '_compat_scoped_not_found'),
+-                    ('view_identity', '_compat_scoped_not_found'),
++                    ('endpoint', '_governed_not_found'),
++                    ('view_identity', '_governed_not_found'),
+                     ('blueprint_name', ''),
+                     ('blueprint_constructor_prefix', ''),
+                     ('errorhandler_key', '404'),
+                     ('routing_keywords', ()),
+                     ('public_internal_classification', 'public')),
+   'source_locus': 'adapter/http_reader.py',
+-  'view_identity': '_compat_scoped_not_found'},
++  'view_identity': '_governed_not_found'},
+  {'blueprint_constructor_prefix': '',
+   'blueprint_name': '',
+   'decorator_path': 'app.errorhandler',
+-  'endpoint': '_compat_scoped_method_not_allowed',
++  'endpoint': '_governed_method_not_allowed',
+   'errorhandler_key': '405',
+   'fail_closed_reason': '',
+   'http_methods': (),
+@@ -557,7 +757,7 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+                     'reason': '',
+                     'source': 'endpoint_source',
+                     'state': 'literal',
+-                    'value': '_compat_scoped_method_not_allowed'},
++                    'value': '_governed_method_not_allowed'},
+                    {'field': 'method_source',
+                     'reason': '',
+                     'source': 'http_methods',
+@@ -582,7 +782,7 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+                     'reason': '',
+                     'source': 'view_binding',
+                     'state': 'literal',
+-                    'value': '_compat_scoped_method_not_allowed'},
++                    'value': '_governed_method_not_allowed'},
+                    {'field': 'classification_inputs',
+                     'reason': '',
+                     'source': 'classification_inputs',
+@@ -601,15 +801,15 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS = ({'blueprint_constructor_prefix
+                     ('decorator_path', 'app.errorhandler'),
+                     ('route_path', '405'),
+                     ('http_methods', ()),
+-                    ('endpoint', '_compat_scoped_method_not_allowed'),
+-                    ('view_identity', '_compat_scoped_method_not_allowed'),
++                    ('endpoint', '_governed_method_not_allowed'),
++                    ('view_identity', '_governed_method_not_allowed'),
+                     ('blueprint_name', ''),
+                     ('blueprint_constructor_prefix', ''),
+                     ('errorhandler_key', '405'),
+                     ('routing_keywords', ()),
+                     ('public_internal_classification', 'public')),
+   'source_locus': 'adapter/http_reader.py',
+-  'view_identity': '_compat_scoped_method_not_allowed'},
++  'view_identity': '_governed_method_not_allowed'},
+  {'blueprint_constructor_prefix': '',
+   'blueprint_name': '',
+   'decorator_path': 'app.after_request',
+diff --git a/tools/evidence/update_evidence_index.py b/tools/evidence/update_evidence_index.py
+index d8586c6..d98550c 100644
+--- a/tools/evidence/update_evidence_index.py
++++ b/tools/evidence/update_evidence_index.py
+@@ -64,7 +64,6 @@ CURRENT_RELEASE_CAPTURE_PATHS = frozenset({
+     "artifacts/catalog/domain_closure_report.log",
+     "artifacts/core/abba/ab_ba_parity.json",
+     "artifacts/core/json_compare/core_result_json_compare.json",
+-    "artifacts/core/purity/purity_report.json",
+     "artifacts/core/two_run/identity.json",
+     "artifacts/proofs/reader_success_get_head_304.json",
+     "artifacts/proofs/success_304.txt",
