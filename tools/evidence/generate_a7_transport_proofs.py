@@ -33,6 +33,9 @@ ALL=[DOC,DOCSHA,AUD,AUDSHA,SNAP,*PROOFS]
 # PF12 §8.8 closed class set, plus PF05 §5.6's projected public_aux (not yet PF12-registered; no conformance claim).
 CLASS={'public_reader','public_compat','internal_identity','internal_admin','ops','dev_harness','public_aux'}
 AUX_PATH='/aux/narrative'; AUX_ALIASES=['/api/aux/narrative']
+# PF02 §3.5 "Current repository discrepancy" and PF29 §1.1: checked-in routes canon marks
+# RETIRED/NONCANONICAL and excludes from the Endpoint Catalog (HDE-CRD-0002 AD-1).
+CANON_RETIRED_PATHS={'/ops/db/unavailable','/ops/probe/env','/ops/writer/diagnostic'}
 def sha(b): return hashlib.sha256(b).hexdigest()
 def cjson(o): return json.dumps(o,separators=(',',':'),sort_keys=True).encode()+b'\n'
 def catalog_obj():
@@ -51,13 +54,8 @@ def catalog_obj():
  {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat HEAD (writer transport 405, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'HEAD','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
  {'a7_eligible':False,'blueprint_module':'engine.http.compat_handler','classification':'internal_admin','description':'Compat OPTIONS (writer transport 204, Allow POST, OPTIONS; internal admin)','env_gate':'APP_ENV!=prod','internal':True,'method':'OPTIONS','path':'/api/compat/v1','rails_profile':'internal-admin writer no-store'},
  {'a7_eligible':False,'aliases':AUX_ALIASES,'blueprint_module':'adapter.http_reader','classification':'public_aux','description':'Aux narrative public bytes (text/plain)','env_gate':'not_applicable_public','internal':False,'method':'GET','path':AUX_PATH,'rails_profile':'public-read-only; vendor-network-disabled'},
- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Forced database-unavailable diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/db/unavailable','rails_profile':'ops diagnostic no-io writer no-store'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Rails-closed refusal diagnostic (no I/O)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/rails/refusal','rails_profile':'ops diagnostic no-io writer no-store'},
- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Process and rails-state probe (names-only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/ops/probe/env','rails_profile':'ops probe no-store'},
- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer (admin bearer scope)','env_gate':'operator-network-only','internal':True,'method':'POST','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store','route_id':'ops.writer.diagnostic.v1'},
- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer HEAD (writer transport 405, Allow POST, OPTIONS)','env_gate':'operator-network-only','internal':True,'method':'HEAD','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store'},
- {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'ops','description':'Diagnostic writer OPTIONS (writer transport 204, Allow POST, OPTIONS)','env_gate':'operator-network-only','internal':True,'method':'OPTIONS','path':'/ops/writer/diagnostic','rails_profile':'ops writer admin-scope no-store'},
  {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Liveness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/healthz','rails_profile':'ops-only no-store'},
  {'a7_eligible':False,'blueprint_module':'adapter.wsgi','classification':'ops','description':'Readiness probe (adapter.wsgi factory only)','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/readyz','rails_profile':'ops-only no-store'},]
  return {'endpoints':eps,'generated_at_utc':TS,'success_endpoints':[{'method':'GET','path':'/reader'}]}
@@ -86,6 +84,7 @@ def validate_catalog(cat):
  aux=[e for e in cat['endpoints'] if e['path']==AUX_PATH]
  if len(aux)!=1 or aux[0]['classification']!='public_aux' or aux[0]['method']!='GET' or aux[0].get('aliases')!=AUX_ALIASES or aux[0]['internal'] is not False or aux[0]['a7_eligible'] is not False or aux[0]['env_gate']!='not_applicable_public': raise ValueError('aux narrative catalog invalid')
  if any('aliases' in e for e in cat['endpoints'] if e['path']!=AUX_PATH): raise ValueError('aliases only on the aux record')
+ if any(p in CANON_RETIRED_PATHS for e in cat['endpoints'] for p in [e['path'],*e.get('aliases',[])]): raise ValueError('canon-retired route must not be cataloged')
  if any(e['env_gate']=='not_applicable_public' and e['internal'] is not False for e in cat['endpoints']): raise ValueError('public env_gate sentinel on internal record')
  production=[e for e in cat['endpoints'] if e['path']==PRODUCTION_READER_PATH]
  if len(production)!=1 or production[0]['method']!='POST' or production[0]['classification']!='public_reader' or production[0]['internal'] is not False or production[0]['a7_eligible'] is not False: raise ValueError('production reader catalog invalid')

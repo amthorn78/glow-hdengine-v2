@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from adapter.http_reader import create_app
-from tools.evidence.generate_a7_transport_proofs import catalog_obj, validate_catalog
+from tools.evidence.generate_a7_transport_proofs import CANON_RETIRED_PATHS, catalog_obj, validate_catalog
 
 def _catalog():
     return json.loads(Path("docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8"))
@@ -98,15 +98,21 @@ def test_production_reader_route_refuses_get_with_the_governed_405(monkeypatch):
 # --- HDE-CRD-0002 S15 (IF-6; ID-1): the catalog covers every served pair ----------
 #
 # Every (method, path) a factory serves as endpoint behavior has exactly one
-# catalog row.  The pairs below are excluded, each for one reason:
-#   (a) governed refusal of a catalogued record (PF05 §5.4 "Production mount";
-#       PF12 §8.8: the production route's other methods are part of its record);
-#   (b) alias spelling of a canonical record, carried by its ``aliases`` (PF05 §5.6);
-#   (c) a method Flask adds automatically (HEAD for a GET view; OPTIONS) whose
-#       behavior neither PF05 §5.6 nor the route's own view defines.
+# catalog row, or is excluded in exactly one class whose canon basis is recorded
+# below (HDE-CRD-0002 AD-1 and AD-6).
 _GOVERNED_REFUSAL = "a"
 _ALIAS = "b"
 _FRAMEWORK_IMPLICIT = "c"
+_CANON_RETIRED = "d"
+_EXCLUSION_BASIS = {
+    _GOVERNED_REFUSAL: 'governed refusal of a catalogued record: PF05 §5.4 "Production mount"; '
+    'PF12 §8.8 "Reader surface routes and distinct contracts"',
+    _ALIAS: 'alias spelling of a canonical record, carried by its aliases: PF05 §5.6',
+    _FRAMEWORK_IMPLICIT: "a method Flask adds automatically (HEAD for a GET view; OPTIONS) "
+    "whose behavior neither PF05 §5.6 nor the route's own view defines",
+    _CANON_RETIRED: 'canon-retired route, excluded from the Endpoint Catalog: PF02 §3.5 '
+    '"Current repository discrepancy"; PF29 §1.1 "Checked-in retired/noncanonical route drift"',
+}
 _EXCLUDED_PAIRS = {
     **{("/api/reader", m): _GOVERNED_REFUSAL for m in ("DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "PUT")},
     ("/reader", "POST"): _GOVERNED_REFUSAL,
@@ -124,12 +130,12 @@ _EXCLUDED_PAIRS = {
             "/dev/writer/conjunction",
             "/internal/healthz",
             "/internal/readyz",
-            "/ops/db/unavailable",
-            "/ops/probe/env",
             "/ops/rails/refusal",
         )
         for m in ("HEAD", "OPTIONS")
     },
+    **{(path, m): _CANON_RETIRED for path in ("/ops/db/unavailable", "/ops/probe/env") for m in ("GET", "HEAD", "OPTIONS")},
+    **{("/ops/writer/diagnostic", m): _CANON_RETIRED for m in ("HEAD", "OPTIONS", "POST")},
 }
 
 
@@ -151,6 +157,11 @@ def test_every_served_pair_has_one_catalog_row_or_a_reasoned_exclusion(monkeypat
     assert sorted(served - catalogued - excluded) == []  # an uncatalogued route fails
     assert sorted(excluded - served) == []  # a stale exclusion fails
     assert sorted(catalogued - served) == []  # no row for an unmounted route (PF12 §8.8)
+    assert len(served) == len(catalogued) + len(excluded)
+    assert all(_EXCLUSION_BASIS.get(why) for why in _EXCLUDED_PAIRS.values())  # every exclusion has a basis
+    retired = {pair for pair in served if pair[0] in CANON_RETIRED_PATHS}
+    assert retired == {pair for pair, why in _EXCLUDED_PAIRS.items() if why == _CANON_RETIRED}
+    assert {path for path, _ in catalogued} & CANON_RETIRED_PATHS == set()  # no record for a canon-retired route
     aux = next(e for e in _catalog()["endpoints"] if e["path"] == "/aux/narrative")
     assert [p for (p, m), why in _EXCLUDED_PAIRS.items() if why == _ALIAS and m == aux["method"]] == aux["aliases"]
 
@@ -190,8 +201,19 @@ def test_validator_rejects_aliases_off_the_aux_record_and_alias_collisions():
     with pytest.raises(ValueError):
         validate_catalog(bad)
     bad = copy.deepcopy(cat)
-    next(e for e in bad["endpoints"] if e["path"] == "/ops/probe/env")["classification"] = "public_ops"
+    next(e for e in bad["endpoints"] if e["path"] == "/internal/healthz")["classification"] = "public_ops"
     with pytest.raises(ValueError):
+        validate_catalog(bad)
+
+
+@pytest.mark.parametrize("path", sorted(CANON_RETIRED_PATHS))
+def test_validator_refuses_a_record_for_a_canon_retired_route(path):
+    # HDE-CRD-0002 AD-1 (PF02 §3.5; PF29 §1.1): fail closed on any record whose path canon retires.
+    cat = catalog_obj()
+    assert not any(e["path"] in CANON_RETIRED_PATHS for e in cat["endpoints"])
+    bad = copy.deepcopy(cat)
+    bad["endpoints"].append(dict(next(e for e in cat["endpoints"] if e["path"] == "/ops/rails/refusal"), path=path))
+    with pytest.raises(ValueError, match="canon-retired"):
         validate_catalog(bad)
 
 

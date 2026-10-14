@@ -377,11 +377,11 @@ _READER_VERSIONS = {"1": "v1", "2": "v2"}
 
 def _reader_dev_env_explicit() -> bool:
     """Dev ``GET /reader`` gate (PF05 §5.4 and §5.6; PF12 §8.8): served only when
-    ``APP_ENV`` is explicitly ``dev``.  Unset, empty, ``test``, ``local`` and
-    every other value refuse; an unset environment is not development."""
+    ``APP_ENV`` is exactly ``dev``, with no trimming or case-folding.  Unset,
+    empty, ``test``, ``local`` and every other value refuse; an unset
+    environment is not development."""
 
-    raw_app_env = os.environ.get("APP_ENV")
-    return raw_app_env is not None and raw_app_env.strip().lower() == "dev"
+    return os.environ.get("APP_ENV") == "dev"
 
 
 def _select_reader_version(allowed: tuple[str, ...]) -> str:
@@ -1237,6 +1237,13 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    # dev runner (Railway uses gunicorn via Procfile)
+    # dev runner (Railway uses gunicorn via Procfile): loopback only, debugger and
+    # reloader off (PF05 §5.4 "Gate"; PF14 §34 "Required local capture profile")
     import os
-    create_app().run(host="0.0.0.0", port=int(os.environ.get("PORT","8000")))
+    create_app().run(
+        host="127.0.0.1",
+        port=int(os.environ.get("PORT", "8000")),
+        debug=False,
+        use_debugger=False,
+        use_reloader=False,
+    )
