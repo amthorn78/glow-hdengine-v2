@@ -76,7 +76,7 @@ def _build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     show = sub.add_parser(
         "showcompat",
-        help="Emit canonical Reader v1 bytes from vendor JSON (stdin or files)",
+        help="Emit the canonical magic10_compat_result.v1 document for a pair (stdin or files); Reader v1 bytes only via --dump-reader",
         allow_abbrev=False,
     )
     show.add_argument("--pair-file", help="Path to JSON with left/right payloads")

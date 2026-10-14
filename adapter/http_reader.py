@@ -375,6 +375,15 @@ def _error(token: str, code: int = 400):
 _READER_VERSIONS = {"1": "v1", "2": "v2"}
 
 
+def _reader_dev_env_explicit() -> bool:
+    """Dev ``GET /reader`` gate (PF05 §5.4 and §5.6; PF12 §8.8): served only when
+    ``APP_ENV`` is explicitly ``dev``.  Unset, empty, ``test``, ``local`` and
+    every other value refuse; an unset environment is not development."""
+
+    raw_app_env = os.environ.get("APP_ENV")
+    return raw_app_env is not None and raw_app_env.strip().lower() == "dev"
+
+
 def _select_reader_version(allowed: tuple[str, ...]) -> str:
     """PF05 §5.1.0 strict version selection.
 
@@ -600,7 +609,7 @@ def get_reader_bp(emit_fn=None):
             _select_reader_version(("1",))
         except _ReaderFailure as exc:
             return _error(exc.token, exc.status)
-        if os.environ.get("APP_ENV", "dev") != "dev":
+        if not _reader_dev_env_explicit():
             return _error("ERR_READER_FORBIDDEN", 403)
 
         a_path = request.args.get("a"); b_path = request.args.get("b")
@@ -1184,17 +1193,32 @@ def create_app():
         resp.headers["Content-Length"] = str(len(payload))
         return resp
 
+    def _governed_error_response(err) -> Response:
+        # App-level 404/405 for an unknown path or method (PF05 §5.2 item 1):
+        # the canonical ERR_NOT_FOUND error_v1 envelope through the presenter,
+        # no-store, no ETag, never framework HTML.  A 405 keeps the routing
+        # Allow header, sorted for deterministic bytes.
+        payload = emit_public(error_envelope("ERR_NOT_FOUND"))
+        resp = Response(payload, status=err.code, mimetype="application/json; charset=utf-8")
+        resp.headers["Cache-Control"] = "no-store"
+        if err.code == 405 and getattr(err, "valid_methods", None):
+            resp.headers["Allow"] = ", ".join(sorted(err.valid_methods))
+        resp.headers.pop("ETag", None)
+        resp.headers.pop("Content-Encoding", None)
+        resp.headers["Content-Length"] = str(len(payload))
+        return resp
+
     @app.errorhandler(404)
-    def _compat_scoped_not_found(err):  # type: ignore[override]
+    def _governed_not_found(err):  # type: ignore[override]
         if request.path.rstrip("/").startswith("/api/compat/v1"):
             return _compat_error_response(404)
-        return err
+        return _governed_error_response(err)
 
     @app.errorhandler(405)
-    def _compat_scoped_method_not_allowed(err):  # type: ignore[override]
+    def _governed_method_not_allowed(err):  # type: ignore[override]
         if request.path.rstrip("/").startswith("/api/compat/v1"):
             return _compat_error_response(405)
-        return err
+        return _governed_error_response(err)
 
     @app.after_request
     def _strip_etag_on_internal(resp):

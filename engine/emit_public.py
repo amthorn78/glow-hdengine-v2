@@ -17,9 +17,9 @@ def emit_public_envelope(
     """Legacy helper retained for harnesses; routes through presenter emitter.
 
     ``eligible`` and ``harmony_band`` carry the current emitter contract, in both
-    directions this helper is used: ``VERIFY.sh`` calls it with the five positional
-    arguments only, while ``dev/reader_harness/app.py`` injects it as the Reader
-    blueprint's ``emit_fn``, which the routes call with both keywords.
+    ways this helper can be used: ``VERIFY.sh`` calls it with the five positional
+    arguments only, and a caller may inject it as the Reader blueprint's
+    ``emit_fn``, which the routes call with both keywords.
 
     The default is the ineligible envelope (``categories: []``) rather than a
     fabricated eligible one: an eligible pair must supply its band, and the band

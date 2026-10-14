@@ -64,7 +64,6 @@ CURRENT_RELEASE_CAPTURE_PATHS = frozenset({
     "artifacts/catalog/domain_closure_report.log",
     "artifacts/core/abba/ab_ba_parity.json",
     "artifacts/core/json_compare/core_result_json_compare.json",
-    "artifacts/core/purity/purity_report.json",
     "artifacts/core/two_run/identity.json",
     "artifacts/proofs/reader_success_get_head_304.json",
     "artifacts/proofs/success_304.txt",

@@ -256,6 +256,11 @@ _WORKFLOW_CONTROL_PATH_LANES = {
     "tools/cli/emitter_symbol_proof.py": {"compat"},
     "tools/cli/serializer_grep_guard.py": {"compat"},
     "tools/order/generate_ordering_artifacts.py": {"product"},
+    # HDE-CRD-0002 WU-PR-03 (S09): the operator verification script, which now
+    # drives the canonical dev runner, and the retired dev Reader harness.
+    "VERIFY.sh": {"product"},
+    "dev/reader_harness/__init__.py": {"product"},
+    "dev/reader_harness/app.py": {"product"},
 }
 _RAILS_MARKERS = (
     "open_rails",
@@ -573,6 +578,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/bodygraph/test_bg_resolve_route_policy.py",
     ),
     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
+    "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
     "scripts/emit_env_guard_artifact.py": (
         "tests/artifacts/test_env_guard_artifact_bytes.py",
     ),

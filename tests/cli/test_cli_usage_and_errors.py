@@ -114,3 +114,13 @@ def test_admission_refusal_is_a_single_stderr_token(monkeypatch, capsys, tmp_pat
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "INCOMPLETE_RELEASE_ROSTER\n"
+
+
+def test_top_level_help_names_the_showcompat_stdout_contract(capsys):
+    # HDE-CRD-0002 S07: the one-line summary matches the stdout contract
+    # (docs/CLI_commands.md); Reader v1 bytes come only from --dump-reader.
+    assert cli(["--help"]) == 0
+    out = capsys.readouterr().out
+    assert "magic10_compat_result.v1" in out
+    assert "--dump-reader" in out
+    assert "Emit canonical Reader v1 bytes from vendor JSON" not in out
