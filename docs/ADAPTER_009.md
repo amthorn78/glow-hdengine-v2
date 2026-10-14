@@ -171,7 +171,7 @@ All predicates below remain required within this document's stated scope. The re
   validators equal 200.
 - `HTTP_ERRORS_NOSTORE_NOETAG_OK` — Errors/writers are JSON, **no-store**, **no ETag**.
 - `HTTP_POST_METHOD_POSTURE_OK` — Reader POST ⇒ 405 typed JSON (`no-store`, no ETag); Compat POST ⇒ 200 non-conditional.
-- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `{"error":"body_not_allowed"}`, `no-store`, no ETag.
+- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 error_v1 envelope built from the `invalid_json` alias (emitted `code`: `ERR_COMPAT_INVALID_JSON`), `no-store`, no ETag.
 
 Current routes (HDE-EPIC040): the 200, 304 and HEAD predicates above apply to the dev Reader `GET /reader`, the route the A7 transport proofs select from `docs/ENDPOINTS_CATALOG.json`. `HTTP_POST_METHOD_POSTURE_OK` keeps its original meaning, which now holds for the unprefixed `POST /reader`: it returns the governed 405 (`ERR_NOT_FOUND`, `Allow: GET, HEAD`, `no-store`, no ETag). The production Reader is `POST /api/reader?v=1` or `?v=2`: a success is 200, non-conditional and carries no ETag; its errors are `no-store` without ETag; every other method on `/api/reader` returns 405 with `Allow: POST`. See `docs/contracts/reader_v2_public_bytes.md`.
 

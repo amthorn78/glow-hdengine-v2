@@ -2,9 +2,10 @@
 
 The helper is used two ways, and PR04 broke both by making ``eligible`` a required
 keyword-only argument of ``emit_reader_public_bytes``: ``VERIFY.sh`` calls it with
-five positional arguments, and ``dev/reader_harness/app.py`` injects it as the
-Reader blueprint's ``emit_fn``, which the routes call with ``eligible=`` and
-``harmony_band=``. Neither shape reaches CI, so these tests own that contract.
+five positional arguments, and a caller may inject it as the Reader blueprint's
+``emit_fn``, which the routes call with ``eligible=`` and ``harmony_band=``. The
+former dev harness that did so was removed (HDE-CRD-0002 S09); these tests own
+that contract.
 """
 from __future__ import annotations
 

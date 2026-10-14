@@ -14,14 +14,14 @@ Everything below this section is retained history. Where it disagrees with this 
 
 - Production Reader: `POST /api/reader?v=1` (Reader v1) and `POST /api/reader?v=2` (Reader v2). The production blueprint (`get_reader_api_bp` in `adapter/http_reader.py`) is mounted under `/api` by every app factory: `adapter/factory.py`, `adapter/wsgi.py` and `adapter/http_reader.py::create_app`. Version selection, request body, lookup, transport and error rules are shared by both versions; see `docs/contracts/reader_v2_public_bytes.md`.
 - Every method other than `POST` on `/api/reader` returns the governed 405 (`ERR_NOT_FOUND`, `Allow: POST`, `no-store`).
-- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. When `APP_ENV` is set to a value other than `dev`, it returns 403 `ERR_READER_FORBIDDEN`; an unset `APP_ENV` is treated as `dev`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
+- Dev Reader: `GET /reader?v=1` (and `HEAD`) is Reader v1 only; any other `v` returns 400 `ERR_READER_INVALID_VERSION`. It is served only when `APP_ENV` is explicitly `dev` (surrounding whitespace and letter case ignored); unset, empty and every other value, including `test` and `local`, return 403 `ERR_READER_FORBIDDEN`. `a` and `b` are chart paths resolved against the server's working directory that must resolve inside `fixtures/charts/` (for example `fixtures/charts/alice.json`); `a_tz` and `b_tz` are required when a chart has no `tz`.
 - `POST /reader` (unprefixed) is not the production Reader: it returns the governed 405 with `Allow: GET, HEAD`.
-- Local start: `scripts/dev_start_reader.sh` runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`). Run it from the repository root. The legacy notice below names `dev/reader_harness/app.py`; as of HDE-EPIC040-PR07 that file raises `AttributeError` at import, so it is not a start path.
-- Known limitation: a path that no route serves receives the framework's HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`; `adapter/wsgi.py` answers with the JSON `ERR_NOT_FOUND` envelope.
+- Local start: `APP_ENV=dev scripts/dev_start_reader.sh`. The script propagates `APP_ENV` exactly as the caller supplies it (it never defaults it, so an unset or empty value starts a runner that refuses `/reader`) and runs `python -m adapter.http_reader`, which binds `0.0.0.0` on `PORT` (default `8000`). Run it from the repository root. `VERIFY.sh` starts the same runner and requires `APP_ENV=dev`: it never defaults `APP_ENV` and refuses with `VERIFY_APP_ENV_NOT_DEV` (exit 2) otherwise. The former dev Reader harness was removed in HDE-CRD-0002; this runner is the dev Reader harness.
+- Unknown paths: a path that no route serves returns 404, and a method a route does not serve returns 405 with `Allow`, as the governed `ERR_NOT_FOUND` envelope (`no-store`, no ETag, `application/json; charset=utf-8`) from every app factory; `adapter/wsgi.py`'s 405 carries no `Allow`.
 
 ---
 
-> **Legacy notice (to be removed):** This page describes a deprecated server/ path. The canonical HTTP adapter is `adapter/http_reader.py`. For local runs use the dev runner `dev/reader_harness/app.py` with `APP_ENV=dev`. Update examples and imports accordingly.
+> **Legacy notice (to be removed):** This page describes a deprecated server/ path. The canonical HTTP adapter is `adapter/http_reader.py`. For local runs use `APP_ENV=dev scripts/dev_start_reader.sh`. Update examples and imports accordingly.
 
 docs/server/reader_v1.md  
 

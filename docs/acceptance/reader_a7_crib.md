@@ -1,7 +1,9 @@
 # Reader v1 — HTTP Transport Evidence crib sheet (dev)
 
-Dev runner (APP_ENV=dev):
-  python dev/reader_harness/app.py
+Dev runner (canonical; the caller supplies APP_ENV=dev, which the script propagates unchanged):
+  APP_ENV=dev scripts/dev_start_reader.sh
+  then probe http://127.0.0.1:8000/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=UTC&b_tz=UTC
+  (`VERIFY.sh` runs these probes against the same runner.)
 
 Probes (use curl):
 1) 200 OK: strong quoted ETag over identity bytes (with the trailing LF). Body matches CLI `--dump-reader` bytes.

@@ -134,3 +134,36 @@ def test_reader_a7_transport_invariants(monkeypatch):
     conditional_post = client.post("/api/reader", query_string=params, headers={"If-None-Match": etag})
     assert conditional_post.status_code == 422
     assert conditional_post.data == api_post.data
+
+
+@pytest.mark.parametrize("app_env", ["dev", " DEV ", "Dev"])
+def test_dev_reader_is_served_only_for_explicit_dev(monkeypatch, app_env):
+    # HDE-CRD-0002 S10 / IF-10 (PF05 §5.4, §5.6): explicit APP_ENV=dev serves.
+    monkeypatch.setenv("APP_ENV", app_env)
+    client = _client()
+    params = _reader_query_params()
+    assert client.get("/reader", query_string=params).status_code == 200
+    head = client.head("/reader", query_string=params)
+    assert head.status_code == 200 and head.data == b""
+
+
+@pytest.mark.parametrize("app_env", [None, "", "  ", "test", "local", "prod", "production", "live", "staging", "development", "dev1"])
+def test_dev_reader_refuses_every_other_environment(monkeypatch, app_env):
+    # Unset, empty and every non-dev value refuse with ERR_READER_FORBIDDEN 403,
+    # the governed error headers, and no ETag; HEAD carries no body.
+    if app_env is None:
+        monkeypatch.delenv("APP_ENV", raising=False)
+    else:
+        monkeypatch.setenv("APP_ENV", app_env)
+    client = _client()
+    params = _reader_query_params()
+    resp = client.get("/reader", query_string=params)
+    assert resp.status_code == 403
+    assert json.loads(resp.data)["code"] == "ERR_READER_FORBIDDEN"
+    assert resp.headers.get("Cache-Control") == "no-store"
+    assert resp.headers.get("Content-Type") == "application/json; charset=utf-8"
+    assert "ETag" not in resp.headers
+    head = client.head("/reader", query_string=params)
+    assert head.status_code == 403 and head.data == b""
+    # Version validation still precedes the environment gate.
+    assert json.loads(client.get("/reader", query_string={"v": "2"}).data)["code"] == "ERR_READER_INVALID_VERSION"
