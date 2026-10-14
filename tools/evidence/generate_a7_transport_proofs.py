@@ -85,7 +85,7 @@ def validate_catalog(cat):
  if any(e['path']=='/internal/dev/sampler' and e['method']=='GET' for e in cat['endpoints']): raise ValueError('GET internal dev sampler must not be cataloged')
  aux=[e for e in cat['endpoints'] if e['path']==AUX_PATH]
  if len(aux)!=1 or aux[0]['classification']!='public_aux' or aux[0]['method']!='GET' or aux[0].get('aliases')!=AUX_ALIASES or aux[0]['internal'] is not False or aux[0]['a7_eligible'] is not False or aux[0]['env_gate']!='not_applicable_public': raise ValueError('aux narrative catalog invalid')
- if any('aliases' in e for e in cat['endpoints'] if e['classification']!='public_aux'): raise ValueError('aliases only on the aux record')
+ if any('aliases' in e for e in cat['endpoints'] if e['path']!=AUX_PATH): raise ValueError('aliases only on the aux record')
  if any(e['env_gate']=='not_applicable_public' and e['internal'] is not False for e in cat['endpoints']): raise ValueError('public env_gate sentinel on internal record')
  production=[e for e in cat['endpoints'] if e['path']==PRODUCTION_READER_PATH]
  if len(production)!=1 or production[0]['method']!='POST' or production[0]['classification']!='public_reader' or production[0]['internal'] is not False or production[0]['a7_eligible'] is not False: raise ValueError('production reader catalog invalid')

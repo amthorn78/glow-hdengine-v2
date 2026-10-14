@@ -181,6 +181,11 @@ def test_validator_rejects_aliases_off_the_aux_record_and_alias_collisions():
     with pytest.raises(ValueError):
         validate_catalog(bad)
     bad = copy.deepcopy(cat)
+    row = next(e for e in bad["endpoints"] if e["path"] == "/ops/rails/refusal" and e["method"] == "GET")
+    row["classification"], row["aliases"] = "public_aux", ["/x"]  # a second public_aux record cannot carry aliases
+    with pytest.raises(ValueError):
+        validate_catalog(bad)
+    bad = copy.deepcopy(cat)
     next(e for e in bad["endpoints"] if e["path"] == "/aux/narrative")["aliases"] = ["/reader"]
     with pytest.raises(ValueError):
         validate_catalog(bad)
