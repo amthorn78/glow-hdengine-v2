@@ -1,0 +1,111 @@
+{
+ "version": "hd-v3",
+ "cases": [
+  {
+   "label": "HA1 Record a delivered report",
+   "session": "controller",
+   "action": "Record the delivery date and Google Doc link of a 40-page reading that has already passed acceptance, publication and QA, in the run log and on the client's Notion page; nothing later depends on this step.",
+   "expect_rung": [
+    "low"
+   ],
+   "expect_model": [
+    "Haiku 5.5",
+    "Sonnet 5.5"
+   ],
+   "source": "hd-v1 acceptance text and rung expectation, unchanged"
+  },
+  {
+   "label": "HA2 Two named one-line fixes",
+   "session": "repair",
+   "action": "Correct one misspelled gate name and one wrong table caption in an accepted 40-page reading, each named by section and line; the deterministic mechanical and structure checks re-run before the report is republished.",
+   "expect_rung": [
+    "medium"
+   ],
+   "expect_model": [
+    "Sonnet 5.5",
+    "Opus 5.5"
+   ],
+   "source": "hd-v1 acceptance text and rung expectation, unchanged"
+  },
+  {
+   "label": "HA3 Repair four named defects",
+   "session": "repair",
+   "action": "Repair a 40-page reading written on the accepted template against four defects named at acceptance, each with its section, the failed requirement and the evidence; acceptance re-runs every check before the report can be published, and a QA pass follows.",
+   "expect_rung": [
+    "high",
+    "extra high"
+   ],
+   "expect_model": [
+    "Opus 5.5"
+   ],
+   "source": "hd-v1 acceptance text and rung expectation, unchanged"
+  },
+  {
+   "label": "HA4 First parent-child composite",
+   "session": "author",
+   "action": "Write the first parent-child composite reading produced on this platform, for paying clients, from a complete packet: both charts, the relationship ledger, a long prompt, a new template version and reference works read passage by passage; later parent-child reports will copy its structure, and the acceptance checks test mechanics and structure, not the interpretation.",
+   "expect_rung": [
+    "max"
+   ],
+   "expect_model": [
+    "Fable 5.1"
+   ],
+   "source": "hd-v1 acceptance text and rung expectation, unchanged"
+  },
+  {
+   "label": "HA5 Claim audit of the first six reports",
+   "session": "QA",
+   "action": "Before the first production reports produced on this platform reach clients, check every claim in six 40-page readings against their chart data and the cited reference passages, section by section; any single reader would miss claims spread across 240 pages.",
+   "expect_rung": [
+    "ultracode"
+   ],
+   "expect_model": null,
+   "source": "hd-v1 acceptance text and rung expectation, unchanged"
+  },
+  {
+   "label": "HA6 Standard single-person reading",
+   "session": "author",
+   "action": "Write a standard 40-page single-person reading for a new client from a complete packet on the accepted template, a report type already produced here many times; acceptance checks and a QA pass follow.",
+   "expect_rung": [
+    "high",
+    "extra high"
+   ],
+   "expect_model": [
+    "Opus 5.5"
+   ],
+   "source": "hd-v1 acceptance text and rung expectation, unchanged"
+  },
+  {
+   "label": "HA7 Check a run folder against the naming plan",
+   "session": "controller",
+   "action": "Check that each of the twelve output files of a finished run is present in the run folder and named by the run plan's convention, and list any that are missing or misnamed; nothing is changed.",
+   "expect_rung": [
+    "low",
+    "medium"
+   ],
+   "expect_model": [
+    "Haiku 5.5"
+   ],
+   "source": "new for hd-v3"
+  },
+  {
+   "label": "HA8 Handover note from open run items",
+   "session": "controller",
+   "action": "Draft the internal handover note for the next controller session from the open items in the run log: which reports await repair, which await QA and which inputs are still missing; the next controller checks the note against the log.",
+   "expect_rung": [
+    "low",
+    "medium"
+   ],
+   "expect_model": [
+    "Sonnet 5.5",
+    "Haiku 5.5"
+   ],
+   "source": "new for hd-v3"
+  }
+ ],
+ "jobs_note": "J0 to J6 (jobs-hd-v1.json, unchanged) are re-read and reported against hd-v1, not gated.",
+ "gates": {
+  "cases": "All 8 cases meet every stated expectation (rung in the set; model in the set where stated), as hd-v1 required 6 of 6; HA7 must read Haiku 5.5.",
+  "overall": "hd-v3 is accepted when all 8 pass on run 1. If any fails, one revision (hd-v3.1) is allowed, run on the same cases and marked as fitted to them; if it also fails, Nathan decides. Run 2 of the cases is reported, not gated."
+ }
+}
