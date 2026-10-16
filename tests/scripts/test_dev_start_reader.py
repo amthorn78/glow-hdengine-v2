@@ -98,6 +98,7 @@ def _start_and_get(env: dict[str, str], port: int) -> tuple[str, int, bytes]:
 def test_runner_with_explicit_dev_serves_reader(tmp_path: Path) -> None:
     banner, status, body = _start_and_get(_env(tmp_path, APP_ENV="dev"), _free_port())
     assert "[dev-start] APP_ENV=dev " in banner
+    assert "(host=127.0.0.1)" in banner  # loopback bind (HDE-CRD-0002 AD-3)
     assert status == 200, body
     assert body.endswith(b"\n")
 
