@@ -1,0 +1,20 @@
+Cases run 1: 8 of 8 meet every expectation (need all); HA7 Haiku 5.5: True. PASS
+  pass  HA1 Record a delivered report: Haiku 5.5 at low (score 0.00; Fable 5.1 0.00, Opus 5.5 0.00, Sonnet 5.5 0.01, Haiku 5.5 0.99); run 2 same
+  pass  HA2 Two named one-line fixes: Opus 5.5 at medium (score 1.01; Fable 5.1 0.00, Opus 5.5 0.85, Sonnet 5.5 0.14, Haiku 5.5 0.01); run 2 same
+  pass  HA3 Repair four named defects: Opus 5.5 at high (score 1.99; Fable 5.1 0.00, Opus 5.5 0.99, Sonnet 5.5 0.01, Haiku 5.5 0.00); run 2 same
+  pass  HA4 First parent-child composite: Fable 5.1 at max (score 4.00; Fable 5.1 0.99, Opus 5.5 0.01, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  pass  HA5 Claim audit of the first six reports: Sonnet 5.5 at ultracode (score 4.98; Fable 5.1 0.13, Opus 5.5 0.37, Sonnet 5.5 0.50, Haiku 5.5 0.00); run 2 same
+  pass  HA6 Standard single-person reading: Opus 5.5 at extra high (score 3.00; Fable 5.1 0.00, Opus 5.5 1.00, Sonnet 5.5 0.00, Haiku 5.5 0.00); run 2 same
+  pass  HA7 Check a run folder against the naming plan: Haiku 5.5 at low (score 0.33; Fable 5.1 0.00, Opus 5.5 0.01, Sonnet 5.5 0.41, Haiku 5.5 0.58); run 2 same
+  pass  HA8 Handover note from open run items: Sonnet 5.5 at medium (score 0.94; Fable 5.1 0.00, Opus 5.5 0.04, Sonnet 5.5 0.95, Haiku 5.5 0.01); run 2 same
+  Part C (reported): cells changed on 0 of 8; largest change in effort score 0.04; P(Fable 5.1) 0.04, P(Opus 5.5) 0.02, P(Sonnet 5.5) 0.03, P(Haiku 5.5) 0.03
+Jobs (reported, not gated):
+  J0 General: a typical three-report request: Opus 5.5 at extra high (score 3.03)
+  J1 Controller: routine production run: Opus 5.5 at extra high (score 2.97)
+  J2 Controller: first live production run here: Opus 5.5 at max (score 4.00)
+  J3 Author: romantic composite, type already produced: Opus 5.5 at extra high (score 3.00)
+  J4 Author: first single-person reading on this platform: Opus 5.5 at max (score 3.60)
+  J5 Author: focused answer to two questions: Opus 5.5 at high (score 2.03)
+  J6 QA: formatting check by the same author: Sonnet 5.5 at medium (score 1.01)
+
+Overall: ACCEPTED (hd-v3)

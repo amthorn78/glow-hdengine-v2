@@ -128,7 +128,7 @@ def hd(acc, r1, r2, jobs):
 def main():
     acc = load(sys.argv[1])
     rest = [load(p) for p in sys.argv[2:]] + [None] * 3
-    ok = glow(acc, *rest[:3]) if acc["version"] == "v8" else hd(acc, *rest[:3])
+    ok = glow(acc, *rest[:3]) if acc["version"] in ("v8", "v8.1") else hd(acc, *rest[:3])
     print(f"\nOverall: {'ACCEPTED' if ok else 'NOT ACCEPTED'} ({acc['version']})")
     sys.exit(0 if ok else 1)
 

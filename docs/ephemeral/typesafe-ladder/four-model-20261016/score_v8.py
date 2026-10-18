@@ -40,6 +40,7 @@ URL = "https://api.typesafe.ai/v1/systemone"
 PINS = {  # request file name -> (version, SHA-256); a changed request is a new version
     "request-v8.json": ("v8", "e19f4e328bd2ec0d6099dcf9b89e668065c77127d4895acf949de6f5d211d236"),
     "request-hd-v3.json": ("hd-v3", "c548868d3c5a45c530474cf2de4b739b96699c2227459ee7e5db4e9c2af2ec8f"),
+    "request-v8.1.json": ("v8.1", "55b835dac95da6bc092ec61235f9b4eb33d46633643849509383227d4b82ba8f"),
 }
 _KEY = None
 
@@ -187,7 +188,7 @@ def main():
     g.add_argument("--action")
     g.add_argument("--action-file")
     g.add_argument("--batch", help="JSON file: list of {label, action, session}")
-    ap.add_argument("--request", required=True, help="request-v8.json or request-hd-v3.json (pinned)")
+    ap.add_argument("--request", required=True, help="a pinned request: request-v8.1.json, request-v8.json or request-hd-v3.json")
     ap.add_argument("--label", default="", help="the Step name of the uses-table row")
     ap.add_argument("--session", default="")
     ap.add_argument("--kind", default="live", help="live, acceptance or calibration")
