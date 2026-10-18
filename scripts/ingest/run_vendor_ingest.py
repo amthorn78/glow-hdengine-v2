@@ -110,6 +110,8 @@ def main() -> int:
         outcome = ingest_vendor_bodygraph(
             inputs,
             env=os.environ,
+            retry_log=RETRY_LOG,
+            success_log=SUCCESS_LOG,
             canon_log=INGEST_CANON_COMPARE_LOG,
         )
         outcomes.append(outcome)

@@ -240,3 +240,30 @@ def test_s19_ingest_rails_are_exact(safe, net, code):
 def test_s19_ingest_defaults_name_no_log():
     assert ingest_vendor_bodygraph.__kwdefaults__["retry_log"] is None
     assert ingest_vendor_bodygraph.__kwdefaults__["success_log"] is None
+
+
+def test_s19_vendor_ingest_runner_passes_its_own_logs(monkeypatch, tmp_path, capsys):
+    import importlib.util
+
+    from engine.bodygraph import ingest
+
+    spec = importlib.util.spec_from_file_location("_s19_run_vendor_ingest", Path("scripts/ingest/run_vendor_ingest.py"))
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    paths = {name: tmp_path / "ingest" / name.lower() for name in ("SUCCESS_LOG", "RETRY_LOG", "IDEMPOTENCY_LOG", "INGEST_CANON_COMPARE_LOG", "ACCEPTANCE_FILE", "VERIFY_OK_FILE")}
+    for name, path in paths.items():
+        monkeypatch.setattr(runner, name, path)
+    monkeypatch.setattr(runner, "ARTIFACTS", [paths[n] for n in ("SUCCESS_LOG", "IDEMPOTENCY_LOG", "RETRY_LOG", "INGEST_CANON_COMPARE_LOG")])
+    monkeypatch.setattr(runner, "gather_inputs_from_env", lambda: VendorInputs(user_id="operator-user", **_S19_BIRTH))
+    seen = []
+    db = FakeDB()
+
+    def _ingest(inputs, **kwargs):
+        seen.append(kwargs)
+        return ingest.ingest_vendor_bodygraph(inputs, **{**kwargs, "env": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1"}, "client": FakeClient(), "db_access": db})
+
+    monkeypatch.setattr(runner, "ingest_vendor_bodygraph", _ingest)
+    assert runner.main() == 0
+    assert [(k["retry_log"], k["success_log"]) for k in seen] == [(paths["RETRY_LOG"], paths["SUCCESS_LOG"])] * 2
+    assert len(paths["SUCCESS_LOG"].read_text(encoding="utf-8").splitlines()) == 2
+    assert json.loads(capsys.readouterr().out)["artifacts"]["ingest_success"] is True
