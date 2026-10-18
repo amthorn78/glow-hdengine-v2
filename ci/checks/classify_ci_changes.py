@@ -577,6 +577,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/bodygraph/test_vendor_client.py",
         "tests/bodygraph/test_bg_resolve_route_policy.py",
     ),
+    # HDE-CRD-0002 WU-PR-04 (S14): the production vendor-override audit module.
+    "engine/bodygraph/vendor_audit.py": ("tests/bodygraph/test_vendor_prod_override.py",),
     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
     "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
     "scripts/emit_env_guard_artifact.py": (
@@ -650,6 +652,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     ),
     "tools/evidence/generate_hdapi_v2_contract_inventory.py": (
         "tests/evidence/test_hdapi_v2_contract_inventory.py",
+    ),
+    # HDE-CRD-0002 WU-PR-04 (ID-8): its production scenario passes the override gate.
+    "tools/evidence/generate_v2_mapped_cache_evidence.py": (
+        "tests/evidence/test_v2_mapped_cache_evidence.py",
     ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (

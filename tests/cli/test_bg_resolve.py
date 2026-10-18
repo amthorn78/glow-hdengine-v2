@@ -194,3 +194,114 @@ def test_bg_resolve_vendor_missing_inputs(
         assert payload["status"] == "error"
     else:
         assert captured.err
+
+
+# HDE-CRD-0002 WU-PR-04 (S14): --allow-prod-vendor usage carrier (HDE-CLI-API-Vendor-Ref
+# §7.1.11a, §7.1.11d steps 1-2, §7.1.11e). Usage errors exit 64, keep stdout empty, print one
+# stderr line and never echo the value.
+
+_REF = "PO-HDE-CRD-0002/QA:live-1"
+_VENDOR_ARGS = ["--source", "vendor", "--birthdate", "1990-01-01", "--birthtime", "12:34", "--location", "Amsterdam, NL"]
+
+
+def _usage(argv, capsys, monkeypatch, *, forbidden=()):
+    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", lambda *a, **k: pytest.fail("resolver reached"))
+    exit_code = cli(argv)
+    captured = capsys.readouterr()
+    assert exit_code == 64
+    assert captured.out == ""
+    assert captured.err.endswith("\n") and captured.err.count("\n") == 1
+    assert "--allow-prod-vendor" in captured.err
+    for value in forbidden:
+        assert value not in captured.err
+    return captured.err
+
+
+@pytest.mark.parametrize("flags", [
+    ["--allow-prod-vendor", _REF, "--allow-prod-vendor", _REF],
+    [f"--allow-prod-vendor={_REF}", f"--allow-prod-vendor={_REF}"],
+    ["--allow-prod-vendor", _REF, "--allow-prod-vendor=OTHER-REF"],
+])
+def test_allow_prod_vendor_duplicate_is_usage(monkeypatch, capsys, flags):
+    _usage(["bg:resolve", "--user", "u", *_VENDOR_ARGS, *flags], capsys, monkeypatch, forbidden=(_REF, "OTHER-REF"))
+
+
+@pytest.mark.parametrize("flags", [
+    ["--allow-prod-vendor="],
+    ["--allow-prod-vendor", ""],
+    ["--allow-prod-vendor"],
+    ["--allow-prod-vendor", "has space"],
+    ["--allow-prod-vendor", "tab\there"],
+    ["--allow-prod-vendor", "ctl\x01x"],
+    ["--allow-prod-vendor", "nul\x7fx"],
+    ["--allow-prod-vendor", "café"],
+    ["--allow-prod-vendor", "at@sign"],
+    ["--allow-prod-vendor", "semi;colon"],
+    ["--allow-prod-vendor=-leading-dash"],
+    ["--allow-prod-vendor", ".leading-dot"],
+    ["--allow-prod-vendor", "line\nbreak"],
+    ["--allow-prod-vendor", "a" * 129],
+])
+def test_allow_prod_vendor_invalid_value_is_usage(monkeypatch, capsys, flags):
+    value = flags[-1].split("=", 1)[-1] if flags[-1].startswith("--allow-prod-vendor=") else (flags[1] if len(flags) > 1 else "")
+    _usage(["bg:resolve", "--user", "u", *_VENDOR_ARGS, *flags], capsys, monkeypatch, forbidden=(value,) if value else ())
+
+
+@pytest.mark.parametrize("source", [["--source", "db"], ["--source", "auto"], []])
+def test_allow_prod_vendor_with_non_vendor_source_is_usage(monkeypatch, capsys, source):
+    err = _usage(["bg:resolve", "--user", "u", *source, "--allow-prod-vendor", _REF], capsys, monkeypatch, forbidden=(_REF,))
+    assert "--source vendor" in err
+
+
+@pytest.mark.parametrize("argv", [
+    ["showcompat", "--allow-prod-vendor", _REF],
+    ["aux-preview", "--allow-prod-vendor", _REF],
+    ["--allow-prod-vendor", _REF, "bg:resolve", "--user", "u", "--source", "vendor"],
+    ["bg:resolve", "--user", "u", *_VENDOR_ARGS, "--", "--allow-prod-vendor", _REF],
+    ["bg:resolve", "--user", "u", *_VENDOR_ARGS, "--", f"--allow-prod-vendor={_REF}"],
+])
+def test_allow_prod_vendor_outside_bg_resolve_is_usage(monkeypatch, capsys, argv):
+    _usage(argv, capsys, monkeypatch, forbidden=(_REF,))
+
+
+@pytest.mark.parametrize("value", ["A", "a" * 128, "PO-1.2_3:x/y-z", "9abc"])
+def test_allow_prod_vendor_valid_value_reaches_the_resolver_once(monkeypatch, capsys, value):
+    _set_safe_rails(monkeypatch)
+    seen = []
+
+    def _fake(user_id, **kwargs):
+        seen.append(kwargs["authorization_ref"])
+        from engine.bodygraph.resolver import ResolveBodygraphResult
+
+        return ResolveBodygraphResult(status="error", payload={"status": "error", "error": {"code": "PROVIDER_REFUSED", "message": "m"}, "resolver": {}}, exit_code=1)
+
+    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", _fake)
+    assert cli(["bg:resolve", "--user", "u", *_VENDOR_ARGS, "--allow-prod-vendor", value]) == 1
+    assert seen == [value]
+    assert value not in capsys.readouterr().out
+
+
+def test_allow_prod_vendor_keeps_missing_vendor_input_usage(monkeypatch, capsys):
+    _set_open_rails(monkeypatch)
+    monkeypatch.setattr("engine.cli.main.resolve_bodygraph", lambda *a, **k: pytest.fail("resolver reached"))
+    assert cli(["bg:resolve", "--user", "u", "--source", "vendor", "--allow-prod-vendor", _REF]) == 64
+    captured = capsys.readouterr()
+    assert captured.out == "" and captured.err == "MISSING_VENDOR_INPUT\n"
+
+
+def test_production_like_cli_without_flag_emits_the_override_refusal(monkeypatch, capsys, tmp_path):
+    _set_open_rails(monkeypatch)
+    monkeypatch.setenv("APP_ENV", "prod")
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v2")
+    monkeypatch.setenv("HDE_VENDOR_OVERRIDE_AUDIT_PATH", str(tmp_path / "audit.jsonl"))
+    monkeypatch.setattr("engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "test-operator")
+    monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
+    exit_code = cli(["bg:resolve", "--user", "open-rails", *_VENDOR_ARGS, "--dry-run"])
+    captured = capsys.readouterr()
+    assert exit_code == 1 and captured.err == ""
+    payload = _assert_canonical_output(captured.out)
+    assert payload["error"]["code"] == "PROVIDER_PROD_OVERRIDE_REQUIRED"
+    assert payload["error"]["details"] == {"outbound_attempted": False}
+    second = cli(["bg:resolve", "--user", "open-rails", *_VENDOR_ARGS, "--dry-run"])
+    assert second == 1 and capsys.readouterr().out == captured.out
