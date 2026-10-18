@@ -328,6 +328,12 @@ def test_o6_event_failure_blocks_step_seven(no_io, seams, tmp_path, monkeypatch)
     _assert_policy_refusal(_resolve(_env(tmp_path), ref=REF), "PROVIDER_AUDIT_UNAVAILABLE")
 
 
+def test_o6_unpersisted_directory_entry_blocks_step_seven(no_io, seams, tmp_path, monkeypatch):
+    monkeypatch.setattr(resolver, "_classify_env_route_policy", _fail("route policy"))
+    _fail_directory_fsync(monkeypatch)
+    _assert_policy_refusal(_resolve(_env(tmp_path), ref=REF), "PROVIDER_AUDIT_UNAVAILABLE")
+
+
 @pytest.mark.parametrize("base, dry_run, upsert, message", [
     (V2_BASE, False, True, "mapped-cache persistence is refused in production-like environments"),
     (V2_BASE, True, True, "mapped-cache persistence is refused in production-like environments"),
@@ -449,6 +455,51 @@ def test_unwritable_sink_is_unavailable(tmp_path, make_bad):
     else:
         sink = tmp_path / "audit.jsonl"
         sink.mkdir()
+    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
+    with pytest.raises(vendor_audit.AuditUnavailable):
+        vendor_audit.append_event(sink, event)
+
+
+def _identity(path):
+    st = os.stat(path)
+    return (st.st_dev, st.st_ino)
+
+
+def _fail_directory_fsync(monkeypatch):
+    real_fsync = os.fsync
+
+    def _fsync(fd):
+        if stat.S_ISDIR(os.fstat(fd).st_mode):
+            raise OSError(5, "directory fsync failed")
+        real_fsync(fd)
+
+    monkeypatch.setattr(vendor_audit.os, "fsync", _fsync)
+
+
+def test_append_persists_the_line_and_every_new_directory_entry(tmp_path, monkeypatch):
+    real_fsync = os.fsync
+    synced = []
+
+    def _fsync(fd):
+        st = os.fstat(fd)
+        synced.append((st.st_dev, st.st_ino))
+        real_fsync(fd)
+
+    monkeypatch.setattr(vendor_audit.os, "fsync", _fsync)
+    (tmp_path / "existing").mkdir()
+    sink = tmp_path / "existing" / "new" / "dir" / "audit.jsonl"
+    event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
+    vendor_audit.append_event(sink, event)
+    # The file, then the directory holding it, then each directory that holds a created one.
+    assert synced == [_identity(sink), _identity(sink.parent), _identity(sink.parent.parent), _identity(tmp_path / "existing")]
+    synced.clear()
+    vendor_audit.append_event(sink, event)
+    assert synced == [_identity(sink), _identity(sink.parent)]
+
+
+def test_directory_fsync_failure_is_unavailable(tmp_path, monkeypatch):
+    _fail_directory_fsync(monkeypatch)
+    sink = tmp_path / "audit.jsonl"
     event = vendor_audit.build_event(correlation_id="c", actor_principal="a", authorization_ref=None, environment="prod", outcome="refused", error_code="X", outbound_attempted=False)
     with pytest.raises(vendor_audit.AuditUnavailable):
         vendor_audit.append_event(sink, event)

@@ -154,12 +154,19 @@ def append_event(sink: Path, event: Mapping[str, Any]) -> None:
     """Append one canonical JSON line, then flush and fsync it.
 
     A missing parent directory is created owner-only. The file is created
-    owner-only, opened for append, and must be a regular file. Any failure is
-    :class:`AuditUnavailable`.
+    owner-only, opened for append, and must be a regular file. After the file,
+    the directory holding it and the parent of every directory created here
+    are fsynced, so the entries survive a crash as well as the line does. Any
+    failure is :class:`AuditUnavailable`.
     """
 
     line = sercanon(dict(event))
     try:
+        created: list[Path] = []
+        directory = sink.parent
+        while not directory.exists():
+            created.append(directory)
+            directory = directory.parent
         sink.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         fd = os.open(sink, os.O_WRONLY | os.O_APPEND | os.O_CREAT | getattr(os, "O_CLOEXEC", 0), 0o600)
     except OSError:
@@ -171,6 +178,22 @@ def append_event(sink: Path, event: Mapping[str, Any]) -> None:
         while view:
             written = os.write(fd, view)
             view = view[written:]
+        os.fsync(fd)
+    except OSError:
+        raise AuditUnavailable() from None
+    finally:
+        os.close(fd)
+    # fsync on the file does not persist its directory entry (§7.1.11f: durable before I/O).
+    for entry_holder in (sink.parent, *(path.parent for path in created)):
+        _fsync_directory(entry_holder)
+
+
+def _fsync_directory(directory: Path) -> None:
+    try:
+        fd = os.open(directory, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0))
+    except OSError:
+        raise AuditUnavailable() from None
+    try:
         os.fsync(fd)
     except OSError:
         raise AuditUnavailable() from None
