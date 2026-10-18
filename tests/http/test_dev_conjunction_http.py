@@ -273,3 +273,38 @@ def test_seam_is_unreachable_in_prod(monkeypatch):
         assert resp.status_code == 403
         assert json.loads(resp.data)["code"] == "ERR_WRITER_FORBIDDEN"
     assert rows.lookups == []
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F02): the dev/admin APP_ENV gate admits exactly dev, test and local
+# (HDE Governance "Dev/admin APP_ENV gating"; PF05 §5.11.2) ---------------------------------------
+
+_S19_GATED_ROUTES = [
+    ("POST", "/internal/dev/sampler"),
+    ("GET", "/dev/sampler/conjunction"),
+    ("GET", "/dev/reader/conjunction"),
+    ("GET", "/dev/writer/conjunction"),
+]
+_S19_REFUSED_APP_ENV = [None, "", " dev", "dev ", "Dev", "DEV", "TEST ", "Local", "prod", "production", "live", "staging"]
+
+
+@pytest.mark.parametrize("app_env", _S19_REFUSED_APP_ENV, ids=repr)
+@pytest.mark.parametrize("method,path", _S19_GATED_ROUTES)
+def test_s19_dev_admin_gate_refuses_every_inexact_app_env(monkeypatch, method, path, app_env):
+    client = _client(monkeypatch, "dev")
+    if app_env is None:
+        monkeypatch.delenv("APP_ENV")
+    else:
+        monkeypatch.setenv("APP_ENV", app_env)
+    resp = client.open(path, method=method)
+    assert resp.status_code == 403
+    assert resp.headers["Cache-Control"] == "no-store" and "ETag" not in resp.headers
+    assert json.loads(resp.data) == {"schema": "v1", "ok": False, "code": "ERR_WRITER_FORBIDDEN", "error": "insufficient scope"}
+
+
+@pytest.mark.parametrize("app_env", ["dev", "test", "local"])
+@pytest.mark.parametrize("method,path", _S19_GATED_ROUTES)
+def test_s19_dev_admin_gate_serves_exactly_dev_test_and_local(monkeypatch, method, path, app_env):
+    resp = _client(monkeypatch, app_env).open(path, method=method)
+    # Past the gate: the sampler's next check is the content type; the conjunction
+    # routes' next check is the missing pair identifiers.
+    assert resp.status_code == (415 if path == "/internal/dev/sampler" else 422)

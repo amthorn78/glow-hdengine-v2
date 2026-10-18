@@ -1,8 +1,12 @@
+import socket
+import urllib.request
+
 import pytest
 
-from engine.bodygraph import resolver
+from engine.bodygraph import ingest, resolver, vendor_audit
 from engine.bodygraph.ingest import IngestOutcome, VendorInputs
-from engine.bodygraph.vendor_client import VendorError
+from engine.bodygraph.vendor_client import HdApiClient, VendorError, VendorRequest, VendorResult
+from engine.db import DBAccess
 
 
 @pytest.fixture(autouse=True)
@@ -188,3 +192,136 @@ def test_non_production_legacy_write_is_unchanged(monkeypatch):
         birthdate="1990-01-01", birthtime="12:00", location="Amsterdam",
     )
     assert result.status == "ok" and seen == {"dry_run": False, "kwargs": {}}
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F05, S19-F06): the resolver opens the rails only for exactly SAFE_MODE=0
+# and ALLOW_NETWORK=1 (HDE-CLI-API-Vendor-Ref §7.1.2): an unset or other value refuses at the rails step,
+# before environment classification, the override matrix, any audit event or any client construction;
+# and a vendor run writes no ingest log under the working directory unless its caller names one ---------
+
+_S19_BIRTH = {"birthdate": "1990-01-01", "birthtime": "07:41", "location": "Amsterdam, NL"}
+_S19_V1_BASE = "https://vendor.example.test/v1"
+_S19_V2_BASE = "https://vendor.example.test/v2"
+_S19_CLOSED_SAFE_MODE = [None, "", "1", " 1 ", "2", "true", "false", "no", "off", "yes"]
+_S19_CLOSED_NETWORK = [None, "", "0", "2", "true", "yes", "on", "false"]
+_S19_CLOSED_RAILS = [*((s, "1", "PROVIDER_REFUSED") for s in _S19_CLOSED_SAFE_MODE), *(("0", n, "PROVIDER_NETWORK_BLOCKED") for n in _S19_CLOSED_NETWORK)]
+
+
+def _s19_fail(name):
+    def _guard(*_args, **_kwargs):
+        raise AssertionError(f"{name} reached under closed rails")
+
+    return _guard
+
+
+@pytest.fixture
+def _s19_vendor_env(monkeypatch, tmp_path):
+    for name in ("APP_ENV", "ENGINE_ENV", "SAFE_MODE", "ALLOW_NETWORK", "HD_API_BASE_URL", "HDAPI_BASE_URL"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv(vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY, str(tmp_path / "state" / "override.jsonl"))
+    monkeypatch.setattr(vendor_audit, "resolve_actor_principal", lambda: "qa-operator")
+
+
+@pytest.fixture
+def _s19_no_io(monkeypatch):
+    monkeypatch.setattr(HdApiClient, "__init__", _s19_fail("HdApiClient"))
+    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **_: _s19_fail("HdApiClient.from_env")()))
+    monkeypatch.setattr(DBAccess, "for_current_env", classmethod(lambda cls, **_: _s19_fail("DBAccess")()))
+    monkeypatch.setattr(urllib.request, "urlopen", _s19_fail("urllib.request.urlopen"))
+    monkeypatch.setattr(socket, "getaddrinfo", _s19_fail("socket.getaddrinfo"))
+    monkeypatch.setattr(socket, "socket", _s19_fail("socket.socket"))
+
+
+def _s19_env(*, safe, net, app_env="dev", base=_S19_V2_BASE):
+    env = {"APP_ENV": app_env, "HD_API_BASE_URL": base, "HD_API_KEY": "fake-key", "GEO_API_KEY": "fake-geo"}
+    if safe is not None:
+        env["SAFE_MODE"] = safe
+    if net is not None:
+        env["ALLOW_NETWORK"] = net
+    return env
+
+_S19_REF = "PO-HDE-CRD-0002/QA:live-1"
+
+
+def _s19_sink(tmp_path):
+    return tmp_path / "state" / "override.jsonl"
+
+
+@pytest.mark.usefixtures("_s19_vendor_env", "_s19_no_io")
+@pytest.mark.parametrize("ref", [None, _S19_REF])
+@pytest.mark.parametrize("app_env", ["dev", "prod"])
+@pytest.mark.parametrize("safe", _S19_CLOSED_SAFE_MODE, ids=repr)
+def test_s19_safe_rail_refuses_every_value_but_exactly_zero(tmp_path, monkeypatch, safe, app_env, ref):
+    monkeypatch.setenv("APP_ENV", app_env)
+    result = resolver.resolve_bodygraph("operator-user", source="vendor", upsert=False, dry_run=True,
+                                        env=_s19_env(safe=safe, net="1", app_env=app_env), authorization_ref=ref, **_S19_BIRTH)
+    assert result.exit_code == 1
+    assert result.payload["error"] == {"code": "PROVIDER_REFUSED", "message": "Vendor source is refused under SAFE rails (SAFE_MODE=1)."}
+    assert result.payload["resolver"]["safe_mode"] is True
+    assert not _s19_sink(tmp_path).exists()
+
+
+@pytest.mark.usefixtures("_s19_vendor_env", "_s19_no_io")
+@pytest.mark.parametrize("ref", [None, _S19_REF])
+@pytest.mark.parametrize("app_env", ["dev", "prod"])
+@pytest.mark.parametrize("net", _S19_CLOSED_NETWORK, ids=repr)
+def test_s19_network_rail_refuses_every_value_but_exactly_one(tmp_path, monkeypatch, net, app_env, ref):
+    monkeypatch.setenv("APP_ENV", app_env)
+    result = resolver.resolve_bodygraph("operator-user", source="vendor", upsert=False, dry_run=True,
+                                        env=_s19_env(safe="0", net=net, app_env=app_env), authorization_ref=ref, **_S19_BIRTH)
+    assert result.exit_code == 1
+    assert result.payload["error"] == {"code": "PROVIDER_NETWORK_BLOCKED", "message": "Network disabled under current rails."}
+    assert result.payload["resolver"]["allow_network"] is False
+    assert not _s19_sink(tmp_path).exists()
+
+
+@pytest.mark.usefixtures("_s19_vendor_env")
+@pytest.mark.parametrize("safe,net", [("0", "1"), (" 0 ", " 1 "), (0, 1), (False, True)])
+def test_s19_canonical_open_rails_reach_the_route(monkeypatch, safe, net):
+    seen = []
+
+    class FakeClient:
+        def build_contract_route_request(self, **_kwargs):
+            raise VendorError("PROVIDER_INPUT_INVALID", "stop after the rails")
+
+    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **kwargs: seen.append(kwargs) or FakeClient()))
+    monkeypatch.setenv("APP_ENV", "dev")
+    result = resolver.resolve_bodygraph("operator-user", source="vendor", upsert=False, dry_run=True, env=_s19_env(safe=safe, net=net), **_S19_BIRTH)
+    assert result.payload["error"]["code"] == "PROVIDER_INPUT_INVALID"
+    assert result.payload["resolver"]["safe_mode"] is False and result.payload["resolver"]["allow_network"] is True
+    assert len(seen) == 1
+
+
+@pytest.mark.usefixtures("_s19_vendor_env", "_s19_no_io")
+@pytest.mark.parametrize("safe,net,code", _S19_CLOSED_RAILS, ids=repr)
+def test_s19_compat_acquisition_rails_are_exact(safe, net, code):
+    with pytest.raises(VendorError) as caught:
+        resolver._acquire_dry_run(
+            "3fa85f64-5717-4562-b3fc-2c963f66afab", set(), ("1990-01-01", "07:41", "Amsterdam, NL"), _s19_env(safe=safe, net=net)
+        )
+    assert caught.value.code == code
+
+
+class _S19LegacyClient:
+    def build_request(self, **_kwargs):
+        return VendorRequest(url=_S19_V1_BASE + "/bodygraphs", headers={"HD-Api-Key": "x"}, body_bytes=b"{}\n", input_fingerprint="b" * 64, route="vendor.hdapi.post:/bodygraphs")
+
+    def fetch(self, request):
+        return VendorResult(payload={"bodygraph": {"type": "Generator"}}, duration_ms=1.0, attempts=1)
+
+
+@pytest.mark.usefixtures("_s19_vendor_env")
+@pytest.mark.parametrize("app_env,ref", [("dev", None), ("prod", _S19_REF)], ids=["non_production", "production_override"])
+def test_s19_legacy_vendor_run_writes_no_log_under_the_working_directory(monkeypatch, tmp_path, app_env, ref):
+    work = tmp_path / "checkout"
+    work.mkdir()
+    monkeypatch.chdir(work)
+    calls = []
+    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **kwargs: calls.append(kwargs) or _S19LegacyClient()))
+    monkeypatch.setenv("APP_ENV", app_env)
+    result = resolver.resolve_bodygraph("3fa85f64-5717-4562-b3fc-2c963f66afab", source="vendor", upsert=False, dry_run=True,
+                                        env=_s19_env(safe="0", net="1", app_env=app_env, base=_S19_V1_BASE), authorization_ref=ref, **_S19_BIRTH)
+    assert result.status == "ok", result.payload
+    assert len(calls) == 1 and calls[0].get("log_path") is None
+    assert sorted(str(path.relative_to(work)) for path in work.rglob("*") if path.is_file()) == []
+    assert not (work / ingest.SUCCESS_LOG).exists() and not (work / ingest.RETRY_LOG).exists()

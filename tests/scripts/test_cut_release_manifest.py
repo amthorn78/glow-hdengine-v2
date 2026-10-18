@@ -555,3 +555,30 @@ def test_cli_roster_flag_cuts_the_admission_roster_and_reports_failures_on_stder
     (complete_root / "math/thresholds.json").unlink()
     assert cutter.main([*argv, "--check", "--roster-from-admission"]) == 1
     assert "RELEASE_MANIFEST_CUT_FAILED:release_manifest_source_missing" in capsys.readouterr().err
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F08): the cutter refuses a row whose path has a control character,
+# without echoing it ---------------------------------------------------------------------------------
+
+_S19_CONTROL_PATHS = ["a\x00b.json", "a\nb.json", "a\rb.json", "a\tb.json", "a\x7fb.json", "catalog/x\n.json"]
+
+
+def _s19_manifest(path: str) -> dict:
+    return {
+        "root": "catalog/",
+        "version": "1.3.0",
+        "built_at_utc": "2026-08-24T18:04:49Z",
+        "files": [{"path": path, "sha256": "zz", "size": 0}],
+    }
+
+
+@pytest.mark.parametrize("path", _S19_CONTROL_PATHS, ids=repr)
+def test_s19_cutter_refuses_a_row_with_a_control_character_without_echoing_it(path, tmp_path, monkeypatch):
+    _closed(monkeypatch)
+    manifest = tmp_path / "catalog" / "manifest.json"
+    manifest.parent.mkdir()
+    manifest.write_bytes(canon.sercanon(_s19_manifest(path), sort_keys=True))
+    assert cutter._path_unsafe(path, "catalog/manifest.json") is True
+    with pytest.raises(ValueError) as caught:
+        cutter.cut_manifest(manifest, version="1.3.0", built_at_utc="2026-08-24T18:04:49Z", check=True, roster=["catalog/b.json"])
+    assert str(caught.value) == "release_manifest_entry_path_unsafe"

@@ -53,12 +53,12 @@ RETRY_LOG = INGEST_DIR / "retry_trace.log"
 CANON_COMPARE_LOG = Path("artifacts/presenter/json_canon_compare.log")
 
 
-def _truthy(value: object) -> bool:
+def _rail_value(value: object) -> str:
+    if isinstance(value, bool):
+        return "1" if value else "0"
     if value is None:
-        return False
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on"}
-    return bool(value)
+        return ""
+    return str(value).strip()
 
 
 def _append_jsonl(path: Path | None, record: Mapping[str, Any]) -> None:
@@ -135,14 +135,15 @@ def ingest_vendor_bodygraph(
     dry_run: bool = False,
     client: HdApiClient | None = None,
     db_access: DBAccess | None = None,
-    retry_log: Path | None = RETRY_LOG,
-    success_log: Path | None = SUCCESS_LOG,
+    retry_log: Path | None = None,
+    success_log: Path | None = None,
     canon_log: Path | None = None,
     vendor_version: int = 1,
 ) -> IngestOutcome:
     env = env or os.environ
-    safe_mode = _truthy(env.get("SAFE_MODE"))
-    allow_network = _truthy(env.get("ALLOW_NETWORK"))
+    # PF05 §7.1.2: open only for exactly SAFE_MODE=0 and ALLOW_NETWORK=1.
+    safe_mode = _rail_value(env.get("SAFE_MODE")) != "0"
+    allow_network = _rail_value(env.get("ALLOW_NETWORK")) == "1"
     if safe_mode:
         raise VendorError("PROVIDER_REFUSED", "Vendor source refused under SAFE rails", details={"SAFE_MODE": True})
     if not allow_network:

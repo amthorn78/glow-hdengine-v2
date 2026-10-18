@@ -15,7 +15,6 @@ from engine.db.errors import AdapterError
 
 from . import vendor_audit
 from .ingest import (
-    RETRY_LOG,
     IngestOutcome,
     VendorInputs,
     _client_config_env,
@@ -123,14 +122,25 @@ class _AttemptTrackingClient:
         return self._client.fetch(request)
 
 
-def _truthy(value: object) -> bool:
+def _rail_value(value: object) -> str:
+    if isinstance(value, bool):
+        return "1" if value else "0"
     if value is None:
-        return False
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on"}
-    if isinstance(value, (int, float)):
-        return bool(value)
-    return bool(value)
+        return ""
+    return str(value).strip()
+
+
+def _safe_mode_closed(value: object) -> bool:
+    """PF05 §7.1.2: the SAFE rail is open only for exactly ``SAFE_MODE=0``; unset,
+    empty and every other value keep it closed (HDE Governance §3.1 default ON)."""
+
+    return _rail_value(value) != "0"
+
+
+def _network_allowed(value: object) -> bool:
+    """PF05 §7.1.2: the network rail is open only for exactly ``ALLOW_NETWORK=1``."""
+
+    return _rail_value(value) == "1"
 
 
 @dataclass(frozen=True)
@@ -171,8 +181,8 @@ def resolve_bodygraph(
     if requested_source not in {"auto", "db", "vendor"}:
         raise ValueError(f"unsupported source '{requested_source}'")
 
-    safe_mode_closed = _truthy(env.get("SAFE_MODE"))
-    allow_network = _truthy(env.get("ALLOW_NETWORK"))
+    safe_mode_closed = _safe_mode_closed(env.get("SAFE_MODE"))
+    allow_network = _network_allowed(env.get("ALLOW_NETWORK"))
     snapshot = {
         "user_id": user_id,
         "requested_source": requested_source,
@@ -458,7 +468,7 @@ def _resolve_vendor_route(
                     VendorError("PROVIDER_WRITE_UNSUPPORTED", "BodyGraph persistence is refused in production-like environments"),
                     resolver_meta,
                 )
-            client = HdApiClient.from_env(log_path=RETRY_LOG, env=_client_config_env(database_env))
+            client = HdApiClient.from_env(env=_client_config_env(database_env))
             outcome = ingest_vendor_bodygraph(
                 vendor_inputs,
                 env=database_env,
@@ -920,9 +930,9 @@ def _acquire_dry_run(
     vendor_env: dict[str, object] = {}
     database_env: dict[str, object] = {}
     try:
-        if _truthy(scoped.get("SAFE_MODE")):
+        if _safe_mode_closed(scoped.get("SAFE_MODE")):
             raise VendorError("PROVIDER_REFUSED", "Vendor source is refused under SAFE rails (SAFE_MODE=1).")
-        if not _truthy(scoped.get("ALLOW_NETWORK")):
+        if not _network_allowed(scoped.get("ALLOW_NETWORK")):
             raise VendorError("PROVIDER_NETWORK_BLOCKED", "Network disabled under current rails.")
         vendor_env = dict(_vendor_config_env(scoped))
         database_env = dict(vendor_env)

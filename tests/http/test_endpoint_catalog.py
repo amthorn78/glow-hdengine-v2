@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from adapter.http_reader import create_app
+from adapter.http_reader import _production_posture, create_app
 from tools.evidence.generate_a7_transport_proofs import CANON_RETIRED_PATHS, catalog_obj, validate_catalog
 
 def _catalog():
@@ -289,3 +289,134 @@ def test_compat_and_production_reader_shaping_is_unchanged(monkeypatch, factory_
         assert refused.headers.get("Allow") == "POST"
     unprefixed = client.post("/reader")
     assert unprefixed.status_code == 405 and unprefixed.headers.get("Allow") == "GET, HEAD"
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F03; PF10 HDE Build Notes 2.7 AD-4): in a production-like posture the
+# dev/internal blueprint answers the dev harness only with its canonical refusals and the canon-retired
+# routes as an unknown path, before any of their handlers runs ---------------------------------------
+
+_S19_DEV_HARNESS = {
+    "reader_v1.reader_v1": ("GET", "/reader?v=1"),
+    "reader_v1.dev_sampler_internal": ("POST", "/internal/dev/sampler"),
+    "reader_v1.dev_sampler_conjunction": ("GET", "/dev/sampler/conjunction"),
+    "reader_v1.dev_reader_conjunction": ("GET", "/dev/reader/conjunction"),
+    "reader_v1.dev_writer_conjunction": ("GET", "/dev/writer/conjunction"),
+}
+_S19_RETIRED_ENDPOINTS = (
+    "reader_v1.ops_db_unavailable",
+    "reader_v1.ops_probe_env",
+    "reader_v1.diagnostic_writer",
+    "reader_v1.diagnostic_writer_head",
+    "reader_v1.diagnostic_writer_options",
+)
+
+
+def _s19_app(monkeypatch, factory_name, app_env):
+    if app_env is None:
+        monkeypatch.delenv("APP_ENV", raising=False)
+    else:
+        monkeypatch.setenv("APP_ENV", app_env)
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+    app = _factories()[factory_name]()
+    app.config.update(TESTING=True)
+    return app
+
+
+def _s19_headers(resp):
+    return sorted((name, value) for name, value in resp.headers.items() if name != "X-Correlation-Id")
+
+
+def _s19_production_guards(app):
+    return [fn for fn in app.before_request_funcs.get(None, []) if fn.__name__ == "_refuse_in_production"]
+
+
+def _s19_request_time_refusal(monkeypatch, factory_name, method, path):
+    """The handler's own request-time refusal, observed on a non-production mount."""
+    client = _s19_app(monkeypatch, factory_name, "dev").test_client()
+    monkeypatch.setenv("APP_ENV", "prod")
+    return client.open(path, method=method)
+
+
+@pytest.mark.parametrize("factory_name", ["factory", "http_reader", "wsgi"])
+@pytest.mark.parametrize("posture", ["prod", "production", "live", " Prod ", "engine_env_prod"])
+def test_s19_production_mount_refuses_every_dev_harness_route_before_its_handler(monkeypatch, factory_name, posture):
+    if posture == "engine_env_prod":
+        _s19_app(monkeypatch, factory_name, None)
+        monkeypatch.setenv("ENGINE_ENV", "prod")
+        app = _factories()[factory_name]()
+    else:
+        app = _s19_app(monkeypatch, factory_name, posture)
+    assert len(_s19_production_guards(app)) == 1
+    expected = {key: _s19_request_time_refusal(monkeypatch, factory_name, *request) for key, request in _S19_DEV_HARNESS.items()}
+    client = app.test_client()
+    # No handler is reachable: the refusal holds even for an exact development value.
+    for app_env in ("dev", "prod"):
+        monkeypatch.setenv("APP_ENV", app_env)
+        for endpoint, (method, path) in _S19_DEV_HARNESS.items():
+            resp = client.open(path, method=method)
+            want = expected[endpoint]
+            assert (resp.status_code, resp.get_data(), resp.headers["Content-Type"], resp.headers["Cache-Control"]) == (
+                want.status_code, want.get_data(), want.headers["Content-Type"], want.headers["Cache-Control"]), (app_env, path)
+            if app_env == "prod":  # wsgi's transport headers follow the request-time APP_ENV
+                assert _s19_headers(resp) == _s19_headers(want), path
+            assert "ETag" not in resp.headers
+    head = client.head("/reader?v=1")
+    assert head.status_code == 403 and head.get_data() == b""
+    assert client.get("/reader").status_code == 400  # version validation stays first
+
+
+@pytest.mark.parametrize("factory_name", ["factory", "http_reader", "wsgi"])
+def test_s19_production_mount_keeps_flasks_automatic_options_answer(monkeypatch, factory_name):
+    paths = ["/reader", *(path for _, path in list(_S19_DEV_HARNESS.values())[2:])]
+    reference = _s19_app(monkeypatch, factory_name, "dev").test_client()
+    want = {path: reference.options(path) for path in paths}
+    client = _s19_app(monkeypatch, factory_name, "prod").test_client()
+    for path in paths:
+        resp = client.options(path)
+        assert (resp.status_code, resp.get_data(), set(resp.headers["Allow"].split(", "))) == (
+            want[path].status_code, want[path].get_data(), set(want[path].headers["Allow"].split(", "))), path
+        assert resp.status_code == 200
+
+
+@pytest.mark.parametrize("factory_name", ["factory", "http_reader", "wsgi"])
+def test_s19_production_mount_answers_canon_retired_routes_as_an_unknown_path(monkeypatch, factory_name):
+    client = _s19_app(monkeypatch, factory_name, "prod").test_client()
+    monkeypatch.setenv("APP_ENV", "dev")
+    for path in sorted(CANON_RETIRED_PATHS):
+        for method in ("GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE"):
+            resp = client.open(path, method=method, headers={"Authorization": "Bearer probe"})
+            unknown = client.open("/no/such/route", method=method, headers={"Authorization": "Bearer probe"})
+            assert (resp.status_code, resp.get_data(), _s19_headers(resp)) == (
+                unknown.status_code, unknown.get_data(), _s19_headers(unknown)), (method, path)
+            _assert_governed(resp, 404, head=method == "HEAD")
+
+
+@pytest.mark.parametrize("factory_name", ["factory", "http_reader", "wsgi"])
+def test_s19_production_mount_keeps_every_route_canon_adopts(monkeypatch, factory_name):
+    client = _s19_app(monkeypatch, factory_name, "prod").test_client()
+    stub = client.post("/reader")
+    assert (stub.status_code, stub.headers["Allow"], stub.data) == (405, "GET, HEAD", _NOT_FOUND_BODY)
+    assert client.get("/internal/version").status_code == 200
+    assert json.loads(client.get("/ops/rails/refusal").data)["code"] == "ERR_WRITER_RAILS_CLOSED"
+    assert client.get("/aux/narrative?category=harmony&band=Warm").status_code == 200
+    assert client.get("/api/aux/narrative?category=harmony&band=Warm").status_code == 200
+    assert client.post("/api/reader?v=1", data=b"{}", headers={"Content-Type": "application/json; charset=utf-8"}).status_code == 422
+    assert client.get("/api/compat/v1").status_code == 404  # its own production-excluding guard
+
+
+@pytest.mark.parametrize("factory_name", ["factory", "http_reader", "wsgi"])
+@pytest.mark.parametrize("posture", [None, "", "dev", "test", "local", "staging"])
+def test_s19_every_other_posture_mounts_the_blueprint_unchanged(monkeypatch, factory_name, posture):
+    app = _s19_app(monkeypatch, factory_name, posture)
+    assert _s19_production_guards(app) == []
+    for endpoint in [*_S19_DEV_HARNESS, *_S19_RETIRED_ENDPOINTS]:
+        assert app.view_functions[endpoint].__name__ == endpoint.split(".", 1)[1]
+
+
+def test_s19_production_posture_follows_the_compat_resolution():
+    for env, expected in [
+        ({"APP_ENV": "prod"}, True), ({"APP_ENV": " LIVE "}, True), ({"APP_ENV": "production"}, True),
+        ({"ENGINE_ENV": "prod"}, True), ({"APP_ENV": "dev", "ENGINE_ENV": "prod"}, False),
+        ({}, False), ({"APP_ENV": "staging"}, False), ({"APP_ENV": ""}, False),
+    ]:
+        assert _production_posture(env) is expected, env

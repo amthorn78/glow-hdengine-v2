@@ -129,7 +129,11 @@ def get_ids_only():
 
 @compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
 def post_json():
-    data = request.get_json(silent=True) or {}
+    try:
+        data = request.get_json(silent=True) or {}
+    except RecursionError:
+        # A body nested past the parser's recursion limit is malformed JSON too.
+        data = {}
     a, b = data.get("a"), data.get("b")
     a_id, b_id = data.get("a_id"), data.get("b_id")
     # Reject mixing id+payload per party

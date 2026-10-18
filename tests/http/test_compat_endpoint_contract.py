@@ -315,3 +315,15 @@ def test_conjunction_resolved_local_hits_evaluate_without_provider():
     observed = {payload["conjunction"]["left"]["person_uid"], payload["conjunction"]["right"]["person_uid"]}
     assert observed == {key_left, key_right}
     assert payload["conjunction"]["compat"]["schema"] == "magic10_compat_result.v1"
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F01): compat POST refuses JSON nested past the parser's recursion limit
+
+def test_s19_compat_post_refuses_deeply_nested_json(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "dev")
+    resp = create_app().test_client().post(
+        "/api/compat/v1", data=b"[" * 32_768, headers={"Content-Type": "application/json; charset=utf-8"}
+    )
+    assert resp.status_code == 400
+    assert resp.headers["Cache-Control"] == "no-store"
+    assert json.loads(resp.data)["code"] == "ERR_COMPAT_INVALID_JSON"

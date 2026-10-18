@@ -220,7 +220,7 @@ def _load_viewer_prefs(path: str | None) -> Dict[str, Any]:
         raise CliError("VIEWER_PREFS_READ_ERROR") from exc
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, RecursionError) as exc:
         raise CliError("INVALID_VIEWER_PREFS") from exc
     err = validate_viewer_prefs(data)
     if err:
@@ -322,7 +322,8 @@ def cli(argv: list[str] | None = None) -> int:
         sys.stderr.write(f"{exc.code}\n")
         return 1
     except Exception as exc:  # pragma: no cover - defensive guard
-        sys.stderr.write(f"CLI_UNEXPECTED:{exc}\n")
+        # PF05 §3.3 and §8.2: one code token on stderr; the exception text is not echoed.
+        sys.stderr.write("CLI_UNEXPECTED\n")
         return 1
 
 
@@ -331,7 +332,7 @@ def _parse_input(raw: str) -> Dict[str, Any]:
         raise CliError("EMPTY_INPUT")
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError as exc:  # pragma: no cover - JSON path exercised by tests
+    except (json.JSONDecodeError, RecursionError) as exc:  # pragma: no cover - JSON path exercised by tests
         raise CliError("INVALID_JSON") from exc
     if not isinstance(data, dict):
         raise CliError("INVALID_JSON")
@@ -830,8 +831,9 @@ def showcompat(_: argparse.Namespace) -> int:
 
 
 def _ensure_dev_admin_env() -> None:
-    app_env = (os.environ.get("APP_ENV") or "").lower()
-    if app_env not in ("dev", "test", "local"):
+    # HDE Governance "Dev/admin APP_ENV gating": exactly dev, test or local, with no
+    # case-folding or trimming.
+    if os.environ.get("APP_ENV") not in ("dev", "test", "local"):
         raise CliError("DEV_ADMIN_ONLY")
 
 
@@ -883,7 +885,7 @@ def _load_candidates_from_path(path: str) -> list[CandidateFeatures]:
     raw = _read_file(path)
     try:
         payload = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, RecursionError) as exc:
         raise CliError("INVALID_CANDIDATES_JSON") from exc
 
     if isinstance(payload, Mapping):
@@ -952,7 +954,7 @@ def _load_party_file(path: str, label: str) -> Dict[str, Any]:
         raise CliError(f"FILE_READ_ERROR_{label.upper()}") from exc
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, RecursionError) as exc:
         raise CliError(f"INVALID_JSON_{label.upper()}") from exc
     if not isinstance(data, dict):
         raise CliError(f"INVALID_JSON_{label.upper()}")

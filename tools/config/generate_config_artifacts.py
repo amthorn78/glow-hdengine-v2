@@ -319,7 +319,13 @@ def _golden_report_destination(report_path: Path, candidate_root: Path, goldens_
     try:
         parent = Path(os.path.realpath(Path(os.path.abspath(report_path)).parent))
         destination = parent / Path(report_path).name
-        forbidden = (Path(os.path.realpath(candidate_root)), Path(os.path.realpath(ROOT)))
+        # The admitted candidate root is the lexical absolute path (compare_goldens);
+        # refuse it as resolved, and the candidate as given resolved, alike.
+        forbidden = (
+            Path(os.path.realpath(candidate_root)),
+            Path(os.path.realpath(os.path.abspath(candidate_root))),
+            Path(os.path.realpath(ROOT)),
+        )
         if (not destination.name or destination.name in {".", ".."} or not parent.is_dir()
                 or destination.is_symlink() or (destination.exists() and not destination.is_file())
                 or destination == Path(os.path.realpath(goldens_path))

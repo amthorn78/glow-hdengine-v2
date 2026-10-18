@@ -1,4 +1,5 @@
 import hashlib
+import io
 import json
 import os
 import pathlib
@@ -7,6 +8,7 @@ import sysconfig
 
 import pytest
 
+from engine.cli import main as cli_main
 from engine.cli.main import cli
 from tests.support.pr04_fixtures import GATES_A, GATES_B, UUID_A, UUID_B, build_bundle, build_pack, complete_chart, inject_seams
 
@@ -103,3 +105,49 @@ def test_type_only_and_empty_gate_fixtures_are_negative_cases(tmp_path: pathlib.
     _write_json(pp, {"left": complete_chart(UUID_A, ["10", "010"]), "right": complete_chart(UUID_B, GATES_B)})
     assert cli(["showcompat", "--pair-file", str(pp)]) == 1
     assert capsys.readouterr().err == "ERR_READER_INVALID_CHART\n"
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F07): JSON input nested past the parser's recursion limit is a typed
+# input refusal (HDE-CLI-API-Vendor-Ref §3.3 and §8.2) ----------------------------------------------
+
+_S19_DEEP = "[" * 30_000
+
+
+def _s19_run(argv, capsys, stdin: str | None = None, monkeypatch=None):
+    if stdin is not None:
+        monkeypatch.setattr("sys.stdin", io.StringIO(stdin))
+    code = cli(argv)
+    captured = capsys.readouterr()
+    return code, captured.out, captured.err
+
+
+def test_s19_deeply_nested_stdin_is_invalid_json(monkeypatch, capsys):
+    assert _s19_run(["showcompat"], capsys, stdin=_S19_DEEP, monkeypatch=monkeypatch) == (64, "", "INVALID_JSON\n")
+
+
+def test_s19_deeply_nested_pair_file_is_invalid_json(capsys, tmp_path):
+    pair = tmp_path / "pair.json"
+    pair.write_text(_S19_DEEP, encoding="utf-8")
+    assert _s19_run(["showcompat", "--pair-file", str(pair)], capsys) == (64, "", "INVALID_JSON\n")
+
+
+def test_s19_deeply_nested_party_files_are_invalid_json(capsys, tmp_path):
+    party = tmp_path / "party.json"
+    party.write_text(_S19_DEEP, encoding="utf-8")
+    assert _s19_run(["showcompat", "--a-file", str(party), "--b-file", str(party)], capsys) == (64, "", "INVALID_JSON_LEFT\n")
+
+
+def test_s19_deeply_nested_candidates_file_is_invalid_candidates_json(monkeypatch, capsys, tmp_path):
+    candidates = tmp_path / "candidates.json"
+    candidates.write_text(_S19_DEEP, encoding="utf-8")
+    monkeypatch.setenv("APP_ENV", "dev")
+    code, out, err = _s19_run(["dev:sampler", "--viewer", "v1", "--candidates-file", str(candidates)], capsys)
+    assert (code, out, err) == (64, "", "INVALID_CANDIDATES_JSON\n")
+
+
+def test_s19_deeply_nested_viewer_prefs_is_invalid_viewer_prefs(tmp_path):
+    prefs = tmp_path / "prefs.json"
+    prefs.write_text(_S19_DEEP, encoding="utf-8")
+    with pytest.raises(cli_main.CliError) as caught:
+        cli_main._load_viewer_prefs(str(prefs))
+    assert caught.value.code == "INVALID_VIEWER_PREFS"
