@@ -26,7 +26,7 @@ pf10_addendum_created: none (PR-10 is not a qualifying approval prompt)
 issuer: the continuing whole-change Implementation Agent (IA) for HDE-CRD-0002, session https://claude.ai/code/session_01CCKsYD2yX5WgU3biWKb59j
 prompt: PR-10 — Create PR Work-Unit Instructions — 100926.1 (https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a; page state as of 2026-10-12T02:29:33.739Z, re-fetched and unchanged in this invocation; read in full)
 prompt_release: GCFPE-20261009.1 / 100926.1
-created_at: 2026-10-18T16:05:00Z
+created_at: 2026-10-18T15:56:00Z
 repository_baseline: origin/main 86e002c3fdb0b1632555c9072bcc3361e81589af (#653). Every non-`docs/` byte equals 5892538 (#651): the two later commits change only docs/ephemeral/ and docs/pfcanon/. Every repository fact in §5 was measured at 86e002c in detached scratch worktrees
 receiver: dedicated HDE-CRD-0002 WU-PR-05 PR engineering session (session_disposition INITIAL_DEDICATED_ASSIGNMENT; role_session_ref NOT_YET_ASSIGNED, assigned by Nathan / Product Owner at launch)
 next_prompt: PR-20 — Create Detailed PR Implementation Plan — 100926.1 (https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba; page state as of 2026-10-12T02:29:47.327Z, re-fetched and unchanged)
@@ -213,6 +213,7 @@ With them:
   - **OBS-P4-7:** `tests/adapter/test_jsonschema.py` leaks `ENGINE_ENV` and `ENGINE_SERVICE_TOKEN` into `os.environ` for the rest of the pytest process. A new test that sets `APP_ENV` and reaches the vendor gate removes the ambient `ENGINE_ENV` with `monkeypatch`.
   - **OBS-P4-5:** the attestation's isolated child environment has no `APP_ENV`. A new open-rails vendor-path test that a rails job or a sanity-run test executes sets `APP_ENV` itself.
   - **OBS-P4-2:** six route-policy tests depend on an ambient `APP_ENV`; run sweeps with the closed-rails profile, which sets it.
+  - **OBS-W5-5:** the `hdctl` subprocess tests use the installed package; install the worktree under test before a sweep.
   - **The EPIC030 generator (OBS-W5-3, §5.6):** `tools/evidence/generate_epic030_pr05_category_framework_evidence.py` parses no arguments. Any invocation, including `--help`, rewrites three tracked EPIC030 logs. Never run it in the repository tree.
 - **No skips.** No test is skipped, deselected, marked expected-failure or quarantined.
 
@@ -350,7 +351,7 @@ Environment: CPython 3.12.3 with CI's install, closed rails (`LC_ALL=C LANG=C TZ
 | Attestation build into an external empty directory with `--require-clean`, then `--verify` | exit 0 and exit 0; `release_admission` `PR06R_B_FINAL_PASS`, `validation_result` `PASS`, `source_commit_exact` true (167 s) |
 | **Pre-existing failures (not caused by HDE-CRD-0002):** `generate_hde_epic037_v2_to_compat.py --check` (one of the 49) | exit 1, `STALE_HDE_EPIC037_PR04_V2_TO_COMPAT` naming four `artifacts/vendor/hdapi_v2/` files. Same result at `982071b` and at `d79cfc1` (OBS-W5-4) |
 | `generate_hde_epic037_bg_resolve.py --check`, `generate_hde_epic036_bg_resolve_route_policy.py --check` | exit 1 each (OBS-P4-3; pre-existing) |
-| Full `tests/` sweep | SWEEP_RESULT_PENDING |
+| Full `tests/` sweep (`python -m pytest -q -p no:cacheprovider tests/`, 15:24:51Z to 15:51:57Z, 1,622 s) | 4,916 passed, 3 skipped, 2 xfailed, **2 failed**; pytest exit 1. Both failures came from the scratch environment, not from `86e002c`: `tests/cli/test_cli_install_help.py::test_hdctl_and_module_help` and `tests/cli/test_cli_usage_and_errors.py::test_admission_refusal_is_a_single_stderr_token` run the installed `hdctl`, whose editable install pointed at a scratch checkout of `1d2c834` (old help text; `release_id` `52be4558…`). With that checkout moved to `86e002c`, both files passed (8 passed). The other 4,916 tests passed in the full run. Not re-run as one full sweep (OBS-W5-5) |
 
 Every worktree ended with an empty `git status --short --untracked-files=all`, after restoring one scratch worktree from the EPIC030 run below.
 
@@ -360,7 +361,7 @@ Every worktree ended with an empty `git status --short --untracked-files=all`, a
 
 - The PR-20 and PR-10 pages are unchanged since the page states named in the header.
 - The installed TypeSafe skill carries request v8.2 (`request-v8.2.json`, sha256 `62486fcc…`).
-- Run times measured here: a full `tests/` sweep about 28 minutes in this lineage; the sanity pipeline 58 s; an attestation build 167 s.
+- Run times measured here: a full `tests/` sweep 27 minutes; the sanity pipeline 58 s; an attestation build 167 s.
 
 ### 5.8 Release identity and the refresh (only if a fix changes a member)
 
@@ -555,6 +556,7 @@ Each run that can write tracked files runs in a detached worktree and ends with 
 | **OBS-W5-2** (new). Audit §6 S19's "only PR06b … changed any of them" omits two PR06b files and four CI commits (§5.2) | IA (recorded; no scope effect) | Recorded |
 | **OBS-W5-3** (new). The EPIC030 generator writes on any invocation, and its output differs from the tracked files (§5.6) | this unit's review (T7, T8); Product Owner for the frozen family | Recorded; a hazard here |
 | **OBS-W5-4** (new). `generate_hde_epic037_v2_to_compat.py --check` fails on `main`, as it did at `982071b` and `d79cfc1` | this unit's review (the file is among the 49); Product Owner for refreshing or retiring the EPIC037 captures, as for OBS-P4-3 | Pre-existing; recorded |
+| **OBS-W5-5** (new). `hdctl` subprocess tests import the installed package. With an editable install that points at another checkout, two tests fail (§5.6) | PR-20, PR-30 (environment: install the worktree under test before a sweep) | Recorded; a hazard here |
 | OBS-W4-2, OBS-W4-4; OBS-P4-3, OBS-P4-4 | Product Owner | Carried, unchanged |
 | OBS-P4-1 (classifier gap for the override tests) | WU-PR-06 or a later classifier unit | Carried |
 | WU-PR-08: the loopback bind statements and OBS-P4-5 | the WU-PR-08 instruction | Not this unit |
@@ -642,6 +644,7 @@ Action sent (v8.2): "Write, in a new dedicated session, the first detailed PR im
   - They also need `ruby` on `PATH` for the contract-inventory test (present at `/usr/local/bin/ruby` in the cloud container used for this instruction), plus `bash` and `curl`.
   - Run under closed rails with the vendor, database and GitHub keys unset; the container sets several of them.
   - Use a clone with history back to `cd6f9e6` (a shallow clone lacks the four merge commits; `git fetch --deepen=400 origin main` reached them here).
+  - Install the worktree under test (`pip install -e .` from it) before a sweep; an installed `hdctl` from another checkout fails two CLI tests (OBS-W5-5).
 - **Run times observed.** A full `tests/` sweep about 28 minutes; the sanity pipeline about one minute; an attestation build about three minutes.
 - **Access.** No live vendor, production or database access is needed. HTTP probes use the Flask test client.
 - **Order.** This instruction's pull request should be merged first.
@@ -656,7 +659,7 @@ Action sent (v8.2): "Write, in a new dedicated session, the first detailed PR im
 | release | GCFPE-20261009.1 / 100926.1 |
 | prompt | PR-10 — Create PR Work-Unit Instructions — 100926.1, https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a (page state as of 2026-10-12T02:29:33.739Z) |
 | role/stage | continuing whole-change IA / PR-10 |
-| capture time | 2026-10-18T16:05:00Z |
+| capture time | 2026-10-18T15:56:00Z |
 | execution identity | https://claude.ai/code/session_01CCKsYD2yX5WgU3biWKb59j |
 | inherited usage | WU-PR-04 lineage review v1.0 §12 (PR-40) and the earlier uses it names |
 | repository persistence | recorded here only (installed writer `docs/changes/GCFPE_PROMPT_PROVENANCE.md` absent on `main`; pending, non-gating) |
