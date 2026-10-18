@@ -148,3 +148,17 @@ The Fable 5.1 picks, P(Fable 5.1):
 
 - `AGENTS.md`: the canon-first rule, and evidence attribution (tested state, time and limitations recorded).
 - HDE Build Notes (PF10) v13.5.8, addendum 2.1: the reading is the installed TypeSafe skill's output; no agent gives its own recommendation; the Product Owner picks.
+
+## 6. hd-v3 deliverables (pre-registration section 6), 18 October 2026
+
+Every step was read back after it was written.
+
+| Step | What was done | Read-back |
+|---|---|---|
+| Uses table `collection://6d7a823b-eb6c-42ed-9d97-93ec1c5306ae` | Options added: the 12 Sonnet 5.5 and Haiku 5.5 cells to *TypeSafe cell* and *Nathan's pick*; "Sonnet 5.5" and "Haiku 5.5" to *TypeSafe model*; "hd-v3" to *Version*. | All 26 earlier options kept their IDs |
+| hd-v3 rows | 15 rows added: HA1 to HA8 as `acceptance` and J0 to J6 as `live`, each with *Run* "hd-v3 setup, 16 Oct 2026" and *Nathan's pick* "pending". The hd-v1 rows are unchanged. | *TypeSafe cell*, *Rung probabilities* and *Model probabilities* identical to the script output on all 15 |
+| Log page 3f24590a-05eb-8151-b4a0-ee4ff3f1612a | A callout at the top marks hd-v3 in force and hd-v1 superseded, followed by an hd-v3 section with three file blocks. The earlier record is kept as written. | Page re-fetched |
+| hd-v3 files on the log page | `request-hd-v3.json`, `score_v8.py` (`822a80cb…`, the committed script with the v8.1 pin) and `acceptance-hd-v3.json` uploaded | Downloaded back; all three match their SHA-256 |
+| Installable skill | `hd-typesafe-scoring.skill`, packaged with skill-creator's `package_skill.py` and passing its validator. It contains `hd-typesafe-scoring/SKILL.md` (8,152 bytes). The package's SHA-256 is `53f42b3d85243c6bfc243ac99294d45429b9dd33c1f0ba670d1faa6c0a662495`. | Handed to Nathan to install; not committed to the repository |
+
+**Not done, per the pre-registration:** because v8 and v8.1 were not accepted, nothing changed in the Glow app uses table, on the Glow app log page, or in the `typesafe-scoring` skill. v6 stays in force for Glow app and repository sessions.
