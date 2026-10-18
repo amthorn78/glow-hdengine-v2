@@ -2,7 +2,7 @@
 artifact_type: SCORER_ACCEPTANCE_RESULTS
 artifact_version: "1.0"
 created_date: 2026-10-18
-status: "hd-v3 ACCEPTED; v8 and v8.1 NOT ACCEPTED (B_model); the Glow app request is Nathan's decision; v6 stays in force for Glow app sessions"
+status: "hd-v3 ACCEPTED; v8 and v8.1 NOT ACCEPTED (B_model); v8.2 pre-registered in section 7 at Nathan's direction, not yet read; v6 stays in force for Glow app sessions until v8.2 is accepted"
 pre_registration: TYPESAFE-FOUR-MODEL-PREREGISTRATION-20261016.md, commit 5438f38, approved by Nathan on 2026-10-18 ("proceed")
 ---
 
@@ -162,3 +162,34 @@ Every step was read back after it was written.
 | Installable skill | `hd-typesafe-scoring.skill`, packaged with skill-creator's `package_skill.py` and passing its validator. It contains `hd-typesafe-scoring/SKILL.md` (8,152 bytes). The package's SHA-256 is `53f42b3d85243c6bfc243ac99294d45429b9dd33c1f0ba670d1faa6c0a662495`. | Handed to Nathan to install; not committed to the repository |
 
 **Not done, per the pre-registration:** because v8 and v8.1 were not accepted, nothing changed in the Glow app uses table, on the Glow app log page, or in the `typesafe-scoring` skill. v6 stays in force for Glow app and repository sessions.
+
+## 7. v8.2: Nathan's option (c) (pre-registered before any v8.2 reading)
+
+**Authority.** Nathan, 2026-10-18, chose option (c) of the three put to him after v8.1 failed: "c, go ahead". The option as put to him: "Keep v6's Fable and Opus text word for word, and add only the Sonnet and Haiku options with their own figures. Same test, re-run on the same cases."
+
+**Status.** This is the second revision fitted to the same cases, and it is recorded as such; a pass is weaker evidence than a first-run pass.
+
+**File.** `request-v8.2.json`, SHA-256 `62486fcc4357e5917c3e9ba3e1ba9e2709364f0338dde70d4a88b116022b22ec`, built by `build_v8_2.py` from `request-v6.json` (`72beaafa…`) and `request-v8.json`.
+
+**What it keeps from v6, word for word:**
+- the effort Score;
+- the model question's wording;
+- v6's two-model tradeoff;
+- v6's two options, with their keys (`most_capable_model`, `strong_lower_cost_model`), texts and examples.
+
+**What it adds:**
+- one sentence before the tradeoff, scoping it to the first two options;
+- one paragraph after it, giving the two new options' prices and figures from `evidence-20261016.json`;
+- v8's `balanced_model` and `small_fast_model` options, with "the strong model" renamed to "the strong lower-cost model".
+
+`build_v8_2.py` asserts each of these.
+
+**Script.** `score_v8.py`, SHA-256 `d8435c16fc96ed0055f9857bc3b0a2f1c25e1a9a1f1c33206bce33a03cfd6e86`, pins the new request as version `v8.2`. It also maps v6's key `strong_lower_cost_model` to Opus 5.5. It refuses an answer whose four options do not name the four models exactly once each. The rule is unchanged. The HD skill keeps its own pinned copy, `822a80cb…`, on the HD log page; that copy needs no change, because its hd-v3 pin is the same.
+
+**Cases and gates.** The same as v8's (`acceptance-v8.json`; pre-registration section 5). v8.2 is read on Part A twice and on Part B once.
+
+**Outcome rule.**
+- If gates A, B_effort and B_model all pass on v8.2's run 1, v8.2 is accepted, and the pre-registration's section 6 steps follow for the Glow app.
+- If any gate fails, v6 stays in force for Glow app and repository sessions (option (a)).
+
+v8.2's results are added below this line after its readings. Nothing above this line changes.

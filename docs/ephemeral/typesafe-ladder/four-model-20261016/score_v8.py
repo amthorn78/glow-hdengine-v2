@@ -36,10 +36,13 @@ CUTS = (0.5, 1.5, 2.5, 3.5, 4.5)
 MODELS = {"most_capable_model": "Fable 5.1", "strong_model": "Opus 5.5",
           "balanced_model": "Sonnet 5.5", "small_fast_model": "Haiku 5.5"}
 ORDER = list(MODELS.values())
+# v8.2 keeps v6's option name for the strong model; it maps to the same model.
+OPTION_NAMES = dict(MODELS, strong_lower_cost_model="Opus 5.5")
 URL = "https://api.typesafe.ai/v1/systemone"
 PINS = {  # request file name -> (version, SHA-256); a changed request is a new version
     "request-v8.json": ("v8", "e19f4e328bd2ec0d6099dcf9b89e668065c77127d4895acf949de6f5d211d236"),
     "request-hd-v3.json": ("hd-v3", "c548868d3c5a45c530474cf2de4b739b96699c2227459ee7e5db4e9c2af2ec8f"),
+    "request-v8.2.json": ("v8.2", "62486fcc4357e5917c3e9ba3e1ba9e2709364f0338dde70d4a88b116022b22ec"),
     "request-v8.1.json": ("v8.1", "55b835dac95da6bc092ec61235f9b4eb33d46633643849509383227d4b82ba8f"),
 }
 _KEY = None
@@ -75,9 +78,9 @@ def apply_rule(answers):
     modal, runner = ordered[0], ordered[1]
     boundary = any(abs(score - c) < 0.10 for c in CUTS) or (modal[1] - runner[1] < 0.20)
     raw = answers["model"]["probabilities"]
-    if set(raw) != set(MODELS):
+    if len(raw) != 4 or not set(raw) <= set(OPTION_NAMES) or {OPTION_NAMES[k] for k in raw} != set(ORDER):
         raise KeyError(f"model options {sorted(raw)} are not the four pinned options")
-    mp = {MODELS[k]: float(v) for k, v in raw.items()}
+    mp = {OPTION_NAMES[k]: float(v) for k, v in raw.items()}
     ranked = sorted(ORDER, key=lambda m: (-mp[m], ORDER.index(m)))
     model, model_runner = ranked[0], ranked[1]
     return {
@@ -188,7 +191,7 @@ def main():
     g.add_argument("--action")
     g.add_argument("--action-file")
     g.add_argument("--batch", help="JSON file: list of {label, action, session}")
-    ap.add_argument("--request", required=True, help="a pinned request: request-v8.1.json, request-v8.json or request-hd-v3.json")
+    ap.add_argument("--request", required=True, help="a pinned request: request-v8.2.json, request-v8.1.json, request-v8.json or request-hd-v3.json")
     ap.add_argument("--label", default="", help="the Step name of the uses-table row")
     ap.add_argument("--session", default="")
     ap.add_argument("--kind", default="live", help="live, acceptance or calibration")
