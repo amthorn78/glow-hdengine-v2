@@ -2,7 +2,7 @@
 artifact_type: SCORER_ACCEPTANCE_RESULTS
 artifact_version: "1.0"
 created_date: 2026-10-18
-status: "hd-v3 ACCEPTED; v8 NOT ACCEPTED on run 1 (B_model); v8.1 pre-registered in section 4, not yet read"
+status: "hd-v3 ACCEPTED; v8 and v8.1 NOT ACCEPTED (B_model); the Glow app request is Nathan's decision; v6 stays in force for Glow app sessions"
 pre_registration: TYPESAFE-FOUR-MODEL-PREREGISTRATION-20261016.md, commit 5438f38, approved by Nathan on 2026-10-18 ("proceed")
 ---
 
@@ -107,6 +107,42 @@ v7's model question was v6's, with only its ladder wording changed.
 - **Outcome rule:** v8.1 is accepted when gates A, B_effort and B_model all pass on its run 1. If any fails, Nathan decides, and v6 stays in force until he does.
 
 v8.1's results are added below this line after its readings. Nothing above this line changes.
+
+## 5. v8.1, run 1 (results)
+
+Readings were sent on 2026-10-18 from 08:36:12 to 08:36:24 UTC: 16 + 16 for Part A and 31 for Part B. Every reading returned HTTP 200 from `jev-1.13.0`, from `request-v8.1.json` matching its pin. The evaluator's output is in `results/evaluation-v8.1.txt`; its last line says "(v8)" because v8.1 is read against v8's cases.
+
+| Gate | Result | Needed |
+|---|---|---|
+| A | pass: 15 of 16 meet every expectation; Fable on A5, A6, A9; Haiku on 3 of A1, A13, A14; Sonnet on 2 of A15, A16 | 14; all three; 2; 1 |
+| B_effort | pass: rung equal to the pick on 25 of 31, within one rung on 31 | 24 and 30 |
+| B_model | **fail: Fable 5.1 picks read Fable 5.1 on 5 of 9**; Opus 5.5 picks read Opus or Sonnet on 20 of 22; Haiku on 0 | 6; 18; at most 1 |
+
+- **The A8 miss.** A8 (mechanical conversion of 240 modules) is a near tie, Opus 5.5 0.50 against Sonnet 5.5 0.49, and it read Opus. Gate A still passes.
+- **Part C.** Run 2 gave the same cell on 16 of 16. The largest changes were 0.09 in effort score and 0.05 in a model probability.
+- **Model agreement with Nathan's picks.** 25 of 31 for v8.1, as for v8, against 27 for v6.
+
+The Fable 5.1 picks, P(Fable 5.1):
+
+| Text | v7 | v8 | v8.1 | v8.1 cell |
+|---|---|---|---|---|
+| P06.1-I2a exact-head review | 0.69 | 0.18 | 0.45 (Opus 0.54) | Opus 5.5 at max |
+| P06.1-I2b implementation | 0.99 | 0.60 | 0.72 | Fable 5.1 at max |
+| P06.1-I2b exact-head review | 0.54 | 0.12 | 0.40 (Opus 0.59) | Opus 5.5 at max |
+| App Manager 4 (v6 also read Opus) | 0.30 | 0.02 | 0.04 | Opus 5.5 at extra high |
+| P06.DB implementation | 0.88 | 0.50 | 0.59 | Fable 5.1 at max |
+| P06.DB exact-head review | 0.95 | 0.81 | 0.84 | Fable 5.1 at max |
+| P06.2 Stage A exact-head review | 0.98 | 0.83 | 0.91 | Fable 5.1 at max |
+| P06.2 Stage B1 implementation | 0.55 | 0.00 | 0.08 | Opus 5.5 at extra high |
+| P06.2 Stage B1 exact-head review | 0.96 | 0.11 | 0.76 | Fable 5.1 at max |
+
+**What the two runs show.**
+- Removing v8's three strong-model phrases recovered P(Fable 5.1) on every Fable pick, most on the B1 exact-head review (0.11 to 0.76).
+- It did not recover v6's level. P(Fable 5.1) stays below v7's on all nine picks.
+- The remaining differences from v6's model question are its rewritten tradeoff (four-model facts in place of v6's two-model comparison) and the split of probability across four options.
+- This is an observation from two fitted runs, not a tested cause.
+
+**Outcome.** Under the pre-registration, v8.1 failing means Nathan decides. v6 stays in force for Glow app and repository sessions until he does. hd-v3 is unaffected: it was accepted in its own right in section 1.
 
 ## Canon relied on
 
