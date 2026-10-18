@@ -374,3 +374,21 @@ def test_production_app_env_serves_v2_and_forbids_the_dev_get(db, monkeypatch):
     assert json.loads(resp.data)["reader_version"] == "v2"
     assert client.get("/reader?v=1&a=x&b=y").status_code == 403
     assert client.get("/reader?v=2&a=x&b=y").status_code == 400
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F01): a body nested past the JSON parser's recursion limit is
+# ERR_READER_INVALID_INPUT, never an unhandled 500 (PF05 §5.2.3), on every app factory ---------------
+
+_S19_NESTED_BODIES = {"array": b"[" * 32_768, "object": b'{"a_id":' + b"[" * 20_000}  # inside the 32 KiB limit
+_S19_FACTORIES = {"factory": factory.create_app, "http_reader": http_reader.create_app, "wsgi": wsgi.create_app}
+
+
+@pytest.mark.parametrize("factory_name", sorted(_S19_FACTORIES))
+@pytest.mark.parametrize("shape", sorted(_S19_NESTED_BODIES))
+def test_s19_production_reader_v2_refuses_deeply_nested_json_as_invalid_input(monkeypatch, factory_name, shape):
+    monkeypatch.setenv("APP_ENV", "prod")
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+    resp = _post(_client(_S19_FACTORIES[factory_name]), raw=_S19_NESTED_BODIES[shape])
+    _assert_error(resp, "ERR_READER_INVALID_INPUT", 422)
+    assert resp.headers["Content-Type"] == "application/json; charset=utf-8"
+    assert json.loads(resp.data)["error"] == "invalid Reader request"

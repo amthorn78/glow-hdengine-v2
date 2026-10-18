@@ -23,6 +23,7 @@ from engine.compat.compute import (
 from engine.compat.error_tokens import MAGIC10_HTTP_STATUS, CompatBoundaryError, admission_token_for
 from engine.config.registry_loader import RegistryConfigError
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
+from adapter.env_guard import _compute_env_mode
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
 from engine.bodygraph.vendor_client import VendorError
@@ -152,7 +153,10 @@ def _read_writer_json(
     if content_length is not None and content_length > _MAX_WRITER_BYTES:
         return None, _reject_request_too_large()
 
-    raw = request.get_data(cache=False)
+    # Bound the read itself, as the production Reader does: a chunked request, or
+    # any request that omits Content-Length, skips the check above, and buffering
+    # the whole body first would let a client consume unbounded worker memory.
+    raw = request.stream.read(_MAX_WRITER_BYTES + 1)
     if len(raw) > _MAX_WRITER_BYTES:
         return None, _reject_request_too_large()
 
@@ -174,7 +178,8 @@ def _read_writer_json(
 
     try:
         data = json.loads(text)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, RecursionError):
+        # A body nested past the parser's recursion limit is malformed JSON too.
         return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
 
     if not isinstance(data, dict):
@@ -487,7 +492,9 @@ def _parse_reader_post_body() -> tuple[str, str]:
         if text.startswith("\ufeff"):
             raise ValueError("bom")
         data = json.loads(text)
-    except (UnicodeDecodeError, ValueError):
+    except (UnicodeDecodeError, ValueError, RecursionError):
+        # PF05 §5.2.3: invalid JSON, including a body nested past the parser's
+        # recursion limit, is ERR_READER_INVALID_INPUT, never an unhandled 500.
         raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422) from None
     if not isinstance(data, dict) or set(data) != _READER_POST_KEYS:
         raise _ReaderFailure("ERR_READER_INVALID_INPUT", 422)
@@ -548,6 +555,74 @@ def _production_reader_response(emit_fn):
     resp.headers.pop("ETag", None)
     resp.headers["Content-Length"] = str(len(body))
     return resp, 200
+
+
+# HDE-CRD-0002 S19 (PF10 HDE Build Notes 2.7 AD-4): the production mount of the
+# dev/internal blueprint.  In a production-like posture (PF05 §5.5 resolution, as
+# the compat guard resolves it) no dev-harness handler and no canon-retired route
+# is served (PF02 §3.3 "never mounted in production"; PF05 §5.4 "Gate" and §5.12):
+# each dev-harness route answers only its canonical refusal, and each canon-retired
+# route (PF02 §3.5 "Current repository discrepancy") answers the app's governed
+# not-found, before any handler runs.  Every other route, and every other posture,
+# is unchanged; the handlers keep their own request-time gates.
+_PRODUCTION_DEV_WRITER_ROUTES = {  # endpoint: its keys-only log route
+    "dev_sampler_internal": "internal.dev.sampler",
+    "dev_sampler_conjunction": "dev.sampler.conjunction",
+    "dev_reader_conjunction": "dev.reader.conjunction",
+    "dev_writer_conjunction": "dev.writer.conjunction",
+}
+_PRODUCTION_RETIRED = {
+    "ops_db_unavailable": "/ops/db/unavailable",
+    "ops_probe_env": "/ops/probe/env",
+    "diagnostic_writer": "/ops/writer/diagnostic",
+    "diagnostic_writer_head": "/ops/writer/diagnostic",
+    "diagnostic_writer_options": "/ops/writer/diagnostic",
+}
+
+
+def _production_posture(environ=None) -> bool:
+    return _compute_env_mode(os.environ if environ is None else environ) == "prod"
+
+
+def _mount_for_production(state) -> None:
+    """Decided once, when an app registers the blueprint: in a production-like
+    posture, refuse the dev-harness and canon-retired routes on that app before
+    any of their handlers runs.  A retired path answers not-found for every method,
+    a method no rule names included."""
+
+    if not _production_posture():
+        return
+    reader = f"{state.name}.reader_v1"
+    writers = {f"{state.name}.{endpoint}": route for endpoint, route in _PRODUCTION_DEV_WRITER_ROUTES.items()}
+    retired = {f"{state.name}.{endpoint}" for endpoint in _PRODUCTION_RETIRED}
+    prefix = (state.url_prefix or "").rstrip("/")
+    retired_paths = {prefix + path for path in _PRODUCTION_RETIRED.values()}
+
+    def _refuse_in_production():
+        if request.endpoint in retired or (
+            isinstance(request.routing_exception, MethodNotAllowed) and request.path in retired_paths
+        ):
+            # The governed not-found, as for a path no rule names.
+            return _error("ERR_NOT_FOUND", 404)
+        if request.method == "OPTIONS" and request.url_rule is not None and request.url_rule.provide_automatic_options:
+            # Flask's automatic OPTIONS answer runs no handler; it stays as it is.
+            return None
+        if request.endpoint == reader:
+            # The dev ``GET /reader`` handler's own refusal under ``APP_ENV=prod``:
+            # version validation first, then the S10 refusal.
+            try:
+                _select_reader_version(("1",))
+            except _ReaderFailure as exc:
+                return _error(exc.token, exc.status)
+            return _error("ERR_READER_FORBIDDEN", 403)
+        if request.endpoint in writers:
+            # The dev/admin gate's own refusal (PF05 §5.11.2 and §5.12): the same
+            # canonical bytes and headers as its writer error.
+            g._log_override = {"route": writers[request.endpoint]}
+            return _error("ERR_WRITER_FORBIDDEN", 403)
+        return None
+
+    state.app.before_request(_refuse_in_production)
 
 
 def get_reader_api_bp(emit_fn=None):
@@ -824,9 +899,9 @@ def get_reader_bp(emit_fn=None):
     # the sampler harness. The route is included in the internal Endpoint
     # Catalog inventory, but excluded from A7 and public contracts.
     def _dev_admin_gate() -> Response | None:
-        raw_app_env = os.environ.get("APP_ENV")
-        app_env = raw_app_env.strip().lower() if raw_app_env is not None else None
-        if app_env in {"dev", "test", "local"}:
+        # HDE Governance "Dev/admin APP_ENV gating" and PF05 §5.11.2: exactly
+        # ``dev``, ``test`` or ``local``, with no trimming or case-folding.
+        if os.environ.get("APP_ENV") in {"dev", "test", "local"}:
             return None
         # Preserve writer-style error envelopes for internal/dev surfaces.
         return _writer_error("ERR_WRITER_FORBIDDEN", status=403)
@@ -1077,6 +1152,7 @@ def get_reader_bp(emit_fn=None):
             return gate
         return _emit_dev_writer_conjunction_response()
 
+    bp.record(_mount_for_production)
     return bp
 
 bp = get_reader_bp()

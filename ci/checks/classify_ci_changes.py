@@ -585,6 +585,8 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/artifacts/test_env_guard_artifact_bytes.py",
     ),
     "scripts/ensure_env.py": ("tests/invariance/test_determinism_env_helper.py",),
+    # HDE-CRD-0002 WU-PR-05 (S19-F06): the S9 ingest runner passes its own log paths.
+    "scripts/ingest/run_vendor_ingest.py": ("tests/bodygraph/test_ingest.py",),
     "scripts/probe_internal_version.py": (
         "tests/transport/test_internal_version_contract.py",
     ),
