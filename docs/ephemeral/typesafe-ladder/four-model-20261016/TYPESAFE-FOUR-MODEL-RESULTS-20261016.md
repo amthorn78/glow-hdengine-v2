@@ -2,7 +2,7 @@
 artifact_type: SCORER_ACCEPTANCE_RESULTS
 artifact_version: "1.0"
 created_date: 2026-10-18
-status: "hd-v3 ACCEPTED; v8 and v8.1 NOT ACCEPTED (B_model); v8.2 pre-registered in section 7 at Nathan's direction, not yet read; v6 stays in force for Glow app sessions until v8.2 is accepted"
+status: "hd-v3 ACCEPTED; v8 and v8.1 NOT ACCEPTED (B_model); v8.2 ACCEPTED on its run 1 (section 8), at the gate thresholds; v8.2 replaces v6 for Glow app and repository sessions"
 pre_registration: TYPESAFE-FOUR-MODEL-PREREGISTRATION-20261016.md, commit 5438f38, approved by Nathan on 2026-10-18 ("proceed")
 ---
 
@@ -193,3 +193,67 @@ Every step was read back after it was written.
 - If any gate fails, v6 stays in force for Glow app and repository sessions (option (a)).
 
 v8.2's results are added below this line after its readings. Nothing above this line changes.
+
+## 8. v8.2, run 1 (results)
+
+**The readings.**
+- Sent on 2026-10-18, from 09:01:53 to 09:02:07 UTC: 16 + 16 for Part A and 31 for Part B.
+- Every reading returned HTTP 200 from `jev-1.13.0`, from `request-v8.2.json` matching its pin.
+- The evaluator's output is in `results/evaluation-v8.2.txt`.
+
+| Gate | Result | Needed |
+|---|---|---|
+| A | **pass at the threshold:** 14 of 16 cases meet every expectation; A5, A6 and A9 read Fable; Haiku on all 3 of A1, A13 and A14; Sonnet on both A15 and A16 | 14 of 16; all three Fable; 2 of 3 Haiku; 1 of 2 Sonnet |
+| B_effort | **pass:** the rung equals the pick on 25 of 31 and is within one rung on 31 | 24 and 30 |
+| B_model | **pass at the threshold:** Fable 5.1 picks read Fable 5.1 on 6 of 9; Opus 5.5 picks read Opus or Sonnet on 19 of 22; Haiku on 0 of 31 | 6; 18; at most 1 |
+
+**The two Part A misses.**
+- **A8**, mechanical conversion of 240 modules: read Opus 5.5 at high (Opus 0.91, Sonnet 0.08); expected Haiku or Sonnet.
+- **A10**, licence survey of 180 packages: read Opus 5.5 at extra high (Opus 0.69, Haiku 0.27); expected Haiku or Sonnet.
+- Under v8.2, both broad mechanical sweeps go to the strong model.
+
+**Part C.** Run 2 gave the same cell on all 16 cases. The largest run-to-run changes were 0.06 in effort score and 0.05 in a model probability.
+
+**Agreement with Nathan's picks.** The model equals his pick on 25 of 31 (v6: 27) and the rung on 25 of 31 (v6: 26). No Opus pick reads Sonnet 5.5.
+
+P(Fable 5.1) on the Fable picks, and on the Opus picks that read Fable:
+
+| Text | Pick | v6 | v7 | v8 | v8.1 | v8.2 | v8.2 cell |
+|---|---|---|---|---|---|---|---|
+| P06.1-I1 exact-head review | Opus | Fable | 0.97 | 0.47 | 0.78 | 0.92 | Fable 5.1 at max |
+| P06.1-I1 implementation | Opus | Fable | 0.97 | 0.74 | 0.75 | 0.95 | Fable 5.1 at max |
+| P06.1-I2a revocation and safety, live | Opus | Fable | 0.93 | 0.32 | 0.46 | 0.85 | Fable 5.1 at max |
+| P06.1-I2a exact-head review | Fable | Fable | 0.69 | 0.18 | 0.45 | 0.58 | Fable 5.1 at max |
+| P06.1-I2b implementation | Fable | Fable | 0.99 | 0.60 | 0.72 | 0.96 | Fable 5.1 at max |
+| P06.1-I2b exact-head review | Fable | Fable | 0.54 | 0.12 | 0.40 | 0.47 | Opus 5.5 at max |
+| App Manager 4 | Fable | Opus | 0.30 | 0.02 | 0.04 | 0.15 | Opus 5.5 at extra high |
+| P06.DB implementation | Fable | Fable | 0.88 | 0.50 | 0.59 | 0.87 | Fable 5.1 at max |
+| P06.DB exact-head review | Fable | Fable | 0.95 | 0.81 | 0.84 | 0.94 | Fable 5.1 at max |
+| P06.2 Stage A exact-head review | Fable | Fable | 0.98 | 0.83 | 0.91 | 0.98 | Fable 5.1 at max |
+| P06.2 Stage B1 implementation | Fable | Fable | 0.55 | 0.00 | 0.08 | 0.42 | Opus 5.5 at extra high |
+| P06.2 Stage B1 exact-head review | Fable | Fable | 0.96 | 0.11 | 0.76 | 0.95 | Fable 5.1 at max |
+
+**What it shows.** Restoring v6's two-model text recovers most of v6's Fable signal. The three misses are:
+- I2b's review and B1's implementation, which were already near ties under v7 (0.54 and 0.55);
+- App Manager 4, which v6 also read as Opus.
+
+The three Opus picks that read Fable are the same three that v6 read Fable and Nathan overrode.
+
+**Outcome.** v8.2 is accepted under section 7's rule. It replaces v6 for Glow app and repository sessions. The pre-registration's section 6 steps for the Glow app follow; they are recorded in section 9.
+
+**Limits of this pass.**
+- Two gates passed exactly at their thresholds.
+- It is the second fitted revision.
+- On the two broad mechanical sweeps (A8, A10), the strong model wins where the cheaper options were expected.
+
+## 9. v8.2 deliverables (pre-registration section 6 for the Glow app), 18 October 2026
+
+Every step was read back after it was written.
+
+| Step | What was done | Read-back |
+|---|---|---|
+| Uses table `collection://e1d83c6d-23b7-447f-8bc6-dcbb4829f24e` | Options added: the 12 Sonnet 5.5 and Haiku 5.5 cells to *TypeSafe cell* and *Nathan's pick*; "Sonnet 5.5" and "Haiku 5.5" to *TypeSafe model*; "v8.2" to *Version*. Earlier rows are unchanged. | Every earlier option kept its ID. *Manager model* is unchanged. |
+| Log page 3e54590a-05eb-81a5-845b-f0a52f7c1cea | A callout at the top marks v8.2 in force and v6 superseded, with the history of v8 and v8.1 and the threshold passes. The earlier record is kept as written. | Page re-fetched |
+| Installable skill | `typesafe-scoring.skill`, packaged with skill-creator's `package_skill.py` and passing its validator. It contains `SKILL.md`, `request-v8.2.json` (`62486fcc…`) and `scripts/score_v8.py` (`d8435c16…`, this directory's script). The package's SHA-256 is `2b79a57bcc1a5de7d81ac09ef56d9df8a735a1f31df3427c935e298fbdc423e8`. | Handed to Nathan to install; not committed to the repository |
+
+**Two copies of the script.** The HD skill keeps its own pinned copy, `822a80cb…`, from commit `d91cb14`. The Glow skill carries `d8435c16…`, which adds the v8.2 pin. Both serve hd-v3 the same way.
