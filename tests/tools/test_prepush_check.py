@@ -156,9 +156,16 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
         lambda text: text.replace("          python-version: '3.12'\n", "          python-version: '3.12'\n          architecture: x86\n"),
         lambda text: text.replace("runs-on: ubuntu-latest", "runs-on: macos-latest"),
         lambda text: text.replace("\njobs:\n", "\nenv:\n  EXTRA: one\n\njobs:\n"),
+        lambda text: text.replace("actions/checkout@v4", "actions/checkout@v5"),
+        lambda text: text.replace("actions/setup-python@v5", "actions/setup-python@main"),
+        lambda text: text.replace("run: python3 ci/checks/check_agents_md_citations.py",
+                                  'run: python3 ci/checks/check_agents_md_citations.py --sha "$GITHUB_SHA"'),
+        lambda text: text.replace("          BASE_SHA: ", "          RUNNER_OS: Linux\n          BASE_SHA: "),
+        lambda text: text.replace("      APP_ENV: dev\n", "      APP_ENV: dev\n      GITHUB_WORKSPACE: /w\n", 1),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
-         "setup-python-input", "runner", "workflow-env"],
+         "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
+         "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -192,6 +199,20 @@ def test_expressions_cover_the_workflow_forms() -> None:
     for unsupported in ("${{ fromJSON('1') }}", "${{ secrets.TOKEN }}", "${{ matrix.os }}"):
         with pytest.raises(tool.ToolingError):
             tool.interpolate(unsupported, expressions)
+    # On a pull_request the merge commit and the payload's before are not modelled: discarded by || they are
+    # harmless, used they are tooling, as is any github path the replay does not model.
+    pull = tool.Expressions(tool.replay_contexts("pull_request", "b", "h"), job_failed=False)
+    assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", pull) == "h"
+    assert tool.interpolate("${{ github.event.pull_request.base.sha || github.event.before }}", pull) == "b"
+    for unmodelled in ("${{ github.sha }}", "${{ github.event.before == 'x' }}", "${{ github.run_id }}",
+                       "${{ github.workspace }}", "${{ github.event.pull_request.title }}", "${{ env.LC_ALL }}"):
+        with pytest.raises(tool.ToolingError, match="not modelled|unsupported context"):
+            tool.interpolate(unmodelled, pull)
+    with pytest.raises(tool.ToolingError, match="not modelled"):
+        tool.condition("${{ github.sha }}", pull)
+    push = tool.Expressions(tool.replay_contexts("push", "p", "s"), job_failed=False)
+    assert tool.interpolate("${{ github.sha }}/${{ github.event.before }}", push) == "s/p"
+    assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", push) == "s"
 
 
 def test_interpreter_substitute_requires_the_workflow_python(tmp_path: Path) -> None:
@@ -246,8 +267,8 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     (copy / "nested/more.txt").write_text("epsilon \\\n  >=1\n", encoding="utf-8")
     (copy / "pyproject.toml").write_text(textwrap.dedent("""\
         [build-system]
-        requires = ["buildreq>=1"]
-        build-backend = "fakebackend"
+        requires = ["setuptools>=68", "wheel"]
+        build-backend = "setuptools.build_meta"
         [project]
         name = "proj"
         version = "0.2.0"
@@ -265,15 +286,16 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         "beta": ("1.5", [], ""),
         "epsilon": ("1.0", [], ""),
         "proj": ("0.1.0", [], "[console_scripts]\nprojcli = proj.old:main\n"),
+        "setuptools": ("84.0.0", [], ""),
     })
     assert tool._install_check(run, copy, broken) == [
         "beta 1.5 (needs >=2.0; required by alpha)",
-        "buildreq (not installed; required by proj's build-system)",
         "gamma (not installed; required by alpha)",
         "proj 0.1.0 (the candidate declares version 0.2.0)",
-        "proj build-backend fakebackend (not importable)",
+        "proj build-backend setuptools.build_meta (not importable)",
         "proj console_scripts {'projcli': 'proj.old:main'} (the candidate declares {'projcli': 'proj.cli:main'})",
         "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})",
+        "wheel (not installed; required by proj's build-system)",
         "zeta (not installed; required by alpha)",
     ]
     fixed = _site(tmp_path / "fixed", {
@@ -281,11 +303,14 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         "beta": ("2.1", [], ""),
         "gamma": ("1.4", [], ""),
         "zeta": ("0.1", [], ""),
-        "buildreq": ("1.0", [], ""),
         "epsilon": ("1.0", [], ""),
         "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
+        "setuptools": ("84.0.0", [], ""),
+        "wheel": ("0.45.0", [], ""),
     })
-    (tmp_path / "fixed/fakebackend.py").write_text("", encoding="utf-8")
+    (tmp_path / "fixed/setuptools").mkdir()
+    for module in ("__init__.py", "build_meta.py"):
+        (tmp_path / "fixed/setuptools" / module).write_text("", encoding="utf-8")
     assert tool._install_check(run, copy, fixed) == []
     pyproject = (copy / "pyproject.toml").read_text(encoding="utf-8")
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"<3"'), encoding="utf-8")
@@ -294,9 +319,15 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"> = 3"'), encoding="utf-8")
     with pytest.raises(ValueError, match="unsupported requires-python"):
         tool._install_check(run, copy, fixed)
-    for missing in ('build-backend = "fakebackend"', 'requires = ["buildreq>=1"]'):
-        (copy / "pyproject.toml").write_text(pyproject.replace(missing, ""), encoding="utf-8")
-        with pytest.raises(ValueError, match="needs a \\[build-system\\]"):
+    # Only the build system the replay models is accepted: another backend, a hook object, other build
+    # requirements, a backend-path or a missing key would make CI's build differ.
+    backend, requires = 'build-backend = "setuptools.build_meta"', 'requires = ["setuptools>=68", "wheel"]'
+    for old, new in ((backend, 'build-backend = "json"'),
+                     (backend, 'build-backend = "setuptools.build_meta:no_such_backend"'),
+                     (requires, 'requires = ["setuptools>=40", "wheel"]'),
+                     (requires, requires + '\nbackend-path = ["."]'), (backend, ""), (requires, "")):
+        (copy / "pyproject.toml").write_text(pyproject.replace(old, new), encoding="utf-8")
+        with pytest.raises(ValueError, match="not the one the replay models"):
             tool._install_check(run, copy, fixed)
     (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
     for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
@@ -634,7 +665,7 @@ def _replay_workflow(product_body: str) -> str:
             'test -n "$BASE_SHA" && test -n "$HEAD_SHA"\n'
             'echo "event=${{ github.event_name }}"\n'
             "printf 'product=true\\nqa=false\\nneeds_python=true\\nchanged_tests=false\\n' >> \"$GITHUB_OUTPUT\"")),
-        "Check AGENTS.md cites no project documents": ("", "", "echo citations"),
+        "Check AGENTS.md cites no project documents": ("", "", "bash ci/runner_env.sh\necho citations"),
         "Verify pytest readiness": ("pytest_readiness", "needs_python", "python -m pytest --version"),
         "Verify closed deterministic environment": ("env_pins", "needs_python", (
             'test "$SAFE_MODE" = 1 && test "$ALLOW_NETWORK" = 0 && test "$TZ" = UTC\n'
@@ -694,8 +725,12 @@ def test_replay_runs_a_synthetic_workflow_in_a_throwaway_copy(tmp_path: Path, pr
     repo = _synthetic(tmp_path / "replay", {
         ".github/workflows/ci.yml": _replay_workflow(product_body),
         "requirements.txt": "pytest\n",
+        # A script a step calls sees only the runner variables the replay models, never the caller's.
+        "ci/runner_env.sh": ('test -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}"\n'
+                             'test "$GITHUB_ACTIONS/$GITHUB_EVENT_NAME" = true/pull_request\n'),
     })
-    result = _run(repo, "replay", "--full")
+    result = _run(repo, "replay", "--full",
+                  extra_env={"GITHUB_SHA": "caller", "RUNNER_OS": "caller", "GITHUB_WORKSPACE": "/caller"})
     lines = _report_lines(result.stdout, "replay")
     steps = {line.split(" ", 3)[1]: line for line in lines if line.startswith("step ")}
     assert len(steps) == len(tool.REPLAY_INVENTORY)

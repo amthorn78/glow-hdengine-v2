@@ -125,14 +125,35 @@ REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env",
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 # What the replay stands in for, and the only inputs it models: the workflow's
 # top-level keys, an ubuntu runner (replayed on this Linux machine), and the
-# inputs of the two substituted actions (None: any value; a string: exactly
-# that value, required).  Anything else is inventory drift.
+# two substituted actions, revision included, with their inputs (None: any
+# value; a string: exactly that value, required).  Anything else is inventory
+# drift.
 REPLAY_WORKFLOW_KEYS = frozenset({"name", "run-name", "on", "permissions", "concurrency", "jobs"})
 REPLAY_SUBSTITUTED_INPUTS: dict[str, dict[str, str | None]] = {
-    "actions/checkout": {"fetch-depth": "0", "persist-credentials": None,
-                         "ref": "${{ github.event.pull_request.head.sha || github.sha }}"},
-    "actions/setup-python": {"python-version": None},
+    "actions/checkout@v4": {"fetch-depth": "0", "persist-credentials": None,
+                            "ref": "${{ github.event.pull_request.head.sha || github.sha }}"},
+    "actions/setup-python@v5": {"python-version": None},
 }
+# The github context paths the replay models; any other path, and github.sha
+# and github.event.before on a pull_request event (the merge commit and the
+# payload's before are unknown offline), is refused where its value is used.
+REPLAY_GITHUB_PATHS = frozenset({"github.event_name", "github.sha", "github.event.before",
+                                 "github.event.pull_request.base.sha", "github.event.pull_request.head.sha"})
+# Variables the runner or a substituted action gives run steps.  The replay
+# sets REPLAY_RUNNER_VARIABLES, leaves REMOVED_ENV_KEYS absent as a hosted
+# runner does, removes every other inherited one, and refuses a workflow whose
+# run text or env keys name any other.  Scripts a step calls are not scanned;
+# they see the same environment.
+REPLAY_RUNNER_VARIABLES = frozenset({"GITHUB_ACTIONS", "GITHUB_EVENT_NAME", "GITHUB_OUTPUT", "RUNNER_TEMP"})
+_RUNNER_VARIABLE_RE = re.compile(
+    r"(?<![A-Za-z0-9_])(?:(?:GITHUB|RUNNER|ACTIONS)_[A-Za-z0-9_]+|ImageOS|ImageVersion|pythonLocation"
+    r"|Python[23]?_ROOT_DIR)(?![A-Za-z0-9_])")
+# The one build system the install step's substitute models: pip builds the
+# editable project with this backend, whose PEP 660 hooks every setuptools
+# from 64 provides, from these requirements in an isolated environment.  Any
+# other [build-system] fails closed.
+REPLAY_BUILD_SYSTEM: dict[str, object] = {"build-backend": "setuptools.build_meta",
+                                          "requires": ["setuptools>=68", "wheel"]}
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
 # PEP 508 requirements as the install step and installed metadata write them:
@@ -908,6 +929,8 @@ class Expressions:
         parts = dotted.split(".")
         if parts[0] not in self.contexts:
             raise ToolingError(f"unsupported context: {dotted}")
+        if parts[0] == "github" and dotted not in REPLAY_GITHUB_PATHS:
+            return _Unmodelled(dotted)
         value: object = self.contexts
         for part in parts:
             if isinstance(value, dict):
@@ -917,11 +940,25 @@ class Expressions:
         return value
 
 
+@dataclass(frozen=True)
+class _Unmodelled:
+    """A context value the replay does not model; using it, not discarding it, is tooling."""
+
+    path: str
+
+    def refuse(self) -> ToolingError:
+        return ToolingError(f"unsupported context: {self.path} is not modelled for this event")
+
+
 def _truthy(value: object) -> bool:
+    if isinstance(value, _Unmodelled):
+        raise value.refuse()
     return bool(value) and value != 0
 
 
 def _string(value: object) -> str:
+    if isinstance(value, _Unmodelled):
+        raise value.refuse()
     if isinstance(value, bool):
         return "true" if value else "false"
     return "" if value is None or isinstance(value, dict) else str(value)
@@ -966,14 +1003,25 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
     if names != expected:
         raise ToolingError("REPLAY_INVENTORY_DRIFT: the test job's steps differ from the tool's inventory: "
                            f"workflow={names} tool={expected}")
+    modelled_variables = REPLAY_RUNNER_VARIABLES | set(REMOVED_ENV_KEYS)
+    job_variables = {key for key in job.env if _RUNNER_VARIABLE_RE.fullmatch(key)}
+    if job_variables:
+        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the test job's env sets runner variables {sorted(job_variables)}")
     for step, (name, kind, _reason) in zip(job.steps, REPLAY_INVENTORY):
         unknown = set(step) - REPLAY_STEP_KEYS
         if unknown:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has unsupported keys {sorted(unknown)}")
         if ("uses" in step) != (kind == REPLAY_EXCLUDED and name != "Install applicable validation dependencies"):
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} changed between uses: and run:")
+        step_env = step.get("env", {})
+        named = set(_RUNNER_VARIABLE_RE.findall(str(step.get("run", "")))) - modelled_variables
+        named |= {str(key) for key in (step_env if isinstance(step_env, dict) else {})
+                  if _RUNNER_VARIABLE_RE.fullmatch(str(key))}
+        if named:
+            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} names runner variables the replay does not "
+                               f"model: {', '.join(sorted(named))}")
         if "uses" in step:
-            action = str(step["uses"]).split("@", 1)[0]
+            action = str(step["uses"]).strip()
             supported = REPLAY_SUBSTITUTED_INPUTS.get(action)
             given = step.get("with", {})
             if supported is None or not isinstance(given, dict):
@@ -984,6 +1032,22 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
                 raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has inputs the replay does not model: "
                                    + ", ".join(unmodelled))
     return job, job.steps
+
+
+def replay_contexts(event: str, base: str, head: str) -> dict[str, object]:
+    """The expression contexts the replay models for one event."""
+    pull_request = event == "pull_request"
+    return {
+        "github": {
+            "event_name": event,
+            "sha": _Unmodelled("github.sha") if pull_request else head,
+            "event": {
+                "before": _Unmodelled("github.event.before") if pull_request else base,
+                "pull_request": {"base": {"sha": base}, "head": {"sha": head}} if pull_request else {},
+            },
+        },
+        "steps": {},
+    }
 
 
 def _python_version(steps: list[dict[str, object]]) -> str:
@@ -1278,9 +1342,10 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     interpreter, so the replay never runs against a dependency set or a wrapper
     CI's install would replace, nor passes a candidate CI cannot install.  pip
     builds the project in an isolated environment fetched from the package
-    index, which an offline check cannot reproduce; as a fail-closed proxy the
-    caller's environment must satisfy the build requirements and hold the
-    build backend's module.
+    index, which an offline check cannot reproduce; the project's build system
+    must be REPLAY_BUILD_SYSTEM, and as a fail-closed proxy the caller's
+    environment must satisfy its build requirements and hold its backend's
+    module.
     """
     words = shlex.split(run_text)
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
@@ -1288,7 +1353,6 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     rest = words[words.index("install") + 1:]
     roots: list[tuple[str, str]] = []
     projects: list[dict[str, object]] = []
-    backends: list[tuple[str, str]] = []
     index = 0
     while index < len(rest):
         word = rest[index]
@@ -1299,15 +1363,13 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
             else:
                 pyproject = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8"))
                 project, build = pyproject["project"], pyproject.get("build-system")
-                if not isinstance(build, dict) or not isinstance(build.get("requires"), list) \
-                        or not build.get("build-backend") or "backend-path" in build:
-                    raise ValueError(f"the editable project {project['name']!r} needs a [build-system] with "
-                                     "requires and build-backend and without backend-path")
+                if build != REPLAY_BUILD_SYSTEM:
+                    raise ValueError(f"the editable project {project['name']!r} has [build-system] {build!r}, not "
+                                     f"the one the replay models, {REPLAY_BUILD_SYSTEM!r}")
                 projects.append(project)
-                backends.append((str(project["name"]), str(build["build-backend"])))
                 roots.append((str(project["name"]), "the install step"))
                 roots += [(str(dependency), str(project["name"])) for dependency in project.get("dependencies", [])]
-                roots += [(str(requirement), f"{project['name']}'s build-system") for requirement in build.get("requires", [])]
+                roots += [(str(requirement), f"{project['name']}'s build-system") for requirement in build["requires"]]
             index += 2
             continue
         if word.startswith("-"):
@@ -1315,11 +1377,11 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
         roots.append((word, "the install step"))
         index += 1
     unmet = _unmet_requirements(roots, search_path)
-    for name, backend in backends:
-        if not _module_locatable(backend.split(":", 1)[0], search_path):
-            unmet.append(f"{name} build-backend {backend} (not importable)")
+    backend = str(REPLAY_BUILD_SYSTEM["build-backend"])
     for project in projects:
         name = str(project["name"])
+        if not _module_locatable(backend, search_path):
+            unmet.append(f"{name} build-backend {backend} (not importable)")
         distribution = _distribution(name, search_path)
         if distribution is None:
             continue  # already reported as not installed
@@ -1397,22 +1459,10 @@ def report_replay(context: Context, report: Report) -> None:
     report.out(f"copy={copy} interpreter={sys.executable} python={sys.version.split()[0]} workflow_python={python_version}")
     runner_temp = context.temporary / "replay-runner-temp"
     runner_temp.mkdir()
-    pull_request = context.event == "pull_request"
-    contexts: dict[str, object] = {
-        "github": {
-            "event_name": context.event,
-            "sha": head,
-            "workflow": "ci",
-            "event": {
-                "before": "" if pull_request else base,
-                "pull_request": {"base": {"sha": base}, "head": {"sha": head}} if pull_request else {},
-            },
-        },
-        "steps": {},
-        "env": {},
-    }
+    contexts = replay_contexts(context.event, base, head)
     expressions = Expressions(contexts, job_failed=False)
-    base_env = child_environment(dict(os.environ), context.temporary,
+    inherited = {k: v for k, v in os.environ.items() if not _RUNNER_VARIABLE_RE.fullmatch(k)}
+    base_env = child_environment(inherited, context.temporary,
                                  {"PYTHONPATH": str(copy), "RUNNER_TEMP": str(runner_temp),
                                   "CI": "true", "GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": context.event})
     try:
@@ -1478,7 +1528,7 @@ def _substitute(step: dict[str, object], reason: str, copy: Path,
     if unmet:
         return "failure", "TOOLING the caller's environment does not satisfy the install step: " + ", ".join(unmet)
     return "success", (f"{reason}: the environment already satisfies every requirement the step names, their "
-                       "dependencies and extras, and the editable project's version and entry points")
+                       "dependencies and extras, and the editable project's build system, version and entry points")
 
 
 def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[str, str],
