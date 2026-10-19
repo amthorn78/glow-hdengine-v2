@@ -164,16 +164,32 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
         lambda text: text.replace("          BASE_SHA: ", "          RUNNER_OS: Linux\n          BASE_SHA: "),
         lambda text: text.replace("      APP_ENV: dev\n", "      APP_ENV: dev\n      GITHUB_WORKSPACE: /w\n", 1),
         lambda text: text.replace("persist-credentials: false", "persist-credentials: true"),
+        lambda text: text.replace("        uses: actions/checkout@v4\n",
+                                  "        if: ${{ false }}\n        uses: actions/checkout@v4\n"),
+        lambda text: text.replace("        id: dependencies\n",
+                                  "        id: dependencies\n        env:\n          PIP_INDEX_URL: x\n"),
+        lambda text: text.replace("        run: python3 ci/checks/check_agents_md_citations.py",
+                                  "        env: invalid\n        run: python3 ci/checks/check_agents_md_citations.py"),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
-         "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials"],
+         "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials",
+         "checkout-condition", "install-env", "step-env-not-a-mapping"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     mutated = mutate(text)
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="REPLAY_INVENTORY_DRIFT"):
+        tool.replay_steps(mutated)
+
+
+def test_a_step_that_is_not_a_mapping_is_refused() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    mutated = text.replace("      - name: Verify truthful applicability",
+                           "      - echo hi\n\n      - name: Verify truthful applicability")
+    assert mutated != text
+    with pytest.raises(tool.ToolingError, match="unsupported shape"):
         tool.replay_steps(mutated)
 
 
@@ -511,7 +527,18 @@ def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
     created = tool.repository_state(repo)
     assert created != rewritten and not created.status
     (repo / "build/out.bin").unlink()
-    assert tool.repository_state(repo) != created
+    deleted = tool.repository_state(repo)
+    assert deleted != created
+    # Empty directories, ignored or not, appear in neither listing; their parents' identities change.
+    (repo / "build/empty").mkdir()
+    ignored_directory = tool.repository_state(repo)
+    assert ignored_directory != deleted and not ignored_directory.status
+    (repo / "build/empty").rmdir()
+    assert tool.repository_state(repo) != ignored_directory
+    (repo / "untracked-empty").mkdir()
+    untracked_directory = tool.repository_state(repo)
+    assert not untracked_directory.status and ".git" not in {entry[0] for entry in untracked_directory.directories}
+    assert "untracked-empty" in {entry[0] for entry in untracked_directory.directories}
 
 
 # --------------------------------------------------------------------------

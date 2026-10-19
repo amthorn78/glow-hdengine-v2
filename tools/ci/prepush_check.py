@@ -134,6 +134,14 @@ REPLAY_INVENTORY: tuple[tuple[str, str, str], ...] = (
     ("Verify truthful applicability and clean candidate tree", REPLAY_EXECUTED, ""),
 )
 REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env", "with"})
+# The keys each excluded step may carry: its substitute models exactly these.
+# The checkout has no `if`, because the copy exists before step 1 whatever a
+# condition says; no excluded step has `env` or `shell`.
+REPLAY_EXCLUDED_STEP_KEYS = {
+    "Check out exact candidate head": frozenset({"name", "id", "uses", "with"}),
+    "Set up Python 3.12": frozenset({"name", "id", "if", "uses", "with"}),
+    "Install applicable validation dependencies": frozenset({"name", "id", "if", "run"}),
+}
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 # What the replay stands in for, and the only inputs it models: the workflow's
 # top-level keys, an ubuntu runner (replayed on this Linux machine), and the
@@ -287,11 +295,27 @@ def _ignored_entries(repo: Path) -> tuple[tuple[str, int, int, int, int], ...]:
     return tuple(entries)
 
 
+def _directory_entries(repo: Path) -> tuple[tuple[str, int, int, int], ...]:
+    """Every working-tree directory outside .git with its lstat identity.
+
+    Neither git status nor the ignored-file listing names a directory, so an
+    empty one, ignored or not, could otherwise be created or removed unseen;
+    adding or removing any entry changes its parent's mtime and ctime.
+    """
+    entries = []
+    for directory, dirnames, _files in os.walk(repo):
+        dirnames[:] = sorted(d for d in dirnames if not (directory == str(repo) and d == ".git"))
+        info = os.lstat(directory)
+        entries.append((os.path.relpath(directory, repo), info.st_mode, info.st_mtime_ns, info.st_ctime_ns))
+    return tuple(entries)
+
+
 @dataclass(frozen=True)
 class RepositoryState:
     head: str
     status: bytes
     ignored: tuple[tuple[str, int, int, int, int], ...]
+    directories: tuple[tuple[str, int, int, int], ...]
     metadata: tuple[tuple[str, str], ...]
 
 
@@ -303,7 +327,8 @@ def repository_state(repo: Path) -> RepositoryState:
         (repo / git_text(repo, "rev-parse", "--git-common-dir")).resolve(),
     }
     metadata = tuple(sorted((str(d), _metadata_digest(d)) for d in directories))
-    return RepositoryState(head=head, status=status, ignored=_ignored_entries(repo), metadata=metadata)
+    return RepositoryState(head=head, status=status, ignored=_ignored_entries(repo),
+                           directories=_directory_entries(repo), metadata=metadata)
 
 
 def make_copy(repo: Path, commit: str, destination: Path) -> Path:
@@ -503,10 +528,9 @@ def parse_jobs(text: str) -> dict[str, Job]:
             raise ToolingError(f"job {name!r} is not a mapping")
         steps = body.get("steps", [])
         env = body.get("env", {})
-        if not isinstance(steps, list) or not isinstance(env, dict):
+        if not isinstance(steps, list) or not isinstance(env, dict) or not all(isinstance(s, dict) for s in steps):
             raise ToolingError(f"job {name!r} has an unsupported shape")
-        jobs[name] = Job(keys=body, env={k: str(v) for k, v in env.items()},
-                         steps=[s for s in steps if isinstance(s, dict)])
+        jobs[name] = Job(keys=body, env={k: str(v) for k, v in env.items()}, steps=steps)
     return jobs
 
 
@@ -1047,10 +1071,14 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has unsupported keys {sorted(unknown)}")
         if ("uses" in step) != (kind == REPLAY_EXCLUDED and name != "Install applicable validation dependencies"):
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} changed between uses: and run:")
+        if kind == REPLAY_EXCLUDED and set(step) - REPLAY_EXCLUDED_STEP_KEYS[name]:
+            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has keys its substitute does not model "
+                               f"{sorted(set(step) - REPLAY_EXCLUDED_STEP_KEYS[name])}")
         step_env = step.get("env", {})
+        if not isinstance(step_env, dict):
+            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has an env that is not a mapping")
         named = set(_RUNNER_VARIABLE_RE.findall(str(step.get("run", "")))) - modelled_variables
-        named |= {str(key) for key in (step_env if isinstance(step_env, dict) else {})
-                  if _RUNNER_VARIABLE_RE.fullmatch(str(key))}
+        named |= {str(key) for key in step_env if _RUNNER_VARIABLE_RE.fullmatch(str(key))}
         if named:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} names runner variables the replay does not "
                                f"model: {', '.join(sorted(named))}")
@@ -1701,13 +1729,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         shutil.rmtree(temporary, ignore_errors=True)
     after = repository_state(repo)
     if after != before:
-        print("PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, HEAD or git metadata changed",
-              file=sys.stderr)
+        print("PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, directories, HEAD or git "
+              "metadata changed", file=sys.stderr)
         return EXIT_READ_ONLY_VIOLATION
     overall = "PASS" if all(status == "PASS" for _n, status, _d in results) else "FAIL"
     print("PREPUSH_CHECK_RESULT: " + overall + " "
           + " ".join(f"{name}={status}" for name, status, _d in results)
-          + "; repository unchanged (tree, ignored files, HEAD and git metadata)", flush=True)
+          + "; repository unchanged (tree, ignored files, directories, HEAD and git metadata)", flush=True)
     print("PREPUSH_CHECK_NONCLAIM: this result is not CI's result, not QA and not governed evidence", flush=True)
     return EXIT_OK if overall == "PASS" else EXIT_REPORT_FAILED
 
