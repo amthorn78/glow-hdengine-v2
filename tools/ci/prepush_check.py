@@ -31,6 +31,7 @@ import argparse  # noqa: E402
 import ast  # noqa: E402
 import fnmatch  # noqa: E402
 import hashlib  # noqa: E402
+import importlib.machinery  # noqa: E402
 import importlib.metadata  # noqa: E402
 import importlib.util  # noqa: E402
 import json  # noqa: E402
@@ -169,6 +170,10 @@ _STATUS_FUNCTIONS = ("always()", "success()", "failure()", "cancelled()")
 
 class ToolingError(RuntimeError):
     """A report could not run as specified (distinct from a behavior failure)."""
+
+
+class AmbiguousClause(ValueError):
+    """A version clause whose result differs between the pip releases CI may run."""
 
 
 class Refusal(RuntimeError):
@@ -1146,6 +1151,8 @@ def _marker_true(node: object, environment: dict[str, str]) -> bool:
             raise ValueError(f"undefined marker comparison {lhs!r} {operator} {rhs!r}")
         try:
             return _satisfies(lhs, operator, rhs)
+        except AmbiguousClause:
+            raise
         except ValueError:
             return False  # a value that is not a version matches no version clause
     if operator not in {"==", "!=", "in", "not in"}:
@@ -1174,10 +1181,24 @@ def _satisfies(installed: str, operator: str, text: str) -> bool:
         return version.key >= spec.key
     if operator == "<=":
         return version.key <= spec.key
+    # pip up to 25.x (packaging before 26) excludes, for <V and >V, every pre-,
+    # post- or local release of V's release; pip 26 (packaging 26) only V's own
+    # family.  Where the two disagree the replay cannot tell what CI's pip does.
     if operator == "<":
-        return version.key < spec.key and not (version.prerelease and not spec.prerelease and same_release)
-    return version.key > spec.key and not (
-        ((version.postrelease and not spec.postrelease) or version.local) and same_release)
+        base_rule = version.key < spec.key and not (version.prerelease and not spec.prerelease and same_release)
+        family = not spec.prerelease and version.prerelease and (
+            version.key[:4] == spec.key[:4] if spec.postrelease else same_release)
+        family_rule = version.key < spec.key and not family
+    else:
+        base_rule = version.key > spec.key and not (
+            ((version.postrelease and not spec.postrelease) or version.local) and same_release)
+        family = (not spec.postrelease and spec.key[4] == (1, 0) and version.postrelease
+                  and version.key[:3] == spec.key[:3]) or (version.local and version.key == spec.key)
+        family_rule = version.key > spec.key and not family
+    if base_rule != family_rule:
+        raise AmbiguousClause(f"pip releases decide {installed} against {operator}{text} differently "
+                              "(before pip 26 it fails, from pip 26 it holds)")
+    return base_rule
 
 
 def _distribution(name: str, search_path: list[str] | None) -> importlib.metadata.Distribution | None:
@@ -1215,6 +1236,22 @@ def _unmet_requirements(roots: list[tuple[str, str]], search_path: list[str] | N
     return sorted(unmet)
 
 
+def _module_locatable(dotted: str, search_path: list[str] | None) -> bool:
+    """Whether a module is found on the path, without importing or running it."""
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", dotted):
+        raise ValueError(f"unsupported module name {dotted!r}")
+    locations: list[str] = list(search_path or sys.path)
+    parts = dotted.split(".")
+    for index in range(len(parts)):
+        spec = importlib.machinery.PathFinder.find_spec(".".join(parts[:index + 1]), locations)
+        if spec is None:
+            return False
+        locations = list(spec.submodule_search_locations or [])
+        if index + 1 < len(parts) and not locations:
+            return False
+    return True
+
+
 def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[str]:
     """A requirements file's requirements; nested -r files are followed, any other option fails closed."""
     if path.resolve() in seen:
@@ -1239,9 +1276,11 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     must be satisfied; the editable project's installed version and entry points
     must equal the candidate's and its requires-python must admit this
     interpreter, so the replay never runs against a dependency set or a wrapper
-    CI's install would replace, nor passes a candidate CI cannot install.  Build
-    requirements, which pip fetches into an isolated build environment, are
-    outside what an offline check can verify.
+    CI's install would replace, nor passes a candidate CI cannot install.  pip
+    builds the project in an isolated environment fetched from the package
+    index, which an offline check cannot reproduce; as a fail-closed proxy the
+    caller's environment must satisfy the build requirements and hold the
+    build backend's module.
     """
     words = shlex.split(run_text)
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
@@ -1249,6 +1288,7 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     rest = words[words.index("install") + 1:]
     roots: list[tuple[str, str]] = []
     projects: list[dict[str, object]] = []
+    backends: list[tuple[str, str]] = []
     index = 0
     while index < len(rest):
         word = rest[index]
@@ -1257,10 +1297,17 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
             if word in {"-r", "--requirement"}:
                 roots += [(line, "the install step") for line in _requirement_lines(target)]
             else:
-                project = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+                pyproject = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8"))
+                project, build = pyproject["project"], pyproject.get("build-system")
+                if not isinstance(build, dict) or not isinstance(build.get("requires"), list) \
+                        or not build.get("build-backend") or "backend-path" in build:
+                    raise ValueError(f"the editable project {project['name']!r} needs a [build-system] with "
+                                     "requires and build-backend and without backend-path")
                 projects.append(project)
+                backends.append((str(project["name"]), str(build["build-backend"])))
                 roots.append((str(project["name"]), "the install step"))
                 roots += [(str(dependency), str(project["name"])) for dependency in project.get("dependencies", [])]
+                roots += [(str(requirement), f"{project['name']}'s build-system") for requirement in build.get("requires", [])]
             index += 2
             continue
         if word.startswith("-"):
@@ -1268,6 +1315,9 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
         roots.append((word, "the install step"))
         index += 1
     unmet = _unmet_requirements(roots, search_path)
+    for name, backend in backends:
+        if not _module_locatable(backend.split(":", 1)[0], search_path):
+            unmet.append(f"{name} build-backend {backend} (not importable)")
     for project in projects:
         name = str(project["name"])
         distribution = _distribution(name, search_path)

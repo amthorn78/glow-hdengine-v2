@@ -245,6 +245,9 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     (copy / "requirements.txt").write_text("alpha[fast, slow]>=1.0  # comment\n-r nested/more.txt\n", encoding="utf-8")
     (copy / "nested/more.txt").write_text("epsilon \\\n  >=1\n", encoding="utf-8")
     (copy / "pyproject.toml").write_text(textwrap.dedent("""\
+        [build-system]
+        requires = ["buildreq>=1"]
+        build-backend = "fakebackend"
         [project]
         name = "proj"
         version = "0.2.0"
@@ -265,8 +268,10 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     })
     assert tool._install_check(run, copy, broken) == [
         "beta 1.5 (needs >=2.0; required by alpha)",
+        "buildreq (not installed; required by proj's build-system)",
         "gamma (not installed; required by alpha)",
         "proj 0.1.0 (the candidate declares version 0.2.0)",
+        "proj build-backend fakebackend (not importable)",
         "proj console_scripts {'projcli': 'proj.old:main'} (the candidate declares {'projcli': 'proj.cli:main'})",
         "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})",
         "zeta (not installed; required by alpha)",
@@ -276,9 +281,11 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         "beta": ("2.1", [], ""),
         "gamma": ("1.4", [], ""),
         "zeta": ("0.1", [], ""),
+        "buildreq": ("1.0", [], ""),
         "epsilon": ("1.0", [], ""),
         "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
     })
+    (tmp_path / "fixed/fakebackend.py").write_text("", encoding="utf-8")
     assert tool._install_check(run, copy, fixed) == []
     pyproject = (copy / "pyproject.toml").read_text(encoding="utf-8")
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"<3"'), encoding="utf-8")
@@ -287,6 +294,10 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"> = 3"'), encoding="utf-8")
     with pytest.raises(ValueError, match="unsupported requires-python"):
         tool._install_check(run, copy, fixed)
+    for missing in ('build-backend = "fakebackend"', 'requires = ["buildreq>=1"]'):
+        (copy / "pyproject.toml").write_text(pyproject.replace(missing, ""), encoding="utf-8")
+        with pytest.raises(ValueError, match="needs a \\[build-system\\]"):
+            tool._install_check(run, copy, fixed)
     (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
     for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
         with pytest.raises(ValueError):
@@ -310,6 +321,11 @@ def test_version_clauses_and_markers_follow_pep_440_and_508() -> None:
     ]
     for installed, operator, text, expected in cases:
         assert tool._satisfies(installed, operator, text) is expected, (installed, operator, text)
+    # pip before 26 and pip 26 decide these differently; the replay refuses to guess.
+    for installed, operator, text in (("1.0.post1", ">", "1.0rc1"), ("1.0rc1", "<", "1.0.post1"),
+                                      ("1.0+local", ">", "1.0rc1"), ("1.0.post1", ">", "1.0.dev1")):
+        with pytest.raises(tool.AmbiguousClause, match="pip releases decide"):
+            tool._satisfies(installed, operator, text)
     assert tool._parse_requirement("psycopg[binary]>=3.1,<3.3")[:3] == (
         "psycopg", frozenset({"binary"}), [(">=", "3.1"), ("<", "3.3")])
     assert tool._parse_requirement("eventlet (>=0.24.1) ; extra == 'eventlet'")[2] == [(">=", "0.24.1")]
