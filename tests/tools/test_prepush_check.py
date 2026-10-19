@@ -194,15 +194,17 @@ def test_interpreter_substitute_requires_the_workflow_python(tmp_path: Path) -> 
 
 
 _PYTEST = importlib.metadata.version("pytest")
+_SATISFIED = "the environment already satisfies every requirement the step names"
 
 
 @pytest.mark.parametrize(
     "requirement, ok, fragment",
     [
-        (f"pytest>={_PYTEST}", True, "at a version its specifiers allow"),
-        (f"pytest=={_PYTEST.split('.')[0]}.*", True, "at a version its specifiers allow"),
-        (f"pytest<{_PYTEST}", False, f"pytest {_PYTEST} (needs <{_PYTEST})"),
-        ("distribution-that-is-not-installed>=1", False, "distribution-that-is-not-installed (not installed)"),
+        (f"pytest>={_PYTEST}", True, _SATISFIED),
+        (f"pytest=={_PYTEST.split('.')[0]}.*", True, _SATISFIED),
+        (f"pytest<{_PYTEST}", False, f"pytest {_PYTEST} (needs <{_PYTEST}; required by the install step)"),
+        ("distribution-that-is-not-installed>=1", False,
+         "distribution-that-is-not-installed (not installed; required by the install step)"),
         ("pytest @ https://example.invalid/pytest.whl", False, "cannot read the install step's inputs: unsupported"),
     ],
     ids=["satisfied", "wildcard", "version-outside-specifier", "missing", "unsupported-form"],
@@ -216,28 +218,103 @@ def test_install_substitute_requires_versions_the_specifiers_allow(
     assert fragment in detail and (ok or detail.startswith("TOOLING"))
 
 
-def test_version_clauses_follow_pep_440() -> None:
+def _site(root: Path, distributions: dict[str, tuple[str, list[str], str]]) -> list[str]:
+    """A synthetic site directory: name -> (version, Requires-Dist entries, entry_points.txt)."""
+    for name, (version, requires, entry_points) in distributions.items():
+        info = root / f"{name}-{version}.dist-info"
+        info.mkdir(parents=True)
+        lines = ["Metadata-Version: 2.1", f"Name: {name}", f"Version: {version}"]
+        (info / "METADATA").write_text("\n".join(lines + [f"Requires-Dist: {r}" for r in requires]) + "\n",
+                                       encoding="utf-8")
+        if entry_points:
+            (info / "entry_points.txt").write_text(entry_points, encoding="utf-8")
+    return [str(root)]
+
+
+def test_install_substitute_follows_extras_dependencies_and_the_editable_project(tmp_path: Path) -> None:
+    copy = tmp_path / "copy"
+    (copy / "nested").mkdir(parents=True)
+    (copy / "requirements.txt").write_text("alpha[fast]>=1.0  # comment\n-r nested/more.txt\n", encoding="utf-8")
+    (copy / "nested/more.txt").write_text("epsilon \\\n  >=1\n", encoding="utf-8")
+    (copy / "pyproject.toml").write_text(textwrap.dedent("""\
+        [project]
+        name = "proj"
+        version = "0.2.0"
+        dependencies = ["beta>=1"]
+        [project.scripts]
+        projcli = "proj.cli:main"
+    """), encoding="utf-8")
+    run = "python -m pip install -r requirements.txt -e ."
+    requires = ["beta>=2.0", 'gamma==1.*; extra == "fast"', 'delta; python_version < "3.0"']
+    broken = _site(tmp_path / "broken", {
+        "alpha": ("1.0", requires, ""),
+        "beta": ("1.5", [], ""),
+        "epsilon": ("1.0", [], ""),
+        "proj": ("0.1.0", [], "[console_scripts]\nprojcli = proj.old:main\n"),
+    })
+    assert tool._install_check(run, copy, broken) == [
+        "beta 1.5 (needs >=2.0; required by alpha)",
+        "gamma (not installed; required by alpha)",
+        "proj 0.1.0 (the candidate declares version 0.2.0)",
+        "proj console_scripts {'projcli': 'proj.old:main'} (the candidate declares {'projcli': 'proj.cli:main'})",
+    ]
+    fixed = _site(tmp_path / "fixed", {
+        "alpha": ("1.0", requires, ""),
+        "beta": ("2.1", [], ""),
+        "gamma": ("1.4", [], ""),
+        "epsilon": ("1.0", [], ""),
+        "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n"),
+    })
+    assert tool._install_check(run, copy, fixed) == []
+    for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
+        with pytest.raises(ValueError):
+            tool._install_check(unsupported, copy, fixed)
+    (copy / "nested/more.txt").write_text("--index-url https://example.invalid/simple\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="unsupported requirements-file option"):
+        tool._install_check(run, copy, fixed)
+
+
+def test_version_clauses_and_markers_follow_pep_440_and_508() -> None:
     cases = [
         ("1.0.0", "==", "1.0", True), ("1.0+local", "==", "1.0", True), ("1.0.post1", "==", "1.0", False),
         ("9.0rc1", "<", "9.0", False), ("8.4.2", "<", "9.0", True), ("9.0.dev0", "<", "9", False),
-        ("1.0.post1", ">", "1.0", False), ("1.0+local", ">", "1.0", False), ("1.0.1", ">", "1.0", True),
-        ("2.4", "~=", "2.3", True), ("3.0", "~=", "2.3", False), ("1.4.9", "~=", "1.4.5", True),
-        ("1.1rc1", "==", "1.1", False), ("1.10", "==", "1.1", False), ("1.1.dev1", ">=", "1.1", False),
-        ("1!1.0", ">=", "2", True), ("1.0a1.dev1", "<", "1.0", False), ("0.9", "<", "1.0", True),
+        ("9.0.dev0", "<", "9.0rc1", True), ("1.0.post1", ">", "1.0", False), ("1.0.post2", ">", "1.0.post1", True),
+        ("1.0+local", ">", "1.0", False), ("1.0.1", ">", "1.0", True), ("2.4", "~=", "2.3", True),
+        ("3.0", "~=", "2.3", False), ("1.4.9", "~=", "1.4.5", True), ("1.1rc1", "==", "1.1", False),
+        ("1.10", "==", "1.1", False), ("1.1.dev1", ">=", "1.1", False), ("1!1.0", ">=", "2", True),
+        ("1.0a1.dev1", "<", "1.0", False), ("0.9", "<", "1.0", True), ("1.1rc1", "==", "1.1.*", True),
+        ("1.10", "==", "1.1.*", False), ("2.0", "!=", "1.*", True), ("3.11.0", "<=", "3.11.0a6", False),
+        ("Foo-1", "===", "foo-1", True),
     ]
     for installed, operator, text, expected in cases:
-        version = tool._parse_version(installed)
-        assert tool._satisfies(version, operator, text, False) is expected, (installed, operator, text)
-    assert tool._satisfies(tool._parse_version("1.1rc1"), "==", "1.1", True)
-    assert not tool._satisfies(tool._parse_version("1.10"), "==", "1.1", True)
-    assert tool._satisfies(tool._parse_version("2.0"), "!=", "1", True)
-    assert tool._parse_requirement("psycopg[binary]>=3.1,<3.3") == (
-        "psycopg", [(">=", "3.1", False), ("<", "3.3", False)])
-    for unsupported in ("x; python_version < '3.11'", "x>=1.0rc1", "x~=1", "x>=1.*", "x>=1,", "x===1.0"):
-        with pytest.raises(ValueError, match="unsupported requirement"):
+        assert tool._satisfies(installed, operator, text) is expected, (installed, operator, text)
+    assert tool._parse_requirement("psycopg[binary]>=3.1,<3.3")[:3] == (
+        "psycopg", frozenset({"binary"}), [(">=", "3.1"), ("<", "3.3")])
+    assert tool._parse_requirement("eventlet (>=0.24.1) ; extra == 'eventlet'")[2] == [(">=", "0.24.1")]
+    for unsupported in ("x>=1.*", "x>=1,", "x==", "x~=1", "x==1.0+local", "x @ https://example.invalid/x.whl"):
+        with pytest.raises(ValueError, match="unsupported"):
             tool._parse_requirement(unsupported)
     with pytest.raises(ValueError, match="not a PEP 440 version"):
         tool._parse_version("not-a-version")
+
+    environment = {"python_version": "3.12", "python_full_version": "3.12.3", "sys_platform": "linux",
+                   "implementation_name": "cpython", "extra": ""}
+    markers = [
+        ('python_version < "3.13"', "", True), ('python_full_version <= "3.11.0a6"', "", False),
+        ('sys_platform == "win32"', "", False), ('implementation_name != "pypy" and extra == "binary"', "binary", True),
+        ('implementation_name != "pypy" and extra == "binary"', "", False), ("'linux' in sys_platform", "", True),
+        ('(python_version >= "3.9" and sys_platform != "cygwin") and extra == "test"', "test", True),
+        ('extra == "Format_NonGPL" or python_version < "3"', "format-nongpl", True),
+    ]
+    for marker, extra, expected in markers:
+        assert tool._marker_true(tool._parse_marker(marker), {**environment, "extra": extra}) is expected, marker
+    for unsupported in ('os.name == "posix"', 'python_version <', 'python_version < "3" and'):
+        with pytest.raises(ValueError, match="unsupported marker"):
+            tool._parse_marker(unsupported)
+    for undefined in ('sys_platform ~= "linux"', 'sys_platform < "z"', 'implementation_name === "cpython"',
+                      'python_version < "abc"'):
+        with pytest.raises(ValueError, match="undefined marker comparison"):
+            tool._marker_true(tool._parse_marker(undefined), environment)
 
 
 # --------------------------------------------------------------------------

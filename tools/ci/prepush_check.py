@@ -35,6 +35,7 @@ import importlib.metadata  # noqa: E402
 import importlib.util  # noqa: E402
 import json  # noqa: E402
 import os  # noqa: E402
+import platform  # noqa: E402
 import re  # noqa: E402
 import shlex  # noqa: E402
 import shutil  # noqa: E402
@@ -123,11 +124,28 @@ REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env",
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
-# The requirement forms the install step may name: a distribution, optional
-# extras and comma-separated PEP 440 clauses on release versions.  A marker,
-# URL, epoch or pre-, post-, dev- or local-release clause fails closed.
-_REQUIREMENT_RE = re.compile(r"([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?:\[[A-Za-z0-9._,\s-]*\])?\s*(.*)")
-_SPECIFIER_RE = re.compile(r"(~=|==|!=|<=|>=|<|>)\s*([0-9]+(?:\.[0-9]+)*)(\.\*)?")
+# PEP 508 requirements as the install step and installed metadata write them:
+# a distribution, optional extras, PEP 440 clauses (optionally parenthesized)
+# and an environment marker.  A URL, a local-version clause, a legacy marker
+# name or any other form the replay cannot verify fails closed.
+_REQUIREMENT_RE = re.compile(
+    r"([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?:\[([A-Za-z0-9._,\s-]*)\])?"
+    r"\s*(\([^()]*\)|[^;()]*?)\s*(?:;\s*(.*\S))?\s*")
+_CLAUSE_RE = re.compile(r"(===|~=|==|!=|<=|>=|<|>)\s*([^\s,;()]+)")
+_WILDCARD_RE = re.compile(r"(?:[0-9]+!)?[0-9]+(?:\.[0-9]+)*\.\*")
+_MARKER_TOKEN_RE = re.compile(
+    r"\s*(?:(?P<paren>[()])|(?P<op>===|==|!=|<=|>=|~=|<|>|not\s+in\b|in\b)|(?P<bool>and\b|or\b)"
+    r"|'(?P<single>[^']*)'|\"(?P<double>[^\"]*)\"|(?P<var>[a-z_]+))")
+# Version comparison applies only to these variables; the others compare as
+# strings with ==, !=, in and not in, and any other operator on them fails
+# closed (packaging releases disagree there).
+_MARKER_VERSION_VARIABLES = frozenset({"implementation_version", "platform_release", "python_full_version",
+                                       "python_version"})
+_MARKER_VARIABLES = frozenset({
+    "extra", "implementation_name", "implementation_version", "os_name", "platform_machine",
+    "platform_python_implementation", "platform_release", "platform_system", "platform_version",
+    "python_full_version", "python_version", "sys_platform",
+})
 _VERSION_RE = re.compile(
     r"v?(?:([0-9]+)!)?([0-9]+(?:\.[0-9]+)*)"
     r"(?:[-_.]?(alpha|beta|preview|pre|rc|a|b|c)[-_.]?([0-9]*))?"
@@ -974,32 +992,152 @@ def _parse_version(text: str) -> _Version:
     return _Version(release, key, pre is not None or dev is not None, post is not None, local is not None)
 
 
-def _parse_requirement(text: str) -> tuple[str, list[tuple[str, str, bool]]]:
-    """A requirement's distribution name and its version clauses."""
+def _canonical(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _clause(operator: str, text: str) -> bool:
+    """Whether ``operator text`` is a PEP 440 clause; raises for one the replay does not verify."""
+    if operator not in {"===", "~=", "==", "!=", "<=", ">=", "<", ">"}:
+        return False
+    if operator == "===":
+        return True
+    if text.endswith(".*"):
+        return operator in {"==", "!="} and bool(_WILDCARD_RE.fullmatch(text))
+    try:
+        version = _parse_version(text)
+    except ValueError:
+        return False
+    if version.local:
+        if operator in {"==", "!="}:
+            raise ValueError(f"unsupported local-version clause {operator}{text}")
+        return False
+    return operator != "~=" or len(version.release) > 1
+
+
+def _parse_requirement(text: str) -> tuple[str, frozenset[str], list[tuple[str, str]], object]:
+    """A requirement's distribution name, extras, version clauses and marker (None when absent)."""
     match = _REQUIREMENT_RE.fullmatch(text.strip())
-    clauses = []
-    if match and match.group(2):
-        for clause in match.group(2).split(","):
-            spec = _SPECIFIER_RE.fullmatch(clause.strip())
-            if not spec or (spec.group(3) and spec.group(1) not in {"==", "!="}) \
-                    or (spec.group(1) == "~=" and "." not in spec.group(2)):
+    clauses: list[tuple[str, str]] = []
+    if match:
+        specifier = match.group(3).strip()
+        if specifier.startswith("("):
+            specifier = specifier[1:-1].strip()
+        for clause in specifier.split(",") if specifier else ():
+            parsed = _CLAUSE_RE.fullmatch(clause.strip())
+            if not parsed or not _clause(*parsed.groups()):
                 match = None
                 break
-            clauses.append((spec.group(1), spec.group(2), bool(spec.group(3))))
+            clauses.append((parsed.group(1), parsed.group(2)))
     if not match:
         raise ValueError(f"unsupported requirement {text.strip()!r}")
-    return match.group(1), clauses
+    extras = frozenset(_canonical(extra) for extra in (match.group(2) or "").split(",") if extra.strip())
+    return match.group(1), extras, clauses, _parse_marker(match.group(4)) if match.group(4) else None
 
 
-def _satisfies(version: _Version, operator: str, text: str, wildcard: bool) -> bool:
+def _parse_marker(text: str) -> object:
+    """A PEP 508 marker as nested ("or" | "and", left, right) and ("cmp", left, op, right) tuples."""
+    tokens: list[tuple[str, str]] = []
+    position = 0
+    while position < len(text):
+        match = _MARKER_TOKEN_RE.match(text, position)
+        if not match:
+            raise ValueError(f"unsupported marker {text!r}")
+        kind = str(match.lastgroup)
+        value = match.group(kind)
+        if kind == "var" and value not in _MARKER_VARIABLES:
+            raise ValueError(f"unsupported marker variable {value!r} in {text!r}")
+        tokens.append(("str" if kind in {"single", "double"} else kind, " ".join(value.split())))
+        position = match.end()
+
+    def disjunction(index: int) -> tuple[object, int]:
+        node, index = conjunction(index)
+        while index < len(tokens) and tokens[index] == ("bool", "or"):
+            right, index = conjunction(index + 1)
+            node = ("or", node, right)
+        return node, index
+
+    def conjunction(index: int) -> tuple[object, int]:
+        node, index = atom(index)
+        while index < len(tokens) and tokens[index] == ("bool", "and"):
+            right, index = atom(index + 1)
+            node = ("and", node, right)
+        return node, index
+
+    def atom(index: int) -> tuple[object, int]:
+        if index < len(tokens) and tokens[index] == ("paren", "("):
+            node, index = disjunction(index + 1)
+            if index < len(tokens) and tokens[index] == ("paren", ")"):
+                return node, index + 1
+        elif len(tokens) - index >= 3 and tokens[index + 1][0] == "op" \
+                and {tokens[index][0], tokens[index + 2][0]} == {"var", "str"}:
+            return ("cmp", tokens[index], tokens[index + 1][1], tokens[index + 2]), index + 3
+        raise ValueError(f"unsupported marker {text!r}")
+
+    node, index = disjunction(0)
+    if index != len(tokens):
+        raise ValueError(f"unsupported marker {text!r}")
+    return node
+
+
+def _marker_environment() -> dict[str, str]:
+    """PEP 508 marker values for this interpreter (the one the replay runs)."""
+    info = sys.implementation.version
+    implementation = f"{info.major}.{info.minor}.{info.micro}"
+    if info.releaselevel != "final":
+        implementation += info.releaselevel[0] + str(info.serial)
+    return {
+        "implementation_name": sys.implementation.name,
+        "implementation_version": implementation,
+        "os_name": os.name,
+        "platform_machine": platform.machine(),
+        "platform_python_implementation": platform.python_implementation(),
+        "platform_release": platform.release(),
+        "platform_system": platform.system(),
+        "platform_version": platform.version(),
+        "python_full_version": platform.python_version(),
+        "python_version": ".".join(platform.python_version_tuple()[:2]),
+        "sys_platform": sys.platform,
+    }
+
+
+def _marker_true(node: object, environment: dict[str, str]) -> bool:
+    kind = node[0]  # type: ignore[index]
+    if kind in {"or", "and"}:
+        left, right = (_marker_true(part, environment) for part in node[1:])  # type: ignore[index]
+        return (left or right) if kind == "or" else (left and right)
+    _cmp, (left_kind, left), operator, (_right_kind, right) = node  # type: ignore[misc]
+    variable = left if left_kind == "var" else right
+    lhs = environment[left] if left_kind == "var" else left
+    rhs = right if left_kind == "var" else environment[right]
+    if variable == "extra":
+        lhs, rhs = _canonical(lhs), _canonical(rhs)
+    if variable in _MARKER_VERSION_VARIABLES and operator not in {"in", "not in"}:
+        if not _clause(operator, rhs):
+            raise ValueError(f"undefined marker comparison {lhs!r} {operator} {rhs!r}")
+        try:
+            return _satisfies(lhs, operator, rhs)
+        except ValueError:
+            return False  # a value that is not a version matches no version clause
+    if operator not in {"==", "!=", "in", "not in"}:
+        raise ValueError(f"undefined marker comparison {lhs!r} {operator} {rhs!r}")
+    return {"==": lhs == rhs, "!=": lhs != rhs, "in": lhs in rhs, "not in": lhs not in rhs}[operator]
+
+
+def _satisfies(installed: str, operator: str, text: str) -> bool:
     """PEP 440 clause matching for an installed version (pre-releases allowed, as pip checks one)."""
-    spec = _parse_version(text)
-    if wildcard:
+    if operator == "===":
+        return installed.strip().lower() == text.lower()
+    version = _parse_version(installed)
+    if text.endswith(".*"):
+        spec = _parse_version(text[:-2])
         width = len(spec.release)
-        matched = version.key[0] == 0 and (version.release + (0,) * width)[:width] == spec.release
+        matched = version.key[0] == spec.key[0] and (version.release + (0,) * width)[:width] == spec.release
         return matched if operator == "==" else not matched
+    spec = _parse_version(text)
     if operator == "~=":
-        return _satisfies(version, ">=", text, False) and _satisfies(version, "==", text.rsplit(".", 1)[0], True)
+        prefix = ".".join(str(part) for part in spec.release[:-1]) + ".*"
+        return _satisfies(installed, ">=", text) and _satisfies(installed, "==", f"{spec.key[0]}!{prefix}")
     same_release = version.key[:2] == spec.key[:2]
     if operator in {"==", "!="}:
         return (version.key == spec.key) == (operator == "==")
@@ -1008,47 +1146,111 @@ def _satisfies(version: _Version, operator: str, text: str, wildcard: bool) -> b
     if operator == "<=":
         return version.key <= spec.key
     if operator == "<":
-        return version.key < spec.key and not (version.prerelease and same_release)
-    return version.key > spec.key and not ((version.postrelease or version.local) and same_release)
+        return version.key < spec.key and not (version.prerelease and not spec.prerelease and same_release)
+    return version.key > spec.key and not (
+        ((version.postrelease and not spec.postrelease) or version.local) and same_release)
 
 
-def _install_check(run_text: str, copy: Path) -> list[str]:
-    """What the install step names that the caller's environment does not satisfy.
+def _distribution(name: str, search_path: list[str] | None) -> importlib.metadata.Distribution | None:
+    return next(iter(importlib.metadata.distributions(name=name, path=search_path or sys.path)), None)
 
-    Each distribution must be installed at a version its clauses allow, so the
-    replay never runs against a dependency set CI's install would replace.
+
+def _unmet_requirements(roots: list[tuple[str, str]], search_path: list[str] | None) -> list[str]:
+    """Requirements in the closure of ``roots`` (requirement, required by) the environment does not satisfy.
+
+    Installed distributions' Requires-Dist entries are followed for the extras
+    requested of them, with markers evaluated for this interpreter, as pip
+    follows them; a satisfied closure is one CI's install would leave unchanged.
+    """
+    environment = _marker_environment()
+    queue = [(text, required_by, frozenset({""})) for text, required_by in roots]
+    visited: dict[str, set[str]] = {}
+    unmet: set[str] = set()
+    while queue:
+        text, required_by, contexts = queue.pop(0)
+        name, extras, clauses, marker = _parse_requirement(text)
+        if not any(context == "" if marker is None else _marker_true(marker, {**environment, "extra": context})
+                   for context in contexts):
+            continue
+        distribution = _distribution(name, search_path)
+        if distribution is None:
+            unmet.add(f"{name} (not installed; required by {required_by})")
+            continue
+        version = distribution.version
+        if not all(_satisfies(version, operator, clause) for operator, clause in clauses):
+            unmet.add(f"{name} {version} (needs {','.join(o + c for o, c in clauses)}; required by {required_by})")
+        new = ({""} | extras) - visited.setdefault(_canonical(name), set())
+        if new:
+            visited[_canonical(name)] |= new
+            queue += [(entry, distribution.metadata["Name"], frozenset(new)) for entry in distribution.requires or ()]
+    return sorted(unmet)
+
+
+def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[str]:
+    """A requirements file's requirements; nested -r files are followed, any other option fails closed."""
+    if path.resolve() in seen:
+        raise ValueError(f"requirements file {path.name} includes itself")
+    lines: list[str] = []
+    for line in path.read_text(encoding="utf-8").replace("\\\n", "").splitlines():
+        line = re.sub(r"(^|\s)#.*", "", line).strip()
+        nested = re.fullmatch(r"(?:-r|--requirement)(?:\s+|=)(\S+)", line)
+        if nested:
+            lines += _requirement_lines(path.parent / nested.group(1), seen | {path.resolve()})
+        elif line.startswith("-"):
+            raise ValueError(f"unsupported requirements-file option {line!r} in {path.name}")
+        elif line:
+            lines.append(line)
+    return lines
+
+
+def _install_check(run_text: str, copy: Path, search_path: list[str] | None = None) -> list[str]:
+    """What the caller's environment lacks for CI's install step to change nothing.
+
+    The step's requirements and their installed dependencies, extras included,
+    must be satisfied, and the editable project's installed version and entry
+    points must equal the candidate's, so the replay never runs against a
+    dependency set or a console-script wrapper CI's install would replace.
     """
     words = shlex.split(run_text)
-    wanted: list[str] = []
+    if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
+        raise ValueError("the install step is not one 'python -m pip install' command")
+    rest = words[words.index("install") + 1:]
+    roots: list[tuple[str, str]] = []
+    projects: list[dict[str, object]] = []
     index = 0
-    while index < len(words):
-        word = words[index]
-        if word in {"-r", "--requirement"} and index + 1 < len(words):
-            for line in (copy / words[index + 1]).read_text(encoding="utf-8").splitlines():
-                line = line.split("#", 1)[0].strip()
-                if line and not line.startswith("-"):
-                    wanted.append(line)
+    while index < len(rest):
+        word = rest[index]
+        if word in {"-r", "--requirement", "-e", "--editable"} and index + 1 < len(rest):
+            target = copy / rest[index + 1]
+            if word in {"-r", "--requirement"}:
+                roots += [(line, "the install step") for line in _requirement_lines(target)]
+            else:
+                project = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+                projects.append(project)
+                roots.append((str(project["name"]), "the install step"))
+                roots += [(str(dependency), str(project["name"])) for dependency in project.get("dependencies", [])]
             index += 2
             continue
-        if word in {"-e", "--editable"} and index + 1 < len(words):
-            project = tomllib.loads((copy / words[index + 1] / "pyproject.toml").read_text(encoding="utf-8"))
-            wanted.append(project["project"]["name"])
-            index += 2
-            continue
-        if not word.startswith("-") and word not in {"python", "pip", "install"}:
-            wanted.append(word)
+        if word.startswith("-"):
+            raise ValueError(f"unsupported install option {word!r}")
+        roots.append((word, "the install step"))
         index += 1
-    unmet = []
-    for requirement in wanted:
-        name, clauses = _parse_requirement(requirement)
-        try:
-            installed = importlib.metadata.distribution(name).version
-        except importlib.metadata.PackageNotFoundError:
-            unmet.append(f"{name} (not installed)")
-            continue
-        version = _parse_version(installed)
-        if not all(_satisfies(version, operator, text, wildcard) for operator, text, wildcard in clauses):
-            unmet.append(f"{name} {installed} (needs {','.join(o + t + ('.*' if w else '') for o, t, w in clauses)})")
+    unmet = _unmet_requirements(roots, search_path)
+    for project in projects:
+        name = str(project["name"])
+        distribution = _distribution(name, search_path)
+        if distribution is None:
+            continue  # already reported as not installed
+        if "version" not in project:
+            raise ValueError(f"the editable project {name!r} declares no static version")
+        if _parse_version(distribution.version).key != _parse_version(str(project["version"])).key:
+            unmet.append(f"{name} {distribution.version} (the candidate declares version {project['version']})")
+        for group, table in (("console_scripts", "scripts"), ("gui_scripts", "gui-scripts")):
+            installed = {entry.name: "".join(entry.value.split())
+                         for entry in distribution.entry_points if entry.group == group}
+            declared = {key: "".join(str(value).split()) for key, value in dict(project.get(table, {})).items()}
+            if installed != declared:
+                unmet.append(f"{name} {group} {installed} (the candidate declares {declared})")
     return sorted(set(unmet))
 
 
@@ -1179,7 +1381,8 @@ def _substitute(step: dict[str, object], reason: str, copy: Path,
         return "failure", f"TOOLING cannot read the install step's inputs: {exc}"
     if unmet:
         return "failure", "TOOLING the caller's environment does not satisfy the install step: " + ", ".join(unmet)
-    return "success", f"{reason}: every named distribution is installed at a version its specifiers allow"
+    return "success", (f"{reason}: the environment already satisfies every requirement the step names, their "
+                       "dependencies and extras, and the editable project's version and entry points")
 
 
 def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[str, str],
