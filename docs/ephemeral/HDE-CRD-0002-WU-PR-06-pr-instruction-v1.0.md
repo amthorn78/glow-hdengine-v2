@@ -25,7 +25,7 @@ pf10_addendum_created: none (PR-10 is not a qualifying approval prompt)
 issuer: the continuing whole-change Implementation Agent (IA) for HDE-CRD-0002, session https://claude.ai/code/session_01CCKsYD2yX5WgU3biWKb59j
 prompt: PR-10 — Create PR Work-Unit Instructions — 100926.1 (https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a; page state as of 2026-10-12T02:29:33.739Z, re-fetched in this invocation, byte-identical to the copy used for WU-PR-05, and read in full)
 prompt_release: GCFPE-20261009.1 / 100926.1
-created_at: @@CREATED@@
+created_at: 2026-10-19T02:03:02Z
 repository_baseline: origin/main 5e62a65d6e89d9a84557b73a9e70ab46ee953aeb (tree cececdb14470). Outside docs/ephemeral/ and docs/pfcanon/, every byte equals 822ce15 (#656, accepted WU-PR-05): the two later commits add the WU-PR-05 lineage review (7d9dbbc, #657) and rename PF10 to v13.6.1 (5e62a65). Every repository fact in §5 was measured at 5e62a65 in detached scratch copies
 receiver: dedicated HDE-CRD-0002 WU-PR-06 PR engineering session (session_disposition INITIAL_DEDICATED_ASSIGNMENT; role_session_ref NOT_YET_ASSIGNED, assigned by Nathan / Product Owner at launch)
 next_prompt: PR-20 — Create Detailed PR Implementation Plan — 100926.1 (https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba; page state as of 2026-10-12T02:29:47.327Z, re-fetched in this invocation and byte-identical to the copy used for WU-PR-05)
@@ -205,7 +205,7 @@ Canon has no rule about git hooks, pre-push scripts or SessionStart hooks (whole
   - The report prints that interpreter's version. A major.minor version other than the `python-version` the workflow's setup step names (`'3.12'` at the baseline) is a tooling failure of the report, so a green replay always means the workflow's Python.
   - The plan states how the report shows where an installed `engine` or `hdctl` resolves (OBS-W5-5, §15).
 - **Results.** Each step's outcome (success, failure, skipped, excluded), its duration and its last lines. Tooling failures stay apart from behavior failures (C3). The final audit step runs with the replay's own outcomes, so `CI_APPLICABILITY_AND_EXACT_HEAD_OK` appears only when CI's own rule would print it.
-- **Feasibility, measured.** A standard-library prototype of exactly this inventory, made by this IA in scratch and not a deliverable, replayed the head at the baseline in full-validation mode in a throwaway clone (§5.8). @@REPLAY_SUMMARY@@
+- **Feasibility, measured.** A standard-library prototype of exactly this inventory, made by this IA in scratch and not a deliverable, replayed the head at the baseline in full-validation mode in a throwaway clone (§5.8). Every executed step exited 0, and the final audit printed `CI_APPLICABILITY_AND_EXACT_HEAD_OK`. The copies ended clean, and the source repository's git metadata was unchanged. A container restart split the run into two parts, which §5.8 records.
 - **Runtime.** Hosted CI took 20 min 55 s for all seven lanes on `f7d610e` (§5.9). A replay takes minutes, which is acceptable for a pre-push tool (Audit §6 S20 "Risks").
 
 **ID-9. Closed rails, no network, keys-only output.**
@@ -356,7 +356,38 @@ Every fact below was measured by this IA at `5e62a65` under closed rails (`LC_AL
 
 ### 5.8 Replay feasibility
 
-@@REPLAY_DETAIL@@
+**The probe.** A standard-library script in this IA's scratch area. It is not a deliverable and not a design for PR-20. It read the `test` job's steps from `ci.yml` (names, ids, `if:`, step `env:` and `run:` blocks), ran the executed steps with `bash -e -o pipefail` and resolved the expressions of §5.2:
+- **Copy.** A `git clone --shared` of a scratch clone into a temporary directory, detached at `5e62a65`.
+- **Inputs.** Base and head both `5e62a65` (`reason=identical_refs_full_validation`), event `pull_request`.
+- **Environment.** The job `env:` of `ci.yml`, `RUNNER_TEMP` and `GITHUB_OUTPUT` inside the temporary directory, and the vendor, database and GitHub keys removed.
+
+**Two parts.**
+- **Part 1** (from 01:29:07Z) ran steps 2 to 12 in the first copy, concurrently with the sweep of §5.10. A container restart stopped it during the evidence lane, and that lane's partial run is discarded.
+- **Part 2** (01:46:52Z to 02:00:34Z) used a fresh clone of the same head. It re-ran steps 2, 3, 6 and 7, carried part 1's outcomes for steps 8 to 12, and ran steps 13 to 16. Its final audit therefore combined both parts' outcomes.
+
+| # | Step | Part | Exit | Seconds | Result |
+| -: | :- | :- | :- | -: | :- |
+| 1 | Check out exact candidate head | — | excluded (`uses`) | — | replaced by the copy |
+| 2 | Classify affected CI lanes | 1, 2 | 0 | 0.1 | `reason=identical_refs_full_validation;paths=0;lanes=product,compat,db,rails,evidence,qa,release` |
+| 3 | Check AGENTS.md cites no project documents | 1, 2 | 0 | 0.1 | `AGENTS_MD_CITATIONS_OK` |
+| 4 | Set up Python 3.12 | — | excluded (`uses`) | — | the caller's CPython 3.12.3 |
+| 5 | Install applicable validation dependencies | — | excluded (install) | — | CI's install present in the venv |
+| 6 | Verify pytest readiness | 1, 2 | 0 | 0.3 / 1.7 | `pytest 8.4.2` |
+| 7 | Verify closed deterministic environment | 1, 2 | 0 | 0.1 | `[env-pins] OK` |
+| 8 | Run affected behavioral tests in isolation | 1 | 0 | 398.7 | 165 full-validation targets: 3,886 passed. Hosted CI ran 166 targets for #656's own change set, 3,914 passed |
+| 9 | Run product mechanics and ordering lane | 1 | 0 | 15.7 | 77 passed |
+| 10 | Run CLI and compatibility lane | 1 | 0 | 8.9 | 119 passed, 3 skipped, 2 xfailed |
+| 11 | Run database and runtime-contract lane | 1 | 0 | 9.6 | 269 passed |
+| 12 | Run rails policy and secret-safety lane | 1 | 0 | 35.2 | last pytest 138 passed |
+| 13 | Run governed evidence integrity lane | 2 | 0 | 624.8 | 130 passed |
+| 14 | Run approved generic QA subsystem lane in isolation | 2 | 0 | 20.7 | 488 passed |
+| 15 | Build and verify exact-source release attestation | 2 | 0 | 173.8 | attestation `PR06R_B_FINAL_PASS`, `PASS`, `release_id` `77204764…`, `source_commit` `5e62a65`, exact |
+| 16 | Verify truthful applicability and clean candidate tree | 2 | 0 | 0.1 | `CI_APPLICABILITY_AND_EXACT_HEAD_OK` |
+
+**After the run.**
+- Both copies ended with an empty `git status --short --untracked-files=all`. The second copy had no registered worktree left: the steps' own `git worktree add` and `remove` acted inside the copy.
+- The source clone's git metadata (worktree registry, `index`, `HEAD`, `config`, `packed-refs` and every ref) had the same digest before and after part 2 (`36fe024da2247074`), and its status stayed empty. Part 1 had no before-snapshot.
+- Step time totalled 1,290 s (about 21.5 minutes): 469 s in part 1, with the sweep running alongside, and 821 s in part 2.
 
 ### 5.9 Hosted CI reference
 
@@ -651,7 +682,7 @@ Action sent (v8.2): "Write, in a new dedicated session, the first detailed PR im
   - The 135-file reproduction needs history back to `a429c7c`. A shallow clone lacks it; `git fetch --deepen=400 origin main` reached older history earlier in this lineage.
 - **Run times observed.**
   - A full `tests/` sweep: about 17 to 28 minutes in this lineage, depending on concurrency.
-  - A full-validation replay: @@REPLAY_TIME@@.
+  - A full-validation replay: about 21.5 minutes of step time in this container (§5.8).
   - Hosted CI on the same code: 21 minutes.
 - **Access.** No live vendor, production or database access is needed.
 - **Order.** This instruction's pull request should be merged first.
@@ -666,7 +697,7 @@ Action sent (v8.2): "Write, in a new dedicated session, the first detailed PR im
 | release | GCFPE-20261009.1 / 100926.1 |
 | prompt | PR-10 — Create PR Work-Unit Instructions — 100926.1, https://app.notion.com/p/3f44590a05eb815d97d5f3930c7d3e8a (page state as of 2026-10-12T02:29:33.739Z). Receiver contract read: PR-20 — Create Detailed PR Implementation Plan — 100926.1, https://app.notion.com/p/3f44590a05eb819fbea5dcd966a750ba (page state as of 2026-10-12T02:29:47.327Z) |
 | role/stage | continuing whole-change IA / PR-10 |
-| capture time | @@CREATED@@ |
+| capture time | 2026-10-19T02:03:02Z |
 | execution identity | https://claude.ai/code/session_01CCKsYD2yX5WgU3biWKb59j |
 | inherited usage | WU-PR-05 lineage review v1.0 §12 (PR-40) and the earlier uses it names |
 | repository persistence | recorded here only (installed writer `docs/changes/GCFPE_PROMPT_PROVENANCE.md` absent on `main`; pending, non-gating) |
