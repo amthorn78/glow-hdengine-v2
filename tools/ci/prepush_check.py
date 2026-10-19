@@ -123,7 +123,18 @@ REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env",
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
-_REQUIREMENT_NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+# The requirement forms the install step may name: a distribution, optional
+# extras and comma-separated PEP 440 clauses on release versions.  A marker,
+# URL, epoch or pre-, post-, dev- or local-release clause fails closed.
+_REQUIREMENT_RE = re.compile(r"([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?:\[[A-Za-z0-9._,\s-]*\])?\s*(.*)")
+_SPECIFIER_RE = re.compile(r"(~=|==|!=|<=|>=|<|>)\s*([0-9]+(?:\.[0-9]+)*)(\.\*)?")
+_VERSION_RE = re.compile(
+    r"v?(?:([0-9]+)!)?([0-9]+(?:\.[0-9]+)*)"
+    r"(?:[-_.]?(alpha|beta|preview|pre|rc|a|b|c)[-_.]?([0-9]*))?"
+    r"(?:-([0-9]+)|[-_.]?(?:post|rev|r)[-_.]?([0-9]*))?"
+    r"(?:[-_.]?(dev)[-_.]?([0-9]*))?"
+    r"(\+[a-z0-9]+(?:[-_.][a-z0-9]+)*)?", re.IGNORECASE)
+_PRE_RANK = {"alpha": 0, "a": 0, "beta": 1, "b": 1, "preview": 2, "pre": 2, "rc": 2, "c": 2}
 _EXPRESSION_RE = re.compile(r"\$\{\{(.*?)\}\}", re.DOTALL)
 _STATUS_FUNCTIONS = ("always()", "success()", "failure()", "cancelled()")
 
@@ -935,8 +946,78 @@ def _python_version(steps: list[dict[str, object]]) -> str:
     raise ToolingError("no actions/setup-python step with python-version")
 
 
+@dataclass(frozen=True)
+class _Version:
+    release: tuple[int, ...]
+    key: tuple[object, ...]  # PEP 440 order of the public version (local label excluded)
+    prerelease: bool
+    postrelease: bool
+    local: bool
+
+
+def _parse_version(text: str) -> _Version:
+    match = _VERSION_RE.fullmatch(text.strip())
+    if not match:
+        raise ValueError(f"version {text.strip()!r} is not a PEP 440 version")
+    epoch, release_text, pre, pre_n, post_implicit, post_n, dev, dev_n, local = match.groups()
+    post = post_implicit if post_implicit is not None else post_n  # "" when "post" has no number
+    release = tuple(int(part) for part in release_text.split("."))
+    trimmed = release
+    while len(trimmed) > 1 and trimmed[-1] == 0:
+        trimmed = trimmed[:-1]
+    if pre is not None:
+        pre_key: tuple[int, int] = (_PRE_RANK[pre.lower()], int(pre_n or 0))
+    else:
+        pre_key = (-1, 0) if post is None and dev is not None else (3, 0)
+    key = (int(epoch or 0), trimmed, pre_key, -1 if post is None else int(post or 0),
+           (1, 0) if dev is None else (0, int(dev_n or 0)))
+    return _Version(release, key, pre is not None or dev is not None, post is not None, local is not None)
+
+
+def _parse_requirement(text: str) -> tuple[str, list[tuple[str, str, bool]]]:
+    """A requirement's distribution name and its version clauses."""
+    match = _REQUIREMENT_RE.fullmatch(text.strip())
+    clauses = []
+    if match and match.group(2):
+        for clause in match.group(2).split(","):
+            spec = _SPECIFIER_RE.fullmatch(clause.strip())
+            if not spec or (spec.group(3) and spec.group(1) not in {"==", "!="}) \
+                    or (spec.group(1) == "~=" and "." not in spec.group(2)):
+                match = None
+                break
+            clauses.append((spec.group(1), spec.group(2), bool(spec.group(3))))
+    if not match:
+        raise ValueError(f"unsupported requirement {text.strip()!r}")
+    return match.group(1), clauses
+
+
+def _satisfies(version: _Version, operator: str, text: str, wildcard: bool) -> bool:
+    """PEP 440 clause matching for an installed version (pre-releases allowed, as pip checks one)."""
+    spec = _parse_version(text)
+    if wildcard:
+        width = len(spec.release)
+        matched = version.key[0] == 0 and (version.release + (0,) * width)[:width] == spec.release
+        return matched if operator == "==" else not matched
+    if operator == "~=":
+        return _satisfies(version, ">=", text, False) and _satisfies(version, "==", text.rsplit(".", 1)[0], True)
+    same_release = version.key[:2] == spec.key[:2]
+    if operator in {"==", "!="}:
+        return (version.key == spec.key) == (operator == "==")
+    if operator == ">=":
+        return version.key >= spec.key
+    if operator == "<=":
+        return version.key <= spec.key
+    if operator == "<":
+        return version.key < spec.key and not (version.prerelease and same_release)
+    return version.key > spec.key and not ((version.postrelease or version.local) and same_release)
+
+
 def _install_check(run_text: str, copy: Path) -> list[str]:
-    """Distributions the install step names that the caller's environment lacks."""
+    """What the install step names that the caller's environment does not satisfy.
+
+    Each distribution must be installed at a version its clauses allow, so the
+    replay never runs against a dependency set CI's install would replace.
+    """
     words = shlex.split(run_text)
     wanted: list[str] = []
     index = 0
@@ -957,16 +1038,18 @@ def _install_check(run_text: str, copy: Path) -> list[str]:
         if not word.startswith("-") and word not in {"python", "pip", "install"}:
             wanted.append(word)
         index += 1
-    missing = []
+    unmet = []
     for requirement in wanted:
-        match = _REQUIREMENT_NAME_RE.match(requirement)
-        if not match:
-            continue
+        name, clauses = _parse_requirement(requirement)
         try:
-            importlib.metadata.distribution(match.group(0))
+            installed = importlib.metadata.distribution(name).version
         except importlib.metadata.PackageNotFoundError:
-            missing.append(match.group(0))
-    return sorted(set(missing))
+            unmet.append(f"{name} (not installed)")
+            continue
+        version = _parse_version(installed)
+        if not all(_satisfies(version, operator, text, wildcard) for operator, text, wildcard in clauses):
+            unmet.append(f"{name} {installed} (needs {','.join(o + t + ('.*' if w else '') for o, t, w in clauses)})")
+    return sorted(set(unmet))
 
 
 def _resolution(copy: Path, env: dict[str, str], temporary: Path) -> list[tuple[str, str, bool]]:
@@ -1091,12 +1174,12 @@ def _substitute(step: dict[str, object], reason: str, copy: Path,
         return "success", f"{reason}: {actual}"
     run = str(step.get("run", ""))
     try:
-        missing = _install_check(run, copy)
+        unmet = _install_check(run, copy)
     except (OSError, KeyError, ValueError, tomllib.TOMLDecodeError) as exc:
         return "failure", f"TOOLING cannot read the install step's inputs: {exc}"
-    if missing:
-        return "failure", "TOOLING not installed in the caller's environment: " + ", ".join(missing)
-    return "success", f"{reason}: every named distribution is installed"
+    if unmet:
+        return "failure", "TOOLING the caller's environment does not satisfy the install step: " + ", ".join(unmet)
+    return "success", f"{reason}: every named distribution is installed at a version its specifiers allow"
 
 
 def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[str, str],

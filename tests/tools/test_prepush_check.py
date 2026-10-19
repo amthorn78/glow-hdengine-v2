@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import importlib.metadata
 import os
 import re
 import subprocess
@@ -190,6 +191,53 @@ def test_interpreter_substitute_requires_the_workflow_python(tmp_path: Path) -> 
     outcome, detail = tool._substitute(step, "reason", tmp_path, "3.12", "3.11")
     assert outcome == "failure" and detail.startswith("TOOLING")
     assert tool._substitute(step, "reason", tmp_path, "3.12", "3.12")[0] == "success"
+
+
+_PYTEST = importlib.metadata.version("pytest")
+
+
+@pytest.mark.parametrize(
+    "requirement, ok, fragment",
+    [
+        (f"pytest>={_PYTEST}", True, "at a version its specifiers allow"),
+        (f"pytest=={_PYTEST.split('.')[0]}.*", True, "at a version its specifiers allow"),
+        (f"pytest<{_PYTEST}", False, f"pytest {_PYTEST} (needs <{_PYTEST})"),
+        ("distribution-that-is-not-installed>=1", False, "distribution-that-is-not-installed (not installed)"),
+        ("pytest @ https://example.invalid/pytest.whl", False, "cannot read the install step's inputs: unsupported"),
+    ],
+    ids=["satisfied", "wildcard", "version-outside-specifier", "missing", "unsupported-form"],
+)
+def test_install_substitute_requires_versions_the_specifiers_allow(
+        tmp_path: Path, requirement: str, ok: bool, fragment: str) -> None:
+    (tmp_path / "requirements.txt").write_text(f"# fixture\n{requirement}\n", encoding="utf-8")
+    step = {"run": "python -m pip install 'setuptools>=1' -r requirements.txt"}
+    outcome, detail = tool._substitute(step, "reason", tmp_path, "3.12", "3.12")
+    assert outcome == ("success" if ok else "failure"), detail
+    assert fragment in detail and (ok or detail.startswith("TOOLING"))
+
+
+def test_version_clauses_follow_pep_440() -> None:
+    cases = [
+        ("1.0.0", "==", "1.0", True), ("1.0+local", "==", "1.0", True), ("1.0.post1", "==", "1.0", False),
+        ("9.0rc1", "<", "9.0", False), ("8.4.2", "<", "9.0", True), ("9.0.dev0", "<", "9", False),
+        ("1.0.post1", ">", "1.0", False), ("1.0+local", ">", "1.0", False), ("1.0.1", ">", "1.0", True),
+        ("2.4", "~=", "2.3", True), ("3.0", "~=", "2.3", False), ("1.4.9", "~=", "1.4.5", True),
+        ("1.1rc1", "==", "1.1", False), ("1.10", "==", "1.1", False), ("1.1.dev1", ">=", "1.1", False),
+        ("1!1.0", ">=", "2", True), ("1.0a1.dev1", "<", "1.0", False), ("0.9", "<", "1.0", True),
+    ]
+    for installed, operator, text, expected in cases:
+        version = tool._parse_version(installed)
+        assert tool._satisfies(version, operator, text, False) is expected, (installed, operator, text)
+    assert tool._satisfies(tool._parse_version("1.1rc1"), "==", "1.1", True)
+    assert not tool._satisfies(tool._parse_version("1.10"), "==", "1.1", True)
+    assert tool._satisfies(tool._parse_version("2.0"), "!=", "1", True)
+    assert tool._parse_requirement("psycopg[binary]>=3.1,<3.3") == (
+        "psycopg", [(">=", "3.1", False), ("<", "3.3", False)])
+    for unsupported in ("x; python_version < '3.11'", "x>=1.0rc1", "x~=1", "x>=1.*", "x>=1,", "x===1.0"):
+        with pytest.raises(ValueError, match="unsupported requirement"):
+            tool._parse_requirement(unsupported)
+    with pytest.raises(ValueError, match="not a PEP 440 version"):
+        tool._parse_version("not-a-version")
 
 
 # --------------------------------------------------------------------------
