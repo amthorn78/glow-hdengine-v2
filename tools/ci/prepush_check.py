@@ -1015,21 +1015,23 @@ def _clause(operator: str, text: str) -> bool:
     return operator != "~=" or len(version.release) > 1
 
 
+def _parse_clauses(specifier: str) -> list[tuple[str, str]] | None:
+    """The PEP 440 clauses of a specifier ("" has none); None when one of them is not a clause."""
+    clauses: list[tuple[str, str]] = []
+    for clause in specifier.split(",") if specifier.strip() else ():
+        parsed = _CLAUSE_RE.fullmatch(clause.strip())
+        if not parsed or not _clause(*parsed.groups()):
+            return None
+        clauses.append((parsed.group(1), parsed.group(2)))
+    return clauses
+
+
 def _parse_requirement(text: str) -> tuple[str, frozenset[str], list[tuple[str, str]], object]:
     """A requirement's distribution name, extras, version clauses and marker (None when absent)."""
     match = _REQUIREMENT_RE.fullmatch(text.strip())
-    clauses: list[tuple[str, str]] = []
-    if match:
-        specifier = match.group(3).strip()
-        if specifier.startswith("("):
-            specifier = specifier[1:-1].strip()
-        for clause in specifier.split(",") if specifier else ():
-            parsed = _CLAUSE_RE.fullmatch(clause.strip())
-            if not parsed or not _clause(*parsed.groups()):
-                match = None
-                break
-            clauses.append((parsed.group(1), parsed.group(2)))
-    if not match:
+    specifier = match.group(3).strip() if match else ""
+    clauses = _parse_clauses(specifier[1:-1] if specifier.startswith("(") else specifier) if match else None
+    if not match or clauses is None:
         raise ValueError(f"unsupported requirement {text.strip()!r}")
     extras = frozenset(_canonical(extra) for extra in (match.group(2) or "").split(",") if extra.strip())
     return match.group(1), extras, clauses, _parse_marker(match.group(4)) if match.group(4) else None
@@ -1207,9 +1209,12 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     """What the caller's environment lacks for CI's install step to change nothing.
 
     The step's requirements and their installed dependencies, extras included,
-    must be satisfied, and the editable project's installed version and entry
-    points must equal the candidate's, so the replay never runs against a
-    dependency set or a console-script wrapper CI's install would replace.
+    must be satisfied; the editable project's installed version and entry points
+    must equal the candidate's and its requires-python must admit this
+    interpreter, so the replay never runs against a dependency set or a wrapper
+    CI's install would replace, nor passes a candidate CI cannot install.  Build
+    requirements, which pip fetches into an isolated build environment, are
+    outside what an offline check can verify.
     """
     words = shlex.split(run_text)
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
@@ -1245,12 +1250,24 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
             raise ValueError(f"the editable project {name!r} declares no static version")
         if _parse_version(distribution.version).key != _parse_version(str(project["version"])).key:
             unmet.append(f"{name} {distribution.version} (the candidate declares version {project['version']})")
-        for group, table in (("console_scripts", "scripts"), ("gui_scripts", "gui-scripts")):
-            installed = {entry.name: "".join(entry.value.split())
-                         for entry in distribution.entry_points if entry.group == group}
-            declared = {key: "".join(str(value).split()) for key, value in dict(project.get(table, {})).items()}
-            if installed != declared:
-                unmet.append(f"{name} {group} {installed} (the candidate declares {declared})")
+        requires_python = str(project.get("requires-python", ""))
+        python_clauses = _parse_clauses(requires_python)
+        if python_clauses is None:
+            raise ValueError(f"unsupported requires-python {requires_python!r} in {name!r}")
+        if not all(_satisfies(platform.python_version(), o, c) for o, c in python_clauses):
+            unmet.append(f"{name} requires-python {requires_python} (the interpreter is {platform.python_version()})")
+        # pip reinstalls the editable project, so every entry-point group is regenerated from the candidate.
+        declared: dict[str, dict[str, str]] = {"console_scripts": dict(project.get("scripts", {})),
+                                               "gui_scripts": dict(project.get("gui-scripts", {}))}
+        declared.update({str(group): dict(entries) for group, entries in dict(project.get("entry-points", {})).items()})
+        installed: dict[str, dict[str, str]] = {}
+        for entry in distribution.entry_points:
+            installed.setdefault(entry.group, {})[entry.name] = entry.value
+        for group in sorted(set(declared) | set(installed)):
+            have = {key: "".join(str(value).split()) for key, value in installed.get(group, {}).items()}
+            want = {key: "".join(str(value).split()) for key, value in declared.get(group, {}).items()}
+            if have != want:
+                unmet.append(f"{name} {group} {have} (the candidate declares {want})")
     return sorted(set(unmet))
 
 

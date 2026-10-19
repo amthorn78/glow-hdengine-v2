@@ -12,6 +12,7 @@ import ast
 import hashlib
 import importlib.metadata
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -240,9 +241,12 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         [project]
         name = "proj"
         version = "0.2.0"
+        requires-python = ">=3.8"
         dependencies = ["beta>=1"]
         [project.scripts]
         projcli = "proj.cli:main"
+        [project.entry-points.pytest11]
+        plug = "proj.plug"
     """), encoding="utf-8")
     run = "python -m pip install -r requirements.txt -e ."
     requires = ["beta>=2.0", 'gamma==1.*; extra == "fast"', 'delta; python_version < "3.0"']
@@ -257,15 +261,24 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         "gamma (not installed; required by alpha)",
         "proj 0.1.0 (the candidate declares version 0.2.0)",
         "proj console_scripts {'projcli': 'proj.old:main'} (the candidate declares {'projcli': 'proj.cli:main'})",
+        "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})",
     ]
     fixed = _site(tmp_path / "fixed", {
         "alpha": ("1.0", requires, ""),
         "beta": ("2.1", [], ""),
         "gamma": ("1.4", [], ""),
         "epsilon": ("1.0", [], ""),
-        "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n"),
+        "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
     })
     assert tool._install_check(run, copy, fixed) == []
+    pyproject = (copy / "pyproject.toml").read_text(encoding="utf-8")
+    (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"<3"'), encoding="utf-8")
+    assert tool._install_check(run, copy, fixed) == [
+        f"proj requires-python <3 (the interpreter is {platform.python_version()})"]
+    (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"> = 3"'), encoding="utf-8")
+    with pytest.raises(ValueError, match="unsupported requires-python"):
+        tool._install_check(run, copy, fixed)
+    (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
     for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
         with pytest.raises(ValueError):
             tool._install_check(unsupported, copy, fixed)
