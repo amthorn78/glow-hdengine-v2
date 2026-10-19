@@ -847,6 +847,13 @@ _BODYGRAPH_TOOL_TEST_OWNERS = {
         "tests/bodygraph/test_check_magic10_gate_readiness.py",
     ),
 }
+# HDE-CRD-0002 WU-PR-06 (S20): the read-only pre-push and pre-plan check.  No
+# workflow step runs the tool; its owner test is what CI runs on its change.
+_CI_TOOL_PREFIX = "tools/ci/"
+_CI_TOOL_LANES = frozenset({"product"})
+_CI_TOOL_TEST_OWNERS = {
+    "tools/ci/prepush_check.py": ("tests/tools/test_prepush_check.py",),
+}
 # Governed chart fixtures consumed by the dev GET /reader route and its tests.
 _FIXTURE_LANE_PREFIXES = (
     ("fixtures/charts/", {"product", "compat", "release"}),
@@ -1077,6 +1084,8 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _CONFIG_WRITER_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _BODYGRAPH_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _CI_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)
@@ -1324,6 +1333,22 @@ def _bodygraph_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]
         path,
         targets,
         error_code="CI_BODYGRAPH_TOOL_OWNER_TEST_INVALID",
+    )
+
+
+def _ci_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve exact behavioral owners for repository CI tools (fail closed)."""
+    rel = PurePosixPath(path)
+    if not path.startswith(_CI_TOOL_PREFIX) or rel.suffix.lower() not in _UNKNOWN_SOURCE_SUFFIXES:
+        return ()
+    targets = _CI_TOOL_TEST_OWNERS.get(path)
+    if targets is None:
+        raise ValueError(f"CI_TOOL_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_TOOL_OWNER_TEST_INVALID",
     )
 
 
@@ -1673,6 +1698,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         )
         targets.update(_qa_tool_owner_targets(repo_root, path))
         targets.update(_bodygraph_tool_owner_targets(repo_root, path))
+        targets.update(_ci_tool_owner_targets(repo_root, path))
         targets.update(_promoted_member_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
@@ -1758,6 +1784,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith(_BODYGRAPH_TOOL_PREFIX):
         return set(_BODYGRAPH_TOOL_LANES)
+
+    if path.startswith(_CI_TOOL_PREFIX):
+        return set(_CI_TOOL_LANES)
 
     if path.startswith("tests/evidence/"):
         lanes = {"evidence"}
