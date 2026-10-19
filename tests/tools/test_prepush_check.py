@@ -336,6 +336,25 @@ def _site(root: Path, distributions: dict[str, tuple[str, list[str], str]]) -> l
     return [str(root)]
 
 
+# A stand-in setuptools.build_meta whose metadata follows the candidate's name, version and dependencies.
+_FAKE_BACKEND = textwrap.dedent('''\
+    import pathlib
+    import tomllib
+
+
+    def prepare_metadata_for_build_editable(directory, config_settings=None):
+        project = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["project"]
+        info = pathlib.Path(directory, f"{project['name']}-{project['version']}.dist-info")
+        info.mkdir()
+        lines = ["Metadata-Version: 2.1", f"Name: {project['name']}", f"Version: {project['version']}"]
+        lines += [f"Requires-Dist: {requirement}" for requirement in project.get("dependencies", [])]
+        (info / "METADATA").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+        (info / "entry_points.txt").write_text(
+            "[console_scripts]\\nprojcli = proj.cli : main\\n[pytest11]\\nplug = proj.plug\\n", encoding="utf-8")
+        return info.name
+''')
+
+
 def test_install_substitute_follows_extras_dependencies_and_the_editable_project(tmp_path: Path) -> None:
     copy = tmp_path / "copy"
     (copy / "nested").mkdir(parents=True)
@@ -389,13 +408,15 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         "gamma": ("1.4", [], ""),
         "zeta": ("0.1", [], ""),
         "epsilon": ("1.0", [], ""),
-        "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
+        "proj": ("0.2.0", ["beta>=1"], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
         "setuptools": ("84.0.0", [], ""),
         "wheel": ("0.45.0", [], ""),
     })
     (tmp_path / "fixed/setuptools").mkdir()
-    for module in ("__init__.py", "build_meta.py"):
-        (tmp_path / "fixed/setuptools" / module).write_text("", encoding="utf-8")
+    (tmp_path / "fixed/setuptools/__init__.py").write_text("", encoding="utf-8")
+    (tmp_path / "fixed/setuptools/build_meta.py").write_text(_FAKE_BACKEND, encoding="utf-8")
+    info = tmp_path / "fixed/proj-0.2.0.dist-info"
+    (info / "INSTALLER").write_text("pip\n", encoding="utf-8")
     assert tool._install_check(run, copy, fixed) == []
     pyproject = (copy / "pyproject.toml").read_text(encoding="utf-8")
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"<3"'), encoding="utf-8")
@@ -404,10 +425,42 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     # The editable reinstall rewrites the installed version, local label included.
     (copy / "pyproject.toml").write_text(pyproject.replace('version = "0.2.0"', 'version = "0.2.0+candidate"'),
                                          encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == ["proj 0.2.0 (the candidate declares version 0.2.0+candidate)"]
+    assert tool._install_check(run, copy, fixed) == [
+        "proj 0.2.0 (the candidate declares version 0.2.0+candidate)",
+        "proj metadata METADATA line 3: installed 'Version: 0.2.0', the candidate's 'Version: 0.2.0+candidate'"]
     # Equal under PEP 440, but the reinstalled metadata would read 0.2.
     (copy / "pyproject.toml").write_text(pyproject.replace('version = "0.2.0"', 'version = "0.2"'), encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == ["proj 0.2.0 (the candidate declares version 0.2)"]
+    assert tool._install_check(run, copy, fixed) == [
+        "proj 0.2.0 (the candidate declares version 0.2)",
+        "proj metadata METADATA line 3: installed 'Version: 0.2.0', the candidate's 'Version: 0.2'"]
+    # The reinstall regenerates every other metadata file from the candidate too, pip's own files aside, so
+    # stale metadata is refused where the version, the entry points and the dependency closure all hold.
+    (copy / "pyproject.toml").write_text(pyproject.replace('["beta>=1"]', '["beta>=1", "epsilon>=1"]'),
+                                         encoding="utf-8")
+    assert tool._install_check(run, copy, fixed) == [
+        "proj metadata METADATA line 5: installed 'end of file', the candidate's 'Requires-Dist: epsilon>=1'"]
+    (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
+    (info / "top_level.txt").write_text("proj\n", encoding="utf-8")
+    assert tool._install_check(run, copy, fixed) == [
+        "proj metadata top_level.txt (installed; the candidate generates none)"]
+    (info / "top_level.txt").unlink()
+    metadata = (info / "METADATA").read_bytes()
+    (info / "METADATA").write_bytes(metadata.replace(b"\n", b"\r\n"))
+    assert tool._install_check(run, copy, fixed) == [
+        "proj metadata METADATA (differs from the candidate's in its line breaks)"]
+    (info / "METADATA").write_bytes(metadata)
+    entry_points = (info / "entry_points.txt").read_text(encoding="utf-8")
+    (info / "entry_points.txt").unlink()
+    assert tool._install_check(run, copy, fixed) == [
+        "proj console_scripts {} (the candidate declares {'projcli': 'proj.cli:main'})",
+        "proj metadata entry_points.txt (not installed; the candidate generates it)",
+        "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})"]
+    (info / "entry_points.txt").write_text(entry_points, encoding="utf-8")
+    (tmp_path / "fixed/setuptools/build_meta.py").write_text("", encoding="utf-8")
+    with pytest.raises(ValueError, match="the build backend did not prepare the metadata of 'proj'"):
+        tool._install_check(run, copy, fixed)
+    (tmp_path / "fixed/setuptools/build_meta.py").write_text(_FAKE_BACKEND, encoding="utf-8")
+    assert tool._install_check(run, copy, fixed) == []
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"> = 3"'), encoding="utf-8")
     with pytest.raises(ValueError, match="unsupported requires-python"):
         tool._install_check(run, copy, fixed)

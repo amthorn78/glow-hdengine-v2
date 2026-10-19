@@ -189,6 +189,13 @@ REPLAY_SETUPTOOLS_CONFIG: dict[str, object] = {
     "packages": {"find": {"where": ["."], "include": ["engine*", "adapter*", "presenter*", "catalog*", "math*"]}},
     "package-data": {"catalog": ["*.json"], "math": ["*.json"]},
 }
+# The files of the editable project's installed .dist-info that pip and the
+# wheel writer add and the modelled configuration does not decide.  Every
+# other file there is metadata the build backend generates from the candidate,
+# which CI's install regenerates.
+REPLAY_INSTALLER_FILES = frozenset({"INSTALLER", "RECORD", "REQUESTED", "WHEEL", "direct_url.json"})
+_PREPARE_METADATA = ("import importlib, sys; sys.path[:0] = sys.argv[3:]; "
+                     "importlib.import_module(sys.argv[1]).prepare_metadata_for_build_editable(sys.argv[2])")
 _PROJECT_NAME_RE = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?")
 _OBJECT_REFERENCE_RE = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*(?:\s*:\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)?")
 
@@ -1495,19 +1502,71 @@ def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[
     return lines
 
 
-def _install_check(run_text: str, copy: Path, search_path: list[str] | None = None) -> list[str]:
+def _tree_files(root: Path) -> dict[str, bytes]:
+    return {path.relative_to(root).as_posix(): path.read_bytes() for path in sorted(root.rglob("*")) if path.is_file()}
+
+
+def _metadata_differences(name: str, project_dir: Path, distribution: importlib.metadata.Distribution,
+                          search_path: list[str] | None, scratch: Path | None) -> list[str]:
+    """Where the installed project's metadata differs from what the build backend generates from the candidate.
+
+    The backend's prepare_metadata_for_build_editable hook runs offline in the
+    caller's environment, under closed rails, against the candidate's tree;
+    its output must equal the installed .dist-info, REPLAY_INSTALLER_FILES
+    aside, file for file and byte for byte.
+    """
+    location = getattr(distribution, "_path", None)  # a PathDistribution's .dist-info; any other fails closed
+    if not isinstance(location, Path) or not location.is_dir():
+        raise ValueError(f"the installed metadata of {name!r} is not a directory the replay can read")
+    with tempfile.TemporaryDirectory(prefix="replay-metadata-", dir=scratch) as work:
+        output = Path(work) / "metadata"
+        output.mkdir()
+        result = subprocess.run(
+            [sys.executable, "-I", "-B", "-c", _PREPARE_METADATA, str(REPLAY_BUILD_SYSTEM["build-backend"]),
+             str(output), *(search_path or [])],
+            cwd=project_dir, env=child_environment(dict(os.environ), Path(work)),
+            capture_output=True, text=True, check=False)
+        generated = list(output.glob("*.dist-info"))
+        if result.returncode != 0 or len(generated) != 1:
+            raise ValueError(f"the build backend did not prepare the metadata of {name!r}: "
+                             + (result.stderr.strip()[-500:] or f"{len(generated)} .dist-info directories"))
+        want = _tree_files(generated[0])
+    have = {path: data for path, data in _tree_files(location).items() if path not in REPLAY_INSTALLER_FILES}
+    differences = []
+    for path in sorted(set(want) | set(have)):
+        if path not in have:
+            differences.append(f"{name} metadata {path} (not installed; the candidate generates it)")
+        elif path not in want:
+            differences.append(f"{name} metadata {path} (installed; the candidate generates none)")
+        elif have[path] != want[path]:
+            old, new = (data.decode("utf-8", "replace").splitlines() for data in (have[path], want[path]))
+            line = next((i for i, pair in enumerate(zip(old, new)) if pair[0] != pair[1]), min(len(old), len(new)))
+            if old == new:
+                differences.append(f"{name} metadata {path} (differs from the candidate's in its line breaks)")
+                continue
+            differences.append(f"{name} metadata {path} line {line + 1}: installed "
+                               f"{old[line][:120] if line < len(old) else 'end of file'!r}, the candidate's "
+                               f"{new[line][:120] if line < len(new) else 'end of file'!r}")
+    return differences
+
+
+def _install_check(run_text: str, copy: Path, search_path: list[str] | None = None,
+                   scratch: Path | None = None) -> list[str]:
     """What the caller's environment lacks for CI's install step to change nothing.
 
     The step's requirements and their installed dependencies, extras included,
-    must be satisfied; the editable project's installed version and entry points
-    must equal the candidate's and its requires-python must admit this
-    interpreter, so the replay never runs against a dependency set or a wrapper
-    CI's install would replace, nor passes a candidate CI cannot install.  pip
-    builds the project in an isolated environment fetched from the package
-    index, which an offline check cannot reproduce; the project's build system
-    must be REPLAY_BUILD_SYSTEM, and as a fail-closed proxy the caller's
-    environment must satisfy its build requirements and hold its backend's
-    module.
+    must be satisfied.  pip reinstalls the editable project, so its installed
+    version, entry points and every other metadata file must equal what its
+    build backend generates from the candidate, and its requires-python must
+    admit this interpreter: the replay never runs against a dependency set,
+    metadata or wrapper CI's install would replace, nor passes a candidate CI
+    cannot install.  pip builds the project in an isolated environment fetched
+    from the package index, which an offline check cannot reproduce; the
+    project's build system must be REPLAY_BUILD_SYSTEM, and as a fail-closed
+    proxy the caller's environment must satisfy its build requirements and hold
+    its backend, which generates the metadata compared.  A backend release
+    other than CI's can write metadata its own version decides differently;
+    the comparison then fails closed.
     """
     words = shlex.split(run_text)
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
@@ -1534,7 +1593,7 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
                 if problems:
                     raise ValueError(f"the editable project {project.get('name')!r} has configuration the replay does not "
                                      "model or setuptools would reject: " + "; ".join(problems))
-                projects.append(project)
+                projects.append((project, target))
                 roots.append((str(project["name"]), "the install step"))
                 roots += [(str(dependency), str(project["name"])) for dependency in project.get("dependencies", [])]
                 roots += [(str(requirement), f"{project['name']}'s build-system") for requirement in build["requires"]]
@@ -1546,9 +1605,10 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
         index += 1
     unmet = _unmet_requirements(roots, search_path)
     backend = str(REPLAY_BUILD_SYSTEM["build-backend"])
-    for project in projects:
+    for project, project_dir in projects:
         name = str(project["name"])
-        if not _module_locatable(backend, search_path):
+        backend_found = _module_locatable(backend, search_path)
+        if not backend_found:
             unmet.append(f"{name} build-backend {backend} (not importable)")
         distribution = _distribution(name, search_path)
         if distribution is None:
@@ -1576,6 +1636,8 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
             want = {key: "".join(str(value).split()) for key, value in declared.get(group, {}).items()}
             if have != want:
                 unmet.append(f"{name} {group} {have} (the candidate declares {want})")
+        if backend_found:
+            unmet += _metadata_differences(name, project_dir, distribution, search_path, scratch)
     return sorted(set(unmet))
 
 
@@ -1661,7 +1723,7 @@ def report_replay(context: Context, report: Report) -> None:
         if not applicable:
             outcome = "skipped"
         elif kind == REPLAY_EXCLUDED:
-            outcome, detail = _substitute(step, reason, copy, python_version, actual)
+            outcome, detail = _substitute(step, reason, copy, python_version, actual, context.temporary)
         else:
             outcome, detail, outputs = _execute(step, number, copy, base_env, expressions, context.temporary)
         if step_id:
@@ -1681,7 +1743,7 @@ def report_replay(context: Context, report: Report) -> None:
 
 
 def _substitute(step: dict[str, object], reason: str, copy: Path,
-                python_version: str, actual: str) -> tuple[str, str]:
+                python_version: str, actual: str, scratch: Path | None = None) -> tuple[str, str]:
     uses = str(step.get("uses", ""))
     if uses.startswith("actions/checkout@"):
         return "success", f"{reason}; copy at {git_text(copy, 'rev-parse', 'HEAD')}"
@@ -1691,13 +1753,13 @@ def _substitute(step: dict[str, object], reason: str, copy: Path,
         return "success", f"{reason}: {actual}"
     run = str(step.get("run", ""))
     try:
-        unmet = _install_check(run, copy)
+        unmet = _install_check(run, copy, scratch=scratch)
     except (OSError, KeyError, TypeError, ValueError, tomllib.TOMLDecodeError) as exc:
         return "failure", f"TOOLING cannot read the install step's inputs: {exc}"
     if unmet:
         return "failure", "TOOLING the caller's environment does not satisfy the install step: " + ", ".join(unmet)
     return "success", (f"{reason}: the environment already satisfies every requirement the step names, their "
-                       "dependencies and extras, and the editable project's build system, version and entry points")
+                       "dependencies and extras, and the editable project's build system and installed metadata")
 
 
 def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[str, str],
