@@ -144,11 +144,14 @@ REPLAY_EXCLUDED_STEP_KEYS = {
 }
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 # What the replay stands in for, and the only inputs it models: the workflow's
-# top-level keys, an ubuntu runner (replayed on this Linux machine), and the
+# top-level keys, the ubuntu-latest runner (x86_64 Linux, replayed on this
+# machine, which must be x86_64 Linux too), and the
 # two substituted actions, revision included, with their inputs (None: any
 # value; a string: exactly that value, required).  Anything else is inventory
 # drift.
 REPLAY_WORKFLOW_KEYS = frozenset({"name", "run-name", "on", "permissions", "concurrency", "jobs"})
+REPLAY_RUNNER = "ubuntu-latest"
+REPLAY_MACHINES = frozenset({"x86_64", "amd64"})
 REPLAY_SUBSTITUTED_INPUTS: dict[str, dict[str, str | None]] = {
     "actions/checkout@v4": {"fetch-depth": "0", "persist-credentials": "false",
                             "ref": "${{ github.event.pull_request.head.sha || github.sha }}"},
@@ -174,6 +177,20 @@ _RUNNER_VARIABLE_RE = re.compile(
 # other [build-system] fails closed.
 REPLAY_BUILD_SYSTEM: dict[str, object] = {"build-backend": "setuptools.build_meta",
                                           "requires": ["setuptools>=68", "wheel"]}
+# The rest of the editable project's configuration the substitute models.
+# setuptools validates all of it when CI's install builds the project, so a
+# table, [project] key or value outside this model fails closed, as do a
+# setup.py, a setup.cfg and a [tool.setuptools] or [tool.distutils] other than
+# these.
+REPLAY_PYPROJECT_TABLES = frozenset({"build-system", "project", "tool"})
+REPLAY_PROJECT_KEYS = frozenset({"name", "version", "description", "readme", "requires-python", "dependencies",
+                                 "scripts", "gui-scripts", "entry-points"})
+REPLAY_SETUPTOOLS_CONFIG: dict[str, object] = {
+    "packages": {"find": {"where": ["."], "include": ["engine*", "adapter*", "presenter*", "catalog*", "math*"]}},
+    "package-data": {"catalog": ["*.json"], "math": ["*.json"]},
+}
+_PROJECT_NAME_RE = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?")
+_OBJECT_REFERENCE_RE = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*(?:\s*:\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)?")
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
 # PEP 508 requirements as the install step and installed metadata write them:
@@ -1053,9 +1070,9 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
     unknown_job_keys = set(job.keys) - REPLAY_JOB_KEYS
     if unknown_job_keys:
         raise ToolingError(f"REPLAY_INVENTORY_DRIFT: unsupported job keys {sorted(unknown_job_keys)}")
-    runs_on = str(job.keys.get("runs-on", ""))
-    if not runs_on.startswith("ubuntu-"):
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: runs-on {runs_on!r} is not an ubuntu runner")
+    runs_on = job.keys.get("runs-on", "")
+    if runs_on != REPLAY_RUNNER:
+        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: runs-on {runs_on!r} is not the modelled {REPLAY_RUNNER!r}")
     names = [str(step.get("name", "")) for step in job.steps]
     expected = [name for name, _kind, _reason in REPLAY_INVENTORY]
     if names != expected:
@@ -1071,6 +1088,8 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has unsupported keys {sorted(unknown)}")
         if ("uses" in step) != (kind == REPLAY_EXCLUDED and name != "Install applicable validation dependencies"):
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} changed between uses: and run:")
+        if "uses" not in step and not (isinstance(step.get("run"), str) and step["run"].strip()):
+            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has neither uses: nor a run: command")
         if kind == REPLAY_EXCLUDED and set(step) - REPLAY_EXCLUDED_STEP_KEYS[name]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has keys its substitute does not model "
                                f"{sorted(set(step) - REPLAY_EXCLUDED_STEP_KEYS[name])}")
@@ -1094,6 +1113,13 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
                 raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has inputs the replay does not model: "
                                    + ", ".join(unmodelled))
     return job, job.steps
+
+
+def replay_machine() -> str | None:
+    """Why this machine cannot stand in for the job's x86_64 Linux runner, or None."""
+    if sys.platform != "linux" or platform.machine().lower() not in REPLAY_MACHINES:
+        return f"{sys.platform} {platform.machine()}"
+    return None
 
 
 def replay_contexts(event: str, base: str, head: str) -> dict[str, object]:
@@ -1399,6 +1425,46 @@ def _module_locatable(dotted: str, search_path: list[str] | None) -> bool:
     return True
 
 
+def _configuration_problems(pyproject: dict[str, object], root: Path) -> list[str]:
+    """What in the editable project's configuration the substitute does not model or setuptools would reject."""
+    problems = [f"top-level tables {sorted(set(pyproject) - REPLAY_PYPROJECT_TABLES)}"] \
+        if set(pyproject) - REPLAY_PYPROJECT_TABLES else []
+    problems += [f"{name} (not modelled)" for name in ("setup.py", "setup.cfg") if (root / name).exists()]
+    project = pyproject.get("project")
+    if not isinstance(project, dict):
+        return problems + ["no [project] table"]
+    if set(project) - REPLAY_PROJECT_KEYS:
+        problems.append(f"[project] keys {sorted(set(project) - REPLAY_PROJECT_KEYS)}")
+    for key, pattern in (("name", _PROJECT_NAME_RE), ("version", None), ("requires-python", None),
+                         ("description", re.compile(r"[^\r\n]*")), ("readme", None)):
+        value = project.get(key, "") if key not in ("name", "version") else project.get(key)
+        if not isinstance(value, str) or (pattern is not None and not pattern.fullmatch(value)):
+            problems.append(f"[project] {key} {value!r}")
+    readme = project.get("readme")
+    if isinstance(readme, str) and (Path(readme).suffix.lower() not in {".md", ".rst", ".txt"}
+                                    or not (root / readme).is_file()):
+        problems.append(f"[project] readme {readme!r} (no such .md, .rst or .txt file)")
+    dependencies = project.get("dependencies", [])
+    if not isinstance(dependencies, list) or not all(isinstance(entry, str) for entry in dependencies):
+        problems.append("[project] dependencies is not a list of strings")
+    groups = {key: project.get(key, {}) for key in ("scripts", "gui-scripts")}
+    entry_points = project.get("entry-points", {})
+    if not isinstance(entry_points, dict) or {"console_scripts", "gui_scripts"} & set(entry_points):
+        problems.append("[project] entry-points is not a table of groups other than console_scripts and gui_scripts")
+    else:
+        groups.update({f"entry-points.{group}": entries for group, entries in entry_points.items()})
+    for group, entries in groups.items():
+        script = group in ("scripts", "gui-scripts")
+        if not isinstance(entries, dict) or not all(
+                isinstance(value, str) and _OBJECT_REFERENCE_RE.fullmatch(value.strip()) and (":" in value or not script)
+                for value in entries.values()):
+            problems.append(f"[project] {group} is not a table of object references")
+    tool = pyproject.get("tool", {})
+    if not isinstance(tool, dict) or tool.get("setuptools") != REPLAY_SETUPTOOLS_CONFIG or "distutils" in tool:
+        problems.append("[tool.setuptools] or [tool.distutils] is not the one the replay models")
+    return problems
+
+
 def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[str]:
     """A requirements file's requirements; nested -r files are followed, any other option fails closed."""
     if path.resolve() in seen:
@@ -1449,6 +1515,10 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
                 if build != REPLAY_BUILD_SYSTEM:
                     raise ValueError(f"the editable project {project['name']!r} has [build-system] {build!r}, not "
                                      f"the one the replay models, {REPLAY_BUILD_SYSTEM!r}")
+                problems = _configuration_problems(pyproject, target)
+                if problems:
+                    raise ValueError(f"the editable project {project['name']!r} has configuration the replay does not "
+                                     "model or setuptools would reject: " + "; ".join(problems))
                 projects.append(project)
                 roots.append((str(project["name"]), "the install step"))
                 roots += [(str(dependency), str(project["name"])) for dependency in project.get("dependencies", [])]
@@ -1533,8 +1603,9 @@ def report_replay(context: Context, report: Report) -> None:
             raise ToolingError(f"base {base} is not available to the throwaway copy")
         job, steps = replay_steps((copy / WORKFLOW_PATH).read_text(encoding="utf-8"))
         python_version = _python_version(steps)
-        if sys.platform != "linux":
-            raise ToolingError(f"the job runs on {job.keys['runs-on']}; this machine is {sys.platform}, not Linux")
+        machine = replay_machine()
+        if machine:
+            raise ToolingError(f"the job runs on {job.keys['runs-on']} (x86_64 Linux); this machine is {machine}")
     except ToolingError as exc:
         report.fail(str(exc), tooling=True)
         return
@@ -1701,11 +1772,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("PREPUSH_CHECK_REFUSED: the working tree is not clean (untracked files included); "
               "commit or stash before running", file=sys.stderr)
         return EXIT_REFUSED
-    temporary = Path(tempfile.mkdtemp(prefix="prepush-check-")).resolve()
+    # Chosen before anything is created: tempfile's own search would write a
+    # probe file into a TMPDIR inside the repository.
+    parent = next((Path(c).resolve() for c in (os.environ.get("TMPDIR"), os.environ.get("TEMP"), os.environ.get("TMP"),
+                                               "/tmp", "/var/tmp", "/usr/tmp") if c and os.path.isdir(c)), None)
+    if parent is None or parent.is_relative_to(repo):
+        print("PREPUSH_CHECK_REFUSED: the temporary directory would be inside the repository or there is none",
+              file=sys.stderr)
+        return EXIT_REFUSED
+    temporary = Path(tempfile.mkdtemp(prefix="prepush-check-", dir=parent)).resolve()
     if temporary.is_relative_to(repo):
         shutil.rmtree(temporary, ignore_errors=True)
         print("PREPUSH_CHECK_REFUSED: the temporary directory would be inside the repository", file=sys.stderr)
-        return EXIT_REFUSED
+        return EXIT_READ_ONLY_VIOLATION if repository_state(repo) != before else EXIT_REFUSED
     print(f"PREPUSH_CHECK: repo={repo} head={before.head} python={sys.version.split()[0]} "
           f"reports={','.join(requested)}", flush=True)
     results: list[tuple[str, str, float]] = []

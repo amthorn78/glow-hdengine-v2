@@ -170,11 +170,13 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
                                   "        id: dependencies\n        env:\n          PIP_INDEX_URL: x\n"),
         lambda text: text.replace("        run: python3 ci/checks/check_agents_md_citations.py",
                                   "        env: invalid\n        run: python3 ci/checks/check_agents_md_citations.py"),
+        lambda text: text.replace("runs-on: ubuntu-latest", "runs-on: ubuntu-24.04-arm"),
+        lambda text: text.replace("        run: python3 ci/checks/check_agents_md_citations.py\n", ""),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
          "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials",
-         "checkout-condition", "install-env", "step-env-not-a-mapping"],
+         "checkout-condition", "install-env", "step-env-not-a-mapping", "runner-label", "executed-without-run"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -182,6 +184,26 @@ def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="REPLAY_INVENTORY_DRIFT"):
         tool.replay_steps(mutated)
+
+
+def test_replay_needs_an_x86_64_linux_machine(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(tool.sys, "platform", "linux")
+    monkeypatch.setattr(tool.platform, "machine", lambda: "x86_64")
+    assert tool.replay_machine() is None
+    monkeypatch.setattr(tool.platform, "machine", lambda: "aarch64")
+    assert tool.replay_machine() == "linux aarch64"
+    monkeypatch.setattr(tool.platform, "machine", lambda: "x86_64")
+    monkeypatch.setattr(tool.sys, "platform", "darwin")
+    assert tool.replay_machine() == "darwin x86_64"
+
+
+def test_a_temporary_directory_inside_the_repository_is_refused_before_anything_is_created(tmp_path: Path) -> None:
+    repo = _synthetic(tmp_path / "temp-inside", {"data.txt": "tracked\n"})
+    (repo / "scratch").mkdir()  # empty, so git status stays clean
+    result = _run(repo, "build-notes", extra_env={"TMPDIR": str(repo / "scratch")})
+    assert result.returncode == tool.EXIT_REFUSED, result.stdout + result.stderr
+    assert "PREPUSH_CHECK_REFUSED: the temporary directory would be inside the repository" in result.stderr
+    assert not any((repo / "scratch").iterdir())
 
 
 def test_a_step_that_is_not_a_mapping_is_refused() -> None:
@@ -290,13 +312,22 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         [project]
         name = "proj"
         version = "0.2.0"
+        description = "A project"
+        readme = "README.md"
         requires-python = ">=3.8"
         dependencies = ["beta>=1"]
         [project.scripts]
         projcli = "proj.cli:main"
         [project.entry-points.pytest11]
         plug = "proj.plug"
+        [tool.setuptools.packages.find]
+        where = ["."]
+        include = ["engine*", "adapter*", "presenter*", "catalog*", "math*"]
+        [tool.setuptools.package-data]
+        catalog = ["*.json"]
+        math = ["*.json"]
     """), encoding="utf-8")
+    (copy / "README.md").write_text("# proj\n", encoding="utf-8")
     run = "python -m pip install -r requirements.txt -e ."
     requires = ["beta>=2.0", 'gamma==1.*; extra == "fast"', 'zeta; extra == "slow"', 'delta; python_version < "3.0"']
     broken = _site(tmp_path / "broken", {
@@ -354,7 +385,24 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         (copy / "pyproject.toml").write_text(pyproject.replace(old, new), encoding="utf-8")
         with pytest.raises(ValueError, match="not the one the replay models"):
             tool._install_check(run, copy, fixed)
+    # So is the rest of the configuration setuptools validates: an invalid value, an unmodelled key or table,
+    # a missing readme, a script without a callable, a reserved entry-point group, other setuptools settings.
+    for old, new in (('description = "A project"', "description = 123"),
+                     ('description = "A project"', 'description = "two\\nlines"'),
+                     ('description = "A project"', 'license = "MIT"'),
+                     ('readme = "README.md"', 'readme = "MISSING.md"'),
+                     ('projcli = "proj.cli:main"', 'projcli = "proj.cli"'),
+                     ("[project.entry-points.pytest11]", "[project.entry-points.console_scripts]"),
+                     ('math = ["*.json"]', 'math = ["*.txt"]'),
+                     ("[build-system]", "[dependency-groups]\ndev = []\n[build-system]")):
+        (copy / "pyproject.toml").write_text(pyproject.replace(old, new), encoding="utf-8")
+        with pytest.raises(ValueError, match="configuration the replay does not model"):
+            tool._install_check(run, copy, fixed)
     (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
+    (copy / "setup.cfg").write_text("[metadata]\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="setup.cfg"):
+        tool._install_check(run, copy, fixed)
+    (copy / "setup.cfg").unlink()
     for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
         with pytest.raises(ValueError):
             tool._install_check(unsupported, copy, fixed)
