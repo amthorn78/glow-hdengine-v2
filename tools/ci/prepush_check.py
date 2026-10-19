@@ -19,6 +19,13 @@ repository, removed at exit.  The tool refuses a dirty tree, acts on committed
 revisions only, resolves refs locally, opens no network connection and runs
 children under closed rails.  Its green is not CI's green and not QA; its
 output is not governed evidence.
+
+Children inherit only HOME, LOGNAME, PATH, SHELL, TERM and USER from the
+caller's environment, so no other variable of the caller's, secrets included,
+reaches them.  They are not sandboxed: ``sweep`` and ``replay`` execute the
+candidate's own tests and workflow steps with the caller's file-system and
+network access, and SAFE_MODE and ALLOW_NETWORK are application flags, not
+isolation.  Run them only on code you trust.
 """
 from __future__ import annotations
 
@@ -68,7 +75,12 @@ EXIT_USAGE = 2
 EXIT_REFUSED = 3
 EXIT_READ_ONLY_VIOLATION = 4
 
-# Removed from every child environment (vendor, database and GitHub keys).
+# The only caller variables a child inherits, as a hosted runner also provides
+# them; the tool sets the rest (closed rails, temporary directories, the
+# report's own values), so no other variable of the caller's reaches a child.
+CHILD_INHERITED_KEYS = ("HOME", "LOGNAME", "PATH", "SHELL", "TERM", "USER")
+# Never passed to a child (vendor, database and GitHub keys), and absent on a
+# hosted runner unless a step sets them.
 REMOVED_ENV_KEYS = (
     "DATABASE_URL",
     "ENGINE_ENV",
@@ -141,9 +153,9 @@ REPLAY_GITHUB_PATHS = frozenset({"github.event_name", "github.sha", "github.even
                                  "github.event.pull_request.base.sha", "github.event.pull_request.head.sha"})
 # Variables the runner or a substituted action gives run steps.  The replay
 # sets REPLAY_RUNNER_VARIABLES, leaves REMOVED_ENV_KEYS absent as a hosted
-# runner does, removes every other inherited one, and refuses a workflow whose
-# run text or env keys name any other.  Scripts a step calls are not scanned;
-# they see the same environment.
+# runner does (children inherit no other runner variable; CHILD_INHERITED_KEYS),
+# and refuses a workflow whose run text or env keys name any other.  Scripts a
+# step calls are not scanned; they see the same environment.
 REPLAY_RUNNER_VARIABLES = frozenset({"GITHUB_ACTIONS", "GITHUB_EVENT_NAME", "GITHUB_OUTPUT", "RUNNER_TEMP"})
 _RUNNER_VARIABLE_RE = re.compile(
     r"(?<![A-Za-z0-9_])(?:(?:GITHUB|RUNNER|ACTIONS)_[A-Za-z0-9_]+|ImageOS|ImageVersion|pythonLocation"
@@ -255,10 +267,31 @@ def _metadata_digest(directory: Path) -> str:
     return digest.hexdigest()
 
 
+def _ignored_entries(repo: Path) -> tuple[tuple[str, int, int, int, int], ...]:
+    """Every ignored working-tree file with its lstat identity.
+
+    git status lists no ignored file, so creating, deleting or rewriting one
+    would otherwise go unseen.  Any write to a file changes its st_ctime_ns,
+    which user space cannot set back, so the identity needs no content read.
+    """
+    listing = git(repo, "ls-files", "-z", "--others", "--ignored", "--exclude-standard").stdout
+    entries = []
+    for raw in sorted(name for name in listing.split(b"\0") if name):
+        name = os.fsdecode(raw)
+        try:
+            info = os.lstat(repo / name)
+        except FileNotFoundError:
+            entries.append((name, -1, -1, -1, -1))
+            continue
+        entries.append((name, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns))
+    return tuple(entries)
+
+
 @dataclass(frozen=True)
 class RepositoryState:
     head: str
     status: bytes
+    ignored: tuple[tuple[str, int, int, int, int], ...]
     metadata: tuple[tuple[str, str], ...]
 
 
@@ -270,7 +303,7 @@ def repository_state(repo: Path) -> RepositoryState:
         (repo / git_text(repo, "rev-parse", "--git-common-dir")).resolve(),
     }
     metadata = tuple(sorted((str(d), _metadata_digest(d)) for d in directories))
-    return RepositoryState(head=head, status=status, metadata=metadata)
+    return RepositoryState(head=head, status=status, ignored=_ignored_entries(repo), metadata=metadata)
 
 
 def make_copy(repo: Path, commit: str, destination: Path) -> Path:
@@ -553,7 +586,7 @@ def coverage_in_child(copy: Path, env: dict[str, str]) -> dict[str, object]:
 # --------------------------------------------------------------------------
 
 def child_environment(base: dict[str, str], temporary: Path, extra: dict[str, str] | None = None) -> dict[str, str]:
-    env = {k: v for k, v in base.items() if k not in REMOVED_ENV_KEYS}
+    env = {k: base[k] for k in CHILD_INHERITED_KEYS if k in base}
     env.update(CLOSED_RAILS)
     interpreter_dir = str(Path(sys.executable).parent)
     env["PATH"] = interpreter_dir + os.pathsep + base.get("PATH", os.defpath)
@@ -561,7 +594,6 @@ def child_environment(base: dict[str, str], temporary: Path, extra: dict[str, st
         (temporary / name).mkdir(exist_ok=True)
     env["TMPDIR"] = str(temporary / "tmp")
     env["XDG_STATE_HOME"] = str(temporary / "xdg_state")
-    env.pop("GIT_OPTIONAL_LOCKS", None)
     if extra:
         env.update(extra)
     return env
@@ -749,6 +781,11 @@ def report_sweep(context: Context, report: Report) -> None:
         return
     env = child_environment(dict(os.environ), context.temporary, {"PYTHONPATH": str(copy)})
     report.out(f"head={context.head_ref}->{head} copy={copy}")
+    # The sweep environment must provide these (PF10 addendum 2.2) whether or not a file is uncovered.
+    missing = [tool for tool in SWEEP_TOOLS if shutil.which(tool, path=env["PATH"]) is None]
+    if missing:
+        report.fail("missing on PATH: " + ", ".join(missing) + " (the sweep environment must provide them)",
+                    tooling=True)
     try:
         coverage = coverage_in_child(copy, env)
     except ToolingError as exc:
@@ -770,9 +807,6 @@ def report_sweep(context: Context, report: Report) -> None:
 
 
 def _run_uncovered(copy: Path, files: list[str], env: dict[str, str], temporary: Path, report: Report) -> None:
-    missing = [tool for tool in SWEEP_TOOLS if shutil.which(tool, path=env["PATH"]) is None]
-    if missing:
-        report.out("TOOLING_FAILURE missing on PATH: " + ", ".join(missing) + " (tests needing them fail as tooling)")
     junit = temporary / "sweep-junit.xml"
     started = time.monotonic()
     result = subprocess.run(
@@ -1483,8 +1517,7 @@ def report_replay(context: Context, report: Report) -> None:
     runner_temp.mkdir()
     contexts = replay_contexts(context.event, base, head)
     expressions = Expressions(contexts, job_failed=False)
-    inherited = {k: v for k, v in os.environ.items() if not _RUNNER_VARIABLE_RE.fullmatch(k)}
-    base_env = child_environment(inherited, context.temporary,
+    base_env = child_environment(dict(os.environ), context.temporary,
                                  {"PYTHONPATH": str(copy), "RUNNER_TEMP": str(runner_temp),
                                   "CI": "true", "GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": context.event})
     try:
@@ -1668,13 +1701,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         shutil.rmtree(temporary, ignore_errors=True)
     after = repository_state(repo)
     if after != before:
-        print("PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, HEAD or git metadata changed",
+        print("PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, HEAD or git metadata changed",
               file=sys.stderr)
         return EXIT_READ_ONLY_VIOLATION
     overall = "PASS" if all(status == "PASS" for _n, status, _d in results) else "FAIL"
     print("PREPUSH_CHECK_RESULT: " + overall + " "
           + " ".join(f"{name}={status}" for name, status, _d in results)
-          + "; repository unchanged (tree, HEAD and git metadata)", flush=True)
+          + "; repository unchanged (tree, ignored files, HEAD and git metadata)", flush=True)
     print("PREPUSH_CHECK_NONCLAIM: this result is not CI's result, not QA and not governed evidence", flush=True)
     return EXIT_OK if overall == "PASS" else EXIT_REPORT_FAILED
 

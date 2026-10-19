@@ -14,6 +14,7 @@ import importlib.metadata
 import os
 import platform
 import re
+import shutil
 import subprocess
 import sys
 import textwrap
@@ -483,6 +484,35 @@ def test_sweep_flags_runs_and_classifies_a_synthetic_uncovered_set(tmp_path: Pat
     assert covered.returncode == tool.EXIT_OK, covered.stdout + covered.stderr
     assert "uncovered=0" in covered.stdout
 
+    # A sweep environment without ruby is a tooling failure even when no file is uncovered.
+    bin_dir = tmp_path / "bin-without-ruby"
+    bin_dir.mkdir()
+    for name in ("git", "bash", "curl", "sh"):
+        found = shutil.which(name)
+        if found:
+            (bin_dir / name).symlink_to(found)
+    no_ruby = _run(repo, "sweep", extra_env={"PATH": str(bin_dir)})
+    assert no_ruby.returncode == tool.EXIT_REPORT_FAILED, no_ruby.stdout + no_ruby.stderr
+    assert "sweep: TOOLING_FAILURE missing on PATH: ruby" in no_ruby.stdout and "uncovered=0" in no_ruby.stdout
+
+
+def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
+    repo = _synthetic(tmp_path / "ignored", {".gitignore": "*.log\nbuild/\n", "data.txt": "tracked\n"})
+    (repo / "kept.log").write_text("one\n", encoding="utf-8")
+    (repo / "build").mkdir()
+    (repo / "build/out.bin").write_bytes(b"\x00")
+    before = tool.repository_state(repo)
+    assert not before.status and [entry[0] for entry in before.ignored] == ["build/out.bin", "kept.log"]
+    assert tool.repository_state(repo) == before
+    (repo / "kept.log").write_text("two\n", encoding="utf-8")
+    rewritten = tool.repository_state(repo)
+    assert rewritten != before and not rewritten.status
+    (repo / "new.log").write_text("", encoding="utf-8")
+    created = tool.repository_state(repo)
+    assert created != rewritten and not created.status
+    (repo / "build/out.bin").unlink()
+    assert tool.repository_state(repo) != created
+
 
 # --------------------------------------------------------------------------
 # every report on the repository: read-only, and the expected answers
@@ -647,14 +677,17 @@ def test_a_report_without_its_inputs_is_a_tooling_failure(tmp_path: Path) -> Non
 
 def test_child_environment_is_closed_rails_without_keys(tmp_path: Path) -> None:
     base = {**DUMMY_KEYS, "PATH": "/usr/bin", "SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "prod",
-            "GIT_OPTIONAL_LOCKS": "0", "HOME": "/home/x"}
+            "GIT_OPTIONAL_LOCKS": "0", "HOME": "/home/x", "USER": "x", "AWS_SECRET_ACCESS_KEY": "aws-dummy",
+            "HTTPS_PROXY": "http://proxy.invalid", "GITHUB_SHA": "caller", "GIT_DIR": "/elsewhere"}
     env = tool.child_environment(base, tmp_path)
     assert not set(DUMMY_KEYS) & set(env)
     assert {k: env[k] for k in tool.CLOSED_RAILS} == tool.CLOSED_RAILS
     assert env["PATH"].split(os.pathsep)[0] == str(Path(sys.executable).parent)
     assert env["TMPDIR"].startswith(str(tmp_path)) and env["XDG_STATE_HOME"].startswith(str(tmp_path))
-    assert "GIT_OPTIONAL_LOCKS" not in env and env["HOME"] == "/home/x"
-    assert set(tool.REMOVED_ENV_KEYS) == set(CHILD_KEYS)
+    # Only the allowlisted caller variables are inherited; everything else is the tool's own.
+    assert set(env) == {"HOME", "PATH", "USER", "TMPDIR", "XDG_STATE_HOME", *tool.CLOSED_RAILS}
+    assert env["HOME"] == "/home/x" and env["USER"] == "x"
+    assert set(tool.REMOVED_ENV_KEYS) == set(CHILD_KEYS) and not set(CHILD_KEYS) & set(tool.CHILD_INHERITED_KEYS)
 
 
 def test_tool_installs_no_hook_fetches_nothing_and_opens_no_network() -> None:
@@ -739,12 +772,14 @@ def test_replay_runs_a_synthetic_workflow_in_a_throwaway_copy(tmp_path: Path, pr
     repo = _synthetic(tmp_path / "replay", {
         ".github/workflows/ci.yml": _replay_workflow(product_body),
         "requirements.txt": "pytest\n",
-        # A script a step calls sees only the runner variables the replay models, never the caller's.
-        "ci/runner_env.sh": ('set -e\ntest -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}"\n'
+        # A script a step calls sees only the runner variables the replay models and none of the caller's others.
+        "ci/runner_env.sh": ('set -e\n'
+                             'test -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}${AWS_SECRET_ACCESS_KEY:-}"\n'
                              'test "$GITHUB_ACTIONS/$GITHUB_EVENT_NAME" = true/pull_request\n'),
     })
     result = _run(repo, "replay", "--full",
-                  extra_env={"GITHUB_SHA": "caller", "RUNNER_OS": "caller", "GITHUB_WORKSPACE": "/caller"})
+                  extra_env={"GITHUB_SHA": "caller", "RUNNER_OS": "caller", "GITHUB_WORKSPACE": "/caller",
+                             "AWS_SECRET_ACCESS_KEY": "aws-dummy"})
     lines = _report_lines(result.stdout, "replay")
     steps = {line.split(" ", 3)[1]: line for line in lines if line.startswith("step ")}
     assert len(steps) == len(tool.REPLAY_INVENTORY)
