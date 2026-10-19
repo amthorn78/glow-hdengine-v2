@@ -150,8 +150,15 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
             "      - name: Verify truthful applicability",
             "      - name: A new step\n        run: echo new\n\n      - name: Verify truthful applicability"),
         lambda text: text.replace("        id: env_pins\n", "        id: env_pins\n        continue-on-error: true\n"),
+        lambda text: text.replace("ref: ${{ github.event.pull_request.head.sha || github.sha }}", "ref: main"),
+        lambda text: text.replace("          fetch-depth: 0\n", "          fetch-depth: 0\n          submodules: true\n"),
+        lambda text: text.replace("fetch-depth: 0", "fetch-depth: 1"),
+        lambda text: text.replace("          python-version: '3.12'\n", "          python-version: '3.12'\n          architecture: x86\n"),
+        lambda text: text.replace("runs-on: ubuntu-latest", "runs-on: macos-latest"),
+        lambda text: text.replace("\njobs:\n", "\nenv:\n  EXTRA: one\n\njobs:\n"),
     ],
-    ids=["renamed", "added", "unsupported-key"],
+    ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
+         "setup-python-input", "runner", "workflow-env"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -235,7 +242,7 @@ def _site(root: Path, distributions: dict[str, tuple[str, list[str], str]]) -> l
 def test_install_substitute_follows_extras_dependencies_and_the_editable_project(tmp_path: Path) -> None:
     copy = tmp_path / "copy"
     (copy / "nested").mkdir(parents=True)
-    (copy / "requirements.txt").write_text("alpha[fast]>=1.0  # comment\n-r nested/more.txt\n", encoding="utf-8")
+    (copy / "requirements.txt").write_text("alpha[fast, slow]>=1.0  # comment\n-r nested/more.txt\n", encoding="utf-8")
     (copy / "nested/more.txt").write_text("epsilon \\\n  >=1\n", encoding="utf-8")
     (copy / "pyproject.toml").write_text(textwrap.dedent("""\
         [project]
@@ -249,7 +256,7 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         plug = "proj.plug"
     """), encoding="utf-8")
     run = "python -m pip install -r requirements.txt -e ."
-    requires = ["beta>=2.0", 'gamma==1.*; extra == "fast"', 'delta; python_version < "3.0"']
+    requires = ["beta>=2.0", 'gamma==1.*; extra == "fast"', 'zeta; extra == "slow"', 'delta; python_version < "3.0"']
     broken = _site(tmp_path / "broken", {
         "alpha": ("1.0", requires, ""),
         "beta": ("1.5", [], ""),
@@ -262,11 +269,13 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
         "proj 0.1.0 (the candidate declares version 0.2.0)",
         "proj console_scripts {'projcli': 'proj.old:main'} (the candidate declares {'projcli': 'proj.cli:main'})",
         "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})",
+        "zeta (not installed; required by alpha)",
     ]
     fixed = _site(tmp_path / "fixed", {
         "alpha": ("1.0", requires, ""),
         "beta": ("2.1", [], ""),
         "gamma": ("1.4", [], ""),
+        "zeta": ("0.1", [], ""),
         "epsilon": ("1.0", [], ""),
         "proj": ("0.2.0", [], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
     })
@@ -304,6 +313,7 @@ def test_version_clauses_and_markers_follow_pep_440_and_508() -> None:
     assert tool._parse_requirement("psycopg[binary]>=3.1,<3.3")[:3] == (
         "psycopg", frozenset({"binary"}), [(">=", "3.1"), ("<", "3.3")])
     assert tool._parse_requirement("eventlet (>=0.24.1) ; extra == 'eventlet'")[2] == [(">=", "0.24.1")]
+    assert tool._parse_requirement("alpha[ Fast , slow_path ]>=1")[1] == frozenset({"fast", "slow-path"})
     for unsupported in ("x>=1.*", "x>=1,", "x==", "x~=1", "x==1.0+local", "x @ https://example.invalid/x.whl"):
         with pytest.raises(ValueError, match="unsupported"):
             tool._parse_requirement(unsupported)
@@ -629,7 +639,9 @@ def _replay_workflow(product_body: str) -> str:
     for name, _kind, _reason in tool.REPLAY_INVENTORY:
         lines.append(f"      - name: {name}")
         if name == "Check out exact candidate head":
-            lines += ["        uses: actions/checkout@v4", "        with:", "          fetch-depth: 0"]
+            lines += ["        uses: actions/checkout@v4", "        with:", "          fetch-depth: 0",
+                      "          persist-credentials: false",
+                      "          ref: ${{ github.event.pull_request.head.sha || github.sha }}"]
         elif name == "Set up Python 3.12":
             lines += ["        id: python_setup", "        if: ${{ steps.classify.outputs.needs_python == 'true' }}",
                       "        uses: actions/setup-python@v5", "        with:", f"          python-version: '{version}'"]

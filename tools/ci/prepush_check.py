@@ -122,6 +122,16 @@ REPLAY_INVENTORY: tuple[tuple[str, str, str], ...] = (
 )
 REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env", "with"})
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
+# What the replay stands in for, and the only inputs it models: the workflow's
+# top-level keys, an ubuntu runner (replayed on this Linux machine), and the
+# inputs of the two substituted actions (None: any value; a string: exactly
+# that value, required).  Anything else is inventory drift.
+REPLAY_WORKFLOW_KEYS = frozenset({"name", "run-name", "on", "permissions", "concurrency", "jobs"})
+REPLAY_SUBSTITUTED_INPUTS: dict[str, dict[str, str | None]] = {
+    "actions/checkout": {"fetch-depth": "0", "persist-credentials": None,
+                         "ref": "${{ github.event.pull_request.head.sha || github.sha }}"},
+    "actions/setup-python": {"python-version": None},
+}
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
 # PEP 508 requirements as the install step and installed metadata write them:
@@ -933,6 +943,9 @@ def condition(text: object, expressions: Expressions) -> bool:
 # --------------------------------------------------------------------------
 
 def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
+    top = {match.group(2) for match in re.finditer(r"^([\"']?)([A-Za-z0-9_-]+)\1[ \t]*:", text, re.MULTILINE)}
+    if top - REPLAY_WORKFLOW_KEYS:
+        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: unsupported workflow keys {sorted(top - REPLAY_WORKFLOW_KEYS)}")
     jobs = parse_jobs(text)
     if REPLAY_JOB not in jobs:
         raise ToolingError(f"{WORKFLOW_PATH} has no {REPLAY_JOB!r} job")
@@ -940,6 +953,9 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
     unknown_job_keys = set(job.keys) - REPLAY_JOB_KEYS
     if unknown_job_keys:
         raise ToolingError(f"REPLAY_INVENTORY_DRIFT: unsupported job keys {sorted(unknown_job_keys)}")
+    runs_on = str(job.keys.get("runs-on", ""))
+    if not runs_on.startswith("ubuntu-"):
+        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: runs-on {runs_on!r} is not an ubuntu runner")
     names = [str(step.get("name", "")) for step in job.steps]
     expected = [name for name, _kind, _reason in REPLAY_INVENTORY]
     if names != expected:
@@ -951,6 +967,17 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has unsupported keys {sorted(unknown)}")
         if ("uses" in step) != (kind == REPLAY_EXCLUDED and name != "Install applicable validation dependencies"):
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} changed between uses: and run:")
+        if "uses" in step:
+            action = str(step["uses"]).split("@", 1)[0]
+            supported = REPLAY_SUBSTITUTED_INPUTS.get(action)
+            given = step.get("with", {})
+            if supported is None or not isinstance(given, dict):
+                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} uses {action!r}, which the replay does not model")
+            unmodelled = sorted(set(given) - set(supported)) + sorted(
+                key for key, value in supported.items() if value is not None and str(given.get(key, "")).strip() != value)
+            if unmodelled:
+                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has inputs the replay does not model: "
+                                   + ", ".join(unmodelled))
     return job, job.steps
 
 
@@ -1033,7 +1060,7 @@ def _parse_requirement(text: str) -> tuple[str, frozenset[str], list[tuple[str, 
     clauses = _parse_clauses(specifier[1:-1] if specifier.startswith("(") else specifier) if match else None
     if not match or clauses is None:
         raise ValueError(f"unsupported requirement {text.strip()!r}")
-    extras = frozenset(_canonical(extra) for extra in (match.group(2) or "").split(",") if extra.strip())
+    extras = frozenset(_canonical(extra.strip()) for extra in (match.group(2) or "").split(",") if extra.strip())
     return match.group(1), extras, clauses, _parse_marker(match.group(4)) if match.group(4) else None
 
 
@@ -1310,6 +1337,8 @@ def report_replay(context: Context, report: Report) -> None:
             raise ToolingError(f"base {base} is not available to the throwaway copy")
         job, steps = replay_steps((copy / WORKFLOW_PATH).read_text(encoding="utf-8"))
         python_version = _python_version(steps)
+        if sys.platform != "linux":
+            raise ToolingError(f"the job runs on {job.keys['runs-on']}; this machine is {sys.platform}, not Linux")
     except ToolingError as exc:
         report.fail(str(exc), tooling=True)
         return
