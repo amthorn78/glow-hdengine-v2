@@ -726,7 +726,7 @@ def test_replay_runs_a_synthetic_workflow_in_a_throwaway_copy(tmp_path: Path, pr
         ".github/workflows/ci.yml": _replay_workflow(product_body),
         "requirements.txt": "pytest\n",
         # A script a step calls sees only the runner variables the replay models, never the caller's.
-        "ci/runner_env.sh": ('test -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}"\n'
+        "ci/runner_env.sh": ('set -e\ntest -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}"\n'
                              'test "$GITHUB_ACTIONS/$GITHUB_EVENT_NAME" = true/pull_request\n'),
     })
     result = _run(repo, "replay", "--full",
