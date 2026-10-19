@@ -375,7 +375,10 @@ On #656's final head `f7d610e` (code equal to `5e62a65`), check run 117798448239
 
 ### 5.10 Full `tests/` sweep at `5e62a65`
 
-@@SWEEP_DETAIL@@
+- **Command:** `python -m pytest -q -p no:cacheprovider tests/` in a detached copy of `5e62a65`, with `XDG_STATE_HOME` pointed at an empty scratch directory.
+- **Result:** **5,186 passed, 3 skipped, 2 xfailed, 0 failed**, 5 warnings (1,088.5 s; 01:25:37Z to 01:43:47Z, concurrent with the replay of §5.8); pytest exit 0.
+- **Afterwards:** `git status` and `git diff` empty; no file under the scratch `XDG_STATE_HOME`.
+- **Comparison:** the count equals the WU-PR-05 lineage review's sweep on `822ce15`, whose code is identical. The skips and xfails are the pre-existing ones. The warnings are the pre-existing `datetime.utcnow()` deprecation in `engine/ops/http_log.py`.
 
 ## 6. Bounded files and components
 
