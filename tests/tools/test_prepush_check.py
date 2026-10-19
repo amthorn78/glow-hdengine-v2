@@ -172,11 +172,19 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
                                   "        env: invalid\n        run: python3 ci/checks/check_agents_md_citations.py"),
         lambda text: text.replace("runs-on: ubuntu-latest", "runs-on: ubuntu-24.04-arm"),
         lambda text: text.replace("        run: python3 ci/checks/check_agents_md_citations.py\n", ""),
+        lambda text: text.rstrip("\n") + ("\n\n  other:\n    runs-on: ubuntu-latest\n    steps:\n"
+                                          "      - name: fail\n        run: exit 1\n"),
+        lambda text: text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}\n",
+                                  "          BASE_SHA:\n            nested: invalid\n"),
+        lambda text: text.replace(
+            "        id: python_setup\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
+            "        id: python_setup\n        if:\n          nested: invalid\n"),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
          "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials",
-         "checkout-condition", "install-env", "step-env-not-a-mapping", "runner-label", "executed-without-run"],
+         "checkout-condition", "install-env", "step-env-not-a-mapping", "runner-label", "executed-without-run",
+         "second-job", "structured-env-value", "step-if-not-a-string"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -213,6 +221,34 @@ def test_a_step_that_is_not_a_mapping_is_refused() -> None:
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="unsupported shape"):
         tool.replay_steps(mutated)
+    nested_job_env = text.replace("      APP_ENV: dev\n", "      APP_ENV:\n        nested: invalid\n", 1)
+    assert nested_job_env != text
+    with pytest.raises(tool.ToolingError, match="unsupported shape"):
+        tool.replay_steps(nested_job_env)
+
+
+@pytest.mark.parametrize("value", ["{nested: invalid}", "[a, b]", "&anchor x", "*alias", "!tag x", "|+", ">2"])
+def test_yaml_forms_the_parser_does_not_model_are_refused(value: str) -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    mutated = text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}",
+                           f"          BASE_SHA: {value}")
+    assert mutated != text
+    with pytest.raises(tool.ToolingError, match="unsupported YAML value"):
+        tool.replay_steps(mutated)
+
+
+def test_an_unexpected_report_exception_still_reaches_the_read_only_check(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    repo = _synthetic(tmp_path / "raises", {"data.txt": "tracked\n"})
+
+    def raises(context: object, report: object) -> None:
+        raise TypeError("boom")
+
+    monkeypatch.setitem(tool.RUNNERS, "build-notes", raises)
+    assert tool.main(["build-notes", "--repo-root", str(repo)]) == tool.EXIT_REPORT_FAILED
+    out = capsys.readouterr().out
+    assert "build-notes: TOOLING_FAILURE TypeError: boom" in out
+    assert "PREPUSH_CHECK_RESULT: FAIL build-notes=FAIL; repository unchanged" in out
 
 
 def test_expressions_cover_the_workflow_forms() -> None:
@@ -403,6 +439,14 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     with pytest.raises(ValueError, match="setup.cfg"):
         tool._install_check(run, copy, fixed)
     (copy / "setup.cfg").unlink()
+    # A [project] that is not a table is refused before anything reads it, and the substitute reports tooling.
+    (copy / "pyproject.toml").write_text('project = []\n[build-system]\nrequires = ["setuptools>=68", "wheel"]\n'
+                                         'build-backend = "setuptools.build_meta"\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="no \\[project\\] table"):
+        tool._install_check(run, copy, fixed)
+    outcome, detail = tool._substitute({"run": run}, "reason", copy, "3.12", "3.12")
+    assert outcome == "failure" and detail.startswith("TOOLING cannot read the install step's inputs")
+    (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
     for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
         with pytest.raises(ValueError):
             tool._install_check(unsupported, copy, fixed)

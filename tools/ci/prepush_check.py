@@ -440,6 +440,12 @@ def _plain(value: str) -> str:
         return inner.replace("''", "'") if value[0] == "'" else inner
     if " #" in value:
         value = value.split(" #", 1)[0].rstrip()
+    # A flow collection, anchor, alias, tag, block-scalar option or other
+    # indicator would be read as a literal string here; GitHub's parser reads
+    # it as YAML, so it fails closed.
+    if value[:1] in set("{[&*!|>%@`") or value == "?" or value.startswith("? "):
+        raise ToolingError(f"unsupported YAML value {value!r} (flow collections, anchors, aliases, tags and "
+                           "block-scalar options are not modelled)")
     return value
 
 
@@ -545,7 +551,8 @@ def parse_jobs(text: str) -> dict[str, Job]:
             raise ToolingError(f"job {name!r} is not a mapping")
         steps = body.get("steps", [])
         env = body.get("env", {})
-        if not isinstance(steps, list) or not isinstance(env, dict) or not all(isinstance(s, dict) for s in steps):
+        if not isinstance(steps, list) or not isinstance(env, dict) or not all(isinstance(s, dict) for s in steps) \
+                or not all(isinstance(v, str) for v in env.values()):
             raise ToolingError(f"job {name!r} has an unsupported shape")
         jobs[name] = Job(keys=body, env={k: str(v) for k, v in env.items()}, steps=steps)
     return jobs
@@ -1066,6 +1073,8 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
     jobs = parse_jobs(text)
     if REPLAY_JOB not in jobs:
         raise ToolingError(f"{WORKFLOW_PATH} has no {REPLAY_JOB!r} job")
+    if set(jobs) != {REPLAY_JOB}:
+        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the workflow's jobs {sorted(jobs)} are not exactly [{REPLAY_JOB!r}]")
     job = jobs[REPLAY_JOB]
     unknown_job_keys = set(job.keys) - REPLAY_JOB_KEYS
     if unknown_job_keys:
@@ -1093,9 +1102,13 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
         if kind == REPLAY_EXCLUDED and set(step) - REPLAY_EXCLUDED_STEP_KEYS[name]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has keys its substitute does not model "
                                f"{sorted(set(step) - REPLAY_EXCLUDED_STEP_KEYS[name])}")
+        for key in ("name", "id", "if", "uses", "shell", "run"):
+            if key in step and not isinstance(step[key], str):
+                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a string")
+        for key in ("env", "with"):
+            if key in step and not (isinstance(step[key], dict) and all(isinstance(v, str) for v in step[key].values())):
+                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a mapping of strings")
         step_env = step.get("env", {})
-        if not isinstance(step_env, dict):
-            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has an env that is not a mapping")
         named = set(_RUNNER_VARIABLE_RE.findall(str(step.get("run", "")))) - modelled_variables
         named |= {str(key) for key in step_env if _RUNNER_VARIABLE_RE.fullmatch(str(key))}
         if named:
@@ -1511,13 +1524,15 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
                 roots += [(line, "the install step") for line in _requirement_lines(target)]
             else:
                 pyproject = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8"))
-                project, build = pyproject["project"], pyproject.get("build-system")
+                project, build = pyproject.get("project"), pyproject.get("build-system")
+                if not isinstance(project, dict):
+                    raise ValueError("the editable project's pyproject.toml has no [project] table")
                 if build != REPLAY_BUILD_SYSTEM:
-                    raise ValueError(f"the editable project {project['name']!r} has [build-system] {build!r}, not "
+                    raise ValueError(f"the editable project {project.get('name')!r} has [build-system] {build!r}, not "
                                      f"the one the replay models, {REPLAY_BUILD_SYSTEM!r}")
                 problems = _configuration_problems(pyproject, target)
                 if problems:
-                    raise ValueError(f"the editable project {project['name']!r} has configuration the replay does not "
+                    raise ValueError(f"the editable project {project.get('name')!r} has configuration the replay does not "
                                      "model or setuptools would reject: " + "; ".join(problems))
                 projects.append(project)
                 roots.append((str(project["name"]), "the install step"))
@@ -1677,7 +1692,7 @@ def _substitute(step: dict[str, object], reason: str, copy: Path,
     run = str(step.get("run", ""))
     try:
         unmet = _install_check(run, copy)
-    except (OSError, KeyError, ValueError, tomllib.TOMLDecodeError) as exc:
+    except (OSError, KeyError, TypeError, ValueError, tomllib.TOMLDecodeError) as exc:
         return "failure", f"TOOLING cannot read the install step's inputs: {exc}"
     if unmet:
         return "failure", "TOOLING the caller's environment does not satisfy the install step: " + ", ".join(unmet)
@@ -1798,7 +1813,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 RUNNERS[name](context, report)
             except ToolingError as exc:
                 report.fail(str(exc), tooling=True)
-            except (OSError, UnicodeError, ValueError, KeyError, subprocess.SubprocessError) as exc:
+            except Exception as exc:  # noqa: BLE001
                 # Keep the post-run read-only check reachable whatever a report raised.
                 report.fail(f"{type(exc).__name__}: {exc}", tooling=True)
             duration = time.monotonic() - started
