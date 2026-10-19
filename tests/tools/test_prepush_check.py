@@ -162,10 +162,11 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
                                   'run: python3 ci/checks/check_agents_md_citations.py --sha "$GITHUB_SHA"'),
         lambda text: text.replace("          BASE_SHA: ", "          RUNNER_OS: Linux\n          BASE_SHA: "),
         lambda text: text.replace("      APP_ENV: dev\n", "      APP_ENV: dev\n      GITHUB_WORKSPACE: /w\n", 1),
+        lambda text: text.replace("persist-credentials: false", "persist-credentials: true"),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
-         "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env"],
+         "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -316,6 +317,13 @@ def test_install_substitute_follows_extras_dependencies_and_the_editable_project
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"<3"'), encoding="utf-8")
     assert tool._install_check(run, copy, fixed) == [
         f"proj requires-python <3 (the interpreter is {platform.python_version()})"]
+    # The editable reinstall rewrites the installed version, local label included.
+    (copy / "pyproject.toml").write_text(pyproject.replace('version = "0.2.0"', 'version = "0.2.0+candidate"'),
+                                         encoding="utf-8")
+    assert tool._install_check(run, copy, fixed) == ["proj 0.2.0 (the candidate declares version 0.2.0+candidate)"]
+    # Equal under PEP 440, but the reinstalled metadata would read 0.2.
+    (copy / "pyproject.toml").write_text(pyproject.replace('version = "0.2.0"', 'version = "0.2"'), encoding="utf-8")
+    assert tool._install_check(run, copy, fixed) == ["proj 0.2.0 (the candidate declares version 0.2)"]
     (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"> = 3"'), encoding="utf-8")
     with pytest.raises(ValueError, match="unsupported requires-python"):
         tool._install_check(run, copy, fixed)
@@ -366,6 +374,12 @@ def test_version_clauses_and_markers_follow_pep_440_and_508() -> None:
             tool._parse_requirement(unsupported)
     with pytest.raises(ValueError, match="not a PEP 440 version"):
         tool._parse_version("not-a-version")
+    for version, normal in (
+            ("1.0+Ubuntu-01", "1.0+ubuntu.1"), ("0.0", "0.0"), ("0.0.0", "0.0.0"), ("v01.2", "1.2"),
+            ("0!1.0-1", "1.0.post1"), ("1!2.0Alpha.3", "1!2.0a3"), ("1.0c1", "1.0rc1"), ("1.0preview2", "1.0rc2"),
+            ("1.0.post", "1.0.post0"), ("1.0r2", "1.0.post2"), ("1.0-dev", "1.0.dev0"),
+            ("1.0b2.post1.dev3", "1.0b2.post1.dev3")):
+        assert tool._normalized_version(version) == normal, version
 
     environment = {"python_version": "3.12", "python_full_version": "3.12.3", "sys_platform": "linux",
                    "implementation_name": "cpython", "extra": ""}

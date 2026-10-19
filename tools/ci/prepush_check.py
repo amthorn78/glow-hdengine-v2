@@ -130,7 +130,7 @@ REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 # drift.
 REPLAY_WORKFLOW_KEYS = frozenset({"name", "run-name", "on", "permissions", "concurrency", "jobs"})
 REPLAY_SUBSTITUTED_INPUTS: dict[str, dict[str, str | None]] = {
-    "actions/checkout@v4": {"fetch-depth": "0", "persist-credentials": None,
+    "actions/checkout@v4": {"fetch-depth": "0", "persist-credentials": "false",
                             "ref": "${{ github.event.pull_request.head.sha || github.sha }}"},
     "actions/setup-python@v5": {"python-version": None},
 }
@@ -1088,6 +1088,27 @@ def _parse_version(text: str) -> _Version:
     return _Version(release, key, pre is not None or dev is not None, post is not None, local is not None)
 
 
+def _normalized_version(text: str) -> str:
+    """A version's PEP 440 normal form, the string installed metadata records (local label included)."""
+    match = _VERSION_RE.fullmatch(text.strip())
+    if not match:
+        raise ValueError(f"version {text.strip()!r} is not a PEP 440 version")
+    epoch, release_text, pre, pre_n, post_implicit, post_n, dev, dev_n, local = match.groups()
+    post = post_implicit if post_implicit is not None else post_n
+    normal = f"{int(epoch)}!" if epoch and int(epoch) else ""
+    normal += ".".join(str(int(part)) for part in release_text.split("."))
+    if pre is not None:
+        normal += {"alpha": "a", "a": "a", "beta": "b", "b": "b"}.get(pre.lower(), "rc") + str(int(pre_n or 0))
+    if post is not None:
+        normal += f".post{int(post or 0)}"
+    if dev is not None:
+        normal += f".dev{int(dev_n or 0)}"
+    if local:
+        segments = re.split(r"[-_.]", local[1:].lower())
+        normal += "+" + ".".join(str(int(part)) if part.isdigit() else part for part in segments)
+    return normal
+
+
 def _canonical(name: str) -> str:
     return re.sub(r"[-_.]+", "-", name).lower()
 
@@ -1387,7 +1408,8 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
             continue  # already reported as not installed
         if "version" not in project:
             raise ValueError(f"the editable project {name!r} declares no static version")
-        if _parse_version(distribution.version).key != _parse_version(str(project["version"])).key:
+        # pip's reinstall rewrites the installed metadata with the candidate's normalized version string.
+        if _normalized_version(distribution.version) != _normalized_version(str(project["version"])):
             unmet.append(f"{name} {distribution.version} (the candidate declares version {project['version']})")
         requires_python = str(project.get("requires-python", ""))
         python_clauses = _parse_clauses(requires_python)
