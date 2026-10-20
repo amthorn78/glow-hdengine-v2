@@ -4927,6 +4927,18 @@ def test_v2_superseded_real_specification_is_refused(
     assert not (repo / CRD_REPORT_REL).exists()
 
 
+def test_v2_real_document_with_a_requirement_row_is_not_a_requirements_source(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    instruction_rel = "docs/ephemeral/HDE-CRD-0002-WU-PR-07-pr-instruction-v1.0.md"
+    payload = (ROOT / instruction_rel).read_bytes()
+    assert close_pack._requirement_ids(payload, "HDE-CRD-0002") == {"S21"}
+    repo, source_rel = _bind_real_crd_specification(tmp_path, instruction_rel)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REQUIREMENTS_SOURCE_NOT_CURRENT"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
 def test_v2_current_real_approved_specification_is_accepted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
