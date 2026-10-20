@@ -266,7 +266,7 @@ def test_a_step_that_is_not_a_mapping_is_refused() -> None:
 
 @pytest.mark.parametrize("value", ["{nested: invalid}", "[a, b]", "&anchor x", "*alias", "!tag x", "|+", ">2",
                                    '"echo replay_pass\\nexit 1"', '"unterminated', "'a' b", "a: b", "- x", "# c",
-                                   "]", "}", ",x", "] x", "-\tx", "?\tx", ":\tx", "? x"])
+                                   "]", "}", ",x", "] x", "-\tx", "?\tx", ":\tx", "? x", "foo:\tbar"])
 def test_yaml_forms_the_parser_does_not_model_are_refused(value: str) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     mutated = text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}",
@@ -281,7 +281,7 @@ def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
     assert tool._plain("'it''s'  # comment") == "it's"
     assert tool._plain("plain value\t# comment") == "plain value"
     # "-", "?" and ":" followed by a non-space begin a plain scalar, and flow indicators may follow its first character.
-    for value in ("-x", "?x", ":x", "a,b", "a]", "x}"):
+    for value in ("-x", "?x", ":x", "a,b", "a]", "x}", "foo:bar"):
         assert tool._plain(value) == value
     # GitHub rejects a repeated key; a key is a plain word followed by ': '.
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -319,6 +319,17 @@ def test_the_whole_workflow_is_one_mapping_without_repeated_keys() -> None:
     # The sweep's coverage reads the jobs through the same parse.
     with pytest.raises(tool.ToolingError, match="repeated"):
         tool.pytest_command_tokens(text + second_jobs)
+
+
+def test_sequence_entries_share_one_indentation() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    entries = "    paths:\n      - '**'\n      - '!docs/crd/**'\n"
+    for new in ("    paths:\n      - '**'\n        - '!docs/crd/**'\n",
+                "    paths:\n        - '**'\n      - '!docs/crd/**'\n"):
+        mutated = text.replace(entries, new, 1)
+        assert mutated != text
+        with pytest.raises(tool.ToolingError, match="indented differently from its sequence's first entry"):
+            tool.replay_steps(mutated)
 
 
 def test_tabs_in_indentation_are_refused_and_elsewhere_read_as_yaml_reads_them() -> None:
@@ -921,6 +932,12 @@ def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
     untracked_directory = tool.repository_state(repo)
     assert not untracked_directory.status and ".git" not in {entry[0] for entry in untracked_directory.directories}
     assert "untracked-empty" in {entry[0] for entry in untracked_directory.directories}
+    # Nor does an empty directory in the git metadata; its name is part of the metadata digest.
+    (repo / ".git" / "refs" / "empty").mkdir()
+    metadata_directory = tool.repository_state(repo)
+    assert metadata_directory.metadata != untracked_directory.metadata and not metadata_directory.status
+    (repo / ".git" / "refs" / "empty").rmdir()
+    assert tool.repository_state(repo).metadata == untracked_directory.metadata
 
 
 # --------------------------------------------------------------------------

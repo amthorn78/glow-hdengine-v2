@@ -307,10 +307,19 @@ def resolve_commit(repo: Path, ref: str) -> str:
 
 
 def _metadata_digest(directory: Path) -> str:
-    """Digest of git metadata: file bytes, plus names and sizes under objects/."""
+    """Digest of git metadata: file bytes, plus names and sizes under objects/, and every directory's name.
+
+    An empty directory holds no file, so without its name its creation or
+    removal would go unseen.
+    """
     digest = hashlib.sha256()
-    for path in sorted(p for p in directory.rglob("*") if p.is_file() or p.is_symlink()):
+    for path in sorted(directory.rglob("*")):
         rel = path.relative_to(directory).as_posix()
+        if path.is_dir() and not path.is_symlink():
+            digest.update(f"{rel}/\0".encode())
+            continue
+        if not (path.is_file() or path.is_symlink()):
+            continue
         if rel.startswith("objects/"):
             digest.update(f"{rel}\0{path.lstat().st_size}\0".encode())
             continue
@@ -534,7 +543,7 @@ def _plain(value: str) -> str:
     # literal string here; GitHub's parser reads it as YAML or rejects it, so
     # it fails closed.
     if value[:1] in set(",[]{}#&*!|>%@`") or (value[:1] in set("-?:") and value[1:2] in {"", " ", "\t"}) \
-            or ": " in value or value.endswith(":"):
+            or re.search(r":[ \t]", value) or value.endswith(":"):
         raise ToolingError(f"unsupported YAML value {value!r} (flow indicators, anchors, aliases, tags, "
                            "block-scalar options, sequence entries and nested mapping values are not modelled)")
     return _resolve(value)
@@ -624,6 +633,7 @@ def _mapping(lines: list[str], start: int, parent_indent: int) -> tuple[dict[str
 def _sequence(lines: list[str], start: int, parent_indent: int) -> tuple[list[object], int]:
     items: list[object] = []
     index = start
+    item_indent = None
     while index < len(lines):
         line = lines[index]
         _spaces_only(line, index)
@@ -633,6 +643,12 @@ def _sequence(lines: list[str], start: int, parent_indent: int) -> tuple[list[ob
         indent = _indent(line)
         if indent <= parent_indent or not line.lstrip().startswith("- "):
             break
+        # YAML rejects a block sequence whose entries are not all at one indentation.
+        if item_indent is None:
+            item_indent = indent
+        if indent != item_indent:
+            raise ToolingError(f"sequence entry at line {index + 1} is indented differently from its sequence's "
+                               "first entry")
         content = line[indent + 2:]
         if ":" in content and not content.lstrip().startswith(("'", '"')):
             # A mapping item: re-read its first line as a key at indent + 2.
