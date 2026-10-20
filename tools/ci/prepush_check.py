@@ -153,12 +153,23 @@ REPLAY_EXCLUDED_STEP_CONDITIONS = {
 }
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 # What the replay stands in for, and the only inputs it models: the workflow's
-# top-level keys, the ubuntu-latest runner (x86_64 Linux, replayed on this
-# machine, which must be x86_64 Linux too), and the
+# keys other than jobs, exactly as ci.yml sets them (GitHub validates them
+# before the job runs; the replay does not, so a key, value or scalar type
+# other than these is drift), the ubuntu-latest runner (x86_64 Linux, replayed
+# on this machine, which must be x86_64 Linux too), and the
 # two substituted actions, revision included, with their inputs (None: any
 # value; a string: exactly that value, required).  Anything else is inventory
 # drift.
-REPLAY_WORKFLOW_KEYS = frozenset({"name", "run-name", "on", "permissions", "concurrency", "jobs"})
+_REPLAY_PATHS = ["**", "!docs/crd/**", "!docs/ephemeral/**", "!docs/graph/**", "!docs/pfcanon/**", "!docs/plans/**",
+                 "!docs/prompt_ecosystem_management/**", "!docs/qa/**", "!docs/run/**", "**.path_proof.txt",
+                 "docs/run/EPIC011_TEST_IDENTITIES.md", "docs/run/PROD_ENDPOINTS.json"]
+REPLAY_WORKFLOW_HEADER: dict[str, object] = {
+    "name": "ci",
+    "on": {"pull_request": {"paths": _REPLAY_PATHS}, "push": {"branches": ["main"], "paths": _REPLAY_PATHS}},
+    "permissions": {"contents": "read"},
+    "concurrency": {"group": "ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}",
+                    "cancel-in-progress": "${{ github.event_name == 'pull_request' }}"},
+}
 REPLAY_RUNNER = "ubuntu-latest"
 REPLAY_MACHINES = frozenset({"x86_64", "amd64"})
 REPLAY_SUBSTITUTED_INPUTS: dict[str, dict[str, str | None]] = {
@@ -1081,7 +1092,7 @@ class Expressions:
         if token in {("op", "=="), ("op", "!=")}:
             self.position += 1
             right = self._unary()
-            equal = str(_string(left)).lower() == str(_string(right)).lower()
+            equal = _equal(left, right)
             return equal if token[1] == "==" else not equal
         return left
 
@@ -1129,6 +1140,9 @@ class Expressions:
                 value = value.get(part, "")
             else:
                 return ""
+        # GitHub compares objects by reference and treats every object as true; the replay models string values only.
+        if isinstance(value, dict):
+            return _Unmodelled(dotted, "is an object, which the replay does not model")
         return value
 
 
@@ -1137,9 +1151,10 @@ class _Unmodelled:
     """A context value the replay does not model; using it, not discarding it, is tooling."""
 
     path: str
+    reason: str = "is not modelled for this event"
 
     def refuse(self) -> ToolingError:
-        return ToolingError(f"unsupported context: {self.path} is not modelled for this event")
+        return ToolingError(f"unsupported context: {self.path} {self.reason}")
 
 
 def _truthy(value: object) -> bool:
@@ -1153,7 +1168,27 @@ def _string(value: object) -> str:
         raise value.refuse()
     if isinstance(value, bool):
         return "true" if value else "false"
-    return "" if value is None or isinstance(value, dict) else str(value)
+    return str(value)
+
+
+def _equal(left: object, right: object) -> bool:
+    """GitHub's == where it needs no conversion: two booleans, or two strings compared ignoring case.
+
+    GitHub converts operands of different types to numbers, and folds the case of
+    non-ASCII letters by its own rules; the replay models neither, so such a
+    comparison is tooling."""
+    for value in (left, right):
+        if isinstance(value, _Unmodelled):
+            raise value.refuse()
+    if isinstance(left, bool) and isinstance(right, bool):
+        return left == right
+    if isinstance(left, str) and isinstance(right, str):
+        if left == right or (left.isascii() and right.isascii()):
+            return left.lower() == right.lower()
+        raise ToolingError("unsupported comparison: GitHub ignores the case of non-ASCII letters by rules the "
+                           "replay does not model")
+    raise ToolingError("unsupported comparison: GitHub converts a boolean and a string to numbers to compare them, "
+                       "which the replay does not model")
 
 
 def interpolate(text: str, expressions: Expressions) -> str:
@@ -1176,10 +1211,24 @@ def condition(text: object, expressions: Expressions) -> bool:
 # replay
 # --------------------------------------------------------------------------
 
+def _identical(left: object, right: object) -> bool:
+    """Equal as parsed YAML, scalar types included: a plain scalar YAML reads as a non-string is not a string."""
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(_identical(left[key], right[key]) for key in left)
+    if isinstance(left, list):
+        return len(left) == len(right) and all(map(_identical, left, right))
+    return left == right
+
+
 def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
-    top = set(parse_workflow(text))
-    if top - REPLAY_WORKFLOW_KEYS:
-        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: unsupported workflow keys {sorted(top - REPLAY_WORKFLOW_KEYS)}")
+    header = {key: value for key, value in parse_workflow(text).items() if key != "jobs"}
+    differ = sorted(key for key in header.keys() | REPLAY_WORKFLOW_HEADER.keys()
+                    if not _identical(header.get(key), REPLAY_WORKFLOW_HEADER.get(key)))
+    if differ:
+        raise ToolingError(f"REPLAY_INVENTORY_DRIFT: workflow keys other than jobs differ from the tool's model: "
+                           + ", ".join(differ))
     jobs = parse_jobs(text)
     if REPLAY_JOB not in jobs:
         raise ToolingError(f"{WORKFLOW_PATH} has no {REPLAY_JOB!r} job")

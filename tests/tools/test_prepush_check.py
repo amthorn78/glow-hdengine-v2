@@ -191,13 +191,22 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
         lambda text: text.replace("run: python3 ci/checks/check_agents_md_citations.py", "run: true"),
         lambda text: text.replace("          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
                                   "          HEAD_SHA: 1.0"),
+        lambda text: text.replace("permissions:\n  contents: read\n", "permissions: invalid\n"),
+        lambda text: text.replace("permissions:\n  contents: read\n", "permissions:\n  contents: write\n"),
+        lambda text: text.replace("name: ci\n", "name: true\n", 1),
+        lambda text: text.replace("\njobs:\n", "\nrun-name: ${{ github.sha }}\n\njobs:\n"),
+        lambda text: text.replace("  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n", ""),
+        lambda text: text.replace("      - '!docs/qa/**'\n", "", 1),
+        lambda text: text.replace("    branches:\n      - main\n", "    branches:\n      - 'main*'\n"),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
          "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials",
          "checkout-condition", "install-env", "step-env-not-a-mapping", "runner-label", "executed-without-run",
          "second-job", "structured-env-value", "step-if-not-a-string", "install-condition",
-         "setup-python-condition", "install-condition-removed", "run-boolean", "step-env-float"],
+         "setup-python-condition", "install-condition-removed", "run-boolean", "step-env-float",
+         "permissions-scalar", "permissions-value", "name-boolean", "run-name-added", "concurrency-key-removed",
+         "pull-request-path-removed", "push-branch"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -205,6 +214,15 @@ def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="REPLAY_INVENTORY_DRIFT"):
         tool.replay_steps(mutated)
+
+
+def test_the_workflow_header_is_compared_with_its_scalar_types(monkeypatch: pytest.MonkeyPatch) -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    monkeypatch.setitem(tool.REPLAY_WORKFLOW_HEADER, "name", "true")
+    assert len(tool.replay_steps(text.replace("name: ci\n", "name: 'true'\n", 1))[1]) == len(tool.REPLAY_INVENTORY)
+    # Plain, the same text is a YAML boolean, which GitHub does not read as the string.
+    with pytest.raises(tool.ToolingError, match="REPLAY_INVENTORY_DRIFT: .*: name$"):
+        tool.replay_steps(text.replace("name: ci\n", "name: true\n", 1))
 
 
 def test_replay_needs_an_x86_64_linux_machine(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -378,6 +396,46 @@ def test_expressions_cover_the_workflow_forms() -> None:
     push = tool.Expressions(tool.replay_contexts("push", "p", "s"), job_failed=False)
     assert tool.interpolate("${{ github.sha }}/${{ github.event.before }}", push) == "s/p"
     assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", push) == "s"
+
+
+@pytest.mark.parametrize(
+    "expression, value",
+    [
+        ("steps.classify.outputs.needs_python == 'true'", True),
+        ("steps.classify.outputs.needs_python == 'TRUE'", True),
+        ("steps.classify.outputs.needs_python != 'false'", True),
+        ("github.event_name == 'push'", False),
+        ("true == true", True),
+        ("false != true", True),
+        ("!steps.classify.outputs.needs_python == false", True),
+        ("'\u00e9' == '\u00e9'", True),
+        ("false == ''", "converts a boolean and a string"),
+        ("false != ''", "converts a boolean and a string"),
+        ("true == '1'", "converts a boolean and a string"),
+        ("steps.classify.outputs.needs_python == true", "converts a boolean and a string"),
+        ("'\u00e9' == '\u00c9'", "non-ASCII"),
+        ("'k' == '\u212a'", "non-ASCII"),
+        ("steps.classify.outputs == ''", "is an object"),
+        ("steps.classify != 'x'", "is an object"),
+        ("steps.classify.outputs || 'x'", "is an object"),
+        ("!steps.classify", "is an object"),
+    ],
+)
+def test_comparisons_are_github_s_where_no_conversion_is_needed_and_refused_otherwise(
+        expression: str, value: object) -> None:
+    # GitHub converts operands of different types to numbers (false == '' is true there) and compares objects
+    # by reference; the replay models strings and booleans only.
+    contexts = tool.replay_contexts("pull_request", "b", "h")
+    contexts["steps"] = {"classify": {"outcome": "success", "outputs": {"needs_python": "true"}}}
+    expressions = tool.Expressions(contexts, job_failed=False)
+    if isinstance(value, bool):
+        assert expressions.evaluate(expression) is value
+    else:
+        with pytest.raises(tool.ToolingError, match=value):
+            expressions.evaluate(expression)
+    for text in ("${{ steps.classify.outputs }}", "${{ steps.classify }}"):
+        with pytest.raises(tool.ToolingError, match="is an object"):
+            tool.interpolate(text, expressions)
 
 
 _REJECTED = "the runner rejects GITHUB_OUTPUT record"
@@ -1049,7 +1107,8 @@ def _replay_workflow(product_body: str) -> str:
         "Run approved generic QA subsystem lane in isolation": ("qa_lane", "qa", "exit 1"),
         "Build and verify exact-source release attestation": ("release_lane", "release", "exit 1"),
     }
-    lines = ["name: ci", "jobs:", "  test:", "    runs-on: ubuntu-latest", "    env:"]
+    header = WORKFLOW.read_text(encoding="utf-8").split("\njobs:\n", 1)[0]
+    lines = header.splitlines() + ["jobs:", "  test:", "    runs-on: ubuntu-latest", "    env:"]
     lines += [f'      {k}: "{v}"' for k, v in tool.CLOSED_RAILS.items()]
     lines.append("    steps:")
     for name, _kind, _reason in tool.REPLAY_INVENTORY:
