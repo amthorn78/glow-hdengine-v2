@@ -4590,6 +4590,25 @@ def test_v2_refuses_updater_outputs_and_the_close_run_family_as_causal_inputs(
     assert not (repo / CRD_REPORT_REL).exists()
 
 
+@pytest.mark.parametrize(
+    ("identifier", "payload", "expected"),
+    (
+        ("S1", b"| S1.2 |", False),
+        ("S1.2", b"| S1.2.3 |", False),
+        ("S1.2", b"| S1.2 |", True),
+        ("HDE-FERM008", b"HDE-FERM008.7 to HDE-FERM008.12", False),
+        ("HDE-FERM008", b"Parent HDE-FERM008.", True),
+        ("2", b"| S1.2 |", False),
+        ("S01", b"| S01 | text |", True),
+        ("S01", b"| S010 |", False),
+    ),
+)
+def test_v2_requirement_ids_match_only_complete_dotted_identifiers(
+    identifier: str, payload: bytes, expected: bool
+) -> None:
+    assert close_pack._token_occurs(identifier, payload) is expected
+
+
 def _mutate(source: dict[str, object], case: str) -> None:
     if case == "unresolved_binding":
         source["acceptance"][0]["evidence_bindings"] = ["absent"]

@@ -2317,7 +2317,12 @@ def _require_feedback_free_values_v2(
 
 
 def _token_occurs(identifier: str, payload: bytes) -> bool:
-    pattern = rb"(?<![A-Za-z0-9-])" + re.escape(identifier.encode("ascii")) + rb"(?![A-Za-z0-9-])"
+    # A dot between alphanumerics continues an ID (HDE-FERM008.5); a trailing dot is punctuation.
+    pattern = (
+        rb"(?<![A-Za-z0-9-])(?<![A-Za-z0-9]\.)"
+        + re.escape(identifier.encode("ascii"))
+        + rb"(?![A-Za-z0-9-])(?!\.[A-Za-z0-9])"
+    )
     return re.search(pattern, payload) is not None
 
 
