@@ -13,7 +13,7 @@ requested_by: Nathan (Product Owner), in the WU-PR-06 PR-20/PR-30 session, befor
 author_session: https://claude.ai/code/session_01NZEtMVb5HR3XYEmJ6W5cb6 (author of the PR-20 plan v1.0 and the PR-30 result v1.0 of this unit)
 canon_read_on: origin/main 0442d23
 analysis_state: COMPLETE
-canon_change: NONE. Sections 9 to 12 are proposals; nothing here is adopted
+canon_change: NONE. Sections 9 to 11 are proposals and are not adopted. §12 was adopted as D-4 (§17)
 code_change: NONE
 ```
 
@@ -318,7 +318,15 @@ Read on `origin/main` `0442d23`:
 | S20's origin | `docs/ephemeral/HDE-CRD-0002-candidate-item-briefs-v1.2.md` item 7; `docs/ephemeral/HDE-CRD-0002-specification-v1.1.md` |
 | The design promise | `docs/ephemeral/HDE-CRD-0002-WU-PR-06-pr-instruction-v1.0.md` ID-8; `docs/ephemeral/HDE-CRD-0002-WU-PR-06-pr-implementation-plan-v1.0.md` §5.7 and PD-8 |
 
+## 17. Decisions taken after writing
+
+| # | Decision | Where it is recorded |
+| :- | :- | :- |
+| D-4 | Adopted. Nathan, 2026-10-20: "make the d4 changes in a new PR". The §12 rule is added to AGENTS.md "Code review guidelines" in the pull request that carries this record. | That pull request's `AGENTS.md` commit |
+| D-5 | Routed. Nathan, 2026-10-20: "send the d5 findings to the GCPFE modification backlog in notion". §11 is recorded as MB-013 to MB-019. Before writing, each target's 100926.1 body (and `glow-hde-pr-development` 1.4.0) was read in full; none has a business-case, real-input, repeated-finding or spend rule. | GCFPE Modification Backlog (Notion `3e54590a05eb81eb818fd0f42045167a`), MB-013 to MB-019, read back after writing |
+| D-1, D-2, D-3 | Open | — |
+
 **Nonclaims.**
-- This record changes no canon, prompt, skill or AGENTS.md.
+- This record changes no canon, prompt or skill. The AGENTS.md change is D-4's, made in its own commit.
 - It approves nothing and establishes no QA, acceptance, merge or closure.
 - It is not the PR-40 lineage review.
