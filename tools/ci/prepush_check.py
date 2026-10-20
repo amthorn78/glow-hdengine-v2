@@ -266,11 +266,12 @@ def resolve_commit(repo: Path, ref: str) -> str:
 
 
 def _metadata_digest(directory: Path) -> str:
-    """Digest of git metadata: file bytes, lstat identities under objects/, and every directory's name.
+    """Digest of git metadata: every file's lstat identity, its bytes outside objects/, and every directory's name.
 
-    An object is not read, but any write to it changes its st_ctime_ns, which
-    user space cannot set back.  An empty directory holds no file, so without
-    its name its creation or removal would go unseen.
+    Any write to a file changes its st_ctime_ns, which user space cannot set
+    back, so a rewrite with the same bytes is seen too; an object is therefore
+    not read.  An empty directory holds no file, so without its name its
+    creation or removal would go unseen.
     """
     digest = hashlib.sha256()
     for path in sorted(directory.rglob("*")):
@@ -280,11 +281,10 @@ def _metadata_digest(directory: Path) -> str:
             continue
         if not (path.is_file() or path.is_symlink()):
             continue
+        info = path.lstat()
+        digest.update(f"{rel}\0{info.st_mode}\0{info.st_size}\0{info.st_mtime_ns}\0{info.st_ctime_ns}\0".encode())
         if rel.startswith("objects/"):
-            info = path.lstat()
-            digest.update(f"{rel}\0{info.st_mode}\0{info.st_size}\0{info.st_mtime_ns}\0{info.st_ctime_ns}\0".encode())
             continue
-        digest.update(rel.encode() + b"\0")
         if path.is_symlink():
             digest.update(os.readlink(path).encode())
         else:

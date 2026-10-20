@@ -729,6 +729,11 @@ def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
     loose.chmod(0o644)
     loose.write_bytes(bytes(len(loose.read_bytes())))
     assert tool.repository_state(repo).metadata != settled.metadata
+    # Other git metadata is read, and its identity is recorded too: a rewrite with the same bytes is seen.
+    settled = tool.repository_state(repo)
+    config = repo / ".git" / "config"
+    config.write_bytes(config.read_bytes())
+    assert tool.repository_state(repo).metadata != settled.metadata
 
 
 # --------------------------------------------------------------------------
