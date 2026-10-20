@@ -42,7 +42,7 @@ HDE-EPIC039 kept the writer ignorant of the evidence graph and of any claim, so 
 ## Stated limits
 
 - Closure-decision postures are exactly `review-trace-only`, `PO closeout` and `formal close-pack completion`; another posture needs a later schema version.
-- Requirement coverage is checked against pinned requirement-ID formats only: CRD table rows whose first cell is `S` followed by two or more digits, as in HDE-CRD-0002's Specification, and Epic requirement paragraphs `**K<NNN>-REQ-<NNN>.**` and acceptance rows `| AC<NNN>-<NN> — …`, as in HDE-EPIC040's. A bound requirements document with none of them is refused (`REQUIREMENTS_TABLE_ABSENT`); another format needs a later pin.
+- Requirement coverage is checked against one pinned requirement-ID format per change kind: a CRD reads table rows whose first cell is `S` followed by two or more digits, as in HDE-CRD-0002's Specification; `HDE-EPIC<NNN>` reads its own requirement paragraphs `**K<NNN>-REQ-<NNN>.**` and acceptance rows `| AC<NNN>-<NN> — …`, as in HDE-EPIC040's. A bound requirements document without its change's format is refused (`REQUIREMENTS_TABLE_ABSENT`); another format needs a later pin.
 - A tracked-issue pointer is a bound evidence input plus a Markdown heading that the file contains; the writer does not judge whether that section demonstrates closure.
 - No Epic close-run family is admitted. An Epic close run needs its own explicit admission later, as each CRD needs its row in `ADMITTED_CRD_QA`.
 - A later Epic's v2 close pack is written and checked by the writer, but its Index rows need that Epic's own registration, as for earlier Epics.

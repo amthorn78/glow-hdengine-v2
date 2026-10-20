@@ -2224,14 +2224,13 @@ PROHIBITED_CAUSAL_INPUTS = frozenset(
     }
 )
 CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
-# The pinned requirement-ID formats; a requirements document with none of them is refused:
-# CRD table rows as in HDE-CRD-0002's Specification (| S01 | ... |), and Epic requirement
-# paragraphs and acceptance rows as in HDE-EPIC040's (**K040-REQ-001.** and | AC040-01 — ...).
-REQUIREMENT_ID_RES = (
-    re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE),
-    re.compile(rb"^\*\*(K[0-9]{3}-REQ-[0-9]{3})\.\*\*", re.MULTILINE),
-    re.compile(rb"^\| (AC[0-9]{3}-[0-9]{2}) \xe2\x80\x94 ", re.MULTILINE),  # em dash
-)
+# The pinned requirement-ID formats, one per change kind; a requirements document without its
+# change's format is refused. A CRD reads table rows as in HDE-CRD-0002's Specification
+# (| S01 | ... |); HDE-EPICNNN reads its own requirement paragraphs and acceptance rows as in
+# HDE-EPIC040's (**K040-REQ-001.** and | AC040-01 — ...).
+CRD_REQUIREMENT_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
+EPIC_REQUIREMENT_RE = rb"^\*\*(K%s-REQ-[0-9]{3})\.\*\*"
+EPIC_ACCEPTANCE_RE = rb"^\| (AC%s-[0-9]{2}) \xe2\x80\x94 "  # em dash
 
 
 @dataclass(frozen=True)
@@ -2339,11 +2338,18 @@ def _heading_occurs(heading: str, payload: bytes) -> bool:
     return re.search(pattern, payload, re.MULTILINE) is not None
 
 
-def _requirement_ids(payload: bytes) -> frozenset[str]:
+def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
+    epic = CHANGE_RE.fullmatch(change_id).group("epic")  # type: ignore[union-attr]
+    patterns = (
+        (CRD_REQUIREMENT_RE,)
+        if epic is None
+        else tuple(
+            re.compile(template % epic.encode("ascii"), re.MULTILINE)
+            for template in (EPIC_REQUIREMENT_RE, EPIC_ACCEPTANCE_RE)
+        )
+    )
     identifiers = frozenset(
-        match.decode("ascii")
-        for pattern in REQUIREMENT_ID_RES
-        for match in pattern.findall(payload)
+        match.decode("ascii") for pattern in patterns for match in pattern.findall(payload)
     )
     if not identifiers:
         raise _fail("REQUIREMENTS_TABLE_ABSENT")
@@ -2394,7 +2400,9 @@ def _require_v2_semantics(
     if any(binding not in bindings for binding in referenced):
         raise _fail("BINDING_UNRESOLVED")
 
-    requirement_ids = _requirement_ids(bindings[str(source["requirements_binding"])].payload)
+    requirement_ids = _requirement_ids(
+        bindings[str(source["requirements_binding"])].payload, change_id
+    )
     criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
     if len(criteria) != len(set(criteria)):
         raise _fail("ACCEPTANCE_AMBIGUOUS")

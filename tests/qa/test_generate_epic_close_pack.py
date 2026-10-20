@@ -4339,6 +4339,26 @@ def _ledger_paths(change_id: str) -> dict[str, str]:
     }
 
 
+def _requirement_rows(change_id: str) -> list[tuple[str, str, str]]:
+    """HDE-CRD-0002's real rows; an Epic gets the same texts under its own K-REQ IDs."""
+    if "CRD" in change_id:
+        return list(CRD_0002_REQUIREMENTS)
+    number = change_id[-3:]
+    return [
+        (f"K{number}-REQ-{index:03d}", scope, intent)
+        for index, (_, scope, intent) in enumerate(CRD_0002_REQUIREMENTS, start=1)
+    ]
+
+
+def _specification_text(change_id: str) -> str:
+    rows = _requirement_rows(change_id)
+    if "CRD" in change_id:
+        return "| ID | Scope | Acceptance intent |\n| :- | :- | :- |\n" + "".join(
+            f"| {i} | {scope} | {intent} |\n" for i, scope, intent in rows
+        )
+    return "".join(f"**{i}.** {scope}: {intent}\n\n" for i, scope, intent in rows)
+
+
 def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
     ledgers = _ledger_paths(change_id)
     report, manifest = close_pack._derived_paths_v2(change_id)
@@ -4364,7 +4384,7 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
                 "result": "MET",
                 "limitation": "None",
             }
-            for requirement_id, _, _ in CRD_0002_REQUIREMENTS
+            for requirement_id, _, _ in _requirement_rows(change_id)
         ],
         "deliverables": ["The close-pack writer accepts Epic and CRD identities."],
         "deferrals": [
@@ -4402,8 +4422,7 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
         shutil.copyfile(ROOT / rel, repo / rel)
     files = {
         "plans/plan.md": "# Plan\n\nTracked plan.\n",
-        "plans/specification.md": "| ID | Scope | Acceptance intent |\n| :- | :- | :- |\n"
-        + "".join(f"| {i} | {scope} | {intent} |\n" for i, scope, intent in CRD_0002_REQUIREMENTS),
+        "plans/specification.md": _specification_text(change_id),
         "evidence/qa_report.md": "# QA report\n\nFinal verdict recorded.\n",
         **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
         _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- TI-002: close-pack canon\n",
@@ -4612,28 +4631,59 @@ def test_v2_requirement_ids_match_only_complete_dotted_identifiers(
 
 def test_v2_requirement_table_pin_reads_the_real_specification_rows() -> None:
     real = (ROOT / "docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md").read_bytes()
-    assert close_pack._requirement_ids(real) == {i for i, _, _ in CRD_0002_REQUIREMENTS}
-    assert len(close_pack._requirement_ids(real)) == 22
-    assert close_pack._requirement_ids(b"| ID | Scope |\n| S01 | a |\n| CD-1 | b |\n| S1 | c |\n") == {"S01"}
+    crd = "HDE-CRD-0002"
+    assert close_pack._requirement_ids(real, crd) == {i for i, _, _ in CRD_0002_REQUIREMENTS}
+    assert len(close_pack._requirement_ids(real, crd)) == 22
+    assert close_pack._requirement_ids(b"| ID | Scope |\n| S01 | a |\n| CD-1 | b |\n| S1 | c |\n", crd) == {"S01"}
     with pytest.raises(close_pack.ClosePackError, match="REQUIREMENTS_TABLE_ABSENT"):
-        close_pack._requirement_ids(b"| HDE-SEPA005.1 | Corrected catalog |\nS01 in prose only.\n")
+        close_pack._requirement_ids(b"| HDE-SEPA005.1 | Corrected catalog |\nS01 in prose only.\n", crd)
 
 
 def test_v2_requirement_pin_reads_the_real_epic_specification_requirements_and_criteria() -> None:
     real = (ROOT / EPIC_040_SPEC_REL).read_bytes()
-    ids = close_pack._requirement_ids(real)
+    ids = close_pack._requirement_ids(real, "HDE-EPIC040")
     assert ids == {f"K040-REQ-{n:03d}" for n in range(1, 14)} | {f"AC040-{n:02d}" for n in range(1, 10)}
-    assert close_pack._requirement_ids("**K040-REQ-001.** A.\n| AC040-01 \u2014 B | C |\n".encode()) == {
-        "K040-REQ-001",
-        "AC040-01",
-    }
-    assert close_pack._requirement_ids(b"| S01 | a |\nSee K040-REQ-001 and AC040-01 in prose.\n") == {"S01"}
+    assert close_pack._requirement_ids(
+        "**K040-REQ-001.** A.\n| AC040-01 \u2014 B | C |\n| S01 | D |\n".encode(), "HDE-EPIC040"
+    ) == {"K040-REQ-001", "AC040-01"}
+    assert close_pack._requirement_ids(
+        b"| S01 | a |\nSee K040-REQ-001 and AC040-01 in prose.\n", "HDE-CRD-0002"
+    ) == {"S01"}
+
+
+@pytest.mark.parametrize(
+    ("spec_rel", "change_id"),
+    (
+        ("docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md", "HDE-EPIC040"),
+        (EPIC_040_SPEC_REL, "HDE-CRD-0002"),
+        (EPIC_040_SPEC_REL, "HDE-EPIC041"),
+    ),
+)
+def test_v2_requirement_format_must_match_the_change(spec_rel: str, change_id: str) -> None:
+    with pytest.raises(close_pack.ClosePackError, match="REQUIREMENTS_TABLE_ABSENT"):
+        close_pack._requirement_ids((ROOT / spec_rel).read_bytes(), change_id)
+
+
+def test_v2_epic_close_refuses_a_crd_specification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    template = source["acceptance"][0]
+    source["acceptance"] = [
+        {**template, "criterion_id": requirement_id} for requirement_id, _, _ in CRD_0002_REQUIREMENTS
+    ]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    (repo / "plans/specification.md").write_text(_specification_text("HDE-CRD-0002"), encoding="utf-8")
+    _commit_all(repo, "bind a CRD specification to an Epic close")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REQUIREMENTS_TABLE_ABSENT"
+    assert not (repo / "audit/EPIC-041_close_report.md").exists()
 
 
 def _epic_040_source() -> dict[str, object]:
     source = _v2_source("HDE-EPIC040")
     template = source["acceptance"][0]
-    ids = sorted(close_pack._requirement_ids((ROOT / EPIC_040_SPEC_REL).read_bytes()))
+    ids = sorted(close_pack._requirement_ids((ROOT / EPIC_040_SPEC_REL).read_bytes(), "HDE-EPIC040"))
     source["acceptance"] = [{**template, "criterion_id": requirement_id} for requirement_id in ids]
     return source
 
