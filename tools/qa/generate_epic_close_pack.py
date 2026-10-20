@@ -1848,14 +1848,14 @@ def _strict_json(payload: bytes, *, code: str) -> Any:
         raise _fail(code) from exc
 
 
-def _validate_schema(schema: Any) -> Mapping[str, Any]:
+def _validate_schema(schema: Any, *, schema_rel: str = SCHEMA_REL) -> Mapping[str, Any]:
     if Draft202012Validator is None:
         raise _fail("JSONSCHEMA_DEPENDENCY_UNAVAILABLE")
     if not isinstance(schema, dict):
         raise _fail("SCHEMA_INVALID")
     if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
         raise _fail("SCHEMA_INVALID")
-    if schema.get("$id") != SCHEMA_REL:
+    if schema.get("$id") != schema_rel:
         raise _fail("SCHEMA_INVALID")
     references: list[str] = []
     pending: list[tuple[Any, bool]] = [(schema, True)]
@@ -1992,6 +1992,8 @@ def _load_model(
 ) -> tuple[CandidateModel, tuple[FileSnapshot, ...]]:
     store = _GitObjectStore(context)
     tree = _tree_entries(context, store)
+    if _source_selects_v2(root, context, store, tree, source_rel):
+        return _load_model_v2(root, context, head, source_rel, store, tree)
     remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
     schema_input = _capture_input(
         root, context, store, tree, SCHEMA_REL, max_bytes=remaining_input_bytes
@@ -2096,7 +2098,9 @@ def _canonical_json(payload: object) -> bytes:
     ).encode("utf-8")
 
 
-def _render_candidate(model: CandidateModel) -> dict[str, bytes]:
+def _render_candidate(model: CandidateModel | CandidateModelV2) -> dict[str, bytes]:
+    if isinstance(model, CandidateModelV2):
+        return _render_candidate_v2(model)
     source = model.source
     lines = [
         f"# {source['epic_id']} Close Candidate",
@@ -2167,6 +2171,485 @@ def _render_candidate(model: CandidateModel) -> dict[str, bytes]:
             },
         },
         "schema_version": MANIFEST_SCHEMA_VERSION,
+    }
+    return {
+        model.manifest_path: _canonical_json(manifest),
+        model.report_path: report,
+    }
+
+
+# --- close_candidate_source.v2 (HDE-CRD-0002 S21; IF-3) ---------------------
+# v2 is selected only by a source whose schema_version names it; every v1
+# source keeps the v1 model, refusals and output bytes above unchanged.
+# Requirement and acceptance text is bound by reference to a tracked
+# requirements document (its path and digest) and never copied into a causal
+# field, so the feedback-dependency refusal applies unchanged to every v2 value.
+SCHEMA_V2_REL = "schemas/close_candidate_source.v2.json"
+SOURCE_SCHEMA_VERSION_V2 = "close_candidate_source.v2"
+MANIFEST_SCHEMA_VERSION_V2 = "close_candidate_manifest.v2"
+CHANGE_RE = re.compile(r"HDE-(?:EPIC(?P<epic>[0-9]{3})|CRD-(?P<crd>[0-9]{4,}))\Z")
+QA_RAILS_HEADING = "QA Rails — Open/Close (Final PR)"
+DECISION_POSTURE_TEXT = {
+    "formal_close_pack_completion": "formal close-pack completion",
+    "po_closeout": "PO closeout",
+    "review_trace_only": "review-trace-only",
+}
+NONCLAIM_TEXT_V2 = {
+    "no_canon_drainage_or_register_movement": (
+        "No PF-Canon drainage and no PF09 or PF30 status movement is performed by "
+        "this close pack."
+    ),
+    "no_execution_by_writer": (
+        "The writer executes no check, QA step, deployment or merge; it derives "
+        "this pack from tracked inputs only."
+    ),
+    "no_hosted_feedback_inputs": (
+        "No hosted result, receipt, later-commit result or external attestation is "
+        "a causal input of this close pack."
+    ),
+    "no_unbound_claim": (
+        "This report claims nothing that its bound tracked inputs do not record."
+    ),
+}
+# Updater-owned outputs and the close-run family are never causal inputs, so no
+# byte the Index binds depends on the Index (Plan v1.1 WU-PR-07 (d)).
+PROHIBITED_CAUSAL_INPUTS = frozenset(
+    {
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.sha256",
+        "audit/gates/topology/orientation_demo.txt",
+        "catalog/manifest.json",
+        "docs/evidence/index.json",
+        "docs/evidence/index.sha256",
+    }
+)
+CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
+
+
+@dataclass(frozen=True)
+class CandidateModelV2:
+    source: Mapping[str, Any]
+    source_path: str
+    source_input: FileSnapshot
+    schema_input: FileSnapshot
+    plan_input: FileSnapshot
+    evidence_inputs: tuple[tuple[str, FileSnapshot], ...]
+    report_path: str
+    manifest_path: str
+
+
+def _derived_paths_v2(change_id: str) -> tuple[str, str]:
+    match = CHANGE_RE.fullmatch(change_id)
+    if match is None:
+        raise _fail("CHANGE_ID_INVALID")
+    prefix = f"EPIC-{match.group('epic')}" if match.group("epic") else change_id
+    return (f"audit/{prefix}_close_report.md", f"audit/{prefix}_MANIFEST.json")
+
+
+def _supporting_paths_v2(change_id: str) -> dict[str, str]:
+    if CHANGE_RE.fullmatch(change_id) is None:
+        raise _fail("CHANGE_ID_INVALID")
+    directory = change_id.lower()
+    return {
+        "doc_deltas": f"audit/docdeltas/{directory}_doc_deltas.md",
+        "drain_targets": f"audit/docdeltas/{directory}_drain_targets.md",
+        "qa_step_logs_manifest": f"audit/qa/{directory}/qa_step_logs_manifest.json",
+    }
+
+
+def _source_selects_v2(
+    root: Path,
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+    source_rel: str,
+) -> bool:
+    # A source that cannot be read here falls through to the v1 path, which
+    # reports its own refusal exactly as before.
+    try:
+        snapshot = _capture_input(root, context, store, tree, source_rel)
+        document = _strict_json(snapshot.payload, code="SOURCE_JSON_INVALID")
+    except ClosePackError:
+        return False
+    return (
+        isinstance(document, dict)
+        and document.get("schema_version") == SOURCE_SCHEMA_VERSION_V2
+    )
+
+
+def _require_admitted_causal_input(rel: str) -> None:
+    folded = rel.casefold()
+    if (
+        folded in PROHIBITED_CAUSAL_INPUTS
+        or folded.endswith(".path_proof.txt")
+        or CLOSE_RUN_INPUT_RE.match(rel) is not None
+    ):
+        raise _fail("CAUSAL_INPUT_PROHIBITED")
+
+
+def _causal_strings_v2(source: Mapping[str, Any]) -> list[str]:
+    values: list[str] = []
+    pending: list[Any] = [
+        value for key, value in source.items() if key not in {"nonclaims", "schema_version"}
+    ]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, str):
+            values.append(node)
+        elif isinstance(node, dict):
+            pending.extend(node.keys())
+            pending.extend(node.values())
+        elif isinstance(node, list):
+            pending.extend(node)
+    return values
+
+
+def _require_feedback_free_values_v2(
+    values: Sequence[str], source_rel: str, head: str
+) -> None:
+    for value in (source_rel, *values):
+        if (
+            value.casefold().startswith("catalog/manifest.json")
+            or head.casefold() in value.casefold()
+            or FEEDBACK_DEPENDENCY_RE.search(value) is not None
+        ):
+            raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
+
+
+def _token_occurs(identifier: str, payload: bytes) -> bool:
+    pattern = rb"(?<![A-Za-z0-9-])" + re.escape(identifier.encode("ascii")) + rb"(?![A-Za-z0-9-])"
+    return re.search(pattern, payload) is not None
+
+
+def _require_v2_semantics(
+    source: Mapping[str, Any],
+    bindings: Mapping[str, FileSnapshot],
+    report_path: str,
+    manifest_path: str,
+) -> None:
+    change_id = str(source["change_id"])
+    supporting = _supporting_paths_v2(change_id)
+    required_outputs = {
+        "close_manifest": manifest_path,
+        "close_report": report_path,
+        **supporting,
+    }
+    key_outputs = source["key_outputs"]
+    if any(key_outputs.get(key) != value for key, value in required_outputs.items()):
+        raise _fail("OUTPUT_BINDING_MISMATCH")
+    evidence_paths = {snapshot.rel for snapshot in bindings.values()}
+    if any(
+        value not in evidence_paths
+        for key, value in key_outputs.items()
+        if key not in {"close_manifest", "close_report"}
+    ):
+        raise _fail("OUTPUT_BINDING_MISMATCH")
+    pointers = set(source["pointers"])
+    required_pointers = set(supporting.values())
+    if CHANGE_RE.fullmatch(change_id).group("crd"):  # type: ignore[union-attr]
+        required_pointers.add(f"audit/qa/{change_id.lower()}/close/")
+    if not required_pointers <= pointers:
+        raise _fail("POINTER_MISSING")
+
+    referenced = [str(source["requirements_binding"])]
+    for item in source["acceptance"]:
+        referenced.extend(item["evidence_bindings"])
+    for item in source["later_drain_statements"]:
+        referenced.extend(item["evidence_bindings"])
+    referenced.extend(item["binding"] for item in source["superseded"])
+    if "binding" in source["qa_rca"]:
+        referenced.append(source["qa_rca"]["binding"])
+    if any(binding not in bindings for binding in referenced):
+        raise _fail("BINDING_UNRESOLVED")
+
+    requirements = bindings[str(source["requirements_binding"])].payload
+    criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
+    if len(criteria) != len(set(criteria)):
+        raise _fail("ACCEPTANCE_AMBIGUOUS")
+    if any(not _token_occurs(criterion, requirements) for criterion in criteria):
+        raise _fail("REQUIREMENT_ID_UNBOUND")
+    drain_targets = next(
+        snapshot.payload
+        for snapshot in bindings.values()
+        if snapshot.rel == supporting["drain_targets"]
+    )
+    for field, key in (("deferrals", "id"), ("tracked_issues", "id")):
+        identifiers = [str(item[key]) for item in source[field]]
+        if len(identifiers) != len(set(identifiers)):
+            raise _fail("DEFERRAL_AMBIGUOUS")
+    if any(
+        "adr_status" in item and not _token_occurs(str(item["id"]), drain_targets)
+        for item in source["deferrals"]
+    ):
+        raise _fail("DEFERRAL_UNBOUND")
+
+    decision = source["closure_decision"]["decision"]
+    if decision == "SATISFIED" and (
+        source["follow_ups"]
+        or any(item["result"] != "MET" for item in source["acceptance"])
+    ):
+        raise _fail("DECISION_CONTRADICTION")
+    if decision == "NOT SATISFIED" and not source["follow_ups"]:
+        raise _fail("DECISION_CONTRADICTION")
+
+
+def _load_model_v2(
+    root: Path,
+    context: GitContext,
+    head: str,
+    source_rel: str,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+) -> tuple[CandidateModelV2, tuple[FileSnapshot, ...]]:
+    remaining_input_bytes = MAX_CAUSAL_INPUT_BYTES
+    _require_admitted_causal_input(source_rel)
+    schema_input = _capture_input(
+        root, context, store, tree, SCHEMA_V2_REL, max_bytes=remaining_input_bytes
+    )
+    remaining_input_bytes -= len(schema_input.payload)
+    source_input = _capture_input(
+        root, context, store, tree, source_rel, max_bytes=remaining_input_bytes
+    )
+    remaining_input_bytes -= len(source_input.payload)
+    schema = _validate_schema(
+        _strict_json(schema_input.payload, code="SCHEMA_JSON_INVALID"),
+        schema_rel=SCHEMA_V2_REL,
+    )
+    source = _validate_source(
+        _strict_json(source_input.payload, code="SOURCE_JSON_INVALID"), schema
+    )
+    if source.get("schema_version") != SOURCE_SCHEMA_VERSION_V2:
+        raise _fail("SOURCE_SCHEMA_INVALID")
+    causal_values = _causal_strings_v2(source)
+    _require_feedback_free_values_v2(causal_values, source_rel, head)
+    if _report_body_structure_is_ambiguous(causal_values):
+        raise _fail("REPORT_SECTION_AMBIGUOUS")
+    if set(source["nonclaims"]) != set(NONCLAIM_TEXT_V2):
+        raise _fail("SOURCE_SCHEMA_INVALID")
+    report_path, manifest_path = _derived_paths_v2(str(source["change_id"]))
+
+    plan_rel = _canonical_relative_path(source["plan_path"])
+    _require_admitted_causal_input(plan_rel)
+    plan_input = _capture_input(
+        root, context, store, tree, plan_rel, max_bytes=remaining_input_bytes
+    )
+    remaining_input_bytes -= len(plan_input.payload)
+    evidence: list[tuple[str, FileSnapshot]] = []
+    bindings: dict[str, FileSnapshot] = {}
+    evidence_paths: set[str] = set()
+    for item in source["evidence_inputs"]:
+        binding = item["binding"]
+        rel = _canonical_relative_path(item["path"])
+        if binding in bindings or rel in evidence_paths:
+            raise _fail("EVIDENCE_BINDING_AMBIGUOUS")
+        _require_admitted_causal_input(rel)
+        snapshot = _capture_input(
+            root, context, store, tree, rel, max_bytes=remaining_input_bytes
+        )
+        remaining_input_bytes -= len(snapshot.payload)
+        bindings[binding] = snapshot
+        evidence_paths.add(rel)
+        evidence.append((binding, snapshot))
+
+    causal_paths = {SCHEMA_V2_REL, source_rel, plan_rel, *evidence_paths}
+    if len(causal_paths) != 3 + len(evidence):
+        raise _fail("INPUT_COLLISION")
+    if report_path in causal_paths or manifest_path in causal_paths:
+        raise _fail("OUTPUT_COLLISION")
+    _require_v2_semantics(source, bindings, report_path, manifest_path)
+
+    if _head(context, store) != head:
+        raise _fail("GIT_HEAD_CHANGED")
+    model = CandidateModelV2(
+        source=source,
+        source_path=source_rel,
+        source_input=source_input,
+        schema_input=schema_input,
+        plan_input=plan_input,
+        evidence_inputs=tuple(sorted(evidence, key=lambda item: (item[0], item[1].rel))),
+        report_path=report_path,
+        manifest_path=manifest_path,
+    )
+    snapshots = (
+        schema_input,
+        source_input,
+        plan_input,
+        *(snapshot for _, snapshot in model.evidence_inputs),
+    )
+    return model, snapshots
+
+
+def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
+    source = model.source
+    bindings = dict(model.evidence_inputs)
+
+    # Each binding's digest is listed once under "Source bindings".
+    def bound(binding: str) -> str:
+        return f"`{binding}` (`{bindings[binding].rel}`)"
+
+    def section(heading: str, body: Sequence[str], empty: str) -> list[str]:
+        return ["", f"## {heading}", "", *(body or [f"- {empty}"])]
+
+    decision = source["closure_decision"]
+    lines = [
+        f"# {source['change_id']} Close Report",
+        "",
+        "This close report is derived only from exact tracked repository inputs.",
+        "",
+        f"## {QA_RAILS_HEADING}",
+        "",
+        "- Close mutation set rails: closed (`ALLOW_NETWORK=0`, `APP_ENV=dev`, "
+        "`LANG=C`, `LC_ALL=C`, `SAFE_MODE=1`, `TZ=UTC`); the writer refuses any "
+        "other posture.",
+        f"- Closure decision: {decision['decision']}",
+        f"- Decision posture: {DECISION_POSTURE_TEXT[decision['posture']]}",
+        "",
+        "## Acceptance and evidence pointers",
+        "",
+        *(f"- `{pointer}`" for pointer in source["pointers"]),
+        "",
+        "## Exact-source acceptance",
+        "",
+        f"Requirement source: {bound(str(source['requirements_binding']))}. Each "
+        "criterion is bound to that document by its ID, and the document by its "
+        "digest under Source bindings; criterion text is not copied.",
+        "",
+    ]
+    for item in source["acceptance"]:
+        evidence = ", ".join(bound(binding) for binding in item["evidence_bindings"])
+        lines.append(
+            f"- `{item['criterion_id']}`: {item['result']}; evidence {evidence}; "
+            f"limitation: {item['limitation']}"
+        )
+    lines.extend(
+        section(
+            "Delivered scope",
+            [f"- {item}" for item in source["deliverables"]],
+            "None.",
+        )
+    )
+    deferrals = []
+    for item in source["deferrals"]:
+        if "drain_target" in item:
+            deferrals.append(f"- `{item['id']}`: drain target {item['drain_target']}")
+        else:
+            deferrals.append(
+                f"- `{item['id']}`: ADR status {item['adr_status']}; rationale: "
+                f"{item['rationale']}"
+            )
+    lines.extend(section("Deferrals", deferrals, "None."))
+    statements = [
+        f"- Affected PF canon homes: {'; '.join(item['canon_homes'])}. Locators: "
+        f"{'; '.join(item['locators'])}. Current canon posture: "
+        f"{item['current_posture']}. Supported later-drain action: `{item['action']}`. "
+        f"Drain readiness: `{item['readiness']}`. Evidence basis: "
+        f"{', '.join(bound(binding) for binding in item['evidence_bindings'])}. "
+        f"Close expectation: {item['close_expectation']}"
+        for item in source["later_drain_statements"]
+    ]
+    lines.extend(section("Later-drain PF-canon update statements", statements, "None."))
+    lines.append(
+        "- Later-drain statements are support records for future canon maintenance; "
+        "they are not prerequisites, required checks, acceptance conditions or "
+        "blockers of this close."
+    )
+    issues = [
+        f"- `{item['id']}`: "
+        + (f"pointer {item['pointer']}" if "pointer" in item else f"ADR status {item['adr_status']}")
+        for item in source["tracked_issues"]
+    ]
+    lines.extend(
+        section("Tracked-issue closeout mapping", issues, "No TI item is cited by this change.")
+    )
+    lines.extend(
+        section(
+            "Follow-ups",
+            [f"- {item}" for item in source["follow_ups"]],
+            "None; the decision is SATISFIED.",
+        )
+    )
+    lines.extend(
+        section(
+            "Superseded artifacts",
+            [
+                f"- {bound(item['binding'])}: {item['evidence_change']}"
+                for item in source["superseded"]
+            ],
+            "None.",
+        )
+    )
+    qa_rca = source["qa_rca"]
+    rca = (
+        [f"- External QA RCA: {bound(qa_rca['binding'])}"]
+        if "binding" in qa_rca
+        else [f"- {line}" for line in qa_rca["summary_lines"]]
+    )
+    lines.extend(section("QA RCA and Doc Delta summary", rca, "None."))
+    lines.extend(
+        (
+            "",
+            "## Key outputs",
+            "",
+            f"The close-pack manifest `{model.manifest_path}` `key_outputs` map is the "
+            "binding authority for primary artifacts and their canonical paths-of-record.",
+            "",
+            *(f"- `{key}`: `{value}`" for key, value in sorted(source["key_outputs"].items())),
+            "",
+            "## Close-pack verification",
+            "",
+            f"- The close report `{model.report_path}` and close manifest "
+            f"`{model.manifest_path}` are written at their canonical filenames; check "
+            "mode accepts them only as one committed pair equal to a fresh derivation "
+            "from the bound inputs.",
+            "",
+            "## Source bindings",
+            "",
+        )
+    )
+    for label, snapshot in (
+        ("Candidate source", model.source_input),
+        ("Candidate-source schema", model.schema_input),
+        ("Plan", model.plan_input),
+    ):
+        lines.append(
+            f"- {label}: `{snapshot.rel}` "
+            f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
+        )
+    for binding, snapshot in model.evidence_inputs:
+        lines.append(
+            f"- Evidence `{binding}`: `{snapshot.rel}` "
+            f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
+        )
+    nonclaim_codes = sorted(source["nonclaims"])
+    lines.extend(("", "## Explicit nonclaims", ""))
+    lines.extend(f"- {NONCLAIM_TEXT_V2[code]}" for code in nonclaim_codes)
+    report = ("\n".join(lines) + "\n").encode("utf-8")
+
+    manifest = {
+        "change_id": source["change_id"],
+        "closure_decision": dict(decision),
+        "inputs": {
+            "candidate_source": _binding(model.source_input),
+            "evidence": [
+                {"binding": binding, **_binding(snapshot)}
+                for binding, snapshot in model.evidence_inputs
+            ],
+            "plan": _binding(model.plan_input),
+            "schema": _binding(model.schema_input),
+        },
+        "key_outputs": dict(source["key_outputs"]),
+        "nonclaims": [
+            {"code": code, "statement": NONCLAIM_TEXT_V2[code]} for code in nonclaim_codes
+        ],
+        "outputs": {
+            "close_manifest": {"path": model.manifest_path},
+            "close_report": {
+                "path": model.report_path,
+                "sha256": _sha256(report),
+                "size_bytes": len(report),
+            },
+        },
+        "schema_version": MANIFEST_SCHEMA_VERSION_V2,
     }
     return {
         model.manifest_path: _canonical_json(manifest),
@@ -3087,12 +3570,19 @@ def _read_manifest_committed_pair(
         try:
             report_binding = document["outputs"]["close_report"]
             manifest_binding = document["outputs"]["close_manifest"]
-            epic_id = document["epic_id"]
+            schema_version = document.get("schema_version")
+            identity = document[
+                "change_id" if schema_version == MANIFEST_SCHEMA_VERSION_V2 else "epic_id"
+            ]
         except (KeyError, TypeError) as exc:
             raise _fail("MANIFEST_BINDING_MISMATCH") from exc
-        expected_report, expected_manifest = _derived_paths(str(epic_id))
+        expected_report, expected_manifest = (
+            _derived_paths_v2(str(identity))
+            if schema_version == MANIFEST_SCHEMA_VERSION_V2
+            else _derived_paths(str(identity))
+        )
         if (
-            document.get("schema_version") != MANIFEST_SCHEMA_VERSION
+            schema_version not in {MANIFEST_SCHEMA_VERSION, MANIFEST_SCHEMA_VERSION_V2}
             or expected_report != report_rel
             or expected_manifest != manifest_rel
             or report_binding

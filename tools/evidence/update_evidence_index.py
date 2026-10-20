@@ -3975,9 +3975,17 @@ def _load_crd_qa_entries(
         expected = _crd_qa_entry(crd_id)
         if path != expected["discovered_physical_path"]:
             parts = path.split("/") if isinstance(path, str) else []
-            if len(parts) != 6 or "/".join(parts[:4]) != f"{root_rel}/checks" or parts[-1] != "primary.log":
+            family = "/".join(parts[:4])
+            if (
+                len(parts) != 6
+                or family not in {f"{root_rel}/checks", f"{root_rel}/close"}
+                or parts[-1] != "primary.log"
+            ):
                 raise ValueError("CRD index key/path relationship is malformed")
-            expected = _crd_qa_entry(crd_id, parts[-2])
+            if family == f"{root_rel}/close":
+                expected = _crd_close_run_entry(crd_id, parts[-2])
+            else:
+                expected = _crd_qa_entry(crd_id, parts[-2])
         if dict(entry) != expected:
             raise ValueError("CRD index row has foreign or contradictory key/path/metadata")
         if key in seen_keys or path in seen_paths:
@@ -3993,6 +4001,90 @@ def _load_crd_qa_entries(
             continue
         checks = qa_harness.validate_crd_check_family(config)
         current.extend([_crd_qa_entry(crd_id), *(_crd_qa_entry(crd_id, check_id) for check_id in sorted(checks))])
+        current.extend(_crd_close_run_entry(crd_id, check_id) for check_id in _crd_close_run_check_ids(config))
+    return unrelated, current
+
+
+# HDE-CRD-0002 IF-4: the post-verdict close-run family of an admitted CRD,
+# audit/qa/<crd-id>/close/<check_id>/primary.log, admitted by the S21 ADR. Its
+# members are the primaries on disk; it never enters qa_step_logs_manifest.json.
+def _crd_close_run_entry(crd_id: str, check_id: str) -> dict[str, object]:
+    root_rel, key_prefix = ADMITTED_CRD_QA[crd_id]
+    qa_harness.validate_check_id(check_id)
+    return {
+        "artifact_key": f"{key_prefix}.close.{check_id}.primary.log",
+        "discovered_physical_path": f"{root_rel}/close/{check_id}/primary.log",
+        "role": "log",
+    }
+
+
+def _crd_close_run_check_ids(config: qa_harness.HarnessConfig) -> list[str]:
+    """Validate and list the close-run family; any other member is refused."""
+    close_root = config.qa_root / "close"
+    qa_harness._validate_crd_path(config, close_root, directory=True)
+    if close_root.is_symlink():
+        raise ValueError("CRD close-run root is aliased")
+    if not close_root.exists():
+        return []
+    check_ids: list[str] = []
+    for name in sorted(os.listdir(close_root)):
+        member = close_root / name
+        if member.is_symlink() or not member.is_dir():
+            raise ValueError(f"CRD close-run family has an unexpected member: {name}")
+        check_id = qa_harness.validate_check_id(name)
+        if set(os.listdir(member)) - {"primary.log", "primary.log.path_proof.txt"}:
+            raise ValueError(f"CRD close-run family has an unexpected member: {name}")
+        primary = member / "primary.log"
+        snapshot = qa_harness._crd_file_snapshot(config, primary)
+        qa_harness._parse_crd_primary(config, check_id, snapshot.payload, family="close")
+        check_ids.append(check_id)
+    if not check_ids:
+        raise ValueError("CRD close-run root exists without a primary")
+    return check_ids
+
+
+def _crd_close_pack_entries(
+    retained: Sequence[Mapping[str, object]],
+) -> tuple[list[Mapping[str, object]], list[dict[str, object]]]:
+    """Absent-tolerant CRD close-pack rows (review v1.1 note M1).
+
+    Neither file present: no rows. Both present: one row each. One present,
+    or a row whose file is absent: refused.
+    """
+    expected: dict[str, dict[str, object]] = {}
+    pairs: list[tuple[str, tuple[str, str]]] = []
+    for crd_id in sorted(ADMITTED_CRD_QA):
+        key = crd_id.lower().replace("-", "_")
+        report = f"audit/{crd_id}_close_report.md"
+        manifest = f"audit/{crd_id}_MANIFEST.json"
+        for suffix, rel in (("close_report", report), ("manifest", manifest)):
+            expected[rel] = {
+                "artifact_key": f"{key}.{suffix}",
+                "crd_id": crd_id,
+                "discovered_physical_path": rel,
+            }
+        pairs.append((crd_id, (report, manifest)))
+    keys = {str(row["artifact_key"]) for row in expected.values()}
+    unrelated: list[Mapping[str, object]] = []
+    indexed: set[str] = set()
+    for entry in retained:
+        key = entry.get("artifact_key") or entry.get("title")
+        path = entry.get("discovered_physical_path") or entry.get("path")
+        normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
+        if key not in keys and normalized_path not in expected:
+            unrelated.append(entry)
+            continue
+        if normalized_path not in expected or dict(entry) != expected[normalized_path]:
+            raise ValueError("CRD_CLOSE_PACK_REGISTRATION_COLLISION")
+        indexed.add(normalized_path)
+    current: list[dict[str, object]] = []
+    for crd_id, pair in pairs:
+        present = {rel for rel in pair if _path_exists(ROOT / rel)}
+        if present and present != set(pair):
+            raise ValueError(f"CRD_CLOSE_PACK_INCOMPLETE:{crd_id}")
+        if indexed & set(pair) - present:
+            raise ValueError(f"CRD_CLOSE_PACK_INDEXED_BUT_ABSENT:{crd_id}")
+        current.extend(expected[rel] for rel in pair if rel in present)
     return unrelated, current
 
 
@@ -4052,6 +4144,7 @@ def _load_human_index() -> list[dict[str, object]]:
     payload = [_strip_current_release_label(entry) for entry in payload]
     catalog_entries = _catalog_validation_entries(payload)
     payload, crd_entries = _load_crd_qa_entries(payload)
+    payload, crd_close_pack_entries = _crd_close_pack_entries(payload)
     payload = [
         entry
         for entry in payload
@@ -4089,6 +4182,7 @@ def _load_human_index() -> list[dict[str, object]]:
         [
             *payload,
             *crd_entries,
+            *crd_close_pack_entries,
             *catalog_entries,
             *BASELINE_ENTRIES,
             *EPIC021_PRIMARY_ARTIFACTS,
@@ -5123,6 +5217,78 @@ def publish_crd_check_family(
         if coherence_verifier is not None:
             coherence_verifier()
         return published
+
+
+def publish_crd_close_run_family(
+    config: qa_harness.HarnessConfig,
+    results: Sequence[qa_harness.CheckResult],
+    *,
+    captured_at_utc: str | None = None,
+    coherence_verifier: Callable[[], None] | None = None,
+) -> tuple[Path, ...]:
+    """Publish an admitted CRD's post-verdict close-run family with recovery.
+
+    Each primary is rendered only from its captured command, exit code and
+    output, under audit/qa/<crd-id>/close/<check_id>/ (HDE-CRD-0002 IF-4). The
+    given results replace the whole family. This entrypoint writes neither
+    qa_step_logs_manifest.json nor any checks/ primary; the shared convergence
+    reads them read-only, as every updater run does. Recovery has the same
+    bounds as publish_crd_check_family. No acceptance claim is inferred.
+    """
+    if not isinstance(config, qa_harness.HarnessConfig) or config.crd_id not in ADMITTED_CRD_QA:
+        refused = getattr(config, "crd_id", None)
+        raise ValueError(
+            "governed CRD close-run publication admits only "
+            + ", ".join(sorted(ADMITTED_CRD_QA))
+            + f"; refused {refused}"
+        )
+    if config.repo_root != ROOT:
+        raise ValueError("CRD config must select this updater's repository root")
+    if config.qa_root != ROOT / ADMITTED_CRD_QA[config.crd_id][0]:
+        raise ValueError("CRD config QA root differs from its admitted root")
+    if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
+        raise RuntimeError("CRD close-run publication requires its own outer transaction")
+    ensure_determinism_env()
+    staged_results = tuple(results)
+    if not staged_results or not all(isinstance(result, qa_harness.CheckResult) for result in staged_results):
+        raise ValueError("CRD close-run publication requires a nonempty CheckResult family")
+    result_ids = [qa_harness.validate_check_id(result.check_id) for result in staged_results]
+    if len(result_ids) != len(set(result_ids)):
+        raise ValueError("CRD close-run publication contains duplicate check IDs")
+    planned = [
+        qa_harness._primary_log_content(
+            config, result, captured_at_utc=captured_at_utc, family="close"
+        )
+        for result in staged_results
+    ]
+    # T0: the close-run family follows a recorded QA family. Refuse its
+    # absence, and any existing incoherence, before touching any byte.
+    qa_harness.validate_crd_check_family(config)
+    stale = [
+        config.qa_root / "close" / check_id
+        for check_id in _crd_close_run_check_ids(config)
+        if check_id not in result_ids
+    ]
+    _run_once(check=True)
+    with _WriteTransaction(ROOT) as transaction:
+        for path, _ in planned:
+            transaction.capture(path)
+        for directory in stale:
+            for name in ("primary.log", "primary.log.path_proof.txt"):
+                transaction.capture(directory / name)
+                (directory / name).unlink(missing_ok=True)
+            directory.rmdir()
+        for path, content in planned:
+            qa_harness._atomic_write(path, content)
+        _converge_and_publish()
+        if _crd_close_run_check_ids(config) != sorted(result_ids):
+            raise RuntimeError("CRD close-run family differs from the published results")
+        for path, content in planned:
+            if path.read_text(encoding="utf-8") != content:
+                raise RuntimeError(f"CRD close-run primary changed during publication: {path}")
+        if coherence_verifier is not None:
+            coherence_verifier()
+        return tuple(path for path, _ in planned)
 
 
 def main(argv: list[str] | None = None) -> None:

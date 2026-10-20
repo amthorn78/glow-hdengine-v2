@@ -1243,3 +1243,141 @@ def test_index_normalizer_keeps_crd_id_and_refuses_epic_and_crd_together():
     assert writer._normalize_index_entry({**row, "epic_id": "HDE-EPIC040"})["epic_id"] == "HDE-EPIC040"
     with pytest.raises(ValueError, match="both epic_id and crd_id"):
         writer._normalize_index_entry({**row, "epic_id": "HDE-EPIC040", "crd_id": "HDE-CRD-0002"})
+
+
+# --- HDE-CRD-0002 S21: close-run family (IF-4) and CRD close-pack rows (M1) ---
+CLOSE_CRD = "HDE-CRD-0002"
+CLOSE_ROOT = "audit/qa/hde-crd-0002"
+CLOSE_PACK = ("audit/HDE-CRD-0002_close_report.md", "audit/HDE-CRD-0002_MANIFEST.json")
+CLOSE_FIXTURE_PROGRAM = CRD_FIXTURE_PROGRAM.replace(
+    'crd_id="HDE-CRD-0001"', 'crd_id="HDE-CRD-0002"'
+) + '''
+def publish_close(check_ids=("close-pack-check", "evidence-index-check"), **kwargs):
+    return writer.publish_crd_close_run_family(
+        config, tuple(observed(check_id) for check_id in check_ids),
+        captured_at_utc=timestamp, **kwargs,
+    )
+'''
+
+
+def _close_program(repo: Path, program: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-c", CLOSE_FIXTURE_PROGRAM + "\n" + program],
+        cwd=repo, env=ENV, capture_output=True, text=True, check=False,
+    )
+
+
+@pytest.fixture
+def close_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+    assert not (repo / CLOSE_ROOT).exists()
+    return repo
+
+
+def _index_rows(repo: Path) -> dict[str, dict[str, object]]:
+    return {
+        str(row["discovered_physical_path"]): row
+        for row in json.loads((repo / "docs/evidence/INDEX.json").read_bytes())
+    }
+
+
+def test_crd_close_pack_rows_are_absent_tolerant(close_repo: Path) -> None:
+    before = _snapshot(close_repo)
+    _success(_run(close_repo, "tools/evidence/update_evidence_index.py", "--check"))
+    _success(_run(close_repo, "tools/evidence/update_evidence_index.py"))
+    assert _snapshot(close_repo) == before
+    assert not set(CLOSE_PACK) & set(_index_rows(close_repo))
+
+    report, manifest = (close_repo / rel for rel in CLOSE_PACK)
+    report.write_text("# HDE-CRD-0002 Close Report\n", encoding="utf-8")
+    one = _run(close_repo, "tools/evidence/update_evidence_index.py")
+    assert one.returncode != 0 and "CRD_CLOSE_PACK_INCOMPLETE:HDE-CRD-0002" in one.stderr
+    assert _snapshot(close_repo) == before
+
+    manifest.write_text("{}\n", encoding="utf-8")
+    _success(_run(close_repo, "tools/evidence/update_evidence_index.py"))
+    rows = _index_rows(close_repo)
+    assert rows[CLOSE_PACK[0]] == {
+        "artifact_key": "hde_crd_0002.close_report",
+        "crd_id": CLOSE_CRD,
+        "discovered_physical_path": CLOSE_PACK[0],
+    }
+    assert rows[CLOSE_PACK[1]]["artifact_key"] == "hde_crd_0002.manifest"
+    for rel in CLOSE_PACK:
+        assert (close_repo / f"{rel}.path_proof.txt").is_file()
+    _checks(close_repo)
+
+    report.unlink()
+    manifest.unlink()
+    gone = _run(close_repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert gone.returncode != 0 and "CRD_CLOSE_PACK_INDEXED_BUT_ABSENT:HDE-CRD-0002" in gone.stderr
+
+
+def test_close_run_family_publishes_without_touching_the_qa_family(close_repo: Path) -> None:
+    _success(_close_program(close_repo, "publish()"))
+    qa_family = {
+        rel: ((close_repo / rel).read_bytes(), (close_repo / rel).stat().st_mtime_ns)
+        for rel in (f"{CLOSE_ROOT}/qa_step_logs_manifest.json", f"{CLOSE_ROOT}/checks/current/primary.log")
+    }
+    _success(_close_program(close_repo, "print(len(publish_close()))"))
+    rows = _index_rows(close_repo)
+    for check_id in ("close-pack-check", "evidence-index-check"):
+        rel = f"{CLOSE_ROOT}/close/{check_id}/primary.log"
+        assert rows[rel] == {
+            "artifact_key": f"audit.qa.hde_crd_0002.close.{check_id}.primary.log",
+            "discovered_physical_path": rel,
+            "role": "log",
+        }
+        header = json.loads((close_repo / rel).read_text(encoding="utf-8").splitlines()[0])
+        assert header["status"] == "PASS" and header["exit_code"] == 0 and header["command"]
+        assert (close_repo / f"{rel}.path_proof.txt").is_file()
+    assert {
+        rel: ((close_repo / rel).read_bytes(), (close_repo / rel).stat().st_mtime_ns)
+        for rel in qa_family
+    } == qa_family
+    manifest = json.loads((close_repo / f"{CLOSE_ROOT}/qa_step_logs_manifest.json").read_bytes())
+    assert set(manifest) == {"current"}
+    _checks(close_repo)
+
+    # The given results replace the whole family; a stale member leaves with its rows.
+    _success(_close_program(close_repo, 'publish_close(("close-pack-check",))'))
+    assert not (close_repo / f"{CLOSE_ROOT}/close/evidence-index-check").exists()
+    assert f"{CLOSE_ROOT}/close/evidence-index-check/primary.log" not in _index_rows(close_repo)
+    _checks(close_repo)
+
+
+def test_close_run_publication_refuses_scope_and_restores_on_failure(close_repo: Path) -> None:
+    before = _whole_tree_state(close_repo, metadata=True)
+    refused = _close_program(close_repo, "publish_close()")
+    assert refused.returncode != 0 and "CRD record is missing" in refused.stderr
+    assert _whole_tree_state(close_repo, metadata=True) == before
+    _success(_close_program(close_repo, "publish()"))
+    before = _whole_tree_state(close_repo, metadata=True)
+    _success(_close_program(close_repo, '''
+for selected in (qa.HarnessConfig(crd_id="HDE-CRD-0003", repo_root=writer.ROOT),):
+    try:
+        writer.publish_crd_close_run_family(selected, (observed(),))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("unadmitted close-run publication was accepted")
+def broken():
+    raise RuntimeError("fixture verifier failure")
+try:
+    publish_close(coherence_verifier=broken)
+except RuntimeError as exc:
+    assert "fixture verifier failure" in str(exc)
+else:
+    raise AssertionError("verifier failure was not raised")
+'''))
+    assert _whole_tree_state(close_repo, metadata=True) == before
+
+
+def test_close_run_family_refuses_an_unexpected_member(close_repo: Path) -> None:
+    _success(_close_program(close_repo, "publish(); publish_close()"))
+    stray = close_repo / f"{CLOSE_ROOT}/close/close-pack-check/notes.txt"
+    stray.write_text("not a primary\n", encoding="utf-8")
+    result = _run(close_repo, "tools/evidence/update_evidence_index.py", "--check")
+    assert result.returncode != 0
+    assert "unexpected member" in result.stderr

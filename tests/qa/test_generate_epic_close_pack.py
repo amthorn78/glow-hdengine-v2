@@ -3623,6 +3623,27 @@ def test_source_commit_hash_and_feedback_dependencies_do_not_enter_outputs(
     source_text = (ROOT / "tools/qa/generate_epic_close_pack.py").read_text(
         encoding="utf-8"
     )
+    # S21 reverses HDE-EPIC039's neutral writer only inside the v2 block: v2
+    # names updater outputs and the close-run family to refuse them as causal
+    # inputs, and derives the canonical QA-manifest pointer. Everything else
+    # stays forbidden in both models.
+    v1_text, v2_text = source_text.split("# --- close_candidate_source.v2", 1)
+    for v2_only in ("orientation_demo", "path_proof", "audit/qa/"):
+        assert v2_only in v2_text
+    for forbidden in (
+        "HDE-EPIC" + "038",
+        "update_evidence_index",
+        "release_id",
+        "build_release_attestation",
+        "acceptance_map",
+        "token_evidence_matrix",
+        "requests.",
+        "urllib.",
+        "os.utime",
+        ".touch(",
+    ):
+        assert forbidden not in v2_text
+    source_text = v1_text
     for forbidden in (
         "HDE-EPIC" + "038",
         "_HDE_EPIC" + "038_PRIVATE_CI",
@@ -4272,3 +4293,378 @@ def test_linked_worktree_common_dir_retargeting_fails_closed(
     finally:
         commondir.write_bytes(original_commondir)
     assert _git(linked, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+# --- close_candidate_source.v2 (HDE-CRD-0002 S21; IF-3) ---------------------
+
+# HDE-CRD-0002 Specification v1.1 requirement rows (ID, scope, acceptance intent),
+# copied verbatim: the real content the first v2 close source binds (PF10 2.11 rule 4).
+CRD_0002_REQUIREMENTS: tuple[tuple[str, str, str], ...] = (
+    ('S01', 'Package every release member with the distribution', 'A regular wheel install admits the complete release outside a source checkout'),
+    ('S02', 'Unknown non-compat paths on the production app return the governed not-found envelope', 'Every 404 from the production app is the governed `ERR_NOT_FOUND` envelope with `no-store`, never Flask HTML'),
+    ('S03', 'Bring every test file into a CI lane or retire it with a recorded reason', 'No test file runs in no CI lane; each retirement has a recorded reason; recorded failures and collection errors are fixed or retired with their files'),
+    ('S04', 'Unregistered `tools/qa/` sources get the same fail-closed treatment as `tools/bodygraph/`', 'An unregistered `tools/qa/` source, `.sh` and `.sql` included, cannot pass classification without an owner test'),
+    ('S05', "Align the CI workflow's documentation skip list with the classifier's documentation prefixes", 'A PR touching only classifier documentation prefixes starts no CI run'),
+    ('S06', "Make the attestation builder's wheel stage work under Debian-patched setuptools", 'The release attestation builds under Debian-patched setuptools'),
+    ('S07', 'Correct the showcompat help summary', "`hdctl --help` describes showcompat's actual `magic10_compat_result.v1` output"),
+    ('S08', 'Apply `aux-preview --band` when the band comes from the pair file', 'The band flag takes effect for pair-file input'),
+    ('S09', 'Repair or retire the dev Reader harness and the references to it', 'The harness imports and runs, or it is retired and `VERIFY.sh` and `docs/acceptance/reader_a7_crib.md` no longer reference it'),
+    ('S10', 'Gate dev `GET /reader` on an explicit environment', 'The dev route is served only when `APP_ENV` is explicitly `dev`, `test` or `local`; unset or any other value refuses'),
+    ('S11', 'Make the engine-core evidence currency test check release identity', 'The test fails when `release_id` drifts'),
+    ('S12', 'Correct provenance labels on current-release captures in the Machine Mirror', 'Current-release captures carry current-release labels'),
+    ('S13', "Remove the closure admission probe's dependence on the ambient installed package", "The probe's result depends only on the isolated closure's own sources"),
+    ('S14', 'Implement the production vendor override as CLI/API/Vendor Ref §7.1.11a to §7.1.11f state it', '`--allow-prod-vendor` behaves as §7.1.11 specifies, including environment classification, rails, evaluation order, error carrier, authorized initiator and audit; closed rails still refuse first, and public Reader or Aux traffic never reaches the vendor'),
+    ('S15', 'Reconcile the endpoint catalog with the routes the service registers', 'Every registered route has a catalog entry, or the route is removed; the audit mirror is produced by its owner'),
+    ('S16', 'Add `GEO_API_KEY` to the environment template', '`.env.example` has a `GEO_API_KEY` entry'),
+    ('S17', 'Correct the readiness and port statements in `docs/ADAPTER_009.md`', 'The readiness rules describe what `/internal/readyz` does, and the port statements are current'),
+    ('S18', "Correct `docs/ADAPTER_009.md`'s GET-with-body code and `ARCHITECTURE.md`'s stale statements", 'The documents say `invalid_json` for a compat GET with a body (observed by the Lead Developer in `engine/http/compat_handler.py` at `2aed56f1`) and state the current emitter return type and route mounts'),
+    ('S19', 'One code security review of what #467, #492, #501 and #508 merged, read on `main`', 'The review is recorded; each confirmed finding is fixed within this CRD or routed to an owner with a reason'),
+    ('S20', 'One read-only pre-push and pre-plan check with its own test', 'One read-only command reports CI lanes and release membership for given paths, the current Build Notes path and hash, the uncovered-test sweep run in a throwaway copy, and a `ci.yml` replay in a throwaway worktree, writing nothing to the repository'),
+    ('S21', 'A governed, feedback-free close-pack writer for Epic and CRD identities, and an admitted home for close-workflow run evidence', "The writer produces a canon-conforming close report and manifest from tracked inputs for an Epic or a CRD; close-workflow run evidence has a home, inside an existing evidence family or in one S21's ADR admits, that does not reopen an approved QA manifest; the accompanying ADR is approved"),
+    ('S22', "Extend the canonical evidence-index updater's CRD admission to HDE-CRD-0002's QA root", 'Before HDE-CRD-0002 enters QA, the canonical updater publishes and validates Index and Mirror entries for artifacts under `audit/qa/hde-crd-0002/`, and existing Epic and HDE-CRD-0001 inputs still publish and validate'),
+)
+CRD_SOURCE_REL = "audit/HDE-CRD-0002_close_candidate_source.json"
+CRD_REPORT_REL = "audit/HDE-CRD-0002_close_report.md"
+CRD_MANIFEST_REL = "audit/HDE-CRD-0002_MANIFEST.json"
+V2_NONCLAIMS = sorted(close_pack.NONCLAIM_TEXT_V2)
+
+
+def _ledger_paths(change_id: str) -> dict[str, str]:
+    directory = change_id.lower()
+    return {
+        "doc_deltas": f"audit/docdeltas/{directory}_doc_deltas.md",
+        "drain_targets": f"audit/docdeltas/{directory}_drain_targets.md",
+        "qa_step_logs_manifest": f"audit/qa/{directory}/qa_step_logs_manifest.json",
+    }
+
+
+def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
+    ledgers = _ledger_paths(change_id)
+    report, manifest = close_pack._derived_paths_v2(change_id)
+    pointers = sorted(ledgers.values())
+    if "CRD" in change_id:
+        pointers.append(f"audit/qa/{change_id.lower()}/close/")
+    return {
+        "schema_version": "close_candidate_source.v2",
+        "change_id": change_id,
+        "plan_path": "plans/plan.md",
+        "evidence_inputs": [
+            {"binding": "specification", "path": "plans/specification.md"},
+            {"binding": "doc_deltas", "path": ledgers["doc_deltas"]},
+            {"binding": "drain_targets", "path": ledgers["drain_targets"]},
+            {"binding": "qa_manifest", "path": ledgers["qa_step_logs_manifest"]},
+            {"binding": "qa_report", "path": "evidence/qa_report.md"},
+        ],
+        "requirements_binding": "specification",
+        "acceptance": [
+            {
+                "criterion_id": requirement_id,
+                "evidence_bindings": ["qa_manifest", "qa_report"],
+                "result": "MET",
+                "limitation": "None",
+            }
+            for requirement_id, _, _ in CRD_0002_REQUIREMENTS
+        ],
+        "deliverables": ["The close-pack writer accepts Epic and CRD identities."],
+        "deferrals": [
+            {"id": "DEF-1", "adr_status": "Deferred", "rationale": "Drains with the close-pack ADR."},
+            {"id": "DEF-2", "drain_target": "HDE Schemas and Artifacts 1.2 Close-pack artifacts"},
+        ],
+        "later_drain_statements": [
+            {
+                "canon_homes": ["Change Process Guide"],
+                "locators": ["3.5.2.1 Close-pack files"],
+                "current_posture": "Names the Epic filename prefix only.",
+                "action": "No status change recommended",
+                "readiness": "Supportable from repo evidence",
+                "evidence_bindings": ["qa_report"],
+                "close_expectation": "Drained after closure by its owner.",
+            }
+        ],
+        "tracked_issues": [{"id": "TI-002", "adr_status": "Deferred with drain targets"}],
+        "closure_decision": {"decision": "SATISFIED", "posture": "formal_close_pack_completion"},
+        "follow_ups": [],
+        "superseded": [],
+        "pointers": pointers,
+        "qa_rca": {"binding": "qa_report"},
+        "key_outputs": {"close_report": report, "close_manifest": manifest, **ledgers},
+        "nonclaims": list(V2_NONCLAIMS),
+    }
+
+
+def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tuple[Path, str]:
+    source = source or _v2_source()
+    change_id = str(source["change_id"])
+    repo = tmp_path / "repo"
+    for rel in (close_pack.SCHEMA_REL, close_pack.SCHEMA_V2_REL):
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / rel, repo / rel)
+    files = {
+        "plans/plan.md": "# Plan\n\nTracked plan.\n",
+        "plans/specification.md": "| ID | Scope | Acceptance intent |\n| :- | :- | :- |\n"
+        + "".join(f"| {i} | {scope} | {intent} |\n" for i, scope, intent in CRD_0002_REQUIREMENTS),
+        "evidence/qa_report.md": "# QA report\n\nFinal verdict recorded.\n",
+        **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
+        _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n",
+        _ledger_paths(change_id)["qa_step_logs_manifest"]: "{}\n",
+    }
+    for rel, text in files.items():
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        (repo / rel).write_text(text, encoding="utf-8")
+    source_rel = f"audit/{close_pack._derived_paths_v2(change_id)[0].split('/')[1].split('_close')[0]}_close_candidate_source.json"
+    _write_json(repo / source_rel, source)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "close-pack@example.invalid")
+    _git(repo, "config", "user.name", "Close Pack Test")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-m", "tracked v2 candidate inputs")
+    return repo, source_rel
+
+
+def _commit_all(repo: Path, message: str) -> None:
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-m", message)
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def _error(capsys: pytest.CaptureFixture[str]) -> str:
+    return capsys.readouterr().err.strip()
+
+
+def test_v2_schema_is_closed_and_shares_the_v1_feedback_refusal() -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+    assert schema["$id"] == close_pack.SCHEMA_V2_REL
+    assert schema["additionalProperties"] is False
+    assert set(schema["required"]) == set(schema["properties"])
+    assert schema["$defs"]["feedback_dependency"]["pattern"] == close_pack.FEEDBACK_DEPENDENCY_PATTERN
+    assert schema["properties"]["nonclaims"]["items"]["enum"] == V2_NONCLAIMS
+    assert Draft202012Validator(schema).is_valid(_v2_source())
+    assert Draft202012Validator(schema).is_valid(_v2_source("HDE-EPIC041"))
+
+
+def test_v2_crd_dry_run_writes_complete_close_pack_and_check_is_read_only(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+    manifest = json.loads((repo / CRD_MANIFEST_REL).read_text(encoding="utf-8"))
+    headings = [line[3:] for line in report.splitlines() if line.startswith("## ")]
+    assert headings == [
+        "QA Rails — Open/Close (Final PR)",
+        "Acceptance and evidence pointers",
+        "Exact-source acceptance",
+        "Delivered scope",
+        "Deferrals",
+        "Later-drain PF-canon update statements",
+        "Tracked-issue closeout mapping",
+        "Follow-ups",
+        "Superseded artifacts",
+        "QA RCA and Doc Delta summary",
+        "Key outputs",
+        "Close-pack verification",
+        "Source bindings",
+        "Explicit nonclaims",
+    ]
+    for pointer in _v2_source()["pointers"]:
+        assert f"- `{pointer}`" in report
+    assert "- Closure decision: SATISFIED" in report
+    assert "- Decision posture: formal close-pack completion" in report
+    for requirement_id, _, _ in CRD_0002_REQUIREMENTS:
+        assert f"- `{requirement_id}`: MET; evidence" in report
+    assert "- `DEF-1`: ADR status Deferred; rationale:" in report
+    assert "Supported later-drain action: `No status change recommended`" in report
+    assert manifest["schema_version"] == "close_candidate_manifest.v2"
+    assert manifest["change_id"] == "HDE-CRD-0002"
+    assert isinstance(manifest["key_outputs"], dict)
+    assert all(isinstance(value, str) for value in manifest["key_outputs"].values())
+    assert manifest["key_outputs"]["close_report"] == CRD_REPORT_REL
+    assert manifest["outputs"]["close_report"]["sha256"] == hashlib.sha256(
+        (repo / CRD_REPORT_REL).read_bytes()
+    ).hexdigest()
+    _commit_all(repo, "commit v2 close pack")
+    before = {rel: (repo / rel).read_bytes() for rel in (CRD_REPORT_REL, CRD_MANIFEST_REL)}
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+    assert {rel: (repo / rel).read_bytes() for rel in before} == before
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all", "--ignored") == ""
+
+
+def test_v2_epic_dry_run_uses_the_epic_prefix(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path, _v2_source("HDE-EPIC041"))
+    assert source_rel == "audit/EPIC-041_close_candidate_source.json"
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
+    assert report.startswith("# HDE-EPIC041 Close Report\n")
+    assert "## QA Rails — Open/Close (Final PR)" in report
+    assert "- `audit/qa/hde-epic041/qa_step_logs_manifest.json`" in report
+    _commit_all(repo, "commit epic v2 close pack")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+
+
+def test_real_requirement_text_trips_the_refusal_so_v2_binds_it_by_reference(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    tripped = {
+        requirement_id
+        for requirement_id, scope, intent in CRD_0002_REQUIREMENTS
+        if close_pack.FEEDBACK_DEPENDENCY_RE.search(scope)
+        or close_pack.FEEDBACK_DEPENDENCY_RE.search(intent)
+    }
+    assert tripped == {"S06", "S11"}
+    source = _v2_source()
+    source["acceptance"][5]["limitation"] = CRD_0002_REQUIREMENTS[5][2]  # S06 intent copied
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert "SOURCE_SCHEMA_INVALID" in _error(capsys)
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        "run ID 39345008218",
+        "the hosted run result",
+        "receipt from the workflow",
+        "release attestation",
+        "commit SHA of the close",
+        "later commits absorb it",
+    ),
+)
+@pytest.mark.parametrize("field", ("deliverable", "limitation", "follow_up", "rca", "posture_text"))
+def test_v2_refuses_feedback_identities_in_every_free_text_field(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, field: str, value: str
+) -> None:
+    source = _v2_source()
+    if field == "deliverable":
+        source["deliverables"].append(value)
+    elif field == "limitation":
+        source["acceptance"][0]["limitation"] = value
+    elif field == "follow_up":
+        source["closure_decision"]["decision"] = "NOT SATISFIED"
+        source["follow_ups"] = [value]
+    elif field == "rca":
+        source["qa_rca"] = {"summary_lines": [value]}
+    else:
+        source["later_drain_statements"][0]["current_posture"] = value
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    assert not Draft202012Validator(schema).is_valid(source)
+    with pytest.raises(close_pack.ClosePackError, match="FEEDBACK_DEPENDENCY_PROHIBITED"):
+        close_pack._require_feedback_free_values_v2(
+            close_pack._causal_strings_v2(source), CRD_SOURCE_REL, "0" * 40
+        )
+
+
+def test_v2_refuses_the_head_identity_like_v1() -> None:
+    head = "1" * 40
+    with pytest.raises(close_pack.ClosePackError, match="FEEDBACK_DEPENDENCY_PROHIBITED"):
+        close_pack._require_feedback_free_values_v2([f"Built on {head}."], CRD_SOURCE_REL, head)
+    close_pack._require_feedback_free_values_v2(["Built on the tracked plan."], CRD_SOURCE_REL, head)
+
+
+@pytest.mark.parametrize(
+    "path",
+    (
+        "docs/evidence/INDEX.json",
+        "docs/evidence/INDEX.sha256",
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.sha256",
+        "audit/gates/topology/orientation_demo.txt",
+        "evidence/qa_report.md.path_proof.txt",
+        "audit/qa/hde-crd-0002/close/close-pack-check/primary.log",
+    ),
+)
+def test_v2_refuses_updater_outputs_and_the_close_run_family_as_causal_inputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], path: str
+) -> None:
+    source = _v2_source()
+    source["evidence_inputs"].append({"binding": "prohibited", "path": path})
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    (repo / path).parent.mkdir(parents=True, exist_ok=True)
+    (repo / path).write_text("tracked\n", encoding="utf-8")
+    _commit_all(repo, "track a prohibited input")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:CAUSAL_INPUT_PROHIBITED"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+def _mutate(source: dict[str, object], case: str) -> None:
+    if case == "unresolved_binding":
+        source["acceptance"][0]["evidence_bindings"] = ["absent"]
+    elif case == "requirement_not_in_document":
+        source["acceptance"][0]["criterion_id"] = "S99"
+    elif case == "duplicate_criterion":
+        source["acceptance"][1]["criterion_id"] = "S01"
+        source["acceptance"][1]["limitation"] = "A second entry for the same criterion."
+    elif case == "satisfied_with_unmet":
+        source["acceptance"][0]["result"] = "NOT_MET"
+    elif case == "not_satisfied_without_follow_ups":
+        source["closure_decision"]["decision"] = "NOT SATISFIED"
+    elif case == "missing_close_run_pointer":
+        source["pointers"].remove("audit/qa/hde-crd-0002/close/")
+    elif case == "wrong_report_output":
+        source["key_outputs"]["close_report"] = "audit/CRD-0002_close_report.md"
+    elif case == "unbound_key_output":
+        source["key_outputs"]["qa_rca"] = "evidence/not_bound.md"
+    elif case == "adr_deferral_not_in_drain_targets":
+        source["deferrals"][0]["id"] = "DEF-9"
+    elif case == "ledger_not_bound":
+        source["evidence_inputs"] = [
+            item for item in source["evidence_inputs"] if item["binding"] != "doc_deltas"
+        ]
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("unresolved_binding", "BINDING_UNRESOLVED"),
+        ("requirement_not_in_document", "REQUIREMENT_ID_UNBOUND"),
+        ("duplicate_criterion", "ACCEPTANCE_AMBIGUOUS"),
+        ("satisfied_with_unmet", "DECISION_CONTRADICTION"),
+        ("not_satisfied_without_follow_ups", "DECISION_CONTRADICTION"),
+        ("missing_close_run_pointer", "POINTER_MISSING"),
+        ("wrong_report_output", "OUTPUT_BINDING_MISMATCH"),
+        ("unbound_key_output", "OUTPUT_BINDING_MISMATCH"),
+        ("adr_deferral_not_in_drain_targets", "DEFERRAL_UNBOUND"),
+        ("ledger_not_bound", "OUTPUT_BINDING_MISMATCH"),
+    ),
+)
+def test_v2_semantic_refusals_write_nothing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str,
+) -> None:
+    source = _v2_source()
+    _mutate(source, case)
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def test_v2_check_rejects_committed_bytes_that_differ_from_a_fresh_derivation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    _commit_all(repo, "commit v2 close pack")
+    report = repo / CRD_REPORT_REL
+    report.write_bytes(report.read_bytes().replace(b"SATISFIED", b"SATISFIED.", 1))
+    _commit_all(repo, "commit an edited report")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REPORT_HASH_MISMATCH"
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+
+def test_unknown_source_schema_version_keeps_the_v1_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = _v2_source()
+    source["schema_version"] = "close_candidate_source.v3"
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"

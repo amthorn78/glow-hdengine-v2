@@ -217,6 +217,10 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
     assert text.count("actions/checkout@v4") == 1
     assert text.count("persist-credentials: false") == 1
     assert "ref: ${{ inputs.git_ref }}" in text
+    # The evidence checks import the Reader's transport validators, so the job
+    # installs the runtime requirements (HDE-CRD-0002 WU-PR-07 F-1).
+    assert text.count("python -m pip install") == 1
+    assert "run: python -m pip install -r requirements.txt\n" in text
     assert "^[0-9a-f]{40,64}$" in text
     assert '${#CANDIDATE_SOURCE} <= 512' in text
     assert (
