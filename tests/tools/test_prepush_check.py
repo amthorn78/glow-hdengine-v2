@@ -179,12 +179,25 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
         lambda text: text.replace(
             "        id: python_setup\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
             "        id: python_setup\n        if:\n          nested: invalid\n"),
+        lambda text: text.replace(
+            "        id: dependencies\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
+            "        id: dependencies\n        if: ${{ false }}\n"),
+        lambda text: text.replace(
+            "        id: python_setup\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
+            "        id: python_setup\n        if: ${{ false }}\n"),
+        lambda text: text.replace(
+            "        id: dependencies\n        if: ${{ steps.classify.outputs.needs_python == 'true' }}\n",
+            "        id: dependencies\n"),
+        lambda text: text.replace("run: python3 ci/checks/check_agents_md_citations.py", "run: true"),
+        lambda text: text.replace("          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+                                  "          HEAD_SHA: 1.0"),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
          "runner-variable-in-run", "runner-variable-step-env", "runner-variable-job-env", "checkout-credentials",
          "checkout-condition", "install-env", "step-env-not-a-mapping", "runner-label", "executed-without-run",
-         "second-job", "structured-env-value", "step-if-not-a-string"],
+         "second-job", "structured-env-value", "step-if-not-a-string", "install-condition",
+         "setup-python-condition", "install-condition-removed", "run-boolean", "step-env-float"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -251,6 +264,22 @@ def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
         assert mutated != text
         with pytest.raises(tool.ToolingError, match=message):
             tool.replay_steps(mutated)
+
+
+def test_implicitly_typed_scalars_are_refused_unless_github_writes_them_back_unchanged() -> None:
+    # GitHub reads the workflow as YAML 1.2 and writes an env value it reads as a boolean or an integer back as
+    # true, false or decimal; any other spelling, a null or a float would become another string.
+    text = WORKFLOW.read_text(encoding="utf-8")
+    env_line = "      APP_ENV: dev\n"
+    for value in ("1.0", "0x10", "010", "+1", "True", "~", "null", ".inf"):
+        with pytest.raises(tool.ToolingError, match="unsupported shape"):
+            tool.replay_steps(text.replace(env_line, f"      APP_ENV: {value}\n"))
+    for value in ("true", "false", "0", "12", "-3"):
+        assert tool.replay_steps(text.replace(env_line, f"      APP_ENV: {value}\n"))[0].env["APP_ENV"] == value
+    with pytest.raises(tool.ToolingError, match="unsupported workflow key"):
+        tool.replay_steps(text.replace(env_line, env_line + "      true: x\n"))
+    assert isinstance(tool._plain("TRUE"), tool._Resolved) and not isinstance(tool._plain("'true'"), tool._Resolved)
+    assert not isinstance(tool._plain("ubuntu-latest"), tool._Resolved)
 
 
 def test_the_whole_workflow_is_one_mapping_without_repeated_keys() -> None:

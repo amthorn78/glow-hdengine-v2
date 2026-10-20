@@ -142,6 +142,15 @@ REPLAY_EXCLUDED_STEP_KEYS = {
     "Set up Python 3.12": frozenset({"name", "id", "if", "uses", "with"}),
     "Install applicable validation dependencies": frozenset({"name", "id", "if", "run"}),
 }
+# The condition each excluded step must carry, exactly ("" for none).  The
+# caller's environment holds what the substituted steps provide whether or not
+# they run, so a substitute stands in for its step only when it runs exactly
+# when CI's does.
+REPLAY_EXCLUDED_STEP_CONDITIONS = {
+    "Check out exact candidate head": "",
+    "Set up Python 3.12": "${{ steps.classify.outputs.needs_python == 'true' }}",
+    "Install applicable validation dependencies": "${{ steps.classify.outputs.needs_python == 'true' }}",
+}
 REPLAY_JOB_KEYS = frozenset({"runs-on", "env", "steps"})
 # What the replay stands in for, and the only inputs it models: the workflow's
 # top-level keys, the ubuntu-latest runner (x86_64 Linux, replayed on this
@@ -440,6 +449,43 @@ def _indent(line: str) -> int:
     return len(line) - len(line.lstrip(" "))
 
 
+class _Resolved(str):
+    """A plain scalar that YAML 1.2's core schema reads as a null, boolean, integer or float, not a string."""
+
+    kind = ""
+
+
+# GitHub reads the workflow as YAML 1.2 (its `on:` key would be a boolean under 1.1).
+_CORE_SCHEMA = (
+    ("null", re.compile(r"~|null|Null|NULL")),
+    ("boolean", re.compile(r"true|True|TRUE|false|False|FALSE")),
+    ("integer", re.compile(r"[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+")),
+    ("float", re.compile(r"[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?|[-+]?\.(?:inf|Inf|INF)"
+                         r"|\.(?:nan|NaN|NAN)")),
+)
+
+
+def _resolve(value: str) -> str:
+    for kind, pattern in _CORE_SCHEMA:
+        if pattern.fullmatch(value):
+            scalar = _Resolved(value)
+            scalar.kind = kind
+            return scalar
+    return value
+
+
+def _as_string(value: object) -> bool:
+    """Whether GitHub reads an env or with value as the very string the replay uses.
+
+    A string is; GitHub writes a boolean as true or false and an integer in
+    decimal, so only those spellings of them are; any other non-string is not.
+    """
+    if not isinstance(value, _Resolved):
+        return isinstance(value, str)
+    return (value.kind == "boolean" and value in {"true", "false"}) \
+        or (value.kind == "integer" and re.fullmatch(r"0|-?[1-9][0-9]*", value) is not None)
+
+
 _SINGLE_QUOTED_RE = re.compile(r"'((?:[^']|'')*)'(?:\s+#.*)?")
 _DOUBLE_QUOTED_RE = re.compile(r'"([^"\\]*)"(?:\s+#.*)?')
 _KEY_RE = re.compile(r"[A-Za-z0-9_.-]+")
@@ -468,7 +514,7 @@ def _plain(value: str) -> str:
             or ": " in value or value.endswith(":"):
         raise ToolingError(f"unsupported YAML value {value!r} (flow collections, anchors, aliases, tags, "
                            "block-scalar options, sequence entries and nested mapping values are not modelled)")
-    return value
+    return _resolve(value)
 
 
 def _block(lines: list[str], start: int, parent_indent: int, style: str) -> tuple[str, int]:
@@ -530,7 +576,7 @@ def _mapping(lines: list[str], start: int, parent_indent: int) -> tuple[dict[str
         if not sep:
             raise ToolingError(f"unsupported workflow line {index + 1}")
         # Keys are plain words followed by ': ' or a line end; GitHub rejects a repeated key.
-        if not _KEY_RE.fullmatch(key) or rest[:1] not in {"", " ", "\t"}:
+        if not _KEY_RE.fullmatch(key) or isinstance(_resolve(key), _Resolved) or rest[:1] not in {"", " ", "\t"}:
             raise ToolingError(f"unsupported workflow key at line {index + 1}: {line.strip()!r}")
         if key in result:
             raise ToolingError(f"workflow key {key!r} repeated at line {index + 1}")
@@ -588,7 +634,7 @@ def parse_jobs(text: str) -> dict[str, Job]:
         steps = body.get("steps", [])
         env = body.get("env", {})
         if not isinstance(steps, list) or not isinstance(env, dict) or not all(isinstance(s, dict) for s in steps) \
-                or not all(isinstance(v, str) for v in env.values()):
+                or not all(_as_string(v) for v in env.values()):
             raise ToolingError(f"job {name!r} has an unsupported shape")
         jobs[name] = Job(keys=body, env={k: str(v) for k, v in env.items()}, steps=steps)
     return jobs
@@ -1167,11 +1213,14 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has keys its substitute does not model "
                                f"{sorted(set(step) - REPLAY_EXCLUDED_STEP_KEYS[name])}")
         for key in ("name", "id", "if", "uses", "shell", "run"):
-            if key in step and not isinstance(step[key], str):
+            if key in step and (not isinstance(step[key], str) or isinstance(step[key], _Resolved)):
                 raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a string")
         for key in ("env", "with"):
-            if key in step and not (isinstance(step[key], dict) and all(isinstance(v, str) for v in step[key].values())):
+            if key in step and not (isinstance(step[key], dict) and all(_as_string(v) for v in step[key].values())):
                 raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a mapping of strings")
+        if kind == REPLAY_EXCLUDED and str(step.get("if", "")).strip() != REPLAY_EXCLUDED_STEP_CONDITIONS[name]:
+            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has the condition {step.get('if')!r}, "
+                               f"not the modelled {REPLAY_EXCLUDED_STEP_CONDITIONS[name]!r}")
         step_env = step.get("env", {})
         named = set(_RUNNER_VARIABLE_RE.findall(str(step.get("run", "")))) - modelled_variables
         named |= {str(key) for key in step_env if _RUNNER_VARIABLE_RE.fullmatch(str(key))}
