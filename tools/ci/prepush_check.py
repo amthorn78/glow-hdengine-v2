@@ -1661,6 +1661,9 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
         raise ValueError("the install step is not one 'python -m pip install' command")
     rest = words[words.index("install") + 1:]
+    if not rest:
+        # pip refuses an install with no requirement, requirements file or project.
+        raise ValueError("the install step names nothing to install, which pip refuses")
     roots: list[tuple[str, str]] = []
     projects: list[dict[str, object]] = []
     index = 0

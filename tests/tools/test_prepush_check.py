@@ -289,6 +289,14 @@ def test_the_install_substitute_stands_in_for_one_simple_command_only(tmp_path: 
         tool._install_check("python -m pip install pytest" + extra, tmp_path)
 
 
+@pytest.mark.parametrize("run", ["python -m pip install", "pip install", "python -m pip install  "])
+def test_an_install_step_with_nothing_to_install_is_refused(tmp_path: Path, run: str) -> None:
+    with pytest.raises(ValueError, match="names nothing to install"):
+        tool._install_check(run, tmp_path)
+    outcome, detail = tool._substitute({"run": run}, "reason", tmp_path, "3.12", "3.12")
+    assert outcome == "failure" and detail.startswith("TOOLING") and "names nothing to install" in detail
+
+
 def test_an_unexpected_report_exception_still_reaches_the_read_only_check(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     repo = _synthetic(tmp_path / "raises", {"data.txt": "tracked\n"})
