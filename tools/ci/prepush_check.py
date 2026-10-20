@@ -768,12 +768,40 @@ def repository_state_head(repo: Path) -> str:
     return git_text(repo, "rev-parse", "--verify", "HEAD")
 
 
+def parse_github_output(data: bytes) -> tuple[dict[str, str], tuple[str, str] | None]:
+    """A GITHUB_OUTPUT file's outputs as the Linux runner reads them, and the first record the replay cannot take.
+
+    The runner splits the file at line feeds, skips empty lines and reads
+    NAME=VALUE at the first '='.  It rejects a line with neither '=' nor '<<'
+    and fails the step, keeping the outputs set before it: a BEHAVIOR problem.
+    The heredoc form NAME<<DELIMITER, an empty name, a carriage return and text
+    that is not UTF-8 are not modelled: a TOOLING problem.
+    """
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return {}, ("TOOLING", "GITHUB_OUTPUT is not UTF-8, which the replay does not model")
+    outputs: dict[str, str] = {}
+    for line in text.split("\n"):
+        if not line:
+            continue
+        equals, heredoc = line.find("="), line.find("<<")
+        if "\r" in line or equals == 0 or (heredoc >= 0 and (equals < 0 or heredoc < equals)):
+            return outputs, ("TOOLING", f"GITHUB_OUTPUT record {line[:80]!r} is a form the replay does not model")
+        if equals < 0:
+            return outputs, ("BEHAVIOR", f"the runner rejects GITHUB_OUTPUT record {line[:80]!r}, "
+                                         "which is neither NAME=VALUE nor NAME<<DELIMITER")
+        outputs[line[:equals]] = line[equals + 1:]
+    return outputs, None
+
+
 def _print_outputs(report: Report, output: Path, target_file: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for line in output.read_text(encoding="utf-8").splitlines():
-        report.out(f"output {line}")
-        key, _sep, value = line.partition("=")
-        values[key] = value
+    values, problem = parse_github_output(output.read_bytes())
+    for line in output.read_text(encoding="utf-8", errors="replace").split("\n"):
+        if line:
+            report.out(f"output {line}")
+    if problem:
+        report.fail(f"classifier output: {problem[1]}", tooling=problem[0] == "TOOLING")
     targets = [t for t in target_file.read_text(encoding="utf-8").splitlines() if t]
     report.out(f"changed_test_targets={len(targets)}")
     for target in targets:
@@ -1786,16 +1814,15 @@ def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[st
         return "failure", f"TOOLING unsupported shell {shell!r}", {}
     result = subprocess.run(command, cwd=copy, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             text=True, errors="replace", check=False)
-    outputs = {}
-    for line in output_file.read_text(encoding="utf-8").splitlines():
-        key, sep, value = line.partition("=")
-        if sep:
-            outputs[key] = value
+    # The runner reads the step's file commands whatever its exit status, and a record it rejects fails the step.
+    outputs, problem = parse_github_output(output_file.read_bytes())
     lines = [line for line in result.stdout.splitlines() if line.strip()]
-    if result.returncode == 0:
+    if result.returncode == 0 and problem is None:
         return "success", "\n".join(lines[-3:]), outputs
-    kind = _classify_failure(result.returncode, result.stdout)
-    return "failure", f"{kind} exit {result.returncode}\n" + "\n".join(lines[-30:]), outputs
+    head = [] if result.returncode == 0 else [
+        f"{_classify_failure(result.returncode, result.stdout)} exit {result.returncode}"]
+    head += [f"{problem[0]} {problem[1]}"] if problem else []
+    return "failure", "\n".join(head + lines[-30:]), outputs
 
 
 # --------------------------------------------------------------------------

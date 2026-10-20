@@ -291,6 +291,64 @@ def test_expressions_cover_the_workflow_forms() -> None:
     assert tool.interpolate("${{ github.event.pull_request.head.sha || github.sha }}", push) == "s"
 
 
+_REJECTED = "the runner rejects GITHUB_OUTPUT record"
+_UNMODELLED = "is a form the replay does not model"
+
+
+@pytest.mark.parametrize(
+    "data, outputs, problem",
+    [
+        (b"", {}, None),
+        (b"a=1\n\nb=x=y\nk=v<<x\nlast=", {"a": "1", "b": "x=y", "k": "v<<x", "last": ""}, None),
+        (b"a=1\ninvalid\nb=2\n", {"a": "1"}, ("BEHAVIOR", _REJECTED)),
+        (b"body<<EOF\nx\nEOF\n", {}, ("TOOLING", _UNMODELLED)),
+        (b"a<<b=c\n", {}, ("TOOLING", _UNMODELLED)),
+        (b"a=1\n=v\n", {"a": "1"}, ("TOOLING", _UNMODELLED)),
+        (b"a=1\r\n", {}, ("TOOLING", _UNMODELLED)),
+        (b"\r\n", {}, ("TOOLING", _UNMODELLED)),
+        (b"a=\xff\n", {}, ("TOOLING", "is not UTF-8")),
+    ],
+    ids=["empty", "name-value", "no-separator", "heredoc", "heredoc-first", "empty-name", "carriage-return",
+         "carriage-return-alone", "not-utf-8"],
+)
+def test_github_output_is_read_as_the_linux_runner_reads_it(
+        data: bytes, outputs: dict[str, str], problem: tuple[str, str] | None) -> None:
+    got, got_problem = tool.parse_github_output(data)
+    assert got == outputs
+    assert (got_problem is None) == (problem is None)
+    if problem:
+        assert got_problem[0] == problem[0] and problem[1] in got_problem[1]
+
+
+def test_a_step_whose_output_the_runner_rejects_fails(tmp_path: Path) -> None:
+    expressions = tool.Expressions(tool.replay_contexts("pull_request", "b", "h"), job_failed=False)
+    env = tool.child_environment(dict(os.environ), tmp_path)
+    copy = tmp_path / "copy"
+    copy.mkdir()
+
+    def run(body: str) -> tuple[str, str, dict[str, str]]:
+        return tool._execute({"run": body, "shell": "bash"}, 1, copy, env, expressions, tmp_path)
+
+    assert run('echo product=true >> "$GITHUB_OUTPUT"') == ("success", "", {"product": "true"})
+    outcome, detail, outputs = run('echo product=true >> "$GITHUB_OUTPUT"\necho invalid >> "$GITHUB_OUTPUT"')
+    assert (outcome, outputs) == ("failure", {"product": "true"})
+    assert detail.startswith(f"BEHAVIOR {_REJECTED} 'invalid'")
+    outcome, detail, _outputs = run('printf "body<<EOF\\nx\\nEOF\\n" >> "$GITHUB_OUTPUT"\nexit 3')
+    assert outcome == "failure" and detail.splitlines()[:2] == [
+        "BEHAVIOR exit 3", f"TOOLING GITHUB_OUTPUT record 'body<<EOF' {_UNMODELLED}"]
+
+
+def test_lanes_refuses_classifier_output_the_runner_would_reject(tmp_path: Path) -> None:
+    output, targets = tmp_path / "output.txt", tmp_path / "targets.txt"
+    output.write_text("product=true\ninvalid\n", encoding="utf-8")
+    targets.write_text("", encoding="utf-8")
+    report = tool.Report("lanes")
+    assert tool._print_outputs(report, output, targets) == {"product": "true"}
+    assert report.status == "FAIL"
+    assert f"lanes: FAILURE classifier output: {_REJECTED} 'invalid', which is neither NAME=VALUE nor " \
+           "NAME<<DELIMITER" in report.lines
+
+
 def test_interpreter_substitute_requires_the_workflow_python(tmp_path: Path) -> None:
     step = {"uses": "actions/setup-python@v5", "with": {"python-version": "3.12"}}
     outcome, detail = tool._substitute(step, "reason", tmp_path, "3.12", "3.11")
