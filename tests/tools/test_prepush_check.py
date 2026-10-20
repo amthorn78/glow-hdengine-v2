@@ -253,6 +253,35 @@ def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
             tool.replay_steps(mutated)
 
 
+def test_the_whole_workflow_is_one_mapping_without_repeated_keys() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    second_jobs = "\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - name: only\n        run: exit 1\n"
+    for appended in ("\nname: other\n", second_jobs):
+        with pytest.raises(tool.ToolingError, match="repeated"):
+            tool.replay_steps(text + appended)
+    # The sweep's coverage reads the jobs through the same parse.
+    with pytest.raises(tool.ToolingError, match="repeated"):
+        tool.pytest_command_tokens(text + second_jobs)
+
+
+def test_block_scalars_are_read_as_yaml_reads_them_or_refused() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    line = "        run: python3 ci/checks/check_agents_md_citations.py\n"
+
+    def run_of(block: str) -> object:
+        mutated = text.replace(line, block)
+        assert mutated != text
+        return tool.replay_steps(mutated)[1][2]["run"]
+
+    assert run_of("        run: >-\n          echo a\n          echo b\n\n          echo c\n") == "echo a echo b\necho c"
+    assert run_of("        run: |\n          echo a\n            echo b\n") == "echo a\n  echo b\n"
+    # A folded block keeps the line breaks around a more-indented line, which is not modelled.
+    with pytest.raises(tool.ToolingError, match="more indented"):
+        run_of("        run: >\n          echo replay_pass\n            exit 1\n")
+    with pytest.raises(tool.ToolingError, match="less indented"):
+        run_of("        run: |\n            echo a\n          echo b\n")
+
+
 @pytest.mark.parametrize("extra", ["\npytest", "; pytest", " && pytest", " | cat", " $(true)", " `true`",
                                    ' "$HOME"', " > log", " # note", " \\\n -r more.txt", " 'unterminated"])
 def test_the_install_substitute_stands_in_for_one_simple_command_only(tmp_path: Path, extra: str) -> None:
@@ -612,7 +641,10 @@ def test_version_clauses_and_markers_follow_pep_440_and_508() -> None:
         "psycopg", frozenset({"binary"}), [(">=", "3.1"), ("<", "3.3")])
     assert tool._parse_requirement("eventlet (>=0.24.1) ; extra == 'eventlet'")[2] == [(">=", "0.24.1")]
     assert tool._parse_requirement("alpha[ Fast , slow_path ]>=1")[1] == frozenset({"fast", "slow-path"})
-    for unsupported in ("x>=1.*", "x>=1,", "x==", "x~=1", "x==1.0+local", "x @ https://example.invalid/x.whl"):
+    assert tool._parse_requirement("alpha[ ]")[1] == frozenset()
+    # PEP 508 extras are identifiers separated by commas: pip refuses an empty element or a bad identifier.
+    for unsupported in ("x>=1.*", "x>=1,", "x==", "x~=1", "x==1.0+local", "x @ https://example.invalid/x.whl",
+                        "x[,]", "x[a,]", "x[,a]", "x[a,,b]", "x[-a]"):
         with pytest.raises(ValueError, match="unsupported"):
             tool._parse_requirement(unsupported)
     with pytest.raises(ValueError, match="not a PEP 440 version"):

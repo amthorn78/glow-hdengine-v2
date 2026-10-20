@@ -481,7 +481,14 @@ def _block(lines: list[str], start: int, parent_indent: int, style: str) -> tupl
             break
         if line.strip() and block_indent is None:
             block_indent = _indent(line)
-        body.append(line[block_indent:] if block_indent is not None and line.strip() else "")
+        if line.strip() and block_indent is not None and _indent(line) < block_indent:
+            raise ToolingError(f"block scalar line {index + 1} is less indented than the block's first line")
+        content = line[block_indent:] if block_indent is not None and line.strip() else ""
+        # YAML keeps the line breaks around a more-indented line of a folded
+        # block; that rule is not modelled, so such a line fails closed.
+        if style.startswith(">") and content[:1] in {" ", "\t"}:
+            raise ToolingError(f"folded block scalar line {index + 1} is more indented, which is not modelled")
+        body.append(content)
         index += 1
     while body and not body[-1]:
         body.pop()
@@ -564,14 +571,16 @@ def _sequence(lines: list[str], start: int, parent_indent: int) -> tuple[list[ob
     return items, index
 
 
+def parse_workflow(text: str) -> dict[str, object]:
+    """The whole workflow document as one mapping, so a repeated key fails closed at every level."""
+    document, _ = _mapping(text.splitlines(), 0, -1)
+    return document
+
+
 def parse_jobs(text: str) -> dict[str, Job]:
-    lines = text.splitlines()
-    for index, line in enumerate(lines):
-        if line.rstrip() == "jobs:":
-            mapping, _ = _mapping(lines, index + 1, 0)
-            break
-    else:
-        raise ToolingError(f"{WORKFLOW_PATH} has no jobs")
+    mapping = parse_workflow(text).get("jobs")
+    if not isinstance(mapping, dict):
+        raise ToolingError(f"{WORKFLOW_PATH} has no jobs mapping")
     jobs: dict[str, Job] = {}
     for name, body in mapping.items():
         if not isinstance(body, dict):
@@ -1122,7 +1131,7 @@ def condition(text: object, expressions: Expressions) -> bool:
 # --------------------------------------------------------------------------
 
 def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
-    top = {match.group(2) for match in re.finditer(r"^([\"']?)([A-Za-z0-9_-]+)\1[ \t]*:", text, re.MULTILINE)}
+    top = set(parse_workflow(text))
     if top - REPLAY_WORKFLOW_KEYS:
         raise ToolingError(f"REPLAY_INVENTORY_DRIFT: unsupported workflow keys {sorted(top - REPLAY_WORKFLOW_KEYS)}")
     jobs = parse_jobs(text)
@@ -1304,9 +1313,11 @@ def _parse_requirement(text: str) -> tuple[str, frozenset[str], list[tuple[str, 
     match = _REQUIREMENT_RE.fullmatch(text.strip())
     specifier = match.group(3).strip() if match else ""
     clauses = _parse_clauses(specifier[1:-1] if specifier.startswith("(") else specifier) if match else None
-    if not match or clauses is None:
+    # PEP 508 extras: identifiers separated by commas, an empty list allowed, no empty element.
+    names = [extra.strip() for extra in match.group(2).split(",")] if match and (match.group(2) or "").strip() else []
+    if not match or clauses is None or not all(_PROJECT_NAME_RE.fullmatch(name) for name in names):
         raise ValueError(f"unsupported requirement {text.strip()!r}")
-    extras = frozenset(_canonical(extra.strip()) for extra in (match.group(2) or "").split(",") if extra.strip())
+    extras = frozenset(_canonical(name) for name in names)
     return match.group(1), extras, clauses, _parse_marker(match.group(4)) if match.group(4) else None
 
 
