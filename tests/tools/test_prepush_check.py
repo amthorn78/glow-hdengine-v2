@@ -265,7 +265,8 @@ def test_a_step_that_is_not_a_mapping_is_refused() -> None:
 
 
 @pytest.mark.parametrize("value", ["{nested: invalid}", "[a, b]", "&anchor x", "*alias", "!tag x", "|+", ">2",
-                                   '"echo replay_pass\\nexit 1"', '"unterminated', "'a' b", "a: b", "- x", "# c"])
+                                   '"echo replay_pass\\nexit 1"', '"unterminated', "'a' b", "a: b", "- x", "# c",
+                                   "]", "}", ",x", "] x", "-\tx", "?\tx", ":\tx", "? x"])
 def test_yaml_forms_the_parser_does_not_model_are_refused(value: str) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     mutated = text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}",
@@ -279,6 +280,9 @@ def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
     assert tool._plain('"x" # comment') == "x"
     assert tool._plain("'it''s'  # comment") == "it's"
     assert tool._plain("plain value\t# comment") == "plain value"
+    # "-", "?" and ":" followed by a non-space begin a plain scalar, and flow indicators may follow its first character.
+    for value in ("-x", "?x", ":x", "a,b", "a]", "x}"):
+        assert tool._plain(value) == value
     # GitHub rejects a repeated key; a key is a plain word followed by ': '.
     text = WORKFLOW.read_text(encoding="utf-8")
     line = "        run: python3 ci/checks/check_agents_md_citations.py\n"

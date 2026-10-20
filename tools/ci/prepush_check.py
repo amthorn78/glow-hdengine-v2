@@ -527,13 +527,15 @@ def _plain(value: str) -> str:
                                "and its escape sequences are not modelled)")
         return match.group(1)
     value = re.split(r"\s#", value, maxsplit=1)[0].rstrip()
-    # A flow collection, anchor, alias, tag, block-scalar option, comment,
-    # sequence entry or other indicator, or a mapping value inside the scalar,
-    # would be read as a literal string here; GitHub's parser reads it as YAML
-    # or rejects it, so it fails closed.
-    if value[:1] in set("{[&*!|>%@`#") or value in {"?", "-"} or value.startswith(("? ", "- ")) \
+    # A plain scalar cannot begin with an indicator, except "-", "?" or ":"
+    # followed by a non-space (YAML 1.2.2 §7.3.3).  A flow collection, anchor,
+    # alias, tag, block-scalar option, comment, sequence entry or other
+    # indicator, or a mapping value inside the scalar, would be read as a
+    # literal string here; GitHub's parser reads it as YAML or rejects it, so
+    # it fails closed.
+    if value[:1] in set(",[]{}#&*!|>%@`") or (value[:1] in set("-?:") and value[1:2] in {"", " ", "\t"}) \
             or ": " in value or value.endswith(":"):
-        raise ToolingError(f"unsupported YAML value {value!r} (flow collections, anchors, aliases, tags, "
+        raise ToolingError(f"unsupported YAML value {value!r} (flow indicators, anchors, aliases, tags, "
                            "block-scalar options, sequence entries and nested mapping values are not modelled)")
     return _resolve(value)
 
