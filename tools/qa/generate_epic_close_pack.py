@@ -2338,6 +2338,27 @@ def _heading_occurs(heading: str, payload: bytes) -> bool:
     return re.search(pattern, payload, re.MULTILINE) is not None
 
 
+def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
+    # The pinned ledger format, as the canonical QA harness writes it for every Epic and CRD on
+    # main: a nonempty mapping of check_id to exactly {check_id, log_path, status}.
+    try:
+        ledger = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        raise _fail("QA_LEDGER_INVALID") from None
+    if not isinstance(ledger, dict) or not ledger:
+        raise _fail("QA_LEDGER_INVALID")
+    for check_id, entry in ledger.items():
+        if (
+            not isinstance(entry, dict)
+            or set(entry) != {"check_id", "log_path", "status"}
+            or entry["check_id"] != check_id
+            or entry["log_path"] != f"audit/qa/{directory}/checks/{check_id}/primary.log"
+            or not isinstance(entry["status"], str)
+        ):
+            raise _fail("QA_LEDGER_INVALID")
+    return [entry["status"] for entry in ledger.values()]
+
+
 def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
     epic = CHANGE_RE.fullmatch(change_id).group("epic")  # type: ignore[union-attr]
     patterns = (
@@ -2435,11 +2456,20 @@ def _require_v2_semantics(
         for item in source["tracked_issues"]
     ):
         raise _fail("TRACKED_ISSUE_POINTER_UNBOUND")
+    qa_statuses = _qa_ledger_statuses(
+        next(
+            snapshot.payload
+            for snapshot in bindings.values()
+            if snapshot.rel == supporting["qa_step_logs_manifest"]
+        ),
+        change_id.lower(),
+    )
 
     decision = source["closure_decision"]["decision"]
     if decision == "SATISFIED" and (
         source["follow_ups"]
         or any(item["result"] != "MET" for item in source["acceptance"])
+        or any(status != "PASS" for status in qa_statuses)
     ):
         raise _fail("DECISION_CONTRADICTION")
     if decision == "SATISFIED" and not requirement_ids <= set(criteria):

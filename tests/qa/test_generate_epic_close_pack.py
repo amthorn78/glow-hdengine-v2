@@ -4359,6 +4359,13 @@ def _specification_text(change_id: str) -> str:
     return "".join(f"**{i}.** {scope}: {intent}\n\n" for i, scope, intent in rows)
 
 
+def _qa_ledger_text(change_id: str, status: str) -> str:
+    directory = change_id.lower()
+    check = "qa-01-setup"
+    entry = {"check_id": check, "log_path": f"audit/qa/{directory}/checks/{check}/primary.log", "status": status}
+    return json.dumps({check: entry}, sort_keys=True, separators=(",", ":")) + "\n"
+
+
 def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
     ledgers = _ledger_paths(change_id)
     report, manifest = close_pack._derived_paths_v2(change_id)
@@ -4426,7 +4433,7 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
         "evidence/qa_report.md": "# QA report\n\nFinal verdict recorded.\n",
         **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
         _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- TI-002: close-pack canon\n",
-        _ledger_paths(change_id)["qa_step_logs_manifest"]: "{}\n",
+        _ledger_paths(change_id)["qa_step_logs_manifest"]: _qa_ledger_text(change_id, "PASS"),
     }
     for rel, text in files.items():
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -4735,6 +4742,57 @@ def test_v2_tracked_issue_pointer_must_be_a_bound_path_and_heading() -> None:
     source = _v2_source()
     source["tracked_issues"] = [{"id": "TI-009", "pointer": "Closed"}]
     assert not Draft202012Validator(schema).is_valid(source)
+
+
+@pytest.mark.parametrize(
+    "rel",
+    (
+        "audit/qa/hde-crd-0001/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic021/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic039/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic040/qa_step_logs_manifest.json",
+    ),
+)
+def test_v2_qa_ledger_pin_reads_the_real_ledgers(rel: str) -> None:
+    directory = rel.split("/")[2]
+    statuses = close_pack._qa_ledger_statuses((ROOT / rel).read_bytes(), directory)
+    assert statuses and set(statuses) == {"PASS"}
+
+
+@pytest.mark.parametrize(
+    ("ledger", "decision", "code"),
+    (
+        ("{}\n", "SATISFIED", "QA_LEDGER_INVALID"),
+        ("[]\n", "SATISFIED", "QA_LEDGER_INVALID"),
+        ("not json\n", "SATISFIED", "QA_LEDGER_INVALID"),
+        ('{"qa-01-setup":{"check_id":"qa-01-setup","log_path":"evidence/qa_report.md","status":"PASS"}}\n', "SATISFIED", "QA_LEDGER_INVALID"),
+        ('{"qa-01-setup":{"check_id":"qa-02","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"PASS"}}\n', "SATISFIED", "QA_LEDGER_INVALID"),
+        (None, "SATISFIED", "DECISION_CONTRADICTION"),
+        (None, "NOT SATISFIED", None),
+    ),
+)
+def test_v2_qa_ledger_is_read_before_any_decision(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    ledger: str | None,
+    decision: str,
+    code: str | None,
+) -> None:
+    source = _v2_source()
+    source["closure_decision"]["decision"] = decision
+    if decision == "NOT SATISFIED":
+        source["follow_ups"] = ["Rerun qa-01-setup to PASS before closure."]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    rel = _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]
+    (repo / rel).write_text(ledger or _qa_ledger_text("HDE-CRD-0002", "FAIL_BEHAVIOR"), encoding="utf-8")
+    _commit_all(repo, "bind the QA ledger under test")
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
 
 
 def _mutate(source: dict[str, object], case: str) -> None:
