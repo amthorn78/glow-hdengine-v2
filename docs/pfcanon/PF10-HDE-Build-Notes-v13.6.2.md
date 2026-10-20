@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.6.1**  
-Effective Date: 2026.10.19  
+**Version: v13.6.2**  
+Effective Date: 2026.10.20  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -192,7 +192,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.7 HDE-CRD-0002 WU-PR-03 corrective cycle: canon route postures govern the Endpoint Catalog, the dev Reader gate compares APP\_ENV exactly, and the canonical dev runner meets the required local capture profile  
 * 2.8 HDE-CRD-0002 WU-PR-03: PR work-unit lineage review v1.0 accepts the unit across pull requests \#643 and \#646  
 * 2.9 HDE-CRD-0002 WU-PR-04: PR work-unit lineage review v1.0 accepts the unit on pull request \#651  
-* 2.10 HDE-CRD-0002 WU-PR-05: PR work-unit lineage review v1.0 accepts the unit on pull request \#656
+* 2.10 HDE-CRD-0002 WU-PR-05: PR work-unit lineage review v1.0 accepts the unit on pull request \#656  
+* 2.11 Every requirement and work unit carries a business case; work rests on real inputs only
 
 # **2\) Numbered Addenda**
 
@@ -1176,5 +1177,119 @@ Drainage stays with the Product Owner and is unperformed. The canon doc-delta ca
 ### **Relationship to existing HDE Build Notes guidance**
 
 This addendum follows addenda 2.4, 2.5, 2.8 and 2.9 in the sequence of accepted HDE-CRD-0002 work units. It delivers the four non-public-route gaps that addendum 2.7 AD-4 decided into S19, relies on AD-5 and addendum 2.6 for the refresh base, roster and convergence order, on addendum 2.5 for LR-O1 to LR-O3, on addendum 2.2 for the `ruby` requirement carried to WU-PR-06, on addendum 2.3 for the review chain and on addendum 2.1 for the TypeSafe reading, changing none of them. It supersedes no addendum.
+
+## 2.11 Every requirement and work unit carries a business case; work rests on real inputs only
+
+Timestamp: 102026 10:35 (UTC). Details: Establishes that no requirement or work unit is done without a stated business case or on inputs the product never has, and sets the rules for where the business case is checked, what counts as a real input, the ban on emulating external systems, how review findings are dispositioned, and when a repeated finding class stops the fixing of instances. Origin: the HDE-CRD-0002 WU-PR-06 postmortem v1.0 (HDE-CRD-0002-WU-PR-06-postmortem-v1.0.md, INCIDENT\_RCA, analysis state COMPLETE, author session https\://claude.ai/code/session\_01NZEtMVb5HR3XYEmJ6W5cb6), written at the Product Owner's request in the WU-PR-06 PR-20/PR-30 session before PR-40. Evidence: the postmortem's reading of the Specification, Implementation Plan v1.1, the PR instruction and plan, results v1.0 to v1.24, the GitHub Actions run list and the pull request record of [amthorn78/glow-hdengine-v2\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660).
+
+### Source and authority
+
+This addendum records the Product Owner's rules, in the Product Owner's words: "Every PR must have a business case. It cannot simply be for the sake of evidence or CI." and "no work is ever done based on inputs the product will never have." The Product Owner directed that entry into HDE Build Notes is adoption (direction of 2026-10-20 in the authoring conversation). Where this addendum conflicts with earlier PF-Canon or with an in-flight change document, this addendum governs for the scope below.
+
+### Rule
+
+1. Business case. Every Specification requirement (Epic or CRD) and every work unit states:  
+   * its beneficiary: who gains (Glow users, the production operator, or the delivery team);  
+   * its evidence: the observed incidents or measurements that show the problem, cited; a forecast is not evidence;  
+   * its benefit: what changes for the beneficiary, in user outcome, risk, time or money;  
+   * its measure: how the benefit is checked after delivery;  
+   * its cost ceiling: the most the work may spend before it returns to the Product Owner, in sessions and elapsed days. This is a business-case budget and not a CI-budget control.  
+2. More complete or more faithful evidence, CI, tooling or records for their own sake, conformance to canon, and "could prevent" without an observed incident are not a business case. Internal tooling qualifies only when its expected saving, from observed incident data, exceeds its ceiling.  
+3. Gates.  
+   * Specification approval blocks a requirement without a business case, for CRDs and Epics alike.  
+   * IA-30 checks each work unit's business case and ceiling.  
+   * PR-10 carries both into the instruction, and PR-20 states how the plan stays within the ceiling.  
+   * The Proceed is given against them.  
+   * A unit whose business case is met stops; further work on it needs a new business case.  
+   * A unit that passes its ceiling has a change of "budget, schedule or risk needing Product Owner direction", which is material under the existing definition, and the work returns to the Product Owner before it continues.  
+4. Real inputs. Requirements, designs, tests, fixes and review dispositions rest on real inputs. An input is real when it:  
+   * (a) exists on main, or in an approved unit's planned deliverable;  
+   * (b) occurs in the product's real operating environment: the deployed services, the hosted CI runner, the operator's shell, the vendor's responses; or  
+   * (c) can be supplied by a user, a vendor or an attacker through an interface the product exposes.  
+5. An input constructed only to exercise code justifies no requirement, design element, test, fix or blocking finding. An input outside the real set gets one refusal or a stated limit, never a model of it.  
+6. No emulation of external systems. A tool or test does not reimplement the behavior of an external system: GitHub Actions, pip and Python packaging, YAML, a vendor API, PostgreSQL. It pins the exact input it supports and refuses any other, or it calls the real system.  
+7. Finding disposition.  
+   * A review finding, from Codex or from a person, is fixed when it shows a wrong result, a crash or a guarantee breach on a real input (rule 3).  
+   * Otherwise the reply on the thread gives the traced path and the stated limit, and the thread is resolved.  
+   * Declining a P1 or a security finding goes to the Product Owner first.  
+   * A blanket instruction to fix every finding on a PR is read under this rule.  
+   * This makes the dispositions PO-35-5 and PO-35-6 of the WU-PR-06 pull request the standing default: fix only a wrong result on a real input, or a breach of the read-only or no-secrets guarantees; a snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself, or code it runs in the checkout, can make.  
+8. Repeated finding class. When two consecutive review rounds on one PR raise findings of the same class (the same component or contract), the session stops fixing instances and asks the Product Owner one design question: narrow the design, accept a stated limit, or rescope. This is a design trigger by finding class. It is not a push count, a pause threshold or a CI-budget control, and it leaves the Change Process Guide §0.2 rule "There is no five-update circuit breaker" unchanged.
+
+### Scope and supersession
+
+The rules apply from this addendum to every Epic and CRD, including units of in-flight changes not yet at PR-10. They extend the Epic Business Case rules (HDE Governance §9.7.7, "Business Case section required (Epic Specifications)", and Plan Templates "Business Case (MUST)") to CRD requirements and to work units, where canon asked only for a "Warrant" for the whole change (HDE CRD Records §4.1 "Initial registration": "Observed need", "Warrant", "Lead Developer finding"). They add a PR-review trigger beside the Live QA churn rules (Change Process Guide §1.1.4; Plan Templates "QoS stop-rule: iteration churn escalation"), which cover Live QA only. They do not change the CI-budget rules of Change Process Guide §0.2 or Plan Templates "CI lane classification and automated budget-control discipline". The rules do not weaken the existing duty to fix a real defect; the real security finding of the postmortem (CX6-15, P1) stays a fix under rule 5\.
+
+### Findings behind the rules (WU-PR-06, requirement S20)
+
+* Outcome. WU-PR-06 spent 24 Codex review rounds, 51 findings, 24 completed hosted CI runs (7.5 hours of runner time) and 21 hours of PR-35 work, and the business case for it was never established. S20's stated purpose was fewer failed paid CI runs; its only evidence was PR04's ([\#467](https://github.com/amthorn78/glow-hdengine-v2/issues/467)) 4 failed runs out of 19\. Those 4 were catchable by running CI's own steps locally (the changed-test step with 4 tests, an owner-guard tuple that omitted a new consumer, a test that wrote a timestamp into a tracked file and failed the clean-tree check, and one rails-lane failure), and \#467's session reproduced all seven lanes directly under closed rails. The business function was delivered at PR-30: the replay ran all 16 steps of the real ci.yml and passed (CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK), and hosted CI passed on the same head (d2ed4fc). 49 of the 51 findings needed a ci.yml, pyproject.toml, requirements-dev.txt, environment or Git state that no commit on main has ever had and no planned unit creates; the fixes for 41 of them were later deleted, or left unable to change any outcome, by the redesign PO-35-4.  
+* Three causes. (1) Canon requires a Business Case only for Epics; a CRD requirement needs only a warrant, S20 had none in the approved Specification, and nothing measured it. (2) The design promised fidelity to external systems over open-ended inputs (replay whatever ci.yml a candidate has; fail closed on any construct not understood), made by PR plan v1.0 (PD-8), so every constructed input became a real defect against the plan. (3) Nothing told the reviewer, the PR-35 prompt or the round-7 decision to ask whether an input is real, and canon has no churn trigger for PR review; the loop stopped only when the Product Owner imposed the real-input test (PO-35-5, PO-35-6).  
+* Cost. Codex review rounds 24; findings 51 (50 P2 and 1 P1; 47 fixed, 1 resolved by the pin (CX6-47), 3 declined as stated limits (CX6-12, CX6-49, CX6-51)); hosted CI runs on [\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660) 25 (23 success, 1 failure on 7a3b7b2 from an intermittent close-pack test, 1 in progress), completed-run wall time 451.6 minutes; PR-35 elapsed 21 h 16 min (13:00Z 19 Oct to 10:16Z 20 Oct); 50 commits; 25 result records (v1.0 to v1.24); tools/ci/prepush\_check.py 1,229 lines at PR-30, 2,132 at the pushed peak, 1,755 at head; owner test 552 lines and 21 cases at PR-30, 1,229 lines and 141 cases at the peak, 1,070 lines and 137 cases at head; PR diff \+6,789 lines in 28 files. Codex findings on the final pull request of sibling units of the same CRD and reviewer: WU-PR-01 ([\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630)) 0; WU-PR-02 ([\#637](https://github.com/amthorn78/glow-hdengine-v2/issues/637)) 0; WU-PR-04 ([\#651](https://github.com/amthorn78/glow-hdengine-v2/issues/651)) 1 (P1); WU-PR-05 ([\#656](https://github.com/amthorn78/glow-hdengine-v2/issues/656)) 1 (P2); WU-PR-06 ([\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660)) 51 (addenda 2.4, 2.5, 2.9 and 2.10); the volume came from what WU-PR-06 built and not from the reviewer.  
+* Business case, tested. Beneficiary: PR sessions and the Product Owner. Evidence: one incident ([\#467](https://github.com/amthorn78/glow-hdengine-v2/issues/467)), with the briefs listing \#467, [\#492](https://github.com/amthorn78/glow-hdengine-v2/issues/492), [\#501](https://github.com/amthorn78/glow-hdengine-v2/issues/501) and [\#508](https://github.com/amthorn78/glow-hdengine-v2/issues/508) as intake evidence and no count of avoidable failures recorded. Benefit: fewer failed hosted runs, never quantified. Measure: none defined. Ceiling: none set. The problem was catchable and the function was delivered at PR-30; the unit then cost 24 completed hosted runs, six times the 4 failed runs that were its whole evidence, plus 21 hours of PR-35 work. S20 was a reasonable hypothesis with one data point that became a requirement without a beneficiary measure or a cost ceiling, and once work began nothing asked whether the next round of fixes bought anything.  
+* The 51 findings by class (defined by where the triggering input would have to come from):
+
+| Class | Subject | Count | Real input? |
+| :---- | :---- | :---- | :---- |
+| A. Python packaging | pip resolution, PEP 440/508/621, extras, build backends, editable metadata, install-step text (CX6-1, 2, 3, 4, 5, 7, 8, 11, 14, 23, 27, 28, 30, 34, 35\) | 15 | No, except CX6-1 (the caller's versions can drift from CI's, though hosted CI still decides). pyproject.toml and requirements-dev.txt have one commit each on main (their creation, 2026-08-06); requirements-dev.txt has never had an extra and build-backend has never changed |
+| B. GitHub Actions and YAML | runner labels, action revisions, step conditions, loose equality, env shapes, duplicate keys, tabs, block and flow scalars, job sets, output files (CX6-6, 9, 10, 12, 13, 18, 20, 21, 22, 25, 26, 29, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42, 44, 45, 47, 49\) | 26 | No. Each needs a ci.yml edit no commit has made: across its 10 commits on main, runs-on was always ubuntu-latest, no tab ever appeared, the actions were always checkout@v4 and setup-python@v5, and persist-credentials has been false since added (CX6-25's second job existed before the HDE-EPIC039 consolidation to the one test job). No planned unit edits ci.yml |
+| C. Self-check precision | the before-and-after snapshot missing a write that nothing makes (CX6-16, 19, 24, 43, 46, 48, 50, 51\) | 8 | No observed path; each was confirmed only by constructing its condition (a write into .git or ignored files in a scratch repository, or a TMPDIR inside the checkout). After PO-35-4 no repository code runs in the caller's checkout (PO-35-6) |
+| D. Real | caller secrets reached child processes (P1, CX6-15); the sweep reported PASS without its tools when no test was uncovered (CX6-17) | 2 | Yes |
+
+* What became of the fixes. PO-35-4 returned the install check to presence only (plan §5.7's original rule for the install step, before IF-35-7, IF-35-12 and IF-35-14 added the modelling; result v1.22, IF-35-23), so the class A modelling was deleted; the pin refuses any ci.yml other than the pinned one before parsing it, so the class B fixes can no longer change an outcome. Codex was measuring the code against the plan's own promise, for example CX6-42: "omitting them from this guard violates the replay parser's fail-closed contract".  
+* Timeline decisions. Round 7: PO-35-1 declines CX6-12; PO-35-2, asked "What rule should I apply to further findings of that kind?" with "Fix if real and small (recommended)", answers "Fix every finding". Round 8: CX6-15 (the one P1) fixed under PO-35-3, an allowlisted child environment; CX6-16 and CX6-17 fixed. Rounds 9 to 21: CX6-18 to CX6-45 each fixed under PO-35-2, the tool growing to a pushed peak of 2,132 lines. 20 Oct 07:22 after round 22 (CX6-46 to CX6-48): PR-35 escalates; PO-35-4 pins ci.yml by SHA-256, reduces the install check to presence only and runs the classifier only in copies; PO-35-5 replaces PO-35-2 (fix only a wrong result on "the repository's real ci.yml, real install step or real tree", or a breach of the read-only or no-secrets guarantees; CX6-46 and CX6-48 fixed, CX6-47 resolved by the pin). Round 23: CX6-49 declined, CX6-50 fixed. 20 Oct 10:08: PO-35-6 ("A snapshot-precision finding is a hypothetical-input finding unless it shows a write that the tool itself or code it runs in the checkout can make"); CX6-51 declined. 20 Oct 10:16: MERGE\_PENDING (result v1.24, bd2dc3a); hosted CI run 39406716584 on bd2dc3a was in progress at writing.  
+* Causal chain and the gaps the rules close.
+
+| Stage | Gap | Owner of the gap |
+| :---- | :---- | :---- |
+| Intake and Specification | S20 entered with a forecast for a warrant, no measure and no ceiling; the Lead Developer finding says "each requirement below is an observed defect or gap with a cited source" while S20's source was a convenience need | Canon: HDE Governance §9.7.7 and Plan Templates "Business Case (MUST)" apply to Epics only; HDE CRD Records asks only for "Warrant" |
+| Specification review | The duplication risk ("S20 duplicates CI logic and must track ci.yml changes") was named, not bounded | The CRD Specification approval route |
+| Implementation Plan and IA-30 | S20 was allocated to WU-PR-06 with no budget | IA-30 |
+| PR-10, ID-8 | The bar "runs what CI would run", reading the head's ci.yml with no YAML dependency, made the tool a GitHub Actions emulator over any candidate workflow | PR-10 has no rule to pin what you depend on |
+| PR-20, plan v1.0 (PD-8) | The plan promised the parser would fail closed on any construct it did not understand and gave excluded steps substituted outcomes, turning an open-ended input language into a contract to defend; a pin or a stated precondition was available at planning time (the plan's author records this one as the author's own) | PR-20 has no real-input-set rule |
+| PR-30 | The function was delivered and working | No check exists that a met business case stops further work |
+| PR-35, rounds 1 to 6 | Each P2 was classified a "substantive in-scope correction" and fixed; the PR-35 prompt's only decline classes are "already resolved, duplicate/superseded, unsupported/out of scope, evidence pending, or material change" | The PR-35 prompt, step 3 |
+| PR-35, round 7 | A blanket "Fix every finding" was chosen over the recommended "Fix if real and small" | No standing disposition rule |
+| PR-35, rounds 8 to 22 | Same-class findings recurred for 15 more rounds; the instruction's materiality test includes "budget, schedule or risk needing Product Owner direction" but no budget existed, so it never tripped | Canon's churn rules (Change Process Guide §1.1.4; Plan Templates "QoS stop-rule: iteration churn escalation") cover Live QA only |
+| Codex code review | Constructed-input findings were reported as P2 | AGENTS.md "Code review guidelines" excludes Markdown and CI-exempt paths only |
+
+* Effect on WU-PR-06 had the rules been in force. Rule 1 would have stopped S20 at the Specification or given it a ceiling; rule 4 would have led the PR-20 plan to the pin it eventually adopted; rule 6 would have tripped at round 2, when CX6-2 and CX6-3 repeated CX6-1's class.  
+* What went right. PR-30 delivered a working tool in one session; the one real security finding (CX6-15, P1) was caught and fixed; 23 of 24 completed CI runs passed (the cost was revalidating each fix, not failures); PR-35 escalated with options and PO-35-4, PO-35-5 and PO-35-6 ended the loop within three rounds and shrank the tool by 377 lines from its pushed peak.
+
+### Epic, task, and status effects
+
+* The rules apply immediately to the remaining HDE-CRD-0002 units. The postmortem's screen of them under rules 1 and 3 found: WU-PR-07 (S21: close-pack writer for Epic and CRD identities, close-run evidence family, ADR draft) has as its only evidence one incident (HDE-EPIC040 needed exceptional closure), states no benefit in product terms and has no measure or ceiling, so it needs a rule 1 business case before its PR-10, weighed against cheaper options such as a canon change to the close-report requirement or keeping exceptional closure; WU-PR-08 (S01 every release member in the wheel; S16 GEO\_API\_KEY in .env.example; S17 docs/ADAPTER\_009.md corrections; the release 1.4.0 cut) is open for S01 on rule 3, because whether production installs from a wheel is unknown and the Railway build command and deploy trigger are a PF07 gap that WU-OPS-01 discovers only after WU-PR-08, so that fact is established before WU-PR-08's PR-10, while S16, S17 and the cut are real; WU-DOC-01 (final repository documentation) has real operators and agents as beneficiaries and shrinks with any scope dropped; WU-OPS-01 (place the QA candidate in production; record the deployment facts) carries the strongest business case left (S02, a live public production defect, and S10, a fail-open security default, reach users only when deployed), and whether WU-PR-03's merged fixes for S02 and S10 are already live depends on the same unknown deploy trigger.  
+* Work unit WU-PR-06 (S20): the pull request [\#660](https://github.com/amthorn78/glow-hdengine-v2/pull/660) was open at MERGE\_PENDING (result v1.24, head bd2dc3a) with PR-40 waiting on it. Its disposition is the Product Owner's decision and is not made by this addendum. The postmortem's options were: A, merge [\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660) after hosted CI on bd2dc3a passes and attach a measure (each later unit's PR-40 records any hosted CI failure a local replay would have caught; if none is recorded by HDE-CRD-0002's QA-10 the replay is removed in a later change; cost one PR-40 session; upkeep the pin when ci.yml changes, which no planned unit does); B, close [\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660) unmerged and remove S20 through a Specification delta (cost a Specification-delta cycle; the work is discarded; the strictest reading of rule 1); C, strip the replay and merge the four small reports (another review cycle on new code; not recommended). The postmortem recommends A.  
+* No epic, task or PF09 row changes status by this addendum.
+
+### Required canon drainage
+
+Drainage is unperformed.
+
+| Target | Required change |
+| :---- | :---- |
+| HDE Governance §9.7.7 and Plan Templates "Business Case (MUST)" | State that the Business Case applies to every requirement and work unit of Epics and CRDs (rules 1 and 2\) |
+| HDE CRD Records §4.1 | Replace the warrant-only registration with the rule 1 business case per requirement |
+| Plan Templates "Source-bound review authority and exact-fix limits" and Change Process Guide §1.1.4 | Add the rule 5 disposition and the rule 6 trigger beside the Live QA churn rules |
+| AGENTS.md "Code review guidelines" | Add a real-input reporting rule: report a finding only when its triggering input is real (exists in this repository on the PR head or main; occurs in the product's real operating environment such as the hosted CI runner, the deployed service or the operator's shell; or a user, vendor or attacker can supply it through an interface the product exposes); do not report a finding that needs a hypothetical future edit to a file the PR does not change, such as .github/workflows/\*.yml, pyproject.toml or requirements\*.txt; where a tool pins the input it supports and refuses any other, a different input is not a defect. Editing AGENTS.md needs the Product Owner's explicit instruction |
+
+### Deferred obligations and unresolved work
+
+* Prompt wording changes that make the rules executable, unperformed, owner GCFPE-MGMT-10 and the Product Owner: CF-C-30 and CF-E-30 (Specification approval) check rule 1 per requirement and treat a requirement without a business case as a blocker; IA-30 checks each unit's business case and ceiling and flags any acceptance criterion that depends on emulating an external system; PR-10 carries the unit's business case and ceiling into the instruction and sets no fidelity target against an external system (use a pin or a stated precondition); PR-20 states each component's real-input set and how inputs outside it are refused, with no promise of fail-closed handling over an open-ended input language; PR-30 and PR-35 record spend against the ceiling in each checkpoint, PR-35 step 3 gains the class "constructed input (rule 3): traced path and stated limit", PR-35 step 4's "resolve all … substantive in-scope findings" applies to real-input findings, and the rule 6 trigger is added; PR-40 records the unit's actual cost against its ceiling and whether its measure was met; the glow-hde-pr-development skill takes the PR-35 change through the skill's owner.  
+* The disposition of [\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660) and WU-PR-06 (above), and the business-case and real-input work for WU-PR-07 and WU-PR-08 before their PR-10 (above): the Product Owner.  
+* PF10 numbering and publication: the Product Owner.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no prompt, skill, AGENTS.md or permanent PF document; the drainage and prompt changes above are unperformed.  
+* It is not the PR-40 lineage review of WU-PR-06 and establishes no QA, acceptance, merge or closure.
+
+### Evidence anchors
+
+* HDE-CRD-0002-WU-PR-06-postmortem-v1.0.md (provided by the Product Owner); canon read on origin/main 0442d23: HDE Governance §9.7.7 and "Specification review boundary"; Plan Templates "Business Case (MUST)", §2A "HDE-CRD-Specification Profile and PF30 Record Contract", "Source-bound review authority and exact-fix limits", "CI lane classification and automated budget-control discipline", "QoS stop-rule: iteration churn escalation"; HDE CRD Records §4.1; Change Process Guide §0.2 and §1.1.4; PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1 ("Review-first and action-efficient execution" steps 3 and 4; "Material rescope boundary"); AGENTS.md. The postmortem's search of HDE Build Notes for "business case", "hypothetical", "churn", "edge case", "Codex review" and "finding" found no prior rule.  
+* Records: results v1.1 to v1.24 on branch claude/youthful-gauss-d9e0ab (PO-35-2 in v1.7 §2a; PO-35-4 and PO-35-5 in v1.22 §2a; PO-35-6 in v1.24 §2a); hosted CI runs numbered 3750 to 3774 on that branch; S20's origin in HDE-CRD-0002-candidate-item-briefs-v1.2.md item 7 and HDE-CRD-0002-specification-v1.1.md; the design promise in the WU-PR-06 PR instruction v1.0 ID-8 and PR implementation plan v1.0 §5.7 and PD-8; input history from git log \-p origin/main \-- .github/workflows/ci.yml pyproject.toml requirements-dev.txt at 0442d23.
+
+### Relationship to existing HDE Build Notes guidance
+
+The addendum is consistent with addenda 2.4, 2.5, 2.9 and 2.10, whose Codex finding counts it cites, and with addendum 2.3, which it leaves unchanged (the Codex code review remains in the chain and its findings are read under rule 5). It supersedes no addendum.
 
 \<eof\>
