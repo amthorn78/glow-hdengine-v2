@@ -227,7 +227,8 @@ def test_a_step_that_is_not_a_mapping_is_refused() -> None:
         tool.replay_steps(nested_job_env)
 
 
-@pytest.mark.parametrize("value", ["{nested: invalid}", "[a, b]", "&anchor x", "*alias", "!tag x", "|+", ">2"])
+@pytest.mark.parametrize("value", ["{nested: invalid}", "[a, b]", "&anchor x", "*alias", "!tag x", "|+", ">2",
+                                   '"echo replay_pass\\nexit 1"', '"unterminated', "'a' b", "a: b", "- x", "# c"])
 def test_yaml_forms_the_parser_does_not_model_are_refused(value: str) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     mutated = text.replace("          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}",
@@ -235,6 +236,28 @@ def test_yaml_forms_the_parser_does_not_model_are_refused(value: str) -> None:
     assert mutated != text
     with pytest.raises(tool.ToolingError, match="unsupported YAML value"):
         tool.replay_steps(mutated)
+
+
+def test_quoted_scalars_and_keys_are_read_as_yaml_reads_them() -> None:
+    assert tool._plain('"x" # comment') == "x"
+    assert tool._plain("'it''s'  # comment") == "it's"
+    assert tool._plain("plain value\t# comment") == "plain value"
+    # GitHub rejects a repeated key; a key is a plain word followed by ': '.
+    text = WORKFLOW.read_text(encoding="utf-8")
+    line = "        run: python3 ci/checks/check_agents_md_citations.py\n"
+    for mutated, message in ((text.replace(line, line + "        run: exit 0\n"), "repeated"),
+                             (text.replace(line, line.replace("run: ", "run:")), "unsupported workflow key"),
+                             (text.replace(line, line.replace("run:", '"run":')), "unsupported workflow key")):
+        assert mutated != text
+        with pytest.raises(tool.ToolingError, match=message):
+            tool.replay_steps(mutated)
+
+
+@pytest.mark.parametrize("extra", ["\npytest", "; pytest", " && pytest", " | cat", " $(true)", " `true`",
+                                   ' "$HOME"', " > log", " # note", " \\\n -r more.txt", " 'unterminated"])
+def test_the_install_substitute_stands_in_for_one_simple_command_only(tmp_path: Path, extra: str) -> None:
+    with pytest.raises(ValueError, match="not one simple command"):
+        tool._install_check("python -m pip install pytest" + extra, tmp_path)
 
 
 def test_an_unexpected_report_exception_still_reaches_the_read_only_check(

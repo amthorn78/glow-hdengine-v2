@@ -440,19 +440,34 @@ def _indent(line: str) -> int:
     return len(line) - len(line.lstrip(" "))
 
 
+_SINGLE_QUOTED_RE = re.compile(r"'((?:[^']|'')*)'(?:\s+#.*)?")
+_DOUBLE_QUOTED_RE = re.compile(r'"([^"\\]*)"(?:\s+#.*)?')
+_KEY_RE = re.compile(r"[A-Za-z0-9_.-]+")
+
+
 def _plain(value: str) -> str:
+    """A one-line scalar of the subset: plain, single-quoted, or double-quoted without escapes."""
     value = value.strip()
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
-        inner = value[1:-1]
-        return inner.replace("''", "'") if value[0] == "'" else inner
-    if " #" in value:
-        value = value.split(" #", 1)[0].rstrip()
-    # A flow collection, anchor, alias, tag, block-scalar option or other
-    # indicator would be read as a literal string here; GitHub's parser reads
-    # it as YAML, so it fails closed.
-    if value[:1] in set("{[&*!|>%@`") or value == "?" or value.startswith("? "):
-        raise ToolingError(f"unsupported YAML value {value!r} (flow collections, anchors, aliases, tags and "
-                           "block-scalar options are not modelled)")
+    if value[:1] == "'":
+        match = _SINGLE_QUOTED_RE.fullmatch(value)
+        if not match:
+            raise ToolingError(f"unsupported YAML value {value!r} (a single-quoted scalar must close on its line)")
+        return match.group(1).replace("''", "'")
+    if value[:1] == '"':
+        match = _DOUBLE_QUOTED_RE.fullmatch(value)
+        if not match:
+            raise ToolingError(f"unsupported YAML value {value!r} (a double-quoted scalar must close on its line, "
+                               "and its escape sequences are not modelled)")
+        return match.group(1)
+    value = re.split(r"\s#", value, maxsplit=1)[0].rstrip()
+    # A flow collection, anchor, alias, tag, block-scalar option, comment,
+    # sequence entry or other indicator, or a mapping value inside the scalar,
+    # would be read as a literal string here; GitHub's parser reads it as YAML
+    # or rejects it, so it fails closed.
+    if value[:1] in set("{[&*!|>%@`#") or value in {"?", "-"} or value.startswith(("? ", "- ")) \
+            or ": " in value or value.endswith(":"):
+        raise ToolingError(f"unsupported YAML value {value!r} (flow collections, anchors, aliases, tags, "
+                           "block-scalar options, sequence entries and nested mapping values are not modelled)")
     return value
 
 
@@ -507,6 +522,11 @@ def _mapping(lines: list[str], start: int, parent_indent: int) -> tuple[dict[str
         key, sep, rest = line.strip().partition(":")
         if not sep:
             raise ToolingError(f"unsupported workflow line {index + 1}")
+        # Keys are plain words followed by ': ' or a line end; GitHub rejects a repeated key.
+        if not _KEY_RE.fullmatch(key) or rest[:1] not in {"", " ", "\t"}:
+            raise ToolingError(f"unsupported workflow key at line {index + 1}: {line.strip()!r}")
+        if key in result:
+            raise ToolingError(f"workflow key {key!r} repeated at line {index + 1}")
         rest = rest.strip()
         index += 1
         if rest in {"|", "|-", ">", ">-"}:
@@ -1530,6 +1550,36 @@ def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[
     return lines
 
 
+_SHELL_SPECIAL = frozenset(";&|<>()`$*?[]{}~!#\\")
+
+
+def _simple_command(text: str) -> list[str]:
+    """The words of one bash simple command with nothing for the shell to interpret, or ValueError.
+
+    Outside quotes no operator, expansion, glob, comment or escape is allowed,
+    inside double quotes no expansion or escape, and no line break anywhere: the
+    substitute stands in for exactly one command, so a second one, a pipeline or
+    a redirection would go unrun.
+    """
+    text = text.strip()
+    quote = ""
+    for char in text:
+        if char in "\n\r":
+            raise ValueError("the install step is not one simple command: it has a line break")
+        if quote:
+            if char == quote:
+                quote = ""
+            elif quote == '"' and char in "$`\\":
+                raise ValueError(f"the install step is not one simple command: {char!r} inside double quotes")
+        elif char in "'\"":
+            quote = char
+        elif char in _SHELL_SPECIAL:
+            raise ValueError(f"the install step is not one simple command: {char!r} outside quotes")
+    if quote:
+        raise ValueError("the install step is not one simple command: an unterminated quote")
+    return shlex.split(text)
+
+
 def _tree_files(root: Path) -> dict[str, bytes]:
     return {path.relative_to(root).as_posix(): path.read_bytes() for path in sorted(root.rglob("*")) if path.is_file()}
 
@@ -1596,7 +1646,7 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     other than CI's can write metadata its own version decides differently;
     the comparison then fails closed.
     """
-    words = shlex.split(run_text)
+    words = _simple_command(run_text)
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
         raise ValueError("the install step is not one 'python -m pip install' command")
     rest = words[words.index("install") + 1:]
