@@ -7,7 +7,7 @@ CHANGE_CLASS: CRD
 CHANGE_ID: HDE-CRD-0002
 WORK_UNIT_ID: WU-PR-07
 requirement: S21
-adr: docs/adr/hde/close_pack_writer_adr.md (status Proposed; 72 lines at PR head 0d50b06)
+adr: docs/adr/hde/close_pack_writer_adr.md (status Proposed; 72 lines, as pushed with this proposal)
 decision_owner: Product Owner (Plan v1.1 §13 AQ-1; instruction v1.0 ID-12)
 reviewer: the continuing whole-change Implementation Agent for HDE-CRD-0002 (the RS-20 reviewer of this unit, session https://claude.ai/code/session_01CCKsYD2yX5WgU3biWKb59j, as provenance)
 author: the dedicated WU-PR-07 PR-35 session, https://claude.ai/code/session_01JnnPXsPjVQT9y49m9Z8qLA, at the Product Owner's direction of 2026-10-20 ("if you need an ADR decision you need to draft the ADR proposal for the IA session")
@@ -60,13 +60,13 @@ Alternatives the ADR weighed (Audit §8 AQ-1):
 
 ## 5. What changed since the PR-30 draft
 
-PR-35 fixed five P1 Codex findings. CX7-2 to CX7-5 were fixed at the Product Owner's direction (PO-35-1, PO-35-2; result records v1.2 and v1.3; PF10 addendum 2.14).
+PR-35 fixed six P1 Codex findings. CX7-2 to CX7-6 were fixed at the Product Owner's direction (PO-35-1, PO-35-2, PO-35-3; result records v1.2, v1.3 and v1.5; PF10 addendum 2.14).
 
 | Finding | Writer behavior now |
 | :- | :- |
 | CX7-1 | Requirement and deferral IDs match only as whole dotted identifiers |
 | CX7-2 | A tracked issue closed by ADR status must name an ID in the drain-targets ledger (`TRACKED_ISSUE_UNBOUND`) |
-| CX7-3, CX7-4 | Requirement IDs are read only from pinned formats: CRD `\| S<NN> \|` rows; Epic `**K<NNN>-REQ-<NNN>.**` paragraphs and `\| AC<NNN>-<NN> — ` rows. Refusals: a document with none of them (`REQUIREMENTS_TABLE_ABSENT`); a criterion that is not a read ID (`REQUIREMENT_ID_UNBOUND`); `SATISFIED` without an acceptance row for every read ID (`REQUIREMENT_COVERAGE_INCOMPLETE`) |
+| CX7-3, CX7-4, CX7-6 | Requirement IDs are read only from the change kind's pinned format: a CRD reads `\| S<NN> \|` rows; `HDE-EPIC<NNN>` reads its own `**K<NNN>-REQ-<NNN>.**` paragraphs and `\| AC<NNN>-<NN> — ` rows. Refusals: a document without its change's format (`REQUIREMENTS_TABLE_ABSENT`); a criterion that is not a read ID (`REQUIREMENT_ID_UNBOUND`); `SATISFIED` without an acceptance row for every read ID (`REQUIREMENT_COVERAGE_INCOMPLETE`) |
 | CX7-5 | A tracked-issue pointer is `{binding, heading}`: a tracked evidence input that contains that Markdown heading (`BINDING_UNRESOLVED`, `TRACKED_ISSUE_POINTER_UNBOUND`) |
 
 The ADR's "Stated limits" already reflect these changes:
@@ -83,7 +83,7 @@ Decision item 4. Replace:
 
 with:
 
-> an exact-source acceptance section that binds each criterion ID to a tracked requirements document, to tracked evidence and to a result and limitation; the criterion IDs are read from that document in a pinned format, and a `SATISFIED` decision needs an acceptance row for every ID read;
+> an exact-source acceptance section that binds each criterion ID to a tracked requirements document, to tracked evidence and to a result and limitation; the criterion IDs are read from that document in the change kind's pinned format, and a `SATISFIED` decision needs an acceptance row for every ID read;
 
 Decision item 4. Replace:
 
@@ -109,14 +109,14 @@ The PR-35 session applies the delta and the status line in one push after the Pr
 
    Check that no further home needs an entry, now that requirement-ID pins and the TI rules exist. Likely candidates are Plan Templates, if a requirement-ID format becomes a Specification contract, and the HDE CRD Records Specification profile.
 2. **PF10 addendum 2.11 rules 4 to 6:** each component rests on real inputs.
-   - Each pinned format is taken from a real Specification on `main` (HDE-CRD-0002 v1.1, HDE-EPIC040 v1.1).
+   - Each pinned format is taken from a real Specification on `main` (HDE-CRD-0002 v1.1, HDE-EPIC040 v1.1), and each change kind reads only its own.
    - Other formats get one refusal and a stated limit.
    - No external system is emulated.
 3. **Addendum 2.14:** no P1 on a real input is left as a stated limit. The two stated limits added in PR-35 are not P1 dispositions:
    - pinned formats only, where another format is refused;
    - the pointer check does not judge whether the section demonstrates closure.
 
-   Check that neither reads as declining a P1. CX7-4 and CX7-5 are still awaiting Codex's check of the fix (threads open).
+   Check that neither reads as declining a P1. CX7-6's fix is pushed with this proposal and awaits Codex's check (thread open).
 4. **The approved base:** Specification S21; Plan v1.1 WU-PR-07 block and §13; instruction ID-12 and H-5; rescope review v1.0 §6. Check that the ADR changes no acceptance criterion and no other unit's scope.
 5. **Consistency with HDE-EPIC039's posture** (AGENTS.md "HDE-EPIC039 current workflow posture"):
    - one writer;
