@@ -260,6 +260,26 @@
       "maxItems": 128,
       "uniqueItems": true
     },
+    "adr_block": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/adr_decision"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "closure_override": {
+          "$ref": "#/$defs/closure_override"
+        }
+      },
+      "required": [
+        "decisions"
+      ]
+    },
     "closure_decision": {
       "type": "object",
       "additionalProperties": false,
@@ -400,6 +420,7 @@
     "deferrals",
     "later_drain_statements",
     "tracked_issues",
+    "adr_block",
     "closure_decision",
     "follow_ups",
     "superseded",
@@ -507,6 +528,135 @@
             "$ref": "#/$defs/feedback_dependency"
           }
         }
+      ]
+    },
+    "pf_title": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/causal_text"
+        },
+        {
+          "maxLength": 96,
+          "pattern": "^[A-Z][A-Za-z &'/-]*[A-Za-z]$"
+        }
+      ]
+    },
+    "adr_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "statement": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "decision_point": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "options_considered": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/causal_text"
+          },
+          "maxItems": 16,
+          "uniqueItems": true,
+          "anyOf": [
+            {
+              "maxItems": 0
+            },
+            {
+              "minItems": 2
+            }
+          ]
+        },
+        "bounding_canon": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pf_title"
+          },
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true
+        },
+        "final_decision": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "scope": {
+          "enum": [
+            "canonical",
+            "change_specific"
+          ]
+        },
+        "doc_delta_targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pf_title"
+          },
+          "minItems": 0,
+          "maxItems": 16,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "bounding_canon",
+        "decision_point",
+        "doc_delta_targets",
+        "final_decision",
+        "label",
+        "options_considered",
+        "scope",
+        "statement"
+      ]
+    },
+    "closure_override": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/causal_text"
+        },
+        "accepted_gaps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "gap": {
+                "$ref": "#/$defs/causal_text"
+              },
+              "evidence_bindings": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/causal_binding"
+                },
+                "minItems": 1,
+                "maxItems": 16,
+                "uniqueItems": true
+              },
+              "drain_targets": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pf_title"
+                },
+                "minItems": 1,
+                "maxItems": 16,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "drain_targets",
+              "evidence_bindings",
+              "gap"
+            ]
+          }
+        }
+      },
+      "required": [
+        "accepted_gaps",
+        "label"
       ]
     }
   }

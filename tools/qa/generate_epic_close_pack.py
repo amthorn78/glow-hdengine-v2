@@ -22,7 +22,7 @@ import stat
 import struct
 import sys
 import zlib
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -2231,6 +2231,11 @@ CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
 CRD_REQUIREMENT_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
 EPIC_REQUIREMENT_RE = rb"^\*\*(K%s-REQ-[0-9]{3})\.\*\*"
 EPIC_ACCEPTANCE_RE = rb"^\| (AC%s-[0-9]{2}) \xe2\x80\x94 "  # em dash
+# The requirements source is the change's own current approved Specification (PF10 addendum 2.15).
+APPROVED_SPECIFICATION_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-specification-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)-approved\.md\Z"
+)
 
 
 @dataclass(frozen=True)
@@ -2359,6 +2364,15 @@ def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
     return [entry["status"] for entry in ledger.values()]
 
 
+def _current_approved_specification(change_id: str, tracked_paths: Iterable[str]) -> str | None:
+    versions = {
+        (int(match["major"]), int(match["minor"])): rel
+        for rel in tracked_paths
+        if (match := APPROVED_SPECIFICATION_RE.match(rel)) and match["change"] == change_id
+    }
+    return versions[max(versions)] if versions else None
+
+
 def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
     epic = CHANGE_RE.fullmatch(change_id).group("epic")  # type: ignore[union-attr]
     patterns = (
@@ -2382,6 +2396,7 @@ def _require_v2_semantics(
     bindings: Mapping[str, FileSnapshot],
     report_path: str,
     manifest_path: str,
+    tracked_paths: Iterable[str],
 ) -> None:
     change_id = str(source["change_id"])
     supporting = _supporting_paths_v2(change_id)
@@ -2416,14 +2431,17 @@ def _require_v2_semantics(
     referenced.extend(
         item["pointer"]["binding"] for item in source["tracked_issues"] if "pointer" in item
     )
+    for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", []):
+        referenced.extend(gap["evidence_bindings"])
     if "binding" in source["qa_rca"]:
         referenced.append(source["qa_rca"]["binding"])
     if any(binding not in bindings for binding in referenced):
         raise _fail("BINDING_UNRESOLVED")
 
-    requirement_ids = _requirement_ids(
-        bindings[str(source["requirements_binding"])].payload, change_id
-    )
+    requirements = bindings[str(source["requirements_binding"])]
+    if requirements.rel != _current_approved_specification(change_id, tracked_paths):
+        raise _fail("REQUIREMENTS_SOURCE_NOT_CURRENT")
+    requirement_ids = _requirement_ids(requirements.payload, change_id)
     criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
     if len(criteria) != len(set(criteria)):
         raise _fail("ACCEPTANCE_AMBIGUOUS")
@@ -2541,7 +2559,7 @@ def _load_model_v2(
         raise _fail("INPUT_COLLISION")
     if report_path in causal_paths or manifest_path in causal_paths:
         raise _fail("OUTPUT_COLLISION")
-    _require_v2_semantics(source, bindings, report_path, manifest_path)
+    _require_v2_semantics(source, bindings, report_path, manifest_path, tree)
 
     if _head(context, store) != head:
         raise _fail("GIT_HEAD_CHANGED")
@@ -2638,18 +2656,48 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         "they are not prerequisites, required checks, acceptance conditions or "
         "blockers of this close."
     )
+    # HDE Governance's literal canon-pointer fields for a TI item.
     issues = [
-        f"- `{item['id']}`: "
-        + (
-            f"pointer {bound(item['pointer']['binding'])}, section {item['pointer']['heading']}"
+        (
+            f"- {item['id']} pointers: {bound(item['pointer']['binding'])}, "
+            f"section {item['pointer']['heading']}"
             if "pointer" in item
-            else f"ADR status {item['adr_status']}"
+            else f"- {item['id']} ADR status line: {item['adr_status']}"
         )
         for item in source["tracked_issues"]
     ]
     lines.extend(
         section("Tracked-issue closeout mapping", issues, "No TI item is cited by this change.")
     )
+    adr_lines: list[str] = []
+    for item in source["adr_block"]["decisions"]:
+        adr_lines.extend(
+            (
+                f"- ADR — {item['label']}: {item['statement']}",
+                f"  - Decision point: {item['decision_point']}",
+                *(
+                    [f"  - Options considered: {'; '.join(item['options_considered'])}"]
+                    if item["options_considered"]
+                    else []
+                ),
+                f"  - Bounding PF canon: {'; '.join(item['bounding_canon'])}",
+                f"  - Final decision: {item['final_decision']}",
+                "  - Future work: "
+                + ("canonical" if item["scope"] == "canonical" else "change-specific only"),
+                "  - Doc Delta targets: "
+                + ("; ".join(item["doc_delta_targets"]) or "None"),
+            )
+        )
+    override = source["adr_block"].get("closure_override")
+    if override is not None:
+        adr_lines.append(f"- ADR — Closure override: {override['label']}")
+        adr_lines.extend(
+            f"  - Accepted gap: {gap['gap']}; evidence basis "
+            f"{', '.join(bound(binding) for binding in gap['evidence_bindings'])}; "
+            f"drain targets {'; '.join(gap['drain_targets'])}"
+            for gap in override["accepted_gaps"]
+        )
+    lines.extend(section("ADR block", adr_lines, "None."))
     lines.extend(
         section(
             "Follow-ups",
