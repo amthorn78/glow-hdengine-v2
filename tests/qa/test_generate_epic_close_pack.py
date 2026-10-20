@@ -4405,7 +4405,7 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
         + "".join(f"| {i} | {scope} | {intent} |\n" for i, scope, intent in CRD_0002_REQUIREMENTS),
         "evidence/qa_report.md": "# QA report\n\nFinal verdict recorded.\n",
         **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
-        _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n",
+        _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- TI-002: close-pack canon\n",
         _ledger_paths(change_id)["qa_step_logs_manifest"]: "{}\n",
     }
     for rel, text in files.items():
@@ -4609,6 +4609,35 @@ def test_v2_requirement_ids_match_only_complete_dotted_identifiers(
     assert close_pack._token_occurs(identifier, payload) is expected
 
 
+def test_v2_requirement_table_pin_reads_the_real_specification_rows() -> None:
+    real = (ROOT / "docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md").read_bytes()
+    assert close_pack._requirement_ids(real) == {i for i, _, _ in CRD_0002_REQUIREMENTS}
+    assert len(close_pack._requirement_ids(real)) == 22
+    assert close_pack._requirement_ids(b"| ID | Scope |\n| S01 | a |\n| CD-1 | b |\n| S1 | c |\n") == {"S01"}
+    with pytest.raises(close_pack.ClosePackError, match="REQUIREMENTS_TABLE_ABSENT"):
+        close_pack._requirement_ids(b"| HDE-SEPA005.1 | Corrected catalog |\nS01 in prose only.\n")
+
+
+def test_v2_not_satisfied_may_cover_part_of_the_requirements(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _v2_source()
+    source["acceptance"].pop()
+    source["closure_decision"]["decision"] = "NOT SATISFIED"
+    source["follow_ups"] = ["Bind S22 before closure."]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+
+
+def test_v2_tracked_issue_pointer_needs_no_drain_target(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _v2_source()
+    source["tracked_issues"] = [{"id": "TI-009", "pointer": "docs/PF09.md Subtask 3 closure"}]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+
+
 def _mutate(source: dict[str, object], case: str) -> None:
     if case == "unresolved_binding":
         source["acceptance"][0]["evidence_bindings"] = ["absent"]
@@ -4629,6 +4658,12 @@ def _mutate(source: dict[str, object], case: str) -> None:
         source["key_outputs"]["qa_rca"] = "evidence/not_bound.md"
     elif case == "adr_deferral_not_in_drain_targets":
         source["deferrals"][0]["id"] = "DEF-9"
+    elif case == "adr_tracked_issue_not_in_drain_targets":
+        source["tracked_issues"] = [{"id": "TI-009", "adr_status": "Closed without any drain mapping"}]
+    elif case == "satisfied_omits_a_requirement":
+        source["acceptance"].pop()
+    elif case == "requirements_document_without_table":
+        source["requirements_binding"] = "qa_report"
     elif case == "ledger_not_bound":
         source["evidence_inputs"] = [
             item for item in source["evidence_inputs"] if item["binding"] != "doc_deltas"
@@ -4647,6 +4682,9 @@ def _mutate(source: dict[str, object], case: str) -> None:
         ("wrong_report_output", "OUTPUT_BINDING_MISMATCH"),
         ("unbound_key_output", "OUTPUT_BINDING_MISMATCH"),
         ("adr_deferral_not_in_drain_targets", "DEFERRAL_UNBOUND"),
+        ("adr_tracked_issue_not_in_drain_targets", "TRACKED_ISSUE_UNBOUND"),
+        ("satisfied_omits_a_requirement", "REQUIREMENT_COVERAGE_INCOMPLETE"),
+        ("requirements_document_without_table", "REQUIREMENTS_TABLE_ABSENT"),
         ("ledger_not_bound", "OUTPUT_BINDING_MISMATCH"),
     ),
 )

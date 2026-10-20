@@ -42,7 +42,7 @@ HDE-EPIC039 kept the writer ignorant of the evidence graph and of any claim, so 
 ## Stated limits
 
 - Closure-decision postures are exactly `review-trace-only`, `PO closeout` and `formal close-pack completion`; another posture needs a later schema version.
-- Requirement coverage is the source author's: the writer checks that each criterion ID occurs in the bound requirements document, not that every requirement there has a criterion.
+- Requirement coverage is checked against one pinned requirements-table format: rows whose first cell is `S` followed by two or more digits, as in HDE-CRD-0002's Specification. A bound requirements document without such a row is refused (`REQUIREMENTS_TABLE_ABSENT`); an Epic Specification in another format needs a later pin.
 - No Epic close-run family is admitted. An Epic close run needs its own explicit admission later, as each CRD needs its row in `ADMITTED_CRD_QA`.
 - A later Epic's v2 close pack is written and checked by the writer, but its Index rows need that Epic's own registration, as for earlier Epics.
 - As in v1, an earlier commit's ID written without the refusal's trigger words is not refused; the current HEAD's ID is.

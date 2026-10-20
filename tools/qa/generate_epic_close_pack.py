@@ -2224,6 +2224,9 @@ PROHIBITED_CAUSAL_INPUTS = frozenset(
     }
 )
 CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
+# The one pinned requirements-table format: rows whose first cell is S followed by two or more
+# digits, as in HDE-CRD-0002's Specification (| S01 | ... |). Any other document is refused.
+REQUIREMENT_ROW_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -2326,6 +2329,13 @@ def _token_occurs(identifier: str, payload: bytes) -> bool:
     return re.search(pattern, payload) is not None
 
 
+def _requirement_ids(payload: bytes) -> frozenset[str]:
+    identifiers = frozenset(match.decode("ascii") for match in REQUIREMENT_ROW_RE.findall(payload))
+    if not identifiers:
+        raise _fail("REQUIREMENTS_TABLE_ABSENT")
+    return identifiers
+
+
 def _require_v2_semantics(
     source: Mapping[str, Any],
     bindings: Mapping[str, FileSnapshot],
@@ -2367,11 +2377,11 @@ def _require_v2_semantics(
     if any(binding not in bindings for binding in referenced):
         raise _fail("BINDING_UNRESOLVED")
 
-    requirements = bindings[str(source["requirements_binding"])].payload
+    requirement_ids = _requirement_ids(bindings[str(source["requirements_binding"])].payload)
     criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
     if len(criteria) != len(set(criteria)):
         raise _fail("ACCEPTANCE_AMBIGUOUS")
-    if any(not _token_occurs(criterion, requirements) for criterion in criteria):
+    if any(criterion not in requirement_ids for criterion in criteria):
         raise _fail("REQUIREMENT_ID_UNBOUND")
     drain_targets = next(
         snapshot.payload
@@ -2387,6 +2397,11 @@ def _require_v2_semantics(
         for item in source["deferrals"]
     ):
         raise _fail("DEFERRAL_UNBOUND")
+    if any(
+        "adr_status" in item and not _token_occurs(str(item["id"]), drain_targets)
+        for item in source["tracked_issues"]
+    ):
+        raise _fail("TRACKED_ISSUE_UNBOUND")
 
     decision = source["closure_decision"]["decision"]
     if decision == "SATISFIED" and (
@@ -2394,6 +2409,8 @@ def _require_v2_semantics(
         or any(item["result"] != "MET" for item in source["acceptance"])
     ):
         raise _fail("DECISION_CONTRADICTION")
+    if decision == "SATISFIED" and not requirement_ids <= set(criteria):
+        raise _fail("REQUIREMENT_COVERAGE_INCOMPLETE")
     if decision == "NOT SATISFIED" and not source["follow_ups"]:
         raise _fail("DECISION_CONTRADICTION")
 
