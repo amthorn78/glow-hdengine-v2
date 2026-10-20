@@ -12,13 +12,22 @@ One command with five reports, each read-only with respect to the repository:
 * ``sweep``: the tracked test files no CI lane and no full-validation target
   reaches, run in a throwaway copy of the head;
 * ``replay``: every step of the ``test`` job of ``.github/workflows/ci.yml``,
-  read from the head's workflow text and replayed in a throwaway copy.
+  replayed in a throwaway copy of the head.  It replays only the one workflow
+  whose SHA-256 is REPLAY_WORKFLOW_SHA256 and refuses any other, so a PR that
+  changes ci.yml updates that value and the replay's model with it.  CI's
+  install step needs the package index and is not run: the caller's
+  environment holding CI's install is a precondition, checked only for the
+  presence of each distribution the step names.
 
 Every write goes under one owner-only temporary directory outside the
-repository, removed at exit.  The tool refuses a dirty tree, acts on committed
-revisions only, resolves refs locally, opens no network connection and runs
-children under closed rails.  Its green is not CI's green and not QA; its
-output is not governed evidence.
+repository, removed at exit.  Repository code runs only in a throwaway copy,
+never in the caller's checkout: ``lanes`` and ``membership`` load the
+classifier in a child process inside a copy of the head, as ``sweep`` and
+``replay`` run there.  The tool refuses a dirty tree, acts on committed
+revisions only, resolves refs locally, opens no network connection, runs
+children under closed rails, and compares the repository's state before and
+after as a check.  Its green is not CI's green and not QA; its output is not
+governed evidence.
 
 Children inherit only HOME, LOGNAME, PATH, SHELL, TERM and USER from the
 caller's environment, so no other variable of the caller's, secrets included,
@@ -38,7 +47,6 @@ import argparse  # noqa: E402
 import ast  # noqa: E402
 import fnmatch  # noqa: E402
 import hashlib  # noqa: E402
-import importlib.machinery  # noqa: E402
 import importlib.metadata  # noqa: E402
 import importlib.util  # noqa: E402
 import json  # noqa: E402
@@ -107,6 +115,11 @@ CLOSED_RAILS = {
 }
 SWEEP_TOOLS = ("bash", "curl", "ruby")
 
+# The SHA-256 of the one ci.yml the replay models.  The replay refuses any
+# other workflow text before reading it, so its YAML reader and inventory only
+# ever see this file; a PR that changes ci.yml updates this value in the same
+# PR, which the owner test requires.
+REPLAY_WORKFLOW_SHA256 = "d02021f3bbeb22ec569fe6282c046d68468af003f0f0370313c5e76f58b6ab9b"
 # Every step of the ``test`` job, in file order.  A step the workflow adds,
 # renames or removes fails the replay (and the owner test) until this list
 # knows it, so the replay never silently runs a different job.
@@ -195,74 +208,20 @@ REPLAY_RUNNER_VARIABLES = frozenset({"GITHUB_ACTIONS", "GITHUB_EVENT_NAME", "GIT
 _RUNNER_VARIABLE_RE = re.compile(
     r"(?<![A-Za-z0-9_])(?:(?:GITHUB|RUNNER|ACTIONS)_[A-Za-z0-9_]+|ImageOS|ImageVersion|pythonLocation"
     r"|Python[23]?_ROOT_DIR)(?![A-Za-z0-9_])")
-# The one build system the install step's substitute models: pip builds the
-# editable project with this backend, whose PEP 660 hooks every setuptools
-# from 64 provides, from these requirements in an isolated environment.  Any
-# other [build-system] fails closed.
-REPLAY_BUILD_SYSTEM: dict[str, object] = {"build-backend": "setuptools.build_meta",
-                                          "requires": ["setuptools>=68", "wheel"]}
-# The rest of the editable project's configuration the substitute models.
-# setuptools validates all of it when CI's install builds the project, so a
-# table, [project] key or value outside this model fails closed, as do a
-# setup.py, a setup.cfg and a [tool.setuptools] or [tool.distutils] other than
-# these.
-REPLAY_PYPROJECT_TABLES = frozenset({"build-system", "project", "tool"})
-REPLAY_PROJECT_KEYS = frozenset({"name", "version", "description", "readme", "requires-python", "dependencies",
-                                 "scripts", "gui-scripts", "entry-points"})
-REPLAY_SETUPTOOLS_CONFIG: dict[str, object] = {
-    "packages": {"find": {"where": ["."], "include": ["engine*", "adapter*", "presenter*", "catalog*", "math*"]}},
-    "package-data": {"catalog": ["*.json"], "math": ["*.json"]},
-}
-# The files of the editable project's installed .dist-info that pip and the
-# wheel writer add and the modelled configuration does not decide.  Every
-# other file there is metadata the build backend generates from the candidate,
-# which CI's install regenerates.
-REPLAY_INSTALLER_FILES = frozenset({"INSTALLER", "RECORD", "REQUESTED", "WHEEL", "direct_url.json"})
-_PREPARE_METADATA = ("import importlib, sys; sys.path[:0] = sys.argv[3:]; "
-                     "importlib.import_module(sys.argv[1]).prepare_metadata_for_build_editable(sys.argv[2])")
-_PROJECT_NAME_RE = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?")
-_OBJECT_REFERENCE_RE = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*(?:\s*:\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)?")
+# A requirement as the install step and its -r files write one: a
+# distribution name, then optionally extras, version clauses or a marker, none
+# of which the presence check reads.  A URL, a path or any other form fails
+# closed.
+_REQUIREMENT_NAME_RE = re.compile(
+    r"([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?:\[[^\]]*\])?\s*(?:[<>=!~(;][^@]*)?")
 
 _TESTS_TOKEN_RE = re.compile(r"tests/[A-Za-z0-9_./-]+")
-# PEP 508 requirements as the install step and installed metadata write them:
-# a distribution, optional extras, PEP 440 clauses (optionally parenthesized)
-# and an environment marker.  A URL, a local-version clause, a legacy marker
-# name or any other form the replay cannot verify fails closed.
-_REQUIREMENT_RE = re.compile(
-    r"([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?:\[([A-Za-z0-9._,\s-]*)\])?"
-    r"\s*(\([^()]*\)|[^;()]*?)\s*(?:;\s*(.*\S))?\s*")
-_CLAUSE_RE = re.compile(r"(===|~=|==|!=|<=|>=|<|>)\s*([^\s,;()]+)")
-_WILDCARD_RE = re.compile(r"(?:[0-9]+!)?[0-9]+(?:\.[0-9]+)*\.\*")
-_MARKER_TOKEN_RE = re.compile(
-    r"\s*(?:(?P<paren>[()])|(?P<op>===|==|!=|<=|>=|~=|<|>|not\s+in\b|in\b)|(?P<bool>and\b|or\b)"
-    r"|'(?P<single>[^']*)'|\"(?P<double>[^\"]*)\"|(?P<var>[a-z_]+))")
-# Version comparison applies only to these variables; the others compare as
-# strings with ==, !=, in and not in, and any other operator on them fails
-# closed (packaging releases disagree there).
-_MARKER_VERSION_VARIABLES = frozenset({"implementation_version", "platform_release", "python_full_version",
-                                       "python_version"})
-_MARKER_VARIABLES = frozenset({
-    "extra", "implementation_name", "implementation_version", "os_name", "platform_machine",
-    "platform_python_implementation", "platform_release", "platform_system", "platform_version",
-    "python_full_version", "python_version", "sys_platform",
-})
-_VERSION_RE = re.compile(
-    r"v?(?:([0-9]+)!)?([0-9]+(?:\.[0-9]+)*)"
-    r"(?:[-_.]?(alpha|beta|preview|pre|rc|a|b|c)[-_.]?([0-9]*))?"
-    r"(?:-([0-9]+)|[-_.]?(?:post|rev|r)[-_.]?([0-9]*))?"
-    r"(?:[-_.]?(dev)[-_.]?([0-9]*))?"
-    r"(\+[a-z0-9]+(?:[-_.][a-z0-9]+)*)?", re.IGNORECASE)
-_PRE_RANK = {"alpha": 0, "a": 0, "beta": 1, "b": 1, "preview": 2, "pre": 2, "rc": 2, "c": 2}
 _EXPRESSION_RE = re.compile(r"\$\{\{(.*?)\}\}", re.DOTALL)
 _STATUS_FUNCTIONS = ("always()", "success()", "failure()", "cancelled()")
 
 
 class ToolingError(RuntimeError):
     """A report could not run as specified (distinct from a behavior failure)."""
-
-
-class AmbiguousClause(ValueError):
-    """A version clause whose result differs between the pip releases CI may run."""
 
 
 class Refusal(RuntimeError):
@@ -307,10 +266,11 @@ def resolve_commit(repo: Path, ref: str) -> str:
 
 
 def _metadata_digest(directory: Path) -> str:
-    """Digest of git metadata: file bytes, plus names and sizes under objects/, and every directory's name.
+    """Digest of git metadata: file bytes, lstat identities under objects/, and every directory's name.
 
-    An empty directory holds no file, so without its name its creation or
-    removal would go unseen.
+    An object is not read, but any write to it changes its st_ctime_ns, which
+    user space cannot set back.  An empty directory holds no file, so without
+    its name its creation or removal would go unseen.
     """
     digest = hashlib.sha256()
     for path in sorted(directory.rglob("*")):
@@ -321,7 +281,8 @@ def _metadata_digest(directory: Path) -> str:
         if not (path.is_file() or path.is_symlink()):
             continue
         if rel.startswith("objects/"):
-            digest.update(f"{rel}\0{path.lstat().st_size}\0".encode())
+            info = path.lstat()
+            digest.update(f"{rel}\0{info.st_mode}\0{info.st_size}\0{info.st_mtime_ns}\0{info.st_ctime_ns}\0".encode())
             continue
         digest.update(rel.encode() + b"\0")
         if path.is_symlink():
@@ -339,7 +300,19 @@ def _ignored_entries(repo: Path) -> tuple[tuple[str, int, int, int, int], ...]:
     would otherwise go unseen.  Any write to a file changes its st_ctime_ns,
     which user space cannot set back, so the identity needs no content read.
     """
-    listing = git(repo, "ls-files", "-z", "--others", "--ignored", "--exclude-standard").stdout
+    return _lstat_entries(repo, git(repo, "ls-files", "-z", "--others", "--ignored", "--exclude-standard").stdout)
+
+
+def _tracked_entries(repo: Path) -> tuple[tuple[str, int, int, int, int], ...]:
+    """Every tracked file with its lstat identity.
+
+    git status compares content, so a tracked file rewritten with the same
+    bytes would otherwise go unseen; the write still changes its st_ctime_ns.
+    """
+    return _lstat_entries(repo, git(repo, "ls-files", "-z").stdout)
+
+
+def _lstat_entries(repo: Path, listing: bytes) -> tuple[tuple[str, int, int, int, int], ...]:
     entries = []
     for raw in sorted(name for name in listing.split(b"\0") if name):
         name = os.fsdecode(raw)
@@ -371,6 +344,7 @@ def _directory_entries(repo: Path) -> tuple[tuple[str, int, int, int], ...]:
 class RepositoryState:
     head: str
     status: bytes
+    tracked: tuple[tuple[str, int, int, int, int], ...]
     ignored: tuple[tuple[str, int, int, int, int], ...]
     directories: tuple[tuple[str, int, int, int], ...]
     metadata: tuple[tuple[str, str], ...]
@@ -384,7 +358,7 @@ def repository_state(repo: Path) -> RepositoryState:
         (repo / git_text(repo, "rev-parse", "--git-common-dir")).resolve(),
     }
     metadata = tuple(sorted((str(d), _metadata_digest(d)) for d in directories))
-    return RepositoryState(head=head, status=status, ignored=_ignored_entries(repo),
+    return RepositoryState(head=head, status=status, tracked=_tracked_entries(repo), ignored=_ignored_entries(repo),
                            directories=_directory_entries(repo), metadata=metadata)
 
 
@@ -755,6 +729,59 @@ def coverage_in_child(copy: Path, env: dict[str, str]) -> dict[str, object]:
     return json.loads(result.stdout)
 
 
+def in_copy(copy: Path, temporary: Path, function: str, *args: object) -> dict[str, object]:
+    """Call one of this tool's functions in a child whose working directory is the copy; it answers in JSON.
+
+    Repository code (the classifier) is then loaded from the copy and runs
+    there, never in the caller's checkout or in this process.
+    """
+    code = (
+        "import importlib.util, json, sys\n"
+        "sys.dont_write_bytecode = True\n"
+        "spec = importlib.util.spec_from_file_location('_prepush_check_child', sys.argv[1])\n"
+        "module = importlib.util.module_from_spec(spec)\n"
+        "sys.modules['_prepush_check_child'] = module\n"
+        "spec.loader.exec_module(module)\n"
+        "print(json.dumps(getattr(module, sys.argv[2])(*json.loads(sys.argv[3]))))\n"
+    )
+    result = subprocess.run([sys.executable, "-B", "-c", code, str(TOOL_PATH), function, json.dumps(list(args))],
+                            cwd=copy, env=child_environment(dict(os.environ), temporary, {"GIT_OPTIONAL_LOCKS": "0"}),
+                            capture_output=True, text=True, check=False)
+    if result.returncode != 0 or not result.stdout.strip():
+        last = result.stderr.strip().splitlines()[-1:] or [f"exit {result.returncode} and no answer"]
+        raise ToolingError(f"{function} failed in the throwaway copy: {last[0][:500]}")
+    return json.loads(result.stdout.strip().splitlines()[-1])
+
+
+def normalized_paths(root: str, paths: list[str]) -> dict[str, object]:
+    """The classifier's normal form of each path; run by in_copy."""
+    classifier = load_classifier(Path(root))
+    normalized = []
+    for raw in paths:
+        try:
+            normalized.append(classifier._normalized_path(raw))
+        except ValueError as exc:
+            return {"error": f"invalid path {raw!r}: {exc}"}
+    return {"paths": normalized}
+
+
+def classify_given_paths(root: str, paths: list[str], output: str, target_file: str) -> dict[str, object]:
+    """The classifier's outputs for given paths against the root's files; run by in_copy."""
+    classifier = load_classifier(Path(root))
+    try:
+        governed = classifier._load_governed_primary_paths(Path(root))
+        result = classifier.classify_paths(paths, governed_paths=governed)
+        targets = result.test_targets or classifier.changed_test_targets(Path(root), paths)
+        classification = classifier.Classification(
+            flags=result.flags, reason=result.reason, path_count=result.path_count, test_targets=targets)
+        classifier.write_github_output(Path(output), classification)
+        classifier.write_changed_test_targets(Path(target_file), classification.test_targets)
+    except (OSError, RuntimeError, UnicodeError, ValueError) as exc:
+        return {"error": f"CI_CHANGE_CLASSIFIER_ERROR:{exc}"}
+    return {"reason": classification.reason, "path_count": classification.path_count,
+            "lanes": [lane for lane in classifier.LANES if classification.flags[lane]]}
+
+
 # --------------------------------------------------------------------------
 # Child environments (closed rails, no keys)
 # --------------------------------------------------------------------------
@@ -805,16 +832,10 @@ class Context:
     no_run: bool
 
 
-def _normalized_paths(context: Context, report: Report) -> list[str] | None:
-    classifier = load_classifier(context.repo)
-    normalized = []
-    for raw in context.paths:
-        try:
-            normalized.append(classifier._normalized_path(raw))
-        except ValueError as exc:
-            report.fail(f"invalid path {raw!r}: {exc}")
-            return None
-    return normalized
+def head_copy(context: Context, name: str) -> tuple[str, Path]:
+    """The head's commit and a throwaway copy of it: a report runs no repository code in the checkout."""
+    head = resolve_commit(context.repo, context.head_ref)
+    return head, make_copy(context.repo, head, context.temporary / f"{name}-copy")
 
 
 # --------------------------------------------------------------------------
@@ -828,26 +849,25 @@ def report_lanes(context: Context, report: Report) -> None:
 
 
 def _lanes_for_given_paths(context: Context, report: Report) -> dict[str, str]:
-    classifier = load_classifier(context.repo)
-    report.out(f"mode=paths root={context.repo} paths={len(context.paths)}")
-    report.out("note: changed-test targets are computed against the head's files; "
-               "a planned file that does not exist yet selects no target of its own")
+    output = context.temporary / "lanes-paths-github-output.txt"
+    target_file = context.temporary / "lanes-paths-changed-tests.txt"
+    output.unlink(missing_ok=True)
     try:
-        governed = classifier._load_governed_primary_paths(context.repo)
-        result = classifier.classify_paths(context.paths, governed_paths=governed)
-        targets = result.test_targets or classifier.changed_test_targets(context.repo, context.paths)
-        classification = classifier.Classification(
-            flags=result.flags, reason=result.reason, path_count=result.path_count, test_targets=targets)
-        output = context.temporary / "lanes-paths-github-output.txt"
-        target_file = context.temporary / "lanes-paths-changed-tests.txt"
-        output.unlink(missing_ok=True)
-        classifier.write_github_output(output, classification)
-        classifier.write_changed_test_targets(target_file, classification.test_targets)
-    except (OSError, RuntimeError, UnicodeError, ValueError) as exc:
-        report.fail(f"CI_CHANGE_CLASSIFIER_ERROR:{exc}")
+        head, copy = head_copy(context, "lanes")
+        report.out(f"mode=paths head={context.head_ref}->{head} paths={len(context.paths)} "
+                   "(classified in a throwaway copy)")
+        report.out("note: changed-test targets are computed against the head's files; "
+                   "a planned file that does not exist yet selects no target of its own")
+        answer = in_copy(copy, context.temporary, "classify_given_paths", str(copy), context.paths,
+                         str(output), str(target_file))
+    except ToolingError as exc:
+        report.fail(str(exc), tooling=True)
         return {}
-    enabled = ",".join(lane for lane in classifier.LANES if classification.flags[lane]) or "none"
-    report.out(f"classification reason={classification.reason};paths={classification.path_count};lanes={enabled}")
+    if "error" in answer:
+        report.fail(str(answer["error"]))
+        return {}
+    enabled = ",".join(answer["lanes"]) or "none"  # type: ignore[arg-type]
+    report.out(f"classification reason={answer['reason']};paths={answer['path_count']};lanes={enabled}")
     return _print_outputs(report, output, target_file)
 
 
@@ -862,10 +882,14 @@ def _lanes_for_refs(context: Context, report: Report) -> dict[str, str]:
                + (" (full validation: base set to head)" if context.full else ""))
     if context.event == "pull_request":
         report.out("note: pull_request compares the merge base of base and head with head (classifier rule)")
-    root = context.repo
-    if head != repository_state_head(context.repo):
+    try:
         root = make_copy(context.repo, head, context.temporary / "lanes-copy")
-        report.out(f"note: head is not the checkout's HEAD; classified in a throwaway copy at {head}")
+        if git(root, "cat-file", "-e", f"{base}^{{commit}}", check=False).returncode != 0:
+            raise ToolingError(f"base {base} is not available to the throwaway copy")
+    except ToolingError as exc:
+        report.fail(str(exc), tooling=True)
+        return {}
+    report.out(f"note: classified in a throwaway copy at {head}")
     output = context.temporary / "lanes-refs-github-output.txt"
     target_file = context.temporary / "lanes-refs-changed-tests.txt"
     output.unlink(missing_ok=True)
@@ -881,10 +905,6 @@ def _lanes_for_refs(context: Context, report: Report) -> dict[str, str]:
         report.fail(f"classifier exit {result.returncode}: {result.stderr.strip()}")
         return {}
     return _print_outputs(report, output, target_file)
-
-
-def repository_state_head(repo: Path) -> str:
-    return git_text(repo, "rev-parse", "--verify", "HEAD")
 
 
 def parse_github_output(data: bytes) -> tuple[dict[str, str], tuple[str, str] | None]:
@@ -936,17 +956,21 @@ def report_membership(context: Context, report: Report) -> None:
     if not context.paths:
         report.fail("membership needs at least one --path")
         return
-    paths = _normalized_paths(context, report)
-    if paths is None:
-        return
     try:
-        version, roster = admitted_release(context.repo)
+        head, copy = head_copy(context, "membership")
+        answer = in_copy(copy, context.temporary, "normalized_paths", str(copy), context.paths)
+        if "error" in answer:
+            report.fail(str(answer["error"]))
+            return
+        version, roster = admitted_release(copy)
     except ToolingError as exc:
         report.fail(str(exc), tooling=True)
         return
-    manifest = context.repo / MANIFEST_PATH
+    paths = [str(path) for path in answer["paths"]]  # type: ignore[union-attr]
+    manifest = copy / MANIFEST_PATH
     release_id = hashlib.sha256(manifest.read_bytes()).hexdigest() if manifest.is_file() else "unavailable"
-    report.out(f"admitted release version={version} roster={len(roster)} release_id={release_id}")
+    report.out(f"admitted release version={version} roster={len(roster)} release_id={release_id} "
+               f"head={head} (read in a throwaway copy)")
     members = 0
     for path in paths:
         member = path in roster
@@ -1366,323 +1390,15 @@ def _python_version(steps: list[dict[str, object]]) -> str:
     raise ToolingError("no actions/setup-python step with python-version")
 
 
-@dataclass(frozen=True)
-class _Version:
-    release: tuple[int, ...]
-    key: tuple[object, ...]  # PEP 440 order of the public version (local label excluded)
-    prerelease: bool
-    postrelease: bool
-    local: bool
-
-
-def _parse_version(text: str) -> _Version:
-    match = _VERSION_RE.fullmatch(text.strip())
-    if not match:
-        raise ValueError(f"version {text.strip()!r} is not a PEP 440 version")
-    epoch, release_text, pre, pre_n, post_implicit, post_n, dev, dev_n, local = match.groups()
-    post = post_implicit if post_implicit is not None else post_n  # "" when "post" has no number
-    release = tuple(int(part) for part in release_text.split("."))
-    trimmed = release
-    while len(trimmed) > 1 and trimmed[-1] == 0:
-        trimmed = trimmed[:-1]
-    if pre is not None:
-        pre_key: tuple[int, int] = (_PRE_RANK[pre.lower()], int(pre_n or 0))
-    else:
-        pre_key = (-1, 0) if post is None and dev is not None else (3, 0)
-    key = (int(epoch or 0), trimmed, pre_key, -1 if post is None else int(post or 0),
-           (1, 0) if dev is None else (0, int(dev_n or 0)))
-    return _Version(release, key, pre is not None or dev is not None, post is not None, local is not None)
-
-
-def _normalized_version(text: str) -> str:
-    """A version's PEP 440 normal form, the string installed metadata records (local label included)."""
-    match = _VERSION_RE.fullmatch(text.strip())
-    if not match:
-        raise ValueError(f"version {text.strip()!r} is not a PEP 440 version")
-    epoch, release_text, pre, pre_n, post_implicit, post_n, dev, dev_n, local = match.groups()
-    post = post_implicit if post_implicit is not None else post_n
-    normal = f"{int(epoch)}!" if epoch and int(epoch) else ""
-    normal += ".".join(str(int(part)) for part in release_text.split("."))
-    if pre is not None:
-        normal += {"alpha": "a", "a": "a", "beta": "b", "b": "b"}.get(pre.lower(), "rc") + str(int(pre_n or 0))
-    if post is not None:
-        normal += f".post{int(post or 0)}"
-    if dev is not None:
-        normal += f".dev{int(dev_n or 0)}"
-    if local:
-        segments = re.split(r"[-_.]", local[1:].lower())
-        normal += "+" + ".".join(str(int(part)) if part.isdigit() else part for part in segments)
-    return normal
-
-
-def _canonical(name: str) -> str:
-    return re.sub(r"[-_.]+", "-", name).lower()
-
-
-def _clause(operator: str, text: str) -> bool:
-    """Whether ``operator text`` is a PEP 440 clause; raises for one the replay does not verify."""
-    if operator not in {"===", "~=", "==", "!=", "<=", ">=", "<", ">"}:
-        return False
-    if operator == "===":
-        return True
-    if text.endswith(".*"):
-        return operator in {"==", "!="} and bool(_WILDCARD_RE.fullmatch(text))
-    try:
-        version = _parse_version(text)
-    except ValueError:
-        return False
-    if version.local:
-        if operator in {"==", "!="}:
-            raise ValueError(f"unsupported local-version clause {operator}{text}")
-        return False
-    return operator != "~=" or len(version.release) > 1
-
-
-def _parse_clauses(specifier: str) -> list[tuple[str, str]] | None:
-    """The PEP 440 clauses of a specifier ("" has none); None when one of them is not a clause."""
-    clauses: list[tuple[str, str]] = []
-    for clause in specifier.split(",") if specifier.strip() else ():
-        parsed = _CLAUSE_RE.fullmatch(clause.strip())
-        if not parsed or not _clause(*parsed.groups()):
-            return None
-        clauses.append((parsed.group(1), parsed.group(2)))
-    return clauses
-
-
-def _parse_requirement(text: str) -> tuple[str, frozenset[str], list[tuple[str, str]], object]:
-    """A requirement's distribution name, extras, version clauses and marker (None when absent)."""
-    match = _REQUIREMENT_RE.fullmatch(text.strip())
-    specifier = match.group(3).strip() if match else ""
-    clauses = _parse_clauses(specifier[1:-1] if specifier.startswith("(") else specifier) if match else None
-    # PEP 508 extras: identifiers separated by commas, an empty list allowed, no empty element.
-    names = [extra.strip() for extra in match.group(2).split(",")] if match and (match.group(2) or "").strip() else []
-    if not match or clauses is None or not all(_PROJECT_NAME_RE.fullmatch(name) for name in names):
-        raise ValueError(f"unsupported requirement {text.strip()!r}")
-    extras = frozenset(_canonical(name) for name in names)
-    return match.group(1), extras, clauses, _parse_marker(match.group(4)) if match.group(4) else None
-
-
-def _parse_marker(text: str) -> object:
-    """A PEP 508 marker as nested ("or" | "and", left, right) and ("cmp", left, op, right) tuples."""
-    tokens: list[tuple[str, str]] = []
-    position = 0
-    while position < len(text):
-        match = _MARKER_TOKEN_RE.match(text, position)
-        if not match:
-            raise ValueError(f"unsupported marker {text!r}")
-        kind = str(match.lastgroup)
-        value = match.group(kind)
-        if kind == "var" and value not in _MARKER_VARIABLES:
-            raise ValueError(f"unsupported marker variable {value!r} in {text!r}")
-        tokens.append(("str" if kind in {"single", "double"} else kind, " ".join(value.split())))
-        position = match.end()
-
-    def disjunction(index: int) -> tuple[object, int]:
-        node, index = conjunction(index)
-        while index < len(tokens) and tokens[index] == ("bool", "or"):
-            right, index = conjunction(index + 1)
-            node = ("or", node, right)
-        return node, index
-
-    def conjunction(index: int) -> tuple[object, int]:
-        node, index = atom(index)
-        while index < len(tokens) and tokens[index] == ("bool", "and"):
-            right, index = atom(index + 1)
-            node = ("and", node, right)
-        return node, index
-
-    def atom(index: int) -> tuple[object, int]:
-        if index < len(tokens) and tokens[index] == ("paren", "("):
-            node, index = disjunction(index + 1)
-            if index < len(tokens) and tokens[index] == ("paren", ")"):
-                return node, index + 1
-        elif len(tokens) - index >= 3 and tokens[index + 1][0] == "op" \
-                and {tokens[index][0], tokens[index + 2][0]} == {"var", "str"}:
-            return ("cmp", tokens[index], tokens[index + 1][1], tokens[index + 2]), index + 3
-        raise ValueError(f"unsupported marker {text!r}")
-
-    node, index = disjunction(0)
-    if index != len(tokens):
-        raise ValueError(f"unsupported marker {text!r}")
-    return node
-
-
-def _marker_environment() -> dict[str, str]:
-    """PEP 508 marker values for this interpreter (the one the replay runs)."""
-    info = sys.implementation.version
-    implementation = f"{info.major}.{info.minor}.{info.micro}"
-    if info.releaselevel != "final":
-        implementation += info.releaselevel[0] + str(info.serial)
-    return {
-        "implementation_name": sys.implementation.name,
-        "implementation_version": implementation,
-        "os_name": os.name,
-        "platform_machine": platform.machine(),
-        "platform_python_implementation": platform.python_implementation(),
-        "platform_release": platform.release(),
-        "platform_system": platform.system(),
-        "platform_version": platform.version(),
-        "python_full_version": platform.python_version(),
-        "python_version": ".".join(platform.python_version_tuple()[:2]),
-        "sys_platform": sys.platform,
-    }
-
-
-def _marker_true(node: object, environment: dict[str, str]) -> bool:
-    kind = node[0]  # type: ignore[index]
-    if kind in {"or", "and"}:
-        left, right = (_marker_true(part, environment) for part in node[1:])  # type: ignore[index]
-        return (left or right) if kind == "or" else (left and right)
-    _cmp, (left_kind, left), operator, (_right_kind, right) = node  # type: ignore[misc]
-    variable = left if left_kind == "var" else right
-    lhs = environment[left] if left_kind == "var" else left
-    rhs = right if left_kind == "var" else environment[right]
-    if variable == "extra":
-        lhs, rhs = _canonical(lhs), _canonical(rhs)
-    if variable in _MARKER_VERSION_VARIABLES and operator not in {"in", "not in"}:
-        if not _clause(operator, rhs):
-            raise ValueError(f"undefined marker comparison {lhs!r} {operator} {rhs!r}")
-        try:
-            return _satisfies(lhs, operator, rhs)
-        except AmbiguousClause:
-            raise
-        except ValueError:
-            return False  # a value that is not a version matches no version clause
-    if operator not in {"==", "!=", "in", "not in"}:
-        raise ValueError(f"undefined marker comparison {lhs!r} {operator} {rhs!r}")
-    return {"==": lhs == rhs, "!=": lhs != rhs, "in": lhs in rhs, "not in": lhs not in rhs}[operator]
-
-
-def _satisfies(installed: str, operator: str, text: str) -> bool:
-    """PEP 440 clause matching for an installed version (pre-releases allowed, as pip checks one)."""
-    if operator == "===":
-        return installed.strip().lower() == text.lower()
-    version = _parse_version(installed)
-    if text.endswith(".*"):
-        spec = _parse_version(text[:-2])
-        width = len(spec.release)
-        matched = version.key[0] == spec.key[0] and (version.release + (0,) * width)[:width] == spec.release
-        return matched if operator == "==" else not matched
-    spec = _parse_version(text)
-    if operator == "~=":
-        prefix = ".".join(str(part) for part in spec.release[:-1]) + ".*"
-        return _satisfies(installed, ">=", text) and _satisfies(installed, "==", f"{spec.key[0]}!{prefix}")
-    same_release = version.key[:2] == spec.key[:2]
-    if operator in {"==", "!="}:
-        return (version.key == spec.key) == (operator == "==")
-    if operator == ">=":
-        return version.key >= spec.key
-    if operator == "<=":
-        return version.key <= spec.key
-    # pip up to 25.x (packaging before 26) excludes, for <V and >V, every pre-,
-    # post- or local release of V's release; pip 26 (packaging 26) only V's own
-    # family.  Where the two disagree the replay cannot tell what CI's pip does.
-    if operator == "<":
-        base_rule = version.key < spec.key and not (version.prerelease and not spec.prerelease and same_release)
-        family = not spec.prerelease and version.prerelease and (
-            version.key[:4] == spec.key[:4] if spec.postrelease else same_release)
-        family_rule = version.key < spec.key and not family
-    else:
-        base_rule = version.key > spec.key and not (
-            ((version.postrelease and not spec.postrelease) or version.local) and same_release)
-        family = (not spec.postrelease and spec.key[4] == (1, 0) and version.postrelease
-                  and version.key[:3] == spec.key[:3]) or (version.local and version.key == spec.key)
-        family_rule = version.key > spec.key and not family
-    if base_rule != family_rule:
-        raise AmbiguousClause(f"pip releases decide {installed} against {operator}{text} differently "
-                              "(before pip 26 it fails, from pip 26 it holds)")
-    return base_rule
-
-
 def _distribution(name: str, search_path: list[str] | None) -> importlib.metadata.Distribution | None:
     return next(iter(importlib.metadata.distributions(name=name, path=search_path or sys.path)), None)
 
 
-def _unmet_requirements(roots: list[tuple[str, str]], search_path: list[str] | None) -> list[str]:
-    """Requirements in the closure of ``roots`` (requirement, required by) the environment does not satisfy.
-
-    Installed distributions' Requires-Dist entries are followed for the extras
-    requested of them, with markers evaluated for this interpreter, as pip
-    follows them; a satisfied closure is one CI's install would leave unchanged.
-    """
-    environment = _marker_environment()
-    queue = [(text, required_by, frozenset({""})) for text, required_by in roots]
-    visited: dict[str, set[str]] = {}
-    unmet: set[str] = set()
-    while queue:
-        text, required_by, contexts = queue.pop(0)
-        name, extras, clauses, marker = _parse_requirement(text)
-        if not any(context == "" if marker is None else _marker_true(marker, {**environment, "extra": context})
-                   for context in contexts):
-            continue
-        distribution = _distribution(name, search_path)
-        if distribution is None:
-            unmet.add(f"{name} (not installed; required by {required_by})")
-            continue
-        version = distribution.version
-        if not all(_satisfies(version, operator, clause) for operator, clause in clauses):
-            unmet.add(f"{name} {version} (needs {','.join(o + c for o, c in clauses)}; required by {required_by})")
-        new = ({""} | extras) - visited.setdefault(_canonical(name), set())
-        if new:
-            visited[_canonical(name)] |= new
-            queue += [(entry, distribution.metadata["Name"], frozenset(new)) for entry in distribution.requires or ()]
-    return sorted(unmet)
-
-
-def _module_locatable(dotted: str, search_path: list[str] | None) -> bool:
-    """Whether a module is found on the path, without importing or running it."""
-    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", dotted):
-        raise ValueError(f"unsupported module name {dotted!r}")
-    locations: list[str] = list(search_path or sys.path)
-    parts = dotted.split(".")
-    for index in range(len(parts)):
-        spec = importlib.machinery.PathFinder.find_spec(".".join(parts[:index + 1]), locations)
-        if spec is None:
-            return False
-        locations = list(spec.submodule_search_locations or [])
-        if index + 1 < len(parts) and not locations:
-            return False
-    return True
-
-
-def _configuration_problems(pyproject: dict[str, object], root: Path) -> list[str]:
-    """What in the editable project's configuration the substitute does not model or setuptools would reject."""
-    problems = [f"top-level tables {sorted(set(pyproject) - REPLAY_PYPROJECT_TABLES)}"] \
-        if set(pyproject) - REPLAY_PYPROJECT_TABLES else []
-    problems += [f"{name} (not modelled)" for name in ("setup.py", "setup.cfg") if (root / name).exists()]
-    project = pyproject.get("project")
-    if not isinstance(project, dict):
-        return problems + ["no [project] table"]
-    if set(project) - REPLAY_PROJECT_KEYS:
-        problems.append(f"[project] keys {sorted(set(project) - REPLAY_PROJECT_KEYS)}")
-    for key, pattern in (("name", _PROJECT_NAME_RE), ("version", None), ("requires-python", None),
-                         ("description", re.compile(r"[^\r\n]*")), ("readme", None)):
-        value = project.get(key, "") if key not in ("name", "version") else project.get(key)
-        if not isinstance(value, str) or (pattern is not None and not pattern.fullmatch(value)):
-            problems.append(f"[project] {key} {value!r}")
-    readme = project.get("readme")
-    if isinstance(readme, str) and (Path(readme).suffix.lower() not in {".md", ".rst", ".txt"}
-                                    or not (root / readme).is_file()):
-        problems.append(f"[project] readme {readme!r} (no such .md, .rst or .txt file)")
-    dependencies = project.get("dependencies", [])
-    if not isinstance(dependencies, list) or not all(isinstance(entry, str) for entry in dependencies):
-        problems.append("[project] dependencies is not a list of strings")
-    groups = {key: project.get(key, {}) for key in ("scripts", "gui-scripts")}
-    entry_points = project.get("entry-points", {})
-    if not isinstance(entry_points, dict) or {"console_scripts", "gui_scripts"} & set(entry_points):
-        problems.append("[project] entry-points is not a table of groups other than console_scripts and gui_scripts")
-    else:
-        groups.update({f"entry-points.{group}": entries for group, entries in entry_points.items()})
-    for group, entries in groups.items():
-        script = group in ("scripts", "gui-scripts")
-        if not isinstance(entries, dict) or not all(
-                isinstance(value, str) and _OBJECT_REFERENCE_RE.fullmatch(value.strip()) and (":" in value or not script)
-                for value in entries.values()):
-            problems.append(f"[project] {group} is not a table of object references")
-    tool = pyproject.get("tool", {})
-    if not isinstance(tool, dict) or tool.get("setuptools") != REPLAY_SETUPTOOLS_CONFIG or "distutils" in tool:
-        problems.append("[tool.setuptools] or [tool.distutils] is not the one the replay models")
-    return problems
+def _requirement_name(text: str) -> str:
+    match = _REQUIREMENT_NAME_RE.fullmatch(text.strip())
+    if not match:
+        raise ValueError(f"unsupported requirement {text.strip()!r}")
+    return match.group(1)
 
 
 def _requirement_lines(path: Path, seen: frozenset[Path] = frozenset()) -> list[str]:
@@ -1732,71 +1448,16 @@ def _simple_command(text: str) -> list[str]:
     return shlex.split(text)
 
 
-def _tree_files(root: Path) -> dict[str, bytes]:
-    return {path.relative_to(root).as_posix(): path.read_bytes() for path in sorted(root.rglob("*")) if path.is_file()}
+def _install_check(run_text: str, copy: Path, search_path: list[str] | None = None) -> list[str]:
+    """The distributions CI's install step names that the caller's environment does not hold.
 
-
-def _metadata_differences(name: str, project_dir: Path, distribution: importlib.metadata.Distribution,
-                          search_path: list[str] | None, scratch: Path | None) -> list[str]:
-    """Where the installed project's metadata differs from what the build backend generates from the candidate.
-
-    The backend's prepare_metadata_for_build_editable hook runs offline in the
-    caller's environment, under closed rails, against the candidate's tree;
-    its output must equal the installed .dist-info, REPLAY_INSTALLER_FILES
-    aside, file for file and byte for byte.
-    """
-    location = getattr(distribution, "_path", None)  # a PathDistribution's .dist-info; any other fails closed
-    if not isinstance(location, Path) or not location.is_dir():
-        raise ValueError(f"the installed metadata of {name!r} is not a directory the replay can read")
-    with tempfile.TemporaryDirectory(prefix="replay-metadata-", dir=scratch) as work:
-        output = Path(work) / "metadata"
-        output.mkdir()
-        result = subprocess.run(
-            [sys.executable, "-I", "-B", "-c", _PREPARE_METADATA, str(REPLAY_BUILD_SYSTEM["build-backend"]),
-             str(output), *(search_path or [])],
-            cwd=project_dir, env=child_environment(dict(os.environ), Path(work)),
-            capture_output=True, text=True, check=False)
-        generated = list(output.glob("*.dist-info"))
-        if result.returncode != 0 or len(generated) != 1:
-            raise ValueError(f"the build backend did not prepare the metadata of {name!r}: "
-                             + (result.stderr.strip()[-500:] or f"{len(generated)} .dist-info directories"))
-        want = _tree_files(generated[0])
-    have = {path: data for path, data in _tree_files(location).items() if path not in REPLAY_INSTALLER_FILES}
-    differences = []
-    for path in sorted(set(want) | set(have)):
-        if path not in have:
-            differences.append(f"{name} metadata {path} (not installed; the candidate generates it)")
-        elif path not in want:
-            differences.append(f"{name} metadata {path} (installed; the candidate generates none)")
-        elif have[path] != want[path]:
-            old, new = (data.decode("utf-8", "replace").splitlines() for data in (have[path], want[path]))
-            line = next((i for i, pair in enumerate(zip(old, new)) if pair[0] != pair[1]), min(len(old), len(new)))
-            if old == new:
-                differences.append(f"{name} metadata {path} (differs from the candidate's in its line breaks)")
-                continue
-            differences.append(f"{name} metadata {path} line {line + 1}: installed "
-                               f"{old[line][:120] if line < len(old) else 'end of file'!r}, the candidate's "
-                               f"{new[line][:120] if line < len(new) else 'end of file'!r}")
-    return differences
-
-
-def _install_check(run_text: str, copy: Path, search_path: list[str] | None = None,
-                   scratch: Path | None = None) -> list[str]:
-    """What the caller's environment lacks for CI's install step to change nothing.
-
-    The step's requirements and their installed dependencies, extras included,
-    must be satisfied.  pip reinstalls the editable project, so its installed
-    version, entry points and every other metadata file must equal what its
-    build backend generates from the candidate, and its requires-python must
-    admit this interpreter: the replay never runs against a dependency set,
-    metadata or wrapper CI's install would replace, nor passes a candidate CI
-    cannot install.  pip builds the project in an isolated environment fetched
-    from the package index, which an offline check cannot reproduce; the
-    project's build system must be REPLAY_BUILD_SYSTEM, and as a fail-closed
-    proxy the caller's environment must satisfy its build requirements and hold
-    its backend, which generates the metadata compared.  A backend release
-    other than CI's can write metadata its own version decides differently;
-    the comparison then fails closed.
+    The step needs the package index, so the replay does not run it: that the
+    caller's environment already holds CI's install is its stated
+    precondition (instruction ID-8).  This checks only that each distribution
+    the step names is installed: every requirement on its command line and in
+    its -r files, and the editable project by its [project] name.  Versions,
+    extras, markers, dependencies, the build system and the installed
+    project's metadata are the caller's to match; they are not checked.
     """
     words = _simple_command(run_text)
     if "install" not in words or words[:words.index("install")] not in (["pip"], ["python", "-m", "pip"]):
@@ -1805,73 +1466,26 @@ def _install_check(run_text: str, copy: Path, search_path: list[str] | None = No
     if not rest:
         # pip refuses an install with no requirement, requirements file or project.
         raise ValueError("the install step names nothing to install, which pip refuses")
-    roots: list[tuple[str, str]] = []
-    projects: list[dict[str, object]] = []
+    names: list[str] = []
     index = 0
     while index < len(rest):
         word = rest[index]
         if word in {"-r", "--requirement", "-e", "--editable"} and index + 1 < len(rest):
             target = copy / rest[index + 1]
             if word in {"-r", "--requirement"}:
-                roots += [(line, "the install step") for line in _requirement_lines(target)]
+                names += [_requirement_name(line) for line in _requirement_lines(target)]
             else:
-                pyproject = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8"))
-                project, build = pyproject.get("project"), pyproject.get("build-system")
-                if not isinstance(project, dict):
-                    raise ValueError("the editable project's pyproject.toml has no [project] table")
-                if build != REPLAY_BUILD_SYSTEM:
-                    raise ValueError(f"the editable project {project.get('name')!r} has [build-system] {build!r}, not "
-                                     f"the one the replay models, {REPLAY_BUILD_SYSTEM!r}")
-                problems = _configuration_problems(pyproject, target)
-                if problems:
-                    raise ValueError(f"the editable project {project.get('name')!r} has configuration the replay does not "
-                                     "model or setuptools would reject: " + "; ".join(problems))
-                projects.append((project, target))
-                roots.append((str(project["name"]), "the install step"))
-                roots += [(str(dependency), str(project["name"])) for dependency in project.get("dependencies", [])]
-                roots += [(str(requirement), f"{project['name']}'s build-system") for requirement in build["requires"]]
+                project = tomllib.loads((target / "pyproject.toml").read_text(encoding="utf-8")).get("project")
+                if not isinstance(project, dict) or not isinstance(project.get("name"), str):
+                    raise ValueError("the editable project's pyproject.toml names no [project] name")
+                names.append(project["name"])
             index += 2
             continue
         if word.startswith("-"):
             raise ValueError(f"unsupported install option {word!r}")
-        roots.append((word, "the install step"))
+        names.append(_requirement_name(word))
         index += 1
-    unmet = _unmet_requirements(roots, search_path)
-    backend = str(REPLAY_BUILD_SYSTEM["build-backend"])
-    for project, project_dir in projects:
-        name = str(project["name"])
-        backend_found = _module_locatable(backend, search_path)
-        if not backend_found:
-            unmet.append(f"{name} build-backend {backend} (not importable)")
-        distribution = _distribution(name, search_path)
-        if distribution is None:
-            continue  # already reported as not installed
-        if "version" not in project:
-            raise ValueError(f"the editable project {name!r} declares no static version")
-        # pip's reinstall rewrites the installed metadata with the candidate's normalized version string.
-        if _normalized_version(distribution.version) != _normalized_version(str(project["version"])):
-            unmet.append(f"{name} {distribution.version} (the candidate declares version {project['version']})")
-        requires_python = str(project.get("requires-python", ""))
-        python_clauses = _parse_clauses(requires_python)
-        if python_clauses is None:
-            raise ValueError(f"unsupported requires-python {requires_python!r} in {name!r}")
-        if not all(_satisfies(platform.python_version(), o, c) for o, c in python_clauses):
-            unmet.append(f"{name} requires-python {requires_python} (the interpreter is {platform.python_version()})")
-        # pip reinstalls the editable project, so every entry-point group is regenerated from the candidate.
-        declared: dict[str, dict[str, str]] = {"console_scripts": dict(project.get("scripts", {})),
-                                               "gui_scripts": dict(project.get("gui-scripts", {}))}
-        declared.update({str(group): dict(entries) for group, entries in dict(project.get("entry-points", {})).items()})
-        installed: dict[str, dict[str, str]] = {}
-        for entry in distribution.entry_points:
-            installed.setdefault(entry.group, {})[entry.name] = entry.value
-        for group in sorted(set(declared) | set(installed)):
-            have = {key: "".join(str(value).split()) for key, value in installed.get(group, {}).items()}
-            want = {key: "".join(str(value).split()) for key, value in declared.get(group, {}).items()}
-            if have != want:
-                unmet.append(f"{name} {group} {have} (the candidate declares {want})")
-        if backend_found:
-            unmet += _metadata_differences(name, project_dir, distribution, search_path, scratch)
-    return sorted(set(unmet))
+    return sorted({name for name in names if _distribution(name, search_path) is None})
 
 
 def _resolution(copy: Path, env: dict[str, str], temporary: Path) -> list[tuple[str, str, bool]]:
@@ -1911,7 +1525,13 @@ def report_replay(context: Context, report: Report) -> None:
         copy = make_copy(context.repo, head, context.temporary / "replay-copy")
         if git(copy, "cat-file", "-e", f"{base}^{{commit}}", check=False).returncode != 0:
             raise ToolingError(f"base {base} is not available to the throwaway copy")
-        job, steps = replay_steps((copy / WORKFLOW_PATH).read_text(encoding="utf-8"))
+        workflow = (copy / WORKFLOW_PATH).read_bytes()
+        workflow_sha256 = hashlib.sha256(workflow).hexdigest()
+        if workflow_sha256 != REPLAY_WORKFLOW_SHA256:
+            raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the head's {WORKFLOW_PATH} has SHA-256 {workflow_sha256}, "
+                               f"not the modelled {REPLAY_WORKFLOW_SHA256}; a PR that changes the workflow updates "
+                               "REPLAY_WORKFLOW_SHA256 and the replay's model with it")
+        job, steps = replay_steps(workflow.decode("utf-8"))
         python_version = _python_version(steps)
         machine = replay_machine()
         if machine:
@@ -1922,6 +1542,7 @@ def report_replay(context: Context, report: Report) -> None:
     actual = f"{sys.version_info.major}.{sys.version_info.minor}"
     report.out(f"event={context.event} base={base} head={head}" + (" (full validation)" if context.full else ""))
     report.out(f"copy={copy} interpreter={sys.executable} python={sys.version.split()[0]} workflow_python={python_version}")
+    report.out(f"workflow {WORKFLOW_PATH} sha256={workflow_sha256} (the modelled one)")
     runner_temp = context.temporary / "replay-runner-temp"
     runner_temp.mkdir()
     contexts = replay_contexts(context.event, base, head)
@@ -1956,7 +1577,7 @@ def report_replay(context: Context, report: Report) -> None:
         if not applicable:
             outcome = "skipped"
         elif kind == REPLAY_EXCLUDED:
-            outcome, detail = _substitute(step, reason, copy, python_version, actual, context.temporary)
+            outcome, detail = _substitute(step, reason, copy, python_version, actual)
         else:
             outcome, detail, outputs = _execute(step, number, copy, base_env, expressions, context.temporary)
         if step_id:
@@ -1976,7 +1597,7 @@ def report_replay(context: Context, report: Report) -> None:
 
 
 def _substitute(step: dict[str, object], reason: str, copy: Path,
-                python_version: str, actual: str, scratch: Path | None = None) -> tuple[str, str]:
+                python_version: str, actual: str) -> tuple[str, str]:
     uses = str(step.get("uses", ""))
     if uses.startswith("actions/checkout@"):
         return "success", f"{reason}; copy at {git_text(copy, 'rev-parse', 'HEAD')}"
@@ -1986,13 +1607,14 @@ def _substitute(step: dict[str, object], reason: str, copy: Path,
         return "success", f"{reason}: {actual}"
     run = str(step.get("run", ""))
     try:
-        unmet = _install_check(run, copy, scratch=scratch)
+        missing = _install_check(run, copy)
     except (OSError, KeyError, TypeError, ValueError, tomllib.TOMLDecodeError) as exc:
         return "failure", f"TOOLING cannot read the install step's inputs: {exc}"
-    if unmet:
-        return "failure", "TOOLING the caller's environment does not satisfy the install step: " + ", ".join(unmet)
-    return "success", (f"{reason}: the environment already satisfies every requirement the step names, their "
-                       "dependencies and extras, and the editable project's build system and installed metadata")
+    if missing:
+        return "failure", ("TOOLING the caller's environment lacks distributions the install step names: "
+                           + ", ".join(missing))
+    return "success", (f"{reason}: every distribution the step names is installed (versions, dependencies and the "
+                       "editable project's metadata are the caller's to match)")
 
 
 def _execute(step: dict[str, object], number: int, copy: Path, base_env: dict[str, str],
@@ -2052,7 +1674,8 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     parser.add_argument("reports", nargs="+", choices=(*REPORTS, "all"),
                         help="reports to run, always in the order lanes, membership, build-notes, sweep, replay")
     parser.add_argument("--base", default=DEFAULT_BASE, help="base ref for lanes and replay (local; default origin/main)")
-    parser.add_argument("--head", default=DEFAULT_HEAD, help="head ref for lanes, sweep and replay (default HEAD)")
+    parser.add_argument("--head", default=DEFAULT_HEAD,
+                        help="head ref for lanes, membership, sweep and replay (default HEAD)")
     parser.add_argument("--event", choices=("pull_request", "push"), default="pull_request",
                         help="CI event the classification and replay assume (default pull_request)")
     parser.add_argument("--path", dest="paths", action="append", default=[],

@@ -10,9 +10,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
-import importlib.metadata
 import os
-import platform
 import re
 import shutil
 import subprocess
@@ -75,11 +73,12 @@ def _snapshot(root: Path) -> dict[str, tuple[object, ...]]:
     return state
 
 
-def _run(repo: Path, *args: str, extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+def _run(repo: Path, *args: str, extra_env: dict[str, str] | None = None,
+         tool_path: Path = TOOL) -> subprocess.CompletedProcess[str]:
     """Run the tool against ``repo`` and assert the read-only rule around it."""
     env = {**os.environ, **DUMMY_KEYS, **(extra_env or {})}
     before = _snapshot(repo)
-    result = subprocess.run([sys.executable, str(TOOL), *args, "--repo-root", str(repo)],
+    result = subprocess.run([sys.executable, str(tool_path), *args, "--repo-root", str(repo)],
                             env=env, capture_output=True, text=True, check=False, timeout=300)
     assert _snapshot(repo) == before, result.stdout + result.stderr
     assert not (repo / ".git/worktrees").exists()
@@ -126,6 +125,8 @@ def _report_lines(stdout: str, report: str) -> list[str]:
 # --------------------------------------------------------------------------
 
 def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
+    # The replay models exactly this workflow: a PR that changes ci.yml updates the pin and the model with it.
+    assert hashlib.sha256(WORKFLOW.read_bytes()).hexdigest() == tool.REPLAY_WORKFLOW_SHA256
     text = WORKFLOW.read_text(encoding="utf-8")
     job, steps = tool.replay_steps(text)
     names = [str(step["name"]) for step in steps]
@@ -543,277 +544,54 @@ def test_interpreter_substitute_requires_the_workflow_python(tmp_path: Path) -> 
     assert tool._substitute(step, "reason", tmp_path, "3.12", "3.12")[0] == "success"
 
 
-_PYTEST = importlib.metadata.version("pytest")
-_SATISFIED = "the environment already satisfies every requirement the step names"
-
-
-@pytest.mark.parametrize(
-    "requirement, ok, fragment",
-    [
-        (f"pytest>={_PYTEST}", True, _SATISFIED),
-        (f"pytest=={_PYTEST.split('.')[0]}.*", True, _SATISFIED),
-        (f"pytest<{_PYTEST}", False, f"pytest {_PYTEST} (needs <{_PYTEST}; required by the install step)"),
-        ("distribution-that-is-not-installed>=1", False,
-         "distribution-that-is-not-installed (not installed; required by the install step)"),
-        ("pytest @ https://example.invalid/pytest.whl", False, "cannot read the install step's inputs: unsupported"),
-    ],
-    ids=["satisfied", "wildcard", "version-outside-specifier", "missing", "unsupported-form"],
-)
-def test_install_substitute_requires_versions_the_specifiers_allow(
-        tmp_path: Path, requirement: str, ok: bool, fragment: str) -> None:
-    (tmp_path / "requirements.txt").write_text(f"# fixture\n{requirement}\n", encoding="utf-8")
-    step = {"run": "python -m pip install 'setuptools>=1' -r requirements.txt"}
-    outcome, detail = tool._substitute(step, "reason", tmp_path, "3.12", "3.12")
-    assert outcome == ("success" if ok else "failure"), detail
-    assert fragment in detail and (ok or detail.startswith("TOOLING"))
-
-
-def _site(root: Path, distributions: dict[str, tuple[str, list[str], str]]) -> list[str]:
-    """A synthetic site directory: name -> (version, Requires-Dist entries, entry_points.txt)."""
-    for name, (version, requires, entry_points) in distributions.items():
+def _site(root: Path, distributions: dict[str, str]) -> list[str]:
+    """A synthetic site directory holding the named distributions at the given versions."""
+    for name, version in distributions.items():
         info = root / f"{name}-{version}.dist-info"
         info.mkdir(parents=True)
-        lines = ["Metadata-Version: 2.1", f"Name: {name}", f"Version: {version}"]
-        (info / "METADATA").write_text("\n".join(lines + [f"Requires-Dist: {r}" for r in requires]) + "\n",
-                                       encoding="utf-8")
-        if entry_points:
-            (info / "entry_points.txt").write_text(entry_points, encoding="utf-8")
+        (info / "METADATA").write_text(f"Metadata-Version: 2.1\nName: {name}\nVersion: {version}\n", encoding="utf-8")
     return [str(root)]
 
 
-# A stand-in setuptools.build_meta whose metadata follows the candidate's name, version and dependencies.
-_FAKE_BACKEND = textwrap.dedent('''\
-    import pathlib
-    import tomllib
+def test_install_substitute_checks_only_that_each_named_distribution_is_installed(tmp_path: Path) -> None:
+    site = _site(tmp_path / "site", {"present": "1.0", "glow_fixture": "0.0.0"})
+    (tmp_path / "requirements.txt").write_text("# fixture\npresent[extra]>=99,<100 ; python_version < '2'\n",
+                                               encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "glow-fixture"\n', encoding="utf-8")
+    run = "python -m pip install 'present>=5' -r requirements.txt -e ."
+    # The step's stated precondition is that CI's install is already present; versions, extras and markers
+    # are the caller's to match.
+    assert tool._install_check(run, tmp_path, site) == []
+    (tmp_path / "requirements.txt").write_text("absent>=1\n", encoding="utf-8")
+    assert tool._install_check(run, tmp_path, site) == ["absent"]
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "uninstalled-project"\n', encoding="utf-8")
+    assert tool._install_check(run, tmp_path, site) == ["absent", "uninstalled-project"]
+    for unreadable in ("present @ https://example.invalid/present.whl", "./present", "git+https://example.invalid/x"):
+        (tmp_path / "requirements.txt").write_text(unreadable + "\n", encoding="utf-8")
+        with pytest.raises(ValueError, match="unsupported requirement"):
+            tool._install_check(run, tmp_path, site)
+    (tmp_path / "pyproject.toml").write_text("[build-system]\nrequires = []\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="names no \\[project\\] name"):
+        tool._install_check("python -m pip install -e .", tmp_path, site)
+    # Nothing beyond the [project] name is read, so a pyproject.toml change elsewhere cannot break the replay.
+    (tmp_path / "pyproject.toml").write_text('[build-system]\nbuild-backend = "other"\n[project]\n'
+                                             'name = "glow-fixture"\nversion = "9"\n[tool.setuptools]\nx = 1\n',
+                                             encoding="utf-8")
+    assert tool._install_check("python -m pip install -e .", tmp_path, site) == []
+    (tmp_path / "requirements.txt").write_text("distribution-that-is-not-installed\n", encoding="utf-8")
+    outcome, detail = tool._substitute({"run": "python -m pip install -r requirements.txt"}, "reason", tmp_path,
+                                       "3.12", "3.12")
+    assert outcome == "failure" and detail == ("TOOLING the caller's environment lacks distributions the install "
+                                               "step names: distribution-that-is-not-installed")
 
 
-    def prepare_metadata_for_build_editable(directory, config_settings=None):
-        project = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["project"]
-        info = pathlib.Path(directory, f"{project['name']}-{project['version']}.dist-info")
-        info.mkdir()
-        lines = ["Metadata-Version: 2.1", f"Name: {project['name']}", f"Version: {project['version']}"]
-        lines += [f"Requires-Dist: {requirement}" for requirement in project.get("dependencies", [])]
-        (info / "METADATA").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
-        (info / "entry_points.txt").write_text(
-            "[console_scripts]\\nprojcli = proj.cli : main\\n[pytest11]\\nplug = proj.plug\\n", encoding="utf-8")
-        return info.name
-''')
+def test_the_real_install_step_names_only_installed_distributions() -> None:
+    step = next(s for s in tool.replay_steps(WORKFLOW.read_text(encoding="utf-8"))[1]
+                if s["name"] == "Install applicable validation dependencies")
+    outcome, detail = tool._substitute(step, "reason", ROOT, "3.12", "3.12")
+    assert outcome == "success", detail
+    assert detail.startswith("reason: every distribution the step names is installed")
 
-
-def test_install_substitute_follows_extras_dependencies_and_the_editable_project(tmp_path: Path) -> None:
-    copy = tmp_path / "copy"
-    (copy / "nested").mkdir(parents=True)
-    (copy / "requirements.txt").write_text("alpha[fast, slow]>=1.0  # comment\n-r nested/more.txt\n", encoding="utf-8")
-    (copy / "nested/more.txt").write_text("epsilon \\\n  >=1\n", encoding="utf-8")
-    (copy / "pyproject.toml").write_text(textwrap.dedent("""\
-        [build-system]
-        requires = ["setuptools>=68", "wheel"]
-        build-backend = "setuptools.build_meta"
-        [project]
-        name = "proj"
-        version = "0.2.0"
-        description = "A project"
-        readme = "README.md"
-        requires-python = ">=3.8"
-        dependencies = ["beta>=1"]
-        [project.scripts]
-        projcli = "proj.cli:main"
-        [project.entry-points.pytest11]
-        plug = "proj.plug"
-        [tool.setuptools.packages.find]
-        where = ["."]
-        include = ["engine*", "adapter*", "presenter*", "catalog*", "math*"]
-        [tool.setuptools.package-data]
-        catalog = ["*.json"]
-        math = ["*.json"]
-    """), encoding="utf-8")
-    (copy / "README.md").write_text("# proj\n", encoding="utf-8")
-    run = "python -m pip install -r requirements.txt -e ."
-    requires = ["beta>=2.0", 'gamma==1.*; extra == "fast"', 'zeta; extra == "slow"', 'delta; python_version < "3.0"']
-    broken = _site(tmp_path / "broken", {
-        "alpha": ("1.0", requires, ""),
-        "beta": ("1.5", [], ""),
-        "epsilon": ("1.0", [], ""),
-        "proj": ("0.1.0", [], "[console_scripts]\nprojcli = proj.old:main\n"),
-        "setuptools": ("84.0.0", [], ""),
-    })
-    assert tool._install_check(run, copy, broken) == [
-        "beta 1.5 (needs >=2.0; required by alpha)",
-        "gamma (not installed; required by alpha)",
-        "proj 0.1.0 (the candidate declares version 0.2.0)",
-        "proj build-backend setuptools.build_meta (not importable)",
-        "proj console_scripts {'projcli': 'proj.old:main'} (the candidate declares {'projcli': 'proj.cli:main'})",
-        "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})",
-        "wheel (not installed; required by proj's build-system)",
-        "zeta (not installed; required by alpha)",
-    ]
-    fixed = _site(tmp_path / "fixed", {
-        "alpha": ("1.0", requires, ""),
-        "beta": ("2.1", [], ""),
-        "gamma": ("1.4", [], ""),
-        "zeta": ("0.1", [], ""),
-        "epsilon": ("1.0", [], ""),
-        "proj": ("0.2.0", ["beta>=1"], "[console_scripts]\nprojcli = proj.cli : main\n[pytest11]\nplug = proj.plug\n"),
-        "setuptools": ("84.0.0", [], ""),
-        "wheel": ("0.45.0", [], ""),
-    })
-    (tmp_path / "fixed/setuptools").mkdir()
-    (tmp_path / "fixed/setuptools/__init__.py").write_text("", encoding="utf-8")
-    (tmp_path / "fixed/setuptools/build_meta.py").write_text(_FAKE_BACKEND, encoding="utf-8")
-    info = tmp_path / "fixed/proj-0.2.0.dist-info"
-    (info / "INSTALLER").write_text("pip\n", encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == []
-    pyproject = (copy / "pyproject.toml").read_text(encoding="utf-8")
-    (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"<3"'), encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == [
-        f"proj requires-python <3 (the interpreter is {platform.python_version()})"]
-    # The editable reinstall rewrites the installed version, local label included.
-    (copy / "pyproject.toml").write_text(pyproject.replace('version = "0.2.0"', 'version = "0.2.0+candidate"'),
-                                         encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == [
-        "proj 0.2.0 (the candidate declares version 0.2.0+candidate)",
-        "proj metadata METADATA line 3: installed 'Version: 0.2.0', the candidate's 'Version: 0.2.0+candidate'"]
-    # Equal under PEP 440, but the reinstalled metadata would read 0.2.
-    (copy / "pyproject.toml").write_text(pyproject.replace('version = "0.2.0"', 'version = "0.2"'), encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == [
-        "proj 0.2.0 (the candidate declares version 0.2)",
-        "proj metadata METADATA line 3: installed 'Version: 0.2.0', the candidate's 'Version: 0.2'"]
-    # The reinstall regenerates every other metadata file from the candidate too, pip's own files aside, so
-    # stale metadata is refused where the version, the entry points and the dependency closure all hold.
-    (copy / "pyproject.toml").write_text(pyproject.replace('["beta>=1"]', '["beta>=1", "epsilon>=1"]'),
-                                         encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == [
-        "proj metadata METADATA line 5: installed 'end of file', the candidate's 'Requires-Dist: epsilon>=1'"]
-    (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
-    (info / "top_level.txt").write_text("proj\n", encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == [
-        "proj metadata top_level.txt (installed; the candidate generates none)"]
-    (info / "top_level.txt").unlink()
-    metadata = (info / "METADATA").read_bytes()
-    (info / "METADATA").write_bytes(metadata.replace(b"\n", b"\r\n"))
-    assert tool._install_check(run, copy, fixed) == [
-        "proj metadata METADATA (differs from the candidate's in its line breaks)"]
-    (info / "METADATA").write_bytes(metadata)
-    entry_points = (info / "entry_points.txt").read_text(encoding="utf-8")
-    (info / "entry_points.txt").unlink()
-    assert tool._install_check(run, copy, fixed) == [
-        "proj console_scripts {} (the candidate declares {'projcli': 'proj.cli:main'})",
-        "proj metadata entry_points.txt (not installed; the candidate generates it)",
-        "proj pytest11 {} (the candidate declares {'plug': 'proj.plug'})"]
-    (info / "entry_points.txt").write_text(entry_points, encoding="utf-8")
-    (tmp_path / "fixed/setuptools/build_meta.py").write_text("", encoding="utf-8")
-    with pytest.raises(ValueError, match="the build backend did not prepare the metadata of 'proj'"):
-        tool._install_check(run, copy, fixed)
-    (tmp_path / "fixed/setuptools/build_meta.py").write_text(_FAKE_BACKEND, encoding="utf-8")
-    assert tool._install_check(run, copy, fixed) == []
-    (copy / "pyproject.toml").write_text(pyproject.replace('">=3.8"', '"> = 3"'), encoding="utf-8")
-    with pytest.raises(ValueError, match="unsupported requires-python"):
-        tool._install_check(run, copy, fixed)
-    # Only the build system the replay models is accepted: another backend, a hook object, other build
-    # requirements, a backend-path or a missing key would make CI's build differ.
-    backend, requires = 'build-backend = "setuptools.build_meta"', 'requires = ["setuptools>=68", "wheel"]'
-    for old, new in ((backend, 'build-backend = "json"'),
-                     (backend, 'build-backend = "setuptools.build_meta:no_such_backend"'),
-                     (requires, 'requires = ["setuptools>=40", "wheel"]'),
-                     (requires, requires + '\nbackend-path = ["."]'), (backend, ""), (requires, "")):
-        (copy / "pyproject.toml").write_text(pyproject.replace(old, new), encoding="utf-8")
-        with pytest.raises(ValueError, match="not the one the replay models"):
-            tool._install_check(run, copy, fixed)
-    # So is the rest of the configuration setuptools validates: an invalid value, an unmodelled key or table,
-    # a missing readme, a script without a callable, a reserved entry-point group, other setuptools settings.
-    for old, new in (('description = "A project"', "description = 123"),
-                     ('description = "A project"', 'description = "two\\nlines"'),
-                     ('description = "A project"', 'license = "MIT"'),
-                     ('readme = "README.md"', 'readme = "MISSING.md"'),
-                     ('projcli = "proj.cli:main"', 'projcli = "proj.cli"'),
-                     ("[project.entry-points.pytest11]", "[project.entry-points.console_scripts]"),
-                     ('math = ["*.json"]', 'math = ["*.txt"]'),
-                     ("[build-system]", "[dependency-groups]\ndev = []\n[build-system]")):
-        (copy / "pyproject.toml").write_text(pyproject.replace(old, new), encoding="utf-8")
-        with pytest.raises(ValueError, match="configuration the replay does not model"):
-            tool._install_check(run, copy, fixed)
-    (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
-    (copy / "setup.cfg").write_text("[metadata]\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="setup.cfg"):
-        tool._install_check(run, copy, fixed)
-    (copy / "setup.cfg").unlink()
-    # A [project] that is not a table is refused before anything reads it, and the substitute reports tooling.
-    (copy / "pyproject.toml").write_text('project = []\n[build-system]\nrequires = ["setuptools>=68", "wheel"]\n'
-                                         'build-backend = "setuptools.build_meta"\n', encoding="utf-8")
-    with pytest.raises(ValueError, match="no \\[project\\] table"):
-        tool._install_check(run, copy, fixed)
-    outcome, detail = tool._substitute({"run": run}, "reason", copy, "3.12", "3.12")
-    assert outcome == "failure" and detail.startswith("TOOLING cannot read the install step's inputs")
-    (copy / "pyproject.toml").write_text(pyproject, encoding="utf-8")
-    for unsupported in ("python -m pip install --upgrade -r requirements.txt", "make install"):
-        with pytest.raises(ValueError):
-            tool._install_check(unsupported, copy, fixed)
-    (copy / "nested/more.txt").write_text("--index-url https://example.invalid/simple\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="unsupported requirements-file option"):
-        tool._install_check(run, copy, fixed)
-
-
-def test_version_clauses_and_markers_follow_pep_440_and_508() -> None:
-    cases = [
-        ("1.0.0", "==", "1.0", True), ("1.0+local", "==", "1.0", True), ("1.0.post1", "==", "1.0", False),
-        ("9.0rc1", "<", "9.0", False), ("8.4.2", "<", "9.0", True), ("9.0.dev0", "<", "9", False),
-        ("9.0.dev0", "<", "9.0rc1", True), ("1.0.post1", ">", "1.0", False), ("1.0.post2", ">", "1.0.post1", True),
-        ("1.0+local", ">", "1.0", False), ("1.0.1", ">", "1.0", True), ("2.4", "~=", "2.3", True),
-        ("3.0", "~=", "2.3", False), ("1.4.9", "~=", "1.4.5", True), ("1.1rc1", "==", "1.1", False),
-        ("1.10", "==", "1.1", False), ("1.1.dev1", ">=", "1.1", False), ("1!1.0", ">=", "2", True),
-        ("1.0a1.dev1", "<", "1.0", False), ("0.9", "<", "1.0", True), ("1.1rc1", "==", "1.1.*", True),
-        ("1.10", "==", "1.1.*", False), ("2.0", "!=", "1.*", True), ("3.11.0", "<=", "3.11.0a6", False),
-        ("Foo-1", "===", "foo-1", True),
-    ]
-    for installed, operator, text, expected in cases:
-        assert tool._satisfies(installed, operator, text) is expected, (installed, operator, text)
-    # pip before 26 and pip 26 decide these differently; the replay refuses to guess.
-    for installed, operator, text in (("1.0.post1", ">", "1.0rc1"), ("1.0rc1", "<", "1.0.post1"),
-                                      ("1.0+local", ">", "1.0rc1"), ("1.0.post1", ">", "1.0.dev1")):
-        with pytest.raises(tool.AmbiguousClause, match="pip releases decide"):
-            tool._satisfies(installed, operator, text)
-    assert tool._parse_requirement("psycopg[binary]>=3.1,<3.3")[:3] == (
-        "psycopg", frozenset({"binary"}), [(">=", "3.1"), ("<", "3.3")])
-    assert tool._parse_requirement("eventlet (>=0.24.1) ; extra == 'eventlet'")[2] == [(">=", "0.24.1")]
-    assert tool._parse_requirement("alpha[ Fast , slow_path ]>=1")[1] == frozenset({"fast", "slow-path"})
-    assert tool._parse_requirement("alpha[ ]")[1] == frozenset()
-    # PEP 508 extras are identifiers separated by commas: pip refuses an empty element or a bad identifier.
-    for unsupported in ("x>=1.*", "x>=1,", "x==", "x~=1", "x==1.0+local", "x @ https://example.invalid/x.whl",
-                        "x[,]", "x[a,]", "x[,a]", "x[a,,b]", "x[-a]"):
-        with pytest.raises(ValueError, match="unsupported"):
-            tool._parse_requirement(unsupported)
-    with pytest.raises(ValueError, match="not a PEP 440 version"):
-        tool._parse_version("not-a-version")
-    for version, normal in (
-            ("1.0+Ubuntu-01", "1.0+ubuntu.1"), ("0.0", "0.0"), ("0.0.0", "0.0.0"), ("v01.2", "1.2"),
-            ("0!1.0-1", "1.0.post1"), ("1!2.0Alpha.3", "1!2.0a3"), ("1.0c1", "1.0rc1"), ("1.0preview2", "1.0rc2"),
-            ("1.0.post", "1.0.post0"), ("1.0r2", "1.0.post2"), ("1.0-dev", "1.0.dev0"),
-            ("1.0b2.post1.dev3", "1.0b2.post1.dev3")):
-        assert tool._normalized_version(version) == normal, version
-
-    environment = {"python_version": "3.12", "python_full_version": "3.12.3", "sys_platform": "linux",
-                   "implementation_name": "cpython", "extra": ""}
-    markers = [
-        ('python_version < "3.13"', "", True), ('python_full_version <= "3.11.0a6"', "", False),
-        ('sys_platform == "win32"', "", False), ('implementation_name != "pypy" and extra == "binary"', "binary", True),
-        ('implementation_name != "pypy" and extra == "binary"', "", False), ("'linux' in sys_platform", "", True),
-        ('(python_version >= "3.9" and sys_platform != "cygwin") and extra == "test"', "test", True),
-        ('extra == "Format_NonGPL" or python_version < "3"', "format-nongpl", True),
-    ]
-    for marker, extra, expected in markers:
-        assert tool._marker_true(tool._parse_marker(marker), {**environment, "extra": extra}) is expected, marker
-    for unsupported in ('os.name == "posix"', 'python_version <', 'python_version < "3" and'):
-        with pytest.raises(ValueError, match="unsupported marker"):
-            tool._parse_marker(unsupported)
-    for undefined in ('sys_platform ~= "linux"', 'sys_platform < "z"', 'implementation_name === "cpython"',
-                      'python_version < "abc"'):
-        with pytest.raises(ValueError, match="undefined marker comparison"):
-            tool._marker_true(tool._parse_marker(undefined), environment)
-
-
-# --------------------------------------------------------------------------
-# sweep: the coverage definition (contract G-2)
-# --------------------------------------------------------------------------
 
 def test_coverage_matches_the_binding_definition_and_the_guard_on_the_repository() -> None:
     coverage = tool.compute_coverage(ROOT)
@@ -938,6 +716,19 @@ def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
     assert metadata_directory.metadata != untracked_directory.metadata and not metadata_directory.status
     (repo / ".git" / "refs" / "empty").rmdir()
     assert tool.repository_state(repo).metadata == untracked_directory.metadata
+    # git status compares content, so a tracked file rewritten with its own bytes is seen by its identity.
+    settled = tool.repository_state(repo)
+    (repo / "data.txt").write_text("tracked\n", encoding="utf-8")
+    rewritten_tracked = tool.repository_state(repo)
+    assert rewritten_tracked.tracked != settled.tracked and rewritten_tracked.status == settled.status
+    # An object is not read, so a same-length overwrite of an unreachable one is seen by its identity too.
+    blob = subprocess.run(["git", "-C", str(repo), "hash-object", "-w", "--stdin"], input=b"unreachable\n",
+                          check=True, capture_output=True).stdout.decode().strip()
+    loose = repo / ".git" / "objects" / blob[:2] / blob[2:]
+    settled = tool.repository_state(repo)
+    loose.chmod(0o644)
+    loose.write_bytes(bytes(len(loose.read_bytes())))
+    assert tool.repository_state(repo).metadata != settled.metadata
 
 
 # --------------------------------------------------------------------------
@@ -1050,6 +841,30 @@ def test_lanes_equals_the_classifier_for_refs_and_for_given_paths(tmp_path: Path
         assert [line[len("target "):] for line in lines if line.startswith("target ")] == list(targets)
 
 
+def test_lanes_and_membership_run_the_classifier_only_in_a_throwaway_copy(tmp_path: Path) -> None:
+    repo = _clone(tmp_path / "clone")
+    # A classifier that, whenever it is loaded, writes beside itself and says where it ran.
+    classifier_file = repo / tool.CLASSIFIER_PATH
+    imports = "from pathlib import Path, PurePosixPath\n"
+    source = classifier_file.read_text(encoding="utf-8")
+    assert source.count(imports) == 1
+    classifier_file.write_text(source.replace(imports, imports + (
+        "Path(__file__).with_name('classifier-ran.txt').write_text(os.getcwd() + '\\n')\n"
+        "print('classifier ran in ' + os.getcwd())\n")), encoding="utf-8")
+    _git(repo, "commit", "--quiet", "-am", "classifier with a write on load")
+    # _run also asserts that the checkout, ignored files and .git included, is unchanged by each run.
+    for args in (("lanes", "--full"), ("lanes", "--path", "tools/ci/prepush_check.py"),
+                 ("membership", "--path", "tools/ci/prepush_check.py")):
+        result = _run(repo, *args)
+        assert result.returncode == tool.EXIT_OK, result.stdout + result.stderr
+        assert not (repo / "ci/checks/classifier-ran.txt").exists()
+    # The script form prints into the report: it ran in the throwaway copy.
+    full = _run(repo, "lanes", "--full")
+    (where,) = [line.split("classifier ran in ", 1)[1] for line in _report_lines(full.stdout, "lanes")
+                if line.startswith("classifier ran in ")]
+    assert Path(where).name == "lanes-copy" and not Path(where).resolve().is_relative_to(repo.resolve())
+
+
 def _clone_at(source: Path, commit: str, tmp_path: Path) -> Path:
     destination = tmp_path / f"at-{commit[:12]}"
     if not destination.exists():
@@ -1096,8 +911,9 @@ def test_a_report_without_its_inputs_is_a_tooling_failure(tmp_path: Path) -> Non
     repo = _synthetic(tmp_path / "bare", {"README.txt": "fixture\n"})
     result = _run(repo, "membership", "lanes", "--path", "README.txt")
     assert result.returncode == tool.EXIT_REPORT_FAILED, result.stdout + result.stderr
-    assert "lanes: TOOLING_FAILURE FileNotFoundError" in result.stdout
-    assert "membership: TOOLING_FAILURE FileNotFoundError" in result.stdout
+    for report in ("lanes", "membership"):
+        (line,) = [line for line in result.stdout.splitlines() if line.startswith(f"{report}: TOOLING_FAILURE")]
+        assert "failed in the throwaway copy" in line and "FileNotFoundError" in line
     assert "PREPUSH_CHECK_RESULT: FAIL lanes=FAIL membership=FAIL; repository unchanged" in result.stdout
 
 
@@ -1193,18 +1009,38 @@ def _replay_workflow(product_body: str) -> str:
     return "\n".join(lines)
 
 
+def _pinned_tool(tmp_path: Path, workflow: str) -> Path:
+    """A copy of the tool whose REPLAY_WORKFLOW_SHA256 is the given workflow's."""
+    source = TOOL.read_text(encoding="utf-8")
+    pin = f'REPLAY_WORKFLOW_SHA256 = "{tool.REPLAY_WORKFLOW_SHA256}"'
+    assert source.count(pin) == 1
+    copy = tmp_path / "pinned-tool" / "prepush_check.py"
+    copy.parent.mkdir()
+    copy.write_text(source.replace(pin, f'REPLAY_WORKFLOW_SHA256 = "{hashlib.sha256(workflow.encode()).hexdigest()}"'),
+                    encoding="utf-8")
+    return copy
+
+
 @pytest.mark.parametrize("product_body, ok", [("echo PRODUCT_RAN", True), ("echo PRODUCT_FAILED\nexit 1", False)],
                          ids=["green", "lane-fails"])
 def test_replay_runs_a_synthetic_workflow_in_a_throwaway_copy(tmp_path: Path, product_body: str, ok: bool) -> None:
+    workflow = _replay_workflow(product_body)
     repo = _synthetic(tmp_path / "replay", {
-        ".github/workflows/ci.yml": _replay_workflow(product_body),
+        ".github/workflows/ci.yml": workflow,
         "requirements.txt": "pytest\n",
         # A script a step calls sees only the runner variables the replay models and none of the caller's others.
         "ci/runner_env.sh": ('set -e\n'
                              'test -z "${GITHUB_SHA:-}${RUNNER_OS:-}${GITHUB_WORKSPACE:-}${AWS_SECRET_ACCESS_KEY:-}"\n'
                              'test "$GITHUB_ACTIONS/$GITHUB_EVENT_NAME" = true/pull_request\n'),
     })
-    result = _run(repo, "replay", "--full",
+    # The real tool refuses a workflow other than the one it models, before reading it.
+    refused = _run(repo, "replay", "--full")
+    assert refused.returncode == tool.EXIT_REPORT_FAILED, refused.stdout + refused.stderr
+    assert ("replay: TOOLING_FAILURE REPLAY_INVENTORY_DRIFT: the head's .github/workflows/ci.yml has SHA-256 "
+            f"{hashlib.sha256(workflow.encode()).hexdigest()}, not the modelled {tool.REPLAY_WORKFLOW_SHA256}") \
+        in refused.stdout
+    assert not any(line.startswith("replay: step ") for line in refused.stdout.splitlines())
+    result = _run(repo, "replay", "--full", tool_path=_pinned_tool(tmp_path, workflow),
                   extra_env={"GITHUB_SHA": "caller", "RUNNER_OS": "caller", "GITHUB_WORKSPACE": "/caller",
                              "AWS_SECRET_ACCESS_KEY": "aws-dummy"})
     lines = _report_lines(result.stdout, "replay")
