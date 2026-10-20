@@ -198,6 +198,12 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
         lambda text: text.replace("  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n", ""),
         lambda text: text.replace("      - '!docs/qa/**'\n", "", 1),
         lambda text: text.replace("    branches:\n      - main\n", "    branches:\n      - 'main*'\n"),
+        lambda text: text.replace("        uses: actions/checkout@v4\n",
+                                  "        id: classify\n        uses: actions/checkout@v4\n"),
+        lambda text: text.replace("        uses: actions/checkout@v4\n",
+                                  "        id: Classify\n        uses: actions/checkout@v4\n"),
+        lambda text: text.replace("        id: env_pins\n", "        id: env.pins\n"),
+        lambda text: text.replace("        id: env_pins\n", "        id: __env_pins\n"),
     ],
     ids=["renamed", "added", "unsupported-key", "checkout-ref", "checkout-submodules", "checkout-depth",
          "setup-python-input", "runner", "workflow-env", "checkout-revision", "setup-python-revision",
@@ -206,7 +212,7 @@ def test_replay_inventory_pins_every_step_of_the_ci_test_job() -> None:
          "second-job", "structured-env-value", "step-if-not-a-string", "install-condition",
          "setup-python-condition", "install-condition-removed", "run-boolean", "step-env-float",
          "permissions-scalar", "permissions-value", "name-boolean", "run-name-added", "concurrency-key-removed",
-         "pull-request-path-removed", "push-branch"],
+         "pull-request-path-removed", "push-branch", "repeated-id", "repeated-id-case", "id-form", "id-reserved"],
 )
 def test_replay_inventory_drift_is_a_tooling_failure(mutate) -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
@@ -309,6 +315,25 @@ def test_the_whole_workflow_is_one_mapping_without_repeated_keys() -> None:
     # The sweep's coverage reads the jobs through the same parse.
     with pytest.raises(tool.ToolingError, match="repeated"):
         tool.pytest_command_tokens(text + second_jobs)
+
+
+def test_tabs_in_indentation_are_refused_and_elsewhere_read_as_yaml_reads_them() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    body = "          set -euo pipefail\n"
+    for old, new in (("name: ci\n", "\tname: ci\n"), ("  contents: read\n", "\tcontents: read\n"),
+                     ("      - main\n", "    \t- main\n"), (body, "        \tset -euo pipefail\n"),
+                     ("permissions:\n", "permissions:\n \t\n")):
+        mutated = text.replace(old, new, 1)
+        assert mutated != text
+        with pytest.raises(tool.ToolingError, match="a tab in the indentation of line"):
+            tool.replay_steps(mutated)
+    with pytest.raises(tool.ToolingError, match="whitespace with a tab"):
+        tool.replay_steps(text.replace(body, body + "\t\n", 1))
+    # A tab after a block's indentation is content, and one after a key's colon separates its value.
+    assert tool.replay_steps(text.replace(body, "          \tset -euo pipefail\n", 1))[1][1]["run"].startswith(
+        "\tset -euo pipefail\n")
+    tab_separated = text.replace("  contents: read\n", "  contents:\tread\n")
+    assert len(tool.replay_steps(tab_separated)[1]) == len(tool.REPLAY_INVENTORY)
 
 
 def test_block_scalars_are_read_as_yaml_reads_them_or_refused() -> None:

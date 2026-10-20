@@ -134,6 +134,10 @@ REPLAY_INVENTORY: tuple[tuple[str, str, str], ...] = (
     ("Verify truthful applicability and clean candidate tree", REPLAY_EXECUTED, ""),
 )
 REPLAY_STEP_KEYS = frozenset({"name", "id", "if", "uses", "shell", "run", "env", "with"})
+# GitHub rejects a job whose step ids repeat.  An id outside the form it
+# documents for job ids, one beginning with "__", and two ids that differ only
+# in case are forms the replay does not model either.
+_STEP_ID_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*")
 # The keys each excluded step may carry: its substitute models exactly these.
 # The checkout has no `if`, because the copy exists before step 1 whatever a
 # condition says; no excluded step has `env` or `shell`.
@@ -460,6 +464,12 @@ def _indent(line: str) -> int:
     return len(line) - len(line.lstrip(" "))
 
 
+def _spaces_only(line: str, index: int) -> None:
+    """YAML forbids tabs in indentation, so a tab in a line's leading whitespace fails closed."""
+    if "\t" in line[:len(line) - len(line.lstrip(" \t"))]:
+        raise ToolingError(f"a tab in the indentation of line {index + 1}, which YAML forbids")
+
+
 class _Resolved(str):
     """A plain scalar that YAML 1.2's core schema reads as a null, boolean, integer or float, not a string."""
 
@@ -536,6 +546,9 @@ def _block(lines: list[str], start: int, parent_indent: int, style: str) -> tupl
         line = lines[index]
         if line.strip() and _indent(line) <= parent_indent:
             break
+        # A tab after the block's indentation is content; a line of whitespace with a tab ends the block in YAML.
+        if not line.strip() and "\t" in line:
+            raise ToolingError(f"block scalar line {index + 1} is whitespace with a tab, which is not modelled")
         if line.strip() and block_indent is None:
             block_indent = _indent(line)
         if line.strip() and block_indent is not None and _indent(line) < block_indent:
@@ -573,6 +586,7 @@ def _mapping(lines: list[str], start: int, parent_indent: int) -> tuple[dict[str
     key_indent = None
     while index < len(lines):
         line = lines[index]
+        _spaces_only(line, index)
         if not line.strip() or line.lstrip().startswith("#"):
             index += 1
             continue
@@ -610,6 +624,7 @@ def _sequence(lines: list[str], start: int, parent_indent: int) -> tuple[list[ob
     index = start
     while index < len(lines):
         line = lines[index]
+        _spaces_only(line, index)
         if not line.strip() or line.lstrip().startswith("#"):
             index += 1
             continue
@@ -1250,6 +1265,7 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
     job_variables = {key for key in job.env if _RUNNER_VARIABLE_RE.fullmatch(key)}
     if job_variables:
         raise ToolingError(f"REPLAY_INVENTORY_DRIFT: the test job's env sets runner variables {sorted(job_variables)}")
+    step_ids: set[str] = set()
     for step, (name, kind, _reason) in zip(job.steps, REPLAY_INVENTORY):
         unknown = set(step) - REPLAY_STEP_KEYS
         if unknown:
@@ -1267,6 +1283,15 @@ def replay_steps(text: str) -> tuple[Job, list[dict[str, object]]]:
         for key in ("env", "with"):
             if key in step and not (isinstance(step[key], dict) and all(_as_string(v) for v in step[key].values())):
                 raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has a {key} that is not a mapping of strings")
+        if "id" in step:
+            step_id = str(step["id"])
+            if not _STEP_ID_RE.fullmatch(step_id) or step_id.startswith("__"):
+                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} has the id {step_id!r}, a form the replay "
+                                   "does not model")
+            if step_id.lower() in step_ids:
+                raise ToolingError(f"REPLAY_INVENTORY_DRIFT: step {name!r} repeats the id {step_id!r}; GitHub requires "
+                                   "step ids to be unique")
+            step_ids.add(step_id.lower())
         if kind == REPLAY_EXCLUDED and str(step.get("if", "")).strip() != REPLAY_EXCLUDED_STEP_CONDITIONS[name]:
             raise ToolingError(f"REPLAY_INVENTORY_DRIFT: excluded step {name!r} has the condition {step.get('if')!r}, "
                                f"not the modelled {REPLAY_EXCLUDED_STEP_CONDITIONS[name]!r}")
