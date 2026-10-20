@@ -217,7 +217,20 @@
                 "$ref": "#/$defs/ti_id"
               },
               "pointer": {
-                "$ref": "#/$defs/causal_text"
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "binding": {
+                    "$ref": "#/$defs/causal_binding"
+                  },
+                  "heading": {
+                    "$ref": "#/$defs/causal_text"
+                  }
+                },
+                "required": [
+                  "binding",
+                  "heading"
+                ]
               }
             },
             "required": [

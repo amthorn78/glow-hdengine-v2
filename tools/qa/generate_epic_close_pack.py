@@ -2224,9 +2224,14 @@ PROHIBITED_CAUSAL_INPUTS = frozenset(
     }
 )
 CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
-# The one pinned requirements-table format: rows whose first cell is S followed by two or more
-# digits, as in HDE-CRD-0002's Specification (| S01 | ... |). Any other document is refused.
-REQUIREMENT_ROW_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
+# The pinned requirement-ID formats; a requirements document with none of them is refused:
+# CRD table rows as in HDE-CRD-0002's Specification (| S01 | ... |), and Epic requirement
+# paragraphs and acceptance rows as in HDE-EPIC040's (**K040-REQ-001.** and | AC040-01 — ...).
+REQUIREMENT_ID_RES = (
+    re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE),
+    re.compile(rb"^\*\*(K[0-9]{3}-REQ-[0-9]{3})\.\*\*", re.MULTILINE),
+    re.compile(rb"^\| (AC[0-9]{3}-[0-9]{2}) \xe2\x80\x94 ", re.MULTILINE),  # em dash
+)
 
 
 @dataclass(frozen=True)
@@ -2329,8 +2334,17 @@ def _token_occurs(identifier: str, payload: bytes) -> bool:
     return re.search(pattern, payload) is not None
 
 
+def _heading_occurs(heading: str, payload: bytes) -> bool:
+    pattern = rb"^#{1,6} " + re.escape(heading.encode("utf-8")) + rb"[ \t]*$"
+    return re.search(pattern, payload, re.MULTILINE) is not None
+
+
 def _requirement_ids(payload: bytes) -> frozenset[str]:
-    identifiers = frozenset(match.decode("ascii") for match in REQUIREMENT_ROW_RE.findall(payload))
+    identifiers = frozenset(
+        match.decode("ascii")
+        for pattern in REQUIREMENT_ID_RES
+        for match in pattern.findall(payload)
+    )
     if not identifiers:
         raise _fail("REQUIREMENTS_TABLE_ABSENT")
     return identifiers
@@ -2372,6 +2386,9 @@ def _require_v2_semantics(
     for item in source["later_drain_statements"]:
         referenced.extend(item["evidence_bindings"])
     referenced.extend(item["binding"] for item in source["superseded"])
+    referenced.extend(
+        item["pointer"]["binding"] for item in source["tracked_issues"] if "pointer" in item
+    )
     if "binding" in source["qa_rca"]:
         referenced.append(source["qa_rca"]["binding"])
     if any(binding not in bindings for binding in referenced):
@@ -2402,6 +2419,14 @@ def _require_v2_semantics(
         for item in source["tracked_issues"]
     ):
         raise _fail("TRACKED_ISSUE_UNBOUND")
+    if any(
+        "pointer" in item
+        and not _heading_occurs(
+            str(item["pointer"]["heading"]), bindings[str(item["pointer"]["binding"])].payload
+        )
+        for item in source["tracked_issues"]
+    ):
+        raise _fail("TRACKED_ISSUE_POINTER_UNBOUND")
 
     decision = source["closure_decision"]["decision"]
     if decision == "SATISFIED" and (
@@ -2577,7 +2602,11 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     )
     issues = [
         f"- `{item['id']}`: "
-        + (f"pointer {item['pointer']}" if "pointer" in item else f"ADR status {item['adr_status']}")
+        + (
+            f"pointer {bound(item['pointer']['binding'])}, section {item['pointer']['heading']}"
+            if "pointer" in item
+            else f"ADR status {item['adr_status']}"
+        )
         for item in source["tracked_issues"]
     ]
     lines.extend(

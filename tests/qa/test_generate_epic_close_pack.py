@@ -4324,6 +4324,7 @@ CRD_0002_REQUIREMENTS: tuple[tuple[str, str, str], ...] = (
     ('S22', "Extend the canonical evidence-index updater's CRD admission to HDE-CRD-0002's QA root", 'Before HDE-CRD-0002 enters QA, the canonical updater publishes and validates Index and Mirror entries for artifacts under `audit/qa/hde-crd-0002/`, and existing Epic and HDE-CRD-0001 inputs still publish and validate'),
 )
 CRD_SOURCE_REL = "audit/HDE-CRD-0002_close_candidate_source.json"
+EPIC_040_SPEC_REL = "docs/ephemeral/HDE-EPIC040-specification-v1.1-approved.md"
 CRD_REPORT_REL = "audit/HDE-CRD-0002_close_report.md"
 CRD_MANIFEST_REL = "audit/HDE-CRD-0002_MANIFEST.json"
 V2_NONCLAIMS = sorted(close_pack.NONCLAIM_TEXT_V2)
@@ -4618,6 +4619,45 @@ def test_v2_requirement_table_pin_reads_the_real_specification_rows() -> None:
         close_pack._requirement_ids(b"| HDE-SEPA005.1 | Corrected catalog |\nS01 in prose only.\n")
 
 
+def test_v2_requirement_pin_reads_the_real_epic_specification_requirements_and_criteria() -> None:
+    real = (ROOT / EPIC_040_SPEC_REL).read_bytes()
+    ids = close_pack._requirement_ids(real)
+    assert ids == {f"K040-REQ-{n:03d}" for n in range(1, 14)} | {f"AC040-{n:02d}" for n in range(1, 10)}
+    assert close_pack._requirement_ids("**K040-REQ-001.** A.\n| AC040-01 \u2014 B | C |\n".encode()) == {
+        "K040-REQ-001",
+        "AC040-01",
+    }
+    assert close_pack._requirement_ids(b"| S01 | a |\nSee K040-REQ-001 and AC040-01 in prose.\n") == {"S01"}
+
+
+def _epic_040_source() -> dict[str, object]:
+    source = _v2_source("HDE-EPIC040")
+    template = source["acceptance"][0]
+    ids = sorted(close_pack._requirement_ids((ROOT / EPIC_040_SPEC_REL).read_bytes()))
+    source["acceptance"] = [{**template, "criterion_id": requirement_id} for requirement_id in ids]
+    return source
+
+
+def test_v2_epic_close_binds_the_real_epic_specification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path, _epic_040_source())
+    (repo / "plans/specification.md").write_bytes((ROOT / EPIC_040_SPEC_REL).read_bytes())
+    _commit_all(repo, "bind the real HDE-EPIC040 specification")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / "audit/EPIC-040_close_report.md").read_text(encoding="utf-8")
+    assert "- `K040-REQ-013`: MET; evidence" in report
+    assert "- `AC040-09`: MET; evidence" in report
+
+    source = _epic_040_source()
+    source["acceptance"] = [i for i in source["acceptance"] if i["criterion_id"] != "AC040-09"]
+    repo, source_rel = _init_v2_repo(tmp_path / "omitted", source)
+    (repo / "plans/specification.md").write_bytes((ROOT / EPIC_040_SPEC_REL).read_bytes())
+    _commit_all(repo, "bind the real HDE-EPIC040 specification")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REQUIREMENT_COVERAGE_INCOMPLETE"
+
+
 def test_v2_not_satisfied_may_cover_part_of_the_requirements(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -4633,9 +4673,18 @@ def test_v2_tracked_issue_pointer_needs_no_drain_target(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     source = _v2_source()
-    source["tracked_issues"] = [{"id": "TI-009", "pointer": "docs/PF09.md Subtask 3 closure"}]
+    source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "QA report"}}]
     repo, source_rel = _init_v2_repo(tmp_path, source)
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+    assert "- `TI-009`: pointer `qa_report` (`evidence/qa_report.md`), section QA report" in report
+
+
+def test_v2_tracked_issue_pointer_must_be_a_bound_path_and_heading() -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    source = _v2_source()
+    source["tracked_issues"] = [{"id": "TI-009", "pointer": "Closed"}]
+    assert not Draft202012Validator(schema).is_valid(source)
 
 
 def _mutate(source: dict[str, object], case: str) -> None:
@@ -4664,6 +4713,10 @@ def _mutate(source: dict[str, object], case: str) -> None:
         source["acceptance"].pop()
     elif case == "requirements_document_without_table":
         source["requirements_binding"] = "qa_report"
+    elif case == "tracked_issue_pointer_heading_absent":
+        source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "Subtask 9"}}]
+    elif case == "tracked_issue_pointer_binding_unresolved":
+        source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "absent", "heading": "QA report"}}]
     elif case == "ledger_not_bound":
         source["evidence_inputs"] = [
             item for item in source["evidence_inputs"] if item["binding"] != "doc_deltas"
@@ -4685,6 +4738,8 @@ def _mutate(source: dict[str, object], case: str) -> None:
         ("adr_tracked_issue_not_in_drain_targets", "TRACKED_ISSUE_UNBOUND"),
         ("satisfied_omits_a_requirement", "REQUIREMENT_COVERAGE_INCOMPLETE"),
         ("requirements_document_without_table", "REQUIREMENTS_TABLE_ABSENT"),
+        ("tracked_issue_pointer_heading_absent", "TRACKED_ISSUE_POINTER_UNBOUND"),
+        ("tracked_issue_pointer_binding_unresolved", "BINDING_UNRESOLVED"),
         ("ledger_not_bound", "OUTPUT_BINDING_MISMATCH"),
     ),
 )
