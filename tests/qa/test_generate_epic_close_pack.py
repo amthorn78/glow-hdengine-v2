@@ -5028,6 +5028,8 @@ def test_v2_qa_ledger_entries_must_agree_with_their_tracked_primaries(
     if case == "primary_untracked":
         _git(repo, "rm", "-q", "--cached", _primary_rel("HDE-CRD-0002"))
         primary.unlink()
+        primary.parent.rmdir()
+        primary.parent.parent.rmdir()
     elif case == "primary_status_disagrees":
         primary.write_text(_primary_text("FAIL_BEHAVIOR"), encoding="utf-8")
     elif case == "primary_not_pf27_v2":
