@@ -2270,9 +2270,6 @@ IMPLEMENTATION_PLAN_RE = re.compile(
     r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
     r"-implementation-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
 )
-# A tracked-issue pointer names a heading in the change kind's register (PO-35-8).
-EPIC_REGISTER_RE = re.compile(r"docs/pfcanon/PF09\.[0-9]+-Canon-HDE-Build-Checklist-[A-Za-z]+-v[0-9.]+\.md\Z")
-CRD_REGISTER_RE = re.compile(r"docs/pfcanon/PF30\.[0-9]+-Canon-HDE-CRD-Records-v[0-9.]+\.md\Z")
 
 
 @dataclass(frozen=True)
@@ -2374,11 +2371,6 @@ def _token_occurs(identifier: str, payload: bytes) -> bool:
         + rb"(?![A-Za-z0-9-])(?!\.[A-Za-z0-9])"
     )
     return re.search(pattern, payload) is not None
-
-
-def _heading_occurs(heading: str, payload: bytes) -> bool:
-    pattern = rb"^#{1,6} " + re.escape(heading.encode("utf-8")) + rb"[ \t]*$"
-    return re.search(pattern, payload, re.MULTILINE) is not None
 
 
 def _qa_ledger(payload: bytes, directory: str) -> dict[str, dict[str, str]]:
@@ -2563,9 +2555,6 @@ def _require_v2_semantics(
     for item in source["later_drain_statements"]:
         referenced.extend(item["evidence_bindings"])
     referenced.extend(item["binding"] for item in source["superseded"])
-    referenced.extend(
-        item["pointer"]["binding"] for item in source["tracked_issues"] if "pointer" in item
-    )
     for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", []):
         referenced.extend(gap["evidence_bindings"])
     if "binding" in source["qa_rca"]:
@@ -2596,23 +2585,9 @@ def _require_v2_semantics(
     # The ledger names every deferral's ID, in both forms (PO-35-7).
     if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["deferrals"]):
         raise _fail("DEFERRAL_UNBOUND")
-    if any(
-        "adr_status" in item and not _token_occurs(str(item["id"]), drain_targets)
-        for item in source["tracked_issues"]
-    ):
+    # A TI item maps only through an ADR status whose ID the ledger names (PO-35-11).
+    if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["tracked_issues"]):
         raise _fail("TRACKED_ISSUE_UNBOUND")
-    register = CRD_REGISTER_RE if crd else EPIC_REGISTER_RE
-    if any(
-        "pointer" in item
-        and (
-            register.match(bindings[str(item["pointer"]["binding"])].rel) is None
-            or not _heading_occurs(
-                str(item["pointer"]["heading"]), bindings[str(item["pointer"]["binding"])].payload
-            )
-        )
-        for item in source["tracked_issues"]
-    ):
-        raise _fail("TRACKED_ISSUE_POINTER_UNBOUND")
     qa_statuses = _qa_ledger_statuses(
         next(
             snapshot.payload
@@ -2817,16 +2792,8 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         "they are not prerequisites, required checks, acceptance conditions or "
         "blockers of this close."
     )
-    # HDE Governance's literal canon-pointer fields for a TI item.
-    issues = [
-        (
-            f"- {item['id']} pointers: {bound(item['pointer']['binding'])}, "
-            f"section {item['pointer']['heading']}"
-            if "pointer" in item
-            else f"- {item['id']} ADR status line: {item['adr_status']}"
-        )
-        for item in source["tracked_issues"]
-    ]
+    # HDE Governance's literal `ADR status line:` field for a TI item (PO-35-11).
+    issues = [f"- {item['id']} ADR status line: {item['adr_status']}" for item in source["tracked_issues"]]
     lines.extend(
         section("Tracked-issue closeout mapping", issues, "No TI item is cited by this change.")
     )

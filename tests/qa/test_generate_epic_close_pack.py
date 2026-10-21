@@ -4367,15 +4367,7 @@ def _plan_rel(change_id: str) -> str:
 
 
 CRD_REGISTER_REL = "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v0.9.1.md"
-CRD_REGISTER_HEADING = "**4.2 Material update**"
 EPIC_REGISTER_REL = "docs/pfcanon/PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md"
-EPIC_REGISTER_HEADING = "**Subtask HDE-FERM001.3 — Observability & log posture (SAFE rails)**"
-
-
-def _register_pointer(source: dict[str, object], rel: str, heading: str) -> None:
-    """Map TI-009 to a heading in a bound register file (PO-35-8)."""
-    source["evidence_inputs"].append({"binding": "register", "path": rel})
-    source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "register", "heading": heading}}]
 
 
 def _requirement_rows(change_id: str) -> list[tuple[str, str, str]]:
@@ -4820,32 +4812,32 @@ def test_v2_not_satisfied_may_cover_part_of_the_requirements(
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
 
 
-def test_v2_tracked_issue_pointer_needs_no_drain_target(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize(
+    ("change_id", "register_rel"),
+    (("HDE-EPIC041", EPIC_REGISTER_REL), ("HDE-CRD-0002", CRD_REGISTER_REL)),
+)
+def test_v2_tracked_issue_maps_only_through_an_adr_status(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    change_id: str,
+    register_rel: str,
 ) -> None:
-    source = _v2_source()
-    _register_pointer(source, CRD_REGISTER_REL, CRD_REGISTER_HEADING)
-    repo, source_rel = _init_v2_repo(tmp_path, source)
+    # PO-35-11: no register cites a TI ID, so a register pointer cannot show a TI's closure;
+    # a TI item maps only through an ADR status whose ID the drain-targets ledger names.
+    repo, source_rel = _init_v2_repo(tmp_path / "adr", _v2_source(change_id))
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
-    report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
-    assert f"- TI-009 pointers: `register` (`{CRD_REGISTER_REL}`), section {CRD_REGISTER_HEADING}" in report
+    report_rel = close_pack._derived_paths_v2(change_id)[0]
+    assert "- TI-002 ADR status line: Deferred with drain targets" in (repo / report_rel).read_text(encoding="utf-8")
 
-
-def test_v2_epic_tracked_issue_pointer_resolves_in_the_real_build_checklist(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    source = _v2_source("HDE-EPIC041")
-    _register_pointer(source, EPIC_REGISTER_REL, EPIC_REGISTER_HEADING)
-    repo, source_rel = _init_v2_repo(tmp_path / "pf09", source)
-    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
-    report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
-    assert f"- TI-009 pointers: `register` (`{EPIC_REGISTER_REL}`), section {EPIC_REGISTER_HEADING}" in report
-
-    source = _v2_source("HDE-EPIC041")
-    _register_pointer(source, CRD_REGISTER_REL, CRD_REGISTER_HEADING)
-    repo, source_rel = _init_v2_repo(tmp_path / "pf30", source)
+    # CX7-15: a pointer to the register's real "0.1 Header" heading is refused.
+    source = _v2_source(change_id)
+    source["evidence_inputs"].append({"binding": "register", "path": register_rel})
+    source["tracked_issues"] = [{"id": "TI-002", "pointer": {"binding": "register", "heading": "0.1 Header"}}]
+    repo, source_rel = _init_v2_repo(tmp_path / "pointer", source)
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
-    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:TRACKED_ISSUE_POINTER_UNBOUND"
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"
+    assert not (repo / close_pack._derived_paths_v2(change_id)[0]).exists()
 
 
 @pytest.mark.parametrize(
@@ -4878,10 +4870,19 @@ def test_v2_plan_path_must_be_the_changes_current_implementation_plan(
         assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
 
 
-def test_v2_tracked_issue_pointer_must_be_a_bound_path_and_heading() -> None:
+@pytest.mark.parametrize(
+    "item",
+    (
+        {"id": "TI-009", "pointer": "Closed"},
+        {"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "QA report"}},
+        {"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "QA report"}, "adr_status": "Deferred"},
+        {"id": "TI-009"},
+    ),
+)
+def test_v2_schema_admits_only_the_adr_status_form_of_a_tracked_issue(item: dict[str, object]) -> None:
     schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
     source = _v2_source()
-    source["tracked_issues"] = [{"id": "TI-009", "pointer": "Closed"}]
+    source["tracked_issues"] = [item]
     assert not Draft202012Validator(schema).is_valid(source)
 
 
@@ -5361,12 +5362,6 @@ def _mutate(source: dict[str, object], case: str) -> None:
         source["acceptance"].pop()
     elif case == "requirements_source_not_a_specification":
         source["requirements_binding"] = "qa_report"
-    elif case == "tracked_issue_pointer_heading_absent":
-        _register_pointer(source, CRD_REGISTER_REL, "Subtask 9")
-    elif case == "tracked_issue_pointer_not_a_register":
-        source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "QA report"}}]
-    elif case == "tracked_issue_pointer_other_kinds_register":
-        _register_pointer(source, EPIC_REGISTER_REL, EPIC_REGISTER_HEADING)
     elif case == "drain_target_deferral_not_in_drain_targets":
         source["deferrals"][1]["id"] = "DEF-8"
     elif case == "pointer_file_unresolved":
@@ -5375,8 +5370,6 @@ def _mutate(source: dict[str, object], case: str) -> None:
         source["pointers"].append("evidence/absent/")
     elif case == "plan_not_an_implementation_plan":
         source["plan_path"] = CRD_REGISTER_REL
-    elif case == "tracked_issue_pointer_binding_unresolved":
-        source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "absent", "heading": "QA report"}}]
     elif case == "ledger_not_bound":
         source["evidence_inputs"] = [
             item for item in source["evidence_inputs"] if item["binding"] != "doc_deltas"
@@ -5398,14 +5391,10 @@ def _mutate(source: dict[str, object], case: str) -> None:
         ("adr_tracked_issue_not_in_drain_targets", "TRACKED_ISSUE_UNBOUND"),
         ("satisfied_omits_a_requirement", "REQUIREMENT_COVERAGE_INCOMPLETE"),
         ("requirements_source_not_a_specification", "REQUIREMENTS_SOURCE_NOT_CURRENT"),
-        ("tracked_issue_pointer_heading_absent", "TRACKED_ISSUE_POINTER_UNBOUND"),
-        ("tracked_issue_pointer_not_a_register", "TRACKED_ISSUE_POINTER_UNBOUND"),
-        ("tracked_issue_pointer_other_kinds_register", "TRACKED_ISSUE_POINTER_UNBOUND"),
         ("drain_target_deferral_not_in_drain_targets", "DEFERRAL_UNBOUND"),
         ("pointer_file_unresolved", "POINTER_UNRESOLVED"),
         ("pointer_directory_unresolved", "POINTER_UNRESOLVED"),
         ("plan_not_an_implementation_plan", "PLAN_SOURCE_NOT_CURRENT"),
-        ("tracked_issue_pointer_binding_unresolved", "BINDING_UNRESOLVED"),
         ("ledger_not_bound", "OUTPUT_BINDING_MISMATCH"),
     ),
 )
