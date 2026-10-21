@@ -325,6 +325,7 @@ def _assert_only_symlink_atime_may_differ(
             continue
         assert current[:2] == prior[:2]
         assert current[3:] == prior[3:]
+        assert current[2] >= prior[2]
         if require_change:
             assert current[2] != prior[2]
 
@@ -1132,12 +1133,12 @@ def test_complete_candidate_lifecycle_is_committable_exact_and_idempotent(
         MANIFEST_REL: _metadata(repo / MANIFEST_REL),
     }
     assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--write") == 0
-    assert (repo / REPORT_REL).read_bytes() == first_report
-    assert (repo / MANIFEST_REL).read_bytes() == first_manifest
     assert before == {
         REPORT_REL: _metadata(repo / REPORT_REL),
         MANIFEST_REL: _metadata(repo / MANIFEST_REL),
     }
+    assert (repo / REPORT_REL).read_bytes() == first_report
+    assert (repo / MANIFEST_REL).read_bytes() == first_manifest
     assert _git(repo, "diff", "--exit-code") == ""
     assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
 
@@ -1415,20 +1416,30 @@ def test_unrelated_clean_tracked_symlink_preserves_terminal_reachability(
     link.symlink_to("target-one")
     _git(repo, "add", "tracked-link")
     _git(repo, "commit", "-m", "add unrelated tracked symlink")
-    symlink_atime_before_write = link.lstat().st_atime_ns
+    # Reading the link's target is the writer's one metadata exemption: `readlink` has no
+    # no-atime flag, so the link's atime may advance (always under strictatime).
+    link_before_write = {"tracked-link": close_pack._repository_metadata(repo)["tracked-link"]}
 
     assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--write") == 0
-    assert link.lstat().st_atime_ns == symlink_atime_before_write
+    _assert_only_symlink_atime_may_differ(
+        link_before_write,
+        {"tracked-link": close_pack._repository_metadata(repo)["tracked-link"]},
+        "tracked-link",
+        require_change=False,
+    )
     _git(repo, "add", REPORT_REL, MANIFEST_REL)
     _git(repo, "commit", "-m", "commit complete candidate")
     index_path = repo / ".git/index"
     index_before_check = _read_noatime(index_path)
     index_metadata_before_check = _metadata(index_path)
     repository_before_check = close_pack._repository_metadata(repo)
-    symlink_atime_before_check = link.lstat().st_atime_ns
     assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--check") == 0
-    assert link.lstat().st_atime_ns == symlink_atime_before_check
-    assert close_pack._repository_metadata(repo) == repository_before_check
+    _assert_only_symlink_atime_may_differ(
+        repository_before_check,
+        close_pack._repository_metadata(repo),
+        "tracked-link",
+        require_change=False,
+    )
     assert _read_noatime(index_path) == index_before_check
     assert _metadata(index_path) == index_metadata_before_check
 
@@ -1704,10 +1715,6 @@ def test_both_staged_outputs_are_verified_before_any_canonical_install(
 ) -> None:
     repo = _init_repo(tmp_path)
     old_report, old_manifest = _generate_and_commit(repo, monkeypatch)
-    old_metadata = {
-        REPORT_REL: _metadata(repo / REPORT_REL),
-        MANIFEST_REL: _metadata(repo / MANIFEST_REL),
-    }
     source = _valid_source()
     source["report_sections"][0]["body_lines"].append(
         "Recovery requires a fresh derivation from tracked inputs."
@@ -1715,6 +1722,11 @@ def test_both_staged_outputs_are_verified_before_any_canonical_install(
     _write_json(repo / SOURCE_REL, source)
     _git(repo, "add", SOURCE_REL)
     _git(repo, "commit", "-m", "advance candidate source")
+    # After the test's own git steps, which may re-read racy outputs and so move their atime.
+    old_metadata = {
+        REPORT_REL: _metadata(repo / REPORT_REL),
+        MANIFEST_REL: _metadata(repo / MANIFEST_REL),
+    }
 
     installed: list[str] = []
     original_install = close_pack._install_staged_output
@@ -2163,7 +2175,13 @@ def test_recovery_cleanup_refuses_git_identity_drift_before_mutation(
         assert root == repo
         assert residues
         if drift == "same_tree_head":
-            _git(repo, "commit", "--allow-empty", "-m", "inject same-tree head drift")
+            # Plumbing: unlike `git commit`, it refreshes no index entry, so it reads no
+            # worktree file and leaves the protected outputs' atime alone.
+            head = _git(repo, "rev-parse", "HEAD")
+            drifted = _git(
+                repo, "commit-tree", f"{head}^{{tree}}", "-p", head, "-m", "inject same-tree head drift"
+            )
+            _git(repo, "update-ref", "HEAD", drifted)
         else:
             _append_checksum_valid_index_extension(repo, b"DRFT")
         injected_head = _git(repo, "rev-parse", "HEAD")
@@ -2926,15 +2944,16 @@ def test_publication_failure_restores_previous_pair_and_leaves_no_temp_residue(
 ) -> None:
     repo = _init_repo(tmp_path)
     old_report, old_manifest = _generate_and_commit(repo, monkeypatch)
-    old_metadata = {
-        REPORT_REL: _metadata(repo / REPORT_REL),
-        MANIFEST_REL: _metadata(repo / MANIFEST_REL),
-    }
     source = _valid_source()
     source["report_sections"][0]["body_lines"].append("Candidate publication uses the manifest as its commit point.")
     _write_json(repo / SOURCE_REL, source)
     _git(repo, "add", SOURCE_REL)
     _git(repo, "commit", "-m", "change tracked candidate source")
+    # After the test's own git steps, which may re-read racy outputs and so move their atime.
+    old_metadata = {
+        REPORT_REL: _metadata(repo / REPORT_REL),
+        MANIFEST_REL: _metadata(repo / MANIFEST_REL),
+    }
 
     original = close_pack._install_staged_output
     calls = 0
