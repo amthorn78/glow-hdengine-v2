@@ -2191,15 +2191,15 @@ MANIFEST_SCHEMA_VERSION_V2 = "close_candidate_manifest.v2"
 CHANGE_RE = re.compile(r"HDE-(?:EPIC(?P<epic>[0-9]{3})|CRD-(?P<crd>[0-9]{4,}))\Z")
 QA_RAILS_HEADING = "QA Rails — Open/Close (Final PR)"
 # PO closeout is the Product Owner's own action, which a close pack supports but never performs
-# (Change Process Guide; PO-35-14), so the writer states only these two postures.
+# (Change Process Guide; PO-35-14). Nor can a close pack prove its own formal completion before
+# its close PR merges, so its decision is review-trace-only (PO-35-20).
 DECISION_POSTURE_TEXT = {
-    "formal_close_pack_completion": "formal close-pack completion",
     "review_trace_only": "review-trace-only",
 }
 # HDE Governance's "No over-claim rule": a close pack implies none of these (A9, PO-35-15).
 NONCLAIM_FIXED_V2 = (
-    "This close pack establishes no merge provenance, board state, PO closeout, Isis terminal "
-    "closure decision or formal Ops action."
+    "This close pack establishes no formal close-pack completion, merge provenance, board state, "
+    "PO closeout, Isis terminal closure decision or formal Ops action."
 )
 NONCLAIM_TEXT_V2 = {
     "no_canon_drainage_or_register_movement": (
@@ -2278,6 +2278,20 @@ QA_PLAN_RE = re.compile(
     r"-QA50-qa-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
 )
 QA_PLAN_CHECK_RE = re.compile(rb"^### CHECK ([0-9]+) `([a-z0-9][a-z0-9._-]*)`", re.MULTILINE)
+# Plan Templates gives each check a "Surface / D-goal mapping:" line naming the criteria it
+# proves; "A to B" names the IDs between A and B (PO-35-21).
+QA_PLAN_SECTION_END_RE = re.compile(rb"^#{1,3} ", re.MULTILINE)
+QA_PLAN_MAPPING_RE = re.compile(rb"^Surface / D-goal mapping:(.*)$", re.MULTILINE)
+QA_PLAN_RANGE_RE = re.compile(
+    rb"(?<![A-Za-z0-9.-])([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*) to ([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)"
+)
+# The authorized decision is the change's own current QA report, as HDE-EPIC040's QA-120 report
+# is: front matter with artifact_type QA_REPORT, the change's ID and a verdict (PO-35-20).
+QA_REPORT_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-QA120-qa-report-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
+)
+QA_REPORT_FIELD_RE = re.compile(rb"^(artifact_type|change_id|verdict): (.*?)[ \t]*$", re.MULTILINE)
 # HDE Governance's coverage statuses, from the QA ledger's PF27 statuses.
 COVERAGE_STATUS = {
     "PASS": "PASS",
@@ -2433,6 +2447,58 @@ def _qa_plan_checks(payload: bytes) -> list[str]:
     ):
         raise _fail("QA_PLAN_STEPS_ABSENT")
     return checks
+
+
+def _qa_plan_mapping(payload: bytes, requirement_ids: frozenset[str]) -> dict[str, frozenset[str]]:
+    # Each planned check's criteria: the requirement IDs its section's first mapping line names,
+    # whole or inside an "A to B" range of one prefix and width.
+    headings = list(QA_PLAN_CHECK_RE.finditer(payload))
+    mapping: dict[str, frozenset[str]] = {}
+    for index, heading in enumerate(headings):
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(payload)
+        section_end = QA_PLAN_SECTION_END_RE.search(payload, heading.end(), end)
+        section = payload[heading.end() : section_end.start() if section_end else end]
+        found = QA_PLAN_MAPPING_RE.search(section)
+        line = found.group(1) if found else b""
+        named = {identifier for identifier in requirement_ids if _token_occurs(identifier, line)}
+        for low, high in QA_PLAN_RANGE_RE.findall(line):
+            start = re.fullmatch(rb"(.*?)([0-9]+)", low)
+            stop = re.fullmatch(rb"(.*?)([0-9]+)", high)
+            if start is None or stop is None or start[1] != stop[1] or len(start[2]) != len(stop[2]):
+                continue
+            for identifier in requirement_ids:
+                member = re.fullmatch(rb"(.*?)([0-9]+)", identifier.encode("ascii"))
+                if (
+                    member is not None
+                    and member[1] == start[1]
+                    and len(member[2]) == len(start[2])
+                    and int(start[2]) <= int(member[2]) <= int(stop[2])
+                ):
+                    named.add(identifier)
+        mapping[heading.group(2).decode("ascii")] = frozenset(named)
+    return mapping
+
+
+def _qa_report_verdict(payload: bytes, change_id: str) -> str:
+    # The QA report's front matter, between its opening "---" line and the next one, carries
+    # artifact_type QA_REPORT, the change's own ID and a verdict, each exactly once.
+    lines = payload.split(b"\n")
+    if not lines or lines[0].rstrip(b"\r") != b"---" or b"---" not in (
+        line.rstrip(b"\r") for line in lines[1:]
+    ):
+        raise _fail("QA_REPORT_INVALID")
+    front = b"\n".join(lines[1 : [line.rstrip(b"\r") for line in lines].index(b"---", 1)])
+    fields: dict[bytes, list[bytes]] = {}
+    for key, value in QA_REPORT_FIELD_RE.findall(front):
+        fields.setdefault(key, []).append(value)
+    if (
+        any(len(fields.get(key, [])) != 1 for key in (b"artifact_type", b"change_id", b"verdict"))
+        or fields[b"artifact_type"][0] != b"QA_REPORT"
+        or fields[b"change_id"][0] != change_id.encode("ascii")
+        or not fields[b"verdict"][0]
+    ):
+        raise _fail("QA_REPORT_INVALID")
+    return fields[b"verdict"][0].decode("ascii")
 
 
 def _qa_coverage_v2(
@@ -2655,7 +2721,11 @@ def _require_v2_semantics(
     ):
         raise _fail("POINTER_UNRESOLVED")
 
-    referenced = [str(source["requirements_binding"]), str(source["qa_plan_binding"])]
+    referenced = [
+        str(source["requirements_binding"]),
+        str(source["qa_plan_binding"]),
+        str(source["qa_report_binding"]),
+    ]
     referenced.extend(
         item["drain_target"]["binding"] for item in source["deferrals"] if "drain_target" in item
     )
@@ -2679,6 +2749,12 @@ def _require_v2_semantics(
     qa_plan = bindings[str(source["qa_plan_binding"])]
     if qa_plan.rel != _current_version(QA_PLAN_RE, change_id, tracked):
         raise _fail("QA_PLAN_NOT_CURRENT")
+    # The authorized decision is the change's current QA report (Change Process Guide 3.5.2.1;
+    # PO-35-20).
+    qa_report = bindings[str(source["qa_report_binding"])]
+    if qa_report.rel != _current_version(QA_REPORT_RE, change_id, tracked):
+        raise _fail("QA_REPORT_NOT_CURRENT")
+    verdict = _qa_report_verdict(qa_report.payload, change_id)
     # A separate QA RCA uses the canonical audit/<prefix>_QA_RCA.md (Change Process Guide 0.4.1.2).
     if "binding" in source["qa_rca"] and bindings[str(source["qa_rca"]["binding"])].rel != (
         report_path.removesuffix("_close_report.md") + "_QA_RCA.md"
@@ -2759,6 +2835,7 @@ def _require_v2_semantics(
     decision = source["closure_decision"]["decision"]
     if decision == "SATISFIED" and (
         source["follow_ups"]
+        or verdict != "PASS"
         or any(item["result"] != "MET" for item in source["acceptance"])
         or any(impact == "blocks a SATISFIED decision" for _, _, impact in coverage)
     ):
@@ -2767,6 +2844,28 @@ def _require_v2_semantics(
         raise _fail("REQUIREMENT_COVERAGE_INCOMPLETE")
     if decision == "NOT SATISFIED" and not source["follow_ups"]:
         raise _fail("DECISION_CONTRADICTION")
+    # A MET criterion binds the primary of a check that the QA ledger records as PASS and whose
+    # plan mapping names the criterion (Change Process Guide 3.5.2.1; PO-35-21). An accepted gap
+    # is not PASS evidence (Change Process Guide 3.5.4, "No posture-only PASS").
+    mapping = _qa_plan_mapping(qa_plan.payload, requirement_ids)
+    passing = {
+        entry["log_path"]: check
+        for check, entry in _qa_ledger(
+            next(s.payload for s in bindings.values() if s.rel == supporting["qa_step_logs_manifest"]),
+            change_id.lower(),
+        ).items()
+        if entry["status"] == "PASS"
+    }
+    if any(
+        item["result"] == "MET"
+        and not any(
+            bindings[binding].rel in passing
+            and str(item["criterion_id"]) in mapping.get(passing[bindings[binding].rel], frozenset())
+            for binding in item["evidence_bindings"]
+        )
+        for item in source["acceptance"]
+    ):
+        raise _fail("ACCEPTANCE_EVIDENCE_UNBOUND")
 
 
 def _load_model_v2(
@@ -2911,6 +3010,10 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         f"Requirement source: {bound(str(source['requirements_binding']))}. Each "
         "criterion is bound to that document by its ID, and the document by its "
         "digest under Source bindings; criterion text is not copied.",
+        "",
+        f"Authorized decision: the QA report {bound(str(source['qa_report_binding']))}, verdict "
+        f"`{_qa_report_verdict(bindings[str(source['qa_report_binding'])].payload, str(source['change_id']))}`. "
+        "Each MET criterion binds the primary of a PASS check whose QA plan mapping names it.",
         "",
     ]
     for item in source["acceptance"]:

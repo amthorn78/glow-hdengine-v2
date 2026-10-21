@@ -4377,6 +4377,23 @@ def _qa_plan_rel(change_id: str) -> str:
     return f"docs/ephemeral/{change_id}-QA50-qa-plan-v1.0.md"
 
 
+def _qa_report_rel(change_id: str) -> str:
+    return f"docs/ephemeral/{change_id}-QA120-qa-report-v1.0.md"
+
+
+def _qa_report_text(change_id: str, verdict: str = "PASS") -> str:
+    # The front matter of a final QA report, as HDE-EPIC040's QA-120 report carries it.
+    return (
+        f"---\nartifact_type: QA_REPORT\nartifact_id: {change_id}-QA120-QA-REPORT\n"
+        f"verdict: {verdict}\nchange_id: {change_id}\n---\n\n# Final QA report\n"
+    )
+
+
+def _qa_plan_text(criteria: list[str], check: str = "qa-01-setup") -> str:
+    mapping = "; ".join(criteria) or "none"
+    return f"# QA plan\n\n### CHECK 1 `{check}`: Setup\n\nSurface / D-goal mapping: {mapping}.\n"
+
+
 def _rca_rel(change_id: str) -> str:
     return close_pack._derived_paths_v2(change_id)[0].removesuffix("_close_report.md") + "_QA_RCA.md"
 
@@ -4465,15 +4482,18 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
             {"binding": "qa_manifest", "path": ledgers["qa_step_logs_manifest"]},
             {"binding": "qa_report", "path": "evidence/qa_report.md"},
             {"binding": "qa_plan", "path": _qa_plan_rel(change_id)},
+            {"binding": "qa_verdict", "path": _qa_report_rel(change_id)},
+            {"binding": "qa_primary", "path": _primary_rel(change_id)},
             {"binding": "qa_rca", "path": _rca_rel(change_id)},
             {"binding": "register", "path": _register(change_id)[0]},
         ],
         "requirements_binding": "specification",
         "qa_plan_binding": "qa_plan",
+        "qa_report_binding": "qa_verdict",
         "acceptance": [
             {
                 "criterion_id": requirement_id,
-                "evidence_bindings": ["qa_manifest", "qa_report"],
+                "evidence_bindings": ["qa_manifest", "qa_primary"],
                 "result": "MET",
                 "limitation": "None",
             }
@@ -4512,7 +4532,7 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
                 }
             ]
         },
-        "closure_decision": {"decision": "SATISFIED", "posture": "formal_close_pack_completion"},
+        "closure_decision": {"decision": "SATISFIED", "posture": "review_trace_only"},
         "follow_ups": [],
         "superseded": [],
         "pointers": pointers,
@@ -4537,7 +4557,9 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
         if not (repo / "docs/pfcanon" / path.name).exists():
             (repo / "docs/pfcanon" / path.name).write_text("PF title placeholder.\n", encoding="utf-8")
     files = {
-        _qa_plan_rel(change_id): "# QA plan\n\n### CHECK 1 `qa-01-setup`: Setup\n",
+        # The plan's one check maps every criterion the source names (PO-35-21).
+        _qa_plan_rel(change_id): _qa_plan_text([str(item["criterion_id"]) for item in source["acceptance"]]),
+        _qa_report_rel(change_id): _qa_report_text(change_id),
         _rca_rel(change_id): "# QA RCA\n\nRoot causes recorded.\n",
         _plan_rel(change_id): "# Plan\n\nTracked plan.\n",
         _spec_rel(change_id): _specification_text(change_id),
@@ -4613,7 +4635,7 @@ def test_v2_crd_dry_run_writes_complete_close_pack_and_check_is_read_only(
     for pointer in _v2_source()["pointers"]:
         assert f"- `{pointer}`" in report
     assert "- Closure decision: SATISFIED" in report
-    assert "- Decision posture: formal close-pack completion" in report
+    assert "- Decision posture: review-trace-only" in report
     for requirement_id, _, _ in CRD_0002_REQUIREMENTS:
         assert f"- `{requirement_id}`: MET; evidence" in report
     assert "- `DEF-1`: ADR status Deferred; rationale:" in report
@@ -4963,6 +4985,9 @@ def test_v2_qa_ledger_is_read_before_any_decision(
     source["closure_decision"]["decision"] = decision
     if decision == "NOT SATISFIED":
         source["follow_ups"] = ["Rerun qa-01-setup to PASS before closure."]
+        # A failed check supports no MET criterion (PO-35-21).
+        for item in source["acceptance"]:
+            item["result"] = "NOT_MET"
     repo, source_rel = _init_v2_repo(tmp_path, source)
     rel = _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]
     (repo / rel).write_text(ledger or _qa_ledger_text("HDE-CRD-0002", "FAIL_BEHAVIOR"), encoding="utf-8")
@@ -4980,7 +5005,7 @@ def test_v2_qa_ledger_is_read_before_any_decision(
 def test_v2_report_renders_the_adr_block_and_literal_tracked_issue_fields(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    source = _v2_source()
+    source = _bind_proof_check(_v2_source())
     source["adr_block"]["closure_override"] = {
         "label": "Accepted QA proof gap",
         "accepted_gaps": [
@@ -4993,11 +5018,7 @@ def test_v2_report_renders_the_adr_block_and_literal_tracked_issue_fields(
         ],
     }
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    (repo / _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]).write_text(
-        _qa_ledger_text("HDE-CRD-0002", "TOOLING_BLOCKED"), encoding="utf-8"
-    )
-    (repo / _primary_rel("HDE-CRD-0002")).write_text(_primary_text("TOOLING_BLOCKED"), encoding="utf-8")
-    _commit_all(repo, "the QA check is tooling-blocked, under the closure override")
+    _write_proof_check(repo, source, "TOOLING_BLOCKED")
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
     block = report.split("## ADR block\n\n", 1)[1].split("\n\n## ", 1)[0].splitlines()
@@ -5194,13 +5215,18 @@ def test_v2_report_and_manifest_bind_each_qa_primary(
 def test_v2_qa_ledger_entries_must_agree_with_their_tracked_primaries(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], case: str
 ) -> None:
-    repo, source_rel = _init_v2_repo(tmp_path)
+    if case == "primary_untracked":
+        # The MET rows rest on a second check, so the source does not bind the untracked primary.
+        source = _bind_proof_check(_v2_source())
+        repo, source_rel = _init_v2_repo(tmp_path, source)
+        _write_proof_check(repo, source, "PASS")
+    else:
+        repo, source_rel = _init_v2_repo(tmp_path)
     primary = repo / _primary_rel("HDE-CRD-0002")
     if case == "primary_untracked":
         _git(repo, "rm", "-q", "--cached", _primary_rel("HDE-CRD-0002"))
         primary.unlink()
         primary.parent.rmdir()
-        primary.parent.parent.rmdir()
     elif case == "primary_status_disagrees":
         primary.write_text(_primary_text("FAIL_BEHAVIOR"), encoding="utf-8")
     elif case == "primary_not_pf27_v2":
@@ -5341,6 +5367,47 @@ def _write_and_commit(repo: Path, files: dict[str, str], message: str) -> None:
     _commit_all(repo, message)
 
 
+PROOF_CHECK = "qa-02-proof"
+
+
+def _bind_proof_check(source: dict[str, object]) -> dict[str, object]:
+    # The MET rows bind a second check's primary instead of qa-01-setup's.
+    change_id = str(source["change_id"])
+    source["evidence_inputs"] = [
+        *(item for item in source["evidence_inputs"] if item["binding"] != "qa_primary"),
+        {"binding": "qa_proof", "path": _primary_rel(change_id, PROOF_CHECK)},
+    ]
+    for item in source["acceptance"]:
+        item["evidence_bindings"] = ["qa_manifest", "qa_proof"]
+    return source
+
+
+def _write_proof_check(repo: Path, source: dict[str, object], first_status: str) -> None:
+    # qa-01-setup in the given status, and a PASS qa-02-proof whose mapping names every criterion.
+    change_id = str(source["change_id"])
+    directory = change_id.lower()
+    ledger = {
+        check: {"check_id": check, "log_path": _primary_rel(change_id, check), "status": status}
+        for check, status in (("qa-01-setup", first_status), (PROOF_CHECK, "PASS"))
+    }
+    criteria = "; ".join(str(item["criterion_id"]) for item in source["acceptance"])
+    _write_and_commit(
+        repo,
+        {
+            _qa_plan_rel(change_id): (
+                "# QA plan\n\n### CHECK 1 `qa-01-setup`: Setup\n\n"
+                f"### CHECK 2 `{PROOF_CHECK}`: Proof\n\nSurface / D-goal mapping: {criteria}.\n"
+            ),
+            f"audit/qa/{directory}/qa_step_logs_manifest.json": (
+                json.dumps(ledger, sort_keys=True, separators=(",", ":")) + "\n"
+            ),
+            _primary_rel(change_id): _primary_text(first_status, change_id=change_id),
+            _primary_rel(change_id, PROOF_CHECK): _primary_text("PASS", check=PROOF_CHECK, change_id=change_id),
+        },
+        "a second, passing check proves the criteria",
+    )
+
+
 def _gap(check_id: str) -> dict[str, object]:
     return {
         "check_id": check_id,
@@ -5371,19 +5438,13 @@ def test_v2_closure_override_exempts_only_the_tooling_blocked_check_it_names(
     code: str | None,
 ) -> None:
     # PO-35-13 (Change Process Guide 3.5.4, "Closure override" and "No posture-only PASS").
-    source = _v2_source()
+    source = _bind_proof_check(_v2_source())
     if gaps:
         source["adr_block"]["closure_override"] = {"label": "Accepted QA proof gap", "accepted_gaps": [_gap(g) for g in gaps]}
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    if status != "PASS":
-        _write_and_commit(
-            repo,
-            {
-                _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]: _qa_ledger_text("HDE-CRD-0002", status),
-                _primary_rel("HDE-CRD-0002"): _primary_text(status),
-            },
-            "the QA check under test",
-        )
+    # qa-01-setup is the check under test; a second, PASS check proves the criteria, because an
+    # accepted gap is not PASS evidence (PO-35-21).
+    _write_proof_check(repo, source, status)
     if code is None:
         assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
@@ -5437,9 +5498,10 @@ def test_v2_coverage_ledger_follows_the_current_qa_plan(
         source["qa_plan_binding"] = "qa_report"
     repo, source_rel = _init_v2_repo(tmp_path, source)
     plan = _qa_plan_rel("HDE-CRD-0002")
+    mapped = _qa_plan_text([str(item["criterion_id"]) for item in source["acceptance"]])
     texts = {
-        "planned_not_run_satisfied": "### CHECK 1 `qa-01-setup`: Setup\n### CHECK 2 `qa-02-writer`: Writer\n",
-        "planned_not_run_not_satisfied": "### CHECK 1 `qa-01-setup`: Setup\n### CHECK 2 `qa-02-writer`: Writer\n",
+        "planned_not_run_satisfied": mapped + "### CHECK 2 `qa-02-writer`: Writer\n",
+        "planned_not_run_not_satisfied": mapped + "### CHECK 2 `qa-02-writer`: Writer\n",
         "unplanned_ledger_check": "### CHECK 1 `qa-02-writer`: Writer\n",
         "plan_without_checks": "# QA plan\n\nNo checks are listed.\n",
         "plan_numbers_out_of_order": "### CHECK 2 `qa-01-setup`: Setup\n",
@@ -5697,6 +5759,146 @@ def test_v2_an_external_qa_rca_is_the_canonical_rca_file(
         return
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("verdict_pass", None),
+        ("verdict_fail_not_satisfied", None),
+        ("verdict_fail_satisfied", "DECISION_CONTRADICTION"),
+        ("formal_posture", "SOURCE_SCHEMA_INVALID"),
+        ("not_a_qa_report", "QA_REPORT_INVALID"),
+        ("another_change", "QA_REPORT_INVALID"),
+        ("no_front_matter", "QA_REPORT_INVALID"),
+        ("verdict_twice", "QA_REPORT_INVALID"),
+        ("later_version_tracked", "QA_REPORT_NOT_CURRENT"),
+        ("binding_not_a_qa_report", "QA_REPORT_NOT_CURRENT"),
+    ),
+)
+def test_v2_satisfied_needs_the_current_qa_report_verdict(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str | None,
+) -> None:
+    # CX7-20, PO-35-20 (Change Process Guide 3.5.2.1, "authorized decision").
+    source = _v2_source()
+    if case == "verdict_fail_not_satisfied":
+        source["closure_decision"]["decision"] = "NOT SATISFIED"
+        source["follow_ups"] = ["Rerun QA to a PASS verdict before closure."]
+    elif case == "formal_posture":
+        source["closure_decision"]["posture"] = "formal_close_pack_completion"
+    elif case == "binding_not_a_qa_report":
+        source["qa_report_binding"] = "qa_report"
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    report_rel = _qa_report_rel("HDE-CRD-0002")
+    texts = {
+        "verdict_fail_not_satisfied": _qa_report_text("HDE-CRD-0002", "FAIL"),
+        "verdict_fail_satisfied": _qa_report_text("HDE-CRD-0002", "FAIL"),
+        "not_a_qa_report": _qa_report_text("HDE-CRD-0002").replace("QA_REPORT\n", "QA_INTERIM_STATUS\n", 1),
+        "another_change": _qa_report_text("HDE-CRD-0002").replace("change_id: HDE-CRD-0002", "change_id: HDE-CRD-0003"),
+        "no_front_matter": "# Final QA report\n\nverdict: PASS\n",
+        "verdict_twice": _qa_report_text("HDE-CRD-0002").replace("verdict: PASS\n", "verdict: FAIL\nverdict: PASS\n"),
+    }
+    if case in texts:
+        _write_and_commit(repo, {report_rel: texts[case]}, "the QA report under test")
+    elif case == "later_version_tracked":
+        _write_and_commit(
+            repo,
+            {"docs/ephemeral/HDE-CRD-0002-QA120-qa-report-v1.1.md": _qa_report_text("HDE-CRD-0002")},
+            "a later QA report version",
+        )
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        verdict = "FAIL" if case == "verdict_fail_not_satisfied" else "PASS"
+        assert (
+            f"Authorized decision: the QA report `qa_verdict` (`{report_rel}`), verdict `{verdict}`." in report
+        )
+        assert "- Decision posture: review-trace-only" in report
+        assert "formal close-pack completion" not in close_pack.DECISION_POSTURE_TEXT.values()
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+def test_v2_qa_report_verdict_reads_the_real_epic040_report() -> None:
+    payload = (ROOT / "docs/ephemeral/HDE-EPIC040-QA120-qa-report-v1.0.md").read_bytes()
+    assert close_pack.QA_REPORT_RE.fullmatch("docs/ephemeral/HDE-EPIC040-QA120-qa-report-v1.0.md")
+    assert close_pack._qa_report_verdict(payload, "HDE-EPIC040") == "PASS"
+    with pytest.raises(close_pack.ClosePackError, match="QA_REPORT_INVALID"):
+        close_pack._qa_report_verdict(payload, "HDE-EPIC041")
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("mapped_pass_check", None),
+        ("mapped_by_range", None),
+        ("not_met_needs_no_check", None),
+        ("specification_only", "ACCEPTANCE_EVIDENCE_UNBOUND"),
+        ("unrelated_input", "ACCEPTANCE_EVIDENCE_UNBOUND"),
+        ("check_does_not_map_the_criterion", "ACCEPTANCE_EVIDENCE_UNBOUND"),
+        ("mapped_check_not_pass", "ACCEPTANCE_EVIDENCE_UNBOUND"),
+    ),
+)
+def test_v2_met_criteria_bind_a_mapped_passing_check(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str | None,
+) -> None:
+    # CX7-21, PO-35-21 (Change Process Guide 3.5.2.1, "relied-upon checks or governed evidence";
+    # Plan Templates, "Surface / D-goal mapping:").
+    source = _v2_source()
+    criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
+    if case in ("specification_only", "not_met_needs_no_check"):
+        source["acceptance"][0]["evidence_bindings"] = ["specification"]
+    elif case == "unrelated_input":
+        source["acceptance"][0]["evidence_bindings"] = ["qa_manifest", "qa_report"]
+    if case in ("not_met_needs_no_check", "mapped_check_not_pass"):
+        source["closure_decision"]["decision"] = "NOT SATISFIED"
+        source["follow_ups"] = ["Bind a passing check before closure."]
+    if case == "not_met_needs_no_check":
+        source["acceptance"][0]["result"] = "NOT_MET"
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    plan_rel = _qa_plan_rel("HDE-CRD-0002")
+    if case == "mapped_by_range":
+        _write_and_commit(repo, {plan_rel: _qa_plan_text([f"{criteria[0]} to {criteria[-1]}"])}, "a range")
+    elif case == "check_does_not_map_the_criterion":
+        _write_and_commit(repo, {plan_rel: _qa_plan_text(criteria[1:])}, "the first criterion unmapped")
+    elif case == "mapped_check_not_pass":
+        _write_and_commit(
+            repo,
+            {
+                _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]: _qa_ledger_text("HDE-CRD-0002", "FAIL_BEHAVIOR"),
+                _primary_rel("HDE-CRD-0002"): _primary_text("FAIL_BEHAVIOR"),
+            },
+            "the mapped check failed",
+        )
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+def test_v2_qa_plan_mapping_reads_the_real_epic040_plan() -> None:
+    ids = close_pack._requirement_ids((ROOT / EPIC_040_SPEC_REL).read_bytes(), "HDE-EPIC040")
+    plan = (ROOT / "docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md").read_bytes()
+    mapping = close_pack._qa_plan_mapping(plan, ids)
+    assert list(mapping)[0] == "d0-discovery" and mapping["d0-discovery"] == frozenset()
+    # "K040-REQ-003 to K040-REQ-006" is read as a range.
+    assert mapping["ac040-02-03-catalog-config"] == {
+        "AC040-02", "AC040-03", "K040-REQ-003", "K040-REQ-004", "K040-REQ-005", "K040-REQ-006"
+    }
+    # The two documentary requirements map to no check, so this plan cannot support their MET rows.
+    assert ids - frozenset().union(*mapping.values()) == {"K040-REQ-001", "K040-REQ-002"}
 
 
 _DRAINS = "# Drain targets\n\n- DEF-1: close-pack canon\n- DEF-2: close-pack canon\n- TI-002: close-pack canon\n"

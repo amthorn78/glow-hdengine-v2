@@ -43,6 +43,9 @@
     "qa_plan_binding": {
       "$ref": "#/$defs/causal_binding"
     },
+    "qa_report_binding": {
+      "$ref": "#/$defs/causal_binding"
+    },
     "acceptance": {
       "type": "array",
       "items": {
@@ -312,8 +315,7 @@
         },
         "posture": {
           "enum": [
-            "review_trace_only",
-            "formal_close_pack_completion"
+            "review_trace_only"
           ]
         }
       },
@@ -435,6 +437,7 @@
     "evidence_inputs",
     "requirements_binding",
     "qa_plan_binding",
+    "qa_report_binding",
     "acceptance",
     "deliverables",
     "allocation",
