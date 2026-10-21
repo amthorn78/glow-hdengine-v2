@@ -2190,11 +2190,17 @@ SOURCE_SCHEMA_VERSION_V2 = "close_candidate_source.v2"
 MANIFEST_SCHEMA_VERSION_V2 = "close_candidate_manifest.v2"
 CHANGE_RE = re.compile(r"HDE-(?:EPIC(?P<epic>[0-9]{3})|CRD-(?P<crd>[0-9]{4,}))\Z")
 QA_RAILS_HEADING = "QA Rails — Open/Close (Final PR)"
+# PO closeout is the Product Owner's own action, which a close pack supports but never performs
+# (Change Process Guide; PO-35-14), so the writer states only these two postures.
 DECISION_POSTURE_TEXT = {
     "formal_close_pack_completion": "formal close-pack completion",
-    "po_closeout": "PO closeout",
     "review_trace_only": "review-trace-only",
 }
+# HDE Governance's "No over-claim rule": a close pack implies none of these (A9, PO-35-15).
+NONCLAIM_FIXED_V2 = (
+    "This close pack establishes no merge provenance, board state, PO closeout, Isis terminal "
+    "closure decision or formal Ops action."
+)
 NONCLAIM_TEXT_V2 = {
     "no_canon_drainage_or_register_movement": (
         "No PF-Canon drainage and no PF09 or PF30 status movement is performed by "
@@ -2264,6 +2270,30 @@ PRIMARY_NONCLAIM = "token_claim_posture: intended tokens are recorded but not cl
 APPROVED_SPECIFICATION_RE = re.compile(
     r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
     r"-specification-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)-approved\.md\Z"
+)
+# The QA plan is the change's own current QA plan, whose checks are its "### CHECK <n> `<id>`"
+# headings in plan order, as in HDE-EPIC040's (PO-35-18).
+QA_PLAN_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-QA50-qa-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
+)
+QA_PLAN_CHECK_RE = re.compile(rb"^### CHECK ([0-9]+) `([a-z0-9][a-z0-9._-]*)`", re.MULTILINE)
+# HDE Governance's coverage statuses, from the QA ledger's PF27 statuses.
+COVERAGE_STATUS = {
+    "PASS": "PASS",
+    "FAIL_BEHAVIOR": "FAIL",
+    "FAIL_TOOLING": "FAIL",
+    "TOOLING_BLOCKED": "BLOCKED",
+    "PARKED": "BLOCKED",
+}
+# A deferral's drain target names a heading in the change kind's register (PO-35-17).
+EPIC_REGISTER_RE = re.compile(r"docs/pfcanon/PF09\.[0-9]+-Canon-HDE-Build-Checklist-[A-Za-z]+-v[0-9.]+\.md\Z")
+CRD_REGISTER_RE = re.compile(r"docs/pfcanon/PF30\.[0-9]+-Canon-HDE-CRD-Records-v[0-9.]+\.md\Z")
+# A PF title is a tracked PF-Canon file's name, after its PF number and kind and before its
+# version, hyphens read as spaces and "&" as "and" (PO-35-16).
+PF_DOCUMENT_RE = re.compile(
+    r"docs/pfcanon/PF[0-9]{2}(?:\.[0-9]+)?-(?:(?:Canon|Reference)-)?"
+    r"(?P<name>[A-Za-z0-9&'-]+?)-?v[0-9]+(?:\.[0-9]+)*\.md\Z"
 )
 # The plan is the change's own current implementation plan (PO-35-9).
 IMPLEMENTATION_PLAN_RE = re.compile(
@@ -2371,6 +2401,72 @@ def _token_occurs(identifier: str, payload: bytes) -> bool:
         + rb"(?![A-Za-z0-9-])(?!\.[A-Za-z0-9])"
     )
     return re.search(pattern, payload) is not None
+
+
+def _heading_occurs(heading: str, payload: bytes) -> bool:
+    pattern = rb"^#{1,6} " + re.escape(heading.encode("utf-8")) + rb"[ \t]*$"
+    return re.search(pattern, payload, re.MULTILINE) is not None
+
+
+def _pf_title_key(title: str) -> str:
+    return title.replace("-", " ").replace(" & ", " and ")
+
+
+def _pf_titles(tracked_paths: Iterable[str]) -> frozenset[str]:
+    return frozenset(
+        _pf_title_key(match["name"])
+        for rel in tracked_paths
+        if (match := PF_DOCUMENT_RE.fullmatch(rel))
+    )
+
+
+def _qa_plan_checks(payload: bytes) -> list[str]:
+    # Plan order; the numbers run 1, 2, 3, ... and each check ID appears once.
+    found = QA_PLAN_CHECK_RE.findall(payload)
+    checks = [check.decode("ascii") for _, check in found]
+    if (
+        not found
+        or [int(number) for number, _ in found] != list(range(1, len(found) + 1))
+        or len(checks) != len(set(checks))
+    ):
+        raise _fail("QA_PLAN_STEPS_ABSENT")
+    return checks
+
+
+def _qa_coverage_v2(
+    source: Mapping[str, Any], bindings: Mapping[str, FileSnapshot]
+) -> list[tuple[str, str, str]]:
+    # HDE Governance's coverage ledger: every planned check in plan order, its coverage status
+    # and its closeout impact (PO-35-18). A TOOLING_BLOCKED check is an accepted gap only when
+    # exactly one closure-override gap names it (PO-35-13).
+    change_id = str(source["change_id"])
+    supporting = _supporting_paths_v2(change_id)
+    ledger = _qa_ledger(
+        next(s.payload for s in bindings.values() if s.rel == supporting["qa_step_logs_manifest"]),
+        change_id.lower(),
+    )
+    planned = _qa_plan_checks(bindings[str(source["qa_plan_binding"])].payload)
+    if not set(ledger) <= set(planned):
+        raise _fail("QA_COVERAGE_INVALID")
+    gaps = [
+        str(gap["check_id"])
+        for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", [])
+    ]
+    if len(gaps) != len(set(gaps)) or any(
+        ledger.get(check, {}).get("status") != "TOOLING_BLOCKED" for check in gaps
+    ):
+        raise _fail("CLOSURE_OVERRIDE_INVALID")
+    coverage = []
+    for check in planned:
+        status = ledger[check]["status"] if check in ledger else None
+        if status == "PASS":
+            impact = "closure gate met"
+        elif check in gaps:
+            impact = "accepted gap under the closure override"
+        else:
+            impact = "blocks a SATISFIED decision"
+        coverage.append((check, COVERAGE_STATUS.get(str(status), "NOT_RUN"), impact))
+    return coverage
 
 
 def _states_line(payload: bytes, line: bytes) -> bool:
@@ -2557,7 +2653,10 @@ def _require_v2_semantics(
     ):
         raise _fail("POINTER_UNRESOLVED")
 
-    referenced = [str(source["requirements_binding"])]
+    referenced = [str(source["requirements_binding"]), str(source["qa_plan_binding"])]
+    referenced.extend(
+        item["drain_target"]["binding"] for item in source["deferrals"] if "drain_target" in item
+    )
     for item in source["acceptance"]:
         referenced.extend(item["evidence_bindings"])
     for item in source["later_drain_statements"]:
@@ -2575,6 +2674,34 @@ def _require_v2_semantics(
         raise _fail("REQUIREMENTS_SOURCE_NOT_CURRENT")
     if source["plan_path"] != _current_version(IMPLEMENTATION_PLAN_RE, change_id, tracked):
         raise _fail("PLAN_SOURCE_NOT_CURRENT")
+    qa_plan = bindings[str(source["qa_plan_binding"])]
+    if qa_plan.rel != _current_version(QA_PLAN_RE, change_id, tracked):
+        raise _fail("QA_PLAN_NOT_CURRENT")
+    # A separate QA RCA uses the canonical audit/<prefix>_QA_RCA.md (Change Process Guide 0.4.1.2).
+    if "binding" in source["qa_rca"] and bindings[str(source["qa_rca"]["binding"])].rel != (
+        report_path.removesuffix("_close_report.md") + "_QA_RCA.md"
+    ):
+        raise _fail("QA_RCA_UNBOUND")
+    # Every PF title names a tracked PF-Canon document (Change Process Guide 3.5.4; PO-35-16).
+    titles = [
+        *(home for item in source["later_drain_statements"] for home in item["canon_homes"]),
+        *(
+            title
+            for decision in source["adr_block"]["decisions"]
+            for title in (*decision["bounding_canon"], *decision["doc_delta_targets"])
+        ),
+        *(
+            title
+            for gap in source["adr_block"].get("closure_override", {}).get("accepted_gaps", [])
+            for title in gap["drain_targets"]
+        ),
+    ]
+    known_titles = _pf_titles(tracked)
+    if any(_pf_title_key(str(title)) not in known_titles for title in titles):
+        raise _fail("PF_TITLE_UNKNOWN")
+    # Every deliverable is allocated to the slice that closed it (HDE Governance; PO-35-19).
+    if set(source["deliverables"]) != {str(item["deliverable"]) for item in source["allocation"]}:
+        raise _fail("ALLOCATION_INCOMPLETE")
     requirement_ids = _requirement_ids(requirements.payload, change_id)
     criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
     if len(criteria) != len(set(criteria)):
@@ -2593,6 +2720,20 @@ def _require_v2_semantics(
     # The ledger names every deferral's ID, in both forms (PO-35-7).
     if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["deferrals"]):
         raise _fail("DEFERRAL_UNBOUND")
+    # A drain-target pointer names a heading in the change kind's register (PO-35-17).
+    register = CRD_REGISTER_RE if crd else EPIC_REGISTER_RE
+    if any(
+        "drain_target" in item
+        and (
+            register.match(bindings[str(item["drain_target"]["binding"])].rel) is None
+            or not _heading_occurs(
+                str(item["drain_target"]["heading"]),
+                bindings[str(item["drain_target"]["binding"])].payload,
+            )
+        )
+        for item in source["deferrals"]
+    ):
+        raise _fail("DEFERRAL_POINTER_UNBOUND")
     # A TI item maps only through an ADR status whose ID the ledger names (PO-35-11).
     if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["tracked_issues"]):
         raise _fail("TRACKED_ISSUE_UNBOUND")
@@ -2611,20 +2752,13 @@ def _require_v2_semantics(
     nothing_drains = not source["deferrals"] and not source["tracked_issues"]
     if _states_line(drain_targets, b"Drain Targets: None") != nothing_drains:
         raise _fail("DRAIN_TARGETS_INVALID")
-    qa_statuses = _qa_ledger_statuses(
-        next(
-            snapshot.payload
-            for snapshot in bindings.values()
-            if snapshot.rel == supporting["qa_step_logs_manifest"]
-        ),
-        change_id.lower(),
-    )
+    coverage = _qa_coverage_v2(source, bindings)
 
     decision = source["closure_decision"]["decision"]
     if decision == "SATISFIED" and (
         source["follow_ups"]
         or any(item["result"] != "MET" for item in source["acceptance"])
-        or any(status != "PASS" for status in qa_statuses)
+        or any(impact == "blocks a SATISFIED decision" for _, _, impact in coverage)
     ):
         raise _fail("DECISION_CONTRADICTION")
     if decision == "SATISFIED" and not requirement_ids <= set(criteria):
@@ -2785,15 +2919,49 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
         )
     lines.extend(
         section(
+            "Coverage versus the QA plan",
+            [
+                f"QA plan: {bound(str(source['qa_plan_binding']))}. Each planned check, in plan "
+                "order, with its QA ledger status as a coverage status and its closeout impact.",
+                "",
+                *(
+                    f"- {number}. `{check}`: {status}; closeout impact: {impact}"
+                    for number, (check, status, impact) in enumerate(
+                        _qa_coverage_v2(source, bindings), start=1
+                    )
+                ),
+            ],
+            "None.",
+        )
+    )
+    lines.extend(
+        section(
             "Delivered scope",
             [f"- {item}" for item in source["deliverables"]],
             "None.",
         )
     )
+    lines.extend(
+        section(
+            "PR-to-deliverable allocation",
+            [f"- `{item['slice']}`: {item['deliverable']}" for item in source["allocation"]],
+            "None.",
+        )
+    )
+    lines.extend(
+        section(
+            "Reuse boundary",
+            [f"- {item}" for item in source["reuse_boundary"]],
+            "None recorded.",
+        )
+    )
     deferrals = []
     for item in source["deferrals"]:
         if "drain_target" in item:
-            deferrals.append(f"- `{item['id']}`: drain target {item['drain_target']}")
+            deferrals.append(
+                f"- `{item['id']}`: drain target {bound(item['drain_target']['binding'])}, "
+                f"section {item['drain_target']['heading']}"
+            )
         else:
             deferrals.append(
                 f"- `{item['id']}`: ADR status {item['adr_status']}; rationale: "
@@ -2843,7 +3011,7 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     if override is not None:
         adr_lines.append(f"- ADR — Closure override: {override['label']}")
         adr_lines.extend(
-            f"  - Accepted gap: {gap['gap']}; evidence basis "
+            f"  - Accepted gap `{gap['check_id']}`: {gap['gap']}; evidence basis "
             f"{', '.join(bound(binding) for binding in gap['evidence_bindings'])}; "
             f"drain targets {'; '.join(gap['drain_targets'])}"
             for gap in override["accepted_gaps"]
@@ -2916,6 +3084,7 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
     nonclaim_codes = sorted(source["nonclaims"])
     lines.extend(("", "## Explicit nonclaims", ""))
     lines.extend(f"- {NONCLAIM_TEXT_V2[code]}" for code in nonclaim_codes)
+    lines.append(f"- {NONCLAIM_FIXED_V2}")
     report = ("\n".join(lines) + "\n").encode("utf-8")
 
     manifest = {

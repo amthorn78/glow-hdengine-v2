@@ -4367,7 +4367,21 @@ def _plan_rel(change_id: str) -> str:
 
 
 CRD_REGISTER_REL = "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v0.9.1.md"
+CRD_REGISTER_HEADING = "**4.2 Material update**"
 EPIC_REGISTER_REL = "docs/pfcanon/PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md"
+EPIC_REGISTER_HEADING = "**Subtask HDE-FERM001.3 — Observability & log posture (SAFE rails)**"
+
+
+def _qa_plan_rel(change_id: str) -> str:
+    return f"docs/ephemeral/{change_id}-QA50-qa-plan-v1.0.md"
+
+
+def _rca_rel(change_id: str) -> str:
+    return close_pack._derived_paths_v2(change_id)[0].removesuffix("_close_report.md") + "_QA_RCA.md"
+
+
+def _register(change_id: str) -> tuple[str, str]:
+    return (CRD_REGISTER_REL, CRD_REGISTER_HEADING) if "CRD" in change_id else (EPIC_REGISTER_REL, EPIC_REGISTER_HEADING)
 
 
 def _requirement_rows(change_id: str) -> list[tuple[str, str, str]]:
@@ -4449,8 +4463,12 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
             {"binding": "drain_targets", "path": ledgers["drain_targets"]},
             {"binding": "qa_manifest", "path": ledgers["qa_step_logs_manifest"]},
             {"binding": "qa_report", "path": "evidence/qa_report.md"},
+            {"binding": "qa_plan", "path": _qa_plan_rel(change_id)},
+            {"binding": "qa_rca", "path": _rca_rel(change_id)},
+            {"binding": "register", "path": _register(change_id)[0]},
         ],
         "requirements_binding": "specification",
+        "qa_plan_binding": "qa_plan",
         "acceptance": [
             {
                 "criterion_id": requirement_id,
@@ -4461,9 +4479,11 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
             for requirement_id, _, _ in _requirement_rows(change_id)
         ],
         "deliverables": ["The close-pack writer accepts Epic and CRD identities."],
+        "allocation": [{"slice": "WU-PR-07", "deliverable": "The close-pack writer accepts Epic and CRD identities."}],
+        "reuse_boundary": [],
         "deferrals": [
             {"id": "DEF-1", "adr_status": "Deferred", "rationale": "Drains with the close-pack ADR."},
-            {"id": "DEF-2", "drain_target": "HDE Schemas and Artifacts 1.2 Close-pack artifacts"},
+            {"id": "DEF-2", "drain_target": {"binding": "register", "heading": _register(change_id)[1]}},
         ],
         "later_drain_statements": [
             {
@@ -4495,7 +4515,7 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
         "follow_ups": [],
         "superseded": [],
         "pointers": pointers,
-        "qa_rca": {"binding": "qa_report"},
+        "qa_rca": {"binding": "qa_rca"},
         "key_outputs": {"close_report": report, "close_manifest": manifest, **ledgers},
         "nonclaims": list(V2_NONCLAIMS),
     }
@@ -4511,7 +4531,13 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
     for rel in (CRD_REGISTER_REL, EPIC_REGISTER_REL):
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / rel, repo / rel)
+    # The other PF-Canon files by name only, so their PF titles resolve (PO-35-16).
+    for path in sorted((ROOT / "docs/pfcanon").glob("PF*.md")):
+        if not (repo / "docs/pfcanon" / path.name).exists():
+            (repo / "docs/pfcanon" / path.name).write_text("PF title placeholder.\n", encoding="utf-8")
     files = {
+        _qa_plan_rel(change_id): "# QA plan\n\n### CHECK 1 `qa-01-setup`: Setup\n",
+        _rca_rel(change_id): "# QA RCA\n\nRoot causes recorded.\n",
         _plan_rel(change_id): "# Plan\n\nTracked plan.\n",
         _spec_rel(change_id): _specification_text(change_id),
         "evidence/qa_report.md": "# QA report\n\nFinal verdict recorded.\n",
@@ -4567,7 +4593,10 @@ def test_v2_crd_dry_run_writes_complete_close_pack_and_check_is_read_only(
         "QA Rails — Open/Close (Final PR)",
         "Acceptance and evidence pointers",
         "Exact-source acceptance",
+        "Coverage versus the QA plan",
         "Delivered scope",
+        "PR-to-deliverable allocation",
+        "Reuse boundary",
         "Deferrals",
         "Later-drain PF-canon update statements",
         "Tracked-issue closeout mapping",
@@ -4955,6 +4984,7 @@ def test_v2_report_renders_the_adr_block_and_literal_tracked_issue_fields(
         "label": "Accepted QA proof gap",
         "accepted_gaps": [
             {
+                "check_id": "qa-01-setup",
                 "gap": "One manual check ran outside the QA root.",
                 "evidence_bindings": ["qa_report"],
                 "drain_targets": ["Glow QA Guide"],
@@ -4962,6 +4992,11 @@ def test_v2_report_renders_the_adr_block_and_literal_tracked_issue_fields(
         ],
     }
     repo, source_rel = _init_v2_repo(tmp_path, source)
+    (repo / _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]).write_text(
+        _qa_ledger_text("HDE-CRD-0002", "TOOLING_BLOCKED"), encoding="utf-8"
+    )
+    (repo / _primary_rel("HDE-CRD-0002")).write_text(_primary_text("TOOLING_BLOCKED"), encoding="utf-8")
+    _commit_all(repo, "the QA check is tooling-blocked, under the closure override")
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
     block = report.split("## ADR block\n\n", 1)[1].split("\n\n## ", 1)[0].splitlines()
@@ -4974,7 +5009,7 @@ def test_v2_report_renders_the_adr_block_and_literal_tracked_issue_fields(
         "  - Future work: canonical",
         "  - Doc Delta targets: Change Process Guide",
         "- ADR — Closure override: Accepted QA proof gap",
-        "  - Accepted gap: One manual check ran outside the QA root.; evidence basis "
+        "  - Accepted gap `qa-01-setup`: One manual check ran outside the QA root.; evidence basis "
         "`qa_report` (`evidence/qa_report.md`); drain targets Glow QA Guide",
     ]
     assert "- TI-002 ADR status line: Deferred with drain targets" in report
@@ -5021,7 +5056,12 @@ def test_v2_closure_override_evidence_must_be_bound(
     source["adr_block"]["closure_override"] = {
         "label": "Accepted QA proof gap",
         "accepted_gaps": [
-            {"gap": "One manual check.", "evidence_bindings": ["absent"], "drain_targets": ["Glow QA Guide"]}
+            {
+                "check_id": "qa-01-setup",
+                "gap": "One manual check.",
+                "evidence_bindings": ["absent"],
+                "drain_targets": ["Glow QA Guide"],
+            }
         ],
     }
     repo, source_rel = _init_v2_repo(tmp_path, source)
@@ -5293,6 +5333,315 @@ def test_v2_close_expectation_uses_the_canonical_vocabulary(
     assert not (repo / CRD_REPORT_REL).exists()
 
 
+def _write_and_commit(repo: Path, files: dict[str, str], message: str) -> None:
+    for rel, text in files.items():
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        (repo / rel).write_text(text, encoding="utf-8")
+    _commit_all(repo, message)
+
+
+def _gap(check_id: str) -> dict[str, object]:
+    return {
+        "check_id": check_id,
+        "gap": "The check ran under a tooling block.",
+        "evidence_bindings": ["qa_report"],
+        "drain_targets": ["Glow QA Guide"],
+    }
+
+
+@pytest.mark.parametrize(
+    ("status", "gaps", "code"),
+    (
+        # CX7-17: the governed path, a TOOLING_BLOCKED check under an override that names it.
+        ("TOOLING_BLOCKED", ["qa-01-setup"], None),
+        ("TOOLING_BLOCKED", [], "DECISION_CONTRADICTION"),
+        ("FAIL_BEHAVIOR", ["qa-01-setup"], "CLOSURE_OVERRIDE_INVALID"),
+        ("PASS", ["qa-01-setup"], "CLOSURE_OVERRIDE_INVALID"),
+        ("TOOLING_BLOCKED", ["qa-99-unknown"], "CLOSURE_OVERRIDE_INVALID"),
+        ("TOOLING_BLOCKED", ["qa-01-setup", "qa-01-setup"], "CLOSURE_OVERRIDE_INVALID"),
+    ),
+)
+def test_v2_closure_override_exempts_only_the_tooling_blocked_check_it_names(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    status: str,
+    gaps: list[str],
+    code: str | None,
+) -> None:
+    # PO-35-13 (Change Process Guide 3.5.4, "Closure override" and "No posture-only PASS").
+    source = _v2_source()
+    if gaps:
+        source["adr_block"]["closure_override"] = {"label": "Accepted QA proof gap", "accepted_gaps": [_gap(g) for g in gaps]}
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    if status != "PASS":
+        _write_and_commit(
+            repo,
+            {
+                _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]: _qa_ledger_text("HDE-CRD-0002", status),
+                _primary_rel("HDE-CRD-0002"): _primary_text(status),
+            },
+            "the QA check under test",
+        )
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        assert "- 1. `qa-01-setup`: BLOCKED; closeout impact: accepted gap under the closure override" in report
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+def test_v2_writer_never_claims_a_po_closeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # CX7-18, PO-35-14: PO closeout is the Product Owner's own action (Change Process Guide).
+    source = _v2_source()
+    source["closure_decision"]["posture"] = "po_closeout"
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID"
+    assert not (repo / CRD_REPORT_REL).exists()
+    assert "po_closeout" not in close_pack.DECISION_POSTURE_TEXT
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("covered", None),
+        ("planned_not_run_satisfied", "DECISION_CONTRADICTION"),
+        ("planned_not_run_not_satisfied", None),
+        ("unplanned_ledger_check", "QA_COVERAGE_INVALID"),
+        ("plan_without_checks", "QA_PLAN_STEPS_ABSENT"),
+        ("plan_numbers_out_of_order", "QA_PLAN_STEPS_ABSENT"),
+        ("plan_repeats_a_check", "QA_PLAN_STEPS_ABSENT"),
+        ("plan_not_current", "QA_PLAN_NOT_CURRENT"),
+        ("plan_binding_not_a_qa_plan", "QA_PLAN_NOT_CURRENT"),
+    ),
+)
+def test_v2_coverage_ledger_follows_the_current_qa_plan(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str | None,
+) -> None:
+    # PO-35-18: HDE Governance's step-by-step coverage ledger against the change's QA plan.
+    source = _v2_source()
+    if case == "planned_not_run_not_satisfied":
+        source["closure_decision"]["decision"] = "NOT SATISFIED"
+        source["follow_ups"] = ["Run qa-02-writer to PASS before closure."]
+    if case == "plan_binding_not_a_qa_plan":
+        source["qa_plan_binding"] = "qa_report"
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    plan = _qa_plan_rel("HDE-CRD-0002")
+    texts = {
+        "planned_not_run_satisfied": "### CHECK 1 `qa-01-setup`: Setup\n### CHECK 2 `qa-02-writer`: Writer\n",
+        "planned_not_run_not_satisfied": "### CHECK 1 `qa-01-setup`: Setup\n### CHECK 2 `qa-02-writer`: Writer\n",
+        "unplanned_ledger_check": "### CHECK 1 `qa-02-writer`: Writer\n",
+        "plan_without_checks": "# QA plan\n\nNo checks are listed.\n",
+        "plan_numbers_out_of_order": "### CHECK 2 `qa-01-setup`: Setup\n",
+        "plan_repeats_a_check": "### CHECK 1 `qa-01-setup`: Setup\n### CHECK 2 `qa-01-setup`: Again\n",
+    }
+    if case in texts:
+        _write_and_commit(repo, {plan: texts[case]}, "the QA plan under test")
+    elif case == "plan_not_current":
+        _write_and_commit(
+            repo,
+            {"docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.1.md": "### CHECK 1 `qa-01-setup`: Setup\n"},
+            "a later QA plan version",
+        )
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        assert "- 1. `qa-01-setup`: PASS; closeout impact: closure gate met" in report
+        if case == "planned_not_run_not_satisfied":
+            assert "- 2. `qa-02-writer`: NOT_RUN; closeout impact: blocks a SATISFIED decision" in report
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+def test_v2_qa_plan_pin_reads_the_real_epic040_plan_against_its_ledger() -> None:
+    plan = (ROOT / "docs/ephemeral/HDE-EPIC040-QA50-qa-plan-v1.2.md").read_bytes()
+    checks = close_pack._qa_plan_checks(plan)
+    ledger = json.loads((ROOT / "audit/qa/hde-epic040/qa_step_logs_manifest.json").read_text(encoding="utf-8"))
+    assert len(checks) == 12 and set(checks) == set(ledger)
+    assert checks[0] == "d0-discovery" and checks[-1] == "qa-closeout-deliverables"
+
+
+def test_v2_pf_titles_derive_from_the_real_canon_filenames() -> None:
+    names = [f"docs/pfcanon/{path.name}" for path in (ROOT / "docs/pfcanon").glob("PF*.md")]
+    titles = close_pack._pf_titles(names)
+    for title in (
+        "HDE Governance",
+        "Change Process Guide",
+        "HDE Schemas & Artifacts",
+        "HDE-Schemas & Artifacts",
+        "Glow QA Guide",
+        "HDE Build Notes",
+        "HDE Mechanics Guide",
+        "Plan Templates",
+        "HDE CRD Records",
+        "HDE Build Checklist Fermentation",
+        "HDE Phased Epics",
+        "HDE-CLI-API-Vendor-Ref",
+    ):
+        assert close_pack._pf_title_key(title) in titles, title
+    assert close_pack._pf_title_key("Imaginary Guide") not in titles
+
+
+@pytest.mark.parametrize(
+    "field", ("bounding_canon", "doc_delta_targets", "canon_homes", "override_drain_targets", "accepted_alias")
+)
+def test_v2_pf_titles_must_name_tracked_canon_documents(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], field: str
+) -> None:
+    # PO-35-16 (Change Process Guide 3.5.4: PF documents by title).
+    source = _v2_source()
+    decision = source["adr_block"]["decisions"][0]
+    if field == "bounding_canon":
+        decision["bounding_canon"] = ["Change Process Guide", "Imaginary Guide"]
+    elif field == "doc_delta_targets":
+        decision["doc_delta_targets"] = ["Imaginary Guide"]
+    elif field == "canon_homes":
+        source["later_drain_statements"][0]["canon_homes"] = ["Imaginary Guide"]
+    elif field == "override_drain_targets":
+        source["adr_block"]["closure_override"] = {
+            "label": "Accepted QA proof gap",
+            "accepted_gaps": [{**_gap("qa-01-setup"), "drain_targets": ["Imaginary Guide"]}],
+        }
+    else:
+        decision["bounding_canon"] = ["HDE Schemas and Artifacts", "HDE-CLI-API-Vendor-Ref"]
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    if field == "accepted_alias":
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:PF_TITLE_UNKNOWN"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+@pytest.mark.parametrize(
+    ("change_id", "case", "code"),
+    (
+        ("HDE-CRD-0002", "register_heading", None),
+        ("HDE-EPIC041", "register_heading", None),
+        ("HDE-CRD-0002", "heading_absent", "DEFERRAL_POINTER_UNBOUND"),
+        ("HDE-CRD-0002", "not_a_register", "DEFERRAL_POINTER_UNBOUND"),
+        ("HDE-CRD-0002", "other_kinds_register", "DEFERRAL_POINTER_UNBOUND"),
+        ("HDE-CRD-0002", "binding_unresolved", "BINDING_UNRESOLVED"),
+        ("HDE-CRD-0002", "free_text", "SOURCE_SCHEMA_INVALID"),
+    ),
+)
+def test_v2_deferral_drain_target_names_a_register_heading(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    change_id: str,
+    case: str,
+    code: str | None,
+) -> None:
+    # PO-35-17 (HDE Schemas & Artifacts 1.2: "its drain target pointer (PF09 pointer)"; PF30 for a CRD).
+    source = _v2_source(change_id)
+    pointer = source["deferrals"][1]["drain_target"]
+    if case == "heading_absent":
+        pointer["heading"] = "**Subtask 9**"
+    elif case == "not_a_register":
+        pointer["binding"] = "qa_report"
+    elif case == "other_kinds_register":
+        source["evidence_inputs"].append({"binding": "build_checklist", "path": EPIC_REGISTER_REL})
+        source["deferrals"][1]["drain_target"] = {"binding": "build_checklist", "heading": EPIC_REGISTER_HEADING}
+    elif case == "binding_unresolved":
+        pointer["binding"] = "absent"
+    elif case == "free_text":
+        source["deferrals"][1]["drain_target"] = "HDE Schemas and Artifacts 1.2 Close-pack artifacts"
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    report_rel = close_pack._derived_paths_v2(change_id)[0]
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        register, heading = _register(change_id)
+        assert f"- `DEF-2`: drain target `register` (`{register}`), section {heading}" in (repo / report_rel).read_text(
+            encoding="utf-8"
+        )
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / report_rel).exists()
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("allocated", None),
+        ("pr_slice_and_reuse", None),
+        ("deliverable_not_allocated", "ALLOCATION_INCOMPLETE"),
+        ("allocation_names_an_unlisted_deliverable", "ALLOCATION_INCOMPLETE"),
+        ("slice_not_a_work_unit_or_pr", "SOURCE_SCHEMA_INVALID"),
+        ("empty_allocation", "SOURCE_SCHEMA_INVALID"),
+    ),
+)
+def test_v2_every_deliverable_is_allocated_to_its_slice(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str | None,
+) -> None:
+    # PO-35-19 (HDE Governance, close report minimal content).
+    source = _v2_source()
+    second = "The close-run family is published by the canonical updater."
+    if case == "pr_slice_and_reuse":
+        source["deliverables"].append(second)
+        source["allocation"].append({"slice": "#668", "deliverable": second})
+        source["reuse_boundary"] = ["The QA harness's PF27 v2 step-log format is inherited, not newly closed."]
+    elif case == "deliverable_not_allocated":
+        source["deliverables"].append(second)
+    elif case == "allocation_names_an_unlisted_deliverable":
+        source["allocation"].append({"slice": "#668", "deliverable": second})
+    elif case == "slice_not_a_work_unit_or_pr":
+        source["allocation"][0]["slice"] = "PR-7"
+    elif case == "empty_allocation":
+        source["allocation"] = []
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        assert "- `WU-PR-07`: The close-pack writer accepts Epic and CRD identities." in report
+        if case == "pr_slice_and_reuse":
+            assert f"- `#668`: {second}" in report
+            assert "## Reuse boundary\n\n- The QA harness's PF27 v2 step-log format is inherited" in report
+        else:
+            assert "## Reuse boundary\n\n- None recorded." in report
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
+@pytest.mark.parametrize(("binding", "code"), (("qa_rca", None), ("qa_report", "QA_RCA_UNBOUND"), ("summary", None)))
+def test_v2_an_external_qa_rca_is_the_canonical_rca_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    binding: str,
+    code: str | None,
+) -> None:
+    # Change Process Guide 0.4.1.2: a separate QA RCA uses audit/<prefix>_QA_RCA.md.
+    source = _v2_source()
+    source["qa_rca"] = {"summary_lines": ["Root causes: none beyond the recorded findings."]} if binding == "summary" else {"binding": binding}
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        assert f"- {close_pack.NONCLAIM_FIXED_V2}" in report
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+
+
 _DRAINS = "# Drain targets\n\n- DEF-1: close-pack canon\n- DEF-2: close-pack canon\n- TI-002: close-pack canon\n"
 
 
@@ -5428,7 +5777,7 @@ def _mutate(source: dict[str, object], case: str) -> None:
     elif case == "pointer_directory_unresolved":
         source["pointers"].append("evidence/absent/")
     elif case == "plan_not_an_implementation_plan":
-        source["plan_path"] = CRD_REGISTER_REL
+        source["plan_path"] = EPIC_REGISTER_REL
     elif case == "ledger_not_bound":
         source["evidence_inputs"] = [
             item for item in source["evidence_inputs"] if item["binding"] != "doc_deltas"

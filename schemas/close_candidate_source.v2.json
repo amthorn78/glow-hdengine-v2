@@ -40,6 +40,9 @@
     "requirements_binding": {
       "$ref": "#/$defs/causal_binding"
     },
+    "qa_plan_binding": {
+      "$ref": "#/$defs/causal_binding"
+    },
     "acceptance": {
       "type": "array",
       "items": {
@@ -88,6 +91,39 @@
       "maxItems": 256,
       "uniqueItems": true
     },
+    "allocation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "slice": {
+            "type": "string",
+            "maxLength": 32,
+            "pattern": "^(?:#[1-9][0-9]{0,6}|WU-[A-Z0-9]+(?:-[A-Z0-9]+)*)$"
+          },
+          "deliverable": {
+            "$ref": "#/$defs/causal_text"
+          }
+        },
+        "required": [
+          "deliverable",
+          "slice"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "reuse_boundary": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/causal_text"
+      },
+      "minItems": 0,
+      "maxItems": 64,
+      "uniqueItems": true
+    },
     "deferrals": {
       "type": "array",
       "items": {
@@ -100,7 +136,20 @@
                 "$ref": "#/$defs/item_id"
               },
               "drain_target": {
-                "$ref": "#/$defs/causal_text"
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "binding": {
+                    "$ref": "#/$defs/causal_binding"
+                  },
+                  "heading": {
+                    "$ref": "#/$defs/causal_text"
+                  }
+                },
+                "required": [
+                  "binding",
+                  "heading"
+                ]
               }
             },
             "required": [
@@ -143,7 +192,7 @@
           "canon_homes": {
             "type": "array",
             "items": {
-              "$ref": "#/$defs/causal_text"
+              "$ref": "#/$defs/pf_title"
             },
             "minItems": 1,
             "maxItems": 16,
@@ -264,7 +313,6 @@
         "posture": {
           "enum": [
             "review_trace_only",
-            "po_closeout",
             "formal_close_pack_completion"
           ]
         }
@@ -386,8 +434,11 @@
     "plan_path",
     "evidence_inputs",
     "requirements_binding",
+    "qa_plan_binding",
     "acceptance",
     "deliverables",
+    "allocation",
+    "reuse_boundary",
     "deferrals",
     "later_drain_statements",
     "tracked_issues",
@@ -595,6 +646,9 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+              "check_id": {
+                "$ref": "#/$defs/check_id"
+              },
               "gap": {
                 "$ref": "#/$defs/causal_text"
               },
@@ -618,6 +672,7 @@
               }
             },
             "required": [
+              "check_id",
               "drain_targets",
               "evidence_bindings",
               "gap"
@@ -629,6 +684,11 @@
         "accepted_gaps",
         "label"
       ]
+    },
+    "check_id": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
     }
   }
 }
