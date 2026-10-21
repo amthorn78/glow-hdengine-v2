@@ -4908,6 +4908,14 @@ def test_v2_qa_ledger_pin_reads_the_real_ledgers(rel: str) -> None:
         ("not json\n", "SATISFIED", "QA_LEDGER_INVALID"),
         ('{"qa-01-setup":{"check_id":"qa-01-setup","log_path":"evidence/qa_report.md","status":"PASS"}}\n', "SATISFIED", "QA_LEDGER_INVALID"),
         ('{"qa-01-setup":{"check_id":"qa-02","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"PASS"}}\n', "SATISFIED", "QA_LEDGER_INVALID"),
+        # CX7-13: a duplicate check ID whose first entry records the failure.
+        (
+            '{"qa-01-setup":{"check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"FAIL_BEHAVIOR"},'
+            '"qa-01-setup":{"check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"PASS"}}\n',
+            "SATISFIED",
+            "QA_LEDGER_INVALID",
+        ),
+        ('{"qa-01-setup": {"check_id": "qa-01-setup", "log_path": "audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log", "status": "PASS"}}\n', "SATISFIED", "QA_LEDGER_INVALID"),
         (None, "SATISFIED", "DECISION_CONTRADICTION"),
         (None, "NOT SATISFIED", None),
     ),
@@ -5252,6 +5260,49 @@ def test_v2_primary_check_agrees_with_the_shared_pf27_parser(
     assert close_pack._primary_identity(payload, rel, crd=crd) == shared
     if header_case == "complete_pass" and payload_case == "compact":
         assert shared == ("qa-01-setup", "PASS")
+
+
+_LEDGER_ENTRY = '"qa-01-setup":{"check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"%s"}'
+_LEDGER_CASES: dict[str, bytes] = {
+    "canonical": ("{" + _LEDGER_ENTRY % "PASS" + "}\n").encode(),
+    "duplicate_fail_then_pass": ("{" + _LEDGER_ENTRY % "FAIL_BEHAVIOR" + "," + _LEDGER_ENTRY % "PASS" + "}\n").encode(),
+    "duplicate_pass_twice": ("{" + _LEDGER_ENTRY % "PASS" + "," + _LEDGER_ENTRY % "PASS" + "}\n").encode(),
+    "indented": (json.dumps(json.loads("{" + _LEDGER_ENTRY % "PASS" + "}"), indent=2, sort_keys=True) + "\n").encode(),
+    "unsorted_entry": b'{"qa-01-setup":{"status":"PASS","check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log"}}\n',
+    "no_final_lf": ("{" + _LEDGER_ENTRY % "PASS" + "}").encode(),
+    "two_final_lf": ("{" + _LEDGER_ENTRY % "PASS" + "}\n\n").encode(),
+    "crlf": ("{" + _LEDGER_ENTRY % "PASS" + "}\r\n").encode(),
+    "bom": b"\xef\xbb\xbf" + ("{" + _LEDGER_ENTRY % "PASS" + "}\n").encode(),
+    "empty": b"{}\n",
+    "uppercase_check_id": b'{"QA-01":{"check_id":"QA-01","log_path":"audit/qa/hde-crd-0002/checks/QA-01/primary.log","status":"PASS"}}\n',
+    "extra_entry_field": b'{"qa-01-setup":{"check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","note":"x","status":"PASS"}}\n',
+}
+
+
+@pytest.mark.parametrize("case", sorted(_LEDGER_CASES))
+def test_v2_qa_ledger_read_agrees_with_the_harness_crd_family_check(tmp_path: Path, case: str) -> None:
+    # PO-35-10: the writer accepts a QA ledger only in the harness's own bytes; the harness's
+    # CRD family validator, over the same ledger and a valid primary, must agree.
+    from tools.qa import qa_harness
+
+    payload = _LEDGER_CASES[case]
+    qa_root = tmp_path / "audit/qa/hde-crd-0002"
+    (qa_root / "checks/qa-01-setup").mkdir(parents=True)
+    (qa_root / "checks/qa-01-setup/primary.log").write_text(_primary_text("PASS"), encoding="utf-8")
+    (qa_root / "qa_step_logs_manifest.json").write_bytes(payload)
+    try:
+        qa_harness.validate_crd_check_family(qa_harness.HarnessConfig(crd_id="HDE-CRD-0002", repo_root=tmp_path))
+        shared = True
+    except ValueError:
+        shared = False
+    try:
+        close_pack._qa_ledger(payload, "hde-crd-0002")
+        writer = True
+    except close_pack.ClosePackError as exc:
+        assert str(exc) == "QA_LEDGER_INVALID"
+        writer = False
+    assert writer == shared
+    assert writer == (case == "canonical")
 
 
 def _mutate(source: dict[str, object], case: str) -> None:

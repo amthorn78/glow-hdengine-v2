@@ -2381,25 +2381,34 @@ def _heading_occurs(heading: str, payload: bytes) -> bool:
     return re.search(pattern, payload, re.MULTILINE) is not None
 
 
-def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
+def _qa_ledger(payload: bytes, directory: str) -> dict[str, dict[str, str]]:
     # The pinned ledger format, as the canonical QA harness writes it for every Epic and CRD on
-    # main: a nonempty mapping of check_id to exactly {check_id, log_path, status}.
-    try:
-        ledger = json.loads(payload.decode("utf-8"))
-    except (UnicodeDecodeError, ValueError):
-        raise _fail("QA_LEDGER_INVALID") from None
-    if not isinstance(ledger, dict) or not ledger:
+    # main: a nonempty mapping of check_id to exactly {check_id, log_path, status}, in the
+    # harness's own bytes (_manifest_content: sorted, compact, one final LF), so a duplicate or
+    # reordered key cannot stand (PO-35-10).
+    ledger = _strict_json(payload, code="QA_LEDGER_INVALID")
+    if (
+        not isinstance(ledger, dict)
+        or not ledger
+        or payload != (json.dumps(ledger, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    ):
         raise _fail("QA_LEDGER_INVALID")
     for check_id, entry in ledger.items():
         if (
-            not isinstance(entry, dict)
+            not PRIMARY_CHECK_ID_RE.fullmatch(check_id)
+            or check_id in {".", ".."}
+            or not isinstance(entry, dict)
             or set(entry) != {"check_id", "log_path", "status"}
             or entry["check_id"] != check_id
             or entry["log_path"] != f"audit/qa/{directory}/checks/{check_id}/primary.log"
             or not isinstance(entry["status"], str)
         ):
             raise _fail("QA_LEDGER_INVALID")
-    return [entry["status"] for entry in ledger.values()]
+    return ledger
+
+
+def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
+    return [entry["status"] for entry in _qa_ledger(payload, directory).values()]
 
 
 def _current_version(pattern: re.Pattern[str], change_id: str, tracked_paths: Iterable[str]) -> str | None:
@@ -2693,7 +2702,9 @@ def _load_model_v2(
 
     # Each QA ledger entry's primary must be tracked and agree with the ledger (PO-35-5).
     ledger_rel = _supporting_paths_v2(str(source["change_id"]))["qa_step_logs_manifest"]
-    ledger = json.loads(next(s for s in bindings.values() if s.rel == ledger_rel).payload)
+    ledger = _qa_ledger(
+        next(s for s in bindings.values() if s.rel == ledger_rel).payload, str(source["change_id"]).lower()
+    )
     crd = CHANGE_RE.fullmatch(str(source["change_id"])).group("crd") is not None  # type: ignore[union-attr]
     qa_primaries: list[FileSnapshot] = []
     for check_id, entry in sorted(ledger.items()):
