@@ -250,10 +250,17 @@ def _exercise_resolver_policy(guard: HermeticGuard) -> tuple[dict[str, bool], di
         "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
         dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
     )
-    production = resolve_bodygraph(
-        "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
-        dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
-    )
+    # HDE-CRD-0002 WU-PR-04 ID-8: the production override gate (HDE-CLI-API-Vendor-Ref
+    # §7.1.11) needs a valid reference, an actor and an audit sink before the write guard.
+    with tempfile.TemporaryDirectory() as audit_dir, patch(
+        "engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "fixture-operator"
+    ):
+        production = resolve_bodygraph(
+            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
+            dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2",
+            "HDE_VENDOR_OVERRIDE_AUDIT_PATH": str(Path(audit_dir) / "override_audit.jsonl")},
+            authorization_ref="HDE-CRD-0002-FIXTURE", **base,
+        )
     with patch("engine.bodygraph.resolver.ingest_vendor_bodygraph", legacy_ingest):
         legacy = resolve_bodygraph(
             "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import json
+import socket
+import urllib.request
 from pathlib import Path
 
 import pytest
 
+from engine.bodygraph import vendor_audit
 from engine.bodygraph.ingest import VendorInputs, ingest_vendor_bodygraph
-from engine.bodygraph.vendor_client import VendorError, VendorRequest, VendorResult
+from engine.bodygraph.vendor_client import HdApiClient, VendorError, VendorRequest, VendorResult
+from engine.db import DBAccess
 from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
 
 
@@ -177,3 +181,89 @@ def test_write_ingest_refuses_empty_retired_key_before_vendor_provider_and_logs(
     assert vendor_calls == []
     assert not success_log.exists()
     assert not retry_log.exists()
+
+
+# --- HDE-CRD-0002 WU-PR-05 (S19-F05, S19-F06): the ingest opens the rails only for exactly SAFE_MODE=0
+# and ALLOW_NETWORK=1 (HDE-CLI-API-Vendor-Ref §7.1.2), and names no log file unless its caller does --
+
+_S19_BIRTH = {"birthdate": "1990-01-01", "birthtime": "07:41", "location": "Amsterdam, NL"}
+_S19_V1_BASE = "https://vendor.example.test/v1"
+_S19_V2_BASE = "https://vendor.example.test/v2"
+_S19_CLOSED_SAFE_MODE = [None, "", "1", " 1 ", "2", "true", "false", "no", "off", "yes"]
+_S19_CLOSED_NETWORK = [None, "", "0", "2", "true", "yes", "on", "false"]
+_S19_CLOSED_RAILS = [*((s, "1", "PROVIDER_REFUSED") for s in _S19_CLOSED_SAFE_MODE), *(("0", n, "PROVIDER_NETWORK_BLOCKED") for n in _S19_CLOSED_NETWORK)]
+
+
+def _s19_fail(name):
+    def _guard(*_args, **_kwargs):
+        raise AssertionError(f"{name} reached under closed rails")
+
+    return _guard
+
+
+@pytest.fixture
+def _s19_vendor_env(monkeypatch, tmp_path):
+    for name in ("APP_ENV", "ENGINE_ENV", "SAFE_MODE", "ALLOW_NETWORK", "HD_API_BASE_URL", "HDAPI_BASE_URL"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv(vendor_audit.VENDOR_OVERRIDE_AUDIT_PATH_KEY, str(tmp_path / "state" / "override.jsonl"))
+    monkeypatch.setattr(vendor_audit, "resolve_actor_principal", lambda: "qa-operator")
+
+
+@pytest.fixture
+def _s19_no_io(monkeypatch):
+    monkeypatch.setattr(HdApiClient, "__init__", _s19_fail("HdApiClient"))
+    monkeypatch.setattr(HdApiClient, "from_env", classmethod(lambda cls, **_: _s19_fail("HdApiClient.from_env")()))
+    monkeypatch.setattr(DBAccess, "for_current_env", classmethod(lambda cls, **_: _s19_fail("DBAccess")()))
+    monkeypatch.setattr(urllib.request, "urlopen", _s19_fail("urllib.request.urlopen"))
+    monkeypatch.setattr(socket, "getaddrinfo", _s19_fail("socket.getaddrinfo"))
+    monkeypatch.setattr(socket, "socket", _s19_fail("socket.socket"))
+
+
+def _s19_env(*, safe, net, app_env="dev", base=_S19_V2_BASE):
+    env = {"APP_ENV": app_env, "HD_API_BASE_URL": base, "HD_API_KEY": "fake-key", "GEO_API_KEY": "fake-geo"}
+    if safe is not None:
+        env["SAFE_MODE"] = safe
+    if net is not None:
+        env["ALLOW_NETWORK"] = net
+    return env
+
+
+@pytest.mark.usefixtures("_s19_vendor_env", "_s19_no_io")
+@pytest.mark.parametrize("safe,net,code", _S19_CLOSED_RAILS, ids=repr)
+def test_s19_ingest_rails_are_exact(safe, net, code):
+    inputs = VendorInputs(user_id="operator-user", **_S19_BIRTH)
+    with pytest.raises(VendorError) as caught:
+        ingest_vendor_bodygraph(inputs, env=_s19_env(safe=safe, net=net, base=_S19_V1_BASE), dry_run=True, client=object())
+    assert caught.value.code == code
+
+
+def test_s19_ingest_defaults_name_no_log():
+    assert ingest_vendor_bodygraph.__kwdefaults__["retry_log"] is None
+    assert ingest_vendor_bodygraph.__kwdefaults__["success_log"] is None
+
+
+def test_s19_vendor_ingest_runner_passes_its_own_logs(monkeypatch, tmp_path, capsys):
+    import importlib.util
+
+    from engine.bodygraph import ingest
+
+    spec = importlib.util.spec_from_file_location("_s19_run_vendor_ingest", Path("scripts/ingest/run_vendor_ingest.py"))
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    paths = {name: tmp_path / "ingest" / name.lower() for name in ("SUCCESS_LOG", "RETRY_LOG", "IDEMPOTENCY_LOG", "INGEST_CANON_COMPARE_LOG", "ACCEPTANCE_FILE", "VERIFY_OK_FILE")}
+    for name, path in paths.items():
+        monkeypatch.setattr(runner, name, path)
+    monkeypatch.setattr(runner, "ARTIFACTS", [paths[n] for n in ("SUCCESS_LOG", "IDEMPOTENCY_LOG", "RETRY_LOG", "INGEST_CANON_COMPARE_LOG")])
+    monkeypatch.setattr(runner, "gather_inputs_from_env", lambda: VendorInputs(user_id="operator-user", **_S19_BIRTH))
+    seen = []
+    db = FakeDB()
+
+    def _ingest(inputs, **kwargs):
+        seen.append(kwargs)
+        return ingest.ingest_vendor_bodygraph(inputs, **{**kwargs, "env": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1"}, "client": FakeClient(), "db_access": db})
+
+    monkeypatch.setattr(runner, "ingest_vendor_bodygraph", _ingest)
+    assert runner.main() == 0
+    assert [(k["retry_log"], k["success_log"]) for k in seen] == [(paths["RETRY_LOG"], paths["SUCCESS_LOG"])] * 2
+    assert len(paths["SUCCESS_LOG"].read_text(encoding="utf-8").splitlines()) == 2
+    assert json.loads(capsys.readouterr().out)["artifacts"]["ingest_success"] is True

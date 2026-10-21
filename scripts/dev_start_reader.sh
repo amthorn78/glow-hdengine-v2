@@ -20,7 +20,7 @@ fi
 cat <<INFO
 [dev-start] APP_ENV=${APP_ENV_DISPLAY} SAFE_MODE=${SAFE_MODE} ALLOW_NETWORK=${ALLOW_NETWORK}
 [dev-start] LC_ALL=${LC_ALL} LANG=${LANG} TZ=${TZ}
-[dev-start] Binding port ${PORT} via python -m adapter.http_reader (host=0.0.0.0)
+[dev-start] Binding port ${PORT} via python -m adapter.http_reader (host=127.0.0.1)
 INFO
 
 exec python -m adapter.http_reader

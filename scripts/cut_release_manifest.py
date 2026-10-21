@@ -67,6 +67,7 @@ def _path_unsafe(name: str, manifest_rel: str) -> bool:
         or "\\" in name
         or ".." in rel.parts
         or rel.as_posix() != name
+        or not name.isprintable()
         or name == manifest_rel
     )
 

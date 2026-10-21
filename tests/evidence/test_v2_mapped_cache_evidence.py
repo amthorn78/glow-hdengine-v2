@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 from contextlib import ExitStack
 from pathlib import Path
 from unittest.mock import patch
@@ -83,6 +84,19 @@ def _isolate_producer_writes(monkeypatch, root: Path) -> dict[Path, Path]:
 
     monkeypatch.setattr(generator, "write_or_check", isolated)
     return mapping
+
+
+@pytest.fixture
+def isolated_root():
+    """An isolated output root beside the checkout.
+
+    The producer stages candidates in ``ROOT.parent`` and moves each into place with
+    ``os.replace``, which cannot cross filesystems. The isolated root therefore shares the
+    stage's filesystem; pytest's ``tmp_path`` may be on another one (a tmpfs ``/tmp``).
+    """
+
+    with tempfile.TemporaryDirectory(prefix="hde-v2-mapped-cache-test-", dir=ROOT.parent) as root:
+        yield Path(root)
 
 
 def _command_env(**changes: str) -> dict[str, str]:
@@ -401,10 +415,10 @@ def test_check_mode_drift_restores_environment_module_state_and_files(monkeypatc
     assert _governed_state() == governed
 
 
-def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch, tmp_path) -> None:
+def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch, isolated_root) -> None:
     paths = list(generator.build())
     before = _bytes_and_mtimes(paths)
-    isolated = _isolate_producer_writes(monkeypatch, tmp_path)
+    isolated = _isolate_producer_writes(monkeypatch, isolated_root)
     for source, destination in isolated.items():
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
@@ -435,13 +449,13 @@ def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch, tmp_path
     assert _stage_inventory() == stages
 
 
-def test_command_fixed_point_check_nonmutation_and_no_repository_residue(monkeypatch, tmp_path, capsys) -> None:
+def test_command_fixed_point_check_nonmutation_and_no_repository_residue(monkeypatch, isolated_root, capsys) -> None:
     shared = _shared_log_state()
     governed = _governed_state()
     inventory = _repo_inventory()
     tracked = _bytes_and_mtimes(generator.build())
     # Write mode runs against an isolated output root; the checkout is never written.
-    isolated = _isolate_producer_writes(monkeypatch, tmp_path)
+    isolated = _isolate_producer_writes(monkeypatch, isolated_root)
     assert generator.main([]) == 0
     first_out = capsys.readouterr()
     first = {path: isolated[path].read_bytes() for path in tracked}

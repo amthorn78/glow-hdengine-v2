@@ -1075,7 +1075,7 @@ def _parse_manifest(raw: object) -> Manifest:
             raise SchemaValidationError("INVALID_MANIFEST", "manifest file path must be a non-empty string")
         if (Path(path).is_absolute() or "\\" in path or Path(path).as_posix() != path
                 or any(part in {".", ".."} for part in Path(path).parts)
-                or not path.isascii()):
+                or not path.isascii() or not path.isprintable()):
             raise SchemaValidationError("INVALID_MANIFEST_PATH", "manifest file path must be canonical and relative")
         if path == "catalog/manifest.json":
             raise SchemaValidationError("SELF_LISTING_MANIFEST_FORBIDDEN", "manifest.json must not list itself")

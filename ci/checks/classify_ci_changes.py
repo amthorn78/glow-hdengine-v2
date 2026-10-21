@@ -503,6 +503,9 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "schemas/epic_close_candidate_source.v1.json": (
         "tests/qa/test_generate_epic_close_pack.py",
     ),
+    "schemas/close_candidate_source.v2.json": (
+        "tests/qa/test_generate_epic_close_pack.py",
+    ),
     "adapter/http_reader.py": _HTTP_READER_TEST_OWNERS,
     # HDE-EPIC040-PR04 application, identity and consumer loci.
     "engine/compat/compute.py": (
@@ -577,12 +580,16 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/bodygraph/test_vendor_client.py",
         "tests/bodygraph/test_bg_resolve_route_policy.py",
     ),
+    # HDE-CRD-0002 WU-PR-04 (S14): the production vendor-override audit module.
+    "engine/bodygraph/vendor_audit.py": ("tests/bodygraph/test_vendor_prod_override.py",),
     "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
     "scripts/dev_start_reader.sh": ("tests/scripts/test_dev_start_reader.py",),
     "scripts/emit_env_guard_artifact.py": (
         "tests/artifacts/test_env_guard_artifact_bytes.py",
     ),
     "scripts/ensure_env.py": ("tests/invariance/test_determinism_env_helper.py",),
+    # HDE-CRD-0002 WU-PR-05 (S19-F06): the S9 ingest runner passes its own log paths.
+    "scripts/ingest/run_vendor_ingest.py": ("tests/bodygraph/test_ingest.py",),
     "scripts/probe_internal_version.py": (
         "tests/transport/test_internal_version_contract.py",
     ),
@@ -650,6 +657,10 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     ),
     "tools/evidence/generate_hdapi_v2_contract_inventory.py": (
         "tests/evidence/test_hdapi_v2_contract_inventory.py",
+    ),
+    # HDE-CRD-0002 WU-PR-04 (ID-8): its production scenario passes the override gate.
+    "tools/evidence/generate_v2_mapped_cache_evidence.py": (
+        "tests/evidence/test_v2_mapped_cache_evidence.py",
     ),
 }
 _EVIDENCE_HELPER_OWNERSHIP_TEST = (
@@ -838,6 +849,13 @@ _BODYGRAPH_TOOL_TEST_OWNERS = {
     "tools/bodygraph/check_magic10_gate_readiness.py": (
         "tests/bodygraph/test_check_magic10_gate_readiness.py",
     ),
+}
+# HDE-CRD-0002 WU-PR-06 (S20): the read-only pre-push and pre-plan check.  No
+# workflow step runs the tool; its owner test is what CI runs on its change.
+_CI_TOOL_PREFIX = "tools/ci/"
+_CI_TOOL_LANES = frozenset({"product"})
+_CI_TOOL_TEST_OWNERS = {
+    "tools/ci/prepush_check.py": ("tests/tools/test_prepush_check.py",),
 }
 # Governed chart fixtures consumed by the dev GET /reader route and its tests.
 _FIXTURE_LANE_PREFIXES = (
@@ -1069,6 +1087,8 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _CONFIG_WRITER_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _BODYGRAPH_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _CI_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)
@@ -1316,6 +1336,22 @@ def _bodygraph_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]
         path,
         targets,
         error_code="CI_BODYGRAPH_TOOL_OWNER_TEST_INVALID",
+    )
+
+
+def _ci_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve exact behavioral owners for repository CI tools (fail closed)."""
+    rel = PurePosixPath(path)
+    if not path.startswith(_CI_TOOL_PREFIX) or rel.suffix.lower() not in _UNKNOWN_SOURCE_SUFFIXES:
+        return ()
+    targets = _CI_TOOL_TEST_OWNERS.get(path)
+    if targets is None:
+        raise ValueError(f"CI_TOOL_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_TOOL_OWNER_TEST_INVALID",
     )
 
 
@@ -1665,6 +1701,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         )
         targets.update(_qa_tool_owner_targets(repo_root, path))
         targets.update(_bodygraph_tool_owner_targets(repo_root, path))
+        targets.update(_ci_tool_owner_targets(repo_root, path))
         targets.update(_promoted_member_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
@@ -1750,6 +1787,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith(_BODYGRAPH_TOOL_PREFIX):
         return set(_BODYGRAPH_TOOL_LANES)
+
+    if path.startswith(_CI_TOOL_PREFIX):
+        return set(_CI_TOOL_LANES)
 
     if path.startswith("tests/evidence/"):
         lanes = {"evidence"}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, MutableMapping, Optional
 from uuid import UUID
@@ -12,9 +13,11 @@ from engine.compat.error_tokens import CompatBoundaryError
 from engine.db import DBAccess
 from engine.db.errors import AdapterError
 
+from . import vendor_audit
 from .ingest import (
     IngestOutcome,
     VendorInputs,
+    _client_config_env,
     gather_inputs_from_env,
     ingest_vendor_bodygraph,
     resolve_db_user_id,
@@ -31,14 +34,113 @@ from .projection import (
 )
 from .vendor_client import HdApiClient, VendorError, classify_bg_resolve_route_policy, route_auth_posture
 
-def _truthy(value: object) -> bool:
+# HDE-CLI-API-Vendor-Ref §7.1.11a and §7.1.11b.
+AUTHORIZATION_REF_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}")
+_PRODUCTION_ENVIRONMENTS = frozenset({"prod", "production", "live"})
+_NON_PRODUCTION_ENVIRONMENTS = frozenset({"dev", "test", "local", "stage", "staging"})
+_ASCII_WHITESPACE = " \t\n\r\x0b\x0c"
+
+
+def is_valid_authorization_ref(value: object) -> bool:
+    """True when *value* is one §7.1.11a ``AUTHORIZATION_REF`` (1–128 ASCII characters)."""
+
+    return isinstance(value, str) and AUTHORIZATION_REF_PATTERN.fullmatch(value) is not None
+
+
+@dataclass(frozen=True)
+class VendorEnvironment:
+    label: str
+    production_like: bool
+
+
+@dataclass
+class _OverrideGate:
+    """Per-invocation state of an allowed production override (step 7)."""
+
+    outbound_attempted: bool = False
+    route_family: str | None = None
+    resource_path: str | None = None
+
+
+def _environment_value(view: Mapping[str, object], name: str) -> str | None:
+    raw = view.get(name)
+    if raw is None:
+        return None
+    value = str(raw).strip(_ASCII_WHITESPACE).lower()
+    return value or None
+
+
+def classify_vendor_environment(
+    view: Mapping[str, object],
+    process: Mapping[str, object] | None = None,
+) -> VendorEnvironment:
+    """Classify the effective environment exactly as §7.1.11b states.
+
+    *view* is the merged vendor configuration view. A production-like
+    ``APP_ENV`` or ``ENGINE_ENV`` in the process environment is never
+    downgraded to non-production by a caller-supplied mapping.
+    """
+
+    app_env = _environment_value(view, "APP_ENV")
+    engine_env = _environment_value(view, "ENGINE_ENV")
+    invalid = VendorError(
+        "PROVIDER_CONFIG_INVALID",
+        "vendor environment classification requires APP_ENV or ENGINE_ENV to name one recognized environment",
+        details={"outbound_attempted": False},
+    )
+    if app_env and engine_env and app_env != engine_env:
+        raise invalid
+    effective = app_env or engine_env
+    if effective in _PRODUCTION_ENVIRONMENTS:
+        return VendorEnvironment(label=effective, production_like=True)
+    if effective not in _NON_PRODUCTION_ENVIRONMENTS:
+        raise invalid
+    source = os.environ if process is None else process
+    for name in ("APP_ENV", "ENGINE_ENV"):
+        process_value = _environment_value(source, name)
+        if process_value in _PRODUCTION_ENVIRONMENTS:
+            return VendorEnvironment(label=process_value, production_like=True)
+    return VendorEnvironment(label=effective, production_like=False)
+
+
+def _override_refusal(code: str, message: str, resolver: Mapping[str, object]) -> "ResolveBodygraphResult":
+    return _vendor_error(VendorError(code, message, details={"outbound_attempted": False}), resolver)
+
+
+class _AttemptTrackingClient:
+    """Delegates to the legacy client and records that the fetch was entered."""
+
+    def __init__(self, client: HdApiClient, gate: _OverrideGate) -> None:
+        self._client = client
+        self._gate = gate
+
+    def build_request(self, **kwargs: Any) -> Any:
+        return self._client.build_request(**kwargs)
+
+    def fetch(self, request: Any) -> Any:
+        self._gate.outbound_attempted = True
+        return self._client.fetch(request)
+
+
+def _rail_value(value: object) -> str:
+    if isinstance(value, bool):
+        return "1" if value else "0"
     if value is None:
-        return False
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on"}
-    if isinstance(value, (int, float)):
-        return bool(value)
-    return bool(value)
+        return ""
+    return str(value).strip()
+
+
+def _safe_mode_closed(value: object) -> bool:
+    """PF05 §7.1.2: the SAFE rail is open only for exactly ``SAFE_MODE=0``; unset,
+    empty and every other value keep it closed (HDE Governance §3.1 default ON)."""
+
+    return _rail_value(value) != "0"
+
+
+def _network_allowed(value: object) -> bool:
+    """PF05 §7.1.2: the network rail is open only for exactly ``ALLOW_NETWORK=1``."""
+
+    return _rail_value(value) == "1"
 
 
 @dataclass(frozen=True)
@@ -66,16 +168,21 @@ def resolve_bodygraph(
     birthdate: str | None = None,
     birthtime: str | None = None,
     location: str | None = None,
+    authorization_ref: str | None = None,
 ) -> ResolveBodygraphResult:
-    """Resolve BodyGraph data within the selected source and rail posture."""
+    """Resolve BodyGraph data within the selected source and rail posture.
+
+    *authorization_ref* is the §7.1.11a production override reference;
+    ``None`` means absent.
+    """
 
     env = env or {}
     requested_source = (source or "auto").lower()
     if requested_source not in {"auto", "db", "vendor"}:
         raise ValueError(f"unsupported source '{requested_source}'")
 
-    safe_mode_closed = _truthy(env.get("SAFE_MODE"))
-    allow_network = _truthy(env.get("ALLOW_NETWORK"))
+    safe_mode_closed = _safe_mode_closed(env.get("SAFE_MODE"))
+    allow_network = _network_allowed(env.get("ALLOW_NETWORK"))
     snapshot = {
         "user_id": user_id,
         "requested_source": requested_source,
@@ -84,6 +191,13 @@ def resolve_bodygraph(
         "safe_mode": safe_mode_closed,
         "allow_network": allow_network,
     }
+
+    if authorization_ref is not None and (requested_source != "vendor" or not is_valid_authorization_ref(authorization_ref)):
+        return _override_refusal(
+            "PROVIDER_PROD_OVERRIDE_INVALID",
+            "production vendor override reference is malformed or inapplicable",
+            {**snapshot, "resolved_source": "vendor" if requested_source == "vendor" else "db"},
+        )
 
     if requested_source == "vendor":
         return _resolve_vendor(
@@ -95,6 +209,7 @@ def resolve_bodygraph(
             birthdate=birthdate,
             birthtime=birthtime,
             location=location,
+            authorization_ref=authorization_ref,
         )
 
     # Phase S8a treats "auto" as "db" while avoiding real IO.
@@ -119,6 +234,7 @@ def _resolve_vendor(
     birthdate: str | None,
     birthtime: str | None,
     location: str | None,
+    authorization_ref: str | None = None,
 ) -> ResolveBodygraphResult:
     safe_mode_closed = bool(snapshot.get("safe_mode"))
     allow_network = bool(snapshot.get("allow_network"))
@@ -149,10 +265,153 @@ def _resolve_vendor(
     # that the vendor configuration overlay intentionally treats as removal.
     if env is not None:
         database_env.update(env)
+    # Step 4 (§7.1.11d): the effective environment.
+    try:
+        environment = classify_vendor_environment(vendor_env)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    route_args = dict(
+        user_id=user_id,
+        resolver_meta=resolver_meta,
+        vendor_env=vendor_env,
+        database_env=database_env,
+        upsert=upsert,
+        dry_run=dry_run,
+        birthdate=birthdate,
+        birthtime=birthtime,
+        location=location,
+    )
+    # Step 5: the rail and flag matrix (§7.1.11c).
+    if not environment.production_like:
+        if authorization_ref is not None:
+            return _override_refusal(
+                "PROVIDER_PROD_OVERRIDE_INVALID",
+                "production vendor override is not accepted in a non-production environment",
+                resolver_meta,
+            )
+        return _resolve_vendor_route(**route_args, gate=None)
+    if authorization_ref is None:
+        _append_flag_absent_event(vendor_env, environment)
+        return _override_refusal(
+            "PROVIDER_PROD_OVERRIDE_REQUIRED",
+            "production-like vendor access requires --allow-prod-vendor",
+            resolver_meta,
+        )
+    # Step 6: actor identity and the durable pre-I/O audit event (§7.1.11e–f).
+    try:
+        actor = vendor_audit.resolve_actor_principal()
+        sink = vendor_audit.resolve_sink_path(vendor_env)
+        correlation_id = vendor_audit.new_correlation_id()
+        vendor_audit.append_event(
+            sink,
+            vendor_audit.build_event(
+                correlation_id=correlation_id,
+                actor_principal=actor,
+                authorization_ref=authorization_ref,
+                environment=environment.label,
+                outcome="allowed",
+                error_code=None,
+                outbound_attempted=False,
+            ),
+        )
+    except vendor_audit.AuditUnavailable:
+        return _override_refusal(
+            "PROVIDER_AUDIT_UNAVAILABLE",
+            "production vendor override audit is unavailable",
+            resolver_meta,
+        )
+    # Step 7, then one state event under the same correlation ID.
+    gate = _OverrideGate()
+    try:
+        result = _resolve_vendor_route(**route_args, gate=gate)
+    except BaseException:
+        _append_state_event(sink, correlation_id, actor, authorization_ref, environment, gate, None)
+        raise
+    _append_state_event(sink, correlation_id, actor, authorization_ref, environment, gate, result)
+    return result
+
+
+def _append_flag_absent_event(vendor_env: Mapping[str, object], environment: VendorEnvironment) -> None:
+    """Row 3 of §7.1.11c: the refusal stands whether or not its event persists."""
+
+    try:
+        vendor_audit.append_event(
+            vendor_audit.resolve_sink_path(vendor_env),
+            vendor_audit.build_event(
+                correlation_id=vendor_audit.new_correlation_id(),
+                actor_principal=vendor_audit.resolve_actor_principal(),
+                authorization_ref=None,
+                environment=environment.label,
+                outcome="refused",
+                error_code="PROVIDER_PROD_OVERRIDE_REQUIRED",
+                outbound_attempted=False,
+            ),
+        )
+    except vendor_audit.AuditUnavailable:
+        return
+
+
+def _append_state_event(
+    sink: Any,
+    correlation_id: str,
+    actor: str,
+    authorization_ref: str,
+    environment: VendorEnvironment,
+    gate: _OverrideGate,
+    result: "ResolveBodygraphResult | None",
+) -> None:
+    """Append the post-step-7 state event; a failure changes nothing and prints nothing."""
+
+    error_code: str | None = None
+    if result is not None and result.status == "ok":
+        outcome = "completed"
+    else:
+        outcome = "failed" if gate.outbound_attempted else "refused"
+        if result is not None:
+            error = result.payload.get("error")
+            if isinstance(error, Mapping) and isinstance(error.get("code"), str):
+                error_code = error["code"]
+    try:
+        vendor_audit.append_event(
+            sink,
+            vendor_audit.build_event(
+                correlation_id=correlation_id,
+                actor_principal=actor,
+                authorization_ref=authorization_ref,
+                environment=environment.label,
+                outcome=outcome,
+                error_code=error_code,
+                outbound_attempted=gate.outbound_attempted,
+                route_family=gate.route_family,
+                resource_path=gate.resource_path,
+            ),
+        )
+    except vendor_audit.AuditUnavailable:
+        return
+
+
+def _resolve_vendor_route(
+    *,
+    user_id: str,
+    resolver_meta: MutableMapping[str, object],
+    vendor_env: Mapping[str, object],
+    database_env: Mapping[str, object],
+    upsert: bool,
+    dry_run: bool,
+    birthdate: str | None,
+    birthtime: str | None,
+    location: str | None,
+    gate: _OverrideGate | None,
+) -> ResolveBodygraphResult:
+    """Step 7 (§7.1.11d): route, input, identity, write guards, client and fetch."""
+
     try:
         route_policy = _classify_env_route_policy(vendor_env)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
+    if gate is not None:
+        gate.route_family = str(route_policy["route_family"])
+        gate.resource_path = str(route_policy["resource_path"])
     resolver_meta = {**resolver_meta, "route_policy": route_policy}
     if not route_policy["supported"]:
         error = VendorError(
@@ -192,13 +451,30 @@ def _resolve_vendor(
             upsert=upsert,
             dry_run=dry_run,
             route_policy=route_policy,
+            override_gate=gate,
         )
     try:
-        outcome = ingest_vendor_bodygraph(
-            vendor_inputs,
-            env=database_env,
-            dry_run=dry_run,
-        )
+        if gate is None:
+            outcome = ingest_vendor_bodygraph(
+                vendor_inputs,
+                env=database_env,
+                dry_run=dry_run,
+            )
+        else:
+            # §7.1.11d: the override never authorizes production --upsert or a
+            # production database write (HDE-CRD-0002 WU-PR-04 ID-3).
+            if upsert or not dry_run:
+                return _vendor_error(
+                    VendorError("PROVIDER_WRITE_UNSUPPORTED", "BodyGraph persistence is refused in production-like environments"),
+                    resolver_meta,
+                )
+            client = HdApiClient.from_env(env=_client_config_env(database_env))
+            outcome = ingest_vendor_bodygraph(
+                vendor_inputs,
+                env=database_env,
+                dry_run=dry_run,
+                client=_AttemptTrackingClient(client, gate),  # type: ignore[arg-type]
+            )
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     ingest_section = {
@@ -231,6 +507,7 @@ def _resolve_vendor_v2_chart(
     upsert: bool,
     dry_run: bool,
     route_policy: Mapping[str, object],
+    override_gate: _OverrideGate | None = None,
 ) -> ResolveBodygraphResult:
     db: DBAccess | None = None
     if not dry_run and not upsert:
@@ -245,7 +522,11 @@ def _resolve_vendor_v2_chart(
         return _vendor_error(error, resolver_meta)
     requested_app_env = str(vendor_env.get("APP_ENV") or vendor_env.get("ENGINE_ENV") or "").strip().lower()
     database_app_env = str(os.environ.get("APP_ENV") or os.environ.get("ENGINE_ENV") or "").strip().lower()
-    if not dry_run and {requested_app_env, database_app_env} & {"prod", "production", "live"}:
+    production_like = bool({requested_app_env, database_app_env} & {"prod", "production", "live"})
+    if override_gate is not None:
+        # Only an allowed production override reaches here with a gate (ID-3).
+        production_like = True
+    if (not dry_run or (override_gate is not None and upsert)) and production_like:
         return _vendor_error(
             VendorError("PROVIDER_WRITE_UNSUPPORTED", "mapped-cache persistence is refused in production-like environments"),
             resolver_meta,
@@ -268,6 +549,8 @@ def _resolve_vendor_v2_chart(
             birthtime=vendor_inputs.birthtime,
             location=vendor_inputs.location,
         )
+        if override_gate is not None:
+            override_gate.outbound_attempted = True
         vendor_result = client.fetch(request)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
@@ -647,9 +930,9 @@ def _acquire_dry_run(
     vendor_env: dict[str, object] = {}
     database_env: dict[str, object] = {}
     try:
-        if _truthy(scoped.get("SAFE_MODE")):
+        if _safe_mode_closed(scoped.get("SAFE_MODE")):
             raise VendorError("PROVIDER_REFUSED", "Vendor source is refused under SAFE rails (SAFE_MODE=1).")
-        if not _truthy(scoped.get("ALLOW_NETWORK")):
+        if not _network_allowed(scoped.get("ALLOW_NETWORK")):
             raise VendorError("PROVIDER_NETWORK_BLOCKED", "Network disabled under current rails.")
         vendor_env = dict(_vendor_config_env(scoped))
         database_env = dict(vendor_env)

@@ -12,7 +12,12 @@ from engine.bodygraph import resolve_bodygraph
 from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.mapped_cache import MappedBodyGraphRow, MappedCacheError, read_current_mapped_bodygraph
 from engine.bodygraph.projection import BodyGraphProjectionError, canonical_uuid
-from engine.bodygraph.resolver import ResolvedCompatChart, projection_refusal, resolve_compat_chart
+from engine.bodygraph.resolver import (
+    ResolvedCompatChart,
+    is_valid_authorization_ref,
+    projection_refusal,
+    resolve_compat_chart,
+)
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import (
     EvaluationParty,
@@ -42,6 +47,16 @@ from ._admin_dump import canon_dump
 _PROJECTION_KEYS = ("bodygraph", "person", "person_uid", "source")
 _IDENTITY_KEYS = ("user_id", "canonical_person_id")
 _BIRTH_KEYS = ("birthdate", "birthtime", "location")
+# HDE-CLI-API-Vendor-Ref §7.1.11a and §7.1.11e: usage errors name the option and
+# never echo its value.
+_ALLOW_PROD_VENDOR = "--allow-prod-vendor"
+_ALLOW_PROD_VENDOR_COMMAND_USAGE = "hdctl: --allow-prod-vendor is accepted only by bg:resolve --source vendor"
+_ALLOW_PROD_VENDOR_DUPLICATE_USAGE = "hdctl bg:resolve: --allow-prod-vendor may be given only once"
+_ALLOW_PROD_VENDOR_VALUE_USAGE = (
+    "hdctl bg:resolve: --allow-prod-vendor requires one AUTHORIZATION_REF of 1 to 128 characters "
+    "matching ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+)
+_ALLOW_PROD_VENDOR_SOURCE_USAGE = "hdctl bg:resolve: --allow-prod-vendor is accepted only with --source vendor"
 
 
 class CliError(Exception):
@@ -160,6 +175,12 @@ def _build_parser() -> argparse.ArgumentParser:
     bg.add_argument("--birthdate", help="Birthdate (YYYY-MM-DD) for vendor source")
     bg.add_argument("--birthtime", help="Birth time (HH:MM) for vendor source")
     bg.add_argument("--location", help="Location string for vendor source")
+    bg.add_argument(
+        _ALLOW_PROD_VENDOR,
+        dest="allow_prod_vendor",
+        metavar="AUTHORIZATION_REF",
+        help="Production-like environments only, with --source vendor: audit reference of the approved work item (not a credential)",
+    )
     bg.set_defaults(handler=bg_resolve)
 
     dev_sampler = sub.add_parser(
@@ -199,7 +220,7 @@ def _load_viewer_prefs(path: str | None) -> Dict[str, Any]:
         raise CliError("VIEWER_PREFS_READ_ERROR") from exc
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, RecursionError) as exc:
         raise CliError("INVALID_VIEWER_PREFS") from exc
     err = validate_viewer_prefs(data)
     if err:
@@ -207,7 +228,38 @@ def _load_viewer_prefs(path: str | None) -> Dict[str, Any]:
     return normalize_viewer_prefs(data)
 
 
+def _allow_prod_vendor_usage_error(argv: Sequence[str]) -> str | None:
+    """Step 1 of §7.1.11d, run before argparse, which keeps the last value silently."""
+
+    values: list[tuple[int, str | None]] = []
+    for index, token in enumerate(argv):
+        if token == _ALLOW_PROD_VENDOR:
+            values.append((index, argv[index + 1] if index + 1 < len(argv) else None))
+        elif token.startswith(_ALLOW_PROD_VENDOR + "="):
+            values.append((index, token[len(_ALLOW_PROD_VENDOR) + 1 :]))
+    if not values:
+        return None
+    command_index = next((index for index, token in enumerate(argv) if not token.startswith("-")), None)
+    separator_index = argv.index("--") if "--" in argv else len(argv)
+    # After "--" argparse would report the option and its value as unrecognized arguments.
+    if (
+        command_index is None
+        or argv[command_index] != "bg:resolve"
+        or values[0][0] < command_index
+        or values[-1][0] > separator_index
+    ):
+        return _ALLOW_PROD_VENDOR_COMMAND_USAGE
+    if len(values) > 1:
+        return _ALLOW_PROD_VENDOR_DUPLICATE_USAGE
+    if not is_valid_authorization_ref(values[0][1]):
+        return _ALLOW_PROD_VENDOR_VALUE_USAGE
+    return None
+
+
 def bg_resolve(args: argparse.Namespace) -> int:
+    authorization_ref = getattr(args, "allow_prod_vendor", None)
+    if authorization_ref is not None and args.source != "vendor":
+        raise CliError(_ALLOW_PROD_VENDOR_SOURCE_USAGE, exit_code=64)
     if args.source == "vendor":
         # PF-canon: vendor CLI invocations must supply the full birth tuple explicitly.
         missing = [name for name in ("birthdate", "birthtime", "location") if not getattr(args, name, None)]
@@ -222,6 +274,7 @@ def bg_resolve(args: argparse.Namespace) -> int:
         birthdate=getattr(args, "birthdate", None),
         birthtime=getattr(args, "birthtime", None),
         location=getattr(args, "location", None),
+        authorization_ref=authorization_ref,
     )
     output = emitter.emit_public(result.payload).decode("utf-8")
     sys.stdout.write(output)
@@ -235,6 +288,11 @@ def cli(argv: list[str] | None = None) -> int:
             sys.stdout.write(f"{_cli_version_text()}\n")
             return 0
         sys.stderr.write("VERSION_FLAG_WITH_COMMAND\n")
+        return 64
+
+    usage_error = _allow_prod_vendor_usage_error(argv)
+    if usage_error is not None:
+        sys.stderr.write(f"{usage_error}\n")
         return 64
 
     parser = _build_parser()
@@ -264,7 +322,8 @@ def cli(argv: list[str] | None = None) -> int:
         sys.stderr.write(f"{exc.code}\n")
         return 1
     except Exception as exc:  # pragma: no cover - defensive guard
-        sys.stderr.write(f"CLI_UNEXPECTED:{exc}\n")
+        # PF05 §3.3 and §8.2: one code token on stderr; the exception text is not echoed.
+        sys.stderr.write("CLI_UNEXPECTED\n")
         return 1
 
 
@@ -273,7 +332,7 @@ def _parse_input(raw: str) -> Dict[str, Any]:
         raise CliError("EMPTY_INPUT")
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError as exc:  # pragma: no cover - JSON path exercised by tests
+    except (json.JSONDecodeError, RecursionError) as exc:  # pragma: no cover - JSON path exercised by tests
         raise CliError("INVALID_JSON") from exc
     if not isinstance(data, dict):
         raise CliError("INVALID_JSON")
@@ -554,6 +613,9 @@ def aux_preview(args: argparse.Namespace) -> int:
         band = next((row.get("band") for row in categories if row.get("category_id") == category), None)
         if not isinstance(category, str) or not isinstance(band, str):
             raise CliError("MISSING_COMPAT_CATEGORY")
+        if args.band:
+            # S08: an explicit --band replaces only the band read from the file.
+            band = args.band
         perspective = args.perspective or "shared"
         release_id = compat.get("release_id") or identity_meta()["release_id"]
         return category, band, perspective, release_id, data
@@ -769,8 +831,9 @@ def showcompat(_: argparse.Namespace) -> int:
 
 
 def _ensure_dev_admin_env() -> None:
-    app_env = (os.environ.get("APP_ENV") or "").lower()
-    if app_env not in ("dev", "test", "local"):
+    # HDE Governance "Dev/admin APP_ENV gating": exactly dev, test or local, with no
+    # case-folding or trimming.
+    if os.environ.get("APP_ENV") not in ("dev", "test", "local"):
         raise CliError("DEV_ADMIN_ONLY")
 
 
@@ -822,7 +885,7 @@ def _load_candidates_from_path(path: str) -> list[CandidateFeatures]:
     raw = _read_file(path)
     try:
         payload = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, RecursionError) as exc:
         raise CliError("INVALID_CANDIDATES_JSON") from exc
 
     if isinstance(payload, Mapping):
@@ -891,7 +954,7 @@ def _load_party_file(path: str, label: str) -> Dict[str, Any]:
         raise CliError(f"FILE_READ_ERROR_{label.upper()}") from exc
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, RecursionError) as exc:
         raise CliError(f"INVALID_JSON_{label.upper()}") from exc
     if not isinstance(data, dict):
         raise CliError(f"INVALID_JSON_{label.upper()}")

@@ -16,6 +16,14 @@ ROOT = Path(__file__).resolve().parents[2]
 CHART = json.loads((ROOT / "tests/fixtures/bodygraph/source_invariance/vendor_chart_result.v1.json").read_text())["payload"]
 
 
+@pytest.fixture(autouse=True)
+def _no_ambient_engine_env(monkeypatch):
+    # HDE-CRD-0002 WU-PR-04 ID-8: the vendor gate classifies APP_ENV with its ENGINE_ENV
+    # alias (HDE-CLI-API-Vendor-Ref §7.1.11b), so a leaked process ENGINE_ENV must not
+    # conflict with the APP_ENV these mappings set.
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+
+
 def env(**changes):
     value = {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://vendor.test/v2", "HD_API_KEY": "set", "GEO_API_KEY": "set"}
     value.update(changes)
@@ -51,6 +59,12 @@ class MemoryDB:
         return [[(1,)]] if inserted else [[]]
 
 
+def production_override(monkeypatch, tmp_path):
+    """HDE-CRD-0002 WU-PR-04 ID-8: a valid reference, a test actor and a temporary sink."""
+    monkeypatch.setattr("engine.bodygraph.vendor_audit.resolve_actor_principal", lambda: "test-operator")
+    return {"authorization_ref": "HDE-CRD-0002-TEST-1"}, {"HDE_VENDOR_OVERRIDE_AUDIT_PATH": str(tmp_path / "override_audit.jsonl")}
+
+
 def install(monkeypatch, *, db=object()):
     client = Client()
     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: client)
@@ -75,18 +89,20 @@ def test_missing_upsert_refuses_before_vendor_and_db(monkeypatch):
 
 
 @pytest.mark.parametrize("app_env", ["prod", "production", "live"])
-def test_production_like_refuses_before_vendor_and_db(monkeypatch, app_env):
+def test_production_like_refuses_before_vendor_and_db(monkeypatch, tmp_path, app_env):
+    override, sink = production_override(monkeypatch, tmp_path)
     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
     monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: pytest.fail("DB constructed"))
-    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV=app_env), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
+    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV=app_env, **sink), birthdate="2000-01-01", birthtime="00:00", location="Fixture", **override)
     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
 
 
-def test_process_production_environment_cannot_be_overridden_for_database_write(monkeypatch):
+def test_process_production_environment_cannot_be_overridden_for_database_write(monkeypatch, tmp_path):
+    override, sink = production_override(monkeypatch, tmp_path)
     monkeypatch.setenv("APP_ENV", "production")
     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
     monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: pytest.fail("DB constructed"))
-    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV="test"), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
+    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV="test", **sink), birthdate="2000-01-01", birthtime="00:00", location="Fixture", **override)
     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
 
 
