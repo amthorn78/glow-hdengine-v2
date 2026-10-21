@@ -2231,6 +2231,7 @@ CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
 CRD_REQUIREMENT_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
 EPIC_REQUIREMENT_RE = rb"^\*\*(K%s-REQ-[0-9]{3})\.\*\*"
 EPIC_ACCEPTANCE_RE = rb"^\| (AC%s-[0-9]{2}) \xe2\x80\x94 "  # em dash
+PRIMARY_HEADER_SCHEMA = "pf27.step_log_header.v2"
 # The requirements source is the change's own current approved Specification (PF10 addendum 2.15).
 APPROVED_SPECIFICATION_RE = re.compile(
     r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
@@ -2248,6 +2249,7 @@ class CandidateModelV2:
     evidence_inputs: tuple[tuple[str, FileSnapshot], ...]
     report_path: str
     manifest_path: str
+    qa_primaries: tuple[FileSnapshot, ...] = ()
 
 
 def _derived_paths_v2(change_id: str) -> tuple[str, str]:
@@ -2371,6 +2373,17 @@ def _current_approved_specification(change_id: str, tracked_paths: Iterable[str]
         if (match := APPROVED_SPECIFICATION_RE.match(rel)) and match["change"] == change_id
     }
     return versions[max(versions)] if versions else None
+
+
+def _primary_identity(payload: bytes) -> tuple[object, object] | None:
+    # A PF27 v2 step-log primary opens with its header as one compact JSON line.
+    try:
+        header = json.loads(payload.split(b"\n", 1)[0].decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return None
+    if not isinstance(header, dict) or header.get("schema_version") != PRIMARY_HEADER_SCHEMA:
+        return None
+    return header.get("check_id"), header.get("status")
 
 
 def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
@@ -2561,6 +2574,23 @@ def _load_model_v2(
         raise _fail("OUTPUT_COLLISION")
     _require_v2_semantics(source, bindings, report_path, manifest_path, tree)
 
+    # Each QA ledger entry's primary must be tracked and agree with the ledger (PO-35-5).
+    ledger_rel = _supporting_paths_v2(str(source["change_id"]))["qa_step_logs_manifest"]
+    ledger = json.loads(next(s for s in bindings.values() if s.rel == ledger_rel).payload)
+    qa_primaries: list[FileSnapshot] = []
+    for check_id, entry in sorted(ledger.items()):
+        primary_rel = entry["log_path"]
+        if primary_rel not in tree:
+            raise _fail("QA_LEDGER_INVALID")
+        _require_admitted_causal_input(primary_rel)
+        primary = _capture_input(
+            root, context, store, tree, primary_rel, max_bytes=remaining_input_bytes
+        )
+        remaining_input_bytes -= len(primary.payload)
+        if _primary_identity(primary.payload) != (check_id, entry["status"]):
+            raise _fail("QA_LEDGER_INVALID")
+        qa_primaries.append(primary)
+
     if _head(context, store) != head:
         raise _fail("GIT_HEAD_CHANGED")
     model = CandidateModelV2(
@@ -2572,12 +2602,14 @@ def _load_model_v2(
         evidence_inputs=tuple(sorted(evidence, key=lambda item: (item[0], item[1].rel))),
         report_path=report_path,
         manifest_path=manifest_path,
+        qa_primaries=tuple(qa_primaries),
     )
     snapshots = (
         schema_input,
         source_input,
         plan_input,
         *(snapshot for _, snapshot in model.evidence_inputs),
+        *model.qa_primaries,
     )
     return model, snapshots
 
@@ -2757,6 +2789,11 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
             f"- Evidence `{binding}`: `{snapshot.rel}` "
             f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
         )
+    for snapshot in model.qa_primaries:
+        lines.append(
+            f"- QA primary: `{snapshot.rel}` "
+            f"(`sha256={_sha256(snapshot.payload)}`, `size_bytes={len(snapshot.payload)}`)"
+        )
     nonclaim_codes = sorted(source["nonclaims"])
     lines.extend(("", "## Explicit nonclaims", ""))
     lines.extend(f"- {NONCLAIM_TEXT_V2[code]}" for code in nonclaim_codes)
@@ -2772,6 +2809,7 @@ def _render_candidate_v2(model: CandidateModelV2) -> dict[str, bytes]:
                 for binding, snapshot in model.evidence_inputs
             ],
             "plan": _binding(model.plan_input),
+            "qa_primaries": [_binding(snapshot) for snapshot in model.qa_primaries],
             "schema": _binding(model.schema_input),
         },
         "key_outputs": dict(source["key_outputs"]),

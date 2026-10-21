@@ -4363,6 +4363,15 @@ def _specification_text(change_id: str) -> str:
     return "".join(f"**{i}.** {scope}: {intent}\n\n" for i, scope, intent in rows)
 
 
+def _primary_rel(change_id: str, check: str = "qa-01-setup") -> str:
+    return f"audit/qa/{change_id.lower()}/checks/{check}/primary.log"
+
+
+def _primary_text(status: str, check: str = "qa-01-setup", schema: str = "pf27.step_log_header.v2") -> str:
+    header = {"check_id": check, "schema_version": schema, "status": status}
+    return json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n# Actual operator result\n"
+
+
 def _qa_ledger_text(change_id: str, status: str) -> str:
     directory = change_id.lower()
     check = "qa-01-setup"
@@ -4452,6 +4461,7 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
         **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
         _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- TI-002: close-pack canon\n",
         _ledger_paths(change_id)["qa_step_logs_manifest"]: _qa_ledger_text(change_id, "PASS"),
+        _primary_rel(change_id): _primary_text("PASS"),
     }
     for rel, text in files.items():
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -4805,6 +4815,8 @@ def test_v2_qa_ledger_is_read_before_any_decision(
     repo, source_rel = _init_v2_repo(tmp_path, source)
     rel = _ledger_paths("HDE-CRD-0002")["qa_step_logs_manifest"]
     (repo / rel).write_text(ledger or _qa_ledger_text("HDE-CRD-0002", "FAIL_BEHAVIOR"), encoding="utf-8")
+    if ledger is None:
+        (repo / _primary_rel("HDE-CRD-0002")).write_text(_primary_text("FAIL_BEHAVIOR"), encoding="utf-8")
     _commit_all(repo, "bind the QA ledger under test")
     if code is None:
         assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
@@ -4971,6 +4983,61 @@ def test_v2_requirements_source_must_be_the_highest_tracked_approved_specificati
     _commit_all(repo, "track specification versions")
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:REQUIREMENTS_SOURCE_NOT_CURRENT"
+
+
+@pytest.mark.parametrize(
+    "rel",
+    (
+        "audit/qa/hde-crd-0001/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic021/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic039/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic040/qa_step_logs_manifest.json",
+    ),
+)
+def test_v2_real_primaries_agree_with_their_real_ledgers(rel: str) -> None:
+    ledger = json.loads((ROOT / rel).read_text(encoding="utf-8"))
+    for check_id, entry in ledger.items():
+        payload = (ROOT / entry["log_path"]).read_bytes()
+        assert close_pack._primary_identity(payload) == (check_id, entry["status"])
+
+
+def test_v2_report_and_manifest_bind_each_qa_primary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    primary = (repo / _primary_rel("HDE-CRD-0002")).read_bytes()
+    digest = hashlib.sha256(primary).hexdigest()
+    report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+    assert f"- QA primary: `{_primary_rel('HDE-CRD-0002')}` (`sha256={digest}`, `size_bytes={len(primary)}`)" in report
+    manifest = json.loads((repo / CRD_MANIFEST_REL).read_text(encoding="utf-8"))
+    assert manifest["inputs"]["qa_primaries"] == [
+        {"path": _primary_rel("HDE-CRD-0002"), "sha256": digest, "size_bytes": len(primary)}
+    ]
+
+
+@pytest.mark.parametrize(
+    "case",
+    ("primary_untracked", "primary_status_disagrees", "primary_not_pf27_v2", "primary_check_id_disagrees"),
+)
+def test_v2_qa_ledger_entries_must_agree_with_their_tracked_primaries(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], case: str
+) -> None:
+    repo, source_rel = _init_v2_repo(tmp_path)
+    primary = repo / _primary_rel("HDE-CRD-0002")
+    if case == "primary_untracked":
+        _git(repo, "rm", "-q", "--cached", _primary_rel("HDE-CRD-0002"))
+        primary.unlink()
+    elif case == "primary_status_disagrees":
+        primary.write_text(_primary_text("FAIL_BEHAVIOR"), encoding="utf-8")
+    elif case == "primary_not_pf27_v2":
+        primary.write_text(_primary_text("PASS", schema="pf27.step_log_header.v1"), encoding="utf-8")
+    else:
+        primary.write_text(_primary_text("PASS", check="qa-02"), encoding="utf-8")
+    _commit_all(repo, "change the QA primary")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:QA_LEDGER_INVALID"
+    assert not (repo / CRD_REPORT_REL).exists()
 
 
 def _mutate(source: dict[str, object], case: str) -> None:
