@@ -4362,6 +4362,22 @@ def _spec_rel(change_id: str) -> str:
     return f"docs/ephemeral/{change_id}-specification-v1.1-approved.md"
 
 
+def _plan_rel(change_id: str) -> str:
+    return f"docs/ephemeral/{change_id}-implementation-plan-v1.1.md"
+
+
+CRD_REGISTER_REL = "docs/pfcanon/PF30.1-Canon-HDE-CRD-Records-v0.9.1.md"
+CRD_REGISTER_HEADING = "**4.2 Material update**"
+EPIC_REGISTER_REL = "docs/pfcanon/PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md"
+EPIC_REGISTER_HEADING = "**Subtask HDE-FERM001.3 — Observability & log posture (SAFE rails)**"
+
+
+def _register_pointer(source: dict[str, object], rel: str, heading: str) -> None:
+    """Map TI-009 to a heading in a bound register file (PO-35-8)."""
+    source["evidence_inputs"].append({"binding": "register", "path": rel})
+    source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "register", "heading": heading}}]
+
+
 def _requirement_rows(change_id: str) -> list[tuple[str, str, str]]:
     """HDE-CRD-0002's real rows; an Epic gets the same texts under its own K-REQ IDs."""
     if "CRD" in change_id:
@@ -4407,7 +4423,7 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
     return {
         "schema_version": "close_candidate_source.v2",
         "change_id": change_id,
-        "plan_path": "plans/plan.md",
+        "plan_path": _plan_rel(change_id),
         "evidence_inputs": [
             {"binding": "specification", "path": _spec_rel(change_id)},
             {"binding": "doc_deltas", "path": ledgers["doc_deltas"]},
@@ -4473,12 +4489,15 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
     for rel in (close_pack.SCHEMA_REL, close_pack.SCHEMA_V2_REL):
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / rel, repo / rel)
+    for rel in (CRD_REGISTER_REL, EPIC_REGISTER_REL):
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / rel, repo / rel)
     files = {
-        "plans/plan.md": "# Plan\n\nTracked plan.\n",
+        _plan_rel(change_id): "# Plan\n\nTracked plan.\n",
         _spec_rel(change_id): _specification_text(change_id),
         "evidence/qa_report.md": "# QA report\n\nFinal verdict recorded.\n",
         **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
-        _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- TI-002: close-pack canon\n",
+        _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- DEF-2: close-pack canon\n- TI-002: close-pack canon\n",
         _ledger_paths(change_id)["qa_step_logs_manifest"]: _qa_ledger_text(change_id, "PASS"),
         _primary_rel(change_id): _primary_text("PASS"),
     }
@@ -4778,11 +4797,58 @@ def test_v2_tracked_issue_pointer_needs_no_drain_target(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     source = _v2_source()
-    source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "QA report"}}]
+    _register_pointer(source, CRD_REGISTER_REL, CRD_REGISTER_HEADING)
     repo, source_rel = _init_v2_repo(tmp_path, source)
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
     report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
-    assert "- TI-009 pointers: `qa_report` (`evidence/qa_report.md`), section QA report" in report
+    assert f"- TI-009 pointers: `register` (`{CRD_REGISTER_REL}`), section {CRD_REGISTER_HEADING}" in report
+
+
+def test_v2_epic_tracked_issue_pointer_resolves_in_the_real_build_checklist(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = _v2_source("HDE-EPIC041")
+    _register_pointer(source, EPIC_REGISTER_REL, EPIC_REGISTER_HEADING)
+    repo, source_rel = _init_v2_repo(tmp_path / "pf09", source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / "audit/EPIC-041_close_report.md").read_text(encoding="utf-8")
+    assert f"- TI-009 pointers: `register` (`{EPIC_REGISTER_REL}`), section {EPIC_REGISTER_HEADING}" in report
+
+    source = _v2_source("HDE-EPIC041")
+    _register_pointer(source, CRD_REGISTER_REL, CRD_REGISTER_HEADING)
+    repo, source_rel = _init_v2_repo(tmp_path / "pf30", source)
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:TRACKED_ISSUE_POINTER_UNBOUND"
+
+
+@pytest.mark.parametrize(
+    ("plan", "code"),
+    (
+        ("docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md", None),
+        ("docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.0.md", "PLAN_SOURCE_NOT_CURRENT"),
+        ("docs/ephemeral/HDE-EPIC040-implementation-plan-v2.1.md", "PLAN_SOURCE_NOT_CURRENT"),
+    ),
+)
+def test_v2_plan_path_must_be_the_changes_current_implementation_plan(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    plan: str,
+    code: str | None,
+) -> None:
+    source = _v2_source()
+    source["plan_path"] = plan
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    for rel in (
+        "docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.0.md",
+        "docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md",
+        "docs/ephemeral/HDE-EPIC040-implementation-plan-v2.1.md",
+    ):
+        (repo / rel).write_bytes((ROOT / rel).read_bytes())
+    _commit_all(repo, "bind the real implementation plans")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == (0 if code is None else 1)
+    if code is not None:
+        assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
 
 
 def test_v2_tracked_issue_pointer_must_be_a_bound_path_and_heading() -> None:
@@ -5088,7 +5154,19 @@ def _mutate(source: dict[str, object], case: str) -> None:
     elif case == "requirements_source_not_a_specification":
         source["requirements_binding"] = "qa_report"
     elif case == "tracked_issue_pointer_heading_absent":
-        source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "Subtask 9"}}]
+        _register_pointer(source, CRD_REGISTER_REL, "Subtask 9")
+    elif case == "tracked_issue_pointer_not_a_register":
+        source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "qa_report", "heading": "QA report"}}]
+    elif case == "tracked_issue_pointer_other_kinds_register":
+        _register_pointer(source, EPIC_REGISTER_REL, EPIC_REGISTER_HEADING)
+    elif case == "drain_target_deferral_not_in_drain_targets":
+        source["deferrals"][1]["id"] = "DEF-8"
+    elif case == "pointer_file_unresolved":
+        source["pointers"].append("evidence/absent.md")
+    elif case == "pointer_directory_unresolved":
+        source["pointers"].append("evidence/absent/")
+    elif case == "plan_not_an_implementation_plan":
+        source["plan_path"] = CRD_REGISTER_REL
     elif case == "tracked_issue_pointer_binding_unresolved":
         source["tracked_issues"] = [{"id": "TI-009", "pointer": {"binding": "absent", "heading": "QA report"}}]
     elif case == "ledger_not_bound":
@@ -5113,6 +5191,12 @@ def _mutate(source: dict[str, object], case: str) -> None:
         ("satisfied_omits_a_requirement", "REQUIREMENT_COVERAGE_INCOMPLETE"),
         ("requirements_source_not_a_specification", "REQUIREMENTS_SOURCE_NOT_CURRENT"),
         ("tracked_issue_pointer_heading_absent", "TRACKED_ISSUE_POINTER_UNBOUND"),
+        ("tracked_issue_pointer_not_a_register", "TRACKED_ISSUE_POINTER_UNBOUND"),
+        ("tracked_issue_pointer_other_kinds_register", "TRACKED_ISSUE_POINTER_UNBOUND"),
+        ("drain_target_deferral_not_in_drain_targets", "DEFERRAL_UNBOUND"),
+        ("pointer_file_unresolved", "POINTER_UNRESOLVED"),
+        ("pointer_directory_unresolved", "POINTER_UNRESOLVED"),
+        ("plan_not_an_implementation_plan", "PLAN_SOURCE_NOT_CURRENT"),
         ("tracked_issue_pointer_binding_unresolved", "BINDING_UNRESOLVED"),
         ("ledger_not_bound", "OUTPUT_BINDING_MISMATCH"),
     ),

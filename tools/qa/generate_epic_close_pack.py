@@ -2237,6 +2237,14 @@ APPROVED_SPECIFICATION_RE = re.compile(
     r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
     r"-specification-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)-approved\.md\Z"
 )
+# The plan is the change's own current implementation plan (PO-35-9).
+IMPLEMENTATION_PLAN_RE = re.compile(
+    r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
+    r"-implementation-plan-v(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.md\Z"
+)
+# A tracked-issue pointer names a heading in the change kind's register (PO-35-8).
+EPIC_REGISTER_RE = re.compile(r"docs/pfcanon/PF09\.[0-9]+-Canon-HDE-Build-Checklist-[A-Za-z]+-v[0-9.]+\.md\Z")
+CRD_REGISTER_RE = re.compile(r"docs/pfcanon/PF30\.[0-9]+-Canon-HDE-CRD-Records-v[0-9.]+\.md\Z")
 
 
 @dataclass(frozen=True)
@@ -2366,11 +2374,11 @@ def _qa_ledger_statuses(payload: bytes, directory: str) -> list[str]:
     return [entry["status"] for entry in ledger.values()]
 
 
-def _current_approved_specification(change_id: str, tracked_paths: Iterable[str]) -> str | None:
+def _current_version(pattern: re.Pattern[str], change_id: str, tracked_paths: Iterable[str]) -> str | None:
     versions = {
         (int(match["major"]), int(match["minor"])): rel
         for rel in tracked_paths
-        if (match := APPROVED_SPECIFICATION_RE.match(rel)) and match["change"] == change_id
+        if (match := pattern.match(rel)) and match["change"] == change_id
     }
     return versions[max(versions)] if versions else None
 
@@ -2428,12 +2436,27 @@ def _require_v2_semantics(
         if key not in {"close_manifest", "close_report"}
     ):
         raise _fail("OUTPUT_BINDING_MISMATCH")
+    tracked = frozenset(tracked_paths)
+    crd = CHANGE_RE.fullmatch(change_id).group("crd") is not None  # type: ignore[union-attr]
+    close_run = f"audit/qa/{change_id.lower()}/close/"
     pointers = set(source["pointers"])
     required_pointers = set(supporting.values())
-    if CHANGE_RE.fullmatch(change_id).group("crd"):  # type: ignore[union-attr]
-        required_pointers.add(f"audit/qa/{change_id.lower()}/close/")
+    if crd:
+        required_pointers.add(close_run)
     if not required_pointers <= pointers:
         raise _fail("POINTER_MISSING")
+    # Every pointer names a tracked file or a directory holding one; a CRD's close-run
+    # directory is written after the verdict, so it may not exist yet.
+    if any(
+        not (crd and pointer == close_run)
+        and not (
+            any(rel.startswith(pointer) for rel in tracked)
+            if pointer.endswith("/")
+            else pointer in tracked
+        )
+        for pointer in pointers
+    ):
+        raise _fail("POINTER_UNRESOLVED")
 
     referenced = [str(source["requirements_binding"])]
     for item in source["acceptance"]:
@@ -2452,8 +2475,10 @@ def _require_v2_semantics(
         raise _fail("BINDING_UNRESOLVED")
 
     requirements = bindings[str(source["requirements_binding"])]
-    if requirements.rel != _current_approved_specification(change_id, tracked_paths):
+    if requirements.rel != _current_version(APPROVED_SPECIFICATION_RE, change_id, tracked):
         raise _fail("REQUIREMENTS_SOURCE_NOT_CURRENT")
+    if source["plan_path"] != _current_version(IMPLEMENTATION_PLAN_RE, change_id, tracked):
+        raise _fail("PLAN_SOURCE_NOT_CURRENT")
     requirement_ids = _requirement_ids(requirements.payload, change_id)
     criteria = [str(item["criterion_id"]) for item in source["acceptance"]]
     if len(criteria) != len(set(criteria)):
@@ -2469,20 +2494,22 @@ def _require_v2_semantics(
         identifiers = [str(item[key]) for item in source[field]]
         if len(identifiers) != len(set(identifiers)):
             raise _fail("DEFERRAL_AMBIGUOUS")
-    if any(
-        "adr_status" in item and not _token_occurs(str(item["id"]), drain_targets)
-        for item in source["deferrals"]
-    ):
+    # The ledger names every deferral's ID, in both forms (PO-35-7).
+    if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["deferrals"]):
         raise _fail("DEFERRAL_UNBOUND")
     if any(
         "adr_status" in item and not _token_occurs(str(item["id"]), drain_targets)
         for item in source["tracked_issues"]
     ):
         raise _fail("TRACKED_ISSUE_UNBOUND")
+    register = CRD_REGISTER_RE if crd else EPIC_REGISTER_RE
     if any(
         "pointer" in item
-        and not _heading_occurs(
-            str(item["pointer"]["heading"]), bindings[str(item["pointer"]["binding"])].payload
+        and (
+            register.match(bindings[str(item["pointer"]["binding"])].rel) is None
+            or not _heading_occurs(
+                str(item["pointer"]["heading"]), bindings[str(item["pointer"]["binding"])].payload
+            )
         )
         for item in source["tracked_issues"]
     ):
