@@ -4402,8 +4402,35 @@ def _primary_rel(change_id: str, check: str = "qa-01-setup") -> str:
     return f"audit/qa/{change_id.lower()}/checks/{check}/primary.log"
 
 
-def _primary_text(status: str, check: str = "qa-01-setup", schema: str = "pf27.step_log_header.v2") -> str:
-    header = {"check_id": check, "schema_version": schema, "status": status}
+def _primary_header(
+    status: str, check: str = "qa-01-setup", change_id: str = "HDE-CRD-0002"
+) -> dict[str, object]:
+    # A complete PF27 v2 header, as the canonical QA harness writes it.
+    return {
+        "captured_env": {"ALLOW_NETWORK": "0", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"},
+        "check_id": check,
+        "check_name": check,
+        "claimed_tokens": [],
+        "command": [["python", "-m", "pytest", "-q", "tests/qa"]],
+        "command_provenance": "Executed by the canonical QA harness",
+        "evidence_artifacts": [_primary_rel(change_id, check)],
+        "exit_code": 0 if status == "PASS" else 1,
+        "intended_tokens": [],
+        "pf_refs": ["PF19-Canon-Glow-QA-Guide", "PF27-Canon-Plan-Templates"],
+        "schema_version": "pf27.step_log_header.v2",
+        "status": status,
+        "status_reason": "" if status == "PASS" else "The check's command exited 1.",
+        "timestamp_utc": "2026-10-21T00:00:00Z",
+    }
+
+
+def _primary_text(
+    status: str,
+    check: str = "qa-01-setup",
+    schema: str = "pf27.step_log_header.v2",
+    change_id: str = "HDE-CRD-0002",
+) -> str:
+    header = {**_primary_header(status, check, change_id), "schema_version": schema}
     return json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n# Actual operator result\n"
 
 
@@ -4499,7 +4526,7 @@ def _init_v2_repo(tmp_path: Path, source: dict[str, object] | None = None) -> tu
         **{rel: "Doc Deltas: None\n" for key, rel in _ledger_paths(change_id).items() if key == "doc_deltas"},
         _ledger_paths(change_id)["drain_targets"]: "# Drain targets\n\n- DEF-1: close-pack canon\n- DEF-2: close-pack canon\n- TI-002: close-pack canon\n",
         _ledger_paths(change_id)["qa_step_logs_manifest"]: _qa_ledger_text(change_id, "PASS"),
-        _primary_rel(change_id): _primary_text("PASS"),
+        _primary_rel(change_id): _primary_text("PASS", change_id=change_id),
     }
     for rel, text in files.items():
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -5080,10 +5107,12 @@ def test_v2_requirements_source_must_be_the_highest_tracked_approved_specificati
     ),
 )
 def test_v2_real_primaries_agree_with_their_real_ledgers(rel: str) -> None:
+    directory = rel.split("/")[2]
     ledger = json.loads((ROOT / rel).read_text(encoding="utf-8"))
     for check_id, entry in ledger.items():
         payload = (ROOT / entry["log_path"]).read_bytes()
-        assert close_pack._primary_identity(payload) == (check_id, entry["status"])
+        identity = close_pack._primary_identity(payload, entry["log_path"], crd=directory.startswith("hde-crd-"))
+        assert identity == (check_id, entry["status"])
 
 
 def test_v2_report_and_manifest_bind_each_qa_primary(
@@ -5103,7 +5132,14 @@ def test_v2_report_and_manifest_bind_each_qa_primary(
 
 @pytest.mark.parametrize(
     "case",
-    ("primary_untracked", "primary_status_disagrees", "primary_not_pf27_v2", "primary_check_id_disagrees"),
+    (
+        "primary_untracked",
+        "primary_status_disagrees",
+        "primary_not_pf27_v2",
+        "primary_check_id_disagrees",
+        "primary_identity_only_header",
+        "primary_pass_with_failed_command",
+    ),
 )
 def test_v2_qa_ledger_entries_must_agree_with_their_tracked_primaries(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], case: str
@@ -5119,12 +5155,103 @@ def test_v2_qa_ledger_entries_must_agree_with_their_tracked_primaries(
         primary.write_text(_primary_text("FAIL_BEHAVIOR"), encoding="utf-8")
     elif case == "primary_not_pf27_v2":
         primary.write_text(_primary_text("PASS", schema="pf27.step_log_header.v1"), encoding="utf-8")
+    elif case == "primary_identity_only_header":
+        # CX7-12: an identity-only header whose body records a failed command.
+        header = {"check_id": "qa-01-setup", "schema_version": "pf27.step_log_header.v2", "status": "PASS"}
+        text = json.dumps(header, sort_keys=True, separators=(",", ":")) + "\nexit_code=1\n"
+        primary.write_text(text, encoding="utf-8")
+    elif case == "primary_pass_with_failed_command":
+        header = {**_primary_header("PASS"), "exit_code": 1}
+        primary.write_text(json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
     else:
         primary.write_text(_primary_text("PASS", check="qa-02"), encoding="utf-8")
     _commit_all(repo, "change the QA primary")
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
     assert _error(capsys) == "EPIC_CLOSE_PACK_ERROR:QA_LEDGER_INVALID"
     assert not (repo / CRD_REPORT_REL).exists()
+
+
+_PRIMARY_HEADER_CASES: dict[str, Callable[[dict[str, object]], object]] = {
+    "complete_pass": lambda header: header,
+    "complete_fail_tooling": lambda header: {
+        **header, "status": "FAIL_TOOLING", "exit_code": 2, "status_reason": "The runner was lost."
+    },
+    "identity_only": lambda header: {key: header[key] for key in ("check_id", "schema_version", "status")},
+    "extra_field": lambda header: {**header, "note": "extra"},
+    "pass_with_failed_exit_code": lambda header: {**header, "exit_code": 1},
+    "pass_with_reason": lambda header: {**header, "status_reason": "Partly ran."},
+    "pass_not_executed": lambda header: {
+        **header, "command": [], "exit_code": None, "command_provenance": "Not executed"
+    },
+    "exit_code_bool": lambda header: {**header, "exit_code": False},
+    "status_unknown": lambda header: {**header, "status": "SKIPPED"},
+    "check_id_uppercase": lambda header: {**header, "check_id": "QA-01-SETUP"},
+    "check_name_empty": lambda header: {**header, "check_name": ""},
+    "command_mixed": lambda header: {**header, "command": ["python", ["-m", "pytest"]]},
+    "command_empty_part": lambda header: {**header, "command": [["python", ""]]},
+    "provenance_not_executed_with_command": lambda header: {**header, "command_provenance": "Not executed"},
+    "evidence_empty": lambda header: {**header, "evidence_artifacts": []},
+    "evidence_omits_own_primary": lambda header: {**header, "evidence_artifacts": ["evidence/qa_report.md"]},
+    "pf_ref_not_a_title": lambda header: {**header, "pf_refs": ["PF27"]},
+    "env_key_not_admitted": lambda header: {**header, "captured_env": {"HOME": "/root"}},
+    "timestamp_not_a_date": lambda header: {**header, "timestamp_utc": "2026-13-01T00:00:00Z"},
+    "claimed_tokens": lambda header: {**header, "claimed_tokens": ["QA_OK"]},
+    "intended_tokens_without_nonclaim": lambda header: {**header, "intended_tokens": ["QA_OK"]},
+    "fail_behavior_without_reason": lambda header: {
+        **header, "status": "FAIL_BEHAVIOR", "exit_code": 1, "status_reason": ""
+    },
+    "fail_behavior_not_executed": lambda header: {
+        **header,
+        "status": "FAIL_BEHAVIOR",
+        "status_reason": "Refused.",
+        "command": [],
+        "exit_code": None,
+        "command_provenance": "Not executed",
+    },
+    "parked_with_command": lambda header: {
+        **header, "status": "PARKED", "exit_code": 0, "status_reason": "Parked by the owner."
+    },
+}
+_PRIMARY_PAYLOAD_CASES: dict[str, Callable[[str], str]] = {
+    "compact": lambda line: line + "\n# Actual operator result\n",
+    "not_compact": lambda line: json.dumps(json.loads(line), sort_keys=True) + "\n",
+    "crlf": lambda line: line + "\r\n",
+    "no_final_lf": lambda line: line,
+    "duplicate_key": lambda line: line[:-1] + ',"status":"PASS"}\n',
+    "intended_tokens_with_nonclaim": lambda line: line + "\n" + close_pack.PRIMARY_NONCLAIM + "\n",
+}
+
+
+@pytest.mark.parametrize("change_id", ("HDE-CRD-0002", "HDE-EPIC041"))
+@pytest.mark.parametrize("payload_case", sorted(_PRIMARY_PAYLOAD_CASES))
+@pytest.mark.parametrize("header_case", sorted(_PRIMARY_HEADER_CASES))
+def test_v2_primary_check_agrees_with_the_shared_pf27_parser(
+    change_id: str, payload_case: str, header_case: str
+) -> None:
+    # CX7-12: the writer restates the harness's PF27 v2 contract (ID-10); the two must agree.
+    from tools.qa import qa_harness
+
+    rel = _primary_rel(change_id)
+    header = _PRIMARY_HEADER_CASES[header_case](_primary_header("PASS", change_id=change_id))
+    if payload_case == "intended_tokens_with_nonclaim":
+        header = {**header, "intended_tokens": ["QA_OK"]}
+    line = json.dumps(header, sort_keys=True, separators=(",", ":"))
+    payload = _PRIMARY_PAYLOAD_CASES[payload_case](line).encode("utf-8")
+    crd = change_id.startswith("HDE-CRD-")
+    try:
+        if crd:
+            config = qa_harness.HarnessConfig(crd_id=change_id, repo_root=ROOT)
+            parsed = qa_harness._parse_crd_primary(config, "qa-01-setup", payload)
+        else:
+            config = qa_harness.HarnessConfig(change_id, repo_root=ROOT)
+            parsed = qa_harness._parse_primary_header(payload.decode("utf-8"), allow_legacy_check_id=False)
+            qa_harness._require_v2_primary_self_binding(config, "qa-01-setup", parsed)
+        shared = (parsed["check_id"], parsed["status"])
+    except (ValueError, KeyError, TypeError):
+        shared = None
+    assert close_pack._primary_identity(payload, rel, crd=crd) == shared
+    if header_case == "complete_pass" and payload_case == "compact":
+        assert shared == ("qa-01-setup", "PASS")
 
 
 def _mutate(source: dict[str, object], case: str) -> None:

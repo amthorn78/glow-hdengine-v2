@@ -24,6 +24,7 @@ import sys
 import zlib
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -2232,6 +2233,33 @@ CRD_REQUIREMENT_RE = re.compile(rb"^\| (S[0-9]{2,}) \|", re.MULTILINE)
 EPIC_REQUIREMENT_RE = rb"^\*\*(K%s-REQ-[0-9]{3})\.\*\*"
 EPIC_ACCEPTANCE_RE = rb"^\| (AC%s-[0-9]{2}) \xe2\x80\x94 "  # em dash
 PRIMARY_HEADER_SCHEMA = "pf27.step_log_header.v2"
+# The PF27 v2 header contract of tools/qa/qa_harness.py (_parse_primary_header, with
+# _parse_crd_primary's rules for a CRD), restated here because the writer imports only the
+# standard library and jsonschema (ID-10); tests pin the two to agree (CX7-12).
+PRIMARY_HEADER_FIELDS = frozenset(
+    {
+        "schema_version",
+        "timestamp_utc",
+        "check_id",
+        "check_name",
+        "status",
+        "status_reason",
+        "command",
+        "command_provenance",
+        "exit_code",
+        "evidence_artifacts",
+        "captured_env",
+        "pf_refs",
+        "intended_tokens",
+        "claimed_tokens",
+    }
+)
+PRIMARY_STATUSES = frozenset({"PASS", "FAIL_BEHAVIOR", "FAIL_TOOLING", "TOOLING_BLOCKED", "PARKED"})
+PRIMARY_CHECK_ID_RE = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
+PRIMARY_PF_TITLE_RE = re.compile(r"PF[0-9]{2}(?:\.[0-9]+)?-(?:Canon|Reference)-[A-Za-z0-9][A-Za-z0-9-]*\Z")
+PRIMARY_TIMESTAMP_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\Z")
+PRIMARY_ENV_KEYS = frozenset({"LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV"})
+PRIMARY_NONCLAIM = "token_claim_posture: intended tokens are recorded but not claimed by this PR-03 receipt"
 # The requirements source is the change's own current approved Specification (PF10 addendum 2.15).
 APPROVED_SPECIFICATION_RE = re.compile(
     r"docs/ephemeral/(?P<change>HDE-(?:EPIC[0-9]{3}|CRD-[0-9]{4,}))"
@@ -2383,15 +2411,77 @@ def _current_version(pattern: re.Pattern[str], change_id: str, tracked_paths: It
     return versions[max(versions)] if versions else None
 
 
-def _primary_identity(payload: bytes) -> tuple[object, object] | None:
-    # A PF27 v2 step-log primary opens with its header as one compact JSON line.
+def _primary_command_valid(command: object) -> bool:
+    if not isinstance(command, list):
+        return False
+    if command and all(isinstance(argv, list) for argv in command):
+        return all(argv and all(isinstance(part, str) and part for part in argv) for argv in command)
+    return all(isinstance(part, str) and part for part in command)
+
+
+def _primary_timestamp_valid(value: object) -> bool:
+    if not isinstance(value, str) or not PRIMARY_TIMESTAMP_RE.fullmatch(value):
+        return False
     try:
-        header = json.loads(payload.split(b"\n", 1)[0].decode("utf-8"))
-    except (UnicodeDecodeError, ValueError):
+        datetime.fromisoformat(value.removesuffix("Z") + "+00:00")
+    except ValueError:
+        return False
+    return True
+
+
+def _primary_identity(payload: bytes, primary_rel: str, *, crd: bool) -> tuple[object, object] | None:
+    # The whole PF27 v2 header, not only its identity, so a PASS stands only with its causality.
+    if crd and (payload.startswith(b"\xef\xbb\xbf") or b"\r" in payload or not payload.endswith(b"\n")):
         return None
-    if not isinstance(header, dict) or header.get("schema_version") != PRIMARY_HEADER_SCHEMA:
+    try:
+        lines = payload.decode("utf-8").splitlines()
+        header = _strict_json(lines[0].encode("utf-8"), code="QA_LEDGER_INVALID") if lines else None
+    except (UnicodeDecodeError, ClosePackError):
         return None
-    return header.get("check_id"), header.get("status")
+    if (
+        not isinstance(header, dict)
+        or set(header) != PRIMARY_HEADER_FIELDS
+        or header["schema_version"] != PRIMARY_HEADER_SCHEMA
+    ):
+        return None
+    command = header["command"]
+    exit_code = header["exit_code"]
+    status = header["status"]
+    lists = [header[field] for field in ("evidence_artifacts", "pf_refs", "intended_tokens", "claimed_tokens")]
+    if (
+        not isinstance(header["check_id"], str)
+        or not PRIMARY_CHECK_ID_RE.fullmatch(header["check_id"])
+        or header["check_id"] in {".", ".."}
+        or not isinstance(header["check_name"], str)
+        or not header["check_name"]
+        or status not in PRIMARY_STATUSES
+        or not isinstance(header["status_reason"], str)
+        or not _primary_command_valid(command)
+        or not isinstance(header["command_provenance"], str)
+        or not header["command_provenance"]
+        or bool(command) == (header["command_provenance"] == "Not executed")
+        or (exit_code is not None and (not isinstance(exit_code, int) or isinstance(exit_code, bool)))
+        or bool(command) != (exit_code is not None)
+        or any(not isinstance(items, list) or any(not isinstance(item, str) or not item for item in items) for items in lists)
+        or any(not PRIMARY_PF_TITLE_RE.fullmatch(reference) for reference in header["pf_refs"])
+        or not header["evidence_artifacts"]
+        or primary_rel not in header["evidence_artifacts"]
+        or not isinstance(header["captured_env"], dict)
+        or any(key not in PRIMARY_ENV_KEYS or not isinstance(value, str) for key, value in header["captured_env"].items())
+        or not _primary_timestamp_valid(header["timestamp_utc"])
+        or (status == "PASS" and (exit_code != 0 or header["status_reason"]))
+        or (status != "PASS" and not header["status_reason"])
+        or header["claimed_tokens"] != []
+        or (status == "PASS" and header["intended_tokens"] and PRIMARY_NONCLAIM not in lines[1:])
+    ):
+        return None
+    if crd and (
+        lines[0] != json.dumps(header, sort_keys=True, separators=(",", ":"))
+        or (status == "PARKED" and command)
+        or (status == "FAIL_BEHAVIOR" and not command)
+    ):
+        return None
+    return header["check_id"], status
 
 
 def _requirement_ids(payload: bytes, change_id: str) -> frozenset[str]:
@@ -2604,6 +2694,7 @@ def _load_model_v2(
     # Each QA ledger entry's primary must be tracked and agree with the ledger (PO-35-5).
     ledger_rel = _supporting_paths_v2(str(source["change_id"]))["qa_step_logs_manifest"]
     ledger = json.loads(next(s for s in bindings.values() if s.rel == ledger_rel).payload)
+    crd = CHANGE_RE.fullmatch(str(source["change_id"])).group("crd") is not None  # type: ignore[union-attr]
     qa_primaries: list[FileSnapshot] = []
     for check_id, entry in sorted(ledger.items()):
         primary_rel = entry["log_path"]
@@ -2614,7 +2705,7 @@ def _load_model_v2(
             root, context, store, tree, primary_rel, max_bytes=remaining_input_bytes
         )
         remaining_input_bytes -= len(primary.payload)
-        if _primary_identity(primary.payload) != (check_id, entry["status"]):
+        if _primary_identity(primary.payload, primary_rel, crd=crd) != (check_id, entry["status"]):
             raise _fail("QA_LEDGER_INVALID")
         qa_primaries.append(primary)
 
