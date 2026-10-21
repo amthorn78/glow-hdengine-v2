@@ -11,7 +11,7 @@ predecessor: none (first standalone delta authoring)
 immutable_base: docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md (blob abffa2ccbd447a7e13727fc5e53e83341d35f0f4), approved by docs/ephemeral/HDE-CRD-0002-implementation-plan-review-v1.1.md (IA-30 INITIAL_APPROVE; blob 0cc0276524b292777cc562b64bb983bdc4c55e3b). Not edited
 redline_applied: docs/ephemeral/HDE-CRD-0002-implementation-plan-change-assessment-v1.1.md (IA-30 PLAN_DELTA_REDLINE, items P-1 to P-17; blob c4bfa53b6d45065946678bca05fc8ee1f7f9ba84; landed by #679). History: v1.0 of the assessment (blob 52c204abd092afe1d125f869e0822b42cc94117b; #677) and the IA-40 return docs/ephemeral/HDE-CRD-0002-implementation-plan-delta-01-redline-return-v1.0.md (REDLINE_INCOMPLETE on P-7; blob eba413f352561c8afa5f6d153398909b24a0216c; #678)
 material_change: approved Specification delta 01, docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md (blob 9408d6ed091bcba3d751fcb17ae392a1ceca8bbb), approved by docs/ephemeral/HDE-CRD-0002-specification-delta-review-v1.0.md (CF-C-30 DELTA_APPROVE, Thoth, 2026-10-21T18:36:00Z; blob 5a6cecc86f604a17aaa3e6c89b17183d2d0f9ffa)
-overlays: (1) the Specification delta 01 addendum, record docs/ephemeral/HDE-CRD-0002-specification-delta-01-PF10-build-notes-addendum-v1.0.md (blob 64325e32376349394df0989602fca928bdcfb8da; numbered 2.18 in the record; not in PF10 v13.7.1), treated as in force; (2) HDE Build Notes addendum 2.18 as published in PF10 v13.7.1, "Requirements and work units carry no cost ceiling; work continues until it is done" (record docs/ephemeral/HDE-CRD-0002-PF10-build-notes-addendum-no-cost-ceiling-v1.0.md, blob d2932079fd3da8dfb4e6f67b22178fa157fd2ae3, drafted there as 2.19; #680). Overlays carried to the WU-PR-08 instruction: addenda 2.7, 2.8, 2.9 and 2.10 at their WU-PR-08 items (see P-7)
+overlays: (1) the Specification delta 01 addendum, record docs/ephemeral/HDE-CRD-0002-specification-delta-01-PF10-build-notes-addendum-v1.0.md (blob 64325e32376349394df0989602fca928bdcfb8da; numbered 2.18 in the record), which the Product Owner has added to PF10 (2026-10-21) and which is in force; cited here by title and record; (2) HDE Build Notes addendum 2.18 as published in PF10 v13.7.1, "Requirements and work units carry no cost ceiling; work continues until it is done" (record docs/ephemeral/HDE-CRD-0002-PF10-build-notes-addendum-no-cost-ceiling-v1.0.md, blob d2932079fd3da8dfb4e6f67b22178fa157fd2ae3, drafted there as 2.19; #680). Overlays carried to the WU-PR-08 instruction: addenda 2.7, 2.8, 2.9 and 2.10 at their WU-PR-08 items (see P-7)
 authorizing_decision: docs/ephemeral/HDE-CRD-0002-WU-PR-08-po-disposition-scope-v1.0.md (Product Owner OPTION 1, 2026-10-21; blob efc220928f7c313ba5ebabb49b975b624dfbafc2). Its "Cost ceiling" row is not in force (no-ceiling addendum)
 application_report: docs/ephemeral/HDE-CRD-0002-implementation-plan-delta-01-v1.0-application-report.md
 author: the whole-change Implementation Agent for HDE-CRD-0002, session "HDE-CRD-0002-2" (https://claude.ai/code/session_01U3QLYTkfUepeRbSGZNPj9N), continuing the Plan author lineage (sessions https://claude.ai/code/session_012nUipT8gpdYtjzA5UQk5ah and https://claude.ai/code/session_01CCKsYD2yX5WgU3biWKb59j)
@@ -20,7 +20,7 @@ prompt: IA-40 — Prepare or Revise Whole-Change Implementation Plan — 100926.
 prompt_release: GCFPE-20261009.1 / 100926.1
 repository_head_read: origin/main 7b763db
 pf10_read: docs/pfcanon/PF10-HDE-Build-Notes-v13.7.1.md (blob afce167947cd44e84de10ecc2aa18fac142482de; sha256 eab61385a819c859e1cf2743a204b70813feef23c902f647b3a5d7141454114d)
-created_at: 2026-10-21T20:40:00Z
+created_at: 2026-10-21T20:24:34Z
 return_point: IA-30 — Review Whole-Change Implementation Plan — 100926.1 (https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c), MATERIAL_PLAN_DELTA_REVIEW, Isis
 ---
 
@@ -47,7 +47,7 @@ The application, item by item, is in the application report.
 
 ## 2. Addendum numbering used here
 
-PF10 v13.7.1 numbers the no-cost-ceiling addendum 2.18. The Specification delta 01 addendum's record also calls itself 2.18, and it is not yet in PF10. To keep every citation unambiguous, this delta names them as follows:
+PF10 v13.7.1 numbers the no-cost-ceiling addendum 2.18. The Specification delta 01 addendum's record also calls itself 2.18. The Product Owner has since added it to PF10, and this delta does not state its PF10 number. To keep every citation unambiguous, this delta names them as follows:
 
 - **"the no-ceiling addendum"**: HDE Build Notes addendum 2.18 as published, "Requirements and work units carry no cost ceiling; work continues until it is done".
 - **"the Specification delta 01 addendum"**: the addendum recorded in `docs/ephemeral/HDE-CRD-0002-specification-delta-01-PF10-build-notes-addendum-v1.0.md`, "HDE-CRD-0002: Specification delta 01 is approved — requirement S01 is removed and the release keeps its version, with a same-version manifest refresh for any member change".
@@ -264,7 +264,7 @@ Plan v1.1's own header, §16 and §17 are not edited. §8 below takes the place 
 | K-1 | Addendum 2.10 carries "WU-PR-08 (S17) cuts `1.4.0` … (contract F-1)". The Specification delta 01 addendum approves no version cut | Their scopes overlap on the version cut. HDE Build Notes front matter §9 step 8 gives the overlap to the higher-numbered addendum. The Specification delta 01 addendum is later than 2.10 whatever number it takes, and Specification delta 01 is the approved in-flight Specification. Not carried (P-7) |
 | K-2 | Addendum 2.6, "Affected surfaces": "WU-PR-08's version bump changes an engine-core source, so it regenerates the purity report" | Same overlap and resolution as K-1. With no version bump, WU-PR-08 changes no engine-core source and regenerates no purity report. This is a consequence statement in 2.6, not an item carried to the instruction, so the block does not name it |
 | K-3 | Assessment v1.1 §1, P-7, §5, §6 and §7, and the decision record's "Cost ceiling" row, carry a ceiling for WU-PR-08 | The no-ceiling addendum governs. It names each of these passages as not in force. The ceiling clauses are not applied (application report, A-1) |
-| K-4 | Two addenda carry the number 2.18. PF10 v13.7.1's 2.18 is the no-ceiling addendum, while the Specification delta 01 addendum's record also calls itself 2.18 and is not in PF10. The published no-ceiling text also says it "follows addendum 2.18, which is pending publication" | Not a conflict of rules: the two scopes are distinct, and each text is unambiguous by its content. This delta cites both by title and record (§2). Numbering and publication belong to the Product Owner (no-ceiling addendum, "Deferred obligations and unresolved work") |
+| K-4 | Two addenda have carried the number 2.18: PF10 v13.7.1's 2.18 is the no-ceiling addendum, and the Specification delta 01 addendum's record also calls itself 2.18. The published no-ceiling text says it "follows addendum 2.18, which is pending publication", and supersedes the Specification delta 01 addendum's sentence "Its business case and cost ceiling are in the Product Owner decision record §2 (addendum 2.11 rule 1)" | This delta cites both by title and record (§2). Applying no ceiling does not depend on their numbers: the no-ceiling addendum names that sentence and supersedes it, and the Product Owner set the no-ceiling rule after approving Specification delta 01 (19:07 against 18:36 UTC). If PF10 numbers the Specification delta 01 addendum above 2.18, a mechanical reading of front matter §9 step 8 would hand that sentence the overlapping scope. This delta does not read it that way, because the later and more specific rule names the sentence. Numbering belongs to the Product Owner |
 | K-5 | Plan Templates, "CI lane classification and automated budget-control discipline": "a plan or review MUST NOT invent … a change-detection mechanism". The handoff asked that the registration's form be stated from the repository | P-7 keeps the form as the author's statement at PR-20. The delta records only repository facts: the existing mechanisms and who reads `.env.example`. It invents no mechanism, and PR-20 chooses |
 
 The canon-conflict register CR-1 to CR-3 is carried unchanged (Plan v1.1 §15).
@@ -296,13 +296,32 @@ Measured on `main` (`a78b350` for the rehearsal; `7b763db` for the reads, where 
 | The registration's form | WU-PR-08's PR-20 (P-7) |
 | Business cases for WU-DOC-01 and WU-OPS-01: beneficiary, evidence, benefit and measure, due before DOC-10 and OPS-10 | Product Owner (no-ceiling addendum, "Epic, task, and status effects"). Not part of this delta |
 | The live Railway start command, a stated limit and not a blocker | WU-OPS-01; Product Owner |
-| PF10 numbering of the Specification delta 01 addendum (K-4) | Product Owner |
+| The PF10 number of the Specification delta 01 addendum, which this delta does not depend on (K-4) | Product Owner |
 
 **Return point.** IA-30 — Review Whole-Change Implementation Plan — 100926.1 (https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c), `MATERIAL_PLAN_DELTA_REVIEW`, for Isis. On `DELTA_APPROVE`, the continuation is PR-10 — Create PR Work-Unit Instructions — 100926.1, for WU-PR-08. On `DELTA_DENY`, the delta returns to this Implementation Agent through IA-40.
 
 ## 9. TypeSafe reading for the receiving session (IA-30 delta review)
 
-READING_PLACEHOLDER
+Action sent (v8.2): "Review, as the same independent reviewer who wrote its seventeen-item redline, a new 33 KB standalone pending material delta against an approved 76 KB Implementation Plan, with its item-by-item application report as the checklist: confirm each item was applied once at its unique anchor and nothing else changed, and judge the author-stated parts, namely one small work unit's block rewritten around two kept requirements plus one CI classifier registration whose existing-mechanism options and lane selection are recorded from the repository, an Ops unit's handling of a start command that differs from the checked-in one, the unit's risks, and five recorded conflicts including two addenda sharing one number; then approve with one Build Notes addendum and a continuation handoff, or return redlines. No code is written and no live run occurs; per-PR planning, a Product Owner Proceed, CI and a lineage review follow."
+
+- **TypeSafe v8.2: Opus 5.5 at high.** Effort score 2.38 (confidence 0.69); rung probabilities low 0.00, medium 0.04, high 0.55, extra high 0.39, max 0.02, ultracode 0.00. Model probabilities Fable 5.1 0.02, Opus 5.5 0.97, Sonnet 5.5 0.01, Haiku 5.5 0.00 (confidence 0.96). Twenty-four cells, computed from the two answers: Fable 5.1 at low 0.000, Fable 5.1 at medium 0.001, Fable 5.1 at high 0.011, Fable 5.1 at extra high 0.008, Fable 5.1 at max 0.000, Fable 5.1 at ultracode 0.000, Opus 5.5 at low 0.000, Opus 5.5 at medium 0.039, Opus 5.5 at high 0.533, Opus 5.5 at extra high 0.378, Opus 5.5 at max 0.019, Opus 5.5 at ultracode 0.000, Sonnet 5.5 at low 0.000, Sonnet 5.5 at medium 0.000, Sonnet 5.5 at high 0.006, Sonnet 5.5 at extra high 0.004, Sonnet 5.5 at max 0.000, Sonnet 5.5 at ultracode 0.000, Haiku 5.5 at low 0.000, Haiku 5.5 at medium 0.000, Haiku 5.5 at high 0.000, Haiku 5.5 at extra high 0.000, Haiku 5.5 at max 0.000, Haiku 5.5 at ultracode 0.000. Flags: boundary between extra high and high. Sent 2026-10-21T20:22:56Z. Nathan picks the cell.
+- **Detail:** v8.2 sent 2026-10-21T20:22:56Z; HTTP 200 in 0.76 s; 5520 input and 71 output tokens; jev-1.13.0. Session kind "review". Rung by rule: high (nearest to the score, halves up). Model by rule: Opus 5.5 (the most probable of the four options, a tie going to the higher-priced model). Flags: boundary between extra high and high.
+- **One send**, taken before this delta and its application report were saved, and recorded identically in both. No Notion row was written (IA-40 handoff rule).
+- **Nathan's pick for IA-30 (delta review):** not stated.
+- **Nathan's pick for this IA-40 session:** not stated. Its reading is in the change assessment v1.1 §8: Opus 5.5 at high, score 1.99.
+
+**Surface advice:** run IA-30 `MATERIAL_PLAN_DELTA_REVIEW` as a top-level Claude Code cloud session on `amthorn78/glow-hdengine-v2`, with Notion read access, in the continuing Isis reviewer lineage.
+- **Reads from `main`:**
+  - this delta and its application report;
+  - Plan v1.1 and its review v1.1;
+  - the change assessment v1.1 and the IA-40 return record;
+  - Specification delta 01 and its addendum record;
+  - the no-ceiling addendum (PF10);
+  - the decision record;
+  - `docs/pfcanon/`;
+  - for P-7, `ci/checks/classify_ci_changes.py` and `tests/evidence/test_rails_ci_workflow_integration.py`.
+- **Writes:** its review artifact and, at DELTA_APPROVE, the addendum, both under `docs/ephemeral/`.
+- **Needs:** no live vendor, production or database access. The pull request carrying this delta should be merged to `main` first.
 
 ## Canon relied on
 
@@ -321,7 +340,7 @@ Read on `main` at `7b763db` unless stated.
   - addenda 2.7, 2.8, 2.9 and 2.10 at their WU-PR-08 carried items (the loopback bind at 2.7 "Affected surfaces", 2.8 and 2.9; OBS-P4-5 at 2.9 and 2.10; O-19, F-3 and the `1.4.0` cut at 2.10);
   - addendum 2.6 "Affected surfaces", at its WU-PR-08 sentence (K-2);
   - addendum 2.1 for the TypeSafe reading.
-- **The Specification delta 01 addendum**, read in full from its record, and treated as in force.
+- **The Specification delta 01 addendum**, read in full from its record. The Product Owner added it to PF10 on 2026-10-21, and it is in force.
 - **PF27-Canon-Plan-Templates v2.0.5:**
   - "CI lane classification and automated budget-control discipline", read in full: the smallest safe repository-grounded design belongs to the implementation task; a plan must not invent a change-detection mechanism; heavy validation is selected by affected change; nothing affected may be misclassified as irrelevant;
   - "Source-bound review authority and exact-fix limits", as the assessment cites it;
@@ -356,6 +375,6 @@ Read on `main` at `7b763db` unless stated.
 | plan | `docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md` (immutable base) |
 | release | GCFPE-20261009.1 / 100926.1 |
 | role/stage | whole-change Implementation Agent / IA-40 APPROVED_BASE_PLAN_DELTA_AUTHORING |
-| capture time | 2026-10-21T20:40:00Z |
+| capture time | 2026-10-21T20:24:34Z |
 | execution identity | https://claude.ai/code/session_01U3QLYTkfUepeRbSGZNPj9N |
 | repository persistence | recorded here only (`docs/changes/GCFPE_PROMPT_PROVENANCE.md` absent on `main`) |
