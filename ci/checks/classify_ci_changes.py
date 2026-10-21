@@ -503,6 +503,9 @@ _PRODUCT_TEST_OWNER_PATHS = {
     "schemas/epic_close_candidate_source.v1.json": (
         "tests/qa/test_generate_epic_close_pack.py",
     ),
+    "schemas/close_candidate_source.v2.json": (
+        "tests/qa/test_generate_epic_close_pack.py",
+    ),
     "adapter/http_reader.py": _HTTP_READER_TEST_OWNERS,
     # HDE-EPIC040-PR04 application, identity and consumer loci.
     "engine/compat/compute.py": (

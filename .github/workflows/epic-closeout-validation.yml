@@ -64,8 +64,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install bounded validation dependency
-        run: python -m pip install 'jsonschema==4.23.0'
+      - name: Install the read-only checks' runtime requirements
+        run: python -m pip install -r requirements.txt
 
       - name: Validate exact committed closeout candidate without writing
         shell: bash

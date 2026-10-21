@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.6.3**  
+**Version: v13.6.6**  
 Effective Date: 2026.10.20  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -194,7 +194,10 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.9 HDE-CRD-0002 WU-PR-04: PR work-unit lineage review v1.0 accepts the unit on pull request \#651  
 * 2.10 HDE-CRD-0002 WU-PR-05: PR work-unit lineage review v1.0 accepts the unit on pull request \#656  
 * 2.11 Every requirement and work unit carries a business case; work rests on real inputs only  
-* 2.12 HDE-CRD-0002 WU-PR-06: PR work-unit lineage review v1.0 accepts the unit on pull request \#660 and returns the next-unit business case to the Product Owner
+* 2.12 HDE-CRD-0002 WU-PR-06: PR work-unit lineage review v1.0 accepts the unit on pull request \#660 and returns the next-unit business case to the Product Owner  
+* 2.13 HDE-CRD-0002 WU-PR-07: the closeout-validation job installs the repository's runtime requirements, so its read-only evidence checks can pass  
+* 2.14 A P1 finding is addressed until it is resolved; only a finding that depends on an input the product will never have may be declined  
+* 2.15 HDE-CRD-0002 WU-PR-07: the Product Owner approves the S21 close-pack writer ADR with changes, and the close-run evidence family is introduced
 
 # **2\) Numbered Addenda**
 
@@ -1415,5 +1418,254 @@ Drainage stays with the Product Owner and is unperformed, except as stated. The 
 ### Relationship to existing HDE Build Notes guidance
 
 This addendum applies addendum 2.11 to the unit that produced it: it records that 2.11 reserves WU-PR-06's disposition to the Product Owner and gates WU-PR-07's PR-10, and it changes neither 2.11 nor any other addendum. It follows addenda 2.4, 2.5, 2.9 and 2.10 in the sequence of accepted HDE-CRD-0002 work units, relies on 2.2 for the coverage definition and ruby requirement, on 2.3 for the review chain, and on 2.1 for the TypeSafe reading. It supersedes no addendum.
+
+## 2.13 HDE-CRD-0002 WU-PR-07: the closeout-validation job installs the repository's runtime requirements, so its read-only evidence checks can pass
+
+Timestamp: 102026 15:50 (UTC). Details: Records the whole-change Implementation Agent's approval, through Review Bounded Work-Unit Rescope, of one bounded implementation rescope of work unit WU-PR-07 (requirement S21: the close-pack writer for Epic and CRD identities, the close-run evidence home and the ADR draft) of the approved HDE-CRD-0002 Implementation Plan v1.1.
+
+* Origin: the WU-PR-07 rescope proposal v1.0 (finding F-1, items D-1 and D-2) from the dedicated PR engineering session during pre-Proceed planning, written at the Product Owner's direction "Option A, write the rescope proposal".  
+* Evidence: the review's own reproduction at main a9fd343, in throwaway clones with two fresh interpreters, of the failing step and its correction; the plan v1.0 rehearsal of the close sequence; the GitHub Actions record of the workflow (0 runs).
+
+### Decision and approval status
+
+The continuing whole-change Implementation Agent for HDE-CRD-0002 decided APPROVE on the WU-PR-07 rescope proposal v1.0, as one state for the one proposal. The decision record is docs/ephemeral/HDE-CRD-0002-WU-PR-07-rescope-review-v1.0.md.  
+The approval is a bounded implementation rescope within the approved Specification's intent. It does not change the Epic-level commitment, any Specification acceptance criterion, any protected boundary, any other work unit, any accepted dependency or any Product Owner matter. The immutable base is not rewritten.  
+This addendum is the one overlay the approval creates. The effective baseline for WU-PR-07 is the approved base, plus addenda 2.11 (read with 2.12's numbering), 2.12, 2.5 and 2.3, plus the Product Owner's business-case disposition of 2026-10-20, plus this addendum.  
+No canon-conflict register entry is created or changed.
+
+### Base
+
+The base is not changed. Its relevant clauses are:
+
+* Specification v1.1: requirement S21 and its acceptance intent ("The writer produces a canon-conforming close report and manifest from tracked inputs for an Epic or a CRD; close-workflow run evidence has a home …; the accompanying ADR is approved"); the constraint "Close-pack writer", which states that "S21 touches the release-sanity and close-validation lanes".  
+* Implementation Plan v1.1, WU-PR-07:  
+  * Deliverables, which name .github/workflows/epic-closeout-validation.yml "only where they read the schema version";  
+  * Terminal-state reachability (e): HDE-CRD-0002's close dispatches that workflow on the exact close head (T7) before the Product Owner merges.  
+* WU-PR-07 PR instruction v1.0:  
+  * §6 lists the workflow as expected unchanged;  
+  * §7: "No CI change. No new workflow, job, step or lane; the validation workflow and release-sanity stages stay as they are (ID-10)";  
+  * ID-10: "The job also runs the updater's \--check, orientation\_demo.py \--check, the hash, path, Mirror-schema and final-LF checks. ID-9 keeps them passing before HDE-CRD-0002's close pack exists";  
+  * contract H-6;  
+  * §14 names a needed change to the validation workflow as an expected rescope trigger.
+
+### Finding
+
+The closeout-validation job cannot pass its step "Run retained read-only evidence checks" for any candidate.
+
+* The install. The job installs only jsonschema==4.23.0.  
+* The import. tools/evidence/update\_evidence\_index.py \--check runs \_validate\_epic038\_pr02\_semantics, which imports tools/evidence/generate\_a7\_transport\_proofs.py. That reaches adapter/http\_reader.py, which imports Flask at module level.  
+* Measured at main a9fd343, under the job's own environment with a jsonschema-only interpreter: the updater's \--check exits 1 with ModuleNotFoundError: No module named 'flask'. The other five read-only checks exit 0\.  
+* On the plan's rehearsal of a real close state, the writer's \--check exits 0 and the updater's \--check fails the same way.  
+* History. The import entered the updater on 2026-07-28 (\#375), before the workflow was added on 2026-08-21 (\#396, HDE-EPIC039 PR-05). The step has therefore never been passable. The workflow has never been dispatched.  
+* Effect. Without a change, T7 fails for HDE-CRD-0002's close and for every later close. The business-case measure for WU-PR-07 ("every check mode passes … on the first attempt") cannot be met.  
+* Instruction premise. Instruction v1.0 ID-10's statement that those checks pass was not measured under the job's install and is false.
+
+### Approved delta
+
+1. D-1. In .github/workflows/epic-closeout-validation.yml, the install step changes from \- name: Install bounded validation dependency / run: python \-m pip install 'jsonschema==4.23.0' to \- name: Install the read-only checks' runtime requirements / run: python \-m pip install \-r requirements.txt. Nothing else in the workflow changes: the triggers, inputs, permissions (contents: read), checkout (persist-credentials: false, exact ref), environment, step count and order, the writer's \--check, the six read-only checks and the clean-checkout assertions all stay as they are.  
+2. D-2. In tests/evidence/test\_rails\_ci\_workflow\_integration.py, the test test\_manual\_closeout\_validation\_is\_isolated\_read\_only\_and\_exact\_head gains four lines. They assert that the workflow has exactly one python \-m pip install, and that it is run: python \-m pip install \-r requirements.txt.  
+3. Bounded files. WU-PR-07's bounded files gain exactly those two paths, each for exactly that change.  
+4. Overlaid instruction clauses. Instruction v1.0 is read as follows for WU-PR-07:  
+   * §6: the validation workflow leaves the expected-unchanged list for D-1 only. .github/workflows/ci.yml, every other workflow and tools/evidence/run\_sanity\_pipeline.py stay expected unchanged.  
+   * §7: "No new workflow, job, step or lane; the release-sanity stages stay as they are; the validation workflow changes only by D-1 (its install step installs requirements.txt)."  
+   * ID-10: the job installs requirements.txt, and its six read-only checks pass at the base and at the prototype head. ID-9 keeps them passing before HDE-CRD-0002's close pack exists. The writer and the v2 schema still keep standard-library plus jsonschema imports.  
+   * Contract H-6: "unchanged inputs; the job installs requirements.txt (D-1); the writer stays runnable with jsonschema==4.23.0 alone".  
+   * §14: the rescope trigger for a needed change to the validation workflow no longer covers D-1. Any other change to that workflow remains a trigger.  
+5. Validation. The unit's validation adds three checks:  
+   * the job's seven checks, run with a fresh interpreter holding only \-r requirements.txt on the rehearsal's terminal state, each exiting 0 with the checkout clean afterwards;  
+   * the writer's \--check, run on that state with a jsonschema-only interpreter, exiting 0;  
+   * D-2's negative control: the new assertions fail against the unchanged workflow, and the test file passes with D-1 and D-2.  
+6. Plan v1.1. The unit's next planning artifact is plan v1.1, a complete successor of plan v1.0. It carries D-1 and D-2, F-1's disposition and the updated ceiling statement. Plan v1.0 and its prototype diff are preserved.
+
+### Evidence
+
+Each check below was run by the reviewer in throwaway clones under the job's environment: LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 APP\_ENV=dev PYTHONDONTWRITEBYTECODE=1 GIT\_OPTIONAL\_LOCKS=0 GIT\_NO\_LAZY\_FETCH=1, with CPython 3.12.3.
+
+| Check | Result |
+| :---- | :---- |
+| The six read-only checks at a9fd343, jsonschema-only interpreter | the updater's \--check exits 1 (No module named 'flask'); the other five exit 0; checkout clean |
+| The same six at a9fd343, interpreter with only \-r requirements.txt and no editable install (Flask 2.3.3, gunicorn 21.2.0, jsonschema 4.23.0, psycopg 3.2.13) | all exit 0; checkout clean |
+| The same six at the plan v1.0 prototype head (a9fd343 plus the plan's companion diff), requirements.txt-only interpreter | all exit 0; checkout clean |
+| The delta diff | applies to a9fd343 and on top of the plan prototype |
+| The workflow on the delta head, parsed with Ruby's YAML loader | 7 steps in the same order; permissions: contents: read; step 4 python \-m pip install \-r requirements.txt |
+| D-2 against the unchanged workflow | the test fails (1 failed) |
+| tests/evidence/test\_rails\_ci\_workflow\_integration.py with D-1 and D-2 | 138 passed (two runs; main unchanged also 138). One earlier run had 1 failure in an unrelated subprocess test that runs with a 120 s timeout; it passed on re-run and alone |
+| GitHub Actions runs of epic-closeout-validation.yml | 0 |
+
+From the proposal and plan v1.0, not re-run by the reviewer:
+
+* on the rehearsal's terminal state C3, all seven of the job's checks exit 0 with a requirements.txt-only interpreter;  
+* the writer's \--check exits 0 with a jsonschema-only interpreter.
+
+### Scope, exclusions and nonclaims
+
+* Ceiling. Within the adopted ceiling: one PR, at most 4 sessions or 3 days.  
+  * Either way the ceiling is counted, the projected total is 4 of 4 sessions, with no slack. Under the disposition's counting text, plan v1.1 is a repeat of the PR-20 stage; the proposal counts this review as session 3\.  
+  * The Product Owner chose this option with that cost stated.  
+  * A projected pass of the ceiling is material and returns to the Product Owner before work continues.  
+* Not changed:  
+  * no Specification requirement, acceptance criterion or exclusion;  
+  * WU-PR-07 acceptance items (1) to (7);  
+  * instruction IDs other than ID-10, contracts H-1 to H-5, the other exclusions and the nonclaims;  
+  * AQ-1, the CI lanes and the PR-30/PR-35 split.  
+* No other changes:  
+  * no ci.yml change; the pre-push tool's ci.yml pin is unaffected;  
+  * no new workflow, job, step, lane, trigger, permission or secret;  
+  * no other unit's scope changes.  
+* Not established:  
+  * no hosted run of the job: its first run is HDE-CRD-0002's T7, because a dispatch needs a tracked candidate source on the exact head;  
+  * no live vendor, production or database call; closed rails throughout;  
+  * no QA artifact, QA verdict, acceptance, PF09 or PF30 status movement, deployment, canon edit, Product Owner Proceed, merge authority or closure follows from this addendum.
+
+### Dependencies, conflicts and unresolved obligations
+
+* Dependency. The delta lands in WU-PR-07's one implementation PR, after the Product Owner's Proceed against plan v1.1. AQ-1, the Product Owner's decision on the S21 ADR, still comes before that PR merges.  
+* Conflicts. None. Canon names no dependency rule for this job. The job keeps every property the operative workflow posture states: manual workflow\_dispatch, read-only contents permission, exact-ref checkout, non-writing checks, clean-tree enforcement, no pull-request trigger, no credentials persistence, receipt, source writeback or hosted-result feedback.  
+* Unresolved, with owners:  
+  * plan v1.1: the WU-PR-07 PR engineering session;  
+  * the job's first hosted run at HDE-CRD-0002's T7: HDE-CRD-0002's close mutation set, with the Product Owner's dispatch;  
+  * the root cause of the one unrelated test failure observed in the reviewer's container, if it recurs on a hosted run: the WU-PR-07 PR-35 session.
+
+## 2.14 A P1 finding is addressed until it is resolved; only a finding that depends on an input the product will never have may be declined
+
+Timestamp: 102026 18:55 (UTC). Details: Records the Product Owner's rule that no P1 review finding is declined, deferred, or accepted as a stated limit while its triggering input is real; the one exception is a finding whose triggering input the product will never have. Origin: the Product Owner's direction of 2026-10-20 in the continuing HDE-CRD-0002 Implementation Agent session, after the WU-PR-07 PR-35 session offered to decline two P1 Codex findings (CX7-2 and CX7-3 on pull request [amthorn78/glow-hdengine-v2\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668)) as stated limits. Evidence: the PR-35 session's decision request and the two findings, both checked against the code on the pull request's head and against Change Process Guide §3.5.2.1, which requires the behaviour each finding reports missing.
+
+### Source and authority
+
+This addendum records the Product Owner's rule, in the Product Owner's words: "I do NOT want to ignore P1 findings ever. If we have some rule to do that now, it is wrong" and "P1s need to be addressed until the end, unless the violate the rule where they are testing for inputs that will never exist in this app." The Product Owner directed that this be recorded as an HDE Build Notes addendum. Where this addendum conflicts with earlier PF-Canon, an earlier addendum or an in-flight change document, this addendum governs for the scope below.
+
+### Rule
+
+1. Scope. A P1 finding is any review finding labelled P1, or any higher priority such as P0, by the Codex code review or by a person, on any pull request of any Epic or CRD.  
+2. Addressed until resolved. A P1 finding whose triggering input is real is fixed. It is not declined, deferred to a later change, recorded as a stated limit, or resolved on cost, effort, design preference, a plan's earlier choice, an ADR's stated limit, or a "not worth its code" judgement.  
+   * Fixed means the wrong result, crash or guarantee breach the finding reports no longer occurs on that real input. A test shows it, and the test fails without the fix.  
+   * A typed refusal of the input is a fix when refusing it is correct behaviour for the product.  
+   * The thread stays open until the fix is pushed and the finding's own check of it is answered. A pull request with an open P1 thread on a real input is not merge-ready.  
+3. The one exception. A P1 finding may be declined only when its triggering input is not real under addendum 2.11 rule 4: it does not exist on main or in an approved unit's planned deliverable, does not occur in the product's real operating environment, and cannot be supplied by a user, vendor or attacker through an interface the product exposes. The input is then one constructed only to exercise the code (addendum 2.11 rule 5).  
+   * The reply on the thread gives the traced path and shows why the input can never occur in the product.  
+   * As before, declining a P1 goes to the Product Owner first, and the thread is resolved only after that.  
+4. Repeated finding class. Addendum 2.11 rule 8 still applies: two consecutive rounds raising findings of the same class stop the fixing of instances, and the session asks the Product Owner one design question. For a P1 on a real input, "accept a stated limit" is not an option. The answer is a fix or a narrowed design that removes the wrong result, including a typed refusal, or a rescope through the native route. In every case the P1 on its real input is resolved before the pull request merges.  
+5. Budget. A P1 fix that would pass a unit's cost ceiling (addendum 2.11 rules 1 and 3\) still returns to the Product Owner for budget direction before work continues. That return is about the budget. It does not make declining the P1 an option.  
+6. Unchanged.  
+   * Findings below P1 keep addendum 2.11 rule 7 as written.  
+   * Security findings below P1 keep rule 7's Product Owner-first rule for a decline.  
+   * The real-input reporting rule for reviewers (AGENTS.md "Code review guidelines") is unchanged.  
+   * Nothing here weakens the existing duty to fix a real defect at any priority.
+
+### Scope and supersession
+
+* Applies from this addendum to every open and future pull request of every Epic and CRD, including in-flight HDE-CRD-0002 units. That includes pull request [\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668) (WU-PR-07), whose P1 findings CX7-2 and CX7-3 rest on real inputs: a close candidate source whose tracked issues carry an ADR status, and one that omits an acceptance row for a requirement in the bound Specification. Both are therefore fixed.  
+* Supersedes addendum 2.11 rule 7 only where it allows declining a P1 on a real input: its sentence "Otherwise the reply on the thread gives the traced path and the stated limit, and the thread is resolved", as applied to a P1, and its sentence "Declining a P1 or a security finding goes to the Product Owner first", as it would let a P1 on a real input be declined.  
+* Supersedes addendum 2.11 rule 8's option "accept a stated limit" for a P1 on a real input.  
+* Supersedes any plan, instruction, ADR stated limit or Product Owner disposition recorded before this addendum, to the extent it would leave a P1 on a real input unfixed.  
+* Does not change addendum 2.11 rules 1 to 6, the real-input definition, or rule 7 for findings below P1.  
+* Does not reopen accepted-final work. Earlier declines remain historical facts, for example WU-PR-06's three declined findings, which were P2.
+
+### Epic, task, and status effects
+
+* No epic, CRD, task, PF09 or PF30 row changes status by this addendum.  
+* WU-PR-07 (pull request [\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668)): CX7-2 and CX7-3 are fixed in the PR-35 session, as the Product Owner directed on 2026-10-20. The ADR's stated limit "Requirement coverage is the source author's" is removed.
+
+### Required canon drainage
+
+Drainage is unperformed.
+
+| Target | Required change |
+| :---- | :---- |
+| PR-35 — Resolve PR Reviews and Reach Merge Readiness — 100926.1, step 3 | State that a P1 on a real input is fixed and never declined, and that only a P1 on a non-real input may be declined, with the Product Owner first (owner GCFPE-MGMT-10 and the Product Owner) |
+| PR-40 — Review PR Work-Unit Lineage — 100926.1 | Check that no P1 on a real input was declined before merge |
+| Plan Templates "Source-bound review authority and exact-fix limits" and Change Process Guide §1.1.4 | Carry rules 2 and 3 beside addendum 2.11's rules 7 and 8 |
+| AGENTS.md "Code review guidelines" | Optional: note that a P1 the reviewer reports on a real input is fixed by the PR session. Editing AGENTS.md needs the Product Owner's explicit instruction |
+
+### Deferred obligations and unresolved work
+
+* The prompt and canon drainage above: the Product Owner and GCFPE-MGMT-10.  
+* Publication of this addendum into PF10, after addendum 2.13: the Product Owner.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no prompt, skill, AGENTS.md or permanent PF document; the drainage above is unperformed.  
+* It establishes no QA, acceptance, merge or closure, and it does not decide any finding's priority. The priority is the label the reviewer gives.
+
+### Evidence anchors
+
+* The Product Owner's words, quoted under "Source and authority".  
+* PF10 addendum 2.11 rules 4, 5, 7 and 8 (on main, v13.6.3).  
+* Pull request [\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668): Codex findings CX7-2 (tracked-issue ADR statuses not checked against the drain-targets ledger) and CX7-3 (SATISFIED without an acceptance row for every requirement). On its head a6c6655, tools/qa/generate\_epic\_close\_pack.py checks only deferrals against the drain-targets ledger. Change Process Guide §3.5.2.1 requires a TI item's ADR status line to record "Deferred with drain targets", and the acceptance section to bind "each current governing requirement or acceptance criterion".
+
+### Relationship to existing HDE Build Notes guidance
+
+The addendum narrows addendum 2.11 rules 7 and 8 for P1 findings, as stated under "Scope and supersession", and is otherwise consistent with addenda 2.3, 2.11, 2.12 and 2.13. It keeps 2.11's real-input definition as the only ground for declining a P1.
+
+## 2.15 HDE-CRD-0002 WU-PR-07: the Product Owner approves the S21 close-pack writer ADR with changes, and the close-run evidence family is introduced
+
+Timestamp: 102026 23:40 (UTC). Details: Records the Product Owner's AQ-1 decision on the S21 architecture decision record, docs/adr/hde/close\_pack\_writer\_adr.md, of work unit WU-PR-07 of the approved HDE-CRD-0002 Implementation Plan v1.1. The record is approved with changes. This addendum also introduces the post-verdict close-run evidence family that HDE Schemas & Artifacts §8.17 requires a Build Notes addendum to introduce. Origin: the AQ-1 proposal v1.0 from the WU-PR-07 PR-35 session, the Implementation Agent's review of it, and the Product Owner's choice in the Implementation Agent session on 2026-10-20. Evidence: the review's checks of the ADR, the v2 writer and canon at pull request [amthorn78/glow-hdengine-v2\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668)'s head 45e4cef.
+
+### Decision and approval status
+
+* Decision. AQ-1 is decided: the S21 ADR is approved with changes. The decision is the Product Owner's (Implementation Plan v1.1 §13; HDE Governance §9.7.3). It satisfies Change Process Guide §1.0.5's requirement of an approved ADR for S21's canon change, on condition that changes C-1 to C-4 below land in pull request [\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668) before it merges.  
+* What is approved. The design of the ADR at [\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668) head 45e4cef:  
+  * one writer at tools/qa/generate\_epic\_close\_pack.py with a second, closed source schema schemas/close\_candidate\_source.v2.json for Epic (HDE-EPICNNN) and CRD (HDE-CRD-NNNN) identities, v1 unchanged;  
+  * CRD paths of record audit/HDE-CRD-NNNN\_close\_report.md and audit/HDE-CRD-NNNN\_MANIFEST.json, with the directory form hde-crd-nnnn;  
+  * the v2 report and manifest rendered only from tracked inputs, with a key\_outputs map of path strings;  
+  * the feedback-dependency refusal kept, and requirement text bound by reference;  
+  * the post-verdict close-run family (below);  
+  * absent-tolerant CRD close-pack Index rows;  
+  * the dependency direction: causal inputs → close report and manifest → Index; close-run primaries → Index.  
+* Not approved as drafted. The proposal's §6 text delta is replaced by redlines R-1 to R-4 of the review.  
+* Status line. When C-1 to C-4 are pushed, the ADR's status line reads: Status: Approved with changes by the Product Owner on 2026-10-20 (AQ-1; HDE Build Notes addendum 2.15; review docs/ephemeral/HDE-CRD-0002-WU-PR-07-adr-review-v1.0.md). The WU-PR-07 PR-35 session writes that line as a transcription of this decision. Instruction v1.0 ID-12's "no agent marks the ADR approved" is satisfied because the Product Owner, not the agent, made the decision and gave its text here.
+
+### Required changes before [\#668](https://github.com/amthorn78/glow-hdengine-v2/pull/668) merges
+
+1. C-1. ADR block. Change Process Guide §3.5.4 requires an ADR block in every close report, and HDE Schemas & Artifacts §1.2 "Change-container compatibility" applies it to a CRD close.  
+   * The v2 schema gains a required, non-empty list of ADR-block entries. Each entry has a label, a statement, the decision point, the options considered when more than one was real, the bounding PF titles, the final decision, whether it becomes canonical or stays change-specific, and the doc-delta targets by PF title.  
+   * An optional closure-override entry enumerates accepted gaps with their evidence basis and drain targets.  
+   * The report renders the entries as an ADR block with titles-only canon references.  
+2. C-2. The current approved Specification. The requirements document a v2 source binds must be its own change's docs/ephemeral/\<change-id\>-specification-v\<N\>.\<N\>-approved.md, at the highest version tracked. Any other document is refused with one typed code.  
+   * Both real approved Specifications follow that pattern: HDE-CRD-0002 v1.1 and HDE-EPIC040 v1.1.  
+   * A superseded Specification, such as HDE-CRD-0002 v1.0 with 21 requirement rows, can then no longer support a SATISFIED close.  
+3. C-3. Tracked-issue fields. A tracked-issue item renders HDE Governance §2.0.19's literal canon-pointer fields: TI-\<id\> pointers: for a pointer item, and ADR status line: for an ADR-status item.  
+4. C-4. ADR text. The ADR's Decision section and canon table carry redlines R-1 to R-4 of the review, together with C-1 to C-3. In summary:  
+   * R-1: the binary decision and its posture; requirement IDs read from the current approved Specification in the change kind's pinned format; every criterion ID one of them; SATISFIED needs a met row for every ID and no follow-up, and NOT SATISFIED needs a follow-up;  
+   * R-2: the drain-targets ledger names the deferral's or tracked issue's own ID;  
+   * R-3: every key output other than the close report and manifest is also a bound tracked input;  
+   * R-4: five further canon homes in the table.  
+5. Validation.  
+   * The negative controls, the writer test file, every updater consumer, and the evidence and qa lanes pass locally before one push.  
+   * Hosted CI and a fresh Codex code review run on the resulting head.  
+   * Every P1 finding on a real input is fixed (addendum 2.14).  
+6. Scope. C-1 to C-3 are corrections within S21's acceptance intent ("a canon-conforming close report"), in files already in WU-PR-07's bounded set. They need no rescope. A projected pass of the unit's cost ceiling returns to the Product Owner before work continues (addendum 2.11 rule 3; addendum 2.14 rule 5).
+
+### The close-run evidence family (introduced)
+
+HDE Schemas & Artifacts §8.17 requires a new recurring QA evidence family to be introduced through a Build Notes addendum. This addendum introduces one:
+
+* Path. audit/qa/\<change-dir\>/close/\<check\_id\>/primary.log, each with its sibling .path\_proof.txt, for a CRD admitted in the canonical updater's CRD admission table. \<change-dir\> is the lower-case directory form, for example hde-crd-0002.  
+* What it holds. Same-run mechanical evidence of a change's close workflow: one primary per close-run check, rendered from that check's captured command, exit code and output as a PF27 v2 step-log header. Its posture is PASS, FAIL or BLOCKED, as Glow QA Guide "Close-pack truthfulness and same-run execution" requires.  
+* Status. A post-verdict family. It is written after the final QA verdict, and it neither reopens nor adds to the change's approved qa\_step\_logs\_manifest.json or any checks/ primary.  
+* Writer. Only the canonical updater, tools/evidence/update\_evidence\_index.py, writes it, through its close-run publication entrypoint inside one recoverable transaction. The given results replace the whole family. The entrypoint requires the change's recorded QA family to exist.  
+* Membership. The family's members are the validated primaries and path proofs under close/, in a closed shape; anything else under close/ is refused.  
+  * This is a scoped exception, for the close/ directory only, to §8.17 "Current-state evidence": "Tools MUST NOT infer run state by enumerating subdirectories". That rule continues to govern checks/ and every other part of a QA root, where qa\_step\_logs\_manifest.json stays the authoritative index.  
+* Not admitted. No Epic close-run family. An Epic needs its own explicit admission later, as each CRD needs its admission row.
+
+### Scope, exclusions and nonclaims
+
+* This addendum produces no close pack, candidate source or close-run family for any change. HDE-EPIC040 gets no retroactive close pack.  
+* It changes no Specification requirement or acceptance criterion, no other work unit, and no CI lane.  
+* It establishes no QA verdict, acceptance, Ops, deployment, PF09 or PF30 movement, merge or closure.  
+* Drainage of the ADR's affected canon homes is unperformed. Its absence is not a blocker of any change or close (HDE Governance §2.0.19; HDE Schemas & Artifacts §8.17).  
+* Earlier canon governs except where this addendum speaks: the approval itself; the close-run family and its membership exception; the ADR status text.
+
+### Dependencies, conflicts and unresolved obligations
+
+* Dependencies.  
+  * C-1 to C-4 land in [\#668](https://github.com/amthorn78/glow-hdengine-v2/issues/668) in the WU-PR-07 PR-35 session.  
+  * The Product Owner merges [\#668](https://github.com/amthorn78/glow-hdengine-v2/issues/668) only after they land and the pull request is green.  
+  * WU-PR-08 and the later units wait on that merge.  
+* Conflicts. None. Where this addendum departs from HDE Schemas & Artifacts §8.17's no-enumeration rule, it does so only for the close/ family. The canon-conflict register (CR-1 to CR-8) is unchanged.  
+* Unresolved, with owners.  
+  * The C-1 to C-4 implementation and its records: the WU-PR-07 PR-35 session.  
+  * Drainage of the ADR's canon table, including this family into HDE Schemas & Artifacts §8.17 and Glow QA Guide §3.4.3: the Product Owner, through the normal canon-maintenance route.  
+  * Publication of this addendum into PF10, after 2.14: the Product Owner.
 
 \<eof\>
