@@ -2290,10 +2290,12 @@ COVERAGE_STATUS = {
 EPIC_REGISTER_RE = re.compile(r"docs/pfcanon/PF09\.[0-9]+-Canon-HDE-Build-Checklist-[A-Za-z]+-v[0-9.]+\.md\Z")
 CRD_REGISTER_RE = re.compile(r"docs/pfcanon/PF30\.[0-9]+-Canon-HDE-CRD-Records-v[0-9.]+\.md\Z")
 # A PF title is a tracked PF-Canon file's name, after its PF number and kind and before its
-# version, hyphens read as spaces and "&" as "and" (PO-35-16).
+# version, hyphens read as spaces and "&" as "and" (PO-35-16). The tracked names separate those
+# parts with hyphens, spaces or both, and some carry no number or no version (CX7-19).
 PF_DOCUMENT_RE = re.compile(
-    r"docs/pfcanon/PF[0-9]{2}(?:\.[0-9]+)?-(?:(?:Canon|Reference)-)?"
-    r"(?P<name>[A-Za-z0-9&'-]+?)-?v[0-9]+(?:\.[0-9]+)*\.md\Z"
+    r"docs/pfcanon/PF(?:[0-9]{2}(?:\.[0-9]+)?)?[- ]+(?:(?:Canon|Reference)[- ]+)?"
+    r"(?P<name>[A-Za-z0-9&'](?:[A-Za-z0-9&' -]*?[A-Za-z0-9&'])?)"
+    r"(?:[- ]?v[0-9]+(?:\.[0-9]+)*)?\.md\Z"
 )
 # The plan is the change's own current implementation plan (PO-35-9).
 IMPLEMENTATION_PLAN_RE = re.compile(
@@ -2409,7 +2411,7 @@ def _heading_occurs(heading: str, payload: bytes) -> bool:
 
 
 def _pf_title_key(title: str) -> str:
-    return title.replace("-", " ").replace(" & ", " and ")
+    return " ".join(title.replace("-", " ").split()).replace(" & ", " and ")
 
 
 def _pf_titles(tracked_paths: Iterable[str]) -> frozenset[str]:

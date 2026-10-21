@@ -100,7 +100,7 @@
           "slice": {
             "type": "string",
             "maxLength": 32,
-            "pattern": "^(?:#[1-9][0-9]{0,6}|WU-[A-Z0-9]+(?:-[A-Z0-9]+)*)$"
+            "pattern": "^(?:#[1-9][0-9]{0,6}|PR[0-9]{2}[a-z]?|WU-[A-Z0-9]+(?:-[A-Z0-9]+)*)$"
           },
           "deliverable": {
             "$ref": "#/$defs/causal_text"
@@ -559,7 +559,7 @@
         },
         {
           "maxLength": 96,
-          "pattern": "^[A-Z][A-Za-z &'/-]*[A-Za-z]$"
+          "pattern": "^[A-Z0-9][A-Za-z0-9 &'/-]*[A-Za-z0-9]$"
         }
       ]
     },

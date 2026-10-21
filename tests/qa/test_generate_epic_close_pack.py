@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import os
+import re
 import signal
 import shutil
 import stat
@@ -5474,8 +5475,24 @@ def test_v2_qa_plan_pin_reads_the_real_epic040_plan_against_its_ledger() -> None
 
 def test_v2_pf_titles_derive_from_the_real_canon_filenames() -> None:
     names = [f"docs/pfcanon/{path.name}" for path in (ROOT / "docs/pfcanon").glob("PF*.md")]
+    # CX7-19: every tracked PF-Canon file gives one title, whatever its filename convention, and
+    # the schema's title pattern accepts each of them.
+    assert [name for name in names if close_pack.PF_DOCUMENT_RE.fullmatch(name) is None] == []
     titles = close_pack._pf_titles(names)
+    assert len(titles) == len(names)
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    pattern = schema["$defs"]["pf_title"]["allOf"][1]["pattern"]
+    assert [title for title in titles if re.search(pattern, title) is None] == []
     for title in (
+        "HD Engine Epics Map",
+        "Human Design System",
+        "The Rave I Ching",
+        "Glow Development Philosophy",
+        "HDE Copy Tonality Guide",
+        "HDE Narrative Deliverables",
+        "7 Phases of Alchemical Engineering",
+        "Glow Story",
+        "Invocation",
         "HDE Governance",
         "Change Process Guide",
         "HDE Schemas & Artifacts",
@@ -5494,7 +5511,15 @@ def test_v2_pf_titles_derive_from_the_real_canon_filenames() -> None:
 
 
 @pytest.mark.parametrize(
-    "field", ("bounding_canon", "doc_delta_targets", "canon_homes", "override_drain_targets", "accepted_alias")
+    "field",
+    (
+        "bounding_canon",
+        "doc_delta_targets",
+        "canon_homes",
+        "override_drain_targets",
+        "accepted_alias",
+        "accepted_spaced_filename",
+    ),
 )
 def test_v2_pf_titles_must_name_tracked_canon_documents(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], field: str
@@ -5513,10 +5538,13 @@ def test_v2_pf_titles_must_name_tracked_canon_documents(
             "label": "Accepted QA proof gap",
             "accepted_gaps": [{**_gap("qa-01-setup"), "drain_targets": ["Imaginary Guide"]}],
         }
-    else:
+    elif field == "accepted_alias":
         decision["bounding_canon"] = ["HDE Schemas and Artifacts", "HDE-CLI-API-Vendor-Ref"]
+    else:
+        # CX7-19: titles of tracked files named with spaces, and one that begins with a digit.
+        decision["bounding_canon"] = ["HD Engine Epics Map", "7 Phases of Alchemical Engineering"]
     repo, source_rel = _init_v2_repo(tmp_path, source)
-    if field == "accepted_alias":
+    if field.startswith("accepted_"):
         assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
         return
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
@@ -5577,6 +5605,7 @@ def test_v2_deferral_drain_target_names_a_register_heading(
     (
         ("allocated", None),
         ("pr_slice_and_reuse", None),
+        ("epic_plan_slices", None),
         ("deliverable_not_allocated", "ALLOCATION_INCOMPLETE"),
         ("allocation_names_an_unlisted_deliverable", "ALLOCATION_INCOMPLETE"),
         ("slice_not_a_work_unit_or_pr", "SOURCE_SCHEMA_INVALID"),
@@ -5597,6 +5626,13 @@ def test_v2_every_deliverable_is_allocated_to_its_slice(
         source["deliverables"].append(second)
         source["allocation"].append({"slice": "#668", "deliverable": second})
         source["reuse_boundary"] = ["The QA harness's PF27 v2 step-log format is inherited, not newly closed."]
+    elif case == "epic_plan_slices":
+        # HDE-EPIC040's plan names its slices PR01 to PR07, and PR06a and PR06b.
+        source["deliverables"].append(second)
+        source["allocation"] = [
+            {"slice": "PR01", "deliverable": source["deliverables"][0]},
+            {"slice": "PR06a", "deliverable": second},
+        ]
     elif case == "deliverable_not_allocated":
         source["deliverables"].append(second)
     elif case == "allocation_names_an_unlisted_deliverable":
@@ -5609,6 +5645,10 @@ def test_v2_every_deliverable_is_allocated_to_its_slice(
     if code is None:
         assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
         report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        if case == "epic_plan_slices":
+            assert "- `PR01`: The close-pack writer accepts Epic and CRD identities." in report
+            assert f"- `PR06a`: {second}" in report
+            return
         assert "- `WU-PR-07`: The close-pack writer accepts Epic and CRD identities." in report
         if case == "pr_slice_and_reuse":
             assert f"- `#668`: {second}" in report
@@ -5619,6 +5659,23 @@ def test_v2_every_deliverable_is_allocated_to_its_slice(
     assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
     assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
     assert not (repo / CRD_REPORT_REL).exists()
+
+
+def test_v2_allocation_slices_read_the_real_plans_slice_ids() -> None:
+    # The slice IDs the real plans use: HDE-CRD-0002's work units and HDE-EPIC040's PR slices.
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    pattern = schema["properties"]["allocation"]["items"]["properties"]["slice"]["pattern"]
+    crd = (ROOT / "docs/ephemeral/HDE-CRD-0002-implementation-plan-v1.1.md").read_text(encoding="utf-8")
+    epic = (ROOT / "docs/ephemeral/HDE-EPIC040-implementation-plan-v2.1.md").read_text(encoding="utf-8")
+    slices = {
+        *re.findall(r"\bWU-[A-Z0-9]+(?:-[A-Z0-9]+)*\b", crd),
+        *re.findall(r"\bPR0[0-9]\b", epic),
+        *(path.name.split("-")[2] for path in (ROOT / "docs/ephemeral").glob("HDE-EPIC040-PR0*-pr-implementation-plan-v*.md")),
+    }
+    assert {"WU-PR-07", "WU-DOC-01", "PR01", "PR07", "PR06a", "PR06b"} <= slices
+    assert [item for item in sorted(slices) if re.search(pattern, item) is None] == []
+    for refused in ("PR-7", "PR7", "pr01", "WU-pr-07"):
+        assert re.search(pattern, refused) is None, refused
 
 
 @pytest.mark.parametrize(("binding", "code"), (("qa_rca", None), ("qa_report", "QA_RCA_UNBOUND"), ("summary", None)))
