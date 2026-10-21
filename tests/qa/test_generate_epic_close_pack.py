@@ -5293,6 +5293,65 @@ def test_v2_close_expectation_uses_the_canonical_vocabulary(
     assert not (repo / CRD_REPORT_REL).exists()
 
 
+_DRAINS = "# Drain targets\n\n- DEF-1: close-pack canon\n- DEF-2: close-pack canon\n- TI-002: close-pack canon\n"
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("doc_deltas_none", None),
+        ("doc_deltas_enumerated", None),
+        # CX7-16: arbitrary text is not a doc-deltas ledger.
+        ("doc_deltas_arbitrary", "DOC_DELTAS_INVALID"),
+        ("doc_deltas_none_and_entries", "DOC_DELTAS_INVALID"),
+        ("doc_deltas_qa_copy_identical", None),
+        ("doc_deltas_qa_copy_differs", "DOC_DELTAS_INVALID"),
+        ("drain_targets_none_when_nothing_drains", None),
+        ("drain_targets_arbitrary_when_nothing_drains", "DRAIN_TARGETS_INVALID"),
+        ("drain_targets_none_beside_deferrals", "DRAIN_TARGETS_INVALID"),
+    ),
+)
+def test_v2_supporting_ledgers_meet_their_minimum_content(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str | None,
+) -> None:
+    # PO-35-12: HDE Mechanics Guide's doc-deltas minimum and HDE Schemas & Artifacts 1.2's
+    # explicit-empty and QA-root byte-identity rules.
+    source = _v2_source()
+    if case.startswith("drain_targets_") and case.endswith("_when_nothing_drains"):
+        source["deferrals"] = []
+        source["tracked_issues"] = []
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    ledgers = _ledger_paths("HDE-CRD-0002")
+    qa_copy = repo / "audit/qa/hde-crd-0002/00_meta/doc_deltas.md"
+    texts = {
+        "doc_deltas_none": ("doc_deltas", "# Doc deltas\n\nDoc Deltas: None\n"),
+        "doc_deltas_enumerated": ("doc_deltas", "# Doc deltas\n\n- HDE Schemas & Artifacts 1.2: name the CRD prefix.\n"),
+        "doc_deltas_arbitrary": ("doc_deltas", "this is not a doc-delta ledger\n"),
+        "doc_deltas_none_and_entries": ("doc_deltas", "Doc Deltas: None\n\n- HDE Governance: name the CRD prefix.\n"),
+        "drain_targets_none_when_nothing_drains": ("drain_targets", "# Drain targets\n\nDrain Targets: None\n"),
+        "drain_targets_arbitrary_when_nothing_drains": ("drain_targets", "this is not a drain-targets ledger\n"),
+        "drain_targets_none_beside_deferrals": ("drain_targets", _DRAINS + "\nDrain Targets: None\n"),
+    }
+    if case in texts:
+        key, text = texts[case]
+        (repo / ledgers[key]).write_text(text, encoding="utf-8")
+    else:
+        qa_copy.parent.mkdir(parents=True, exist_ok=True)
+        copied = (repo / ledgers["doc_deltas"]).read_text(encoding="utf-8")
+        qa_copy.write_text(copied if case.endswith("identical") else copied + "Drifted.\n", encoding="utf-8")
+    _commit_all(repo, "ledger under test")
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
+
+
 _LEDGER_ENTRY = '"qa-01-setup":{"check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"%s"}'
 _LEDGER_CASES: dict[str, bytes] = {
     "canonical": ("{" + _LEDGER_ENTRY % "PASS" + "}\n").encode(),

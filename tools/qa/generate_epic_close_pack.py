@@ -2373,6 +2373,14 @@ def _token_occurs(identifier: str, payload: bytes) -> bool:
     return re.search(pattern, payload) is not None
 
 
+def _states_line(payload: bytes, line: bytes) -> bool:
+    return any(raw.strip() == line for raw in payload.splitlines())
+
+
+def _lists_items(payload: bytes) -> bool:
+    return re.search(rb"^[ \t]*[-*+][ \t]+\S", payload, re.MULTILINE) is not None
+
+
 def _qa_ledger(payload: bytes, directory: str) -> dict[str, dict[str, str]]:
     # The pinned ledger format, as the canonical QA harness writes it for every Epic and CRD on
     # main: a nonempty mapping of check_id to exactly {check_id, log_path, status}, in the
@@ -2508,7 +2516,7 @@ def _require_v2_semantics(
     bindings: Mapping[str, FileSnapshot],
     report_path: str,
     manifest_path: str,
-    tracked_paths: Iterable[str],
+    tracked_paths: Mapping[str, GitTreeEntry],
 ) -> None:
     change_id = str(source["change_id"])
     supporting = _supporting_paths_v2(change_id)
@@ -2588,6 +2596,21 @@ def _require_v2_semantics(
     # A TI item maps only through an ADR status whose ID the ledger names (PO-35-11).
     if any(not _token_occurs(str(item["id"]), drain_targets) for item in source["tracked_issues"]):
         raise _fail("TRACKED_ISSUE_UNBOUND")
+    # The supporting ledgers' minimum content (PO-35-12). The doc-deltas ledger states exactly
+    # "Doc Deltas: None" or enumerates its deltas as list items, never both; the drain-targets
+    # ledger states "Drain Targets: None" exactly when nothing drains; a tracked QA-root copy of
+    # the doc deltas is byte-identical (HDE Schemas & Artifacts 1.2).
+    doc_deltas = next(
+        snapshot.payload for snapshot in bindings.values() if snapshot.rel == supporting["doc_deltas"]
+    )
+    if _states_line(doc_deltas, b"Doc Deltas: None") == _lists_items(doc_deltas):
+        raise _fail("DOC_DELTAS_INVALID")
+    qa_copy = f"audit/qa/{change_id.lower()}/00_meta/doc_deltas.md"
+    if qa_copy in tracked_paths and tracked_paths[qa_copy] != tracked_paths[supporting["doc_deltas"]]:
+        raise _fail("DOC_DELTAS_INVALID")
+    nothing_drains = not source["deferrals"] and not source["tracked_issues"]
+    if _states_line(drain_targets, b"Drain Targets: None") != nothing_drains:
+        raise _fail("DRAIN_TARGETS_INVALID")
     qa_statuses = _qa_ledger_statuses(
         next(
             snapshot.payload
