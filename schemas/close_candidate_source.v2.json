@@ -188,7 +188,11 @@
             "uniqueItems": true
           },
           "close_expectation": {
-            "$ref": "#/$defs/causal_text"
+            "enum": [
+              "at epic close",
+              "after an additional PR or OPS slice",
+              "after a separate canon-only drain step"
+            ]
           }
         },
         "required": [

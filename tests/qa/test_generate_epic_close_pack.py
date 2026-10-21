@@ -4481,7 +4481,7 @@ def _v2_source(change_id: str = "HDE-CRD-0002") -> dict[str, object]:
                 "action": "No status change recommended",
                 "readiness": "Supportable from repo evidence",
                 "evidence_bindings": ["qa_report"],
-                "close_expectation": "Drained after closure by its owner.",
+                "close_expectation": "after a separate canon-only drain step",
             }
         ],
         "tracked_issues": [{"id": "TI-002", "adr_status": "Deferred with drain targets"}],
@@ -5260,6 +5260,36 @@ def test_v2_primary_check_agrees_with_the_shared_pf27_parser(
     assert close_pack._primary_identity(payload, rel, crd=crd) == shared
     if header_case == "complete_pass" and payload_case == "compact":
         assert shared == ("qa-01-setup", "PASS")
+
+
+@pytest.mark.parametrize(
+    ("close_expectation", "code"),
+    (
+        ("at epic close", None),
+        ("after an additional PR or OPS slice", None),
+        ("after a separate canon-only drain step", None),
+        # CX7-14: free text outside HDE Governance's three epic-close expectations.
+        ("Drained after closure by its owner.", "SOURCE_SCHEMA_INVALID"),
+        ("drain at epic close", "SOURCE_SCHEMA_INVALID"),
+    ),
+)
+def test_v2_close_expectation_uses_the_canonical_vocabulary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    close_expectation: str,
+    code: str | None,
+) -> None:
+    source = _v2_source()
+    source["later_drain_statements"][0]["close_expectation"] = close_expectation
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    if code is None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+        assert f"Close expectation: {close_expectation}" in (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+    assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+    assert not (repo / CRD_REPORT_REL).exists()
 
 
 _LEDGER_ENTRY = '"qa-01-setup":{"check_id":"qa-01-setup","log_path":"audit/qa/hde-crd-0002/checks/qa-01-setup/primary.log","status":"%s"}'
