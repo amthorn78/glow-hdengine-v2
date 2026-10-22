@@ -180,6 +180,9 @@ _DOCUMENTATION_PREFIXES = (
 )
 _DOCUMENT_SUFFIXES = {".adoc", ".md", ".rst"}
 _DOCUMENT_PATHS = {
+    # HDE-CRD-0002 WU-PR-08 (S16): the environment template; nothing in the
+    # repository reads it.
+    ".env.example",
     "LICENSE",
     "AcceptanceMap.md",
     "AGENTS.md",
