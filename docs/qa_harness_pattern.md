@@ -76,13 +76,21 @@ The composed Python API is `publish_crd_check_family` from `tools.evidence.updat
 publish_crd_check_family(config, results, *, captured_at_utc=None, coherence_verifier=None)
 ```
 
-It returns the primary-path tuple and manifest path. The updater module must belong to `config.repo_root`; the supported governed identity is **only `HDE-CRD-0001`**. A broader syntactically valid local CRD ID is not broader writer admission. A nonempty valid `CheckResult` family and an already coherent existing evidence graph are required before this composed writer touches QA bytes. It does not silently repair another evidence family's prior incoherence.
+It returns the primary-path tuple and manifest path. The updater module must belong to `config.repo_root`; the supported governed identities are the CRDs in the updater's source-owned `ADMITTED_CRD_QA` table, today **`HDE-CRD-0001` and `HDE-CRD-0002`**; another CRD needs its own row there. A broader syntactically valid local CRD ID is not broader writer admission. A nonempty valid `CheckResult` family and an already coherent existing evidence graph are required before this composed writer touches QA bytes. It does not silently repair another evidence family's prior incoherence.
 
 One outer `_WriteTransaction` captures planned QA preimages, performs local recording, runs the existing canonical convergence and validates the resulting family. The optional `coherence_verifier` is read-only and runs after actual writes inside the recovery boundary. Recovery covers exceptions in the existing single-writer operation; it does not promise process-crash recovery, interprocess locking or simultaneous atomic visibility to concurrent readers. A rollback failure leaves an untrustworthy state that must be reported with the original cause, not described as successful restoration.
 
-The canonical updater owns the primary/manifest proofs and complete Human Index, Machine Mirror, hash sentinel, orientation and self-proof relationships. Existing CRD keys are `audit.qa.hde_crd_0001.qa_step_logs_manifest` and `audit.qa.hde_crd_0001.checks.<check_id>.primary.log`. Role and physical-path metadata stay writer-controlled; optional empty Index token metadata is omitted. Only admitted listed artifacts enter this graph. There is no arbitrary additional-files or Index-metadata injection argument on the composed publisher. Preserve collision, alias, path and malformed-family rejection; do not hand-edit generated companions.
+The canonical updater owns the primary/manifest proofs and complete Human Index, Machine Mirror, hash sentinel, orientation and self-proof relationships. CRD keys use the admitted key prefix, for example `audit.qa.hde_crd_0001.qa_step_logs_manifest` and `audit.qa.hde_crd_0001.checks.<check_id>.primary.log`. Role and physical-path metadata stay writer-controlled; optional empty Index token metadata is omitted. Only admitted listed artifacts enter this graph. There is no arbitrary additional-files or Index-metadata injection argument on the composed publisher. Preserve collision, alias, path and malformed-family rejection; do not hand-edit generated companions.
 
 A successful local record call is not complete governed publication, and complete governed publication does not itself authorize a QA verdict, acceptance, release or closure. There is no new CRD CLI wrapper and no updater `--crd-id` flag. The existing updater `--check` mode is read-only validation. Ordinary updater write mode and other evidence generators require their actual owning task's authority; documentation verification must not run this publisher as a demonstration or create a fictional QA family.
+
+The post-verdict close-run family of an admitted CRD is published by a second composed Python API:
+
+```text
+publish_crd_close_run_family(config, results, *, captured_at_utc=None, coherence_verifier=None)
+```
+
+It writes `audit/qa/<crd-dir>/close/<check_id>/primary.log` and its path proof, requires the CRD's recorded QA family, replaces the whole close-run family, writes neither `qa_step_logs_manifest.json` nor any `checks/` primary, and has the same recovery bounds as `publish_crd_check_family`. Its membership rule is in `docs/EVIDENCE_INDEX.md`.
 
 ## Pytest and viability mechanics
 
