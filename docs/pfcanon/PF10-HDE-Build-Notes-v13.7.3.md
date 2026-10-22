@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.7.2**  
-Effective Date: 2026.10.21  
+**Version: v13.7.3**  
+Effective Date: 2026.10.22  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -201,7 +201,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.16 HDE-CRD-0002 WU-PR-07: PR work-unit lineage review v1.0 accepts the unit on pull request \#668 and returns WU-PR-08's business case to the Product Owner  
 * 2.17 HDE-CRD-0002 WU-PR-07: the S21 close-pack writer ADR defers to HDE Build Notes; the Product Owner's amendments of 2026-10-21 are recorded and the ADR's contradictions are resolved  
 * 2.18 Requirements and work units carry no cost ceiling; work continues until it is done  
-* 2.19 HDE-CRD-0002: Specification delta 01 is approved — requirement S01 is removed and the release keeps its version, with a same-version manifest refresh for any member change
+* 2.19 HDE-CRD-0002: Specification delta 01 is approved — requirement S01 is removed and the release keeps its version, with a same-version manifest refresh for any member change  
+* 2.20 HDE-CRD-0002 WU-PR-08: PR work-unit lineage review v1.0 accepts the unit on pull request \#687 and returns WU-DOC-01's business case to the Product Owner
 
 # **2\) Numbered Addenda**
 
@@ -2137,8 +2138,111 @@ None. No PF canon requires a release version cut; the decision is consistent wit
 
 The affected continuation is IA-30 — Review Whole-Change Implementation Plan — 100926.1 ([https\://app.notion.com/p/3f44590a05eb811db88dece791f1f60c](https://app.notion.com/p/3f44590a05eb811db88dece791f1f60c)), APPROVED\_BASE\_CHANGE\_ASSESSMENT, with this approved delta and the Product Owner decision as the authorized material-change request against the immutable Implementation Plan v1.1 and its review v1.1. WU-PR-08's PR-10 follows the Plan change.
 
-### Relationship to existing HDE Build Notes guidance
+## **2.20 HDE-CRD-0002 WU-PR-08: PR work-unit lineage review v1.0 accepts the unit on pull request [\#687](https://github.com/amthorn78/glow-hdengine-v2/pull/687) and returns WU-DOC-01's business case to the Product Owner**
 
-This addendum applies addendum 2.11 to requirement S01 and answers the WU-PR-08 business-case and S01 real-input decisions that addenda 2.12 and 2.16 returned to the Product Owner. It changes no other addendum and supersedes none.
+Timestamp: 102226 00:38 (UTC). Details: Records the PR-40 lineage review v1.0 of work unit WU-PR-08 (environment template and operator documentation; requirements S16 and S17) of the approved HDE-CRD-0002 Implementation Plan v1.1 as amended by Plan delta 01 v1.1 (P-7): decision ACCEPT on the unit's one pull request, amthorn78/glow-hdengine-v2\#687. The landed change is the proceeded plan's prototype diff byte for byte; every readiness and port statement S17 corrects matches the code on `main`; `.env.example` has `GEO_API_KEY` and is a classified CI surface; all seven CI lanes are green on the exact final head; Codex reviewed all three heads with no findings; the unit's measure is met. The next ordered unit, WU-DOC-01, cannot start until the Product Owner records its business case (addendum 2.18). Records two later-change candidates for the Product Owner (PR35-C1, LR8-F1) and the items routed to WU-DOC-01. Establishes no QA verdict, acceptance, Ops, deployment or closure.
+
+### **Approval and source record**
+
+* Artifact: `PR_WORK_UNIT_LINEAGE_REVIEW` v1.0, `HDE-CRD-0002-WU-PR-08-PR-WORK-UNIT-LINEAGE-REVIEW`, `docs/ephemeral/HDE-CRD-0002-WU-PR-08-pr-work-unit-lineage-review-v1.0.md`, created 2026-10-22T00:32:39Z (landed by [\#688](https://github.com/amthorn78/glow-hdengine-v2/pull/688); blob `0d841d3f…`, 22,511 bytes). Change: CRD `HDE-CRD-0002`; work unit `WU-PR-08` ("Environment template and operator documentation (PR; Coagulation; S16, S17)"). Decision: `ACCEPT`. Progression: `TERMINAL_PRODUCT_OWNER_RETURN`. Predecessor: none (the first PR-40 review of WU-PR-08).  
+* Reviewer: the continuing whole-change HDE-CRD-0002 Implementation Agent, read-only PR-40 role, session "HDE-CRD-0002-2" (`https://claude.ai/code/session_01U3QLYTkfUepeRbSGZNPj9N`). This session authored WU-PR-08's instruction v1.0 (PR-10) and no plan, code or result record of the unit. Sessions reviewed: PR-20/PR-30 `session_01QezXHuju1GXwpubx7zDvTA`; PR-35 `session_01VASdh3cjEKqEVYa35EwCEn`.  
+* Prompt: PR-40 — Review PR Work-Unit Lineage — 100926.1 (`https://app.notion.com/p/3f44590a05eb81088487e918fd642a7f`, page state as of 2026-10-12T02:29:38.234Z, fetched and read in full); release `GCFPE-20261009.1` / `100926.1`. Execution posture: `MANUAL_PROMPT_EXECUTION`.  
+* Entry event: the Product Owner's fallback PR-40 handoff, pasted after he merged \#687 by hand; no `MERGE_OBSERVED` result reached the session. The handoff's added context (run 39697136314 succeeded on `d37090e`; Codex reviewed that head with no findings) was verified independently.  
+* Governing records: Specification `HDE-CRD-0002-specification-v1.1-approved.md` (v1.1) with Specification delta 01 (`HDE-CRD-0002-specification-delta-v1.0.md`, DELTA\_APPROVE); Implementation Audit v1.0 §6 S16 and S17; Implementation Plan v1.1 (review v1.1, INITIAL\_APPROVE) with Plan delta 01 v1.1 (DELTA\_APPROVE; addendum record numbered 2.19 inside that record); business case `HDE-CRD-0002-WU-PR-08-po-disposition-scope-v1.0.md` §2, with no cost ceiling (addendum 2.18); instruction `HDE-CRD-0002-WU-PR-08-pr-instruction-v1.0.md` (INSTRUCTION\_READY; blob `e2c9f0ae1337`; \#685); plan `HDE-CRD-0002-WU-PR-08-pr-implementation-plan-v1.0.md` with companion `…-prototype.diff` (sha256 `954a7881…`; \#686, landed as `977a9c7`); results v1.0 (`PR_CANDIDATE_PUBLISHED`), v1.1 (MERGE\_PENDING for `bf32d20`, withdrawn by v1.2) and v1.2 (final PR-35 checkpoint). The Product Owner's PR-30 Proceed was for exactly plan v1.0; there was no second Proceed. Product Owner direction PO-35-1: push the result record to the PR's branch.  
+* Repository state reviewed: `origin/main` at `1a4c8abbd2acc34c6c80dd0e90df99295df3f630` (tree `c2a11824cfcd`), the merge commit itself; no later commit on `main` at review time. HDE Build Notes ref: v13.7.1 (SHA-256 `eab61385a819c859e1cf2743a204b70813feef23c902f647b3a5d7141454114d`). The review created no HDE Build Notes addendum (PR-40 is not a qualifying approval prompt).  
+* Canon relied on (as the review records it): PR-40 — Review PR Work-Unit Lineage — 100926.1 ("Resolve the next approved Plan stage"; "Execute" 1 to 10; "Required result"; "Terminal operator return"; "Accepted-final lineage protection"); HDE Build Notes addenda 2.18 (rule 5; "Epic, task, and status effects"), 2.11 (rules 1 to 8), 2.14 (rules 1 to 6\) and 2.3; AGENTS.md "HDE-EPIC039 current workflow posture", "Release identity" and "HDE-EPIC040 current posture"; Change Process Guide §0.6.1 (access-address bullets).
+
+### **Retained decisions and requirements**
+
+* **Decision.** WU-PR-08 (S16, S17) is delivered with sufficient attributable evidence by \#687, merged 2026-10-22T00:26:03Z as squash commit `1a4c8ab`, whose tree equals the PR's final head `d37090e`.  
+  * `.env.example` has `GEO_API_KEY`.  
+  * Every readiness and port statement S17 corrects matches the code on `main`, re-checked against the running apps.  
+  * `.env.example` is a classified CI surface.  
+  * The landed change outside `docs/ephemeral/` is the proceeded plan's prototype diff, byte for byte.  
+  * Codex reviewed all three heads with no findings; no review thread existed, so no P1 was raised or declined (addendum 2.14).  
+  * All seven lanes are green on the exact final head with `CI_APPLICABILITY_AND_EXACT_HEAD_OK`.  
+  * The unit's measure (decision record §2) is met.  
+* **What ACCEPT is not.** It is this review's lineage result only: not QA, acceptance of HDE-CRD-0002, Ops, deployment or closure.  
+* **Merge state and landed lineage.**  
+  * \#687: `merged: true`, merged by `amthorn78`; base `main` `977a9c7`; head `claude/awesome-einstein-ig69r1` at `d37090e`.  
+  * Merge commit `1a4c8abbd2acc34c6c80dd0e90df99295df3f630`: a squash with one parent `977a9c7`.  
+  * PR commits in order: `9b93cf0` (implementation, PR-30), `bf32d20` (result v1.0), `e1cb6d1` (result v1.1), `d37090e` (result v1.2).  
+  * Tree identity: `1a4c8ab^{tree}` \= `d37090e^{tree}` \= `c2a11824cfcd`; `git diff d37090e 1a4c8ab` is empty. `1a4c8ab` is `main`'s head at review time; no divergence.  
+* **Attribution.** All of `977a9c7..1a4c8ab` is attributable to \#687: six files, \+526/−10. Unit files: `.env.example` (+1), `ci/checks/classify_ci_changes.py` (+3), `docs/ADAPTER_009.md` (+7/−10). Records: results v1.0, v1.1 and v1.2 under `docs/ephemeral/`.  
+  * `git diff 977a9c7 1a4c8ab -- . ':(exclude)docs/ephemeral'` has sha256 `954a7881fbdcf688826bdf41f4da593fc7ea9430529709c1e37cfa3024745acb`, equal to the plan's prototype diff byte for byte.  
+  * `9b93cf0` is the only commit touching the unit files; PR-35 made no correction. Between the instruction's baseline `67adb68` and `1a4c8ab`, outside `docs/ephemeral/`, exactly the three unit files changed. Nothing landed outside the PR.  
+* **Requirement coverage on `main` at `1a4c8ab`** (throwaway clone, closed rails `env -i`, `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 PYTHONDONTWRITEBYTECODE=1`, CPython 3.12.3; the clone ended clean). Acceptance (1) to (5) of P-7, all met:  
+  * `.env.example` has a `GEO_API_KEY` entry and nothing else changed: one added line, `GEO_API_KEY=changeme`; lines 1 to 3 unchanged.  
+  * Readiness statements as implemented, naming the app, and port statements matching the runner and `Procfile`: the statement map below.  
+  * Admission `1.3.0`, 45 members, the base's `release_id`: `load_active_mechanics_bundle()` ok; `release_id` `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`; `scripts/release_id_recompute.py --check-manifest-only` exit 0\.  
+  * `.env.example` alone classifies: `classify_paths(['.env.example'])` returns `documentation_only`, no lanes, no `CI_CHANGE_SURFACE_UNCLASSIFIED`. The classifier itself still selects all seven lanes.  
+  * All seven lanes green on the exact PR head with `CI_APPLICABILITY_AND_EXACT_HEAD_OK`: run 39697136314 on `d37090e`.  
+* **Statement map** (plan v1.0 §6), each re-checked against `main`:  
+  * R-1 (`docs/ADAPTER_009.md` line 6): readyz always returns 200 `{"ok":true,"schema":"v1"}` with no dependency check and no smoke. `adapter/wsgi.py` lines 47–51; the test client gives 200 with that body from `adapter.wsgi` under `APP_ENV=dev` and `prod`.  
+  * R-2 (line 22): `/internal/readyz` performs no override check, and `config/runtime_overrides.json` does not change its response. Test client under `APP_ENV=prod` with the file present: 200, same body.  
+  * R-3 (line 33): `/internal/readyz` adds no header of its own (no `X-Toggles-SHA`). The prod response headers are `Cache-Control`, `Content-Length`, `Content-Type`, `Referrer-Policy`, `Strict-Transport-Security`, `X-Adapter-Version`, `X-Content-Type-Options`, `X-Correlation-Id`, `X-Engine-Tag`, `X-Frame-Options`, `X-Release-Id`.  
+  * R-4 (lines 46–48): registered only by `adapter.wsgi:create_app()`, exposed as `adapter.app:app`; the production app (`adapter.factory`) and the dev Reader (`adapter.http_reader`) answer 404 under dev and prod. `Procfile` runs `adapter.factory:create_app()`.  
+  * P-1 (line 119\) and P-2 (line 135): `http://127.0.0.1:8000`; loopback on `$PORT` when set (default 8000). `adapter/http_reader.py` lines 1320–1321; `scripts/dev_start_reader.sh` line 10 (`PORT:=8000`).  
+  * Line 146, unchanged: production `--bind 0.0.0.0:$PORT` per `Procfile`.  
+* **Live probes.** PR-30 (`9b93cf0`) and PR-35 (`bf32d20`) ran live probes from the operator's shell on code identical to `main` (result v1.0 §3; result v1.1 §4). The review relied on the test client and the source rather than repeating them.  
+* **Measure** (decision record §2): "`.env.example` has a `GEO_API_KEY` entry …, and each statement S17 corrects matches the code on the merged head": met, by acceptance (1) and the statement map (addendum 2.18 rule 5).  
+* **Other obligations.** No route, payload or behaviour changed (`/internal/readyz` unchanged; contract F-3 holds). No test added, as plan PD-2 decided (no test enumerates the changed registry). Documentation is `docs/ADAPTER_009.md` only, within S17's bound. Dependency order after WU-PR-07 met. Security: a placeholder value only, no secret in any record. Recovery: PR-30 recovered before creating.  
+* **Reviews and the addendum 2.14 check.**  
+  * Codex code review: summary comment 6328780869 records the latest review, of `d37090e`, completed 2026-10-22T00:02:50Z, trigger "New commits", `has_any_findings: false`, `has_unresolved_findings: false`. Earlier rounds: `9b93cf0` (no findings) and `e1cb6d1` (no findings); the code reviewed is the same in all three.  
+  * Review threads: 0\. Formal reviews: 0\. Issue comments: the Codex summary and PR-35's standing-down comment on the failed run (6329297225).  
+  * No P1 was raised, so none was declined. Addendum 2.11 rules 7 and 8: no finding needed a disposition and no repeated class arose. The Codex security review is not in the chain (addendum 2.3); its empty row is no gap.  
+* **Hosted CI.**  
+  * Run 39693139601 on `bf32d20`: success, seven lanes.  
+  * Run 39695867041 on `e1cb6d1`: failure in the changed-tests step (1 failed, 4,520 passed, 2 skipped) at `tests/tools/test_prepush_check.py::test_build_notes_requires_exactly_one_file[names2-False]`, a test outside the unit (PR35-C1).  
+  * Run 39697136314 on `d37090e`, job 119557151090: success. `event: pull_request`; `HEAD_SHA` `d37090ed0aebb3241e7bc75c19eecb50fcd74bde`; `BASE_SHA` `977a9c7…`; image `ubuntu-26.04` 20261018.168.1; git 2.55.0; 00:01:40Z to 00:22:17Z. The whole job log (920 of 920 lines) was retrieved and scanned. `CI_CHANGE_CLASSIFICATION:event=pull_request;reason=selected_lanes;paths=6;lanes=product,compat,db,rails,evidence,qa,release`. Changed tests 4,521 passed, 2 skipped; product 77; compat 119 passed, 3 skipped, 2 xfailed; db 269; rails 120, 113, 155 and 138; evidence 134; qa 488; release 79; every final-step outcome `success`; the step printed `CI_APPLICABILITY_AND_EXACT_HEAD_OK`.  
+  * Push run 39699657729 on `main` at `1a4c8ab` was in progress at 00:30:30Z when the review was written. Its tree is the one 39697136314 tested; the review does not depend on it.
+
+### **Epic, task, and status effects**
+
+* WU-PR-08 is ACCEPT at the lineage level; the unit has no further PR-stage work. Accepted-final lineage protection applies: WU-PR-06 is not reopened by PR35-C1.  
+* The next ordered unit is WU-DOC-01 ("Final repository documentation (DOC; after WU-PR-08)", Plan v1.1 §7 as Plan delta 01 P-8 amends its scope). Its dependency, "ninth; after WU-PR-08 merges", is met. It is a final documentation unit without instructions, so its stage is DOC-10.  
+* WU-DOC-01 is not runnable: its business case is due before DOC-10 (addendum 2.18, "Epic, task, and status effects"), and none is on `main`. WU-OPS-01 has the same prerequisite before OPS-10. The progression is a terminal Product Owner return with no continuation block.  
+* Not carried, as decided: addendum 2.10's `1.4.0` cut and addendum 2.6's purity-report regeneration (Plan delta 01, K-1 and K-2).  
+* Canon-conflict register CR-1 to CR-8 carried unchanged, all decided; no new entry (CR-1 to CR-3 APPROVED\_AS\_CHANGED by Thoth; CR-4 APPROVED and CR-5 APPROVED\_AS\_CHANGED by the Product Owner; CR-6 APPROVED (a) by this Implementation Agent through RS-20; CR-7 and CR-8 APPROVED (a) each by the Product Owner). Plan v1.0 §19 records why HDE Architecture §3.4's speculative readiness concept is consistent with the corrected document.
+
+### **Required canon drainage**
+
+* None created by this review. The unit's canon-facing statements are corrections to `docs/ADAPTER_009.md`, a repository operator document. The stale-document list (LR8-F2, LR8-O1 and the earlier carried items) goes to WU-DOC-01. No PF canon document was edited, no PF10 addendum was created by the review, and no PF09 or PF30 movement occurred.
+
+### **Deferred obligations and unresolved work**
+
+* **Decision returned to the Product Owner: WU-DOC-01's business case** (beneficiary, evidence, benefit, measure; no ceiling). The review measured these gaps on `main` at `1a4c8ab`:  
+  * `README.md` does not mention `tools/ci/prepush_check.py`, the pre-push check WU-PR-06 delivered;  
+  * `AGENTS.md` names only `schemas/epic_close_candidate_source.v1.json`, while WU-PR-07 delivered `schemas/close_candidate_source.v2.json`, which accepts CRD identities;  
+  * `docs/EVIDENCE_INDEX.md` has no HDE-CRD-0002 entry;  
+  * `CHANGELOG.md` has no HDE-CRD-0002 entry;  
+  * the items routed to WU-DOC-01: LR8-F2, LR8-O1, and the earlier carried items (the H-4 usage note, the start command and bind, OBS-P3-12, LR3-O4, F-3, O-19).  
+* **A draft for the Product Owner to adopt, change or reject** (not decided by the review): beneficiary, agents and operators who take repository workflow from `AGENTS.md` and `README.md`; evidence, the four gaps above; benefit, a session following them uses the delivered pre-push check and v2 close-pack source rather than an outdated description; measure, each statement WU-DOC-01 changes matches merged `main`, checked at DOC-20. Whether this meets addendum 2.11 rule 2 is the Product Owner's call: a document gap is a business case only where someone would act wrongly on it.  
+* **Resume point:** when the business case is recorded, the next stage is DOC-10 for WU-DOC-01, run by the whole-change Implementation Agent.  
+* **No finding against the landed work.** Routed items:
+
+| ID | Item | Owner |
+| :---- | :---- | :---- |
+| PR35-C1 | A test-fixture race in WU-PR-06's `tests/tools/test_prepush_check.py`: `IDENTITY` (line 33\) does not disable git auto-maintenance, so on the runner's git 2.55.0 a detached maintenance child can change `.git/objects` during the test's read-only snapshot (result v1.2 §3, a probable cause from the log and git's documentation). It failed once on hosted CI, a real input under addendum 2.11 rule 4(b). WU-PR-06 is accepted-final and is not reopened. The proposed patch, untested, adds `"-c", "maintenance.auto=false"` to `IDENTITY` | Product Owner, as a later-change candidate |
+| LR8-F1 | Plan F-1: the override guard sees `app.config`, not the environment. `adapter/wsgi.py` line 20 calls `validate_or_fail(app)`; `_as_mapping` (`adapter/env_guard.py` lines 82–95) returns `app.config` for a Flask app, so the prod refusal never sees the process environment; `adapter.factory` does not call the guard. Confirmed by reading the code. The document makes no claim about the guard (plan PD-4) | Product Owner, as a later-change candidate |
+| LR8-F2 | Plan F-2 and instruction ID-8: stale statements in `docs/ADAPTER_009.md` outside S17's bound: lines 7 and 8 list `/internal/version` twice; line 20 says "localhost"; the `ENGINE_ENV` line (now 51); the start line with an install prefix (now 143 to 147); the capture environment without `APP_ENV=dev`; `TOGGLES_SHA`; `X-Release-Id`'s default; the Bearer statement | WU-DOC-01, through its DOC-10 instruction |
+| LR8-O1 | O-19: `scripts/make_release_pack.sh` writes a non-canonical `artifacts/release_id.txt`; its documentation side | WU-DOC-01; any code change, the Product Owner |
+| LR8-O2 | The carried hazards OBS-P4-5 and OBS-P4-7 did not occur on \#687 | carried as before |
+
+* **Not executed by the review:** a live probe from the operator's shell (PR-30 and PR-35 ran them on identical code); the full local replay (the hosted run on the final head was read instead); the test suites (the hosted run covers them). **Not produced:** a QA artifact, an Ops record, a close pack, a PF10 addendum by the review, a WU-DOC-01 instruction or business case. TypeSafe reading: not read, because the terminal return has no receiving session to score; a reading belongs to the record that hands off DOC-10 once it is runnable. Prompt-use provenance is recorded in the review only (`docs/changes/GCFPE_PROMPT_PROVENANCE.md` absent on `main`; pending, non-gating).
+
+### **Scope boundaries and nonclaims**
+
+* ACCEPT is a delivery verdict against the approved scope of WU-PR-08 on \#687. It is not QA, acceptance of HDE-CRD-0002, Ops, deployment, release activation, canon drainage, PF09 or PF30 movement, or closure.  
+* No release changes: admission `1.3.0`, 45 members, `release_id` `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`. `.env.example` classifies as `documentation_only`; nothing in the repository reads the template (plan PD-1).  
+* The override guard's wiring (LR8-F1) and the fixture race (PR35-C1) are candidates only; no change to either is made or approved here. PR35-C1's patch is untested.
+
+### **Evidence anchors**
+
+* Review: `docs/ephemeral/HDE-CRD-0002-WU-PR-08-pr-work-unit-lineage-review-v1.0.md` (blob `0d841d3fd24e1cf53d25c900a1338c903d524be5`; \#688).  
+* PR [\#687](https://github.com/amthorn78/glow-hdengine-v2/pull/687); merge `1a4c8abbd2acc34c6c80dd0e90df99295df3f630`; head `d37090ed0aebb3241e7bc75c19eecb50fcd74bde`; commits `9b93cf0`, `bf32d20`, `e1cb6d1`, `d37090e`.  
+* Prototype diff sha256 `954a7881fbdcf688826bdf41f4da593fc7ea9430529709c1e37cfa3024745acb`.  
+* Hosted runs 39693139601 (`bf32d20`, success), 39695867041 (`e1cb6d1`, failure, PR35-C1), 39697136314 (`d37090e`, success; job 119557151090\) and 39699657729 (push to `main`, in progress at review time). Codex summary comment 6328780869; PR-35 comment 6329297225\.  
+* Release identity `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`.
 
 \<eof\>
