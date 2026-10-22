@@ -4,29 +4,28 @@
 Internal-only WSGI adapter exposing:
 - GET /internal/healthz — process up (no engine checks)
 - GET /internal/readyz — always 200 `{"ok":true,"schema":"v1"}`; no dependency check, no smoke (see Readiness rules)
-- GET /internal/version — engine/build metadata (prod requires Authorization: Bearer)
-- GET /internal/version — engine/build metadata
+- GET /internal/version — engine/build metadata; served by every app factory, with no authorization check
 
-Bodies are minified JSON with stable key order and one trailing newline. All responses include the header set below.
+Bodies are minified JSON with stable key order and one trailing newline. Responses of `adapter.wsgi` include the header set below.
 
 ### `/internal/version` invariants (enforced)
 - GET and HEAD both return **200** with header parity.
 - **Cache-Control: no-store** and no ETag on this route.
 - Conditional validators are ignored; conditional GET still returns 200.
-- Body keys remain ordered: `engine_tag, release_id, invocation_tag, build_commit, emitter_sha256`.
+- Body keys remain ordered: `engine_tag, build_commit, invocation_tag, invocation_sha256, emitter_sha256, release_id` (pinned by `tests/transport/test_internal_version_contract.py`). `release_id` is the canonical release identity.
 - Route stays DB-decoupled and renders without external dependencies.
 
 ## Environments
-- dev/staging: open on localhost; bearer optional (accepted if present).
-- prod: /internal/version requires Authorization: Bearer <ENGINE_SERVICE_TOKEN>.
+- Every environment: /internal/version answers without authorization; an `Authorization` header is ignored, and no code reads `ENGINE_SERVICE_TOKEN`. A request carrying `X-Identity-Override` returns 400 (`no-store`, no ETag). Local captures use `http://127.0.0.1:8000` (see "Deterministic run posture").
 - prod overrides: /internal/readyz performs no override check; config/runtime_overrides.json does not change its response.
 
-## Required headers (all responses)
+## Required headers (all responses of `adapter.wsgi`)
+- Applied by `adapter.wsgi:create_app()` (`adapter.app:app`) only. The production app (`adapter.factory`) and the dev Reader do not add this set; their `/internal/version` response carries `Cache-Control: no-store`, `Content-Type` and `Content-Length`.
 - Cache-Control: no-store
 - Content-Type: application/json; charset=utf-8
 - X-Correlation-Id: <echo or generated uuid4 hex>
-- X-Engine-Tag: <engine_tag>
-- X-Release-Id: <release_id>
+- X-Engine-Tag: the app's `ENGINE_TAG` configuration value, default `Isis6`
+- X-Release-Id: the app's `RELEASE_ID` configuration value, default `rel_dev`; not the canonical `release_id`, which the `/internal/version` body reports
 - X-Adapter-Version: v1
 - Security: X-Content-Type-Options: nosniff, Referrer-Policy: no-referrer, X-Frame-Options: DENY
 - Prod only: Strict-Transport-Security: max-age=31536000; includeSubDomains
@@ -35,21 +34,18 @@ Bodies are minified JSON with stable key order and one trailing newline. All res
 ## Error envelope (v1, strict)
 { "ok": false, "schema": "v1", "code": "<Enum>", "error": "<String>", "details": "<optional>" }
 
-## Auth (prod)
-- /internal/version:
-  - Missing/invalid bearer → 401 with:
-    {"ok":false,"schema":"v1","code":"Unauthorized","error":"InvalidOrMissingToken"}
-  - Valid bearer (ENGINE_SERVICE_TOKEN) → 200
+## Auth
+- /internal/version has no authorization check in any environment: it returns no 401, and an `Authorization` header changes nothing.
 
-*Note (EPIC-005): proofs captured in repo artifacts do not require Bearer. If a Bearer policy is later introduced, update the ops acceptance crib accordingly.*
+*Note (EPIC-005): proofs captured in repo artifacts do not use Bearer.*
 
 ## Readiness rules
 /internal/readyz is registered only by `adapter.wsgi:create_app()`, exposed as `adapter.app:app` for `flask --app adapter.app run`. The production app (`adapter.factory:create_app()`, started by `Procfile`) and the dev Reader (`python -m adapter.http_reader`) do not register it and answer 404.
 It returns 200 with `{"ok":true,"schema":"v1"}` and the header set above, unconditionally. It checks no dependency, runs no smoke and performs no override check, so a 200 shows only that the process answers.
 
 ## Env vars
-ENGINE_ENV=dev|staging|prod (default dev), ENGINE_SERVICE_TOKEN (prod only).
-Optional fixed meta: BUILD_COMMIT_SHORT, BUILD_TIMESTAMP_UTC, ENGINE_TAG, RELEASE_ID, TOGGLES_SHA.
+`APP_ENV` selects the environment. `adapter/wsgi.py` (for the production-only `Strict-Transport-Security` header) and `adapter/env_guard.py` read `ENGINE_ENV` only when `APP_ENV` is blank.
+No code reads `ENGINE_SERVICE_TOKEN`, `TOGGLES_SHA`, `BUILD_COMMIT_SHORT` or `BUILD_TIMESTAMP_UTC`. `ENGINE_TAG` and `RELEASE_ID` are not read from the environment: `adapter/wsgi.py` sets them as app configuration defaults (`Isis6` and `rel_dev`) for its `X-Engine-Tag` and `X-Release-Id` headers and its log lines.
 New
 
 # Appendix-D — Evidence Index (EPIC-005)
@@ -109,7 +105,7 @@ This repo contains implementation docs. Canon (spec/process) lives in PF documen
 - `docs/EVIDENCE_INDEX.md`
 
 - Pins: `python scripts/ensure_env.py` → `[ENV] OK`
-- Tests: `pytest -q tests/test_sercanon.py`
+- Tests: `pytest -q tests/infra/test_sercanon_bytes.py`
 <!-- EPIC-004 PATCH: RUN posture -->
 ### Deterministic run posture (Reader)
 ```bash
@@ -120,10 +116,14 @@ Bind target for captures: http://127.0.0.1:8000 — the runner binds loopback (1
 
 Environment for reproducible bytes/headers (same shell):
 ```
+APP_ENV=dev
+SAFE_MODE=1
+ALLOW_NETWORK=0
+LC_ALL=C
+LANG=C
+TZ=UTC
 PYTHONHASHSEED=0
 PYTHONUTF8=1
-TZ=UTC
-SAFE_MODE=1
 ```
 
 Auto-reload: **off** when capturing evidence.
@@ -132,19 +132,19 @@ Auto-reload: **off** when capturing evidence.
 ```bash
 python -m adapter.http_reader
 ```
-Bind: http://127.0.0.1:8000 (`$PORT` when set)  ·  Env: PYTHONHASHSEED=0 PYTHONUTF8=1 TZ=UTC SAFE_MODE=1  ·  Auto-reload: off
+Bind: http://127.0.0.1:8000 (`$PORT` when set)  ·  Env: APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0 PYTHONUTF8=1  ·  Auto-reload: off
 
 ---
 
-## RUN — Production start (EPIC-005, Railway)
+## RUN — Production start (repository `Procfile`)
 
-Use the exact start line that shipped in EPIC-005 (tactical; normalize later if desired):
+The repository's start command is the `Procfile` line:
 
 ```bash
-python -m pip install --no-cache-dir -r requirements.txt \
-  && python -m gunicorn 'adapter.factory:create_app()' \
-     --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+/app/.venv/bin/python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
 ```
+
+This states the repository's start command only, not the live service's settings.
 
 Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if not yet captured)*
 
@@ -225,5 +225,5 @@ LF-terminated JSON; no extra fields.
 
 ### `/internal/version` invariants (enforced)
 GET/HEAD 200 with header parity; Cache-Control: no-store; no ETag; conditional GET ignored; body key order:
-`engine_tag, release_id, invocation_tag, build_commit, emitter_sha256`.
+`engine_tag, build_commit, invocation_tag, invocation_sha256, emitter_sha256, release_id`.
 

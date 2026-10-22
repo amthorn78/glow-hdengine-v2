@@ -16,7 +16,7 @@ Reader v2 exposes the full Magic-10 set as bands only. HDE-EPIC040-PR06a deliver
 - Body: a JSON object with exactly the keys `a_id` and `b_id`, each a lowercase canonical UUID; at most 32,768 bytes; UTF-8 without a byte-order mark. Any other body returns 422 `ERR_READER_INVALID_INPUT`.
 - Lookup: each identity is resolved by one read-only current-row lookup. An unavailable lookup returns 503 `ERR_M10_RESOLVER_UNAVAILABLE`; a missing row returns 404 `ERR_M10_PERSON_UNRESOLVED`.
 - Other methods: every method other than `POST` on `/api/reader` returns 405 with the `ERR_NOT_FOUND` envelope, `Allow: POST` and `Cache-Control: no-store`.
-- Known limitation: a path that no route serves, such as `/api/reader/missing`, receives the framework's HTML 404 from `adapter/factory.py` and `adapter/http_reader.py`; only `adapter/wsgi.py` answers with the JSON `ERR_NOT_FOUND` envelope. This gap belongs to the HTTP transport owner.
+- Unknown paths: a path that no route serves, such as `/api/reader/missing`, returns 404 with the governed `ERR_NOT_FOUND` envelope (`no-store`, no ETag, `application/json; charset=utf-8`) from every app factory: `adapter/factory.py`, `adapter/http_reader.py` and `adapter/wsgi.py`. `docs/server/reader_v1.md` states the same.
 
 ## Success body
 

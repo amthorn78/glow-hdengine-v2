@@ -12,10 +12,11 @@ Probes (use curl):
 4) Accept-Encoding: identity vs gzip produce same ETag (brotli optional; if unavailable, skip).
 5) Errors/writers: JSON one line + final LF; Cache-Control: no-store.
 
-Proof artifacts (optional): set `HDE_WRITE_A7_PROOFS=1` when running `tests/http/test_reader_a7_transport.py` to emit proof files under `artifacts/proofs/`:
+Proof artifacts: `tools/evidence/generate_a7_transport_proofs.py` writes them under `artifacts/proofs/`, with the Endpoint Catalog and the endpoints snapshot, only when `HDE_WRITE_A7_PROOFS=1` is set; `--check` compares them without writing. `tests/http/test_reader_a7_transport.py` tests the transport and writes nothing.
 - `success_get.txt`, `success_head.txt`, `success_304.txt`
-- `encoding_invariance.txt`
+- `success_encoding_invariance.txt`
 - `success_writers_errors.txt`
 - `endpoints_env_gate_proof.log`
+- `reader_success_get_head_304.json`
 
 For full acceptance details, see “Governance & Process (Acceptance)”.
