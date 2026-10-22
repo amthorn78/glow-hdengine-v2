@@ -335,7 +335,8 @@ Rehearsal is not production execution and created no evidence. It ran in this IA
 - The checkout was clean after every case.
 - **Publication path:** two commits under `audit/ops/hde-crd-0002/wu-ops-01/` were each run through `tools/ci/prepush_check.py` (`lanes` and `replay`) in a throwaway clone, under closed rails, with CPython 3.12.3 and CI's full install. One commit held stand-in files; the other held r01's actual output.
   - Both classified to `evidence` only.
-  - The stand-in commit's replay ran the evidence lane: 134 passed in 671.86 s, `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, `PASS`. The second replay's result is in §16.
+  - The stand-in commit's replay ran the evidence lane: 134 passed in 671.86 s, `CI_APPLICABILITY_AND_EXACT_HEAD_OK`, `PASS`.
+  - The commit with r01's actual output (six files): `lanes=evidence`; evidence lane 134 passed in 658.87 s; `CI_APPLICABILITY_AND_EXACT_HEAD_OK`; `PREPUSH_CHECK_RESULT: PASS lanes=PASS replay=PASS`.
   - These pre-push results are not CI's result.
 - **Limitations:**
   - The HTTPS path was not exercised end to end; production may not be contacted from this session. `curl --proto =https` was confirmed to refuse a plain-HTTP URL (curl 8.5.0, exit 1).
@@ -454,9 +455,7 @@ Rehearsal is not production execution and created no evidence. It ran in this IA
 ## 16. Validation of this record
 
 - **Read back after push:** the record and the script, by their blobs on the branch (pull request below).
-- **Second publication replay** (r01's actual output committed under the root): see the line below, filled before push.
-
-REPLAY-2: running when this record was first committed; its result is added by a follow-up commit on this branch before the pull request opens.
+- **Second publication replay**, with r01's actual output committed under the root: `PASS`. Six paths classified to `evidence` only; the evidence lane passed 134 tests in 658.87 s; `CI_APPLICABILITY_AND_EXACT_HEAD_OK`; the repository was unchanged afterwards (§10). This replay was still running when this record was first committed (`98fc9a2`); this result was added by a follow-up commit on the same branch before the pull request opened.
 
 ## 17. Next stage and return
 
