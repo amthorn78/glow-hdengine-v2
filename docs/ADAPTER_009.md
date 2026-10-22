@@ -45,7 +45,7 @@ It returns 200 with `{"ok":true,"schema":"v1"}` and the header set above, uncond
 
 ## Env vars
 `APP_ENV` selects the environment. `adapter/wsgi.py` (for the production-only `Strict-Transport-Security` header) and `adapter/env_guard.py` read `ENGINE_ENV` only when `APP_ENV` is blank.
-No code reads `ENGINE_SERVICE_TOKEN`, `TOGGLES_SHA`, `BUILD_COMMIT_SHORT` or `BUILD_TIMESTAMP_UTC`. `ENGINE_TAG` and `RELEASE_ID` are not read from the environment: `adapter/wsgi.py` sets them as app configuration defaults (`Isis6` and `rel_dev`) for its `X-Engine-Tag` and `X-Release-Id` headers and its log lines.
+No code reads `ENGINE_SERVICE_TOKEN`, `TOGGLES_SHA`, `BUILD_COMMIT_SHORT` or `BUILD_TIMESTAMP_UTC`. The HTTP adapter reads neither `ENGINE_TAG` nor `RELEASE_ID` from the environment (`adapter/wsgi.py` sets them as app configuration defaults, `Isis6` and `rel_dev`, for its `X-Engine-Tag` and `X-Release-Id` headers and its log lines), but the vendor client (`engine/bodygraph/vendor_client.py`) reads `RELEASE_ID` from the environment for its `User-Agent: GlowHDEngine/<release_id>` header when no release identity is passed.
 New
 
 # Appendix-D — Evidence Index (EPIC-005)

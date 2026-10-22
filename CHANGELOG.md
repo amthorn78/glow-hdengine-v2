@@ -4,7 +4,7 @@ Unreleased — HDE-CRD-0002: repository corrections, CI coverage, pre-push check
 
 ### Added
 - Read-only pre-push check `tools/ci/prepush_check.py` with the reports `lanes`, `membership`, `build-notes`, `sweep` and `replay` (S20; #660). Usage, exit status and limits: README, "Pre-push check (HDE-CRD-0002)".
-- Close-pack source schema `schemas/close_candidate_source.v2.json` for Epic and CRD identities, read by `tools/qa/generate_epic_close_pack.py` beside v1; the post-verdict CRD close-run family, published only by the updater's `publish_crd_close_run_family`; and the architecture decision record `docs/adr/hde/close_pack_writer_adr.md` (S21; #668). Capability only: no close pack of any change exists.
+- Close-pack source schema `schemas/close_candidate_source.v2.json` for Epic and CRD identities, read by `tools/qa/generate_epic_close_pack.py` beside v1; the post-verdict CRD close-run family, published only by the updater's `publish_crd_close_run_family`; and the architecture decision record `docs/adr/hde/close_pack_writer_adr.md` (S21; #668). Capability only: no close pack or candidate source has been produced with this writer, under either schema, and no close-run family exists.
 - CRD admission in the evidence updater: the source-owned `ADMITTED_CRD_QA` table admits HDE-CRD-0001 and HDE-CRD-0002 (S22; #634, #637).
 - Release labels in the Machine Mirror `notes` of current-release captures, applied only when a capture's owner regenerates it (S11, S12, S13; #634, #637).
 - `GEO_API_KEY` in `.env.example`, which CI now classifies (S16; #687).
