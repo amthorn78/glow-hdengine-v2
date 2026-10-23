@@ -142,7 +142,7 @@ Files, all under `audit/ops/hde-crd-0002/wu-ops-01/`. The pull request adds them
 
 - **Branch:** `docs/20261023-hde-crd-0002-wu-ops-01-execution`, from `origin/main` at `45f045ba`.
 - **Commits:** `8d7424c5` (the six evidence files only); this record in the next commit.
-- **Pull request:** PENDING_PR_NUMBER. I opened it and did not merge it. The Product Owner merges.
+- **Pull request:** [#704](https://github.com/amthorn78/glow-hdengine-v2/pull/704). I opened it and did not merge it. The Product Owner merges. The number was added by a follow-up commit on the same branch, after the pull request opened.
 - **Read-only check (task §8.3 step 5):** `python3 tools/ci/prepush_check.py lanes` under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`) on commit `8d7424c5`: `evidence=true`, every other lane `false`, `path_count=6`, `PREPUSH_CHECK_RESULT: PASS lanes=PASS`. It ran without the CI install (no pytest, no `-e .`), so `replay` was **NOT RUN** for that reason. The hosted `evidence` lane on the pull request is the check of record. The pre-push result is not CI's result, not QA and not governed evidence.
 - **Read-back:** this record was read back once after saving; see the pull request for the final blob.
 
