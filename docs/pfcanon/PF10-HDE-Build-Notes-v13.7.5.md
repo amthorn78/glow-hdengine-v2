@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.7.4**  
-Effective Date: 2026.10.22  
+**Version: v13.7.5**  
+Effective Date: 2026.10.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -203,7 +203,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.18 Requirements and work units carry no cost ceiling; work continues until it is done  
 * 2.19 HDE-CRD-0002: Implementation Plan delta 01 is approved — no S01 or version cut, WU-PR-08 is S16 and S17 with one CI classifier registration, and WU-OPS-01 proves deployment by release\_id  
 * 2.20 HDE-CRD-0002: Specification delta 01 is approved — requirement S01 is removed and the release keeps its version, with a same-version manifest refresh for any member change  
-* 2.21 HDE-CRD-0002 WU-PR-08: PR work-unit lineage review v1.0 accepts the unit on pull request \#687 and returns WU-DOC-01's business case to the Product Owner
+* 2.21 HDE-CRD-0002 WU-PR-08: PR work-unit lineage review v1.0 accepts the unit on pull request \#687 and returns WU-DOC-01's business case to the Product Owner  
+* 2.22 HDE-CRD-0002 WU-OPS-01: the Ops task receipt v1.0 accepts the production release-identity read and the presence of seven variables, and the next stage is QA-10
 
 # **2\) Numbered Addenda**
 
@@ -1020,7 +1021,7 @@ Timestamp: 101826 15:04 (UTC). Details: Records the PR-40 lineage review v1.0 of
   * Admission: 2f18a5ebbf1908ae1425ec546677d6618746f27c2e1ddc9e5087a81b0aaceb76 45 1.3.0; manifest SHA-256 equal.  
   * Thirteen read-only evidence and release checks exit 0: release\_id\_recompute.py \--check-manifest-only, update\_evidence\_index.py \--check, orientation\_demo.py \--check, validate\_evidence\_paths.py, ci/checks/check\_mirror\_schema.sh, ci/checks/check\_evidence\_index\_hash.sh, check\_lf\_endings.py, ci/checks/check\_final\_lf.sh, refresh\_step\_logs\_manifest.py \--check, run\_canonical\_json\_gate.py \--check-only, generate\_a7\_transport\_proofs.py \--check, generate\_v2\_mapped\_cache\_evidence.py \--check (V2\_MAPPED\_CACHE\_EVIDENCE\_OK), generate\_bodygraph\_policy\_proofs.py \--check.  
   * Five frozen-family and CLI-help checks exit 0: generate\_showcompat\_artifacts.py \--check, generate\_cli\_conformance\_artifacts.py \--check, generate\_rails\_gate\_evidence.py \--check, generate\_env\_matrix\_snapshot.py \--check, ci/checks/check\_cli\_help.sh.  
-  * Stale-binding sweep: git grep \-l \-E 'd84d99e1|06611525' outside docs/, .audit\_src/, handoff/ and manifest\_\*.sha256: no hit; in docs/ outside docs/ephemeral/ and docs/pfcanon/: no hit. Mirror: 620 rows; 27 labelled rows, all carrying 2f18a5eb… and none d84d99e1…; the purity-report rows carry no notes. No audit sink file is tracked.  
+  * Stale-binding sweep: git grep \-l \-E 'd84d99e1\|06611525' outside docs/, .audit\_src/, handoff/ and manifest\_\*.sha256: no hit; in docs/ outside docs/ephemeral/ and docs/pfcanon/: no hit. Mirror: 620 rows; 27 labelled rows, all carrying 2f18a5eb… and none d84d99e1…; the purity-report rows carry no notes. No audit sink file is tracked.  
   * Pre-existing checks: generate\_hde\_epic037\_bg\_resolve.py \--check and generate\_hde\_epic036\_bg\_resolve\_route\_policy.py \--check exit 1 on 5892538 and on 39afdc6 with the same stale-file lists (plan F-5); not caused by this unit; neither was run in write mode.  
   * Targeted tests: the unit's six test files (test\_vendor\_prod\_override.py, test\_resolver\_vendor.py, test\_bg\_resolve.py, test\_aux\_preview.py, test\_bg\_resolve\_v2\_mapped\_cache.py, tests/evidence/test\_v2\_mapped\_cache\_evidence.py) 215 passed (result v1.0's 212 plus CX-1's 3); the same with APP\_ENV unset 215 passed; with tests/adapter/test\_jsonschema.py first in the same process 218 passed, 2 xfailed (plan F-13 holds); route-policy, compat-chart, serializer-guard, CLI usage, showcompat-sources and classifier-pin files 215 passed; tests/bodygraph/test\_bg\_resolve\_route\_policy.py with APP\_ENV unset 6 failed, 6 passed, the six plan F-4 names (OBS-P4-2), which pass wherever APP\_ENV is set, as in every CI lane.  
   * Negative controls on the merged source (one guard disabled in a scratch worktree, then restored; each fails as intended): NC-A CX-1's directory fsyncs 3 failed, 96 passed; NC-B the step-5 flag-required refusal 17 failed, 119 passed; NC-C ID-3's legacy production write refusal 6 failed, 117 passed; NC-D the S08 band override 3 failed, 6 passed; NC-E the process no-downgrade rule (PD-5) 2 failed, 125 passed; NC-F an actor taken from USER before the user database 1 failed, 98 passed.  
@@ -2485,5 +2486,110 @@ Timestamp: 102226 00:38 (UTC). Details: Records the PR-40 lineage review v1.0 of
 * Prototype diff sha256 `954a7881fbdcf688826bdf41f4da593fc7ea9430529709c1e37cfa3024745acb`.  
 * Hosted runs 39693139601 (`bf32d20`, success), 39695867041 (`e1cb6d1`, failure, PR35-C1), 39697136314 (`d37090e`, success; job 119557151090\) and 39699657729 (push to `main`, in progress at review time). Codex summary comment 6328780869; PR-35 comment 6329297225\.  
 * Release identity `77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e`.
+
+## 2.22 HDE-CRD-0002 WU-OPS-01: the Ops task receipt v1.0 accepts the production release-identity read and the presence of seven variables, and the next stage is QA-10
+
+Timestamp: 102326 13:53 (UTC). Details: Records the OPS-30 review (Ops task receipt v1.0) of Ops task WU-OPS-01 v1.0 and its execution result v1.0 (attempt 1, the only attempt) of the approved HDE-CRD-0002 Implementation Plan v1.1 as amended by Plan delta 01 v1.1 (P-9, P-18, P-19, P-20): decision ACCEPT. On 2026-10-23 at 13:30:06Z, GET /internal/version on the production base URL reported the candidate's release\_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e (release 1.3.0); the seven named production variables were recorded present; the evidence is on main unedited with a verifying checksum ledger; no production configuration changed. Success criteria SC-1 to SC-4 are met, deviations D-1 to D-6 are dispositioned, four non-blocking findings are recorded, and canon-conflict CR-9 is carried PROPOSED. Every delivery, documentation and Ops unit of HDE-CRD-0002 is now accepted; the next stage is QA-10. Establishes no QA verdict, deployment approval, canon drainage or closure.
+
+### Approval and source record
+
+* Artifact: OPS\_TASK\_RECEIPT v1.0, HDE-CRD-0002-WU-OPS-01-OPS-TASK-RECEIPT, docs/ephemeral/HDE-CRD-0002-WU-OPS-01-ops-task-receipt-v1.0.md, created 2026-10-23T13:50:00Z (landed by [\#705](https://github.com/amthorn78/glow-hdengine-v2/pull/705), commit 554e65e; blob 738366990b94). Change: CRD HDE-CRD-0002; Ops unit WU-OPS-01. Decision: ACCEPT. Attempts reviewed: attempt 1 (exit 0, PASS). Next stage: QA-10.  
+* Reviewer: the creator IA and task-acceptance owner, the continuing whole-change HDE-CRD-0002 Implementation Agent, session "HDE-CRD-0002-2" (https\://claude.ai/code/session\_01U3QLYTkfUepeRbSGZNPj9N). Executor reviewed: PO-delegated-agent, local Claude Code session 4b626dac-628b-40e4-9f68-31528cc344bc (no URL), on the Product Owner's direct instruction.  
+* Prompt: OPS-30 — Review Ops Execution Receipt — 100926.1 (https\://app.notion.com/p/3f44590a05eb81ec8da3effc3b28cf97, page state 2026-10-12T02:30:04.097Z, read in full); release GCFPE-20261009.1 / 100926.1. Execution posture: MANUAL\_PROMPT\_EXECUTION. Repository head read: origin/main 04645f4 ([\#704](https://github.com/amthorn78/glow-hdengine-v2/issues/704)).  
+* Records reviewed:  
+  * Ops task docs/ephemeral/HDE-CRD-0002-WU-OPS-01-ops-task-v1.0.md (blob e71b8a4a36b6; \#703, squash 45f045b);  
+  * execution result docs/ephemeral/HDE-CRD-0002-WU-OPS-01-ops-execution-result-v1.0.md ([\#704](https://github.com/amthorn78/glow-hdengine-v2/issues/704), squash 04645f4);  
+  * evidence root audit/ops/hde-crd-0002/wu-ops-01/ (six files on main at 04645f4): identity\_reads.attempt1.tsv, binding\_presence.attempt1.tsv, expected\_identity.attempt1.txt, result.attempt1.txt, run.attempt1.log, SHA256SUMS.attempt1;  
+  * executable docs/ephemeral/HDE-CRD-0002-WU-OPS-01-run-v1.0.sh, sha256 960eabe59b6cc4abda69cf90320fb91abd3f10520830e2fb2fd346f2df7ad0d9 (equals the task's pin and the value in result.attempt1.txt and run.attempt1.log).  
+* Governing records: Specification HDE-CRD-0002-specification-v1.1-approved.md v1.1 with Specification delta 01 (HDE-CRD-0002-specification-delta-v1.0.md, DELTA\_APPROVE); Implementation Plan v1.1 (review v1.1, IA-30 INITIAL\_APPROVE) with Plan delta 01 v1.1 (DELTA\_APPROVE by review v1.1 of the delta; P-9, P-18, P-19, P-20); business case HDE-CRD-0002-WU-OPS-01-po-disposition-business-case-v1.0.md §2. HDE Build Notes ref: v13.7.4 (SHA-256 8ac9723214bd90d12f8cf723e0a1f060ddaf73bc4f91c555447de7c6016d37ff; unchanged on main from 8e6f238 to 04645f4); active addenda 2.11 (as 2.18 narrows it), 2.18 (no cost ceiling), 2.19 (Plan delta 01\) and 2.20 (Specification delta 01). The receipt records PF10\_ADDENDUM\_OUTPUT: NOT\_PRODUCED\_BY\_OPS-30.  
+* Publication: [\#704](https://github.com/amthorn78/glow-hdengine-v2/issues/704) merged by amthorn78 2026-10-23T13:37:24Z, squash 04645f4 (parent 45f045b); squash tree 37b96cbe… equals the PR head eb01939 tree; the six evidence files were added in 8d7424c and are unchanged in the two later commits; \#704 changes seven paths (the six evidence files and the result), with no .path\_proof.txt, Index, Mirror or checksum-sidecar path.  
+* Canon relied on (as the receipt records it): PF27-Canon-Plan-Templates v2.0.5 §11 "Ops Task Final Review Record", §3 and §0 "Exact technical facts and secret safety"; PF04-Canon-HDE-Governance v2.8.7 §9.1 "Ops tasks" items 1 to 5 and §10.5; PF07-Canon-Glow-Infrastructure v2.3.3 §2.2, §2.4, §2.6, §3.1, §4.1; PF12-Canon-HDE-Schemas-and-Artifacts v2.9.6 §8.3 and §8.6.3; PF19-Canon-Glow-QA-Guide v3.0.6 §3.1, §3.1.1, §3.1.2 and §11.1; Implementation Plan v1.1 §7 WU-OPS-01 and §9 item 1; Plan delta 01 v1.1 P-9, P-18 to P-20; HDE Build Notes addenda 2.11, 2.15, 2.18 and 2.19; OPS-30 and QA-10 prompts (the latter "Role and task" and "Inputs" for the handoff).
+
+### Retained decisions and requirements
+
+* Decision. ACCEPT. The task did what it was for. Acceptance covers this task only: it proves the release identity the production service reported at one time and the presence of seven names.  
+* Success criteria (task §7.1, from Plan delta 01 P-9), each checked by the reviewer on stored evidence except where stated:  
+  * SC-1, met. identity\_reads.attempt1.tsv row 1: 2026-10-23T13:30:06Z, HTTP 200, curl exit 0, class MATCH, release\_id 77204764…c51e, keys in HDE Governance §10.5's order, body 347 bytes (sha256 c9302e70…06a). Base URL https\://glow-hdengine-v2-production.up.railway.app; mode EXECUTION. expected\_identity.attempt1.txt: candidate head 45f045ba…, which contains f508dcf; manifest 1.3.0, built 2026-08-24T18:04:49Z, 45 members, pinned\_equal yes. Re-checked: sha256(catalog/manifest.json) at 45f045ba is 77204764…c51e, and f508dcf is an ancestor of 45f045ba.  
+  * SC-2, met. APP\_ENV, SAFE\_MODE, ALLOW\_NETWORK, HD\_API\_BASE\_URL, HD\_API\_KEY, GEO\_API\_KEY and DATABASE\_URL all SET (binding\_presence ALL\_SET), from the Railway CLI listing for service glow-hdengine-v2, environment production. Environment disposition: validated for production (HDE Governance §9.1 "Ops tasks" item 4), within FND-001 and FND-002.  
+  * SC-3, met. sha256sum \-c SHA256SUMS.attempt1 gives 5 of 5 OK on main; the Product Owner merged [\#704](https://github.com/amthorn78/glow-hdengine-v2/issues/704); no path proof, Index or Mirror row by the executor. Path-proof coverage follows CR-9's interim treatment.  
+  * SC-4, met on the task's stated evidence. The rollback condition (exit 5\) did not arise; the result lists only one GET and read-only CLI queries (--version, whoami, list \--json, variable list \--json). The reviewer has no Railway access to observe it independently; the task names the OPS-20 result's before and after statement as its own evidence.  
+  * Secret posture, met. A pattern scan of the six files and the result (bearer tokens, postgres:// URLs, API-key assignments, vendor auth headers, internal hosts, the vendor host, token=) found no hit; run.attempt1.log holds no curl error line and no typed value.  
+  * Run rules (task §7.3), met. Unedited script; no extra header or endpoint; no setting change, deploy, vendor or database access; no hand-written companions; no merge by the executor. The CLI sign-in is an extra step the Product Owner directed (D-2, D-5).  
+* Business-case measure (HDE-CRD-0002-WU-OPS-01-po-disposition-business-case-v1.0.md §2): met for the identity read and the no-change condition. The "with path proofs" wording is covered by CR-9's interim treatment; if Isis rejects alternative (a), the path proofs are added later by the canonical updater over these same bytes and the operation is not re-run (addendum 2.18: no cost ceiling).  
+* Review summary (PF27-Canon-Plan-Templates §11): environment or binding disposition production validated (seven of seven SET); within approved scope; deliverables and evidence sufficient; run posture read-only validation run; external execution classification hosted-service operation; the task claims no PF09 or canon closure; remaining operational risk the Railway login on the Product Owner's machine; downstream use the deployed-candidate identity for QA-10 and the QA Plan's live steps (Plan v1.1 §7, §9); final validation posture the reviewer's sha256sum \-c (5 of 5 OK) and the hosted push run on 04645f4. No status change is recommended (the Specification records no PF09 mapping).  
+* Deviations D-1 to D-6 keep the bytes, script and outcome intact; none defeats a criterion:  
+  * D-1 DELEGATION\_REF is a local session ID, no URL: accepted (PF27 §3 asks for a secret-free reference to the Product Owner's direct instruction; the task said "URL" because it assumed a cloud session).  
+  * D-2 presence came from the Railway CLI at the Product Owner's direction and the agent typed the answers: accepted (the task names no procedure for the view, a PF07 gap, and requires only that the observer sees the names).  
+  * D-3 the production environment was queried without checking it serves the base URL: accepted as a limitation (FND-002).  
+  * D-4 TypeSafe not read in OPS-20 (HTTP 403): no effect on the Ops outcome.  
+  * D-5 the CLI rewrote \~/.railway/config.json, and a fresh Railway login remains on the Product Owner's machine: outside production and the repository (FND-004).  
+  * D-6 the pre-push lanes check ran without the CI install and replay was not run: accepted (task §8.3 step 5 permits NOT RUN with a reason; the hosted check of record is in FND-003).  
+* Findings (none blocks acceptance).  
+  * FND-001: railway variable list \--json writes values to standard output, and the executor piped it into a filter that printed only SET/UNSET and a count. Values reached a pipe in memory, not a display, file, log or argument list; none was revealed, copied, typed or persisted (task O-2; PF27 §0 secret rule). For later tasks: prefer a names-only listing or state the pipe posture. Owner: the task-authoring IA.  
+  * FND-002: the listing used environment production and was not checked against the base URL's domain settings (the task's Constraints exclude that inspection). Basis: PF07 §2.2 lists glow-hdengine-v2 with this base URL in its Production inventory; §2.4 lists the same seven names under "Production — Railway"; the production database instance is ample-illumination/production/postgres. The Product Owner may confirm in the dashboard; nothing contradicts the binding.  
+  * FND-003: run 39962474342 on [\#704](https://github.com/amthorn78/glow-hdengine-v2/issues/704)'s head eb01939 (started 13:35:26Z) still reported in\_progress when \#704 merged at 13:37:24Z. The push run 39962751831 on 04645f4 completed success at 13:42:51Z (job 120444635015; only the evidence lane ran, EVIDENCE\_OUTCOME: success, ending CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK; its tree is identical to the PR head's). That push run is the hosted result for the evidence the task names.  
+  * FND-004: a valid Railway CLI login created by the Product Owner-approved sign-in stays on the Product Owner's machine, outside the task's targets. Owner: the Product Owner, to keep it, or to run railway logout or revoke the session at railway.com.  
+* Independent checks on main 04645f4: sha256sum \-c SHA256SUMS.attempt1 5 of 5 OK; the script's sha256 equals the pin; git show 45f045ba:catalog/manifest.json \| sha256sum is 77204764…c51e; f508dcf is an ancestor of 45f045ba; squash attribution as above; changed paths in [\#704](https://github.com/amthorn78/glow-hdengine-v2/issues/704) are 7; the secret-pattern scan found no hit; each evidence file matches the script's output format (header lines, column order, field set, consistent timestamps, no unexpected line).  
+* Evidence print.  
+  * Deliverables: identity\_reads.attempt1.tsv sha256 2e8706fd…4acc (one row, MATCH at HTTP 200); binding\_presence.attempt1.tsv sha256 a7789c68…f133 (seven rows, all SET); expected\_identity.attempt1.txt sha256 1f60bf93…4c52 (pinned\_equal yes); result.attempt1.txt sha256 eb67facc…b629 (PASS, exit 0, mode EXECUTION); run.attempt1.log sha256 019a6ec6…1d1e (preflight PASS, one read, the result line); SHA256SUMS.attempt1 (the ledger over those five files).  
+  * State proved: the release identity the production base URL reported at 13:30:06Z, and the presence (not the value correctness) of seven names in the Railway production listing.
+
+### Epic, task, and status effects
+
+* WU-OPS-01 is executed and accepted. With WU-PR-01 to WU-PR-08 accepted, WU-DOC-01 COMPLETE (DOC-20 v1.1), WU-OPS-01 accepted here and AQ-1 decided, no unit of Plan v1.1 §7 remains (Plan delta 01 adds none).  
+* Next approved Plan stage: QA-10 — Audit Implementation and Establish QA Readiness — 100926.1, run by continuing Isis, the HDE-CRD-0002 Lead Developer and readiness decision owner (earlier Isis work for this change is in session https\://claude.ai/code/session\_012tPq26JWVhCYZmcqTidpV2, recorded as provenance; the receiving side chooses the session). Plan location: Implementation Plan v1.1 §9 item 1, unchanged by Plan delta 01 ("After WU-PR-08 and WU-DOC-01 have merged and their PR-40 lineage reviews are accepted, and WU-OPS-01 is planned (OPS-10) or executed, and AQ-1 is decided, continuing Isis performs QA-10"); PF19-Canon-Glow-QA-Guide §3.1 says the same. Dependency evidence: AQ-1 was decided "Approve with changes" on 2026-10-20 (addendum 2.15; record HDE-CRD-0002-PF10-build-notes-addendum-aq1-adr-v1.0.md). This receipt's pull request is merged first.  
+* QA-10 intake package (every path on main 04645f4; CHANGE\_CLASS/CHANGE\_ID CRD/HDE-CRD-0002; prior readiness history: none):  
+  * Specification v1.1 with Specification delta 01, approved by HDE-CRD-0002-specification-delta-review-v1.0.md;  
+  * Implementation Plan v1.1 and review v1.1, with Plan delta 01 v1.1 and its review v1.1;  
+  * Implementation Audit HDE-CRD-0002-implementation-audit-v1.0.md;  
+  * documentation completion HDE-CRD-0002-WU-DOC-01-documentation-completion-v1.1.md (COMPLETE);  
+  * Ops: task, execution result, this receipt, and evidence audit/ops/hde-crd-0002/wu-ops-01/.  
+* Unit records (all docs/ephemeral/HDE-CRD-0002-\<unit\>-\<type\>-v\<N\>.md), each accepted by its PR-40 lineage review:
+
+| Unit | Latest plan | Latest result | PRs and squashes | Accepting lineage review |
+| :---- | :---- | :---- | :---- | :---- |
+| WU-PR-01 | v2.0 | v2.1 | [\#627](https://github.com/amthorn78/glow-hdengine-v2/issues/627) 7136040, [\#630](https://github.com/amthorn78/glow-hdengine-v2/issues/630) bf7ad8c | v2.0 (ACCEPT) |
+| WU-PR-02 | v2.0 | v2.2 | [\#634](https://github.com/amthorn78/glow-hdengine-v2/issues/634) 1d2c834, [\#637](https://github.com/amthorn78/glow-hdengine-v2/issues/637) b26f44f | v2.0 (ACCEPT) |
+| WU-PR-03 | v2.0 | v2.1 | [\#643](https://github.com/amthorn78/glow-hdengine-v2/issues/643) c98d41f, [\#646](https://github.com/amthorn78/glow-hdengine-v2/issues/646) 2f3db0a | v1.0 (ACCEPT) |
+| WU-PR-04 | v1.0 | v1.2 | [\#651](https://github.com/amthorn78/glow-hdengine-v2/issues/651) 5892538 | v1.0 (ACCEPT) |
+| WU-PR-05 | v1.0 | v1.2 | [\#656](https://github.com/amthorn78/glow-hdengine-v2/issues/656) 822ce15 | v1.0 (ACCEPT) |
+| WU-PR-06 | v1.0 | v1.25 | [\#660](https://github.com/amthorn78/glow-hdengine-v2/issues/660) b963ed4 | v1.0 (ACCEPT) |
+| WU-PR-07 | v1.1 | v1.20 | [\#668](https://github.com/amthorn78/glow-hdengine-v2/issues/668) 8b73b57; companion \#670 102e97e | v1.0 (ACCEPT) |
+| WU-PR-08 | v1.0 | v1.2 | [\#687](https://github.com/amthorn78/glow-hdengine-v2/issues/687) 1a4c8ab | v1.0 (ACCEPT) |
+| WU-DOC-01 | v3.0 | v3.1 | [\#692](https://github.com/amthorn78/glow-hdengine-v2/issues/692) 4c9bbfc, [\#695](https://github.com/amthorn78/glow-hdengine-v2/issues/695) cf8b759, [\#700](https://github.com/amthorn78/glow-hdengine-v2/issues/700) f508dcf | v2.0 and v3.0 (ACCEPT) |
+
+* Instructions: v1.0 for every unit; WU-DOC-01 also v1.1. Earlier REJECT reviews (WU-PR-01 v1.0, WU-PR-02 v1.0, WU-DOC-01 v1.0) are kept as history.  
+* TypeSafe reading for the receiving session (QA-10, HDE-CRD-0002): v8.2 sent 2026-10-23T13:48:53Z reads Opus 5.5 at extra high (effort score 2.89, confidence 0.70; rungs high 0.28, extra high 0.54, max 0.17; models Fable 5.1 0.17, Opus 5.5 0.83; model confidence 0.77; highest cell Opus 5.5 at extra high 0.448; flags none; jev-1.13.0). An earlier run at 13:46:10Z had one wrong count ("13 merged pull requests"; 12 is correct) and read the same cell (score 2.88); it is superseded by the corrected text, not by its result. The Notion row was not written; Nathan picks the cell, and no pick is stated. Surface advice: run QA-10 in the continuing Isis Lead Developer session for HDE-CRD-0002, or a top-level session Nathan creates for that role, on amthorn78/glow-hdengine-v2; reads need Notion access for the prompt and the PF23 Reality Audits canon; tests use a throwaway clone with CI's full install and closed rails; writes only its three records under docs/ephemeral/ through its own pull request; production, vendor, Railway and database access are not needed.
+
+### Required canon drainage
+
+* None created by the receipt. PF19-Canon-Glow-QA-Guide §11.1 puts the path proof for consumed Ops evidence on the QA check that consumes it: promoting this evidence into QA (a QA check's primary.log and its path proof pointing to these files) belongs to Kronos and the canonical updater at QA, within QA-10's and the QA Plan's scope. No PF canon document was edited and no PF09 or PF30 movement occurred.  
+* The canon gap the task met: PF07-Canon-Glow-Infrastructure names no procedure for observing production variable names (D-2). Recorded as a PF07 gap; no drainage is directed.
+
+### Deferred obligations and unresolved work
+
+| Item | Owner |
+| :---- | :---- |
+| CR-9 disposition: path proofs under the Ops evidence root. Interim treatment applied: no path proof, Index row or Mirror row exists for the root | Isis |
+| The Railway login on the Product Owner's machine (FND-004) | Product Owner |
+| An optional dashboard confirmation of the environment binding (FND-002) | Product Owner |
+| The names-only listing posture for later Ops tasks (FND-001) | The task-authoring IA |
+| Promoting this evidence into QA with its path proof (PF19 §11.1) | Kronos and the canonical updater, at QA |
+
+* Nothing in production needs recovery. Prompt-use provenance is recorded in the receipt only (usage ID GCFPE-USE-HDE-CRD-0002-OPS-30-20261023-WU-OPS-01-01; docs/changes/GCFPE\_PROMPT\_PROVENANCE.md absent on main; repository persistence PENDING / NON\_GATING; earlier uses OPS-10 task record §19 and OPS-20 result §15).  
+* Canon-conflict register: CR-1 to CR-3 APPROVED\_AS\_CHANGED (Thoth); CR-4 APPROVED and CR-5 APPROVED\_AS\_CHANGED (Product Owner); CR-6 APPROVED alternative (a) (this IA through RS-20; addendum 2.6); CR-7 and CR-8 APPROVED alternative (a) each (Product Owner direction of 2026-10-14; addendum 2.7); CR-9 PROPOSED, not yet reviewed (Isis; HDE-CRD-0002-WU-OPS-01-ops-task-v1.0.md §13), unchanged by execution. No new conflict.
+
+### Scope boundaries and nonclaims
+
+* Acceptance is not QA PASS, Live QA, behaviour proof or final acceptance; deployment approval; reachability from another network; the running commit (build\_commit is a fixed source value, and deployment is judged by release\_id alone, Plan delta 01 P-9); value correctness for the seven variables (presence only); PF09 or PF30 movement, PF-canon drainage or closure.  
+* It is not a remedy, scope or Plan approval, and not a PF10 addendum produced by OPS-30.  
+* The receipt's evidence is one read at one time (2026-10-23T13:30:06Z) from the executor's network.
+
+### Evidence anchors
+
+* Receipt: docs/ephemeral/HDE-CRD-0002-WU-OPS-01-ops-task-receipt-v1.0.md ([\#705](https://github.com/amthorn78/glow-hdengine-v2/issues/705), 554e65e; blob 738366990b9400585cf1c8028bb3644bdb058438).  
+* Task \#703 (45f045b); result and evidence \#704 (04645f4, head eb01939, tree 37b96cbe…); evidence root audit/ops/hde-crd-0002/wu-ops-01/; executable sha256 960eabe59b6cc4abda69cf90320fb91abd3f10520830e2fb2fd346f2df7ad0d9.  
+* Release identity 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e (1.3.0, 45 members, candidate head 45f045ba…, f508dcf an ancestor).  
+* Hosted runs: 39962474342 (PR head, in\_progress at merge) and 39962751831 (push to main at 04645f4, success, job 120444635015).
 
 \<eof\>
