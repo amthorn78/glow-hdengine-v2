@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.7.5**  
+**Version: v13.7.6**  
 Effective Date: 2026.10.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -204,7 +204,9 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.19 HDE-CRD-0002: Implementation Plan delta 01 is approved — no S01 or version cut, WU-PR-08 is S16 and S17 with one CI classifier registration, and WU-OPS-01 proves deployment by release\_id  
 * 2.20 HDE-CRD-0002: Specification delta 01 is approved — requirement S01 is removed and the release keeps its version, with a same-version manifest refresh for any member change  
 * 2.21 HDE-CRD-0002 WU-PR-08: PR work-unit lineage review v1.0 accepts the unit on pull request \#687 and returns WU-DOC-01's business case to the Product Owner  
-* 2.22 HDE-CRD-0002 WU-OPS-01: the Ops task receipt v1.0 accepts the production release-identity read and the presence of seven variables, and the next stage is QA-10
+* 2.22 HDE-CRD-0002 WU-OPS-01: the Ops task receipt v1.0 accepts the production release-identity read and the presence of seven variables, and the next stage is QA-10  
+* 2.23 HDE-CRD-0002: remediation of QA-10 finding FND-001 is approved as changed — the evidence-lane tests stop assuming the change's own QA root and close pack are absent, through new work unit WU-REM-01  
+* 2.24 HDE-CRD-0002: the FND-001 remedy is amended — WU-REM-01 also makes the Mirror skeleton test and the QA harness accept crd\_id, so HDE-CRD-0002's close pack leaves the evidence lane, the qa lane and Epic viability as they were
 
 # **2\) Numbered Addenda**
 
@@ -2591,5 +2593,188 @@ Timestamp: 102326 13:53 (UTC). Details: Records the OPS-30 review (Ops task rece
 * Task \#703 (45f045b); result and evidence \#704 (04645f4, head eb01939, tree 37b96cbe…); evidence root audit/ops/hde-crd-0002/wu-ops-01/; executable sha256 960eabe59b6cc4abda69cf90320fb91abd3f10520830e2fb2fd346f2df7ad0d9.  
 * Release identity 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e (1.3.0, 45 members, candidate head 45f045ba…, f508dcf an ancestor).  
 * Hosted runs: 39962474342 (PR head, in\_progress at merge) and 39962751831 (push to main at 04645f4, success, job 120444635015).
+
+## 2.23 HDE-CRD-0002: remediation of QA-10 finding FND-001 is approved as changed — the evidence-lane tests stop assuming the change's own QA root and close pack are absent, through new work unit WU-REM-01
+
+Timestamp: 102326 16:40 (UTC). Details: Records the ESC-40 approval, with one change, of Thoth's remediation proposal v1.0 for the HDE-CRD-0002 QA-10 finding FND-001.
+
+* The finding. Requirement S22's QA evidence admission is not achievable on the real repository, because six tests in tests/evidence/test\_evidence\_index\_missing\_state.py, which the evidence lane runs, assume that audit/qa/hde-crd-0002/ and the change's close pack are absent. Publishing HDE-CRD-0002's QA evidence would fail that lane.  
+* The remedy. It is test-only and delivered by a new work unit, WU-REM-01. One Plan acceptance clause is restated.  
+* What is unchanged. The approved Plan v1.1 and the Specification. WU-PR-02 stays accepted-final.
+
+### Source and approval
+
+* Producing prompt: ESC-40 — Review and Return Approved Remediation — 100926.1, release GCFPE-20261009.1 / 100926.1.  
+* Decision: APPROVE\_AS\_CHANGED by Isis, the continuing HDE-CRD-0002 Lead Developer, recorded in docs/ephemeral/HDE-CRD-0002-remediation-review-FND-001-v1.0.md, 2026-10-23.  
+* Reviewed proposal: docs/ephemeral/HDE-CRD-0002-remediation-proposal-FND-001-v1.0.md (Thoth, ESC-30; file SHA-256 d120223b8e9d5f51176228153a1debf8274f142cd780520cf7513c0a4d02b70d; landed by [\#707](https://github.com/amthorn78/glow-hdengine-v2/pull/707)).  
+* Originating finding: QA-10 readiness v1.0, NOT\_READY (docs/ephemeral/HDE-CRD-0002-QA10-qa-readiness-v1.0.md); triage §3 FND-001 (docs/ephemeral/HDE-CRD-0002-QA10-change-audit-triage-v1.0.md; [\#706](https://github.com/amthorn78/glow-hdengine-v2/pull/706)).  
+* Immutable base: Implementation Plan v1.1 (IA-30 review v1.1, INITIAL\_APPROVE), with Plan delta 01 v1.1 (addendum 2.19). The base file is not edited.
+
+### Cause
+
+* The three loci, all in tests/evidence/test\_evidence\_index\_missing\_state.py:  
+  * test\_absent\_admitted\_crd\_root\_publishes\_nothing asserts that the real checkout holds no audit/qa/hde-crd-0002/, no loader row and no Index row.  
+  * The crd\_repo fixture strips only audit/qa/hde-crd-0001, so test\_crd\_0002\_fixture\_root\_publishes\_beside\_crd\_0001 sees real HDE-CRD-0002 checks.  
+  * The close\_repo fixture asserts that the real checkout holds no audit/qa/hde-crd-0002. The close-pack test it serves also assumes the real close pack is absent.  
+* Why the test exists. WU-PR-02 delivered it to satisfy Plan v1.1 acceptance (5), "the absent real root publishes nothing", which held at delivery.  
+* Reproduction. In a throwaway clone of main 7d5a5aa with a stand-in HDE-CRD-0002 family published by the canonical updater:  
+  * the evidence-lane pytest files gave 2 failed and 4 errors, against 134 passed without the root;  
+  * the seven evidence validators, the QA test files and the release lane stayed green.  
+* What is not at fault. The updater, the harness and the release lane work with the root present.
+
+### Approved remediation
+
+* P-1, Implementation Plan v1.1 §7 WU-PR-02, "Acceptance and verification" item (5), last clause. "the absent real root publishes nothing" reads: "an absent admitted HDE-CRD-0002 root publishes nothing, proven in a copy of the checkout from which that root and its Index rows are removed; the evidence-lane tests do not depend on whether the real checkout holds the HDE-CRD-0002 QA root, its close-run family, its close pack or its close candidate source". WU-PR-02's accepted delivery is unchanged; the new proof is delivered by WU-REM-01.  
+* P-2, a new work unit in Plan v1.1 §7, after WU-OPS-01 and before QA-10 readiness: WU-REM-01 — Evidence-lane independence from the HDE-CRD-0002 QA root (PR; Distillation).  
+  * Purpose: let HDE-CRD-0002's QA evidence and close pack land without breaking the evidence lane.  
+  * Bounded scope: S22, and S21's close-run tests; tests/evidence/test\_evidence\_index\_missing\_state.py only.  
+  * Dependencies: none on unmerged work; it lands before QA-20.  
+  * Acceptance: V-1 to V-5.  
+  * Evidence obligations: the PR result record with the V-2 and V-3 rehearsal outputs; no governed evidence change.  
+  * Business case:  
+    * beneficiary: QA and the Product Owner;  
+    * evidence: the reproduction above;  
+    * benefit: QA-20 and QA-50 can proceed, and the first QA evidence and close-pack pull requests are not blocked by the evidence lane;  
+    * measure: the first pull request that publishes HDE-CRD-0002 QA evidence passes the evidence lane with no change to these tests.  
+  * Nonclaims: no HDE-CRD-0002 QA evidence is produced or committed.  
+* Required behaviour in that file:  
+  * R-1: the absence test builds the absent state in a copy, removing the root and its Index rows and regenerating and checking through the canonical updater. It then asserts no loader row and no Index row under the root. It does not read the real checkout's state.  
+  * R-2: crd\_repo builds the pre-first-publication state for every root in ADMITTED\_CRD\_QA, and the existing assertions stay.  
+  * R-3: close\_repo removes audit/qa/hde-crd-0002/ (including close/), audit/HDE-CRD-0002\_close\_report.md, audit/HDE-CRD-0002\_MANIFEST.json and audit/HDE-CRD-0002\_close\_candidate\_source.json, with their path proofs and Index rows, then regenerates and checks through the canonical updater. The four close-run tests keep their assertions.  
+  * No other file changes.  
+* Verification:  
+  * V-1: on the PR head, the seven evidence-lane validators exit 0, and the six evidence-lane pytest files pass with no fewer than 134 tests.  
+  * V-2: in a throwaway clone with a stand-in HDE-CRD-0002 QA family published through the harness and canonical updater, the evidence and release lanes pass as ci.yml runs them.  
+  * V-3: the same clone additionally holds a stand-in close-run family, the two close-pack files and the close candidate source, indexed by the canonical updater; the evidence lane passes.  
+  * V-4: the R-1 test fails when an Index row under the root is planted in its copy.  
+  * V-5: hosted CI on the PR head has the evidence lane green and ends CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK.  
+  * Nothing from a rehearsal clone is committed.  
+* Change C-1 from the proposal: the close candidate source (audit/HDE-CRD-0002\_close\_candidate\_source.json, the path the close-pack tests name) is added to R-3 and V-3.
+
+### Affected surfaces and consequences
+
+* Requirements: S22 becomes achievable on the real root; S21's close-run tests stop depending on the real checkout. No other requirement is affected.  
+* Tests: one file. CI: the evidence lane only. Release identity, Ops and documentation: unchanged.  
+* Order: WU-REM-01 is delivered and accepted before the HDE-CRD-0002 QA-10 reassessment, and QA-20 waits on that reassessment.
+
+### Exclusions and nonclaims
+
+* No runtime, updater, harness or governed-evidence change.  
+* No new evidence family, no Specification change, and no re-run of an accepted-final pull request.  
+* This approval is not a PR Instruction, Proceed, merge, QA verdict, acceptance or closure, and it moves no PF09 or PF30 row.
+
+### Conflicts
+
+None. The canon-conflict register is unchanged: CR-1 to CR-8 are decided, and CR-9 is proposed and unaffected.
+
+### Unresolved obligations and owners
+
+* WU-REM-01's instruction: the whole-change Implementation Agent. Its code design: WU-REM-01's PR-20.  
+* The QA-10 reassessment of S22 and its dependants, after WU-REM-01 is accepted: Isis.  
+* CR-9's disposition: Isis, at its native review boundary.
+
+### Relationship to existing HDE Build Notes guidance
+
+This addendum restates, for HDE-CRD-0002, how acceptance (5) of WU-PR-02 is proven going forward. It adds one work unit to the Plan that addendum 2.19 amended. It leaves addendum 2.5's acceptance of WU-PR-02 standing and supersedes no addendum.
+
+## 
+
+## 2.24 HDE-CRD-0002: the FND-001 remedy is amended — WU-REM-01 also makes the Mirror skeleton test and the QA harness accept crd\_id, so HDE-CRD-0002's close pack leaves the evidence lane, the qa lane and Epic viability as they were
+
+Timestamp: 102326 20:15 (UTC). Details: Records the ESC-40 approval of Thoth's remediation proposal v1.1 for the HDE-CRD-0002 QA-10 finding FND-001 (requirement S22). It amends the remedy addendum 2.23 recorded.  
+The planner of work unit WU-REM-01 found (F-1) that the approved one-file remedy could not meet its own acceptance. Diagnosis then found a second defect with the same cause (F-2). The two defects:
+
+* F-1. Once HDE-CRD-0002's close pack is indexed, tests/evidence/test\_evidence\_skeleton.py::test\_mirror\_schema\_and\_parity rejects the crd\_id key the canonical updater writes on its two close-pack rows.  
+* F-2. The QA harness (tools/qa/qa\_harness.py) rejects crd\_id on Human Index and Machine Mirror rows. With the close pack indexed, four Epic acceptance-map viabilities (HDE-EPIC021, 027, 028, 029\) turn from PASS to FAIL\_TOOLING, and the qa-lane test test\_current\_acceptance\_inputs\_are\_strictly\_viable fails.
+
+WU-REM-01 widens to three files: R-4 and R-5 add crd\_id to the allowed optional keys of those two validators. The rest of the 2.23 remedy stands.
+
+### Source and approval
+
+* Producing prompt: ESC-40 — Review and Return Approved Remediation — 100926.1; release GCFPE-20261009.1 / 100926.1.  
+* Decision: APPROVE by Isis, the continuing HDE-CRD-0002 Lead Developer, recorded in docs/ephemeral/HDE-CRD-0002-remediation-review-FND-001-v1.1.md, 2026-10-23.  
+* Reviewed proposal: docs/ephemeral/HDE-CRD-0002-remediation-proposal-FND-001-v1.1.md (Thoth, ESC-30; file SHA-256 2aa11d33e3b0cd0332aa0471584e3b0662dc5ab8f796bbf2c9c5fe6d7e07474f; [\#711](https://github.com/amthorn78/glow-hdengine-v2/pull/711)). Predecessor proposal v1.0 ([\#707](https://github.com/amthorn78/glow-hdengine-v2/pull/707)) and review v1.0 ([\#708](https://github.com/amthorn78/glow-hdengine-v2/pull/708)), recorded by addendum 2.23.  
+* Delivery-stage evidence: WU-REM-01 PR implementation plan v1.0 §12 and §16, BLOCKED on F-1 ([\#710](https://github.com/amthorn78/glow-hdengine-v2/pull/710)); instruction v1.0 ([\#709](https://github.com/amthorn78/glow-hdengine-v2/pull/709)) §14 routes a change to the remedy through ESC-30 and ESC-40.  
+* Immutable base: Implementation Plan v1.1 with Plan delta 01 v1.1. Not edited.
+
+### Cause
+
+* HDE Schemas and Artifacts §8.3, "Allowed top-level keys and unknown-key rejection", lists crd\_id as an optional metadata key and requires that "every serializer or validator enforcing this allowed-key set MUST accept crd\_id".  
+* The canonical updater and ci/checks/check\_mirror\_schema.sh accept it. The Mirror skeleton test and the QA harness do not.  
+* The updater writes crd\_id only on CRD close-pack rows. So the defects appear when the close pack is indexed, not when the QA root alone exists.  
+* The close-pack pull request selects only the evidence and release lanes. F-2 would first fail on a later, unrelated qa-lane run.  
+* All of this was reproduced in throwaway clones of main with stand-in states produced only through the harness and the canonical updater.
+
+### Approved remediation
+
+* P-1, unchanged from addendum 2.23: Implementation Plan v1.1 §7 WU-PR-02, "Acceptance and verification" item (5), last clause, reads: "an absent admitted HDE-CRD-0002 root publishes nothing, proven in a copy of the checkout from which that root and its Index rows are removed; the evidence-lane tests do not depend on whether the real checkout holds the HDE-CRD-0002 QA root, its close-run family, its close pack or its close candidate source".  
+* P-2, amended. WU-REM-01 — Evidence-lane independence from the HDE-CRD-0002 QA root (PR; Distillation):  
+  * Purpose: let HDE-CRD-0002's QA evidence and close pack land without breaking the evidence lane, and keep the qa lane and existing Epic acceptance-map viability unaffected once the close pack is on main.  
+  * Bounded scope: S22, and S21's close-run tests and close-pack rows. Three files: tests/evidence/test\_evidence\_index\_missing\_state.py, tests/evidence/test\_evidence\_skeleton.py and tools/qa/qa\_harness.py.  
+  * Dependencies: none on unmerged work; it lands before QA-20.  
+  * Acceptance: V-1 to V-5.  
+  * Evidence obligations: the PR result record with the V-2 and V-3 rehearsal outputs, the V-3 viability comparison included; no governed-evidence change.  
+  * Nonclaims: no HDE-CRD-0002 QA evidence, close pack or close candidate source is produced or committed.  
+* Required behaviour:  
+  * R-1, unchanged: the absence test builds the absent state in a copy, through the canonical updater, and does not read the real checkout's state.  
+  * R-2, unchanged: crd\_repo builds the pre-first-publication state for every root in ADMITTED\_CRD\_QA.  
+  * R-3 with C-1, unchanged: close\_repo removes audit/qa/hde-crd-0002/ (including close/), audit/HDE-CRD-0002\_close\_report.md, audit/HDE-CRD-0002\_MANIFEST.json and audit/HDE-CRD-0002\_close\_candidate\_source.json, with their path proofs and Index rows, from the copy, then regenerates and checks through the canonical updater.  
+  * R-4, new: test\_mirror\_schema\_and\_parity accepts crd\_id as an optional top-level Mirror key. Nothing else in that file changes.  
+  * R-5, new: the harness's evidence-graph validation accepts crd\_id as an optional key on Human Index and Machine Mirror rows. The required keys, the other metadata checks, the strict Epic predicates and the refusal of CRD viability are unchanged.  
+  * Limit: no file outside the three changes.  
+* Verification:  
+  * V-1: on the PR head, the seven evidence-lane validators exit 0; the six evidence-lane pytest files pass with no fewer than 134 tests; the qa lane's seven files pass with its two tree checks; and the classifier's changed-test targets pass in isolation, all as ci.yml runs them.  
+  * V-2: in a throwaway clone with a stand-in HDE-CRD-0002 QA family published by the harness and canonical updater, the evidence, qa and release lanes pass.  
+  * V-3: the same clone additionally holds a stand-in close-run family, the two close-pack files and the close candidate source, indexed by the canonical updater. (a) The evidence, qa and release lanes pass. (b) Each docs/acceptance\_map\_epic0NN.json gets the same evaluate\_acceptance\_map\_viability status as in the V-2 state, and no result names crd\_id.  
+  * V-4, unchanged: the R-1 test fails when an Index row under the root is planted in its copy.  
+  * V-5: on hosted CI on the PR head, every selected lane and the changed-test step are green, and the run ends CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK.  
+  * Nothing from a rehearsal clone is committed.  
+* Business case:  
+  * beneficiary: QA and the Product Owner; every later qa-lane pull request; users of the harness's Epic viability;  
+  * evidence: the reproductions above;  
+  * benefit: QA-20 and QA-50 can proceed, and the close pack leaves no lane or Epic viability failing;  
+  * measure (1): the first pull request that publishes HDE-CRD-0002 QA evidence passes the evidence lane with no change to these tests;  
+  * measure (2): the close-pack pull request passes the evidence lane, and the first qa-lane run on main after it passes, with no change to these three files. Neither measure is observable at WU-REM-01's PR-40; V-2 and V-3 are the proxy.  
+  * No cost ceiling.
+
+### Conflict decided: CR-10
+
+* The conflict. HDE Schemas and Artifacts §8.3 also asks every validator of the key set to "enforce the epic\_id/crd\_id mutual-exclusion rule". A row with both keys cannot reach the skeleton test or the harness: the sole writer refuses it, and check\_mirror\_schema.sh rejects it (EPIC\_CRD\_EXCLUSIVE) on every evidence-lane run.  
+* Decision: APPROVED, alternative (a). Addendum 2.11 rule 5, kept by addendum 2.18 rule 6, governs for this exact scope: such a row is an input outside the real set for these two validators, and it gets a stated limit, not a model.  
+  * The mutual-exclusion rule stays enforced by the canonical writer and the Machine Mirror schema check.  
+  * R-4 and R-5 accept crd\_id only.  
+* Drainage: HDE Schemas and Artifacts §8.3, to state where the mutual-exclusion rule is enforced. Unperformed.
+
+### Affected surfaces and consequences
+
+* Requirements:  
+  * S22 becomes achievable on the real root.  
+  * S21's close-run tests stop depending on the real checkout, and its close-pack rows stop failing a validator.  
+  * S22's "existing Epic … inputs still publish and validate" is preserved once the close pack lands.  
+* Files: two test files and one QA tool. None is a release member; release identity is unchanged.  
+* CI: WU-REM-01's pull request runs the evidence and qa lanes and the changed-test step.  
+* Ops and documentation: none.  
+* Order: WU-REM-01 is delivered and accepted before the HDE-CRD-0002 QA-10 reassessment, and QA-20 waits on that reassessment.  
+* This addendum supersedes addendum 2.23's WU-REM-01 scope, limit, exclusions, verification and business case. 2.23's P-1 and R-1 to R-3 with C-1 stand unchanged.
+
+### Exclusions and nonclaims
+
+* No updater or runtime change, and no harness change beyond R-5.  
+* No regeneration or hand edit of governed evidence, and no new evidence family.  
+* No Specification change.  
+* No reopening of WU-PR-02 or WU-PR-07, and no re-run of an accepted-final pull request.  
+* The 12 Epic acceptance maps that already fail viability on main, for reasons unrelated to crd\_id, are not repaired.  
+* This approval is not a PR Instruction, Proceed, merge, QA verdict, acceptance or closure, and it moves no PF09 or PF30 row.
+
+### Unresolved obligations and owners
+
+* WU-REM-01 instruction v1.1: the whole-change Implementation Agent. The successor PR plan: WU-REM-01's PR-20.  
+* The QA-10 reassessment of S22 and its dependants, after WU-REM-01 is accepted: Isis. It includes one observation: 9 local failures of tests/evidence/test\_hdapi\_v2\_contract\_inventory.py in the remediation author's environment, a file that hosted full-validation run 39699657729 passed.  
+* CR-10 drainage, and the 12 Epic viabilities already failing: the Product Owner.  
+* CR-9's disposition: Isis, at its native review boundary.
+
+### Relationship to existing HDE Build Notes guidance
+
+This addendum amends addendum 2.23 for WU-REM-01 within the scope stated above. It applies addendum 2.11 rule 5 to HDE Schemas and Artifacts §8.3's mutual-exclusion duty for two validators (CR-10). It leaves addenda 2.5 and 2.16, which accepted WU-PR-02 and WU-PR-07, standing.
 
 \<eof\>
