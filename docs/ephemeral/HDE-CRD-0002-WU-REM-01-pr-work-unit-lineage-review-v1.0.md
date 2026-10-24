@@ -33,7 +33,7 @@ repository_state_reviewed: origin/main 3a5d8461e412d386fb6b835461f76d1954dcbf54 
 pf10_ref: docs/pfcanon/PF10-HDE-Build-Notes-v13.7.6.md (473,130 bytes; sha256 ee6d55b57b3b922116363dd914264333cf3566c4856819e2a139ed50f7a6604e; last addendum 2.24; unchanged since 3b21327)
 pf10_addendum_created: none (PR-40 is not a qualifying approval prompt)
 canon_conflict_register: CR-1 to CR-8 carried, decided; CR-9 carried PROPOSED, unaffected; CR-10 carried APPROVED (a), applied as decided; no new entry (§11)
-created_at: 2026-10-24T00:50:00Z
+created_at: 2026-10-24T00:42:00Z
 ---
 
 # HDE-CRD-0002 WU-REM-01 — PR work-unit lineage review v1.0 (PR-40)
@@ -160,7 +160,7 @@ ACCEPT is this review's lineage result only. It is not a QA verdict, acceptance 
 | ID | State | Result |
 | :- | :- | :- |
 | V-1 | `3a5d846`, root absent | readiness and env pins exit 0; changed-test step **146 passed** in 0.50 s, worktree clean; qa lane **488 passed** in 17.52 s with both tree checks; 7 evidence validators exit 0; six evidence files **134 passed** in 684.82 s; final tree checks (`git diff --check`, `git diff --exit-code`, empty status) clean |
-| V-3 | `624430b`: `3a5d846` plus a stand-in QA family and a stand-in close stage | qa lane **488 passed** in 18.48 s with both tree checks; release lane: manifest check exit 0, **79 passed**, attestation built (exit 0) and verified (exit 0), tree clean, 115 s; 7 evidence validators exit 0; six evidence files PENDING (run in progress at 2026-10-24T00:30Z); final tree checks PENDING |
+| V-3 | `624430b`: `3a5d846` plus a stand-in QA family and a stand-in close stage | qa lane **488 passed** in 18.48 s with both tree checks; release lane: manifest check exit 0, **79 passed**, attestation built (exit 0) and verified (exit 0), tree clean, 115 s; 7 evidence validators exit 0, including `check_mirror_schema.sh`; six evidence files **134 passed** in 714.06 s; final tree checks clean |
 
 **Stand-ins**, produced only through the harness and the canonical updater, plus authored files, each stating "WU-REM-01 PR-40 rehearsal stand-in in a throwaway clone; not QA evidence, a close pack or a close candidate":
 - QA family: `publish_crd_check_family` with checks `qa-01-standin` and `qa-02-standin`, each a `PASS` from an executed `python -c "raise SystemExit(0)"`, captured 2026-10-24T00:20:13Z; then `validate_crd_check_family` and the updater's `--check`. 16 paths changed (+39/−18).
@@ -285,7 +285,7 @@ Action sent (v8.2): "As the continuing lead developer and readiness decision own
 | Prompt | PR-40 — Review PR Work-Unit Lineage — 100926.1, page state of 2026-10-12T02:29:38.234Z |
 | Release | GCFPE-20261009.1 / 100926.1 |
 | Role and stage | whole-change IA, read-only PR-40 |
-| Capture time | 2026-10-24T00:50:00Z |
+| Capture time | 2026-10-24T00:42:00Z |
 | Execution identity | session "HDE-CRD-0002-2" (https://claude.ai/code/session_01U3QLYTkfUepeRbSGZNPj9N) |
 | Inherited usage | instruction v1.1 (`…-PR-10-20261023-WU-REM-01-02`); plan v1.1 (`…-PR-20-20261023-WU-REM-01-02`); result v1.0 (`…-PR-30-20261023-WU-REM-01-01`); results v1.1 and v1.2 (`…-PR-35-20261023-WU-REM-01-01`) |
 | Repository persistence | PENDING / NON_GATING (`docs/changes/GCFPE_PROMPT_PROVENANCE.md` absent on `main`) |
