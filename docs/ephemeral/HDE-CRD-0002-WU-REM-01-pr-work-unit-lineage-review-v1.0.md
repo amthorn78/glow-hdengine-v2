@@ -46,7 +46,7 @@ created_at: 2026-10-24T00:42:00Z
 - **Behaviour.** R-1 to R-5 are on `main` as the approved overlay requires (§5). CR-10's stated limit holds: `crd_id` only, with no both-keys or type check.
 - **Reviews.** The Codex code review completed with no findings on the implementation head `9ad4336` and again on the final head `844db2f`. There were no review threads and no formal reviews, so no P1 was raised or declined (§6). The Codex security review is not in the chain (addendum 2.3).
 - **CI.** Hosted CI is green on the final PR head (run 40042683632) and on the merge commit (push run 40043995165). Both runs selected the evidence and qa lanes and the changed-test step, and ended `CI_APPLICABILITY_AND_EXACT_HEAD_OK` (§7).
-- **This review's own checks** on merged `main` and on stand-in states built from it in throwaway clones all pass: V-1, V-3 (a) and (b), V-4 and the necessity controls (§8).
+- **This review's own checks** on merged `main`, and on stand-in states built from it in throwaway clones, hold: V-1, V-3 (a) and (b) and V-4 pass. The negative controls fail exactly where they should: FND-001 without R-1 to R-3, the skeleton test without R-4, and Epic viability without R-5 (§8).
 - **Business-case measures (1) and (2):** not yet measurable, as the plan and addendum 2.24 expect. V-2 and V-3 are the proxy, and both hold (§9).
 
 **Next stage:** the remedy's originating return, the same Isis QA-10 reassessment of S22 and its dependants (§10).
