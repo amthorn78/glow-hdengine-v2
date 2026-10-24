@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.7.6**  
-Effective Date: 2026.10.23  
+**Version: v13.7.7**  
+Effective Date: 2026.10.24  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -206,7 +206,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.21 HDE-CRD-0002 WU-PR-08: PR work-unit lineage review v1.0 accepts the unit on pull request \#687 and returns WU-DOC-01's business case to the Product Owner  
 * 2.22 HDE-CRD-0002 WU-OPS-01: the Ops task receipt v1.0 accepts the production release-identity read and the presence of seven variables, and the next stage is QA-10  
 * 2.23 HDE-CRD-0002: remediation of QA-10 finding FND-001 is approved as changed — the evidence-lane tests stop assuming the change's own QA root and close pack are absent, through new work unit WU-REM-01  
-* 2.24 HDE-CRD-0002: the FND-001 remedy is amended — WU-REM-01 also makes the Mirror skeleton test and the QA harness accept crd\_id, so HDE-CRD-0002's close pack leaves the evidence lane, the qa lane and Epic viability as they were
+* 2.24 HDE-CRD-0002: the FND-001 remedy is amended — WU-REM-01 also makes the Mirror skeleton test and the QA harness accept crd\_id, so HDE-CRD-0002's close pack leaves the evidence lane, the qa lane and Epic viability as they were  
+* 2.25 HDE-CRD-0002 WU-REM-01: PR work-unit lineage review v1.0 accepts the FND-001 remedy on pull request \#716 and returns the change to the Isis QA-10 reassessment
 
 # **2\) Numbered Addenda**
 
@@ -2776,5 +2777,116 @@ WU-REM-01 widens to three files: R-4 and R-5 add crd\_id to the allowed optional
 ### Relationship to existing HDE Build Notes guidance
 
 This addendum amends addendum 2.23 for WU-REM-01 within the scope stated above. It applies addendum 2.11 rule 5 to HDE Schemas and Artifacts §8.3's mutual-exclusion duty for two validators (CR-10). It leaves addenda 2.5 and 2.16, which accepted WU-PR-02 and WU-PR-07, standing.
+
+## 2.25 HDE-CRD-0002 WU-REM-01: PR work-unit lineage review v1.0 accepts the FND-001 remedy on pull request [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716) and returns the change to the Isis QA-10 reassessment
+
+Timestamp: 102426 00:48 (UTC). Details: Records the PR-40 lineage review v1.0 of work unit WU-REM-01 (evidence-lane independence from the HDE-CRD-0002 QA root; requirement S22, with S21's close-run tests and close-pack rows) of the approved FND-001 remediation (addenda 2.23 and 2.24): decision ACCEPT on the unit's one pull request, [amthorn78/glow-hdengine-v2\#716](https://github.com/amthorn78/glow-hdengine-v2/issues/716), merged as squash 3a5d846. The landed change to the three code files is the proceeded plan v1.1's companion diff byte for byte; requirements R-1 to R-5 are on main; CR-10's stated limit holds; the Codex code review found nothing on the implementation head and on the final head; hosted CI is green on the final PR head and on the merge commit; the review's own checks V-1, V-3 and V-4 pass and its negative controls fail exactly where they should. Business-case measures (1) and (2) are not yet measurable. The next stage is the same Isis QA-10 reassessment of S22 and its dependants. Establishes no QA verdict, acceptance, Ops, deployment or closure.
+
+### Approval and source record
+
+* Artifact: PR\_WORK\_UNIT\_LINEAGE\_REVIEW v1.0, HDE-CRD-0002-WU-REM-01-PR-WORK-UNIT-LINEAGE-REVIEW, docs/ephemeral/HDE-CRD-0002-WU-REM-01-pr-work-unit-lineage-review-v1.0.md, created 2026-10-24T00:42:00Z (landed by [\#717](https://github.com/amthorn78/glow-hdengine-v2/pull/717), commit e70fecb; blob 473c19c8e3fa). Change: CRD HDE-CRD-0002; work unit WU-REM-01 ("Evidence-lane independence from the HDE-CRD-0002 QA root (PR; Distillation; S22, with S21's close-run tests and close-pack rows)"). Decision: ACCEPT. Progression: QA-10 — Audit Implementation and Establish QA Readiness — 100926.1, the same Isis reassessment. Predecessor: none (the first PR-40 review of WU-REM-01).  
+* Reviewer: the continuing whole-change HDE-CRD-0002 Implementation Agent, read-only PR-40 role, session "HDE-CRD-0002-2" (https\://claude.ai/code/session\_01U3QLYTkfUepeRbSGZNPj9N). This session authored WU-REM-01's instructions v1.0 and v1.1 (PR-10) and no plan, code or result record of the unit. Sessions reviewed: PR-20 (plan v1.0) session\_01UnrRbwMW8bPrYjZkNxPmB5 (archived); PR-20 (plan v1.1) and PR-30 session\_01AZdnRebA6fKRxfAgHmLYtP; PR-35 session\_01CjBMTFr8SepLRi97rM6KcL.  
+* Prompt: PR-40 — Review PR Work-Unit Lineage — 100926.1 (https\://app.notion.com/p/3f44590a05eb81088487e918fd642a7f, page state 2026-10-12T02:29:38.234Z, fetched and read in full); release GCFPE-20261009.1 / 100926.1. Execution posture: MANUAL\_PROMPT\_EXECUTION.  
+* Entry event: the Product Owner's fallback PR-40 handoff, pasted after he merged [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716) by hand; no MERGE\_OBSERVED result reached the session. The merge was verified independently.  
+* Records in the lineage:  
+  * instruction v1.1 (INSTRUCTION\_READY; blob 768772ec5e8a; \#714, squash e1010b5), which superseded v1.0 (blob d89d1dc9991b; \#709);  
+  * plan v1.1 (blob d28458c15047; \#715, squash c27d47d; the Product Owner's PR-30 Proceed was for exactly v1.1) with companion HDE-CRD-0002-WU-REM-01-pr-implementation-plan-v1.1-prototype.diff (blob e286cf0c40bf; sha256 1323f0960a1898ce0515d7ad52dacdabd3350962fe5af2f6af12324697488d8e), which superseded plan v1.0 (BLOCKED on F-1; \#710);  
+  * results v1.0 (PR-30, PR\_CANDIDATE\_PUBLISHED; blob 0478fea1362b), v1.1 (PR-35, MERGE\_PENDING on 5abc532; blob dccdc9e47c9a) and v1.2 (PR-35, MERGE\_PENDING on 696c051, historical pre-merge evidence; blob d6b219368838).  
+* Governing records: Specification v1.1 (blob c4802a5a7fa3) with Specification delta 01 (addendum 2.20); Implementation Audit v1.0 (blob b39ac9f276db); Implementation Plan v1.1 (blob abffa2ccbd44) with Plan delta 01 v1.1 (addendum 2.19), to whose §7 WU-REM-01 is added by the remediation overlay's amended P-2; plan reviews (IA-30 INITIAL\_APPROVE and DELTA\_APPROVE); remediation proposal FND-001 v1.1 (Thoth; blob 12fcbb30585f; \#711); remediation review FND-001 v1.1 (Isis, ESC-40 APPROVE, CR-10 APPROVED (a); blob 126330b8f6b9; \#712); originating finding QA-10 FND-001 (HDE-CRD-0002-QA10-change-audit-triage-v1.0.md §3, blob dac6d1a79de8, from HDE-CRD-0002-QA10-qa-readiness-v1.0.md, NOT\_READY on S22, blob f6d7ff018ce7).  
+* Repository state reviewed: origin/main at 3a5d8461e412d386fb6b835461f76d1954dcbf54 (tree cdca58af838e), the merge commit itself; no later commit on main at review time. HDE Build Notes ref: docs/pfcanon/PF10-HDE-Build-Notes-v13.7.6.md (473,130 bytes; SHA-256 ee6d55b57b3b922116363dd914264333cf3566c4856819e2a139ed50f7a6604e; last addendum 2.24; unchanged since 3b21327). The review created no HDE Build Notes addendum (PR-40 is not a qualifying approval prompt).  
+* Canon relied on (as the review records it): PR-40 — Review PR Work-Unit Lineage — 100926.1 ("Resolve the next approved Plan stage"; "Inputs"; "Product Owner merge action"; "Read-only review boundary"; "Execute" 1 to 10; "Required result"; "ACCEPT → next approved Plan stage"; "Mandatory single-block handoff"); QA-10 — Audit Implementation and Establish QA Readiness — 100926.1 (the remediation-return intake and "Accepted repair delivery → same Isis QA-10 reassessment"); PF04-Canon-HDE-Governance v2.8.7 §9.1.1; PF12-Canon-HDE-Schemas-and-Artifacts v2.9.6 §8.3 ("Machine Evidence Index — JSONL mirror"; "Allowed top-level keys and unknown-key rejection"); PF14-Canon-HDE-Mechanics-Guide v3.5.8 §1.6.3 ("Explicit legacy Epic compatibility"); HDE Build Notes addenda 2.3, 2.11, 2.14, 2.18, 2.23 and 2.24, with 2.5 and 2.16 as accepted-final units left untouched; AGENTS.md "Governed evidence rules", closed rails, "Pytest readiness rule", "Pre-push check", "QA output placement", "Code review guidelines", "Code review scope — CI-exempt paths are out of scope" and "Evidence attribution, currentness and distinct decisions".
+
+### Retained decisions and requirements
+
+* Decision. WU-REM-01 is delivered with sufficient attributable evidence by [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716), merged 2026-10-24T00:14:37Z as squash commit 3a5d846, whose tree equals the PR's final head 844db2f.  
+* Merge state and landed lineage.  
+  * [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716): state: closed, merged: true, merged by amthorn78; base main c27d47d ([\#715](https://github.com/amthorn78/glow-hdengine-v2/issues/715)) at merge; branch claude/relaxed-hamilton-vorgjj (the PR-30 session's branch; PR-35 pushed its records there under PO-35-1).  
+  * PR commits in order: 9ad4336 (implementation, PR-30), 5abc532 (result v1.0), 696c051 (result v1.1), 844db2f97419b89f4e54e370fbdc366d8ce2f1d0 (result v1.2, the final head).  
+  * Merge commit 3a5d8461e412d386fb6b835461f76d1954dcbf54: a squash with the single parent c27d47d. main at review is 3a5d846; no later divergence.  
+  * The Product Owner's invocation of PR-30 for exactly plan v1.1, after [\#715](https://github.com/amthorn78/glow-hdengine-v2/issues/715) merged, was the Proceed; it was not reused or renewed.  
+* Attribution. git diff c27d47d 3a5d846 changes 6 files, \+563/−27:  
+  * tests/evidence/test\_evidence\_index\_missing\_state.py (+57/−26; blob 8c368caf3b42; sha256 fae8ed97df6910a2f241e1b74cae344b113080c89ce1abbd232a7f893e5e03dc): R-1, R-2, R-3 with C-1 (9ad4336);  
+  * tests/evidence/test\_evidence\_skeleton.py (+1; blob f2e0b855c13a; sha256 64c23bae882edf853ea5b913ea46c751a304aedc89d0d8660166bd6c4eb741b7): R-4;  
+  * tools/qa/qa\_harness.py (+2/−1; blob 37fd7116d2da; sha256 dcd2093da5b64ebda73757070af1fec12952b755081695e76a09705ce34525b2): R-5;  
+  * three result records v1.0, v1.1 and v1.2 under docs/ephemeral/.  
+  * The diff restricted to the three code files is byte-equal to the companion diff (cmp equal; sha256 1323f0960a1898ce0515d7ad52dacdabd3350962fe5af2f6af12324697488d8e); the three blobs are those plan v1.1 §7 states. The three-file limit is met. Unchanged: tools/evidence/update\_evidence\_index.py, .github/workflows/ci.yml, ci/checks/\*\*, governed evidence (Index, Mirror, sentinels, path proofs, orientation), audit/\*\*, every release member and docs/pfcanon/\*\*. No unattributable or unrelated change.  
+* Requirement coverage on main at 3a5d846 (instruction v1.1 §4; addendum 2.24):  
+  * R-1: test\_absent\_admitted\_crd\_root\_publishes\_nothing(tmp\_path) copies the checkout and strips audit/qa/hde-crd-0002 with its Index rows through \_strip\_from\_copy (which writes the Index, then runs the canonical updater's write and \--check); it asserts the root is absent, runs the loader inside the copy through \_crd\_program (whose CRD\_FIXTURE\_PROGRAM asserts writer.ROOT \== Path.cwd()) and asserts no Index row under the root. It no longer reads the real checkout.  
+  * R-2: crd\_repo strips every root in writer.ADMITTED\_CRD\_QA (today HDE-CRD-0001 and HDE-CRD-0002) through the same helper; its ten users keep their assertions.  
+  * R-3 with C-1: close\_repo strips CLOSE\_ROOT (with close/), both CLOSE\_PACK files and the new CLOSE\_SOURCE (audit/HDE-CRD-0002\_close\_candidate\_source.json), with their proofs and rows, then regenerates and checks; its four users keep their assertions.  
+  * R-4: "crd\_id" added to test\_mirror\_schema\_and\_parity's optional\_fields; nothing else in that file changes.  
+  * R-5: "crd\_id" added to \_MIRROR\_OPTIONAL\_FIELDS and \_HUMAN\_INDEX\_OPTIONAL\_FIELDS; \_MIRROR\_REQUIRED\_FIELDS, \_STRING\_METADATA\_FIELDS, \_metadata\_type\_error, the strict Epic predicates and the CRD viability refusal are unchanged.  
+  * CR-10 (a) stated limit holds: crd\_id only, with no both-keys or type check added. The mutual-exclusion rule stays enforced by the writer (pinned by test\_index\_normalizer\_keeps\_crd\_id\_and\_refuses\_epic\_and\_crd\_together, unchanged) and by check\_mirror\_schema.sh (EPIC\_CRD\_EXCLUSIVE, exit 0 on every state checked).  
+  * P-1 (acceptance (5) restated): an absent HDE-CRD-0002 root publishes nothing, proven in a copy; no evidence-lane test depends on whether the real checkout holds the QA root, the close-run family, the close pack or the candidate source (V-1 with the root absent and V-3 with everything present both pass 134 of 134).  
+  * Exclusions kept: no updater, runtime or workflow change; no harness change beyond R-5; no governed-evidence change; no HDE-CRD-0002 QA evidence, close pack or candidate source committed. The admission table is unchanged and still pinned. Security and migration: test code and one internal QA tool; no secret, network or production surface; no migration; rollback is a revert of 3a5d846 with no manifest refresh. Documentation: none required (proposal v1.1 §7). WU-REM-01 lands before QA-20, which has not started.  
+* Reviews.  
+  * Codex code review (summary comment 6375679259): 9ad4336 completed 2026-10-23T22:06:46Z, has\_any\_findings: false; 696c051 stalled at "Running" from 22:24:12Z, which the Product Owner ruled not a merge-readiness gate (PO-35-2; result v1.2 §4); 844db2f (final head) completed 2026-10-24T00:01:28Z, trigger "New commits", has\_any\_findings: false, has\_unresolved\_findings: false.  
+  * Codex security review: status: null, not part of the chain (addendum 2.3 rule 2). Formal reviews: 0\. Review threads: 0\. No P1 was raised, so none was declined (addendum 2.14). There was no corrective change: the code tree reviewed clean on 9ad4336 is the merged code tree.  
+  * Product Owner decisions in the lineage: PO-35-1 (push the PR-35 records to the PR branch) and PO-35-2 (the stalled run on 696c051 is not a gate); neither waives a finding, a review of code or a security obligation.  
+* CI ledger.  
+  * Run 40031375753 (9ad4336): cancelled at 22:07:35Z, superseded by 5abc532 under the workflow's pull-request cancellation.  
+  * Runs 40031439957 (5abc532) and 40033364013 (696c051): success; changed tests 146, evidence 134, qa 488, marker.  
+  * Run 40042683632, job 120717168115 (844db2f, final PR head): success, 23:59:46Z to 00:10:18Z; changed tests 146 passed in 0.40 s; seven evidence validators; evidence 134 passed in 585.07 s; qa 488 passed in 20.28 s; product, compat, db, rails and release skipped; CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK.  
+  * Run 40043995165, job 120721363419 (push, 3a5d846 on main): success, 00:14:42Z to 00:25:11Z; changed tests 146 in 0.39 s; evidence 134 in 583.56 s; qa 488 in 20.00 s; release skipped; CI\_APPLICABILITY\_AND\_EXACT\_HEAD\_OK.  
+  * V-5 is met on the final PR head and on the merge commit. No scoped CI waiver applies.  
+* The review's independent checks. Throwaway clones of main at 3a5d846, no remote, own CPython 3.12.3 venv with CI's install (pip exit 0; pytest 8.4.2), every command under env \-i with LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 APP\_ENV=dev PYTHONDONTWRITEBYTECODE=1; nothing from a clone was committed or pushed.  
+  * Classification (base c27d47d, head 3a5d846, pull\_request and push): exit 0; reason=selected\_lanes;paths=6;lanes=evidence,qa; changed\_tests=true; one target tests/qa/test\_qa\_tool\_ownership.py. check\_agents\_md\_citations.py: AGENTS\_MD\_CITATIONS\_OK. Stand-in QA family commit (3a5d846 → d2c83dd): paths=16;lanes=evidence,release. Stand-in close stage commit (d2c83dd → 624430b): paths=21;lanes=evidence,release; the qa lane is not selected, which is why V-3 runs it as a later qa-lane pull request would.  
+  * V-1 (3a5d846, root absent): readiness and env pins exit 0; changed-test step 146 passed in 0.50 s, worktree clean; qa lane 488 passed in 17.52 s; seven evidence validators exit 0; six evidence files 134 passed in 684.82 s; final tree checks clean.  
+  * V-3 (624430b: 3a5d846 plus a stand-in QA family and a stand-in close stage): qa lane 488 passed in 18.48 s; release lane manifest check exit 0, 79 passed, attestation built (exit 0\) and verified (exit 0), 115 s; seven evidence validators exit 0 including check\_mirror\_schema.sh; six evidence files 134 passed in 714.06 s; final tree checks clean. Stand-ins were produced only through the harness (publish\_crd\_check\_family; publish\_crd\_close\_run\_family) and the canonical updater, plus authored files that state "WU-REM-01 PR-40 rehearsal stand-in in a throwaway clone; not QA evidence, a close pack or a close candidate". Their Index and Mirror hold 627 rows each, 7 of them HDE-CRD-0002's, 2 carrying crd\_id, none carrying both crd\_id and epic\_id. V-2's state is the QA-family commit d2c83dd; PR-30 ran the full V-2 lanes (result v1.0 §3).  
+  * V-3 (b), Epic viability, read-only probe of evaluate\_acceptance\_map\_viability(HarnessConfig(\<epic\>, \<tree\>)) over the 16 docs/acceptance\_map\_epic0NN.json maps in clean worktrees of each state: HDE-EPIC021, 027, 028 and 029 PASS on main, V-2 and V-3, and FAIL\_TOOLING with c27d47d's harness; HDE-EPIC017, 019, 020, 022, 023, 024, 030, 033, 034, 035, 036 and 037 FAIL\_TOOLING in every state; results naming crd\_id: 0 on main, V-2 and V-3, 7 with c27d47d's harness. All 16 V-3 statuses equal V-2's, so V-3 (b) holds. The 12 FAIL\_TOOLING maps fail on main for reasons unrelated to crd\_id (OBS-1).  
+  * Negative controls (each in a detached worktree, restored, tree clean afterwards): merged code, test\_mirror\_schema\_and\_parity, test\_current\_acceptance\_inputs\_are\_strictly\_viable, test\_absent\_admitted\_crd\_root\_publishes\_nothing and test\_crd\_0002\_fixture\_root\_publishes\_beside\_crd\_0001, 4 passed in 25.88 s; R0 (c27d47d's R-1 to R-3 file), 2 failed and 4 errors in 21.37 s, so FND-001 reproduces without the change; R-4 necessity (c27d47d's skeleton test), test\_mirror\_schema\_and\_parity 1 failed with assert {'crd\_id'} \== set(); R-5 necessity (c27d47d's harness), test\_current\_acceptance\_inputs\_are\_strictly\_viable 1 failed with "Human Evidence Index row 567 has unknown fields: \['crd\_id'\]" and the probe gives 0 PASS maps and 7 results naming crd\_id; V-4 (on 3a5d846, the R-1 test with a planted Index row audit/qa/hde-crd-0002/qa\_step\_logs\_manifest.json inserted after its strip), unmutated 1 passed in 7.03 s and planted 1 failed in 6.04 s at the Index assertion.  
+* Business case and measures (addendum 2.11 rule 1 as addendum 2.18 narrows it; 2.18 rule 5).  
+  * Beneficiaries: QA and the Product Owner; every later qa-lane pull request; the users of the harness's Epic viability. Benefit delivered at this boundary: the evidence lane no longer blocks HDE-CRD-0002's QA evidence or close pack; once the close pack is on main, the qa lane and Epic viability are unchanged.  
+  * Measure (1) (the first pull request that publishes HDE-CRD-0002 QA evidence passes the evidence lane with no change to these tests): not yet measurable, because no such pull request exists. Proxy: V-2 (PR-30) and the V-3 lanes.  
+  * Measure (2) (the close-pack pull request passes the evidence lane, and the first qa-lane run on main after it passes, with no change to these three files): not yet measurable. Proxy: V-3 (a) and (b). Checked by the first QA-evidence pull request, the close-pack pull request and the next qa-lane run on main, or the QA-10 reassessment.  
+  * No cost ceiling (addendum 2.18 rule 1); nothing records spend against one. Stop rule (addendum 2.11 rule 3, kept by 2.18 rule 3): the business case is met at this boundary, so WU-REM-01 stops here; further work needs a new business case.
+
+### Epic, task, and status effects
+
+* WU-REM-01 is ACCEPT at the lineage level. Amended P-2 places it after WU-OPS-01 and before QA-10 readiness; every other unit of Plan v1.1 §7 is accepted (addendum 2.22 and earlier). No planned unit remains ahead of QA-10.  
+* Next stage: QA-10 — Audit Implementation and Establish QA Readiness — 100926.1, in "Accepted repair delivery → same Isis QA-10 reassessment", run by the same Isis, the continuing Lead Developer and readiness decision owner who produced QA-10 readiness v1.0 (https\://claude.ai/code/session\_01NxRhYei7RDGmMPYdKEkpok). The approved remediation's originating return is controlling (review v1.1 §7, addendum 2.24 return\_phase, plan v1.1 return\_owner): the reassessment covers S22 and its dependants.  
+* That branch's intake is satisfied: the prior REALITY\_AUDIT, CHANGE\_AUDIT\_TRIAGE and QA\_READINESS v1.0; remediation proposal and review v1.1; the originating finding; the accepted returned PR and merge evidence (this review, with [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716)); the immutable Specification, Plan and Plan review with their overlays; and the exact repair scope (S22, with S21's close-run tests and close-pack rows). No Ops or documentation delivery was part of this remedy. OBS-2 (remediation review v1.1 §3) is routed to the reassessment.  
+* TypeSafe reading for the receiving session (QA-10 reassessment, HDE-CRD-0002): v8.2 sent 2026-10-24T00:26:40Z reads Opus 5.5 at high (effort score 2.45, confidence 0.67; rungs medium 0.02, high 0.54, extra high 0.41, max 0.03; models Fable 5.1 0.02, Opus 5.5 0.97, Sonnet 5.5 0.01; model confidence 0.96; highest cells Opus 5.5 at high 0.524 and Opus 5.5 at extra high 0.398; jev-1.13.0). Flag: boundary between extra high and high. The Notion row was not written; Nathan picks the cell, and no pick is stated for the reassessment or for this PR-40 session. Surface advice: run the reassessment in the continuing Isis QA-10 session for HDE-CRD-0002, or a top-level Claude Code cloud session Nathan creates for that role, on amthorn78/glow-hdengine-v2 with Notion read access for the prompt. Reads: the prior QA-10 records, remediation review and proposal v1.1, this review, plan v1.1 with its results, and the three files on main. Optional re-runs: a throwaway clone with CI's install on Python 3.12 under closed rails (the evidence lane takes about 10 minutes hosted and 12 to 17 minutes in a session container; the read-only viability probe and the stand-in builds take under two minutes each). Writes: only the refreshed QA-10 records under docs/ephemeral/. Not needed: production, vendor, Railway and database access. This review's pull request is merged first.
+
+### Required canon drainage
+
+* CR-10's drainage into PF12-Canon-HDE-Schemas-and-Artifacts §8.3 (the Index and Mirror key set gaining crd\_id) is unperformed; owner, the Product Owner. The review decides no canon and creates no addendum. No PF canon document was edited and no PF09 or PF30 movement occurred.
+
+### Deferred obligations and unresolved work
+
+| Item | Owner | State |
+| :---- | :---- | :---- |
+| QA-10 reassessment of S22 and its dependants | Isis | Next |
+| Measures (1) and (2) | The first QA-evidence pull request, the close-pack pull request and the next qa-lane run on main, or the QA-10 reassessment | Not yet measurable |
+| OBS-1: the 12 Epic viabilities already failing on main | Product Owner, as a later-change candidate | Unchanged; reproduced |
+| OBS-2: the local failures of tests/evidence/test\_hdapi\_v2\_contract\_inventory.py | Isis at the reassessment; Product Owner triage | Not run here; in no lane this unit selects |
+| CR-10 drainage into PF12 §8.3 | Product Owner | Unperformed |
+| CR-9 (path proofs under the Ops evidence root) | Isis, IA-30 | PROPOSED, unaffected |
+| FND-024 (the PR35-C1 flake risk on QA-evidence pull requests) | As recorded in the triage | Not observed on [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716) |
+| Publication of the review into PF10 | Product Owner (informational, non-gating) | Not performed |
+
+* Canon-conflict register: CR-1 to CR-3 APPROVED\_AS\_CHANGED (Thoth); CR-4 APPROVED and CR-5 APPROVED\_AS\_CHANGED (Product Owner); CR-6 APPROVED alternative (a) (IA through RS-20; addendum 2.6); CR-7 and CR-8 APPROVED alternative (a) each (Product Owner; addendum 2.7); CR-9 PROPOSED, not yet reviewed (Isis, IA-30); CR-10 APPROVED alternative (a), applied as decided (Isis, ESC-40, 2026-10-23T20:15:00Z; review v1.1 §4; addendum 2.24). No new conflict.  
+* Limitations. Mergeability on 844db2f before the merge was not recorded in a saved record (result v1.2 §6 left it to the session's reply); the merge succeeded and the merged tree equals that head's tree. The full V-2 lane run is PR-30's; the review ran the V-3 lanes on the superset state and the V-2 viability probe. Lane times come from a 4-CPU session container running two lanes side by side and do not compare with hosted times.  
+* Prompt-use provenance is recorded in the review only (usage ID GCFPE-USE-HDE-CRD-0002-PR-40-20261024-WU-REM-01-01; inherited usages from instruction v1.1, plan v1.1 and results v1.0 to v1.2; docs/changes/GCFPE\_PROMPT\_PROVENANCE.md absent on main; repository persistence PENDING / NON\_GATING).
+
+### Scope boundaries and nonclaims
+
+* ACCEPT is this review's lineage result only. It is not a QA verdict, acceptance of the change, Ops, deployment, PF09 or PF30 movement, canon drainage or closure.  
+* It makes no canon, code, test, workflow, release or governed-evidence change. Not produced: HDE-CRD-0002 QA evidence, a close pack, a close candidate source, a QA Guide, a QA Plan or a PF10 addendum by the review. Not executed: QA, Ops, deployment, release activation or closure.  
+* The stand-in states exist only in throwaway clones and are not QA evidence, a close pack or a close candidate.
+
+### Evidence anchors
+
+* Review: docs/ephemeral/HDE-CRD-0002-WU-REM-01-pr-work-unit-lineage-review-v1.0.md ([\#717](https://github.com/amthorn78/glow-hdengine-v2/issues/717), e70fecb; blob 473c19c8e3fa8319c60aa4d49e229343eb290c06).  
+* PR [\#716](https://github.com/amthorn78/glow-hdengine-v2/pull/716); merge 3a5d8461e412d386fb6b835461f76d1954dcbf54; final head 844db2f97419b89f4e54e370fbdc366d8ce2f1d0; commits 9ad4336, 5abc532, 696c051, 844db2f; base c27d47d.  
+* Companion diff sha256 1323f0960a1898ce0515d7ad52dacdabd3350962fe5af2f6af12324697488d8e; code blobs 8c368caf3b42, f2e0b855c13a, 37fd7116d2da.  
+* Hosted runs 40031375753 (cancelled), 40031439957, 40033364013, 40042683632 (job 120717168115\) and 40043995165 (push; job 120721363419). Codex summary comment 6375679259\.
+
+### Relationship to existing HDE Build Notes guidance
+
+* Applies addenda 2.23 and 2.24 (the remedy, R-1 to R-5, V-1 to V-5, CR-10 (a), the business case), 2.18 (no cost ceiling; the measure check), 2.11 (rules 1, 3, 7 and 8), 2.14 (the P1 check) and 2.3 (the review chain). Leaves addenda 2.5 and 2.16, which accepted WU-PR-02 and WU-PR-07, standing. Supersedes nothing and amends no earlier addendum.  
+* Numbering: PF10 v13.7.6 on main runs through 2.24, so this addendum is 2.25. Its index lists 2.21 as the WU-PR-08 lineage review and 2.22 as the WU-OPS-01 receipt. The WU-DOC-01 records are not published in PF10 v13.7.6; the Product Owner decides any further publication order and renumbering.
+
+\<eof\>
 
 \<eof\>
