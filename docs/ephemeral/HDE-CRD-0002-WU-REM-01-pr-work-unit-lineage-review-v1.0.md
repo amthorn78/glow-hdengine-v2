@@ -159,7 +159,7 @@ ACCEPT is this review's lineage result only. It is not a QA verdict, acceptance 
 
 | ID | State | Result |
 | :- | :- | :- |
-| V-1 | `3a5d846`, root absent | readiness and env pins exit 0; changed-test step **146 passed** in 0.50 s, worktree clean; qa lane **488 passed** in 17.52 s with both tree checks; 7 evidence validators exit 0; six evidence files PENDING (run in progress at 2026-10-24T00:30Z); final tree checks PENDING |
+| V-1 | `3a5d846`, root absent | readiness and env pins exit 0; changed-test step **146 passed** in 0.50 s, worktree clean; qa lane **488 passed** in 17.52 s with both tree checks; 7 evidence validators exit 0; six evidence files **134 passed** in 684.82 s; final tree checks (`git diff --check`, `git diff --exit-code`, empty status) clean |
 | V-3 | `624430b`: `3a5d846` plus a stand-in QA family and a stand-in close stage | qa lane **488 passed** in 18.48 s with both tree checks; release lane: manifest check exit 0, **79 passed**, attestation built (exit 0) and verified (exit 0), tree clean, 115 s; 7 evidence validators exit 0; six evidence files PENDING (run in progress at 2026-10-24T00:30Z); final tree checks PENDING |
 
 **Stand-ins**, produced only through the harness and the canonical updater, plus authored files, each stating "WU-REM-01 PR-40 rehearsal stand-in in a throwaway clone; not QA evidence, a close pack or a close candidate":
