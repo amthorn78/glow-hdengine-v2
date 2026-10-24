@@ -392,7 +392,7 @@ Rails: default (the tool runs its children under closed rails) · Env: E-L (a cl
 - Step 2 prints `lanes: classification reason=documentation_only;paths=1;lanes=none` and exits 0.
 - Step 3 "137 passed"; step 4 empty.
 
-The `lanes`, `membership` and `build-notes` lines and step 2 were observed at `0b15328d` (Audit §7 item 9).
+Every line above was observed at `0b15328d` (Audit §7 item 9); step 1 took about 24 minutes there, most of it `replay`.
 **Outcomes:** a step 2 failure whose signature is the recorded git auto-maintenance race (PR35-C1, FND-024) is an execution fault eligible for §9's one rerun; any other failure → `FAIL_BEHAVIOR`. Exit 4 (repository changed) → `FAIL_BEHAVIOR`.
 **Deliverables:** `audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log`.
 **Nonclaims:** the tool's result is not CI's result (README "Pre-push check"); FND-028 (removing `replay`) stays the Product Owner's decision.
