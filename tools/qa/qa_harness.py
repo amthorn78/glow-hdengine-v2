@@ -228,10 +228,11 @@ _MIRROR_REQUIRED_FIELDS = frozenset(
     }
 )
 _MIRROR_OPTIONAL_FIELDS = frozenset(
-    {"epic_id", "notes", "record_type", "schema_version", "tokens"}
+    {"crd_id", "epic_id", "notes", "record_type", "schema_version", "tokens"}
 )
 _HUMAN_INDEX_OPTIONAL_FIELDS = frozenset(
     {
+        "crd_id",
         "epic_id",
         "notes",
         "produced_at_utc",
