@@ -28,3 +28,11 @@ Inputs:
 
 Minimum context: the review, addendum record and this handoff reach main through amthorn78/glow-hdengine-v2#731, which Nathan merges before PR-10 starts.
 ```
+
+## Canon relied on
+
+The handoff carries the decision of `docs/ephemeral/HDE-CRD-0002-remediation-review-QA110-F01-v1.0.md`, whose "Canon relied on" block is the full record. For the routing in this block:
+- ESC-40 — Review and Return Approved Remediation — 100926.1, "Result routing" (a non-PR delivery owner takes its exact prompt from the approved return map), read in full;
+- PR-10 — Create PR Work-Unit Instructions — 100926.1, "Inputs" (remediation lineage) and "Required result" (SPECIFICATION_REF, IMPLEMENTATION_PLAN_REF, PLAN_REVIEW_REF), read;
+- PF19-Canon-Glow-QA-Guide v3.0.6 §10.6 "Common remediation cycle and return owner", step 4 (continuing IA delivers through the established PR lane), read in full;
+- `docs/pfcanon/PF10-HDE-Build-Notes-v13.7.8.md`, with the addendum 2.27 record named above.
