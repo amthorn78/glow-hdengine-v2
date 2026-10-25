@@ -736,6 +736,93 @@ def test_repository_state_covers_ignored_files(tmp_path: Path) -> None:
     assert tool.repository_state(repo).metadata != settled.metadata
 
 
+# A fixed past instant: a file set to it and then written or freshened has a changed mtime on any clock.
+PAST_NS = 1_600_000_000_000_000_000
+
+
+def _set_past(paths: list[Path]) -> None:
+    assert paths
+    for path in paths:
+        os.utime(path, ns=(PAST_NS, PAST_NS))
+
+
+def _write_existing_blob(repo: Path) -> None:
+    subprocess.run(["git", "-C", str(repo), "hash-object", "-w", "--stdin"], input=b"alpha\n", check=True,
+                   capture_output=True)
+
+
+@pytest.mark.parametrize("packed", [True, False], ids=["packed", "loose"])
+def test_a_copy_owns_its_objects_so_a_write_in_it_cannot_freshen_the_source(tmp_path: Path, packed: bool) -> None:
+    """QA110-F01: writing again an object that a reachable store already holds makes git freshen (re-time) the file
+    holding it, so a copy that borrowed the source's objects would change the source's pack or loose object."""
+    source = _synthetic(tmp_path / "source", {"a.txt": "alpha\n", "d/b.txt": "beta\n"})
+    if packed:
+        _git(source, "repack", "-a", "-d", "-q")
+        _git(source, "prune-packed", "-q")
+    head = _git(source, "rev-parse", "HEAD")
+    objects = source / ".git" / "objects"
+    blob = _git(source, "hash-object", "a.txt")
+    (held,) = sorted(objects.glob("pack/*.pack")) if packed else [objects / blob[:2] / blob[2:]]
+    _set_past([path for path in objects.rglob("*") if path.is_file()])
+    before = tool.repository_state(source)
+    copy = tool.make_copy(source, head, tmp_path / "copy")
+    assert not (copy / ".git" / "objects" / "info" / "alternates").exists()
+    assert tool.repository_state(source) == before
+    _write_existing_blob(copy)
+    assert tool.repository_state(source) == before
+    assert tool.state_changes(before, tool.repository_state(source)) == []
+    # Negative control: a borrowing copy shows the mechanism this test guards against, in git metadata only.
+    shared = tmp_path / "shared"
+    subprocess.run(["git", "clone", "--quiet", "--shared", "--no-checkout", "--", str(source), str(shared)],
+                   check=True, capture_output=True)
+    _git(shared, "-c", "advice.detachedHead=false", "checkout", "--quiet", "--detach", head)
+    assert tool.repository_state(source) == before
+    _write_existing_blob(shared)
+    freshened = tool.repository_state(source)
+    assert freshened.metadata != before.metadata
+    assert (freshened.head, freshened.status, freshened.tracked, freshened.ignored, freshened.directories) == \
+        (before.head, before.status, before.tracked, before.ignored, before.directories)
+    git_dir = tool.git_text(source, "rev-parse", "--absolute-git-dir")
+    assert tool.state_changes(before, freshened) == [
+        f"git metadata {git_dir}/{held.relative_to(source / '.git').as_posix()} (mtime, ctime)"]
+
+
+def test_a_copy_of_a_source_that_borrows_objects_borrows_none_itself(tmp_path: Path) -> None:
+    base = _synthetic(tmp_path / "base", {"a.txt": "alpha\n"})
+    _git(base, "repack", "-a", "-d", "-q")
+    source = tmp_path / "borrowing"
+    subprocess.run(["git", "clone", "--quiet", "--shared", "--", str(base), str(source)], check=True,
+                   capture_output=True)
+    assert (source / ".git" / "objects" / "info" / "alternates").exists()
+    head = _git(source, "rev-parse", "HEAD")
+    _set_past([path for path in (base / ".git" / "objects").rglob("*") if path.is_file()])
+    before_base, before_source = tool.repository_state(base), tool.repository_state(source)
+    copy = tool.make_copy(source, head, tmp_path / "copy")
+    assert not (copy / ".git" / "objects" / "info" / "alternates").exists()
+    _write_existing_blob(copy)
+    assert tool.repository_state(source) == before_source
+    assert tool.repository_state(base) == before_base
+
+
+def test_a_read_only_violation_names_the_changed_entries(tmp_path: Path) -> None:
+    repo = _synthetic(tmp_path / "named", {"README.txt": "fixture\n"})
+    config = repo / ".git" / "config"
+    _set_past([repo / "README.txt", config])
+    before = tool.repository_state(repo)
+    config.write_bytes(config.read_bytes())
+    (repo / "README.txt").write_text("fixture\n", encoding="utf-8")
+    after = tool.repository_state(repo)
+    changes = tool.state_changes(before, after)
+    git_dir = tool.git_text(repo, "rev-parse", "--absolute-git-dir")
+    assert [line.rsplit(" (", 1)[0] for line in changes] == ["tracked README.txt", f"git metadata {git_dir}/config"]
+    # Rewritten with the same bytes: only the times moved, and no content or digest is named.
+    for line in changes:
+        moved = set(line.rsplit(" (", 1)[1].removesuffix(")").split(", "))
+        assert "mtime" in moved and moved <= {"mtime", "ctime"}, line
+    assert all("fixture" not in line and not re.search(r"[0-9a-f]{40}", line) for line in changes)
+    assert tool.state_changes(before, after, limit=1) == [changes[0], "and 1 more"]
+
+
 # --------------------------------------------------------------------------
 # every report on the repository: read-only, and the expected answers
 # --------------------------------------------------------------------------

@@ -265,32 +265,35 @@ def resolve_commit(repo: Path, ref: str) -> str:
     return result.stdout.decode("ascii").strip()
 
 
-def _metadata_digest(directory: Path) -> str:
-    """Digest of git metadata: every file's lstat identity, its bytes outside objects/, and every directory's name.
+# The fields after the path in each kind of state entry, as a read-only violation names them.
+_FILE_FIELDS = ("mode", "size", "mtime", "ctime")
+_DIRECTORY_FIELDS = ("mode", "mtime", "ctime")
+_METADATA_FIELDS = ("mode", "size", "mtime", "ctime", "sha256")
+
+
+def _metadata_entries(directory: Path) -> tuple[tuple[str, int, int, int, int, str], ...]:
+    """Git metadata: every file's lstat identity, its bytes' SHA-256 outside objects/, and every directory's name.
 
     Any write to a file changes its st_ctime_ns, which user space cannot set
     back, so a rewrite with the same bytes is seen too; an object is therefore
     not read.  An empty directory holds no file, so without its name its
-    creation or removal would go unseen.
+    creation or removal would go unseen; a directory's entry is its name only.
+    Each entry is kept by name, so a violation can name the entries that changed.
     """
-    digest = hashlib.sha256()
+    entries = []
     for path in sorted(directory.rglob("*")):
         rel = path.relative_to(directory).as_posix()
         if path.is_dir() and not path.is_symlink():
-            digest.update(f"{rel}/\0".encode())
+            entries.append((f"{rel}/", -1, -1, -1, -1, ""))
             continue
         if not (path.is_file() or path.is_symlink()):
             continue
         info = path.lstat()
-        digest.update(f"{rel}\0{info.st_mode}\0{info.st_size}\0{info.st_mtime_ns}\0{info.st_ctime_ns}\0".encode())
-        if rel.startswith("objects/"):
-            continue
-        if path.is_symlink():
-            digest.update(os.readlink(path).encode())
-        else:
-            digest.update(path.read_bytes())
-        digest.update(b"\0")
-    return digest.hexdigest()
+        content = ""
+        if not rel.startswith("objects/"):
+            content = hashlib.sha256(os.readlink(path).encode() if path.is_symlink() else path.read_bytes()).hexdigest()
+        entries.append((rel, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns, content))
+    return tuple(entries)
 
 
 def _ignored_entries(repo: Path) -> tuple[tuple[str, int, int, int, int], ...]:
@@ -347,7 +350,7 @@ class RepositoryState:
     tracked: tuple[tuple[str, int, int, int, int], ...]
     ignored: tuple[tuple[str, int, int, int, int], ...]
     directories: tuple[tuple[str, int, int, int], ...]
-    metadata: tuple[tuple[str, str], ...]
+    metadata: tuple[tuple[str, tuple[tuple[str, int, int, int, int, str], ...]], ...]
 
 
 def repository_state(repo: Path) -> RepositoryState:
@@ -357,15 +360,65 @@ def repository_state(repo: Path) -> RepositoryState:
         Path(git_text(repo, "rev-parse", "--absolute-git-dir")),
         (repo / git_text(repo, "rev-parse", "--git-common-dir")).resolve(),
     }
-    metadata = tuple(sorted((str(d), _metadata_digest(d)) for d in directories))
+    metadata = tuple(sorted((str(d), _metadata_entries(d)) for d in directories))
     return RepositoryState(head=head, status=status, tracked=_tracked_entries(repo), ignored=_ignored_entries(repo),
                            directories=_directory_entries(repo), metadata=metadata)
 
 
+def state_changes(before: RepositoryState, after: RepositoryState, limit: int = 20) -> list[str]:
+    """Each entry that differs between two states, with the fields that moved; at most ``limit`` lines and a count.
+
+    Paths and field names only: no file content, digest, commit or environment
+    value, so the read-only violation can say what changed and nothing else.
+    """
+    lines = []
+    if after.head != before.head:
+        lines.append("HEAD")
+    if after.status != before.status:
+        lines.append("git status")
+    lines += _entry_changes("tracked", before.tracked, after.tracked, _FILE_FIELDS)
+    lines += _entry_changes("ignored", before.ignored, after.ignored, _FILE_FIELDS)
+    lines += _entry_changes("directory", before.directories, after.directories, _DIRECTORY_FIELDS)
+    old_metadata, new_metadata = dict(before.metadata), dict(after.metadata)
+    for directory in sorted(old_metadata.keys() | new_metadata.keys()):
+        lines += _entry_changes("git metadata", old_metadata.get(directory, ()), new_metadata.get(directory, ()),
+                                _METADATA_FIELDS, prefix=f"{directory}/")
+    if len(lines) > limit:
+        lines = [*lines[:limit], f"and {len(lines) - limit} more"]
+    return lines
+
+
+def _entry_changes(kind: str, before: Iterable[tuple], after: Iterable[tuple], fields: tuple[str, ...],
+                   prefix: str = "") -> list[str]:
+    old, new = {entry[0]: entry[1:] for entry in before}, {entry[0]: entry[1:] for entry in after}
+    lines = []
+    for path in sorted(old.keys() | new.keys()):
+        if path not in new:
+            moved = "removed"
+        elif path not in old:
+            moved = "created"
+        elif old[path] != new[path]:
+            moved = ", ".join(name for name, was, now in zip(fields, old[path], new[path]) if was != now)
+        else:
+            continue
+        lines.append(f"{kind} {prefix}{path} ({moved})")
+    return lines
+
+
 def make_copy(repo: Path, commit: str, destination: Path) -> Path:
-    """Clone ``commit`` outside the repository; the source repository is only read."""
+    """Clone ``commit`` outside the repository; the source repository is only read.
+
+    The copy owns its objects.  Writing in a copy an object that the source
+    already holds makes git freshen (re-time) the file holding it, and a
+    ``--shared`` copy, or a clone of one, reaches the source's own files that
+    way (QA110-F01); a hardlinked ``--local`` copy changes their ctime at once.
+    ``--no-hardlinks`` copies the objects, and ``--dissociate`` drops any
+    alternates the source itself borrows from, so the copy reaches no other
+    repository; one that still does is refused.
+    """
     result = subprocess.run(
-        ["git", "clone", "--quiet", "--shared", "--no-checkout", "--", str(repo), str(destination)],
+        ["git", "clone", "--quiet", "--no-hardlinks", "--dissociate", "--no-checkout", "--", str(repo),
+         str(destination)],
         env=_git_env(),
         capture_output=True,
         check=False,
@@ -374,6 +427,8 @@ def make_copy(repo: Path, commit: str, destination: Path) -> Path:
     if result.returncode != 0:
         raise ToolingError("git clone into the temporary directory failed: "
                            + result.stderr.decode("utf-8", errors="replace").strip())
+    if (destination / ".git" / "objects" / "info" / "alternates").exists():
+        raise ToolingError("the throwaway copy still borrows objects from another repository")
     if git(destination, "cat-file", "-e", f"{commit}^{{commit}}", check=False).returncode != 0:
         raise ToolingError(f"commit {commit} is not available to the throwaway copy")
     git(destination, "-c", "advice.detachedHead=false", "checkout", "--quiet", "--detach", commit)
@@ -1742,6 +1797,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if after != before:
         print("PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, directories, HEAD or git "
               "metadata changed", file=sys.stderr)
+        for line in state_changes(before, after):
+            print(f"PREPUSH_CHECK_READ_ONLY_VIOLATION: changed: {line}", file=sys.stderr)
         return EXIT_READ_ONLY_VIOLATION
     overall = "PASS" if all(status == "PASS" for _n, status, _d in results) else "FAIL"
     print("PREPUSH_CHECK_RESULT: " + overall + " "
