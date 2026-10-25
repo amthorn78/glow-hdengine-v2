@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log
+size_bytes: 35842
+sha256: 71a0d11afff1b89a76a9c7624d0cfa93d22845f5714a3618a87c7967b9593ef7
+mtime_utc: 2026-10-25T00:58:29Z
+produced_at_utc: 2026-09-22T14:25:29Z
