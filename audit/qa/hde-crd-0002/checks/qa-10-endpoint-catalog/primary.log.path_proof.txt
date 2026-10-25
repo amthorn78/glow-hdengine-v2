@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-10-endpoint-catalog/primary.log
+size_bytes: 7209
+sha256: 34c747808926344b21553cb75ca6656880bf43d7c05133ba2198d67c1946f6da
+mtime_utc: 2026-10-25T00:00:05Z
+produced_at_utc: 2026-09-22T14:25:29Z

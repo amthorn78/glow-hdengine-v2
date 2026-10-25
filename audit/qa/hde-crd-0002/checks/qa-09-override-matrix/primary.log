@@ -1,0 +1,135 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-09-override-matrix","check_name":"Override matrix, order and refusals, local","claimed_tokens":[],"command":[["python","-m","pytest","-q","-p","no:cacheprovider","tests/bodygraph/test_vendor_prod_override.py","tests/cli/test_bg_resolve.py","tests/bodygraph/test_resolver_vendor.py"],["bash","-c","# T09 step 2 probes in one asserting script (NZ-05): stdout and stderr captured separately per probe.\nFAIL=0\np() { label=$1; exp=$2; shift 2; o=$(mktemp); e=$(mktemp); \"$@\" >\"$o\" 2>\"$e\"; rc=$?\n  printf -- '--- probe (%s):' \"$label\"; printf ' %q' \"$@\"; printf '\\n'\n  if [ \"$rc\" = \"$exp\" ]; then echo \"exit_code: $rc (expected $exp) ASSERT_OK\"; else echo \"exit_code: $rc (expected $exp) ASSERT_FAIL\"; FAIL=1; fi\n  echo \"stdout ($(wc -c <\"$o\") bytes):\"; if [ -s \"$o\" ]; then cat \"$o\"; [ -n \"$(tail -c1 \"$o\")\" ] && echo; else echo \"(empty)\"; fi\n  echo \"stderr ($(wc -c <\"$e\") bytes, $(grep -c '' \"$e\") lines):\"; if [ -s \"$e\" ]; then cat \"$e\"; [ -n \"$(tail -c1 \"$e\")\" ] && echo; else echo \"(empty)\"; fi\n  rm -f \"$o\" \"$e\"; }\np a 1 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\"\np b 1 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override\np c 64 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor \"bad ref\"\np d 64 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor A --allow-prod-vendor A\np e 64 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source db --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override\nif [ \"$FAIL\" = 0 ]; then echo \"ASSERTIONS: every probe exit status as expected\"; exit 0; else echo \"ASSERTIONS: at least one probe exit status not as expected\"; exit 1; fi"],["find","/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state","-type","f"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check 9; QA-90 task T09 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad), NZ-05 (step 2 probes in one asserting bash -c script)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-09-override-matrix/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-24T23:59:03Z"}
+=== CONTEXT ===
+check_id: qa-09-override-matrix
+task: QA-90 task T09, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 9 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-L with XDG_STATE_HOME an empty scratch directory; E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-24T23:58:56Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:58:56Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:58:56Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:58:56Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-24T23:58:56Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-24T23:58:56Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-24T23:58:57Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+--- command: ["find", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state", "-type", "f"]
+started_utc: 2026-10-24T23:58:57Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+pre-step XDG_STATE_HOME read: find exit 0, 0 bytes of output (empty expected before step 2)
+end_utc: 2026-10-24T23:59:03Z
+=== COMMANDS ===
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/bodygraph/test_vendor_prod_override.py", "tests/cli/test_bg_resolve.py", "tests/bodygraph/test_resolver_vendor.py"]
+started_utc: 2026-10-24T23:58:57Z; exit_code: 0
+stdout (340 bytes):
+........................................................................ [ 28%]
+........................................................................ [ 56%]
+........................................................................ [ 84%]
+........................................                                 [100%]
+256 passed in 2.44s
+stderr (0 bytes):
+(empty)
+--- command: ["bash", "-c", "# T09 step 2 probes in one asserting script (NZ-05): stdout and stderr captured separately per probe.\nFAIL=0\np() { label=$1; exp=$2; shift 2; o=$(mktemp); e=$(mktemp); \"$@\" >\"$o\" 2>\"$e\"; rc=$?\n  printf -- '--- probe (%s):' \"$label\"; printf ' %q' \"$@\"; printf '\\n'\n  if [ \"$rc\" = \"$exp\" ]; then echo \"exit_code: $rc (expected $exp) ASSERT_OK\"; else echo \"exit_code: $rc (expected $exp) ASSERT_FAIL\"; FAIL=1; fi\n  echo \"stdout ($(wc -c <\"$o\") bytes):\"; if [ -s \"$o\" ]; then cat \"$o\"; [ -n \"$(tail -c1 \"$o\")\" ] && echo; else echo \"(empty)\"; fi\n  echo \"stderr ($(wc -c <\"$e\") bytes, $(grep -c '' \"$e\") lines):\"; if [ -s \"$e\" ]; then cat \"$e\"; [ -n \"$(tail -c1 \"$e\")\" ] && echo; else echo \"(empty)\"; fi\n  rm -f \"$o\" \"$e\"; }\np a 1 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\"\np b 1 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override\np c 64 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor \"bad ref\"\np d 64 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor A --allow-prod-vendor A\np e 64 hdctl bg:resolve --user qa-hde-crd-0002-local1 --source db --birthdate 1990-01-01 --birthtime 12:34 --location \"Amsterdam, NL\" --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override\nif [ \"$FAIL\" = 0 ]; then echo \"ASSERTIONS: every probe exit status as expected\"; exit 0; else echo \"ASSERTIONS: at least one probe exit status not as expected\"; exit 1; fi"]
+started_utc: 2026-10-24T23:59:01Z; exit_code: 0
+stdout (2301 bytes):
+--- probe (a): hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location Amsterdam\,\ NL
+exit_code: 1 (expected 1) ASSERT_OK
+stdout (297 bytes):
+{"error":{"code":"PROVIDER_REFUSED","message":"Vendor source is refused under SAFE rails (SAFE_MODE=1)."},"resolver":{"allow_network":false,"dry_run":false,"requested_source":"vendor","resolved_source":"vendor","safe_mode":true,"upsert":false,"user_id":"qa-hde-crd-0002-local1"},"status":"error"}
+stderr (0 bytes, 0 lines):
+(empty)
+--- probe (b): hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location Amsterdam\,\ NL --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override
+exit_code: 1 (expected 1) ASSERT_OK
+stdout (297 bytes):
+{"error":{"code":"PROVIDER_REFUSED","message":"Vendor source is refused under SAFE rails (SAFE_MODE=1)."},"resolver":{"allow_network":false,"dry_run":false,"requested_source":"vendor","resolved_source":"vendor","safe_mode":true,"upsert":false,"user_id":"qa-hde-crd-0002-local1"},"status":"error"}
+stderr (0 bytes, 0 lines):
+(empty)
+--- probe (c): hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location Amsterdam\,\ NL --allow-prod-vendor bad\ ref
+exit_code: 64 (expected 64) ASSERT_OK
+stdout (0 bytes):
+(empty)
+stderr (138 bytes, 1 lines):
+hdctl bg:resolve: --allow-prod-vendor requires one AUTHORIZATION_REF of 1 to 128 characters matching ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$
+--- probe (d): hdctl bg:resolve --user qa-hde-crd-0002-local1 --source vendor --birthdate 1990-01-01 --birthtime 12:34 --location Amsterdam\,\ NL --allow-prod-vendor A --allow-prod-vendor A
+exit_code: 64 (expected 64) ASSERT_OK
+stdout (0 bytes):
+(empty)
+stderr (61 bytes, 1 lines):
+hdctl bg:resolve: --allow-prod-vendor may be given only once
+--- probe (e): hdctl bg:resolve --user qa-hde-crd-0002-local1 --source db --birthdate 1990-01-01 --birthtime 12:34 --location Amsterdam\,\ NL --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override
+exit_code: 64 (expected 64) ASSERT_OK
+stdout (0 bytes):
+(empty)
+stderr (76 bytes, 1 lines):
+hdctl bg:resolve: --allow-prod-vendor is accepted only with --source vendor
+ASSERTIONS: every probe exit status as expected
+stderr (0 bytes):
+(empty)
+--- command: ["find", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state", "-type", "f"]
+started_utc: 2026-10-24T23:59:03Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:59:03Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (collection §4.5); XDG_STATE_HOME empty before step 2 | observed: PASS; pre-step find recorded in CONTEXT | PASS
+- step 1: '256 passed' | observed: 256 passed in 2.44s (exit 0) | PASS
+- step 2 probe (a): exit 1 with a status error envelope, code PROVIDER_REFUSED, stderr empty | observed: exit 1; status=error code=PROVIDER_REFUSED; stderr 0 bytes | PASS
+- step 2 probe (b): exit 1 with a status error envelope, code PROVIDER_REFUSED, stderr empty | observed: exit 1; status=error code=PROVIDER_REFUSED; stderr 0 bytes | PASS
+- step 2 probe (c): exit 64, stdout empty, one stderr line not containing the flag value | observed: exit 64; stdout empty; stderr 1 line: 'hdctl bg:resolve: --allow-prod-vendor requires one AUTHORIZATION_REF of 1 to 128 characters matching ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$'; flag value 'bad ref' absent | PASS
+- step 2 probe (d): exit 64, stdout empty, one stderr line not containing the flag value | observed: exit 64; stdout empty; stderr 1 line: 'hdctl bg:resolve: --allow-prod-vendor may be given only once'; flag value 'A' absent | PASS
+- step 2 probe (e): exit 64, stdout empty, one stderr line not containing the flag value | observed: exit 64; stdout empty; stderr 1 line: 'hdctl bg:resolve: --allow-prod-vendor is accepted only with --source vendor'; flag value 'HDE-CRD-0002/qa/qa-20-live-vendor-override' absent | PASS
+- step 2 asserting script exit 0 | observed: exit 0 | PASS
+- step 3: find "$XDG_STATE_HOME" -type f prints nothing | observed: (empty) (exit 0) | PASS
+- step 3: git status --porcelain prints nothing | observed: (empty) (exit 0) | PASS
+=== NOTES ===
+- normalization NZ-05: the five probes of step 2 ran in one asserting bash -c script (expected exits 1, 1, 64, 64, 64); each probe's real exit code, stdout and stderr are inside that command's stdout, captured separately.
+- flag-value check: each refusal's stderr was tested for the exact supplied value as a substring ('bad ref', 'A', 'HDE-CRD-0002/qa/qa-20-live-vendor-override'); none occurs. Probe (c)'s stderr quotes the allow-list pattern, not the value.
+- nonclaims: no vendor I/O (closed rails refuse first); the live behaviour is check 20, not selected.
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.

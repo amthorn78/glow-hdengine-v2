@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-09-override-matrix/primary.log
+size_bytes: 14878
+sha256: fea39bb3ead43325c6607bfc770afad7afb93176335548c17c07eb4d419bc643
+mtime_utc: 2026-10-24T23:59:27Z
+produced_at_utc: 2026-09-22T14:25:29Z

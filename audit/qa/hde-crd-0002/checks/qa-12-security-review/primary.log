@@ -1,0 +1,87 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-12-security-review","check_name":"The S19 record and its fixes' regression tests","claimed_tokens":[],"command":[["awk","/^## 6\\. /{s=1;next} /^## /{s=0} s && /^\\| [0-9]+ \\| /{n++} END{print \"per-file rows\", n}","docs/ephemeral/HDE-CRD-0002-S19-code-security-review-v1.0.md"],["awk","-F [|] ","/^## 4\\. /{s=1;next} /^## /{s=0} s && /^\\| S19-F[0-9][0-9] \\|/{n++; if ($9 ~ /^ *$/) bad++} s && /^\\| S19-R[0-9][0-9][ |(]/{r++; if ($7 ~ /^ *$/) rbad++} END{print \"fixed rows\", n, \"without disposition\", bad+0; print \"routed rows\", r, \"without disposition\", rbad+0}","docs/ephemeral/HDE-CRD-0002-S19-code-security-review-v1.0.md"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/http/test_reader_post_v1.py","tests/http/test_reader_post_v2.py","tests/transport/test_writers_errors_headers.py","tests/http/test_compat_endpoint_contract.py","tests/http/test_dev_conjunction_http.py","tests/cli/test_cli_usage_and_errors.py","tests/http/test_endpoint_catalog.py","tests/bodygraph/test_resolver_vendor.py","tests/bodygraph/test_ingest.py","tests/cli/test_cli_file_inputs.py","tests/config/test_manifest_schema.py","tests/scripts/test_cut_release_manifest.py","tests/config/test_config_artifacts.py","-k","s19"]],"command_provenance":"QA Plan v1.2 check 12; QA-90 task T12 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad), NZ-04 (section-scoped counting commands)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-12-security-review/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-25T00:01:57Z"}
+=== CONTEXT ===
+check_id: qa-12-security-review
+task: QA-90 task T12, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 12 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-L; E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-25T00:01:48Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-25T00:01:48Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-25T00:01:48Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-25T00:01:48Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-25T00:01:48Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-25T00:01:48Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-25T00:01:49Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+end_utc: 2026-10-25T00:01:57Z
+=== COMMANDS ===
+--- command: ["awk", "/^## 6\\. /{s=1;next} /^## /{s=0} s && /^\\| [0-9]+ \\| /{n++} END{print \"per-file rows\", n}", "docs/ephemeral/HDE-CRD-0002-S19-code-security-review-v1.0.md"]
+started_utc: 2026-10-25T00:01:49Z; exit_code: 0
+stdout (17 bytes):
+per-file rows 49
+stderr (0 bytes):
+(empty)
+--- command: ["awk", "-F [|] ", "/^## 4\\. /{s=1;next} /^## /{s=0} s && /^\\| S19-F[0-9][0-9] \\|/{n++; if ($9 ~ /^ *$/) bad++} s && /^\\| S19-R[0-9][0-9][ |(]/{r++; if ($7 ~ /^ *$/) rbad++} END{print \"fixed rows\", n, \"without disposition\", bad+0; print \"routed rows\", r, \"without disposition\", rbad+0}", "docs/ephemeral/HDE-CRD-0002-S19-code-security-review-v1.0.md"]
+started_utc: 2026-10-25T00:01:49Z; exit_code: 0
+stdout (71 bytes):
+fixed rows 9 without disposition 0
+routed rows 7 without disposition 0
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/http/test_reader_post_v1.py", "tests/http/test_reader_post_v2.py", "tests/transport/test_writers_errors_headers.py", "tests/http/test_compat_endpoint_contract.py", "tests/http/test_dev_conjunction_http.py", "tests/cli/test_cli_usage_and_errors.py", "tests/http/test_endpoint_catalog.py", "tests/bodygraph/test_resolver_vendor.py", "tests/bodygraph/test_ingest.py", "tests/cli/test_cli_file_inputs.py", "tests/config/test_manifest_schema.py", "tests/scripts/test_cut_release_manifest.py", "tests/config/test_config_artifacts.py", "-k", "s19"]
+started_utc: 2026-10-25T00:01:49Z; exit_code: 0
+stdout (356 bytes):
+........................................................................ [ 26%]
+........................................................................ [ 53%]
+........................................................................ [ 80%]
+....................................................                     [100%]
+268 passed, 648 deselected in 7.19s
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (collection §4.5) | observed: PASS | PASS
+- step 1: per-file rows 49 (§6) | observed: per-file rows 49 (exit 0) | PASS
+- step 1: fixed rows 9 without disposition 0 (§4) | observed: fixed rows 9 without disposition 0 (exit 0) | PASS
+- step 1: routed rows 7 without disposition 0 (§4) | observed: routed rows 7 without disposition 0 | PASS
+- step 2: '268 passed' | observed: 268 passed, 648 deselected in 7.19s (exit 0) | PASS
+=== NOTES ===
+- normalization NZ-04: step 1's counts use the collection's section-scoped awk commands (§6 per-file rows; §4 S19-F and S19-R rows with their disposition columns), as recorded; a naive grep -c '^| S19-F' over the whole file miscounts because §10 repeats the IDs (review v1.0 N-4).
+- deployed classes and nonclaims (Plan check 12): S19-F01 and S19-F03 are proven in the deployed target by checks 19 and 18, S19-F05 and S19-F06 at check 20; none of those checks is selected in this run. S19-F02, F04, F07, F08 (loader) and F09 are covered locally by step 2. S19-R01 to R07 stay undecided with the Product Owner (FND-029).
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.

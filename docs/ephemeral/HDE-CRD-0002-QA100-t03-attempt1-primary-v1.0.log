@@ -1,0 +1,119 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-03-attestation-debian","check_name":"Attestation builds under a distribution-patched setuptools","claimed_tokens":[],"command":[["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python","-c","import setuptools, importlib.util; print(setuptools.__version__, setuptools.__file__, importlib.util.find_spec('_distutils_system_mod'))"]],"command_provenance":"QA Plan v1.2 check 3; QA-90 task T03 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad), NZ-02 (E-D interpreter chosen by its defining properties; every candidate tried is recorded)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide"],"schema_version":"pf27.step_log_header.v2","status":"TOOLING_BLOCKED","status_reason":"No interpreter meets step 1 in this venue: /usr/bin/python3 (3.14.4) makes _distutils_system_mod importable; /usr/bin/python3.13, 3.12 and 3.11 are absent","timestamp_utc":"2026-10-24T23:45:27Z"}
+=== CONTEXT ===
+check_id: qa-03-attestation-debian
+task: QA-90 task T03, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 3 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-D (E-L plus a second venv; NZ-02); E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-24T23:45:15Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:45:15Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:45:15Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:45:15Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-24T23:45:15Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-24T23:45:16Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-24T23:45:16Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+E-D setup (collection T03 'E-D setup', NZ-02 candidate order /usr/bin/python3, /usr/bin/python3.13, /usr/bin/python3.12, /usr/bin/python3.11; not a check step; recorded):
+--- command: ["/usr/bin/python3", "--version"]
+started_utc: 2026-10-24T23:45:16Z; exit_code: 0
+stdout (14 bytes):
+Python 3.14.4
+stderr (0 bytes):
+(empty)
+candidate /usr/bin/python3: Python 3.14.4 -> /usr/bin/python3.14
+--- command: ["/usr/bin/python3", "-m", "venv", "--system-site-packages", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv"]
+started_utc: 2026-10-24T23:45:16Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- setup command: ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-m", "pip", "install", "-r", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/requirements.txt", "-r", "/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/requirements-dev.txt"]
+exit_code: 0; last 6 lines of pip output (full log kept outside the repository at /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/pip-python3.log, not evidence):
+  |   Attempting uninstall: jsonschema
+  |     Found existing installation: jsonschema 4.19.2
+  |     Not uninstalling jsonschema at /usr/lib/python3/dist-packages, outside environment /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv
+  |     Can't uninstall 'jsonschema'. No files were found to uninstall.
+  | 
+  | Successfully installed Flask-2.3.3 Werkzeug-3.1.9 coverage-7.17.0 gunicorn-21.2.0 iniconfig-2.3.1 itsdangerous-2.2.0 jsonschema-4.23.0 pluggy-1.7.0 psycopg-3.2.13 psycopg-binary-3.2.13 pytest-8.4.2 pytest-cov-4.1.0 pytest-mock-3.17.0
+candidate /usr/bin/python3 step 1: exit 0; setuptools under /usr/lib/python3/dist-packages: yes; _distutils_system_mod spec None: no
+--- command: ["test", "-x", "/usr/bin/python3.13"]
+started_utc: 2026-10-24T23:45:26Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+candidate /usr/bin/python3.13: not present in this venue (test -x exit 1); not tried further
+--- command: ["test", "-x", "/usr/bin/python3.12"]
+started_utc: 2026-10-24T23:45:26Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+candidate /usr/bin/python3.12: not present in this venue (test -x exit 1); not tried further
+--- command: ["test", "-x", "/usr/bin/python3.11"]
+started_utc: 2026-10-24T23:45:26Z; exit_code: 1
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+candidate /usr/bin/python3.11: not present in this venue (test -x exit 1); not tried further
+end_utc: 2026-10-24T23:45:27Z
+=== COMMANDS ===
+--- command: ["/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-qa03/venv/bin/python", "-c", "import setuptools, importlib.util; print(setuptools.__version__, setuptools.__file__, importlib.util.find_spec('_distutils_system_mod'))"]
+started_utc: 2026-10-24T23:45:26Z; exit_code: 0
+stdout (236 bytes):
+78.1.1 /usr/lib/python3/dist-packages/setuptools/__init__.py ModuleSpec(name='_distutils_system_mod', loader=<_frozen_importlib_external.SourceFileLoader object at 0x7b738386ef30>, origin='/usr/lib/python3.14/_distutils_system_mod.py')
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness for the E-L clone and venv (collection §4.5) | observed: PASS (context above) | PASS
+- step 1, candidate /usr/bin/python3 (Python 3.14.4): setuptools path under /usr/lib/python3/dist-packages | observed: 78.1.1 /usr/lib/python3/dist-packages/setuptools/__init__.py | PASS
+- step 1, candidate /usr/bin/python3: importlib.util.find_spec('_distutils_system_mod') is None | observed: ModuleSpec(name='_distutils_system_mod', loader=<_frozen_importlib_external.SourceFileLoader object at 0x7b738386ef30>, origin='/usr/lib/python3.14/_distutils_system_mod.py') | FAIL
+- step 1, candidates /usr/bin/python3.13, /usr/bin/python3.12, /usr/bin/python3.11 | observed: not present in this venue (test -x exit 1 each) | FAIL
+- E-D available (some NZ-02 candidate meets step 1) | observed: none | FAIL
+- steps 2 to 6 (build, verify, attestation fields, E-L layout_compat/wheel_build_env tests, build-clone status) | observed: NOT RUN: the Debian condition is unavailable, so the behaviour-decisive point cannot be reached | NOT RUN
+=== NOTES ===
+- status: TOOLING_BLOCKED, by check 3's own Outcomes line: 'no interpreter meets step 1 in the venue -> TOOLING_BLOCKED (the Debian condition is unavailable; no claim)'. No claim is made about S06 either way.
+- normalization NZ-02: E-D venvs tried in the order /usr/bin/python3, /usr/bin/python3.13, /usr/bin/python3.12, /usr/bin/python3.11, each recorded in CONTEXT. /usr/bin/python3 resolves to /usr/bin/python3.14 (3.14.4); its --system-site-packages venv imports setuptools 78.1.1 from /usr/lib/python3/dist-packages, but _distutils_system_mod is importable from /usr/lib/python3.14/_distutils_system_mod.py, so it does not meet E-D. The other three interpreters do not exist here. No container runtime (docker, podman) is installed on this venue.
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-D venv at hde-crd-0002-qa03/venv). NZ-07 was not reached (no builder command ran).
+- blocked-step fields (HDE-Governance §9.8.2 'Blocked-step minimum fields'; review v1.0 N-8): blocking precondition: the E-D environment class of Plan §3.2 (a --system-site-packages venv of a system interpreter whose setuptools imports from /usr/lib/python3/dist-packages and in which _distutils_system_mod is not importable: the WU-PR-02 E-DEB condition). Why it cannot currently be satisfied: this venue is Ubuntu 26.04.1 LTS; its only system interpreter, Python 3.14.4, ships _distutils_system_mod, and no /usr/bin/python3.13, 3.12 or 3.11 exists. Closeout-blocking: yes for a QA-120 PASS verdict, because check 3 is S06's only check (Plan §10) and a TOOLING_BLOCKED check leaves its criterion unproven (Plan §11); any closure override is a close-stage decision, not QA's. Required follow-up: input-availability (venue): an attempt 2, only on Kronos's QA-110 decision (Plan §9), in a venue where an NZ-02 candidate meets step 1, for example an Ubuntu 24.04 container whose /usr/bin/python3.13 venv met E-D at QA-90 authoring (collection §2.4 row 3). No plan or implementation change is indicated.
+- E-D setup network use: pip installed CI's requirements into the E-D venv from the package index (setup, not a check step; collection §4.1). No attestation output directory or build clone was created.
+- nonclaims: no release cut, activation or deployment; no claim about the attestation builder's behaviour under a distribution-patched setuptools.
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.

@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-02-ci-coverage/primary.log
+size_bytes: 7990
+sha256: bc52ae603d33932cc634751f267d7e21b3f1c8438a0deebe294cfb70c1359eac
+mtime_utc: 2026-10-24T23:44:41Z
+produced_at_utc: 2026-09-22T14:25:29Z

@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log
+size_bytes: 39632
+sha256: 7dfc152a9f8e38450a1644437f692c6687998c30179b315834e0ffa854cf3094
+mtime_utc: 2026-10-24T23:46:04Z
+produced_at_utc: 2026-09-22T14:25:29Z

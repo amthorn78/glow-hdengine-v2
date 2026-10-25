@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-12-security-review/primary.log
+size_bytes: 8802
+sha256: d7c986943c3f52a49a75d06a49d94de9c9dad984443a8958f20ccbb1dc610c08
+mtime_utc: 2026-10-25T00:01:59Z
+produced_at_utc: 2026-09-22T14:25:29Z

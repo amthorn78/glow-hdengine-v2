@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-07-dev-reader-gate/primary.log
+size_bytes: 6097
+sha256: 3da89797b92d68046be61c46a53c280d7e530dff5aea75ee0b3531c1709ae262
+mtime_utc: 2026-10-24T23:57:48Z
+produced_at_utc: 2026-09-22T14:25:29Z
