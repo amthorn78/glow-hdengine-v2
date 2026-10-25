@@ -1,77 +1,105 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-13-prepush-check","check_name":"One read-only command with all five reports","claimed_tokens":[],"command":[["python","tools/ci/prepush_check.py","--full","--path","engine/cli/main.py","--path","docs/ADAPTER_009.md","lanes","membership","build-notes","sweep","replay"],["python","tools/ci/prepush_check.py","--path","docs/ADAPTER_009.md","lanes"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/tools/test_prepush_check.py"],["git","status","--porcelain"],["python","tools/ci/prepush_check.py","--full","--path","engine/cli/main.py","--path","docs/ADAPTER_009.md","lanes","membership","build-notes","sweep","replay"],["python","tools/ci/prepush_check.py","--path","docs/ADAPTER_009.md","lanes"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/tools/test_prepush_check.py"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.2 check 13; QA-90 task T13 attempt 1 with a Product Owner-directed Moon Loop (Glow QA Guide \u00a73.4.8): TMPDIR unset so pytest temp paths share /tmp with the OPS03 run root, two leftover test directories removed; rerun decisive; normalizations: NZ-01 (scratch paths under the session scratchpad)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log"],"exit_code":4,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"FAIL_BEHAVIOR","status_reason":"Step 1 exits 4 (PREPUSH_CHECK_READ_ONLY_VIOLATION) although all five reports are status=PASS after the Moon Loop venue correction; the tool's read-only guard sees git metadata changed (Plan check 13: exit 4 -> FAIL_BEHAVIOR)","timestamp_utc":"2026-10-25T00:56:35Z"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-13-prepush-check","check_name":"One read-only command with all five reports","claimed_tokens":[],"command":[["python","tools/ci/prepush_check.py","--full","--path","engine/cli/main.py","--path","docs/ADAPTER_009.md","lanes","membership","build-notes","sweep","replay"],["python","tools/ci/prepush_check.py","--path","docs/ADAPTER_009.md","lanes"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/tools/test_prepush_check.py"],["git","status","--porcelain"]],"command_provenance":"QA Plan v1.3 check 13; QA-90 collection v1.1 task T13-RV1, remediation verification RV-1 of QA110-F01 (not attempt 2; Plan \u00a79); normalizations: NZ-01, NZ-06, NZ-08","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-25T17:43:16Z"}
 === CONTEXT ===
 check_id: qa-13-prepush-check
-task: QA-90 task T13, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 13 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
-tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
-environment_class: E-L (clean clone; ruby, bash, curl on PATH); E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
-interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
-rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
-presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
-presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
-actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
-venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
-start_utc: 2026-10-25T00:02:20Z
-readiness reads (collection §4.5; Plan §7 rule A):
---- command: ["git", "rev-parse", "HEAD"]
-started_utc: 2026-10-25T00:02:20Z; exit_code: 0
-stdout (41 bytes):
-2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
-stderr (0 bytes):
-(empty)
---- command: ["git", "rev-parse", "--is-shallow-repository"]
-started_utc: 2026-10-25T00:02:20Z; exit_code: 0
-stdout (6 bytes):
+task: QA-90 task T13-RV1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.1.md, TASK_READY); QA Plan v1.3 check 13 and §9 'Remediation verification' (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.3.md, blob 3aea6033e3c0, SHA-256 30f4a83cfa62276523c6bad5222f521cdf361eed8ebe59408387b24e8c2ec35a); approving review docs/ephemeral/HDE-CRD-0002-QA70-qa-plan-review-v1.4.md; QA Audit v1.0
+attempt label: RV-1 (remediation verification 1 of check 13; not attempt 2, not a reset; set by Kronos, collection §4.2)
+tested_commit: da5735eb2c88d232d61babf27497548e24387050 (origin/main at execution, amthorn78/glow-hdengine-v2#740 merged); tested_tree: b5356a4ffec03a3dfb41036b38d2cc9411322137; state (b) of Plan §2, proven by step 0a below
+environment_class: E-L (full-history clone /tmp/hde-crd-0002-rv1-el, detached at origin/main; ruby, bash, curl, git on PATH); venv /tmp/hde-crd-0002-rv1-venv (CPython 3.12 with CI's full install); XDG_STATE_HOME /tmp/hde-crd-0002-xdg-state (empty)
+interpreter: /tmp/hde-crd-0002-rv1-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15; pytest 8.4.2
+git: git version 2.53.0 (the version under which QA110-F01 was observed)
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET (no value recorded)
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session 49a89e6e-0814-43b6-93fe-d9f369720e51, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs; /tmp is tmpfs
+start_utc: 2026-10-25T17:10:50Z (readiness reads, then step 1); end_utc: 2026-10-25T17:42:08Z (step 4 end)
+TMPDIR posture (collection §4.3 step 6, NZ-08), recorded before the exports:
+TMPDIR(prior)=/home/nathan/.tmp
+stat /tmp: tmpfs
+stat /home/nathan/.tmp: ext2/ext3
+check shell after the §4.3 step 6 exports (rails, then presence SET/UNSET):
+LC_ALL=C
+LANG=C
+TZ=UTC
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+PYTHONDONTWRITEBYTECODE=1
+XDG_STATE_HOME=/tmp/hde-crd-0002-xdg-state
+HD_API_KEY UNSET
+GEO_API_KEY UNSET
+HD_API_BASE_URL UNSET
+HDAPI_BASE_URL UNSET
+DATABASE_URL UNSET
+GH_TOKEN UNSET
+GITHUB_TOKEN UNSET
+HDE_VENDOR_OVERRIDE_AUDIT_PATH UNSET
+ENGINE_ENV UNSET
+TMPDIR UNSET
+XDG_STATE_HOME entries: 0
+which python: /tmp/hde-crd-0002-rv1-venv/bin/python
+actor: nathan@vps3662684 (Claude Code session, Opus 5.5, executor chosen by the Product Owner)
+uname: Linux 7.0.0-38-generic
+readiness reads, collection §4.5 steps 0a then 0b (Plan §7 rule A, E-L bullet and state-(b) sub-bullet); stdout and stderr combined per read:
+$ git rev-parse HEAD
+da5735eb2c88d232d61babf27497548e24387050
+exit=0
+$ git rev-parse HEAD^{tree}
+b5356a4ffec03a3dfb41036b38d2cc9411322137
+exit=0
+$ git rev-parse --is-shallow-repository
 false
-stderr (0 bytes):
-(empty)
---- command: ["git", "status", "--porcelain"]
-started_utc: 2026-10-25T00:02:20Z; exit_code: 0
-stdout (0 bytes):
-(empty)
-stderr (0 bytes):
-(empty)
---- command: ["python", "--version"]
-started_utc: 2026-10-25T00:02:21Z; exit_code: 0
-stdout (15 bytes):
+exit=0
+$ git cat-file -e 7136040^{commit}
+exit=0
+$ git diff --stat 22a3bc040a60c75b089a629172a5d829f20d8e98 HEAD -- . :!docs/ephemeral :!docs/pfcanon
+exit=0
+$ sha256sum catalog/manifest.json
+77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e  catalog/manifest.json
+exit=0
+$ hdctl --version
+hdctl 0.0.0 (hdengine@prod;77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e)
+exit=0
+$ git rev-parse HEAD
+da5735eb2c88d232d61babf27497548e24387050
+exit=0
+$ git status --porcelain
+exit=0
+$ python --version
 Python 3.12.15
-stderr (0 bytes):
-(empty)
---- command: ["python", "-m", "pytest", "--version"]
-started_utc: 2026-10-25T00:02:21Z; exit_code: 0
-stdout (13 bytes):
+exit=0
+$ python -m pytest --version
 pytest 8.4.2
-stderr (0 bytes):
-(empty)
---- command: ["python", "-c", "import engine; print(engine.__file__)"]
-started_utc: 2026-10-25T00:02:21Z; exit_code: 0
-stdout (143 bytes):
-/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
-stderr (0 bytes):
-(empty)
-readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
---- command: ["ruby", "--version"]
-started_utc: 2026-10-25T00:02:22Z; exit_code: 0
-stdout (63 bytes):
+exit=0
+$ python -c import engine; print(engine.__file__)
+/tmp/hde-crd-0002-rv1-el/engine/__init__.py
+exit=0
+$ ruby --version
 ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]
-stderr (0 bytes):
-(empty)
---- command: ["curl", "--version"]
-started_utc: 2026-10-25T00:02:22Z; exit_code: 0
-stdout (579 bytes):
+exit=0
+$ bash --version
+GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2025 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+exit=0
+$ curl --version
 curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
 Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
 Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
 Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
-stderr (0 bytes):
-(empty)
-further tool reads: ruby --version exit 0; curl --version exit 0
-end_utc: 2026-10-25T00:56:35Z
+exit=0
+$ git --version
+git version 2.53.0
+exit=0
+readiness result: PASS (steps 0a and 0b as recorded; no TOOLING_BLOCKED condition)
 === COMMANDS ===
---- command: ["python", "tools/ci/prepush_check.py", "--full", "--path", "engine/cli/main.py", "--path", "docs/ADAPTER_009.md", "lanes", "membership", "build-notes", "sweep", "replay"]
-started_utc: 2026-10-25T00:02:22Z; exit_code: 4
-stdout (8620 bytes):
-PREPUSH_CHECK: repo=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 python=3.12.15 reports=lanes,membership,build-notes,sweep,replay
-lanes: mode=paths head=HEAD->2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 paths=2 (classified in a throwaway copy)
+--- step 1 command: ["python", "tools/ci/prepush_check.py", "--full", "--path", "engine/cli/main.py", "--path", "docs/ADAPTER_009.md", "lanes", "membership", "build-notes", "sweep", "replay"]
+started_utc: 2026-10-25T17:10:50Z; ended_utc: 2026-10-25T17:40:58Z; exit_code: 0
+stdout (6870 bytes):
+PREPUSH_CHECK: repo=/tmp/hde-crd-0002-rv1-el head=da5735eb2c88d232d61babf27497548e24387050 python=3.12.15 reports=lanes,membership,build-notes,sweep,replay
+lanes: mode=paths head=HEAD->da5735eb2c88d232d61babf27497548e24387050 paths=2 (classified in a throwaway copy)
 lanes: note: changed-test targets are computed against the head's files; a planned file that does not exist yet selects no target of its own
 lanes: classification reason=selected_lanes;paths=2;lanes=product,compat,release
 lanes: output product=true
@@ -91,23 +119,23 @@ lanes: target tests/cli/test_showcompat_sources.py
 lanes: target tests/qa/test_cli_admin_dumps.py
 lanes: target tests/qa/test_cli_admin_parity.py
 lanes: status=PASS duration=1.6s
-membership: admitted release version=1.3.0 roster=45 release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 (read in a throwaway copy)
+membership: admitted release version=1.3.0 roster=45 release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e head=da5735eb2c88d232d61babf27497548e24387050 (read in a throwaway copy)
 membership: member engine/cli/main.py
 membership: not-member docs/ADAPTER_009.md
 membership: note: changing a release member requires a same-version release manifest refresh with convergence (information only; this tool runs no owner tool)
 membership: status=PASS duration=1.6s
-build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.7.8.md bytes=519440 sha256=42459e54e4a14eb89a1cd3be80eae8458a5b1c2c50e1fca1b1ce9882b05e6f9b
+build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.8.md bytes=568847 sha256=439775924392a206ceffb70952b0af1975c24d4214fc73d4ed98fcf94220e13c
 build-notes: status=PASS duration=0.0s
-sweep: head=HEAD->2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 copy=/home/nathan/.tmp/prepush-check-9uvhgk0m/sweep-copy
+sweep: head=HEAD->da5735eb2c88d232d61babf27497548e24387050 copy=/tmp/prepush-check-96vu41yt/sweep-copy
 sweep: tracked_test_files=215 pytest_command_tokens=39 workflow_tests_tokens=39 full_validation_targets=166 uncovered=0
-sweep: status=PASS duration=1.9s
-replay: event=pull_request base=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 (full validation)
-replay: copy=/home/nathan/.tmp/prepush-check-9uvhgk0m/replay-copy interpreter=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python python=3.12.15 workflow_python=3.12
+sweep: status=PASS duration=1.6s
+replay: event=pull_request base=da5735eb2c88d232d61babf27497548e24387050 head=da5735eb2c88d232d61babf27497548e24387050 (full validation)
+replay: copy=/tmp/prepush-check-96vu41yt/replay-copy interpreter=/tmp/hde-crd-0002-rv1-venv/bin/python python=3.12.15 workflow_python=3.12
 replay: workflow .github/workflows/ci.yml sha256=d02021f3bbeb22ec569fe6282c046d68468af003f0f0370313c5e76f58b6ab9b (the modelled one)
 replay: job env LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
-replay: resolves hdctl (/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/hdctl) -> engine.cli.main: /home/nathan/.tmp/prepush-check-9uvhgk0m/replay-copy/engine/cli/main.py
+replay: resolves hdctl (/tmp/hde-crd-0002-rv1-venv/bin/hdctl) -> engine.cli.main: /tmp/prepush-check-96vu41yt/replay-copy/engine/cli/main.py
 replay: step 01 SUCCESS [excluded, substituted] 0.0s Check out exact candidate head
-replay:   uses: actions/checkout; replaced by a throwaway clone of the head outside the repository; copy at 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+replay:   uses: actions/checkout; replaced by a throwaway clone of the head outside the repository; copy at da5735eb2c88d232d61babf27497548e24387050
 replay: step 02 SUCCESS [executed] 0.1s Classify affected CI lanes
 replay:   CI_CHANGE_CLASSIFICATION:event=pull_request;reason=identical_refs_full_validation;paths=0;lanes=product,compat,db,rails,evidence,qa,release
 replay: step 03 SUCCESS [executed] 0.1s Check AGENTS.md cites no project documents
@@ -118,274 +146,53 @@ replay: step 05 SUCCESS [excluded, substituted] 0.0s Install applicable validati
 replay:   needs the package index; the caller's environment must already hold every distribution the step installs: every distribution the step names is installed (versions, dependencies and the editable project's metadata are the caller's to match)
 replay: step 06 SUCCESS [executed] 0.5s Verify pytest readiness
 replay:   pytest 8.4.2
-replay: step 07 SUCCESS [executed] 0.2s Verify closed deterministic environment
+replay: step 07 SUCCESS [executed] 0.1s Verify closed deterministic environment
 replay:   [env-pins] OK: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
-replay: step 08 FAILURE [executed] 794.4s Run affected behavioral tests in isolation
-replay:   BEHAVIOR exit 1
-replay:   tests/ops/test_hde_epic038_ops03.py:2793: AssertionError
-replay:   _____________ test_validator_rejects_authorized_candidate_symlink ______________
-replay:   authorization = (PosixPath('/home/nathan/.tmp/prepush-check-9uvhgk0m/tmp/pytest-of-nathan/pytest-0/test_validator_rejects_authori0/aut...s03-test-a97e1a31042e404485933af4'), PosixPath('/tmp/hde-epic038-ops03/ops03-test-a97e1a31042e404485933af4/candidate'))
-replay:   tmp_path = PosixPath('/home/nathan/.tmp/prepush-check-9uvhgk0m/tmp/pytest-of-nathan/pytest-0/test_validator_rejects_authori0')
-replay:       def test_validator_rejects_authorized_candidate_symlink(authorization, tmp_path):
-replay:           auth_path, _auth, _base, candidate = authorization
-replay:           assert _capture(authorization) == 0
-replay:           outside = tmp_path / "external-candidate"
-replay:   >       candidate.rename(outside)
-replay:   tests/ops/test_hde_epic038_ops03.py:3416: 
-replay:   _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-replay:   self = PosixPath('/tmp/hde-epic038-ops03/ops03-test-a97e1a31042e404485933af4/candidate')
-replay:   target = PosixPath('/home/nathan/.tmp/prepush-check-9uvhgk0m/tmp/pytest-of-nathan/pytest-0/test_validator_rejects_authori0/external-candidate')
-replay:       def rename(self, target):
-replay:           """
-replay:           Rename this path to the target path.
-replay:           The target path may be absolute or relative. Relative paths are
-replay:           interpreted relative to the current working directory, *not* the
-replay:           directory of the Path object.
-replay:           Returns the new Path instance pointing to the target path.
-replay:           """
-replay:   >       os.rename(self, target)
-replay:   E       OSError: [Errno 18] Invalid cross-device link: '/tmp/hde-epic038-ops03/ops03-test-a97e1a31042e404485933af4/candidate' -> '/home/nathan/.tmp/prepush-check-9uvhgk0m/tmp/pytest-of-nathan/pytest-0/test_validator_rejects_authori0/external-candidate'
-replay:   ../../../../.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/pathlib.py:1363: OSError
-replay:   =========================== short test summary info ============================
-replay:   FAILED tests/ops/test_hde_epic038_ops03.py::test_candidate_replacement_failure_is_persisted_before_cleanup - AssertionError: assert False
-replay:    +  where False = is_dir()
-replay:    +    where is_dir = PosixPath('/tmp/hde-epic038-ops03/ops03-test-23b86802e7ca416d9e198302/candidate').is_dir
-replay:   FAILED tests/ops/test_hde_epic038_ops03.py::test_validator_rejects_authorized_candidate_symlink - OSError: [Errno 18] Invalid cross-device link: '/tmp/hde-epic038-ops03/ops03-test-a97e1a31042e404485933af4/candidate' -> '/home/nathan/.tmp/prepush-check-9uvhgk0m/tmp/pytest-of-nathan/pytest-0/test_validator_rejects_authori0/external-candidate'
-replay:   2 failed, 4521 passed in 790.38s (0:13:10)
-replay: step 09 SKIPPED [executed] 0.0s Run product mechanics and ordering lane
-replay: step 10 SKIPPED [executed] 0.0s Run CLI and compatibility lane
-replay: step 11 SKIPPED [executed] 0.0s Run database and runtime-contract lane
-replay: step 12 SKIPPED [executed] 0.0s Run rails policy and secret-safety lane
-replay: step 13 SKIPPED [executed] 0.0s Run governed evidence integrity lane
-replay: step 14 SKIPPED [executed] 0.0s Run approved generic QA subsystem lane in isolation
-replay: step 15 SKIPPED [executed] 0.0s Build and verify exact-source release attestation
-replay: step 16 FAILURE [executed] 1.1s Verify truthful applicability and clean candidate tree
-replay:   BEHAVIOR exit 1
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:changed-tests:failure
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:product:skipped
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:compatibility:skipped
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:database:skipped
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:rails:skipped
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:evidence:skipped
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:qa:skipped
-replay:   APPLICABLE_CI_LANE_NOT_SUCCESSFUL:release:skipped
-replay: replay step time 796.5s; copy after replay: clean
-replay: status=FAIL duration=798.6s
-stderr (115 bytes):
-PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, directories, HEAD or git metadata changed
---- command: ["python", "tools/ci/prepush_check.py", "--path", "docs/ADAPTER_009.md", "lanes"]
-started_utc: 2026-10-25T00:15:48Z; exit_code: 0
-stdout (1219 bytes):
-PREPUSH_CHECK: repo=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 python=3.12.15 reports=lanes
-lanes: mode=paths head=HEAD->2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 paths=1 (classified in a throwaway copy)
-lanes: note: changed-test targets are computed against the head's files; a planned file that does not exist yet selects no target of its own
-lanes: classification reason=documentation_only;paths=1;lanes=none
-lanes: output product=false
-lanes: output compat=false
-lanes: output db=false
-lanes: output rails=false
-lanes: output evidence=false
-lanes: output qa=false
-lanes: output release=false
-lanes: output needs_python=false
-lanes: output changed_tests=false
-lanes: output reason=documentation_only
-lanes: output path_count=1
-lanes: changed_test_targets=0
-lanes: note: reason=documentation_only means the workflow's path filter starts no hosted run
-lanes: status=PASS duration=1.5s
-PREPUSH_CHECK_RESULT: PASS lanes=PASS; repository unchanged (tree, ignored files, directories, HEAD and git metadata)
-PREPUSH_CHECK_NONCLAIM: this result is not CI's result, not QA and not governed evidence
-stderr (0 bytes):
-(empty)
---- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/tools/test_prepush_check.py"]
-started_utc: 2026-10-25T00:15:51Z; exit_code: 0
-stdout (191 bytes):
-........................................................................ [ 52%]
-.................................................................        [100%]
-137 passed in 65.83s (0:01:05)
-stderr (0 bytes):
-(empty)
---- command: ["git", "status", "--porcelain"]
-started_utc: 2026-10-25T00:16:57Z; exit_code: 0
-stdout (0 bytes):
-(empty)
-stderr (0 bytes):
-(empty)
-=== Moon Loop rerun (Product Owner-directed): environment correction, then steps 1 to 4 again (attempt-1 records above; see NOTES) ===
---- setup (not a check command): TMPDIR in the check shell before correction: /home/nathan/.tmp
---- command: ["ls", "-la", "/tmp/hde-epic038-ops03"]
-started_utc: 2026-10-25T00:24:36Z; exit_code: 0
-stdout (265 bytes):
-total 0
-drwx------  4 nathan nathan  80 Oct 25 00:12 .
-drwxrwxrwt 16 root   root   320 Oct 25 00:10 ..
-drwx------  3 nathan nathan  60 Oct 25 00:12 ops03-test-261f683ea8cd46dba0fa6139
-drwx------  3 nathan nathan  60 Oct 25 00:12 ops03-test-a7783fabc7244eb7ba132c1d
-stderr (0 bytes):
-(empty)
---- command: ["rm", "-rf", "/tmp/hde-epic038-ops03/ops03-test-261f683ea8cd46dba0fa6139", "/tmp/hde-epic038-ops03/ops03-test-a7783fabc7244eb7ba132c1d"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (0 bytes):
-(empty)
-stderr (0 bytes):
-(empty)
---- setup (not a check command): unset TMPDIR; TMPDIR now UNSET; python tempfile.gettempdir() -> /tmp
---- command: ["stat", "-f", "-c", "%T %n", "/tmp"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (11 bytes):
-tmpfs /tmp
-stderr (0 bytes):
-(empty)
---- Moon Loop rerun readiness (collection §4.5):
---- command: ["git", "rev-parse", "HEAD"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (41 bytes):
-2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
-stderr (0 bytes):
-(empty)
---- command: ["git", "rev-parse", "--is-shallow-repository"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (6 bytes):
-false
-stderr (0 bytes):
-(empty)
---- command: ["git", "status", "--porcelain"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (0 bytes):
-(empty)
-stderr (0 bytes):
-(empty)
---- command: ["python", "--version"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (15 bytes):
-Python 3.12.15
-stderr (0 bytes):
-(empty)
---- command: ["python", "-m", "pytest", "--version"]
-started_utc: 2026-10-25T00:24:37Z; exit_code: 0
-stdout (13 bytes):
-pytest 8.4.2
-stderr (0 bytes):
-(empty)
---- command: ["python", "-c", "import engine; print(engine.__file__)"]
-started_utc: 2026-10-25T00:24:38Z; exit_code: 0
-stdout (143 bytes):
-/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
-stderr (0 bytes):
-(empty)
---- command: ["ruby", "--version"]
-started_utc: 2026-10-25T00:24:38Z; exit_code: 0
-stdout (63 bytes):
-ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]
-stderr (0 bytes):
-(empty)
---- command: ["curl", "--version"]
-started_utc: 2026-10-25T00:24:38Z; exit_code: 0
-stdout (579 bytes):
-curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
-Release-Date: 2026-01-07, security patched: 8.18.0-1ubuntu2.8
-Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp ws wss
-Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
-stderr (0 bytes):
-(empty)
---- Moon Loop rerun readiness result: PASS
---- command: ["python", "tools/ci/prepush_check.py", "--full", "--path", "engine/cli/main.py", "--path", "docs/ADAPTER_009.md", "lanes", "membership", "build-notes", "sweep", "replay"]
-started_utc: 2026-10-25T00:24:38Z; exit_code: 4
-stdout (6912 bytes):
-PREPUSH_CHECK: repo=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 python=3.12.15 reports=lanes,membership,build-notes,sweep,replay
-lanes: mode=paths head=HEAD->2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 paths=2 (classified in a throwaway copy)
-lanes: note: changed-test targets are computed against the head's files; a planned file that does not exist yet selects no target of its own
-lanes: classification reason=selected_lanes;paths=2;lanes=product,compat,release
-lanes: output product=true
-lanes: output compat=true
-lanes: output db=false
-lanes: output rails=false
-lanes: output evidence=false
-lanes: output qa=false
-lanes: output release=true
-lanes: output needs_python=true
-lanes: output changed_tests=true
-lanes: output reason=selected_lanes
-lanes: output path_count=2
-lanes: changed_test_targets=4
-lanes: target tests/cli/test_cli_file_inputs.py
-lanes: target tests/cli/test_showcompat_sources.py
-lanes: target tests/qa/test_cli_admin_dumps.py
-lanes: target tests/qa/test_cli_admin_parity.py
-lanes: status=PASS duration=1.5s
-membership: admitted release version=1.3.0 roster=45 release_id=77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 (read in a throwaway copy)
-membership: member engine/cli/main.py
-membership: not-member docs/ADAPTER_009.md
-membership: note: changing a release member requires a same-version release manifest refresh with convergence (information only; this tool runs no owner tool)
-membership: status=PASS duration=1.5s
-build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.7.8.md bytes=519440 sha256=42459e54e4a14eb89a1cd3be80eae8458a5b1c2c50e1fca1b1ce9882b05e6f9b
-build-notes: status=PASS duration=0.0s
-sweep: head=HEAD->2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 copy=/tmp/prepush-check-6tzjc07j/sweep-copy
-sweep: tracked_test_files=215 pytest_command_tokens=39 workflow_tests_tokens=39 full_validation_targets=166 uncovered=0
-sweep: status=PASS duration=1.2s
-replay: event=pull_request base=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 (full validation)
-replay: copy=/tmp/prepush-check-6tzjc07j/replay-copy interpreter=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python python=3.12.15 workflow_python=3.12
-replay: workflow .github/workflows/ci.yml sha256=d02021f3bbeb22ec569fe6282c046d68468af003f0f0370313c5e76f58b6ab9b (the modelled one)
-replay: job env LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
-replay: resolves hdctl (/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/hdctl) -> engine.cli.main: /tmp/prepush-check-6tzjc07j/replay-copy/engine/cli/main.py
-replay: step 01 SUCCESS [excluded, substituted] 0.0s Check out exact candidate head
-replay:   uses: actions/checkout; replaced by a throwaway clone of the head outside the repository; copy at 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
-replay: step 02 SUCCESS [executed] 0.1s Classify affected CI lanes
-replay:   CI_CHANGE_CLASSIFICATION:event=pull_request;reason=identical_refs_full_validation;paths=0;lanes=product,compat,db,rails,evidence,qa,release
-replay: step 03 SUCCESS [executed] 0.2s Check AGENTS.md cites no project documents
-replay:   AGENTS_MD_CITATIONS_OK
-replay: step 04 SUCCESS [excluded, substituted] 0.0s Set up Python 3.12
-replay:   uses: actions/setup-python; replaced by the caller's interpreter, whose major.minor must equal python-version: 3.12
-replay: step 05 SUCCESS [excluded, substituted] 0.0s Install applicable validation dependencies
-replay:   needs the package index; the caller's environment must already hold every distribution the step installs: every distribution the step names is installed (versions, dependencies and the editable project's metadata are the caller's to match)
-replay: step 06 SUCCESS [executed] 0.5s Verify pytest readiness
-replay:   pytest 8.4.2
-replay: step 07 SUCCESS [executed] 0.2s Verify closed deterministic environment
-replay:   [env-pins] OK: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
-replay: step 08 SUCCESS [executed] 733.9s Run affected behavioral tests in isolation
+replay: step 08 SUCCESS [executed] 728.5s Run affected behavioral tests in isolation
 replay:   ........................................................................ [ 98%]
-replay:   ...........................................................              [100%]
-replay:   4521 passed, 2 skipped in 730.74s (0:12:10)
-replay: step 09 SUCCESS [executed] 18.0s Run product mechanics and ordering lane
+replay:   ...............................................................          [100%]
+replay:   4525 passed, 2 skipped in 725.40s (0:12:05)
+replay: step 09 SUCCESS [executed] 16.1s Run product mechanics and ordering lane
 replay:   ........................................................................ [ 93%]
 replay:   .....                                                                    [100%]
-replay:   77 passed in 16.87s
-replay: step 10 SUCCESS [executed] 15.2s Run CLI and compatibility lane
+replay:   77 passed in 14.95s
+replay: step 10 SUCCESS [executed] 13.9s Run CLI and compatibility lane
 replay:   ..xx.................................................................... [ 58%]
 replay:   sss.................................................                     [100%]
-replay:   119 passed, 3 skipped, 2 xfailed in 13.50s
-replay: step 11 SUCCESS [executed] 19.0s Run database and runtime-contract lane
+replay:   119 passed, 3 skipped, 2 xfailed in 12.49s
+replay: step 11 SUCCESS [executed] 17.7s Run database and runtime-contract lane
 replay:       "at": datetime.utcnow().isoformat(timespec="milliseconds") + "Z",
 replay:   -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-replay:   269 passed, 5 warnings in 2.33s
-replay: step 12 SUCCESS [executed] 57.8s Run rails policy and secret-safety lane
+replay:   269 passed, 5 warnings in 2.20s
+replay: step 12 SUCCESS [executed] 58.0s Run rails policy and secret-safety lane
 replay:   ........................................................................ [ 52%]
 replay:   ..................................................................       [100%]
-replay:   138 passed in 34.90s
-replay: step 13 SUCCESS [executed] 808.1s Run governed evidence integrity lane
+replay:   138 passed in 34.57s
+replay: step 13 SUCCESS [executed] 787.4s Run governed evidence integrity lane
 replay:   ........................................................................ [ 53%]
 replay:   ..............................................................           [100%]
-replay:   134 passed in 804.82s (0:13:24)
-replay: step 14 SUCCESS [executed] 27.4s Run approved generic QA subsystem lane in isolation
+replay:   134 passed in 784.28s (0:13:04)
+replay: step 14 SUCCESS [executed] 28.4s Run approved generic QA subsystem lane in isolation
 replay:   ........................................................................ [ 88%]
 replay:   ........................................................                 [100%]
-replay:   488 passed in 25.31s
-replay: step 15 SUCCESS [executed] 161.2s Build and verify exact-source release attestation
-replay:   79 passed in 3.36s
-replay:   /tmp/prepush-check-6tzjc07j/replay-runner-temp/hde-release-attestation/attestation.json
-replay:   /tmp/prepush-check-6tzjc07j/replay-runner-temp/hde-release-attestation/attestation.json
+replay:   488 passed in 25.42s
+replay: step 15 SUCCESS [executed] 150.0s Build and verify exact-source release attestation
+replay:   79 passed in 3.27s
+replay:   /tmp/prepush-check-96vu41yt/replay-runner-temp/hde-release-attestation/attestation.json
+replay:   /tmp/prepush-check-96vu41yt/replay-runner-temp/hde-release-attestation/attestation.json
 replay: step 16 SUCCESS [executed] 0.1s Verify truthful applicability and clean candidate tree
 replay:   CI_APPLICABILITY_AND_EXACT_HEAD_OK
-replay: replay step time 1841.7s; copy after replay: clean
-replay: status=PASS duration=1843.4s
-stderr (115 bytes):
-PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, directories, HEAD or git metadata changed
---- command: ["python", "tools/ci/prepush_check.py", "--path", "docs/ADAPTER_009.md", "lanes"]
-started_utc: 2026-10-25T00:55:28Z; exit_code: 0
-stdout (1219 bytes):
-PREPUSH_CHECK: repo=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el head=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 python=3.12.15 reports=lanes
-lanes: mode=paths head=HEAD->2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 paths=1 (classified in a throwaway copy)
+replay: replay step time 1800.9s; copy after replay: clean
+replay: status=PASS duration=1802.5s
+PREPUSH_CHECK_RESULT: PASS lanes=PASS membership=PASS build-notes=PASS sweep=PASS replay=PASS; repository unchanged (tree, ignored files, directories, HEAD and git metadata)
+PREPUSH_CHECK_NONCLAIM: this result is not CI's result, not QA and not governed evidence
+stderr (0 bytes):
+(empty)
+--- step 2 command: ["python", "tools/ci/prepush_check.py", "--path", "docs/ADAPTER_009.md", "lanes"]
+started_utc: 2026-10-25T17:40:58Z; ended_utc: 2026-10-25T17:41:00Z; exit_code: 0
+stdout (1120 bytes):
+PREPUSH_CHECK: repo=/tmp/hde-crd-0002-rv1-el head=da5735eb2c88d232d61babf27497548e24387050 python=3.12.15 reports=lanes
+lanes: mode=paths head=HEAD->da5735eb2c88d232d61babf27497548e24387050 paths=1 (classified in a throwaway copy)
 lanes: note: changed-test targets are computed against the head's files; a planned file that does not exist yet selects no target of its own
 lanes: classification reason=documentation_only;paths=1;lanes=none
 lanes: output product=false
@@ -401,46 +208,49 @@ lanes: output reason=documentation_only
 lanes: output path_count=1
 lanes: changed_test_targets=0
 lanes: note: reason=documentation_only means the workflow's path filter starts no hosted run
-lanes: status=PASS duration=1.5s
+lanes: status=PASS duration=1.2s
 PREPUSH_CHECK_RESULT: PASS lanes=PASS; repository unchanged (tree, ignored files, directories, HEAD and git metadata)
 PREPUSH_CHECK_NONCLAIM: this result is not CI's result, not QA and not governed evidence
 stderr (0 bytes):
 (empty)
---- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/tools/test_prepush_check.py"]
-started_utc: 2026-10-25T00:55:30Z; exit_code: 0
+--- step 3 command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/tools/test_prepush_check.py"]
+started_utc: 2026-10-25T17:41:00Z; ended_utc: 2026-10-25T17:42:08Z; exit_code: 0
 stdout (191 bytes):
-........................................................................ [ 52%]
-.................................................................        [100%]
-137 passed in 64.27s (0:01:04)
+........................................................................ [ 51%]
+.....................................................................    [100%]
+141 passed in 66.65s (0:01:06)
 stderr (0 bytes):
 (empty)
---- command: ["git", "status", "--porcelain"]
-started_utc: 2026-10-25T00:56:35Z; exit_code: 0
+--- step 4 command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-25T17:42:08Z; ended_utc: 2026-10-25T17:42:08Z; exit_code: 0
 stdout (0 bytes):
 (empty)
 stderr (0 bytes):
 (empty)
 === PREDICATES ===
-- Moon Loop rerun readiness (collection §4.5, plus ruby and curl) | observed: PASS | PASS
-- step 1 exits 0 | observed: exit 4 (EXIT_READ_ONLY_VIOLATION = 4 in tools/ci/prepush_check.py) | FAIL
-- step 1 prints lanes: classification reason=selected_lanes;paths=2;lanes=product,compat,release | observed: lanes: classification reason=selected_lanes;paths=2;lanes=product,compat,release | PASS
+- readiness, step 0a (state-(b) candidate reads) | observed: HEAD da5735eb2c88d232d61babf27497548e24387050, tree b5356a4ffec03a3dfb41036b38d2cc9411322137, shallow false, 7136040^{commit} exit 0, diff --stat against 22a3bc0 outside docs/ephemeral and docs/pfcanon empty, catalog/manifest.json sha256 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e, hdctl 0.0.0 (hdengine@prod;77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e) | PASS
+- readiness, step 0b (E-L reads) | observed: HEAD equals step 0a's; status empty; Python 3.12.15; pytest 8.4.2; engine /tmp/hde-crd-0002-rv1-el/engine/__init__.py; ruby, bash, curl, git print versions | PASS
+- step 1 exits 0 | observed: exit 0 | PASS
+- step 1 prints lanes: classification reason=selected_lanes;paths=2;lanes=product,compat,release | observed: present | PASS
 - step 1 prints membership: member engine/cli/main.py | observed: present | PASS
 - step 1 prints membership: not-member docs/ADAPTER_009.md | observed: present | PASS
-- step 1 prints build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.7.8.md with sha256=42459e54e4a14eb89a1cd3be80eae8458a5b1c2c50e1fca1b1ce9882b05e6f9b | observed: build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.7.8.md bytes=519440 sha256=42459e54e4a14eb89a1cd3be80eae8458a5b1c2c50e1fca1b1ce9882b05e6f9b | PASS
+- step 1 prints build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.7.8.md with sha256=42459e54e4a14eb89a1cd3be80eae8458a5b1c2c50e1fca1b1ce9882b05e6f9b, or the single PF10 file then on main recorded as a CAVEAT | observed: build-notes: path=docs/pfcanon/PF10-HDE-Build-Notes-v13.8.md bytes=568847 sha256=439775924392a206ceffb70952b0af1975c24d4214fc73d4ed98fcf94220e13c, the single PF10 file on main (CAVEAT form, as collection §2.5 expected) | PASS (CAVEAT)
 - step 1 sweep report uncovered=0 | observed: sweep: tracked_test_files=215 pytest_command_tokens=39 workflow_tests_tokens=39 full_validation_targets=166 uncovered=0 | PASS
-- step 1: status=PASS for each of the five reports | observed: lanes: status=PASS;membership: status=PASS;build-notes: status=PASS;sweep: status=PASS;replay: status=PASS; | PASS
-- step 1: final PREPUSH_CHECK_RESULT: PASS line reporting the repository unchanged | observed: absent; stderr: PREPUSH_CHECK_READ_ONLY_VIOLATION: the repository's tree, ignored files, directories, HEAD or git metadata changed | FAIL
-- step 2 prints lanes: classification reason=documentation_only;paths=1;lanes=none and exits 0 | observed: lanes: classification reason=documentation_only;paths=1;lanes=none (exit 0) | PASS
-- step 3: '137 passed' | observed: 137 passed in 64.27s (0:01:04) (exit 0) | PASS
+- step 1: status=PASS for each of the five reports | observed: lanes, membership, build-notes, sweep and replay each status=PASS; replay steps 01 to 16 SUCCESS | PASS
+- step 1: final PREPUSH_CHECK_RESULT: PASS line reporting the repository unchanged | observed: PREPUSH_CHECK_RESULT: PASS lanes=PASS membership=PASS build-notes=PASS sweep=PASS replay=PASS; repository unchanged (tree, ignored files, directories, HEAD and git metadata) | PASS
+- step 2 prints lanes: classification reason=documentation_only;paths=1;lanes=none and exits 0 | observed: present (exit 0) | PASS
+- step 3: '141 passed' | observed: 141 passed in 66.65s (0:01:06) (exit 0) | PASS
 - step 4: git status --porcelain empty | observed: (empty) (exit 0) | PASS
 === NOTES ===
-- status: FAIL_BEHAVIOR, by check 13's own Outcomes line: 'Exit 4 (repository changed) → FAIL_BEHAVIOR'. Decisive receipt: the Moon Loop rerun, in which every report including replay is status=PASS and the delivered tool exits 4 with PREPUSH_CHECK_READ_ONLY_VIOLATION. The PR35-C1 signature does not apply: no test in tests/tools/test_prepush_check.py failed (step 3, 137 passed; replay steps 08 and 13 all passed); the violation is the tool's own read-only guard on the source repository.
-- attempt-1 failure signature (first run above, 2026-10-25T00:02:22Z to 00:16:57Z): step 1 exit 4; replay status=FAIL at step 08 'Run affected behavioral tests in isolation', 2 failed, 4521 passed: tests/ops/test_hde_epic038_ops03.py::test_candidate_replacement_failure_is_persisted_before_cleanup (AssertionError, candidate is_dir() False) and ::test_validator_rejects_authorized_candidate_symlink (OSError [Errno 18] Invalid cross-device link from /tmp/hde-epic038-ops03/... to the pytest tmp_path under TMPDIR=/home/nathan/.tmp); steps 09 to 15 SKIPPED, step 16 FAILURE; stderr PREPUSH_CHECK_READ_ONLY_VIOLATION; steps 2 to 4 as in the rerun (step 3, 137 passed).
-- Moon Loop (Glow QA Guide §3.4.8), directed by the Product Owner in this session: 'That means this environment needs a fix, so resolve it as a moon loop'. Remediation note (what changed and why): only the check shell's environment and scratch outside the repository. TMPDIR (/home/nathan/.tmp, ext4) was unset so Python's tempfile uses /tmp, the tmpfs that holds the OPS03 tool's fixed RUN_ROOT /tmp/hde-epic038-ops03, as on hosted CI where TMPDIR is unset. Two directories that attempt 1's failed OPS03 tests left under /tmp/hde-epic038-ops03 (ops03-test-261f683ea8cd46dba0fa6139, ops03-test-a7783fabc7244eb7ba132c1d) were listed and removed. No repository file, product code, test, generator, predicate or expected value changed.
-- result of the Moon Loop: the venue cause is removed. Replay steps 01 to 16 all SUCCESS (step 08: 4521 passed, 2 skipped), replay status=PASS. The read-only violation recurred, so it is not caused by the venue's TMPDIR.
-- observation on the violation (executor's reading for QA-110, not a predicate): in both runs no tracked, ignored or directory entry of the E-L clone changed; the only .git entry whose mtime and ctime moved in the check window is .git/objects/pack/pack-0702e37ebe0101b3b80d126c73ab6880b2aff2bc.pack (last at 00:16:40Z in attempt 1 and 00:56:17Z in the rerun, both inside step 3; a step-1 change would have been overwritten by these). repository_state() in tools/ci/prepush_check.py digests every file under .git with its mtime and ctime, objects included, and make_copy() creates every throwaway copy with git clone --shared, so the copies borrow the source repository's object store. An executor diagnostic in separate scratch repositories (git 2.53.0), outside this check, showed that writing an object that already exists in the source pack from inside a --shared copy updates the source pack's mtime, while clone --shared and checkout alone do not. A replayed test that writes such an object would therefore trip the guard. The Audit's preapproval run at 0b15328d (Audit §7 item 9) reported 'repository unchanged'; why that venue did not trip the guard is not established here.
-- routing: a FAIL_BEHAVIOR returns to Kronos at QA-110 (Plan §9 escalation; Glow QA Guide §10.6); the executor makes no product change. FND-028 (removing replay) stays with the Product Owner.
-- nonclaims: the tool's result is not CI's result (README 'Pre-push check').
-- normalizations: NZ-01 (scratch paths under the session scratchpad). exit_code records step 1's status (4), the decisive child for the failed predicate; the last command, step 4's git status, exited 0.
-- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
-- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.
+- Remediation verification RV-1 of check 13 (QA110-F01), not attempt 2 and not a reset. Attempt 1: exit 4, PREPUSH_CHECK_READ_ONLY_VIOLATION, every report PASS, FAIL_BEHAVIOR; primary published at faa2246 (blob 4c6d826ae0ac). Remedy: WU-REM-02, amthorn78/glow-hdengine-v2#734, squash 22a3bc0 (HDE Build Notes 2.27).
+- status: PASS. Every predicate of Plan v1.3 check 13 is met (PREDICATES above). The Outcomes line's cases do not arise: no test failed in step 3 or in replay (PR35-C1 signature absent), and step 1 did not exit 4.
+- attempt label: RV-1, set by Kronos in collection v1.1 §4.2; recorded here, in command_provenance and in the QA-100 result.
+- normalizations applied: NZ-01 (the fixed scratch paths of collection §4.3 under /tmp, as listed); NZ-06 (publication through python -c exec of /tmp/hde-crd-0002-qa/publish_check.py from the evidence checkout root); NZ-08 (TMPDIR, prior value /home/nathan/.tmp on ext2/ext3, unset in the check shell so children use /tmp (tmpfs), as on hosted CI; it removes O-1's venue cause and does not decide O-1).
+- build-notes CAVEAT: the build-notes report names docs/pfcanon/PF10-HDE-Build-Notes-v13.8.md (sha256 439775924392a206ceffb70952b0af1975c24d4214fc73d4ed98fcf94220e13c), the single PF10 file on main at the tested commit, not v13.7.8 (review v1.3 N-202; collection §2.5).
+- observations (not predicates): step 1 took 1,808 s (17:10:50Z to 17:40:58Z), replay 1,802.5 s; replay step 08 '4525 passed, 2 skipped', step 13 '134 passed', step 15 the release attestation SUCCESS, step 16 SUCCESS; 'copy after replay: clean'. Stderr of every step is empty. The tested tree differs from 22a3bc0's only under docs/ephemeral/ and docs/pfcanon/ (step 0a diff empty).
+- observation outside the check (O-3 context, Product Owner's): /tmp/hde-epic038-ops03 held two leftover OPS03 test directories before this run (ops03-test-03c7fd6d9c364a7ebd4bc9b7, ops03-test-c9f3990f2f154f8f83394c7e; left by attempt 1's rerun) and holds two more after it (ops03-test-d25fef4e537642e08a15286b, ops03-test-e0071e5300fe4d95b44a7062). Each test run uses a unique run ID, so they did not bear on this result. They were neither removed nor used.
+- readiness preview: before this execution, the executor ran the same §4.5 reads once (READS_ONLY) to confirm readiness; they matched the reads recorded above. No step 1 to 4 command ran in the preview.
+- exit_code records step 1's status (0), the decisive child (QA-110 v1.0 D-04 precedent); every child exited 0.
+- captures: reads combine stdout and stderr per read; steps 1 to 4 keep them separate. No CR byte was present; no CRLF normalization was needed.
+- secret scan (Plan §5.3 rule 3; collection §4.6): NO_HIT from the check's shell (names unset), and NO_HIT again from the venue's parent shell, which holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL (comparison only; no value printed or recorded).
+- nonclaims: the tool's result is not CI's result (README 'Pre-push check'). This primary is not a QA verdict or acceptance; Kronos decides at QA-110. FND-028, D-1/LR6-O1, O-1 and O-A stay with their owners.
