@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-06-dev-harness-retired/primary.log
+size_bytes: 8485
+sha256: 0fe1f4cb69ff89b8cdad5cbd03a5c2f957d471d15e2b9266f42b2a71aecfc5e2
+mtime_utc: 2026-10-24T23:49:10Z
+produced_at_utc: 2026-09-22T14:25:29Z

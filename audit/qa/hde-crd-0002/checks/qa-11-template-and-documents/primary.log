@@ -1,0 +1,196 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-11-template-and-documents","check_name":"Environment template and operator documents match the code","claimed_tokens":[],"command":[["bash","-c","# T11 steps 1 to 3 in one asserting script (NZ-05): \"contains\" greps expect exit 0 (count >= 1); the \"no\" grep expects exit 1 (every count 0).\nFAIL=0\nc() { label=$1; exp=$2; shift 2; o=$(mktemp); e=$(mktemp); \"$@\" >\"$o\" 2>\"$e\"; rc=$?\n  printf -- '--- %s:' \"$label\"; printf ' %q' \"$@\"; printf '\\n'\n  if [ \"$rc\" = \"$exp\" ]; then echo \"exit_code: $rc (expected $exp) ASSERT_OK\"; else echo \"exit_code: $rc (expected $exp) ASSERT_FAIL\"; FAIL=1; fi\n  echo \"stdout:\"; if [ -s \"$o\" ]; then cat \"$o\"; [ -n \"$(tail -c1 \"$o\")\" ] && echo; else echo \"(empty)\"; fi\n  echo \"stderr:\"; if [ -s \"$e\" ]; then cat \"$e\"; [ -n \"$(tail -c1 \"$e\")\" ] && echo; else echo \"(empty)\"; fi\n  rm -f \"$o\" \"$e\"; }\nc S16-template 0 grep -c -x -F 'GEO_API_KEY=changeme' .env.example\nc S16-classifier 0 python -c \"from ci.checks import classify_ci_changes as c; print(c.classify_paths(['.env.example']).reason)\"\nc S17-readyz-always-200 0 grep -c -F 'GET /internal/readyz \u2014 always 200' docs/ADAPTER_009.md\nc S17-readyz-registered-only-by 0 grep -c -F '/internal/readyz is registered only by' docs/ADAPTER_009.md\nc S17-wsgi-registers-readyz 0 grep -c -F '@app.get(\"/internal/readyz\")' adapter/wsgi.py\nc S17-no-readyz-in-factory-and-dev-runner 1 grep -c readyz adapter/factory.py adapter/http_reader.py\nc S17-bind-target 0 grep -c -F 'Bind target for captures: http://127.0.0.1:8000' docs/ADAPTER_009.md\nc S17-procfile-command 0 grep -c -F \"$(sed -n 's/^web: //p' Procfile)\" docs/ADAPTER_009.md\nc S17-procfile-command-text 0 sed -n 's/^web: //p' Procfile\nc S17-dev-runner-loopback 0 grep -c -F 'host=\"127.0.0.1\"' adapter/http_reader.py\nc S18-invalid-json-alias 0 grep -c -F 'built from the `invalid_json` alias (emitted `code`: `ERR_COMPAT_INVALID_JSON`)' docs/ADAPTER_009.md\nc S18-compat-handler-alias 0 grep -c -F 'error_envelope(\"invalid_json\")' engine/http/compat_handler.py\nc S18-emit-public-doc 0 grep -c -F 'emit_public(envelope, *, sort_keys=True) -> bytes' ARCHITECTURE.md\nc S18-routing-heading 0 grep -c -x '## Routing and mounts' ARCHITECTURE.md\nfor f in 'adapter/factory.py::create_app' 'adapter/wsgi.py::create_app' 'adapter/http_reader.py::create_app'; do\n  c \"S18-section-factory $f\" 0 bash -c \"awk '/^## Routing and mounts\\$/{s=1;print;next} s&&/^## /{exit} s' ARCHITECTURE.md | grep -c -F '$f'\"\ndone\nc S18-emit-public-code 0 grep -n 'def emit_public' engine/presenter/emitter.py\nif [ \"$FAIL\" = 0 ]; then echo \"ASSERTIONS: every child exit status as expected\"; exit 0; else echo \"ASSERTIONS: at least one child exit status not as expected\"; exit 1; fi"]],"command_provenance":"QA Plan v1.2 check 11; QA-90 task T11 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad), NZ-05 (steps 1 to 3 in one asserting bash -c script)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-11-template-and-documents/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-25T00:00:51Z"}
+=== CONTEXT ===
+check_id: qa-11-template-and-documents
+task: QA-90 task T11, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 11 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-L; E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-25T00:00:49Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-25T00:00:49Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-25T00:00:49Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-25T00:00:49Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-25T00:00:49Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-25T00:00:49Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-25T00:00:50Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+end_utc: 2026-10-25T00:00:51Z
+=== COMMANDS ===
+--- command: ["bash", "-c", "# T11 steps 1 to 3 in one asserting script (NZ-05): \"contains\" greps expect exit 0 (count >= 1); the \"no\" grep expects exit 1 (every count 0).\nFAIL=0\nc() { label=$1; exp=$2; shift 2; o=$(mktemp); e=$(mktemp); \"$@\" >\"$o\" 2>\"$e\"; rc=$?\n  printf -- '--- %s:' \"$label\"; printf ' %q' \"$@\"; printf '\\n'\n  if [ \"$rc\" = \"$exp\" ]; then echo \"exit_code: $rc (expected $exp) ASSERT_OK\"; else echo \"exit_code: $rc (expected $exp) ASSERT_FAIL\"; FAIL=1; fi\n  echo \"stdout:\"; if [ -s \"$o\" ]; then cat \"$o\"; [ -n \"$(tail -c1 \"$o\")\" ] && echo; else echo \"(empty)\"; fi\n  echo \"stderr:\"; if [ -s \"$e\" ]; then cat \"$e\"; [ -n \"$(tail -c1 \"$e\")\" ] && echo; else echo \"(empty)\"; fi\n  rm -f \"$o\" \"$e\"; }\nc S16-template 0 grep -c -x -F 'GEO_API_KEY=changeme' .env.example\nc S16-classifier 0 python -c \"from ci.checks import classify_ci_changes as c; print(c.classify_paths(['.env.example']).reason)\"\nc S17-readyz-always-200 0 grep -c -F 'GET /internal/readyz \u2014 always 200' docs/ADAPTER_009.md\nc S17-readyz-registered-only-by 0 grep -c -F '/internal/readyz is registered only by' docs/ADAPTER_009.md\nc S17-wsgi-registers-readyz 0 grep -c -F '@app.get(\"/internal/readyz\")' adapter/wsgi.py\nc S17-no-readyz-in-factory-and-dev-runner 1 grep -c readyz adapter/factory.py adapter/http_reader.py\nc S17-bind-target 0 grep -c -F 'Bind target for captures: http://127.0.0.1:8000' docs/ADAPTER_009.md\nc S17-procfile-command 0 grep -c -F \"$(sed -n 's/^web: //p' Procfile)\" docs/ADAPTER_009.md\nc S17-procfile-command-text 0 sed -n 's/^web: //p' Procfile\nc S17-dev-runner-loopback 0 grep -c -F 'host=\"127.0.0.1\"' adapter/http_reader.py\nc S18-invalid-json-alias 0 grep -c -F 'built from the `invalid_json` alias (emitted `code`: `ERR_COMPAT_INVALID_JSON`)' docs/ADAPTER_009.md\nc S18-compat-handler-alias 0 grep -c -F 'error_envelope(\"invalid_json\")' engine/http/compat_handler.py\nc S18-emit-public-doc 0 grep -c -F 'emit_public(envelope, *, sort_keys=True) -> bytes' ARCHITECTURE.md\nc S18-routing-heading 0 grep -c -x '## Routing and mounts' ARCHITECTURE.md\nfor f in 'adapter/factory.py::create_app' 'adapter/wsgi.py::create_app' 'adapter/http_reader.py::create_app'; do\n  c \"S18-section-factory $f\" 0 bash -c \"awk '/^## Routing and mounts\\$/{s=1;print;next} s&&/^## /{exit} s' ARCHITECTURE.md | grep -c -F '$f'\"\ndone\nc S18-emit-public-code 0 grep -n 'def emit_public' engine/presenter/emitter.py\nif [ \"$FAIL\" = 0 ]; then echo \"ASSERTIONS: every child exit status as expected\"; exit 0; else echo \"ASSERTIONS: at least one child exit status not as expected\"; exit 1; fi"]
+started_utc: 2026-10-25T00:00:50Z; exit_code: 0
+stdout (3712 bytes):
+--- S16-template: grep -c -x -F GEO_API_KEY=changeme .env.example
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S16-classifier: python -c from\ ci.checks\ import\ classify_ci_changes\ as\ c\;\ print\(c.classify_paths\(\[\'.env.example\'\]\).reason\)
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+documentation_only
+stderr:
+(empty)
+--- S17-readyz-always-200: grep -c -F $'GET /internal/readyz \342\200\224 always 200' docs/ADAPTER_009.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S17-readyz-registered-only-by: grep -c -F /internal/readyz\ is\ registered\ only\ by docs/ADAPTER_009.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S17-wsgi-registers-readyz: grep -c -F @app.get\(\"/internal/readyz\"\) adapter/wsgi.py
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S17-no-readyz-in-factory-and-dev-runner: grep -c readyz adapter/factory.py adapter/http_reader.py
+exit_code: 1 (expected 1) ASSERT_OK
+stdout:
+adapter/factory.py:0
+adapter/http_reader.py:0
+stderr:
+(empty)
+--- S17-bind-target: grep -c -F Bind\ target\ for\ captures:\ http://127.0.0.1:8000 docs/ADAPTER_009.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S17-procfile-command: grep -c -F /app/.venv/bin/python\ -m\ gunicorn\ \'adapter.factory:create_app\(\)\'\ --bind\ 0.0.0.0:\$PORT\ --workers\ 2\ --threads\ 4\ --timeout\ 30 docs/ADAPTER_009.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S17-procfile-command-text: sed -n s/\^web:\ //p Procfile
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+/app/.venv/bin/python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+stderr:
+(empty)
+--- S17-dev-runner-loopback: grep -c -F host=\"127.0.0.1\" adapter/http_reader.py
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-invalid-json-alias: grep -c -F built\ from\ the\ \`invalid_json\`\ alias\ \(emitted\ \`code\`:\ \`ERR_COMPAT_INVALID_JSON\`\) docs/ADAPTER_009.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-compat-handler-alias: grep -c -F error_envelope\(\"invalid_json\"\) engine/http/compat_handler.py
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+4
+stderr:
+(empty)
+--- S18-emit-public-doc: grep -c -F emit_public\(envelope\,\ \*\,\ sort_keys=True\)\ -\>\ bytes ARCHITECTURE.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-routing-heading: grep -c -x \##\ Routing\ and\ mounts ARCHITECTURE.md
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-section-factory adapter/factory.py::create_app: bash -c awk\ \'/\^##\ Routing\ and\ mounts\$/\{s=1\;print\;next\}\ s\&\&/\^##\ /\{exit\}\ s\'\ ARCHITECTURE.md\ \|\ grep\ -c\ -F\ \'adapter/factory.py::create_app\'
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-section-factory adapter/wsgi.py::create_app: bash -c awk\ \'/\^##\ Routing\ and\ mounts\$/\{s=1\;print\;next\}\ s\&\&/\^##\ /\{exit\}\ s\'\ ARCHITECTURE.md\ \|\ grep\ -c\ -F\ \'adapter/wsgi.py::create_app\'
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-section-factory adapter/http_reader.py::create_app: bash -c awk\ \'/\^##\ Routing\ and\ mounts\$/\{s=1\;print\;next\}\ s\&\&/\^##\ /\{exit\}\ s\'\ ARCHITECTURE.md\ \|\ grep\ -c\ -F\ \'adapter/http_reader.py::create_app\'
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+1
+stderr:
+(empty)
+--- S18-emit-public-code: grep -n def\ emit_public engine/presenter/emitter.py
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+6:def emit_public(envelope: Dict[str, Any], *, sort_keys: bool = True) -> bytes:
+16:def emit_public_with_envelope(
+stderr:
+(empty)
+ASSERTIONS: every child exit status as expected
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (collection §4.5) | observed: PASS | PASS
+- contains count >= 1: S16-template | observed: exit 0; 1 | PASS
+- step 1 (S16): classify_paths(['.env.example']).reason prints documentation_only | observed: exit 0; documentation_only | PASS
+- contains count >= 1: S17-readyz-always-200 | observed: exit 0; 1 | PASS
+- contains count >= 1: S17-readyz-registered-only-by | observed: exit 0; 1 | PASS
+- contains count >= 1: S17-wsgi-registers-readyz | observed: exit 0; 1 | PASS
+- step 2 (S17): adapter/factory.py and adapter/http_reader.py contain no readyz (count 0 each; exit 1 asserted) | observed: exit 1; adapter/factory.py:0; adapter/http_reader.py:0 | PASS
+- contains count >= 1: S17-bind-target | observed: exit 0; 1 | PASS
+- contains count >= 1: S17-procfile-command | observed: exit 0; 1 | PASS
+- step 2 (S17): the Procfile command after 'web: ', the text the previous grep searched for | observed: /app/.venv/bin/python -m gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30 | RECORDED
+- contains count >= 1: S17-dev-runner-loopback | observed: exit 0; 1 | PASS
+- contains count >= 1: S18-invalid-json-alias | observed: exit 0; 1 | PASS
+- contains count >= 1: S18-compat-handler-alias | observed: exit 0; 4 | PASS
+- contains count >= 1: S18-emit-public-doc | observed: exit 0; 1 | PASS
+- contains count >= 1: S18-routing-heading | observed: exit 0; 1 | PASS
+- contains count >= 1: S18-section-factory adapter/factory.py::create_app | observed: exit 0; 1 | PASS
+- contains count >= 1: S18-section-factory adapter/wsgi.py::create_app | observed: exit 0; 1 | PASS
+- contains count >= 1: S18-section-factory adapter/http_reader.py::create_app | observed: exit 0; 1 | PASS
+- step 3 (S18): engine/presenter/emitter.py defines emit_public returning bytes (the def emit_public( line; grep also lists def emit_public_with_envelope() | observed: exit 0; 6:def emit_public(envelope: Dict[str, Any], *, sort_keys: bool = True) -> bytes:; 16:def emit_public_with_envelope( | PASS
+- NZ-05 script: every child's expected exit status held | observed: script exit 0 | PASS
+=== NOTES ===
+- normalization NZ-05: steps 1 to 3 ran in one asserting bash -c script; every 'contains' grep is asserted exit 0 and the one 'no' grep exit 1; each child's real exit code and output are inside that command's stdout.
+- the three factory names checked in ARCHITECTURE.md's '## Routing and mounts' section are adapter/factory.py::create_app, adapter/wsgi.py::create_app and adapter/http_reader.py::create_app, the three app factories that section names; each is counted only within the section (awk section scope, then grep -c -F).
+- nonclaims: FND-017 and FND-018's other stale lines are outside S17 and S18 and stay with the Product Owner.
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.

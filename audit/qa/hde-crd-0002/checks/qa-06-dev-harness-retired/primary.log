@@ -1,0 +1,96 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-06-dev-harness-retired","check_name":"Dev Reader harness retired; VERIFY.sh uses the canonical runner","claimed_tokens":[],"command":[["bash","-c","# T06 steps 1 and 2 in one asserting script (NZ-05): each child's real exit code and output are printed.\nFAIL=0\nc() { exp=$1; shift; o=$(mktemp); e=$(mktemp); \"$@\" >\"$o\" 2>\"$e\"; rc=$?; printf -- '--- child:'; printf ' %q' \"$@\"; printf '\\n'\n  if [ \"$rc\" = \"$exp\" ]; then echo \"exit_code: $rc (expected $exp) ASSERT_OK\"; else echo \"exit_code: $rc (expected $exp) ASSERT_FAIL\"; FAIL=1; fi\n  echo \"stdout:\"; if [ -s \"$o\" ]; then cat \"$o\"; else echo \"(empty)\"; fi; echo \"stderr:\"; if [ -s \"$e\" ]; then cat \"$e\"; else echo \"(empty)\"; fi; rm -f \"$o\" \"$e\"; }\nc 0 git ls-files dev/reader_harness\nc 0 test ! -e dev/reader_harness/app.py\nc 1 grep -c -i harness VERIFY.sh docs/acceptance/reader_a7_crib.md\nif [ \"$FAIL\" = 0 ]; then echo \"ASSERTIONS: every child exit status as expected\"; exit 0; else echo \"ASSERTIONS: at least one child exit status not as expected\"; exit 1; fi"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/scripts/test_dev_start_reader.py","-k","verify"]],"command_provenance":"QA Plan v1.2 check 6; QA-90 task T06 attempt 1; normalizations: NZ-01 (scratch paths under the session scratchpad), NZ-05 (steps 1 and 2 in one asserting bash -c script)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-06-dev-harness-retired/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF14-Canon-HDE-Mechanics-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-24T23:48:08Z"}
+=== CONTEXT ===
+check_id: qa-06-dev-harness-retired
+task: QA-90 task T06, attempt 1 (docs/ephemeral/HDE-CRD-0002-QA90-qa-task-collection-v1.0.md); QA Plan v1.2 check 6 (docs/ephemeral/HDE-CRD-0002-QA50-qa-plan-v1.2.md, blob 66f6016cc75bd1ab4ff9730ea89e5e25c7ec629c)
+tested_commit: 2e03a2686af87ab0607c6cfb9afb4ad79bcdb171; tested_tree: af5293473238c17d72c7d73013493739b9f32750
+environment_class: E-L; E-L clone /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el; venv /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv (NZ-01 scratch paths)
+interpreter: /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el-venv/bin/python -> /home/nathan/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/bin/python3.12; Python 3.12.15
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1 XDG_STATE_HOME=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-xdg-state
+presence in the check shell: HD_API_KEY=UNSET GEO_API_KEY=UNSET HD_API_BASE_URL=UNSET HDAPI_BASE_URL=UNSET DATABASE_URL=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+presence in the venue's parent shell before the §4.3 step 6 unset: HD_API_KEY=SET GEO_API_KEY=SET HD_API_BASE_URL=SET HDAPI_BASE_URL=UNSET DATABASE_URL=SET GH_TOKEN=UNSET GITHUB_TOKEN=UNSET HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET ENGINE_ENV=UNSET COLUMNS=UNSET
+actor: Claude Code CLI agent (model Claude Opus 5.5, claude-opus-5-5), local session abab87ae-fdb9-4eb6-b2b9-de5380cee6cb, the QA-100 executor the Product Owner chose by issuing the QA-100 handoff to this session
+venue: Product Owner's Linux workstation, Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, 2 CPUs
+start_utc: 2026-10-24T23:48:01Z
+readiness reads (collection §4.5; Plan §7 rule A):
+--- command: ["git", "rev-parse", "HEAD"]
+started_utc: 2026-10-24T23:48:01Z; exit_code: 0
+stdout (41 bytes):
+2e03a2686af87ab0607c6cfb9afb4ad79bcdb171
+stderr (0 bytes):
+(empty)
+--- command: ["git", "rev-parse", "--is-shallow-repository"]
+started_utc: 2026-10-24T23:48:02Z; exit_code: 0
+stdout (6 bytes):
+false
+stderr (0 bytes):
+(empty)
+--- command: ["git", "status", "--porcelain"]
+started_utc: 2026-10-24T23:48:02Z; exit_code: 0
+stdout (0 bytes):
+(empty)
+stderr (0 bytes):
+(empty)
+--- command: ["python", "--version"]
+started_utc: 2026-10-24T23:48:02Z; exit_code: 0
+stdout (15 bytes):
+Python 3.12.15
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "--version"]
+started_utc: 2026-10-24T23:48:02Z; exit_code: 0
+stdout (13 bytes):
+pytest 8.4.2
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-c", "import engine; print(engine.__file__)"]
+started_utc: 2026-10-24T23:48:03Z; exit_code: 0
+stdout (143 bytes):
+/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py
+stderr (0 bytes):
+(empty)
+readiness result: PASS (HEAD=2e03a2686af87ab0607c6cfb9afb4ad79bcdb171 shallow=false status_empty=yes python='Python 3.12.15' engine=/home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad/hde-crd-0002-el/engine/__init__.py)
+end_utc: 2026-10-24T23:48:08Z
+=== COMMANDS ===
+--- command: ["bash", "-c", "# T06 steps 1 and 2 in one asserting script (NZ-05): each child's real exit code and output are printed.\nFAIL=0\nc() { exp=$1; shift; o=$(mktemp); e=$(mktemp); \"$@\" >\"$o\" 2>\"$e\"; rc=$?; printf -- '--- child:'; printf ' %q' \"$@\"; printf '\\n'\n  if [ \"$rc\" = \"$exp\" ]; then echo \"exit_code: $rc (expected $exp) ASSERT_OK\"; else echo \"exit_code: $rc (expected $exp) ASSERT_FAIL\"; FAIL=1; fi\n  echo \"stdout:\"; if [ -s \"$o\" ]; then cat \"$o\"; else echo \"(empty)\"; fi; echo \"stderr:\"; if [ -s \"$e\" ]; then cat \"$e\"; else echo \"(empty)\"; fi; rm -f \"$o\" \"$e\"; }\nc 0 git ls-files dev/reader_harness\nc 0 test ! -e dev/reader_harness/app.py\nc 1 grep -c -i harness VERIFY.sh docs/acceptance/reader_a7_crib.md\nif [ \"$FAIL\" = 0 ]; then echo \"ASSERTIONS: every child exit status as expected\"; exit 0; else echo \"ASSERTIONS: at least one child exit status not as expected\"; exit 1; fi"]
+started_utc: 2026-10-24T23:48:03Z; exit_code: 0
+stdout (457 bytes):
+--- child: git ls-files dev/reader_harness
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+(empty)
+stderr:
+(empty)
+--- child: test \! -e dev/reader_harness/app.py
+exit_code: 0 (expected 0) ASSERT_OK
+stdout:
+(empty)
+stderr:
+(empty)
+--- child: grep -c -i harness VERIFY.sh docs/acceptance/reader_a7_crib.md
+exit_code: 1 (expected 1) ASSERT_OK
+stdout:
+VERIFY.sh:0
+docs/acceptance/reader_a7_crib.md:0
+stderr:
+(empty)
+ASSERTIONS: every child exit status as expected
+stderr (0 bytes):
+(empty)
+--- command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/scripts/test_dev_start_reader.py", "-k", "verify"]
+started_utc: 2026-10-24T23:48:03Z; exit_code: 0
+stdout (112 bytes):
+....                                                                     [100%]
+4 passed, 6 deselected in 4.20s
+stderr (0 bytes):
+(empty)
+=== PREDICATES ===
+- readiness (collection §4.5) | observed: PASS | PASS
+- step 1: git ls-files dev/reader_harness prints nothing | observed: stdout (empty) | PASS
+- step 1: test ! -e dev/reader_harness/app.py exits 0 (file absent) | observed: exit_code: 0 (expected 0) ASSERT_OK | PASS
+- step 2: grep -c -i harness counts VERIFY.sh:0 and docs/acceptance/reader_a7_crib.md:0 (exit 1 asserted) | observed: VERIFY.sh:0;docs/acceptance/reader_a7_crib.md:0; | PASS
+- NZ-05 script: every child's expected exit status held | observed: script exit 0 | PASS
+- step 3: '4 passed' | observed: 4 passed, 6 deselected in 4.20s (exit 0) | PASS
+=== NOTES ===
+- normalization NZ-05: steps 1 and 2 ran in one asserting bash -c script (grep -c exits 1 when every count is 0, asserted); each child's real exit code and output are inside that command's stdout.
+- normalization NZ-01: scratch paths under the session scratchpad /home/nathan/.tmp/claude-1000/-home-nathan-glow-hdengine-v2/abab87ae-fdb9-4eb6-b2b9-de5380cee6cb/scratchpad (E-L clone hde-crd-0002-el, venv hde-crd-0002-el-venv, XDG_STATE_HOME hde-crd-0002-xdg-state, evidence checkout hde-crd-0002-evidence, QA files hde-crd-0002-qa).
+- presence: the venue's parent shell holds HD_API_KEY, GEO_API_KEY, HD_API_BASE_URL and DATABASE_URL; the §4.3 step 6 exports unset them in this check shell (presence table above); no value is recorded.
