@@ -24,7 +24,7 @@ Inputs:
 - docs/ephemeral/HDE-CRD-0002-QA70-qa-plan-review-v1.2.md — the APPROVE of v1.2
 - docs/ephemeral/HDE-CRD-0002-QA80-redline-application-report-v1.1.md — application report for v1.2 (RL-15 to RL-17)
 - docs/ephemeral/HDE-CRD-0002-QA80-redline-application-report-v1.0.md — application report for v1.1 (RL-01 to RL-14)
-- docs/ephemeral/HDE-CRD-0002-WU-REM-02-pr-work-unit-lineage-review-v1.0.md — PR-40 ACCEPT of #734, with the owner-test count (141)
+- docs/ephemeral/HDE-CRD-0002-WU-REM-02-pr-work-unit-lineage-review-v1.0.md — PR-40 ACCEPT of amthorn78/glow-hdengine-v2#734, with the owner-test count (141)
 - docs/ephemeral/HDE-CRD-0002-QA50-qa-audit-v1.0.md — QA Audit v1.0 (AUDIT_COMPLETE)
 - docs/ephemeral/HDE-CRD-0002-QA80-checkpoint-v1.2.md — QA-80 working-state checkpoint
 - docs/pfcanon/PF10-HDE-Build-Notes-v13.8.md — HDE Build Notes in force, holding addenda 2.27 and 2.28
