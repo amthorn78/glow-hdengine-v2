@@ -3,7 +3,7 @@ artifact_type: PROMPT_ECOSYSTEM_AUTHORITATIVE_SURFACES
 artifact_version: "1.0"
 created_date: 2026-09-18
 status: BINDING
-authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21; repository baseline and graph proof token updated 2026-09-23 after D23 (close-out of MODIFICATION-20260923-alpha-feedback-open-entries); release baseline, Notion controls and graph proof token updated 2026-10-12 by decision D29 (MODIFICATION-20261011-gcfpe-mb008-to-promotion, X21)
+authority: Product Owner instruction, 2026-09-18; release baseline updated by decision D17, 2026-09-21; repository baseline and graph proof token updated 2026-09-23 after D23 (close-out of MODIFICATION-20260923-alpha-feedback-open-entries); release baseline, Notion controls and graph proof token updated 2026-10-12 by decision D29 (MODIFICATION-20261011-gcfpe-mb008-to-promotion, X21); the Alpha Feedback and Modification Backlog rows updated 2026-10-25 by Product Owner instruction (GCFPE feedback consolidated on the Modification Backlog)
 baseline: main @ 3473b34, plus the selected surfaces this Modification's X21 writes
 ---
 
@@ -81,8 +81,8 @@ never committed. **A session that cannot find the builder has not lost it — it
 | Page | ID | Role |
 |---|---|---|
 | Glow HDE Prompt Flow Index — GCFPE-20261009.1 — 100926.1 | `3db4590a05eb81de9736ea69bac61016` | Operational mapping index: families, actors, artifacts, lifecycle, selected topology. `REGISTER_CONTROLLED`. Updated in place at each promotion |
-| GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | `3dc4590a05eb81a9adf1d8f800863937` | **Closed 2026-09-23** (Product Owner): historical repair plan and batch checklists. Parent of the live Alpha Feedback page |
-| GCFPE Modification Backlog | `3e54590a05eb81eb818fd0f42045167a` | Created 2026-09-24 (Product Owner). Defects a maintenance run finds outside its Modification's frozen scope, each with a severity S1–S4; beside the Alpha Feedback list, which holds the Product Owner's own feedback and deferrals. Written by `GCFPE-MGMT-10` runs under the maintenance destination rule |
+| GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | `3dc4590a05eb81a9adf1d8f800863937` | **Closed 2026-09-23** (Product Owner): historical repair plan and batch checklists. Parent of the Alpha Feedback page (`3df4590a05eb8111a6a5f67cb82f96f6`), which takes no new items from 2026-10-25 and keeps its closed entries as the record, and of the Modification Backlog |
+| GCFPE Modification Backlog | `3e54590a05eb81eb818fd0f42045167a` | Created 2026-09-24 (Product Owner). **The one list of GCFPE feedback from 2026-10-25** (Product Owner: "make sure that all the GCFPE feedback is consolidated in one place", merging the Alpha Feedback list into it). It holds both the defects a maintenance run or a review finds and the Product Owner's own feedback. Each entry has a severity S1–S4; a request rather than a defect is not rated. The Alpha list's open items moved here as MB-028 and MB-029. Written by `GCFPE-MGMT-10` runs under the maintenance destination rule, and by a flow session only on the Product Owner's explicit instruction |
 | GCFPE Membership and Release Register | `3d24590a05eb81ce942ad994cfca9fa1` | **Sole selection authority.** Selection is resolved only here |
 | Register entry — GCFPE-20261009.1 | `3f74590a05eb81b8b7bbcbfe0dcacea9` | The promotion transaction and its archival receipt. The 091426.1 entry, `3db4590a05eb816f925ef3b0659de3b8`, is its predecessor's record |
 | Glow HDE Complete Prompt Set — GCFPE-20261009.1 — 100926.1 | `3f74590a05eb812db385c2544d7570f7` | The 55-member selected catalog. `REGISTER_CONTROLLED`. The 091426.1 catalog is archived |
