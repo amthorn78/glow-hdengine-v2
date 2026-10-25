@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/checks/qa-20-live-vendor-override/primary.log
+size_bytes: 26905
+sha256: 5e96be9bd026172770b15a691fe18de415e13fb8907442dc09aaa99882bf1ed1
+mtime_utc: 2026-10-25T23:33:31Z
+produced_at_utc: 2026-09-22T14:25:29Z

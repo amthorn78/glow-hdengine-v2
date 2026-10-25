@@ -1,0 +1,197 @@
+{"captured_env":{"ALLOW_NETWORK":"1","APP_ENV":"prod","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"},"check_id":"qa-20-live-vendor-override","check_name":"The mandatory live vendor call through the production override","claimed_tokens":[],"command":[["railway","--version"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","cat","/proc/sys/kernel/hostname"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<P1 executable read, verbatim in the body>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","/app/.venv/bin/python","-c","import engine; print(engine.__file__)"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","/app/.venv/bin/python","-m","engine.cli","--version"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<P2 presence read, verbatim in the body>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","/app/.venv/bin/python","-c","<Plan P2 ENGINE_ENV code>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<P3 rails read, verbatim in the body>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","/app/.venv/bin/python","-c","<Plan P4 code with NZ-24>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<P4 host and directory mode read>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","/app/.venv/bin/python","-c","import os, pwd; print(pwd.getpwuid(os.geteuid()).pw_name)"],["bash","/tmp/hde-crd-0002-qa/qa-20/v1.sh"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<A1 product stderr and host read>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<A1 sink read>","sh","0","/root/.local/state/glow-hdengine/vendor_prod_override.jsonl"],["bash","/tmp/hde-crd-0002-qa/qa-20/v2.sh"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<A2 product stderr and host read>"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","sh","-c","<A2 sink read>","sh","0","/root/.local/state/glow-hdengine/vendor_prod_override.jsonl"],["railway","ssh","-p","ce01529f-679f-4f52-a979-23113299a59b","-e","a06b149a-2876-40bf-84a0-7880feaf8b67","-s","62e7b993-6d30-48b4-9059-c1884b16e90b","--","/app/.venv/bin/python","-c","<A3 secret scan reading stdin>"]],"command_provenance":"QA Plan v1.3 check 20; QA-90 collection v1.2 task T20, attempt 1; venue V-B; initiator the Product Owner; normalizations: NZ-01, NZ-06, NZ-20 to NZ-24; executed by Product Owner direction before collection v1.2 merged (PR 743)","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-20-live-vendor-override/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF05-Canon-HDE-CLI-API-Vendor-Ref","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-25T23:33:19Z"}
+=== CONTEXT ===
+check: qa-20-live-vendor-override (QA Plan v1.3 check 20; QA-90 collection v1.2 task T20; attempt 1); requirements S14, S19 (S19-F05, S19-F06)
+class: 3, vendor; the Product Owner's Live QA workload (Glow QA Guide 3.5.5, 3.5.6)
+venue class: V-B, production service shell: Railway project ample-illumination (ce01529f-679f-4f52-a979-23113299a59b), environment production (a06b149a-2876-40bf-84a0-7880feaf8b67), service glow-hdengine-v2 (62e7b993-6d30-48b4-9059-c1884b16e90b); reached with Railway CLI 5.71.0 (railway ssh) from the Product Owner's workstation, signed in to the Product Owner's Railway account
+container hostname (NZ-23): 60f93a3e5923 at P0, P1, P2, P3, P4, V1, A1, V2 and A2
+candidate: release_id 77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e; check 16 qa-16-deployed-identity published PASS in this session window (captured_at_utc 2026-10-25T23:40:00Z label; executed 23:18Z; evidence commit ee7b8d9c)
+initiator: the Product Owner (Nathan), who typed and ran V1 and V2 with the ! prefix of the Claude Code prompt in this session (NZ-20)
+initiator attestation (verbatim, given in this session at about 2026-10-25T23:33Z): "I, Nathan, the Product Owner, typed and ran V1 and V2 myself"
+executor of P0 to P5, A1, A2, A3 and assembly: Kronos (Claude Code CLI session on the Product Owner's workstation, local session 5c9c7c47-41bd-437a-a9ee-63879dec618b)
+authorization reference: HDE-CRD-0002/qa/qa-20-live-vendor-override (names this approved work item; not a credential)
+synthetic inputs: --user qa-hde-crd-0002-vendor1 --birthdate 1990-01-01 --birthtime 12:34 --location "Amsterdam, NL" (no real person)
+request limit: one allowed invocation (V2) in this attempt; used: 1. No --upsert; no other vendor command; no retry by the executor
+working directory of every V-B command: /app (NZ-21)
+script digests (collection v1.2 section 5 T20 text): v1.sh b3c9f473e830aba5a27a3df3e8e223f5245fa8ab270db724bafa93774f3faf55; v2.sh 90b7b6cc12ea92fc02d1f99dae11e6bf4e2ad4634e6f82a62a78994810e9c9ff; P2 code (Plan verbatim) f2d3f6b6d94604f12205f23146a3db91dcb2d10e4edd2242556125307da33d85; P4 code (Plan, NZ-24 mode 0o700) 344df89d2a40eb103d4ef8e300ee529acd9ea857950d90900afb2d303df8832e
+=== COMMANDS ===
+--- P0 venue: CLI version ---
+command: railway --version
+at_utc: 2026-10-25T23:25:23Z
+exit: 0
+stdout:
+railway 5.71.0
+transport stderr (Railway CLI, kept apart; NZ-22): 
+--- P0 venue: container ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- cat /proc/sys/kernel/hostname
+at_utc: 2026-10-25T23:25:23Z
+exit: 0
+stdout:
+60f93a3e5923
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P1 candidate: interpreter executable ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'test -x /app/.venv/bin/python && echo P1_EXECUTABLE=OK; cat /proc/sys/kernel/hostname; pwd'
+at_utc: 2026-10-25T23:25:25Z
+exit: 0
+stdout:
+P1_EXECUTABLE=OK
+60f93a3e5923
+/app
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P1 candidate: engine location ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- /app/.venv/bin/python -c "import engine; print(engine.__file__)"
+at_utc: 2026-10-25T23:25:26Z
+exit: 0
+stdout:
+/app/engine/__init__.py
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P1 candidate: version ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- /app/.venv/bin/python -m engine.cli --version
+at_utc: 2026-10-25T23:25:27Z
+exit: 0
+stdout:
+hdctl 0.0.0 (hdengine@prod;77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e)
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P2 presence (SET/UNSET only) ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'for n in HD_API_BASE_URL HD_API_KEY GEO_API_KEY HDAPI_BASE_URL HDE_VENDOR_OVERRIDE_AUDIT_PATH DATABASE_URL ENGINE_ENV; do eval "s=\${$n+SET}"; echo "$n=${s:-UNSET}"; done; if [ -n "${HDAPI_BASE_URL+x}" ]; then [ "$HDAPI_BASE_URL" = "${HD_API_BASE_URL-}" ] && echo HDAPI_BASE_URL_EQUAL=YES || echo HDAPI_BASE_URL_EQUAL=NO; fi; cat /proc/sys/kernel/hostname'
+at_utc: 2026-10-25T23:25:28Z
+exit: 0
+stdout:
+HD_API_BASE_URL=SET
+HD_API_KEY=SET
+GEO_API_KEY=SET
+HDAPI_BASE_URL=UNSET
+HDE_VENDOR_OVERRIDE_AUDIT_PATH=UNSET
+DATABASE_URL=SET
+ENGINE_ENV=UNSET
+60f93a3e5923
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P2 ENGINE_ENV (Plan code verbatim) ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- /app/.venv/bin/python -c "import os; ws=' \t\n\r\x0b\x0c'; a=os.environ.get('APP_ENV','').strip(ws).lower(); g=os.environ.get('ENGINE_ENV','').strip(ws).lower(); print('APP_ENV='+(a or 'UNSET'), 'ENGINE_ENV='+(g or 'UNSET'), 'P2_ENGINE_ENV='+('OK' if (not g or g==a) else 'CONFLICT'))"
+at_utc: 2026-10-25T23:25:30Z
+exit: 0
+stdout:
+APP_ENV=prod ENGINE_ENV=UNSET P2_ENGINE_ENV=OK
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P3 rails ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'for n in SAFE_MODE ALLOW_NETWORK APP_ENV LC_ALL LANG TZ; do eval "v=\${$n-UNSET}"; echo "$n=$v"; done; cat /proc/sys/kernel/hostname'
+at_utc: 2026-10-25T23:25:31Z
+exit: 0
+stdout:
+SAFE_MODE=0
+ALLOW_NETWORK=1
+APP_ENV=prod
+LC_ALL=C
+LANG=C
+TZ=UTC
+60f93a3e5923
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P4 sink (Plan code with NZ-24) ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- /app/.venv/bin/python -c "import os, pathlib, engine; ws=' \t\n\r\x0b\x0c'; root=pathlib.Path(engine.__file__).resolve().parents[1]; c=os.environ.get('HDE_VENDOR_OVERRIDE_AUDIT_PATH','').strip(ws); x=os.environ.get('XDG_STATE_HOME','').strip(ws); h=os.path.expanduser('~'); base=pathlib.Path(x) if x and pathlib.Path(x).is_absolute() else (pathlib.Path(h)/'.local'/'state' if h!='~' and pathlib.Path(h).is_absolute() else None); cand=pathlib.Path(c) if c else (base/'glow-hdengine'/'vendor_prod_override.jsonl' if base else None); ab=cand is not None and cand.is_absolute(); p=pathlib.Path(os.path.realpath(cand)) if ab else None; inrepo=p is not None and (p==root or root in p.parents); ok=ab and not inrepo; ok and p.parent.mkdir(mode=0o700, parents=True, exist_ok=True); print('ENGINE_ROOT='+str(root), 'SINK='+str(p or cand), 'ABSOLUTE_AS_CONFIGURED='+str(ab), 'IN_REPOSITORY='+str(inrepo), 'DIR_WRITABLE='+str(bool(ok) and os.access(p.parent, os.W_OK)), 'FILE_WRITABLE='+str(bool(ok) and ((not p.exists()) or os.access(p, os.W_OK))), 'LINES='+str(sum(1 for _ in open(p, 'rb')) if ok and p.exists() else 0))"
+at_utc: 2026-10-25T23:25:32Z
+exit: 0
+stdout:
+ENGINE_ROOT=/app SINK=/root/.local/state/glow-hdengine/vendor_prod_override.jsonl ABSOLUTE_AS_CONFIGURED=True IN_REPOSITORY=False DIR_WRITABLE=True FILE_WRITABLE=True LINES=0
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P4 container and sink directory mode ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'cat /proc/sys/kernel/hostname; ls -ld /root/.local/state/glow-hdengine'
+at_utc: 2026-10-25T23:25:33Z
+exit: 0
+stdout:
+60f93a3e5923
+drwx------ 2 root root 4096 Oct 25 23:25 /root/.local/state/glow-hdengine
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- P5 actor ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- /app/.venv/bin/python -c "import os, pwd; print(pwd.getpwuid(os.geteuid()).pw_name)"
+at_utc: 2026-10-25T23:25:34Z
+exit: 0
+stdout:
+root
+transport stderr (Railway CLI, kept apart; NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- V1 (typed and run by the initiator) ---
+command typed: bash /tmp/hde-crd-0002-qa/qa-20/v1.sh
+argv run in the container (cwd /app): /app/.venv/bin/python -m engine.cli bg:resolve --user qa-hde-crd-0002-vendor1 --source vendor --dry-run --birthdate 1990-01-01 --birthtime 12:34 --location "Amsterdam, NL"
+started_at_utc: 2026-10-25T23:30:01Z; finished_at_utc: 2026-10-25T23:30:03Z
+script output: V1 exit status 1 (expected 1); script exit 0
+V1 exit code: 1
+V1 stdout (353 bytes, sha256 432c78d9294f495ed4860ffcfb0f004ccf70c8f422468a21d703fbd3cde44ae8):
+{"error":{"code":"PROVIDER_PROD_OVERRIDE_REQUIRED","details":{"outbound_attempted":false},"message":"production-like vendor access requires --allow-prod-vendor"},"resolver":{"allow_network":true,"dry_run":true,"requested_source":"vendor","resolved_source":"vendor","safe_mode":false,"upsert":false,"user_id":"qa-hde-crd-0002-vendor1"},"status":"error"}
+V1 product stderr (read back from the container, 0 bytes): 
+transport stderr (Railway CLI, NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- A1, V1 gate (executor; no vendor I/O) ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'wc -c </tmp/hde-crd-0002-qa20/v1.stderr; cat /tmp/hde-crd-0002-qa20/v1.stderr; echo HOST=$(cat /tmp/hde-crd-0002-qa20/v1.host); echo NOW=$(cat /proc/sys/kernel/hostname)'
+stdout:
+0
+HOST=60f93a3e5923
+NOW=60f93a3e5923
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'tail -n +"$(( $1 + 1 ))" "$2"' sh 0 /root/.local/state/glow-hdengine/vendor_prod_override.jsonl
+stdout (new sink lines after P4's count 0):
+{"actor_principal":"root","authorization_ref":null,"command":"bg:resolve","correlation_id":"3408d8b3-ebb9-490e-a838-da1be1ad2423","environment":"prod","error_code":"PROVIDER_PROD_OVERRIDE_REQUIRED","event":"vendor_prod_override","network_open":true,"occurred_at":"2026-10-25T23:30:03.400843Z","outbound_attempted":false,"outcome":"refused","resource_path":null,"route_family":null,"safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+gate decision: every V1 predicate held, the V1 host equals P0's, and exactly one new line; V2 allowed
+--- V2 (typed and run by the initiator) ---
+command typed: bash /tmp/hde-crd-0002-qa/qa-20/v2.sh
+argv run in the container (cwd /app): /app/.venv/bin/python -m engine.cli bg:resolve --user qa-hde-crd-0002-vendor1 --source vendor --dry-run --birthdate 1990-01-01 --birthtime 12:34 --location "Amsterdam, NL" --allow-prod-vendor HDE-CRD-0002/qa/qa-20-live-vendor-override
+started_at_utc: 2026-10-25T23:31:07Z; finished_at_utc: 2026-10-25T23:31:09Z
+script output: V2 exit status 0 (expected 0); script exit 0
+V2 exit code: 0
+V2 stdout (2022 bytes, sha256 6801e122949dabc055aa394003c88d591bb257f12bed0f45d23683747399df59; canonical JSON; the mapped record of the synthetic input, no raw vendor payload):
+{"adapter":{"code":"ADAPTER_MAPPED","payload_family":"ChartResult","status":"mapped"},"cache":{"input_fingerprint":"481ee027693240c0daf1d082e12ad81e6cf96b7eb372af60348ffdf5cfeb27ac","payload_posture":"adapter_mapped_no_raw_vendor_payload","user_id":"ad6385b2-095a-56f5-bc7b-a449f4e49cca","vendor":"hdapi","vendor_version":2},"ingest":{"db_rows_after":0,"payload_posture":"adapter_mapped_no_raw_vendor_payload","rows_written":0},"resolved":{"bodygraph":{"authority":"Emotional","birthDateUtc":"1990-01-01T11:34:00.000Z","centers":["Root","Sacral","Solar Plexus"],"channelsLong":["Emoting (39-55)","Concentration (9-52)"],"channelsShort":["39-55","9-52"],"definition":"Single Definition","gates":["38","39","13","7","55","61","9","41","52","54","58","1","48","21","49","4","26","6","14","10"],"profile":"2/4","strategy":"Wait to Respond","type":"Generator"},"person":{"person_uid":"person-qa-hde-crd-0002-vendor1"},"person_uid":"person-qa-hde-crd-0002-vendor1","source":"hdapi_v2_chart_adapter"},"resolver":{"allow_network":true,"dry_run":true,"request":{"configured_base_url":"<redacted>","header_posture":["Authorization: Bearer <redacted>","HD-Geocode-Key: <redacted>"],"input_fingerprint":"481ee027693240c0daf1d082e12ad81e6cf96b7eb372af60348ffdf5cfeb27ac","raw_body_emitted":false,"raw_response_body_emitted":false,"resource_path":"charts","route":"vendor.hdapi.post:/charts","route_auth_posture":"Authorization: Bearer <redacted>","url_posture":"configured_base_url/<resource_path>"},"requested_source":"vendor","resolved_source":"vendor","route_policy":{"classification":"adapter_backed_v2_chart","configured_base_version":"v2","geocode_required":true,"payload_family":"ChartResult","reason":"configured v2 base uses the governed chart route and deterministic ChartResult adapter for bg:resolve","resource_path":"charts","route_auth_posture":"Authorization: Bearer <redacted>","route_family":"recommended_v2_chart","supported":true},"safe_mode":false,"upsert":false,"user_id":"qa-hde-crd-0002-vendor1"},"status":"ok"}
+V2 product stderr (read back from the container, 0 bytes): 
+transport stderr (Railway CLI, NZ-22): Using SSH key from file /home/nathan/.ssh/id_ed25519.pub: glow-workstation railway
+--- A2, after-reads (executor) ---
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'wc -c </tmp/hde-crd-0002-qa20/v2.stderr; cat /tmp/hde-crd-0002-qa20/v2.stderr; echo HOST=$(cat /tmp/hde-crd-0002-qa20/v2.host); echo NOW=$(cat /proc/sys/kernel/hostname)'
+stdout:
+0
+HOST=60f93a3e5923
+NOW=60f93a3e5923
+command: railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- sh -c 'tail -n +"$(( $1 + 1 ))" "$2"' sh 0 /root/.local/state/glow-hdengine/vendor_prod_override.jsonl
+stdout (all sink lines after P4's count 0, verbatim; keys-only by contract):
+{"actor_principal":"root","authorization_ref":null,"command":"bg:resolve","correlation_id":"3408d8b3-ebb9-490e-a838-da1be1ad2423","environment":"prod","error_code":"PROVIDER_PROD_OVERRIDE_REQUIRED","event":"vendor_prod_override","network_open":true,"occurred_at":"2026-10-25T23:30:03.400843Z","outbound_attempted":false,"outcome":"refused","resource_path":null,"route_family":null,"safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+{"actor_principal":"root","authorization_ref":"HDE-CRD-0002/qa/qa-20-live-vendor-override","command":"bg:resolve","correlation_id":"5ef25d3a-79a0-43c5-885a-e4f879ea4607","environment":"prod","error_code":null,"event":"vendor_prod_override","network_open":true,"occurred_at":"2026-10-25T23:31:09.142069Z","outbound_attempted":false,"outcome":"allowed","resource_path":null,"route_family":null,"safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+{"actor_principal":"root","authorization_ref":"HDE-CRD-0002/qa/qa-20-live-vendor-override","command":"bg:resolve","correlation_id":"5ef25d3a-79a0-43c5-885a-e4f879ea4607","environment":"prod","error_code":null,"event":"vendor_prod_override","network_open":true,"occurred_at":"2026-10-25T23:31:09.741882Z","outbound_attempted":true,"outcome":"completed","resource_path":"charts","route_family":"recommended_v2_chart","safe_mode_open":true,"schema_version":"vendor_prod_override.v1","source":"vendor"}
+--- A3, secret scan inside the service against the service's own values (Plan 5.3 rule 3) ---
+command: cat v1.stdout v1.product.stderr v2.stdout v2.product.stderr a2_sink.out | railway ssh -p ce01529f-679f-4f52-a979-23113299a59b -e a06b149a-2876-40bf-84a0-7880feaf8b67 -s 62e7b993-6d30-48b4-9059-c1884b16e90b -- /app/.venv/bin/python -c "<collection 4.6 scan, reading sys.stdin>"
+stdout (result, names compared, characters scanned): NO_HIT 4 3815
+exit: 0
+=== PREDICATES ===
+PASS | P1 V-B: check 16 PASS in the same session window | observed: published PASS, executed 23:18Z; P1 at 23:25Z
+PASS | P1 V-B: /app/.venv/bin/python executable | observed: P1_EXECUTABLE=OK
+PASS | P1 V-B: engine resolves to the deployed package | observed: /app/engine/__init__.py
+PASS | P1 V-B: --version contains the candidate release_id | observed: hdctl 0.0.0 (hdengine@prod;77204764c225b6458e748d8ba6ca2b196dd741b88a7250221a94a1640666c51e)
+PASS | P2: HD_API_BASE_URL, HD_API_KEY, GEO_API_KEY SET; HDAPI_BASE_URL UNSET or equal | observed: {'HD_API_BASE_URL': 'SET', 'HD_API_KEY': 'SET', 'GEO_API_KEY': 'SET', 'HDAPI_BASE_URL': 'UNSET'}
+PASS | P2: P2_ENGINE_ENV=OK | observed: APP_ENV=prod ENGINE_ENV=UNSET P2_ENGINE_ENV=OK
+PASS | P3: rails exactly SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod LC_ALL=C LANG=C TZ=UTC | observed: {'SAFE_MODE': '0', 'ALLOW_NETWORK': '1', 'APP_ENV': 'prod', 'LC_ALL': 'C', 'LANG': 'C', 'TZ': 'UTC'}
+PASS | P4: ABSOLUTE_AS_CONFIGURED=True IN_REPOSITORY=False DIR_WRITABLE=True FILE_WRITABLE=True | observed: ENGINE_ROOT=/app SINK=/root/.local/state/glow-hdengine/vendor_prod_override.jsonl ABSOLUTE_AS_CONFIGURED=True IN_REPOSITORY=False DIR_WRITABLE=True FILE_WRITABLE=True LINES=0
+PASS | P5: actor account non-empty | observed: root
+PASS | V1 exits 1 | observed: 1
+PASS | V1 stdout status error, code PROVIDER_PROD_OVERRIDE_REQUIRED, error.details.outbound_attempted false | observed: ('error', 'PROVIDER_PROD_OVERRIDE_REQUIRED', False)
+PASS | V1 product stderr empty | observed: 0 bytes
+PASS | V1: exactly one new sink line after P4's count | observed: 1
+PASS | V1 sink line: event vendor_prod_override, outcome refused, error_code PROVIDER_PROD_OVERRIDE_REQUIRED, authorization_ref null, outbound_attempted false | observed: ('vendor_prod_override', 'refused', 'PROVIDER_PROD_OVERRIDE_REQUIRED', None, False)
+PASS | V2 exits 0 | observed: 0
+PASS | V2 stdout status ok | observed: ok
+PASS | V2 resolver.route_policy.route_family recommended_v2_chart and resource_path charts | observed: ('recommended_v2_chart', 'charts')
+PASS | V2 adapter.status mapped, payload_family ChartResult | observed: ('mapped', 'ChartResult')
+PASS | V2 cache.payload_posture adapter_mapped_no_raw_vendor_payload | observed: adapter_mapped_no_raw_vendor_payload
+PASS | V2 ingest.rows_written 0 | observed: 0
+PASS | V2 request posture lists Authorization: Bearer <redacted> and HD-Geocode-Key: <redacted>, no HD-Api-Key | observed: ['Authorization: Bearer <redacted>', 'HD-Geocode-Key: <redacted>']
+PASS | V2 product stderr empty | observed: 0 bytes
+PASS | exactly two further sink lines (three after P4's count) | observed: 3
+PASS | further lines share one correlation_id (distinct from V1's) | observed: ('5ef25d3a-79a0-43c5-885a-e4f879ea4607', '5ef25d3a-79a0-43c5-885a-e4f879ea4607')
+PASS | first further line: outcome allowed, authorization_ref the reference, outbound_attempted false, route_family null | observed: ('allowed', 'HDE-CRD-0002/qa/qa-20-live-vendor-override', False, None)
+PASS | second further line: outcome completed, outbound_attempted true, route_family recommended_v2_chart, resource_path charts, error_code null | observed: ('completed', True, 'recommended_v2_chart', 'charts', None)
+PASS | every new sink line has the sixteen keys of HDE CLI/API/Vendor Ref 7.1.11f | observed: [16, 16, 16]
+PASS | every new sink line: actor_principal equals P5's account | observed: ['root', 'root', 'root']
+PASS | no user key, birth data, location, URL, header, key or raw provider text in the sink lines | observed: {'qa-hde-crd-0002-vendor1': False, '1990': False, '12:34': False, 'Amsterdam': False, 'http': False, 'Bearer': False, 'HD-': False}
+PASS | V-A git status --porcelain | observed: not applicable under V-B: no tracked checkout in the container (/app/.git absent)
+PASS | secret scan in the service (A3) | observed: NO_HIT 4 3815
+PASS | one container throughout (NZ-23) | observed: ['60f93a3e5923']
+=== NOTES ===
+attempt 1 of check 20 (Plan section 9); no earlier attempt. One allowed invocation (V2) used.
+Classification: every P row held; V1 and V2 and their events agree with HDE CLI/API/Vendor Ref 7.1.11c to 7.1.11f; no deviation to classify (Glow QA Guide 3.5.7).
+Initiator: the Product Owner typed both commands in the Claude Code prompt with the ! prefix; the executor did not run V1 or V2 (Plan section 2; HDE CLI/API/Vendor Ref 7.1.11e). An earlier keystroke, 'bash /tmp/', ran only against the local directory and reached no service.
+IR-1: actor_principal 'root' is the container's effective account, not proof of a person; the attestation above is.
+Normalizations: NZ-01 (scratch /tmp/hde-crd-0002-qa/qa-20), NZ-06 (publication helper), NZ-20 (V1 and V2 as two short asserting scripts; command lists the P reads, the two scripts and the gate and after-reads; exit_code is v2.sh's status), NZ-21 (cwd /app), NZ-22 (outputs captured to files; product stderr read back from the container; the Railway CLI transport line kept apart), NZ-23 (hostname recorded), NZ-24 (P4 directory mode 0700; observed drwx------).
+Sink: /root/.local/state/glow-hdengine/vendor_prod_override.jsonl on the service host; P4 count 0; three new lines; it lives until the container is replaced (append-only by design).
+The V2 stdout holds the adapter-mapped BodyGraph of the synthetic input and a cache user_id derived from it; no raw vendor payload (raw_body_emitted false, raw_response_body_emitted false); configured_base_url is <redacted>.
+captured_env is the Production binding as P3 read it in the service shell.
+Nonclaims: V-B is a call inside the deployed service's container through the CLI, not a request to its HTTP surface; no broad HumanDesignAPI v2 conformance, mapped-cache write, database write, deployment, QA PASS for the change or closure (Glow QA Guide 3.5.5).
