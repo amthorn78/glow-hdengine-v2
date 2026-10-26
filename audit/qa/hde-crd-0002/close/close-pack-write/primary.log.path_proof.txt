@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0002/close/close-pack-write/primary.log
+size_bytes: 763
+sha256: f272ad23857f0f39d98b6fa2015652e6a542cccb7341c1d14ce6a98eb6bebb5f
+mtime_utc: 2026-10-26T04:37:35Z
+produced_at_utc: 2026-09-22T14:25:29Z

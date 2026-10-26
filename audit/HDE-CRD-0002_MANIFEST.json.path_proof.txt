@@ -1,0 +1,5 @@
+path: audit/HDE-CRD-0002_MANIFEST.json
+size_bytes: 11495
+sha256: 1e2ae1693dc0e8da7ec9ee13dbfadb5bfcaa1f04fd50905060f7d09814dbb9f2
+mtime_utc: 2026-10-26T04:37:08Z
+produced_at_utc: 2026-09-22T14:25:29Z
