@@ -1,16 +1,17 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-21-evidence-admission","check_name":"The first real HDE-CRD-0002 publication validates; existing inputs still validate","claimed_tokens":[],"command":[["git","rev-parse","HEAD"],["git","status","--porcelain"],["python","--version"],["python","-c","import flask"],["git","diff","--stat","22a3bc040a60c75b089a629172a5d829f20d8e98","--",".",":!docs/ephemeral",":!docs/pfcanon",":!audit/qa/hde-crd-0002",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*"],["git","status","--porcelain","--untracked-files=all","--",".",":!docs/ephemeral",":!docs/pfcanon",":!audit/qa/hde-crd-0002",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*"],["python","--version"],["python","-m","pytest","--version"],["python","-c","import engine; print(engine.__file__)"],["python","-c","<validate_crd_check_family HDE-CRD-0002>"],["python","-c","<validate_crd_check_family HDE-CRD-0001>"],["python","tools/evidence/update_evidence_index.py","--check"],["python","tools/evidence/orientation_demo.py","--check"],["python","tools/evidence/validate_evidence_paths.py"],["python","ci/checks/check_mirror_schema.sh"],["python","tools/evidence/check_lf_endings.py"],["python","-c","<Index key read>"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py","-k","crd"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_evidence_skeleton.py::test_mirror_schema_and_parity"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","crd"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/qa/test_epic021_acceptance_alignment.py::test_current_acceptance_inputs_are_strictly_viable"]],"command_provenance":"QA Plan v1.3 check 21; QA-90 collection v1.3 task T21, attempt 1; normalizations: NZ-01, NZ-06, NZ-08, NZ-30, NZ-31","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"TOOLING_BLOCKED","status_reason":"readiness (i): the test copy differs from 22a3bc0 outside the excluded paths by docs/prompt_ecosystem_management/authoritative-surfaces.md (63335e66, PR 737); every other predicate held","timestamp_utc":"2026-10-25T23:51:34Z"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-21-evidence-admission","check_name":"The first real HDE-CRD-0002 publication validates; existing inputs still validate","claimed_tokens":[],"command":[["git","diff","--stat","22a3bc040a60c75b089a629172a5d829f20d8e98","--",".",":!docs/ephemeral",":!docs/pfcanon",":!audit/qa/hde-crd-0002",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*"],["git","checkout","22a3bc040a60c75b089a629172a5d829f20d8e98","--","docs/prompt_ecosystem_management/authoritative-surfaces.md"],["git","commit","-q","-m","<QA-21 Moon Loop copy-local restore>"],["git","diff","--stat","22a3bc040a60c75b089a629172a5d829f20d8e98","--",".",":!docs/ephemeral",":!docs/pfcanon",":!audit/qa/hde-crd-0002",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*"],["git","status","--porcelain","--untracked-files=all","--",".",":!docs/ephemeral",":!docs/pfcanon",":!audit/qa/hde-crd-0002",":!docs/evidence/INDEX.*",":!artifacts/evidence_index.jsonl*",":!audit/gates/topology/orientation_demo.txt*"],["python","-c","<validate_crd_check_family HDE-CRD-0002>"],["python","-c","<validate_crd_check_family HDE-CRD-0001>"],["python","tools/evidence/update_evidence_index.py","--check"],["python","tools/evidence/orientation_demo.py","--check"],["python","tools/evidence/validate_evidence_paths.py"],["python","ci/checks/check_mirror_schema.sh"],["python","tools/evidence/check_lf_endings.py"],["python","-c","<Index key read>"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py","-k","crd"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_evidence_skeleton.py::test_mirror_schema_and_parity"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","crd"],["python","-m","pytest","-q","-p","no:cacheprovider","tests/qa/test_epic021_acceptance_alignment.py::test_current_acceptance_inputs_are_strictly_viable"]],"command_provenance":"QA Plan v1.3 check 21; QA-90 collection v1.3 task T21, attempt 1 with a Product Owner-directed in-session Moon Loop rerun (Glow QA Guide 3.4.8); normalizations: NZ-01, NZ-06, NZ-08, NZ-30, NZ-31, NZ-32","evidence_artifacts":["audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-10-26T00:00:03Z"}
 === CONTEXT ===
-check: qa-21-evidence-admission (QA Plan v1.3 check 21; QA-90 collection v1.3 task T21; attempt 1); requirement S22
+check: qa-21-evidence-admission (QA Plan v1.3 check 21; QA-90 collection v1.3 task T21; attempt 1, with an in-session Moon Loop rerun); requirement S22
 class: 2, local/offline
-environments: the evidence checkout /tmp/hde-crd-0002-evidence (branch qa/hde-crd-0002-t16-t20-evidence, holding checks 1 to 20; validation only; interpreter /tmp/hde-crd-0002-evid-venv/bin/python) and the throwaway test copy /tmp/hde-crd-0002-qa21-copy (cp -a of the evidence checkout; venv /tmp/hde-crd-0002-qa21-venv, CI's full install from the copy)
+environments: the evidence checkout /tmp/hde-crd-0002-evidence (branch qa/hde-crd-0002-t16-t20-evidence; validation only; /tmp/hde-crd-0002-evid-venv) and a throwaway test copy /tmp/hde-crd-0002-qa21-copy (cp -a of the evidence checkout; venv /tmp/hde-crd-0002-qa21-venv with CI's full install from the copy)
 actor: Kronos (Claude Code CLI session on the Product Owner's workstation, local session 5c9c7c47-41bd-437a-a9ee-63879dec618b), by the Product Owner's direction
-started_at_utc: 2026-10-25T23:44:39Z; ended_at_utc: 2026-10-25T23:50:00Z
+first run: 2026-10-25T23:44:39Z to 2026-10-25T23:50:00Z (copy built from evidence HEAD 2861558b, before check 21's first publication)
+Moon Loop rerun: 2026-10-25T23:53:28Z to 2026-10-25T23:59:11Z (copy built from evidence HEAD d639772d, after check 21's first publication d639772d)
 prior shell posture (NZ-30, NZ-08):
 prior_rails: SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev
 TMPDIR(prior)=SET
 tmpfs
 ext2/ext3
-exported posture (E-L hygiene; presence only):
+exported posture for every command (E-L hygiene; presence only):
 LC_ALL=C
 LANG=C
 TZ=UTC
@@ -29,11 +30,61 @@ ENGINE_ENV=UNSET
 TMPDIR=UNSET
 XDG_STATE_HOME=/tmp/hde-crd-0002-xdg-state (entries: 0)
 === COMMANDS ===
+===== FIRST RUN (failure signature) =====
+--- r_cp_diff (test copy) ---
+command: git diff --stat 22a3bc040a60c75b089a629172a5d829f20d8e98 -- . ':!docs/ephemeral' ':!docs/pfcanon' ':!audit/qa/hde-crd-0002' ':!docs/evidence/INDEX.*' ':!artifacts/evidence_index.jsonl*' ':!audit/gates/topology/orientation_demo.txt*'
+exit: 0
+stdout:
+ docs/prompt_ecosystem_management/authoritative-surfaces.md | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+stderr (0 bytes):
+--- r_cp_status (test copy) ---
+command: git status --porcelain --untracked-files=all -- . ':!docs/ephemeral' ':!docs/pfcanon' ':!audit/qa/hde-crd-0002' ':!docs/evidence/INDEX.*' ':!artifacts/evidence_index.jsonl*' ':!audit/gates/topology/orientation_demo.txt*'
+exit: 0
+stdout:
+
+stderr (0 bytes):
+first-run result: readiness (i) non-empty (one file, docs/prompt_ecosystem_management/authoritative-surfaces.md); every other first-run read and predicate held: CRD-0002 20 checks, 20 of 20 statuses equal, CRD-0001 10 checks, five validators exit 0, Index 21 of 21, tests 31 passed, 35 deselected in 276.03s (0:04:36); 1 passed in 0.61s; 81 passed, 86 deselected in 3.23s; 1 passed in 16.63s. Published as TOOLING_BLOCKED at d639772d (blob 3e1562ea1175, 20,530 bytes, SHA-256 138e0ab6a69cf519a178fd09cdac237d980f11a181d259b437893d12bc64a037), kept in git history.
+===== MOON LOOP (Glow QA Guide 3.4.8; QA-created throwaway copy only) =====
+--- ml_before (test copy, fresh copy) ---
+command: sha256sum docs/prompt_ecosystem_management/authoritative-surfaces.md
+exit: 0
+stdout:
+b5dd52c723d8911b5e6404dd4273a53e74aa74bd19ec3049f74ea79499e171c5  docs/prompt_ecosystem_management/authoritative-surfaces.md
+stderr (0 bytes):
+--- ml_restore (test copy) ---
+command: git checkout 22a3bc040a60c75b089a629172a5d829f20d8e98 -- docs/prompt_ecosystem_management/authoritative-surfaces.md
+exit: 0
+stdout:
+
+stderr (0 bytes):
+--- ml_after (test copy) ---
+command: sha256sum docs/prompt_ecosystem_management/authoritative-surfaces.md
+exit: 0
+stdout:
+9daecccc35005346e574b0055c27cd79f76ff4ec246d204d4bdf678f16e12b97  docs/prompt_ecosystem_management/authoritative-surfaces.md
+stderr (0 bytes):
+--- ml_ref ---
+command: git show 22a3bc040a60c75b089a629172a5d829f20d8e98:docs/prompt_ecosystem_management/authoritative-surfaces.md | sha256sum
+stdout: 9daecccc35005346e574b0055c27cd79f76ff4ec246d204d4bdf678f16e12b97  -
+--- ml_commit (test copy) ---
+command: git -c user.name=qa-moon-loop -c user.email=qa@localhost commit -q -m 'QA-21 Moon Loop: copy-local restore of docs/prompt_ecosystem_management/authoritative-surfaces.md to 22a3bc0 bytes (never pushed)'
+exit: 0
+stdout:
+
+stderr (0 bytes):
+--- ml_head (test copy) ---
+command: git rev-parse HEAD
+exit: 0
+stdout:
+3b3cef3d9aec6efc531d2f0a55ddde80805e7d9e
+stderr (0 bytes):
+===== RERUN =====
 --- r_ev_head (evidence checkout) ---
 command: git rev-parse HEAD
 exit: 0
 stdout:
-2861558b63a457c94f8e219c59357b4961853c9d
+d639772d9638e8f1d8d4f7565f02c543520e2d57
 stderr (0 bytes):
 --- r_ev_status (evidence checkout) ---
 command: git status --porcelain
@@ -57,8 +108,7 @@ stderr (0 bytes):
 command: git diff --stat 22a3bc040a60c75b089a629172a5d829f20d8e98 -- . ':!docs/ephemeral' ':!docs/pfcanon' ':!audit/qa/hde-crd-0002' ':!docs/evidence/INDEX.*' ':!artifacts/evidence_index.jsonl*' ':!audit/gates/topology/orientation_demo.txt*'
 exit: 0
 stdout:
- docs/prompt_ecosystem_management/authoritative-surfaces.md | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+
 stderr (0 bytes):
 --- r_cp_status (test copy) ---
 command: git status --porcelain --untracked-files=all -- . ':!docs/ephemeral' ':!docs/pfcanon' ':!audit/qa/hde-crd-0002' ':!docs/evidence/INDEX.*' ':!artifacts/evidence_index.jsonl*' ':!audit/gates/topology/orientation_demo.txt*'
@@ -84,20 +134,14 @@ exit: 0
 stdout:
 /tmp/hde-crd-0002-qa21-copy/engine/__init__.py
 stderr (0 bytes):
---- r_cp_head (test copy) ---
-command: git rev-parse HEAD
-exit: 0
-stdout:
-2861558b63a457c94f8e219c59357b4961853c9d
-stderr (0 bytes):
 --- s1_fam2 (evidence checkout) ---
-command: python -c "import pathlib; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; print(v(HarnessConfig(crd_id='HDE-CRD-0002', repo_root=pathlib.Path.cwd())))"
+command: python -c "<validate_crd_check_family HDE-CRD-0002>"
 exit: 0
 stdout:
-{'qa-01-preflight': {'check_id': 'qa-01-preflight', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log', 'status': 'PASS'}, 'qa-02-ci-coverage': {'check_id': 'qa-02-ci-coverage', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-02-ci-coverage/primary.log', 'status': 'PASS'}, 'qa-03-attestation-debian': {'check_id': 'qa-03-attestation-debian', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log', 'status': 'PASS'}, 'qa-04-showcompat-help': {'check_id': 'qa-04-showcompat-help', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-04-showcompat-help/primary.log', 'status': 'PASS'}, 'qa-05-aux-preview-band': {'check_id': 'qa-05-aux-preview-band', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-05-aux-preview-band/primary.log', 'status': 'PASS'}, 'qa-06-dev-harness-retired': {'check_id': 'qa-06-dev-harness-retired', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-06-dev-harness-retired/primary.log', 'status': 'PASS'}, 'qa-07-dev-reader-gate': {'check_id': 'qa-07-dev-reader-gate', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-07-dev-reader-gate/primary.log', 'status': 'PASS'}, 'qa-08-release-evidence-tooling': {'check_id': 'qa-08-release-evidence-tooling', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-08-release-evidence-tooling/primary.log', 'status': 'PASS'}, 'qa-09-override-matrix': {'check_id': 'qa-09-override-matrix', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-09-override-matrix/primary.log', 'status': 'PASS'}, 'qa-10-endpoint-catalog': {'check_id': 'qa-10-endpoint-catalog', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-10-endpoint-catalog/primary.log', 'status': 'PASS'}, 'qa-11-template-and-documents': {'check_id': 'qa-11-template-and-documents', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-11-template-and-documents/primary.log', 'status': 'PASS'}, 'qa-12-security-review': {'check_id': 'qa-12-security-review', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-12-security-review/primary.log', 'status': 'PASS'}, 'qa-13-prepush-check': {'check_id': 'qa-13-prepush-check', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log', 'status': 'PASS'}, 'qa-14-close-pack-writer': {'check_id': 'qa-14-close-pack-writer', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-14-close-pack-writer/primary.log', 'status': 'PASS'}, 'qa-15-s01-removal': {'check_id': 'qa-15-s01-removal', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-15-s01-removal/primary.log', 'status': 'PASS'}, 'qa-16-deployed-identity': {'check_id': 'qa-16-deployed-identity', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-16-deployed-identity/primary.log', 'status': 'PASS'}, 'qa-17-deployed-not-found': {'check_id': 'qa-17-deployed-not-found', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-17-deployed-not-found/primary.log', 'status': 'PASS'}, 'qa-18-deployed-dev-surfaces': {'check_id': 'qa-18-deployed-dev-surfaces', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-18-deployed-dev-surfaces/primary.log', 'status': 'PASS'}, 'qa-19-deployed-reader-input': {'check_id': 'qa-19-deployed-reader-input', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-19-deployed-reader-input/primary.log', 'status': 'PASS'}, 'qa-20-live-vendor-override': {'check_id': 'qa-20-live-vendor-override', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-20-live-vendor-override/primary.log', 'status': 'PASS'}}
+{'qa-01-preflight': {'check_id': 'qa-01-preflight', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-01-preflight/primary.log', 'status': 'PASS'}, 'qa-02-ci-coverage': {'check_id': 'qa-02-ci-coverage', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-02-ci-coverage/primary.log', 'status': 'PASS'}, 'qa-03-attestation-debian': {'check_id': 'qa-03-attestation-debian', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-03-attestation-debian/primary.log', 'status': 'PASS'}, 'qa-04-showcompat-help': {'check_id': 'qa-04-showcompat-help', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-04-showcompat-help/primary.log', 'status': 'PASS'}, 'qa-05-aux-preview-band': {'check_id': 'qa-05-aux-preview-band', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-05-aux-preview-band/primary.log', 'status': 'PASS'}, 'qa-06-dev-harness-retired': {'check_id': 'qa-06-dev-harness-retired', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-06-dev-harness-retired/primary.log', 'status': 'PASS'}, 'qa-07-dev-reader-gate': {'check_id': 'qa-07-dev-reader-gate', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-07-dev-reader-gate/primary.log', 'status': 'PASS'}, 'qa-08-release-evidence-tooling': {'check_id': 'qa-08-release-evidence-tooling', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-08-release-evidence-tooling/primary.log', 'status': 'PASS'}, 'qa-09-override-matrix': {'check_id': 'qa-09-override-matrix', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-09-override-matrix/primary.log', 'status': 'PASS'}, 'qa-10-endpoint-catalog': {'check_id': 'qa-10-endpoint-catalog', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-10-endpoint-catalog/primary.log', 'status': 'PASS'}, 'qa-11-template-and-documents': {'check_id': 'qa-11-template-and-documents', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-11-template-and-documents/primary.log', 'status': 'PASS'}, 'qa-12-security-review': {'check_id': 'qa-12-security-review', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-12-security-review/primary.log', 'status': 'PASS'}, 'qa-13-prepush-check': {'check_id': 'qa-13-prepush-check', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-13-prepush-check/primary.log', 'status': 'PASS'}, 'qa-14-close-pack-writer': {'check_id': 'qa-14-close-pack-writer', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-14-close-pack-writer/primary.log', 'status': 'PASS'}, 'qa-15-s01-removal': {'check_id': 'qa-15-s01-removal', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-15-s01-removal/primary.log', 'status': 'PASS'}, 'qa-16-deployed-identity': {'check_id': 'qa-16-deployed-identity', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-16-deployed-identity/primary.log', 'status': 'PASS'}, 'qa-17-deployed-not-found': {'check_id': 'qa-17-deployed-not-found', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-17-deployed-not-found/primary.log', 'status': 'PASS'}, 'qa-18-deployed-dev-surfaces': {'check_id': 'qa-18-deployed-dev-surfaces', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-18-deployed-dev-surfaces/primary.log', 'status': 'PASS'}, 'qa-19-deployed-reader-input': {'check_id': 'qa-19-deployed-reader-input', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-19-deployed-reader-input/primary.log', 'status': 'PASS'}, 'qa-20-live-vendor-override': {'check_id': 'qa-20-live-vendor-override', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-20-live-vendor-override/primary.log', 'status': 'PASS'}, 'qa-21-evidence-admission': {'check_id': 'qa-21-evidence-admission', 'log_path': 'audit/qa/hde-crd-0002/checks/qa-21-evidence-admission/primary.log', 'status': 'TOOLING_BLOCKED'}}
 stderr (0 bytes):
 --- s1_fam1 (evidence checkout) ---
-command: python -c "import pathlib; from tools.qa.qa_harness import HarnessConfig, validate_crd_check_family as v; print(v(HarnessConfig(crd_id='HDE-CRD-0001', repo_root=pathlib.Path.cwd())))"
+command: python -c "<validate_crd_check_family HDE-CRD-0001>"
 exit: 0
 stdout:
 {'qa-01-setup': {'check_id': 'qa-01-setup', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log', 'status': 'PASS'}, 'qa-02-claims': {'check_id': 'qa-02-claims', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log', 'status': 'PASS'}, 'qa-03-crd-local': {'check_id': 'qa-03-crd-local', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log', 'status': 'PASS'}, 'qa-04-runner': {'check_id': 'qa-04-runner', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log', 'status': 'PASS'}, 'qa-05-epic-compat': {'check_id': 'qa-05-epic-compat', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log', 'status': 'PASS'}, 'qa-06-publication': {'check_id': 'qa-06-publication', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log', 'status': 'PASS'}, 'qa-07-admission': {'check_id': 'qa-07-admission', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log', 'status': 'PASS'}, 'qa-08-recovery': {'check_id': 'qa-08-recovery', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log', 'status': 'PASS'}, 'qa-09-docs-and-history': {'check_id': 'qa-09-docs-and-history', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log', 'status': 'PASS'}, 'qa-10-governed-evidence': {'check_id': 'qa-10-governed-evidence', 'log_path': 'audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log', 'status': 'PASS'}}
@@ -139,7 +183,7 @@ stdout:
 21 21 []
 stderr (0 bytes):
 --- s1_hdr (evidence checkout) ---
-command: python -c "<manifest status versus each primary header status, for Plan section 6's twenty IDs>"
+command: python -c "<manifest status versus each primary header status, Plan section 6's twenty IDs; extra manifest entries listed>"
 exit: 0
 stdout:
 qa-01-preflight PASS PASS EQUAL
@@ -162,47 +206,21 @@ qa-17-deployed-not-found PASS PASS EQUAL
 qa-18-deployed-dev-surfaces PASS PASS EQUAL
 qa-19-deployed-reader-input PASS PASS EQUAL
 qa-20-live-vendor-override PASS PASS EQUAL
-equal 20 of 20 manifest ids 20 exact set True
-stderr (0 bytes):
---- s1_proofs (evidence checkout) ---
-command: python -c "<read produced_at_utc and mtime_utc from every audit/qa/hde-crd-0002 path proof>"
-exit: 0
-stdout:
-checks/qa-01-preflight/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:43:05Z
-checks/qa-02-ci-coverage/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:44:41Z
-checks/qa-03-attestation-debian/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:46:04Z
-checks/qa-04-showcompat-help/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:46:43Z
-checks/qa-05-aux-preview-band/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:47:40Z
-checks/qa-06-dev-harness-retired/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:49:10Z
-checks/qa-07-dev-reader-gate/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:57:48Z
-checks/qa-08-release-evidence-tooling/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:58:52Z
-checks/qa-09-override-matrix/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:59:27Z
-checks/qa-10-endpoint-catalog/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T00:00:05Z
-checks/qa-11-template-and-documents/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T00:01:25Z
-checks/qa-12-security-review/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T00:01:59Z
-checks/qa-13-prepush-check/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T00:58:29Z
-checks/qa-14-close-pack-writer/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T00:24:46Z
-checks/qa-15-s01-removal/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T00:24:52Z
-checks/qa-16-deployed-identity/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T23:23:10Z
-checks/qa-17-deployed-not-found/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T23:24:41Z
-checks/qa-18-deployed-dev-surfaces/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T23:24:46Z
-checks/qa-19-deployed-reader-input/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T23:24:50Z
-checks/qa-20-live-vendor-override/primary.log.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-25T23:33:31Z
-qa_step_logs_manifest.json.path_proof.txt produced_at_utc 2026-09-22T14:25:29Z mtime_utc 2026-10-24T23:43:05Z
+equal 20 of 20 ; manifest ids 21 ; extra beyond checks 1 to 20: ['qa-21-evidence-admission'] ; all twenty present True
 stderr (0 bytes):
 --- s2_t1 (test copy) ---
 command: python -m pytest -q -p no:cacheprovider tests/evidence/test_evidence_index_missing_state.py -k crd
 exit: 0
 stdout:
 ...............................                                          [100%]
-31 passed, 35 deselected in 276.03s (0:04:36)
+31 passed, 35 deselected in 274.14s (0:04:34)
 stderr (0 bytes):
 --- s2_t2 (test copy) ---
 command: python -m pytest -q -p no:cacheprovider tests/evidence/test_evidence_skeleton.py::test_mirror_schema_and_parity
 exit: 0
 stdout:
 .                                                                        [100%]
-1 passed in 0.61s
+1 passed in 0.67s
 stderr (0 bytes):
 --- s2_t3 (test copy) ---
 command: python -m pytest -q -p no:cacheprovider tests/qa/test_generic_qa_harness.py -k crd
@@ -210,34 +228,36 @@ exit: 0
 stdout:
 ........................................................................ [ 88%]
 .........                                                                [100%]
-81 passed, 86 deselected in 3.23s
+81 passed, 86 deselected in 2.95s
 stderr (0 bytes):
 --- s2_t4 (test copy) ---
 command: python -m pytest -q -p no:cacheprovider tests/qa/test_epic021_acceptance_alignment.py::test_current_acceptance_inputs_are_strictly_viable
 exit: 0
 stdout:
 .                                                                        [100%]
-1 passed in 16.63s
+1 passed in 15.40s
 stderr (0 bytes):
 === PREDICATES ===
+PASS | Moon Loop: the restored file equals 22a3bc0's bytes | observed: 9daecccc35005346e574b0055c27cd79f76ff4ec246d204d4bdf678f16e12b97
 PASS | readiness: evidence checkout python 3.12.x and flask importable | observed: ('Python 3.12.15', '0')
-FAIL | readiness (i): test copy git diff --stat against 22a3bc0 outside the excluded paths prints nothing | observed: docs/prompt_ecosystem_management/authoritative-surfaces.md | 6 +++--- /  1 file changed, 3 insertions(+), 3 deletions(-)
-PASS | readiness (i): test copy git status outside the excluded paths prints nothing | observed: 0 bytes
-PASS | readiness (ii): test copy python 3.12.x, pytest, engine inside the copy | observed: ('Python 3.12.15', 'pytest 8.4.2', '/tmp/hde-crd-0002-qa21-copy/engine/__init__.py')
-PASS | HDE-CRD-0002 validates with exactly the twenty IDs of checks 1 to 20 | observed: 20 checks; exact set True
-PASS | each manifest status equals its primary header | observed: equal 20 of 20 manifest ids 20 exact set True
+PASS | readiness (i): test copy diff against 22a3bc0 outside the excluded paths prints nothing | observed: 0 bytes
+PASS | readiness (i): test copy status outside the excluded paths prints nothing | observed: 0 bytes
+PASS | readiness (ii): python 3.12.x, pytest, engine inside the copy | observed: ('Python 3.12.15', 'pytest 8.4.2', '/tmp/hde-crd-0002-qa21-copy/engine/__init__.py')
+PASS | HDE-CRD-0002 validates with exactly the twenty IDs of checks 1 to 20 (plus check 21's own attempt-1 entry, which this publication replaces; NZ-32) | observed: 21 entries; extra ['qa-21-evidence-admission']
+PASS | each of the twenty manifest statuses equals its header | observed: equal 20 of 20 ; manifest ids 21 ; extra beyond checks 1 to 20: ['qa-21-evidence-admission'] ; all twenty present True
 PASS | HDE-CRD-0001 validates with its ten checks | observed: 10 checks
 PASS | the five validators exit 0 | observed: ['0', '0', '0', '0', '0']
 PASS | all twenty-one Index keys present | observed: 21 21 []
-PASS | step 2 invocation 1: 31 passed | observed: 31 passed, 35 deselected in 276.03s (0:04:36)
-PASS | step 2 invocation 2: 1 passed | observed: 1 passed in 0.61s
-PASS | step 2 invocation 3: 81 passed | observed: 81 passed, 86 deselected in 3.23s
-PASS | step 2 invocation 4: 1 passed | observed: 1 passed in 16.63s
+PASS | step 2 invocation 1: 31 passed | observed: 31 passed, 35 deselected in 274.14s (0:04:34)
+PASS | step 2 invocation 2: 1 passed | observed: 1 passed in 0.67s
+PASS | step 2 invocation 3: 81 passed | observed: 81 passed, 86 deselected in 2.95s
+PASS | step 2 invocation 4: 1 passed | observed: 1 passed in 15.40s
 === NOTES ===
-attempt 1 of check 21 (Plan section 9); no earlier attempt.
-OUTCOME: TOOLING_BLOCKED by Plan section 7 rule A ("A non-empty diff ... is TOOLING_BLOCKED (candidate changed)"). Readiness (i)'s diff is non-empty by exactly one file: docs/prompt_ecosystem_management/authoritative-surfaces.md (3 insertions, 3 deletions), changed on main by 63335e66 (amthorn78/glow-hdengine-v2#737, 2026-10-25T17:52:29Z, the Product Owner direction on the C-1 route), after T13-RV1's tested commit da5735eb. It is a Markdown file under a CI-exempt documentation prefix (ci/checks/classify_ci_changes.py _DOCUMENTATION_PREFIXES; AGENTS.md "storage, not runtime"); no Python, YAML, JSON or TOML file outside docs/ephemeral/ names it. Every other readiness read and every PASS predicate of check 21 held, observed above; the readiness read was not gated before the main commands, so their results are recorded as observed.
-The executor does not soften an assertion (QA-100). For Kronos at QA-110: (a) accept the difference as outside "code" under the Plan's objective, or (b) authorize attempt 2 on a test copy whose one differing file is restored to 22a3bc0's bytes; either is Kronos's decision.
-O-2 and O-5 (recorded, not judged): every one of the 21 audit/qa/hde-crd-0002 path proofs carries produced_at_utc 2026-09-22T14:25:29Z; mtime_utc carries the capture times (AGENTS.md "Path-proof portability": mtime_utc is provenance, not a correctness input).
-QA-100 results v1.2 G-1 is present in the validated family: qa-16-deployed-identity's header timestamp_utc 2026-10-25T23:40:00Z; the validators accept it.
-Normalizations: NZ-01, NZ-06; NZ-08 (TMPDIR unset after recording its prior posture: tmpfs /tmp, ext2/ext3 TMPDIR); NZ-30 (closed rails exported explicitly over a base shell holding SAFE_MODE=0, ALLOW_NETWORK=1); NZ-31 (Index read).
-Nonclaims: the remedy's measure (1) is the evidence pull request's hosted result, read by QA-110; measure (2) belongs to the close-pack pull request. No primary claims the graph that includes itself (HDE-Mechanics Guide 1.6.3); the final receipt is in the QA-100 result.
+Moon Loop failure signature: readiness (i) printed "docs/prompt_ecosystem_management/authoritative-surfaces.md | 6 +++---" (Plan section 7 rule A: non-empty diff); first run published TOOLING_BLOCKED at d639772d.
+Moon Loop remediation note: in the QA-created throwaway test copy only, docs/prompt_ecosystem_management/authoritative-surfaces.md was restored to 22a3bc0's bytes and committed locally (never pushed), because main's 63335e66 (PR 737, a Product Owner direction record under a CI-exempt documentation prefix that no code or test reads) is not a code difference; the Product Owner directed "you need to moon loop that unless it's a real code defect". No repository file, product code, test, generator, governed artifact, predicate or expected value changed; the evidence checkout and main are untouched.
+Rerun result: every predicate PASS in this same primary. Per QA-110 v1.0 ruling R-2 precedent, an in-session rerun inside attempt 1 is a process deviation that consumes check 21's one ordinary rerun; attempt accounting is Kronos's.
+NZ-32: the rerun's family holds check 21's own attempt-1 entry, so "exactly the twenty IDs of checks 1 to 20" is judged as all twenty present with equal statuses and no other entry than qa-21-evidence-admission itself, which this publication replaces by check_id.
+O-2 and O-5 (recorded, not judged): all 21 audit/qa/hde-crd-0002 path proofs carry produced_at_utc 2026-09-22T14:25:29Z (first run's read); mtime_utc carries capture times.
+QA-100 results v1.2 G-1 is present in the validated family (qa-16-deployed-identity timestamp_utc 2026-10-25T23:40:00Z); validators accept it.
+Normalizations: NZ-01, NZ-06, NZ-08, NZ-30, NZ-31, NZ-32.
+Nonclaims: the remedy's measure (1) is the evidence pull request's hosted result, read by QA-110; measure (2) belongs to the close-pack pull request. No primary claims the graph that includes itself (HDE-Mechanics Guide 1.6.3).
