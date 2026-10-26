@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 from pathlib import Path, PurePosixPath
 
 import pytest
@@ -186,16 +187,26 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert workflow_targets == fixed_targets
 
 
-def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> None:
+def test_closeout_validation_is_isolated_read_only_and_exact_head() -> None:
     manual_path = ROOT / ".github/workflows/epic-closeout-validation.yml"
     text = manual_path.read_text(encoding="utf-8")
     ordinary = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
 
-    assert re.findall(r"(?m)^  [a-z_]+:\s*$", text.split("permissions:", 1)[0]) == [
-        "  workflow_dispatch:"
+    # A close never waits on a manual dispatch: the job runs by itself on a
+    # pull request that changes a writer close pack (HDE-CRD-0002 CL-05, B-5).
+    triggers = text.split("permissions:", 1)[0]
+    assert re.findall(r"(?m)^  [a-z_]+:\s*$", triggers) == [
+        "  pull_request:",
+        "  workflow_dispatch:",
+    ]
+    assert re.findall(r'(?m)^      - "([^"]+)"$', triggers) == [
+        ".github/workflows/epic-closeout-validation.yml",
+        "audit/*_close_candidate_source.json",
+        "audit/*_close_report.md",
+        "audit/*_MANIFEST.json",
     ]
     for forbidden_trigger in (
-        "pull_request:",
+        "pull_request_target:",
         "push:",
         "workflow_run:",
         "repository_dispatch:",
@@ -203,6 +214,12 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
         "schedule:",
     ):
         assert forbidden_trigger not in text
+    assert text.count("pull_request:") == 1
+    assert (
+        "  group: epic-closeout-validation-"
+        "${{ github.event.pull_request.number || github.run_id }}\n"
+        "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n"
+    ) in text
     assert re.findall(r"(?m)^[ \t]*permissions:[ \t]*$", text) == ["permissions:"]
     assert re.findall(r"(?m)^[ \t]*contents:[ \t]+read[ \t]*$", text) == [
         "  contents: read"
@@ -216,12 +233,17 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
     assert text.count('GIT_NO_LAZY_FETCH: "1"') == 1
     assert text.count("actions/checkout@v4") == 1
     assert text.count("persist-credentials: false") == 1
-    assert "ref: ${{ inputs.git_ref }}" in text
+    assert (
+        "      SELECTED_REF: ${{ github.event_name == 'pull_request' && "
+        "github.event.pull_request.head.sha || inputs.git_ref }}\n"
+    ) in text
+    assert text.count("ref: ${{ env.SELECTED_REF }}") == 1
     # The evidence checks import the Reader's transport validators, so the job
     # installs the runtime requirements (HDE-CRD-0002 WU-PR-07 F-1).
     assert text.count("python -m pip install") == 1
     assert "run: python -m pip install -r requirements.txt\n" in text
-    assert "^[0-9a-f]{40,64}$" in text
+    assert text.count("^[0-9a-f]{40,64}$") == 2
+    assert '[[ "$DISPATCHED_SOURCE" != *$\'\\n\'* ]]' in text
     assert '${#CANDIDATE_SOURCE} <= 512' in text
     assert (
         '[[ "$CANDIDATE_SOURCE" =~ '
@@ -237,6 +259,11 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
     assert text.count('test "$(git rev-parse --verify HEAD)" = "$SELECTED_REF"') == 2
     assert text.count("git diff --exit-code") == 2
     assert text.count('git status --short --untracked-files=all') == 2
+    # Every step that installs or validates runs only where a candidate applies;
+    # the clean-checkout verification always runs.
+    assert text.count("        if: steps.select.outputs.applies == 'true'\n") == 4
+    final_step = text[text.index("      - name: Verify validation left the exact checkout clean") :]
+    assert "if:" not in final_step
     validation_step = text[
         text.index("      - name: Validate exact committed closeout candidate without writing") :
         text.index("      - name: Run retained read-only evidence checks")
@@ -266,11 +293,125 @@ def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> No
         "ALLOW_NETWORK=1",
     ):
         assert forbidden not in text
-
     assert ordinary.count("\n  test:\n") == 1
     assert ordinary.count("actions/checkout@v4") == 1
     assert "epic-closeout-validation" not in ordinary
     assert "workflow_dispatch:" not in ordinary
+
+
+def _closeout_selection_script() -> str:
+    text = (ROOT / ".github/workflows/epic-closeout-validation.yml").read_text(encoding="utf-8")
+    body = text.split("<<'SELECT_CLOSEOUT_CANDIDATES'\n", 1)[1]
+    body = body.split("\n          SELECT_CLOSEOUT_CANDIDATES\n", 1)[0]
+    return textwrap.dedent(body) + "\n"
+
+
+def _commit_all(repo: Path, message: str) -> str:
+    _git(repo, "add", "-A")
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q", "-m", message)
+    return _git(repo, "rev-parse", "HEAD")
+
+
+@pytest.mark.parametrize(
+    ("files", "deleted", "expected"),
+    [
+        (
+            {
+                "audit/HDE-CRD-0003_close_candidate_source.json": "{}\n",
+                "audit/HDE-CRD-0003_close_report.md": "# close\n",
+                "audit/HDE-CRD-0003_MANIFEST.json": (
+                    '{"inputs":{"candidate_source":{"path":'
+                    '"audit/HDE-CRD-0003_close_candidate_source.json"}},'
+                    '"schema_version":"close_candidate_manifest.v2"}\n'
+                ),
+            },
+            (),
+            "audit/HDE-CRD-0003_close_candidate_source.json\n",
+        ),
+        (
+            {
+                "audit/EPIC-041_MANIFEST.json": (
+                    '{"inputs":{"candidate_source":{"path":"audit/sources/epic041.json"}},'
+                    '"schema_version":"epic_close_candidate_manifest.v1"}\n'
+                ),
+                "audit/sources/epic041.json": "{}\n",
+            },
+            (),
+            "audit/sources/epic041.json\n",
+        ),
+        ({"audit/EPIC-027_MANIFEST.json": '{"epic":"EPIC-027","rev":2}\n'}, (), ""),
+        ({"README.md": "changed\n"}, (), ""),
+        ({}, ("audit/EPIC-027_MANIFEST.json", "audit/EPIC-027_close_report.md"), ""),
+        (
+            {"audit/HDE-CRD-0004_MANIFEST.json": '{"schema_version":"close_candidate_manifest.v2"}\n'},
+            (),
+            "CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:audit/HDE-CRD-0004_MANIFEST.json",
+        ),
+        (
+            {
+                "audit/HDE-CRD-0004_MANIFEST.json": (
+                    '{"inputs":{"candidate_source":{"path":"audit/../x.json"}},'
+                    '"schema_version":"close_candidate_manifest.v2"}\n'
+                )
+            },
+            (),
+            "CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:audit/HDE-CRD-0004_MANIFEST.json",
+        ),
+        (
+            {"audit/HDE-CRD-0005_close_report.md": "# close\n"},
+            (),
+            "CLOSEOUT_MANIFEST_ABSENT:audit/HDE-CRD-0005_MANIFEST.json",
+        ),
+        (
+            {"audit/HDE-CRD-0006_MANIFEST.json": "{not json\n"},
+            (),
+            "CLOSEOUT_MANIFEST_INVALID:audit/HDE-CRD-0006_MANIFEST.json",
+        ),
+    ],
+    ids=[
+        "v2-pack",
+        "v1-pack-source-elsewhere",
+        "earlier-generator-manifest",
+        "unrelated-change",
+        "deleted-pack",
+        "unbound-source",
+        "dot-segment-source",
+        "manifest-absent",
+        "manifest-invalid",
+    ],
+)
+def test_closeout_validation_selects_each_changed_writer_close_pack(
+    tmp_path: Path, files: dict[str, str], deleted: tuple[str, ...], expected: str
+) -> None:
+    repo = tmp_path / "repo"
+    (repo / "audit").mkdir(parents=True)
+    (repo / "README.md").write_text("base\n", encoding="utf-8")
+    (repo / "audit/EPIC-027_MANIFEST.json").write_text('{"epic":"EPIC-027"}\n', encoding="utf-8")
+    (repo / "audit/EPIC-027_close_report.md").write_text("# EPIC-027\n", encoding="utf-8")
+    _git(repo, "init", "-q")
+    base = _commit_all(repo, "base")
+    for relative, content in files.items():
+        (repo / relative).parent.mkdir(parents=True, exist_ok=True)
+        (repo / relative).write_text(content, encoding="utf-8")
+    for relative in deleted:
+        (repo / relative).unlink()
+    _commit_all(repo, "change")
+
+    result = subprocess.run(
+        [sys.executable, "-I", "-", base],
+        cwd=repo,
+        input=_closeout_selection_script(),
+        text=True,
+        capture_output=True,
+    )
+
+    if expected.startswith("CLOSEOUT_"):
+        assert result.returncode != 0
+        assert result.stdout == ""
+        assert result.stderr.strip() == expected
+    else:
+        assert result.returncode == 0, result.stderr
+        assert result.stdout == expected
 
 
 @pytest.mark.parametrize(
