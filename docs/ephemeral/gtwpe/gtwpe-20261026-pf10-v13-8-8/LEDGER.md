@@ -1,0 +1,233 @@
+# gtwpe-20261026-pf10-v13-8-8 — source inventory and manual document handoffs
+
+Triage state: **COMPLETE**. Document execution: **PENDING**. This ledger is routing and provenance only. It is not substantive source text, and it cannot certify that an edit was made. No document task, QA, review, merge, canon write or operational action ran in this triage session.
+
+Repository: `amthorn78/glow-hdengine-v2`. Source and target baseline: `origin/main` at `9dda63dd3f05f496c3ff67e95da78550d3950c5a` (2026-10-26T20:36:17Z, the commit that published PF10 v13.8.8). The invocation was GTWPE-FLOW-10 100926.1 with three named sources: PF10 v13.8.8, the approved HDE-CRD-0002 Specification v1.1, and its approved delta 01. No earlier ledger, branch or PR identifies this work. The 2026-10-09 run (`gtwpe-20261009-pf10-v13-5`, #596 and #597, both closed) drained an older PF10 base version and is not a continuation.
+
+Coverage:
+- PF10 v13.8.8 is the sole unlettered logical representation on `main`. It was read in full, lines 1–3955, through the stored `\<eof\>` marker on line 3955, which has no trailing newline. All 35 addenda were read, 2.1 to 2.35.
+- The Specification (308 lines), delta 01 (162 lines) and the delta review (190 lines) were read in full.
+- The supporting cross-references listed below were read at the boundaries given.
+- Each of the 25 eligible-or-candidate PF documents got a scan of its leading front matter and purpose/scope block only. No target was read in full, and no existing coverage is asserted. Each document session determines the actual edits.
+
+## Prompt pins
+
+The prompts come from the iteration Nathan named, https://app.notion.com/p/3f44590a05eb81589a9af40e6317f82a (GTWPE iteration 100926.1, accepted for the current run on 2026-10-09). Their bodies were fetched once, live, on 2026-10-26.
+
+| Prompt | Version | Exact page |
+| --- | --- | --- |
+| GTWPE-FLOW-10 | 100926.1 | https://app.notion.com/p/3f44590a05eb81a4ad0dd4df2c6d401c |
+| TW-TRIAGE-10 | 100926.1 | https://app.notion.com/p/3f44590a05eb8118aa19c41e0891b40c |
+| TW-DRAIN-10 | 100926.1 | https://app.notion.com/p/3f44590a05eb8172a314fe6b958bb9ff |
+| TW-DRAIN-20 | 100926.1 | https://app.notion.com/p/3f44590a05eb815ebfd2cf992bec9862 |
+| TW-RECORD-10 | 100926.1 | https://app.notion.com/p/3f44590a05eb81be8aacdd5b075d2605 |
+| TW-RECORD-20 | 100926.1 | https://app.notion.com/p/3f44590a05eb81968215cd653f35f77e |
+| TW-APPLY-10 | 100926.1 | https://app.notion.com/p/3f44590a05eb81eebff6e3afa3d9aa5b |
+
+## Source register
+
+Every repository reference is at `9dda63dd3f05f496c3ff67e95da78550d3950c5a`. Line ranges are inclusive. Read each selected unit from its heading to the next heading of the same level, including its tables.
+
+| Source | Role and path | Identity and coverage |
+| --- | --- | --- |
+| SR1 (F00, A01–A35) | Change-bearing source: `docs/pfcanon/PF10-HDE-Build-Notes-v13.8.8.md` | v13.8.8, effective 2026.10.26; blob `680b0accb0bdf260b0489d1a7385f90bb120cd99`; 729,539 bytes; SHA-256 `f5e13efb5ab1354bda2f578ca69f41bed773160784602a896927bc091a254c2f`; lines 1–3955 read in full |
+| SR2 (S-rows) | Approved base: `docs/ephemeral/HDE-CRD-0002-specification-v1.1-approved.md` | v1.1, SPECIFICATION_APPROVED; blob `c4802a5a7fa3`; 43,151 bytes; SHA-256 `fb412f178fa0ecae527704b16ced4be2c28e42a84e663ccbebdbdb669b7382df`; lines 1–308 |
+| SR3 (D01) | Approved delta 01: `docs/ephemeral/HDE-CRD-0002-specification-delta-v1.0.md` | v1.0; blob `9408d6ed091b`; 21,046 bytes; SHA-256 `59ef9a776c6b5615333cfe68ba4d8145a3d1fe1fdd194b12bb24cf71a233b636` (the approved-delta digest); lines 1–162 |
+| SR4 (D01 approval) | `docs/ephemeral/HDE-CRD-0002-specification-delta-review-v1.0.md` | DELTA_APPROVE by Thoth, 2026-10-21T18:36:00Z; blob `5a6cecc86f60`; 14,586 bytes; SHA-256 `ee5b07d2fe1ee69e23fb0b78b489fde4885696eb7c1135e80a5a887e207ac169`; lines 1–190 |
+| SR5 | Repository controls: `AGENTS.md` | blob `7e358b4601d3`; canon-first rule, canon read-only rule, write boundaries, "PR descriptions" |
+| SR6 | PF front matter in the scope scan below | Per-file blobs below; only the leading logical blocks were inspected |
+
+Supporting cross-references. The addenda name these as necessary inputs. Each is read only at the boundary given, as supporting reading, not as a change source in its own right.
+
+| Ref | Path and boundary | Blob | Why it is needed |
+| --- | --- | --- | --- |
+| X01 | `audit/docdeltas/hde-crd-0002_drain_targets.md`, whole file | `ee5057acb06e` | The drain-targets ledger that PF10 addenda 2.32 and 2.33 cite: the owner and target of each deferral |
+| X02 | `audit/docdeltas/hde-crd-0002_doc_deltas.md`, whole file | `ef3d56eef47e` | The close's doc-delta ledger: the canon home of each item, by title |
+| X03 | `docs/adr/hde/close_pack_writer_adr.md`, section "Affected canon and drainage consequences" (lines 76–88) and the Decision section | `2d91679a1981` | The S21 ADR canon table cited by addenda 2.15 to 2.17 and the Specification's S21 posture; it defers to HDE Build Notes (2.17) |
+| X04 | `docs/ephemeral/HDE-CRD-0002-WU-PR-03-pr-implementation-plan-v2.0.md` §18 (lines 753–792) | `1d6a92a483e2` | "Plan v2.0 §18" doc-delta candidates carried by addendum 2.8 |
+| X05 | `docs/ephemeral/HDE-CRD-0002-WU-PR-04-pr-implementation-plan-v1.0.md` §17 (lines 701–739) | `6baead456619` | "Plan v1.0 §17" doc-delta candidates carried by addenda 2.9 and 2.10 |
+| X06 | `docs/ephemeral/HDE-CRD-0002-WU-PR-05-pr-implementation-result-v1.0.md` §10 (lines 156–165) | `20b170490447` | "Result v1.0 §10" stale canon passages named by addendum 2.10 |
+| X07 | `docs/ephemeral/HDE-CRD-0002-QA70-qa-plan-review-v1.0.md` §5, the "CR-11 — decided" block (lines 256–274) | `b083486fc768` | CR-11 decision and its drainage targets, listed as a canon drainage item by addendum 2.35 |
+| X08 | `docs/ephemeral/HDE-CRD-0002-po-direction-qa-evidence-persistence-v1.0.md`, whole file | `03377747a384` | PO-5, which addenda 2.28 and 2.30 drain to Glow QA Guide §3.4.3 |
+| X09 | `docs/ephemeral/HDE-CRD-0002-po-direction-tool-version-pinning-v1.0.md`, whole file | `9c967d203a37` | PO-2; its home is the Product Owner's choice (held) |
+| X10 | `docs/ephemeral/HDE-CRD-0002-specification-review-v1.1.md` | `c48f77a0c220` | Specification approval evidence: INITIAL_APPROVE by Thoth, 2026-10-12T19:39:51Z |
+| X11 | `docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.2.md` | `2260eae17974` | Closure evidence: CLOSE, CHANGE_CLOSED by Isis, 2026-10-26T16:40:00Z |
+| X12 | `docs/ephemeral/HDE-CRD-0002-CL-20-post-closure-record-v1.0.md` | `ac60f368f6d9` | Post-closure record: manual actions M-0 to M-3; M-0 is this drainage |
+| X13 | `docs/ephemeral/HDE-CRD-0002-QA120-qa-report-v1.0.md` | `d6cceaf3a019` | Final QA Report: verdict PASS, 21 checks |
+| X14 | `audit/HDE-CRD-0002_close_report.md` | `0bbc8050d3c1` | The close report and its 34 deferrals |
+
+## Precedence and closure controls
+
+- **HDE-CRD-0002 is closed.** CL-C-10 v1.2 (X11) records CLOSE, CHANGE_CLOSED, by Isis on 2026-10-26T16:40:00Z, after QA-120 PASS (X13). PF10 2.32 to 2.35 record the closure and the post-closure stages. Its changes are therefore not held back on closure grounds. The cross-cutting rules (2.1, 2.3, 2.11, 2.14, 2.18, 2.31, 2.34) are Product Owner directions in force now. They wait on no closure.
+- **The Specification in force** is the approved base v1.1 plus approved delta 01 (SR2 to SR4; PF10 2.20). S01 is removed, and the release stays at 1.3.0. The base file is immutable. The delta is applied by overlay and never by editing the base.
+- **Supersession inside PF10** (front matter §5). 2.18 withdraws the cost-ceiling passages of 2.11 to 2.16, and of the record of the Specification delta addendum. 2.14 narrows 2.11 rules 7 and 8 for P1 findings. 2.17 amends 2.15 (it supersedes C-3's pointer clause and adds resolutions A and B). 2.19 and 2.20 take addendum 2.10's "1.4.0 cut" and addendum 2.6's purity-report regeneration out of force for WU-PR-08. 2.24 amends 2.23 for WU-REM-01. Editors apply only the surviving text of each superseded passage.
+- **PF10 publication facts, which are not drain targets** (owner: Product Owner):
+  - 2.11's internal rule cross-references are misnumbered (2.12, LR6-O2): read each reference by the rule its text describes.
+  - 2.7's values `dev` and `dev ` lost their code spans (2.8, LR3-O1).
+  - The published 2.31 numbers its rules 1 to 10, while its record numbers them 1 to 7 (2.32, 2.33).
+  - An empty `## ` heading sits at lines 2691–2692, between 2.23 and 2.24.
+  - Three addendum records carry numbers other than their published ones (2.33). The published number governs.
+- **The PF30 record.** PF04 §9.1.1 states that "the active workflow MUST NOT create, update or synchronize" HDE CRD Records entries, so the change flow created none (Specification CR-1). The same section's "Historical drainage" paragraph allows "a separately authorized historical drainage action" to add the planned baseline and the actual history. HDE-CRD-0001's record precedes this one in PF30.1 §8. T-PF30.1 is offered on that basis: Nathan's start of that session is the separate authorization. If he does not start it, no record is made, and only that task's non-record changes stay undone.
+- **The cross-cutting rules.** For 2.1, 2.3, 2.11, 2.14, 2.18, 2.31 and 2.34, the GCFPE prompt and skill wording changes belong to GCFPE-MGMT-10 and the Product Owner, not to a PF document. Only the PF canon targets that the addenda name are routed here.
+
+## Complete source inventory
+
+Disposition key: **R** routed to the named document tasks; **H** held or deferred, with the reason; **N** no PF change, recorded so that it is not lost.
+
+| Row | Unit and inclusive lines | Change and controlling context | Disposition and targets |
+| --- | --- | --- | --- |
+| F00 | PF10 front matter, precedence rules §1–§9, cross-references, template and Addendum Index; 1–223 | Container identity and the PF10 application rules; no standalone change | N. Every task cites SR1's identity |
+| A01 | 2.1 TypeSafe reading is the GCFPE model guidance; 224–257 | Rules 1 to 5; superseded passages: HDE Governance §9.1.3 (the sentence beginning "Every downstream-session prompt must receive task-specific human advice") and §9.1.6 | R: T-PF04. Prompt and skill changes: GCFPE-MGMT-10 |
+| A02 | 2.2 WU-PR-01 rescope RP-1 and RP-2; 258–337 | Rescope of a delivered unit. RP-2 routes the legacy chart-loader defect to the HDE-SEPA006 owner. Documentation delta: undeclared `ruby` dependency (OBS-12) | R: T-PF09.3 (SEPA006 evidence, read with A35 R-1); T-PF30.1 (record history). The ruby item is repository documentation: N, see A34 |
+| A03 | 2.3 Codex security review deprecated; 338–395 | Rules 1 to 5. "Permanent PF canon names no Codex security review." The wording of HDE Governance §9.1.1's chain entry is explicitly not decided. Rule 5 keeps HDE Phased Epics §2.26.7 as history | N for PF canon (no named target). Prompt and skill wording: GCFPE-MGMT-10. T-PF30.1 cites it in the record's review-chain history |
+| A04 | 2.4 WU-PR-01 lineage review v2.0 ACCEPT; 396–462 | Lineage history; "Required canon drainage: None" | R: T-PF30.1 (record history only) |
+| A05 | 2.5 WU-PR-02 lineage review v2.0 ACCEPT; 463–530 | Lineage history; drainage: none | R: T-PF30.1 |
+| A06 | 2.6 WU-PR-03 rescope RP-1, RP-3, RP-2; 531–687 | CR-6: canon governs the start helper, and six canon passages stand, so no drainage. Doc-delta candidate: HDE Mechanics Guide §34 "Current repository posture" (missing APP_ENV treated as dev) | R: T-PF14 (§34); T-PF30.1. HDE Architecture §3.8.1, HDE Mechanics Guide §5.6, Glow Infrastructure §8.1, HDE-CONJ001.4 and Glow QA Guide §13.9 need no change (CR-6) |
+| A07 | 2.7 WU-PR-03 corrective architecture decisions AD-1 to AD-6; 688–889 | CR-7 and CR-8. Doc-delta candidates: HDE Schemas & Artifacts §8.8 population rule; HDE CLI/API/Vendor Ref §5.6 "Implementation and acceptance state"; HDE Mechanics Guide §34 posture (bind, flags, CORS, APP_ENV default) and its `/api/reader` alias row; HDE Architecture §3.4 (health probes labelled speculative, versus HDE Mechanics Guide §32.3). AD-4's gaps were settled later by S19 (A10) | R: T-PF12, T-PF05, T-PF14, T-PF02, T-PF30.1 |
+| A08 | 2.8 WU-PR-03 lineage review v1.0 ACCEPT; 890–1002 | Required drainage: CR-7 into HDE Schemas & Artifacts §8.8 and HDE CLI/API/Vendor Ref §5.6, plus the 2.7 and plan v2.0 §18 candidates (X04). LR3-O1 is a PF10 publication fact | R: T-PF12, T-PF05, T-PF14, T-PF02, T-PF29 (X04's HDE Users Guide §4.1 row), T-PF09.4 (X04's OBS-P3-16 row; uncertain), T-PF30.1 |
+| A09 | 2.9 WU-PR-04 lineage review v1.0 ACCEPT; 1003–1101 | Carries the plan v1.0 §17 doc-delta candidates (X05): HDE CLI/API/Vendor Ref §7.1.11 "Required-Now implementation gap (DD-04; held)", §7.2.0 posture and §7.1.11f "governed clock boundary"; HDE Users Guide §16, §10.1 and Recipe F; the Glow Infrastructure §8 key `HDE_VENDOR_OVERRIDE_AUDIT_PATH`. OBS-W4-2 and OBS-W4-4 go to the Product Owner | R: T-PF05, T-PF29, T-PF07, T-PF30.1. H: §7.1.11f clock term (OBS-W4-4; see H-04) |
+| A10 | 2.10 WU-PR-05 lineage review v1.0 ACCEPT (S19); 1102–1204 | Stale canon passages (X06): HDE Architecture §3.3, §3.5, §3.8.1; HDE Users Guide §1.1; HDE Mechanics Guide §34. LR5-O1 is a question for the Product Owner. The "never fires" wording is a PF10 publication fact. "Cuts 1.4.0" is out of force (2.19, 2.20) | R: T-PF02, T-PF29, T-PF14, T-PF30.1. H: LR5-O1 (H-03) |
+| A11 | 2.11 Business case and real inputs; 1205–1318 | Rules 1 to 8, as 2.14 and 2.18 narrow them. Drainage table: HDE Governance §9.7.7 and Plan Templates "Business Case (MUST)" (every requirement and work unit); HDE CRD Records §4.1; Plan Templates "Source-bound review authority and exact-fix limits" and Change Process Guide §1.1.4 (rules 7 and 8). The AGENTS.md row landed through #661 (2.12) | R: T-PF04, T-PF27, T-PF30.1, T-PF06. Prompt changes: GCFPE-MGMT-10 |
+| A12 | 2.12 WU-PR-06 lineage review v1.0 ACCEPT; 1319–1441 | Lineage history; drainage: only LR6-O2, a PF10 publication fact | R: T-PF30.1 |
+| A13 | 2.13 WU-PR-07 rescope D-1 and D-2; 1442–1548 | The closeout job installs `requirements.txt`; no canon conflict, no drainage. Its kept-property text was later narrowed by #755 (2.32, CL-05 O-5) | R: T-PF30.1 |
+| A14 | 2.14 P1 findings addressed until resolved; 1549–1619 | Rules 1 to 6; rule 5 was withdrawn by 2.18. Drainage: Plan Templates "Source-bound review authority and exact-fix limits" and Change Process Guide §1.1.4 (rules 2 and 3); the PR-35 and PR-40 prompts | R: T-PF27, T-PF06. Prompts: GCFPE-MGMT-10 |
+| A15 | 2.15 AQ-1: the S21 ADR approved with changes; close-run family introduced; 1620–1690 | C-1 to C-4; close-run family at `audit/qa/<change-dir>/close/` with a close-only membership exception to HDE Schemas & Artifacts §8.17. Drainage: the ADR canon table (X03), including §8.17 and Glow QA Guide §3.4.3. Its ceiling sentence is out of force (2.18) | R: T-PF12, T-PF19, T-PF06, T-PF04, T-PF14, T-PF30.1 |
+| A16 | 2.16 WU-PR-07 lineage review v1.0 ACCEPT; 1691–1825 | Required drainage: Change Process Guide §3.5.2 and §3.5.2.1; HDE Schemas & Artifacts §1.2 "Close-pack artifacts"; Glow QA Guide "Close-pack truthfulness and same-run execution" and "Close report requirements"; the HDE Governance §2.0.19 row (LR7-O9). Ceiling passages are out of force | R: T-PF06, T-PF12, T-PF19, T-PF04, T-PF30.1 |
+| A17 | 2.17 The S21 ADR defers to HDE Build Notes; resolutions A and B; 1826–1955 | Drainage: Change Process Guide §3.5.4 and HDE Governance §2.0.19 (resolution A); Change Process Guide §3.5.2.1 and the HDE Governance §2.0.19 canon-pointer fields (resolution B, form (b) only). The ADR revision is not PF | R: T-PF06, T-PF04, T-PF30.1. The ADR text: N (see A34, D-9 and D-10) |
+| A18 | 2.18 No cost ceiling; 1956–2081 | Withdraws the ceiling everywhere. Its "Required canon drainage: None of its own" means 2.11's targets carry the business case without a ceiling | R: with A11 into T-PF04, T-PF27, T-PF30.1 |
+| A19 | 2.19 Implementation Plan delta 01 approved; 2082–2321 | P-1 to P-20. Doc-delta candidate: Glow Infrastructure §3.1 and §4.1, the HD Engine deploy source (commits landing on `main`), a Product Owner-provided fact | R: T-PF07, T-PF30.1 |
+| A20 | 2.20 Specification delta 01 approved; 2322–2395 | C-1 to C-14; "no canon change". The live Railway start setting is a stated limit (Glow Infrastructure §10) | R: T-PF30.1 (the effective Specification), T-PF07 (§10 stated limit; uncertain) |
+| A21 | 2.21 WU-PR-08 lineage review v1.0 ACCEPT; 2396–2502 | Drainage: none; the stale items are repository documents | R: T-PF30.1 |
+| A22 | 2.22 WU-OPS-01 Ops task receipt v1.0 ACCEPT; 2503–2607 | Glow Infrastructure names no procedure for observing production variable names. Recorded as a gap; "no drainage is directed" | R: T-PF30.1. H: the procedure gap (H-05) |
+| A23 | 2.23 FND-001 remediation, WU-REM-01; 2608–2692 (2691–2692 hold an empty `## ` heading) | No canon change, no conflict | R: T-PF30.1 |
+| A24 | 2.24 FND-001 remedy amended; CR-10; 2693–2790 | CR-10 drainage: HDE Schemas & Artifacts §8.3, where the `epic_id`/`crd_id` mutual-exclusion rule is enforced | R: T-PF12, T-PF30.1 |
+| A25 | 2.25 WU-REM-01 lineage review v1.0 ACCEPT; 2791–2899 | CR-10 drainage into HDE Schemas & Artifacts §8.3 (the key set gaining `crd_id`) | R: T-PF12, T-PF30.1 |
+| A26 | 2.26 QA-10 reassessment v1.1 READY_FOR_QA; 2900–2986 | FND-040: HDE Mechanics Guide §1.6.3 admission text, the `ADMITTED_CRD_QA` set. CR-10 into §8.3. FND-021 is an open question (HDE Math Spec §§6.1–6.2). FND-017 to FND-020 are repository documents | R: T-PF14, T-PF12, T-PF30.1. H: FND-021 (H-01). N: the repository documents (A34) |
+| A27 | 2.27 QA110-F01 remediation, WU-REM-02; 2987–3077 | No canon change | R: T-PF30.1 |
+| A28 | 2.28 QA-110 review v1.0; WU-REM-02 PR-35 v1.1; 3078–3175 | PO-5: the evidence-persistence rule drains to Glow QA Guide §3.4.3 (X08). PO-2 is pending, with no home named (X09). The QA-100 prompt defect goes to GCFPE-MGMT-10 | R: T-PF19, T-PF30.1. H: PO-2 (H-02) |
+| A29 | 2.29 QA-110 review v1.2; run complete; 3176–3258 | Drainage: none created | R: T-PF30.1 |
+| A30 | 2.30 QA-120 final Report PASS and RCA; 3259–3360 | Carried: PO-5 and PO-2. RCA D-1: Plan Templates, a code-identity guard that excludes storage paths uses the whole CI-exempt prefix set. LR5-O1 | R: T-PF27, T-PF19, T-PF30.1. H: PO-2 (H-02), LR5-O1 (H-03) |
+| A31 | 2.31 The change flow gains the CL-05 close-mutation-set stage; 3361–3470 | Drainage: Change Process Guide §3.5.1 and §3.5.2 (stage, entries, exit, close-tooling repair, Dev and not Ops); Glow QA Guide §3.1.3; Plan Templates (a close-mutation-set task template beside the Ops Task Record). Installation: MB-030, GCFPE-MGMT-10 | R: T-PF06, T-PF19, T-PF27, T-PF30.1 |
+| A32 | 2.32 CL-C-10 v1.2 CLOSE (CHANGE_CLOSED); 3471–3562 | The closure basis. Nothing drained; addenda 2.2 to 2.31, PO-2 and PO-5 deferred to the Product Owner's canon maintenance. CL-05 O-5 (2.13's kept-property text narrowed by #755) | R: T-PF30.1 (closure); also the closure evidence for every other task |
+| A33 | 2.33 CL-20 post-closure record; 3563–3642 | M-0 (this drainage) to M-3; the reconciliation of the 15 addendum records | R: T-PF30.1 |
+| A34 | 2.34 Documentation-only changes go in HDE Build Notes; D-1 to D-10; 3643–3724 | Rule 1 to 4. "Required canon drainage: None into permanent PF canon." D-1 to D-10 target repository documents and the ADR. D-5 (AGENTS.md) needs the Product Owner's explicit instruction | N for PF canon. Repository documentation drainage is the Product Owner's (D-1 to D-10). The CL-40 prompt boundary goes to GCFPE-MGMT-10 |
+| A35 | 2.35 CL-40 cycle gap scan COMPLETE; 3725–3955 (`\<eof\>` on 3955) | No PF09 gap. PF09 owner relations: R-1 HDE-SEPA006 (PF09.3); R-2 the stale HDE-SEPA005 task notes (PF09.3 lines 1167 and 1170), HDE-CONJ005 notes (PF09.4 line 1112) and HDE-CONJ010.4 notes (PF09.4 line 2139); R-3 HDE-COAG001.9; R-4 HDE-COAG001.4 with PF09.6's identity rule as context; R-5 HDE-COAG003.8 and .9 (unchanged, listed only to avoid re-recording). Items 9 to 11 are on the Notion candidate list | R: T-PF09.3, T-PF09.4, T-PF09.7, T-PF30.1. N: PF09.6 (context only) and R-5 |
+| S-INT | Specification: Format and register posture, Record control, Intake (30–70) | The CRD's identity, title, intake and lead finding | R: T-PF30.1 |
+| S-REQ | Specification: Requirements S01 to S22, Exclusions, Constraints, CD-1 to CD-3, RD-1 (72–145), as overlaid by D01 C-1 to C-7 | The planned scope baseline, with S01 removed | R: T-PF30.1 |
+| S-APR | Specification: approval block, phase blocks, Canon, QA & Build Notes posture (147–193), as overlaid by D01 C-8 to C-12 | Canon impact: S21 (ADR-covered) targets Change Process Guide §3.5.2, HDE Schemas & Artifacts §1.2 and the Glow QA Guide close-pack sections. S14 makes stale the "Required-Now implementation gap (DD-04; held)" paragraph of HDE CLI/API/Vendor Ref §7.1.11 and the `--allow-prod-vendor` bullet of HDE Users Guide §16 | R: T-PF06, T-PF12, T-PF19 (S21); T-PF05, T-PF29 (S14); T-PF30.1 |
+| S-CR1 | Specification CR-1 (199–208) | Drainage: the Change Process Guide owner aligns §0.1, §0.1A, §1.0, §1.0.3, §1.0.4 and §1.0.6; the Plan Templates owner aligns §2A; the PF30 owner aligns the "CRD Plan" wording (PF30.1 §1, §2, §3.2, §4.1, §7) | R: T-PF06, T-PF27, T-PF30.1 |
+| S-CR2 | Specification CR-2 (210–219) | Drainage: Plan Templates §2A intake prompt "Planned PR and Ops units" and §2A "Alchemical phase separation" | R: T-PF27 |
+| S-CR3 | Specification CR-3 (221–230) | Drainage: the PF09 owner rewords the HDE-SEPA005 note to name the Specification; the HDE Schemas & Artifacts owner rewords §1.2 and §8.17 ("the stable CRD ID recorded in PF30") | R: T-PF09.3, T-PF12 |
+| S-HIS | Specification: Material-change history, lineage, Closure result, revision history, kickoff points (232–275), as overlaid by D01 C-13 and C-14 | Record history | R: T-PF30.1 |
+| S-OTH | Specification: front matter (1–28), the TypeSafe reading (277–287), Canon relied on (289–308) | Provenance only | N |
+| D01 | Delta 01, C-1 to C-14 (SR3) with its approval (SR4); PF10 2.20 records it | The effective Specification. "No canon change" | R: T-PF30.1 |
+| X07 | CR-11 (QA-70 review v1.0 §5) | Drainage: Plan Templates Step-0B (CRD applicability) and HDE Mechanics Guide §1.6.3. PF10 2.35 lists CR-11 among the canon drainage items | R: T-PF27, T-PF14 |
+
+## Held and deferred items
+
+| ID | Item | Why it is held | Owner |
+| --- | --- | --- | --- |
+| H-01 | FND-021: whether C040 drainage into HDE Math Spec §§6.1–6.2 is complete (A26, A34, X01) | An open question, not a change. The C040 source is no longer in the current PF10, and PF10 front matter §6 forbids reading older base versions | Product Owner |
+| H-02 | PO-2 "Do not pin tool versions" (A28, A30, X09) | No home is decided: "drain target the owner's choice of home" (X01). The candidates are HDE Governance, HDE Users Guide §3.1, Glow Infrastructure §10 and the Glow QA Guide | Product Owner, who picks the home; a later run routes it |
+| H-03 | LR5-O1: whether "not available" in HDE CLI/API/Vendor Ref §5.12 and §5.11.2 covers router-level `OPTIONS` and redirect answers (A10, A30) | A question for the Product Owner. Canon is silent, and the behavior meets the stated refusal rule | Product Owner |
+| H-04 | OBS-W4-4: §7.1.11f's "governed clock boundary" is defined nowhere (A09, X05) | Defining the term needs a decision that no source records | Product Owner |
+| H-05 | No Glow Infrastructure procedure for observing production variable names (A22) | "Recorded as a PF07 gap; no drainage is directed" | Product Owner |
+| H-06 | HDE Governance §9.1.1's PR review chain entry and any other source of security review (A03) | "Not decided by this addendum" | Product Owner |
+
+## PF scope scan
+
+Only the leading front-matter block was read for routing. A document is eligible when it is PF03, a PF whose controlled title or status identifies it as Canon, an actual PF09 phase file, PF20 or a PF30 volume. PF10 is source only.
+
+| Document | Blob | Status and scope anchor (leading block) | Triage result |
+| --- | --- | --- | --- |
+| `PF01-Canon-HDE-Math-Spec-v1.3.8.md` | `5ea667831bc3` | Canon; §0.2 "Contract surface. This spec is math-only." | No task (H-01 only) |
+| `PF02-Canon-HDE-Architecture-v2.4.6.md` | `b0bf3d66965d` | Canon; "Intent & scope": the canonical map of components and flows, including dev/QA surfaces | T-PF02 |
+| `PF03-Reference-Technical-Writing-Best-Practices-v1.8.8.md` | `504712df548a` | Reference; §1: writing rules for AI agents authoring PF documentation | No task; no change bears on its scope. It is the editorial standard every session reads |
+| `PF04-Canon-HDE-Governance-v2.8.7.md` | `86cf613ce7f9` | Canon; §0.2: acceptance gates, evidence discipline, governance and operational policy | T-PF04 |
+| `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.3.md` | `8b136def4c22` | Canon; §0.2 "Ownership": the bytes for CLI, Reader transport, vendor ingest and the Endpoint Catalog proof surface | T-PF05 |
+| `PF06-Canon-Change-Process-Guide-v2.5.4.md` | `d2df157b4014` | Canon; §0.1 and §0.1A: the change-delivery process, Epic and CRD lanes ("accountable to PF30") | T-PF06 |
+| `PF07-Canon-Glow-Infrastructure-v2.3.3.md` | `7d2734ce2b75` | Canon; "Intent & scope": providers, services, base URLs, config key names, evidence roots | T-PF07 |
+| `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.7.md` | `e8101489d5ba` | Canon; §0.1 Calcination phase scope | No task; no relation names it |
+| `PF09.2-Canon-HDE-Build-Checklist-Dissolution-v1.2.4.md` | `1b4ff0a29d4a` | Canon; §0.1 Dissolution phase scope | No task |
+| `PF09.3-Canon-HDE-Build-Checklist-Separation-v1.1.7.md` | `1e8fb350a7ab` | Canon; §0.1 Separation phase scope; HDE-SEPA005 and HDE-SEPA006 | T-PF09.3 |
+| `PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.3.1.md` | `3abe7fc79d69` | Canon; §0.1 Conjunction phase scope; HDE-CONJ005, HDE-CONJ010.4 | T-PF09.4 |
+| `PF09.5-Canon-HDE-Build-Checklist-Fermentation-v1.6.1.md` | `9df823476491` | Canon; §0.1 Fermentation phase scope | No task; the CL-40 scan names no relation here |
+| `PF09.6-Canon-HDE-Build-Checklist-Distillation-v1.1.9.md` | `ccac80507b5f` | Canon; §0.1 Distillation phase scope | No task; its identity rule is context for T-PF09.7's R-4 only |
+| `PF09.7-Canon-HDE-Build-Checklist-Coagulation-v1.1.8.md` | `512cef6449b7` | Canon; §0.1 Coagulation phase scope; HDE-COAG001.4, HDE-COAG001.9 | T-PF09.7 |
+| `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.6.md` | `1542a8f78846` | Canon; §0.2: catalogs, manifest, schemas, Evidence Index and close-pack artifacts | T-PF12 |
+| `PF14-Canon-HDE-Mechanics-Guide-v3.5.8.md` | `3360a9eb1a50` | Canon; §0.2: components, tools, evidence tools and build tasks | T-PF14 |
+| `PF15 HDE Copy Tonality Guide v1.2.0.md` | `04c07a607472` | Status: Reference; not a Canon title | Not eligible |
+| `PF16-Canon-HD Engine Epics Map v2.3.8.md` | `0fe6931365a7` | Canon, but its deprecation note says "maintained for historical purposes only" | No task; no change bears on it |
+| `PF17-Canon-HDE-Narratives-Guide-v1.5.4.md` | `3cc04c021812` | Canon; §0.2: narrative mechanics | No task |
+| `PF19-Canon-Glow-QA-Guide-v3.0.6.md` | `1d86fdb495d4` | Canon; §0.2: QA across projects; change-lane QA applicability | T-PF19 |
+| `PF20-Reference-HDE-Phased-Epicsv1.9.6.md` | `e168dc0eba81` | Reference; §0 "Historical reference only": historical epic records | No task. HDE-CRD-0002 is a CRD, and 2.3 rule 5 keeps §2.26.7 as history (N) |
+| `PF23-Canon-Reality-Audits-v1.2.2.md` | `d83b832a2231` | Canon; PO-only audits at an epic's close | No task |
+| `PF27-Canon-Plan-Templates-v2.0.5.md` | `96becf4158c0` | Canon; "Purpose & scope": reusable plan, runbook, review and closeout templates | T-PF27 |
+| `PF29-Canon-HDE-Users-Guide-v1.0.2.md` | `6a0d4725a710` | Canon; §0.2: the runnable operator and agent guide; "must keep feature availability current" | T-PF29 |
+| `PF30.1-Canon-HDE-CRD-Records-v0.9.1.md` | `35e7e3ad07d5` | Canon; Volume status Active; §1: the persistent CRD record; §8 holds HDE-CRD-0001 | T-PF30.1 |
+
+Reference-only and non-PF files were not candidates: PF08, PF11, PF13, PF18, PF21, PF31, PF-Invocation, and PF-Reference-Glow Story.
+
+## Document tasks
+
+The shared output directory is `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/`. `<dir>` below means that directory. On a drain route, each task writes four files, in order:
+1. `redlines-<PF>-from-v<ver>.md`;
+2. its proof log, `redlines-<PF>-from-v<ver>.proof-log.md`;
+3. the revised PF, `<PF>-from-v<ver>.md`;
+4. its proof log, `<PF>-from-v<ver>.proof-log.md`.
+
+A failed Apply writes `apply-diagnostic-<PF>-from-v<ver>.md` instead of files 3 and 4. A record route writes the updated volume and its proof log. A no-change result writes no artifact; it updates these completion fields and gives the commit.
+
+| Task | Target, baseline blob and scope anchor | Assigned rows, with the target sections the source names | Uncertainty | Route | Output subdirectory | Completion |
+| --- | --- | --- | --- | --- | --- | --- |
+| T-PF02 | `PF02-Canon-HDE-Architecture-v2.4.6.md` v2.4.6, `b0bf3d66965d`; "Intent & scope" | A07 (§3.4, labelled speculative, against HDE Mechanics Guide §32.3); A08 with X04 (§3.4 row); A10 with X06 (§3.3, §3.5 and §3.8.1 as stale: production mount of the dev-harness routes and the retired `/ops` routes, settled by S19-F03; root helpers); A06 as context (§3.8.1 start-helper posture stands) | The sources name the stale passages and the delivered facts, not replacement wording. The editor verifies each current-repository claim on `main` before stating it | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf02/` | PENDING |
+| T-PF04 | `PF04-Canon-HDE-Governance-v2.8.7.md` v2.8.7, `86cf613ce7f9`; §0.2 | A01 (§9.1.3 sentence, §9.1.6); A11 with A18 (§9.7.7: business case for every requirement and work unit of Epics and CRDs, with no ceiling); A15, A16, A17 with X03 (§2.0.19 "Close-pack baseline artifacts", "Close report minimal content", "Close-pack manifest `key_outputs` shape", the canon-pointer fields with resolutions A and B, the literal `ADR status line:` field; Appendix D.0) | §9.1.1's review-chain entry is not decided (H-06); leave it as it is | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf04/` | PENDING |
+| T-PF05 | `PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.3.md` v2.5.3, `8b136def4c22`; §0.2 "Ownership" | A07 and A08 (CR-7: §5.6 "Implementation and acceptance state", the canon-retired exclusion and the 18-record catalog); A09 with X05 (§7.1.11 "Required-Now implementation gap (DD-04; held)" paragraph and §7.2.0 posture, stale since S14 was delivered); S-APR (DD-04 status) | H-03 (LR5-O1) and H-04 (the clock term) are held; do not draft them | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf05/` | PENDING |
+| T-PF06 | `PF06-Canon-Change-Process-Guide-v2.5.4.md` v2.5.4, `d2df157b4014`; §0.1 and §0.1A | S-CR1 (§0.1, §0.1A, the §1.0 heading, §1.0.3, §1.0.4, §1.0.6: PF30 registration and the "CRD Plan" against HDE Governance §9.1.1); A11 and A14 (§1.1.4: real-input disposition, the repeated-finding-class trigger, the P1 rules); A31 (§3.5.1 and §3.5.2: the CL-05 stage); A15, A16, A17 with X03 and S-APR (§3.5.2, §3.5.2.1, §3.5.4: CRD prefix, v2 writer, close-run family, v2 ADR block and closure override, resolution A, form (b) only) | None beyond full target reading | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf06/` | PENDING |
+| T-PF07 | `PF07-Canon-Glow-Infrastructure-v2.3.3.md` v2.3.3, `7d2734ce2b75`; "Intent & scope" | A19 (§3.1 and §4.1: the deploy source, a Product Owner fact that §2.4 says must not be downgraded); A09 with X05 (§8 config keys: `HDE_VENDOR_OVERRIDE_AUDIT_PATH`); A20 and A35 (§10: the live Railway start setting stays unverified, a stated limit) | §10 is a doc-delta candidate; the editor decides whether any wording changes. H-05 is held | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf07/` | PENDING |
+| T-PF09.3 | `PF09.3-Canon-HDE-Build-Checklist-Separation-v1.1.7.md` v1.1.7, `1e8fb350a7ab`; §0.1 and §0.2 | S-CR3 (the HDE-SEPA005 note at line 1170: "that CRD's PF30 record, once entered, owns them" → name the Specification); A35 R-2 (lines 1167 and 1170: delivered and removed items no longer "remain baseline"); A35 R-1 with A02 RP-2 (HDE-SEPA006 evidence: the legacy chart-loader defect and the retired test) | Row statuses are the editor's to judge on all six PF09 duties; R-1 asks no closure | TW-DRAIN-20 then TW-APPLY-10 | `<dir>pf09-3/` | PENDING |
+| T-PF09.4 | `PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.3.1.md` v1.3.1, `3abe7fc79d69`; §0.1 and §0.2 | A35 R-2 (HDE-CONJ005 notes at line 1112; HDE-CONJ010.4 notes at line 2139: the `--allow-prod-vendor` gap is delivered, wheel installs removed, HTML 404 fixed); A08 with X04 (OBS-P3-16: HDE-CONJ001.1 `no-store` "on all" responses against HDE CLI/API/Vendor Ref §5.4) | OBS-P3-16 is a pre-existing doc-delta candidate; the editor decides | TW-DRAIN-20 then TW-APPLY-10 | `<dir>pf09-4/` | PENDING |
+| T-PF09.7 | `PF09.7-Canon-HDE-Build-Checklist-Coagulation-v1.1.8.md` v1.1.8, `512cef6449b7`; §0.1 and §0.2 | A35 R-3 (HDE-COAG001.9: the pip-installable form is unavailable after S01's removal, D01 C-6); A35 R-4 (HDE-COAG001.4: `build_commit` is the fixed `9479d28`; PF09.6's identity rule is context only); A35 R-5 (HDE-COAG003.8 and .9 unchanged; no change) | R-4: "whether this is a defect is not established" | TW-DRAIN-20 then TW-APPLY-10 | `<dir>pf09-7/` | PENDING |
+| T-PF12 | `PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.6.md` v2.9.6, `1542a8f78846`; §0.2 | A07 and A08 (CR-7: §8.8 population rule, canon-retired exclusion, `public_aux`, aliases); A24, A25, A26 (CR-10: §8.3, `crd_id` as an optional key and where the mutual exclusion is enforced); A15, A16, A17 with X03 and S-APR (§1.2 "Close-pack artifacts" and "Change-container compatibility", `close_candidate_source.v2`, `key_outputs`; §8.17 and §8.17.1, the close-run family and its close-only exception); S-CR3 (§1.2 and §8.17: "the stable CRD ID recorded in PF30") | None beyond full target reading | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf12/` | PENDING |
+| T-PF14 | `PF14-Canon-HDE-Mechanics-Guide-v3.5.8.md` v3.5.8, `3360a9eb1a50`; §0.2 | A06, A07, A10 with X04 and X06 (§34 "Current repository posture": loopback bind, debugger and reloader off, no CORS, exact APP_ENV, no default; the route table's `/api/reader` alias row); A26 (FND-040: §1.6.3 admission is the `ADMITTED_CRD_QA` set, HDE-CRD-0001 and HDE-CRD-0002, with roots and Index keys); X07 (CR-11: §1.6.3 Step-0B for a CRD); A15 with X03 (§37.2, §37.3: the generic v2 close-pack generator, CRD filename form, `key_outputs` minimum; §1.6.3 close-run publication API) | None beyond full target reading | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf14/` | PENDING |
+| T-PF19 | `PF19-Canon-Glow-QA-Guide-v3.0.6.md` v3.0.6, `1d86fdb495d4`; §0.2 | A15, A16 with X03 and S-APR ("Close-pack truthfulness and same-run execution", "Close report requirements": `audit/qa/<change-id>/close/` as the CRD's same-run close evidence); A15 (§3.4.3: the close-run family beside `checks/`); A28 and A30 with X08 (PO-5: the evidence-persistence rule into §3.4.3); A31 (§3.1.3: the close mutation set precedes the closure decision, outside post-closure drainage) | None beyond full target reading | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf19/` | PENDING |
+| T-PF27 | `PF27-Canon-Plan-Templates-v2.0.5.md` v2.0.5, `96becf4158c0`; "Purpose & scope" | S-CR1 (§2A PF30 accountability and record contract); S-CR2 (§2A intake prompt "Planned PR and Ops units", §2A "Alchemical phase separation"); A11 with A18 ("Business Case (MUST)": every requirement and work unit, no ceiling); A11 and A14 ("Source-bound review authority and exact-fix limits"); A31 (a close-mutation-set task template beside the Ops Task Record); A30 (RCA D-1: a storage-path guard uses the classifier's whole CI-exempt prefix list); X07 (CR-11: Step-0B applicability for a CRD) | A31's template has no given content beyond 2.31 rules 4 to 8; draft it only as far as those rules support | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf27/` | PENDING |
+| T-PF29 | `PF29-Canon-HDE-Users-Guide-v1.0.2.md` v1.0.2, `6a0d4725a710`; §0.2 | A10 with X06 (§1.1: retired-route table and production posture after S19-F03); S-APR with X05 (§16 `--allow-prod-vendor` bullet; §10.1 band override after S08; Recipe F: APP_ENV after S14); A08 with X04 (§4.1: the helper binds 127.0.0.1, not 0.0.0.0) | §0.2 requires each availability claim to be checked against current repository reality; the editor inspects `main` | TW-DRAIN-10 then TW-APPLY-10 | `<dir>pf29/` | PENDING |
+| T-PF30.1 | `PF30.1-Canon-HDE-CRD-Records-v0.9.1.md` v0.9.1, `35e7e3ad07d5`; §1 to §3, §7, §8 | The HDE-CRD-0002 record, closed, made from S-INT, S-REQ, S-APR, S-HIS and D01, with every HDE-CRD-0002 addendum: A02, A04 to A10, A12, A13, A15 to A17, A19 to A33, A35; approval evidence X10; closure evidence X11, X12, X13, X14. Non-record changes: S-CR1 (the "CRD Plan" wording in §1, §2, §3.2, §4.1, §7, against HDE Governance §9.1.1); A11 with A18 (§4.1: a business case per requirement, no ceiling) | Making the record is historical drainage that HDE Governance §9.1.1 lets only a separately authorized action perform. Nathan's start of this session is that authorization | TW-RECORD-20 (no Apply) | `<dir>pf30-1/` | PENDING |
+
+Exact output names, for the drain routes as `<dir><sub>/` plus the four files above:
+
+| Task | Redlines file | Revised PF |
+| --- | --- | --- |
+| T-PF02 | `redlines-PF02-from-v2.4.6.md` | `PF02-from-v2.4.6.md` |
+| T-PF04 | `redlines-PF04-from-v2.8.7.md` | `PF04-from-v2.8.7.md` |
+| T-PF05 | `redlines-PF05-from-v2.5.3.md` | `PF05-from-v2.5.3.md` |
+| T-PF06 | `redlines-PF06-from-v2.5.4.md` | `PF06-from-v2.5.4.md` |
+| T-PF07 | `redlines-PF07-from-v2.3.3.md` | `PF07-from-v2.3.3.md` |
+| T-PF09.3 | `redlines-PF09.3-from-v1.1.7.md` | `PF09.3-from-v1.1.7.md` |
+| T-PF09.4 | `redlines-PF09.4-from-v1.3.1.md` | `PF09.4-from-v1.3.1.md` |
+| T-PF09.7 | `redlines-PF09.7-from-v1.1.8.md` | `PF09.7-from-v1.1.8.md` |
+| T-PF12 | `redlines-PF12-from-v2.9.6.md` | `PF12-from-v2.9.6.md` |
+| T-PF14 | `redlines-PF14-from-v3.5.8.md` | `PF14-from-v3.5.8.md` |
+| T-PF19 | `redlines-PF19-from-v3.0.6.md` | `PF19-from-v3.0.6.md` |
+| T-PF27 | `redlines-PF27-from-v2.0.5.md` | `PF27-from-v2.0.5.md` |
+| T-PF29 | `redlines-PF29-from-v1.0.2.md` | `PF29-from-v1.0.2.md` |
+| T-PF30.1 | (record route) | `PF30.1-from-v0.9.1.md` |
+
+Each proof log sits beside its file, with `.proof-log` before `.md`.
+
+## Specification-update queue
+
+Empty. No source directs a change to the HDE-CRD-0002 Specification. Delta 01 is approved and in force (SR3, SR4; PF10 2.20), the change is closed, and the approved base is immutable. No specification prompt is needed.
+
+## Execution destination
+
+- **Ledger branch and default document branch:** `docs/20261026-gtwpe-pf10-v13-8-8`, created from `9dda63dd3f05f496c3ff67e95da78550d3950c5a`. Ledger and default document draft PR: recorded in the PR body and in the triage result, and opened after this file's first commit.
+- **Continuation if Nathan merges the ledger PR first:** `docs/20261026-gtwpe-pf10-v13-8-8-documents`. The first document session that finds the ledger PR merged creates this branch from the current `origin/main`, but only when it does not exist. It opens one shared draft PR and records that PR's reference on this line. Every later session fetches and reuses it.
+- **Collision evidence before creation:** `git ls-remote --heads origin` showed no branch matching `gtwpe`. A GitHub search for "gtwpe" PRs found #588 to #597, all closed, and none on these branch names. The baseline tree holds no `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/`.
+- **Rules for every session:**
+  - Fetch the destination branch, then commit and push sequentially.
+  - Never force-push, merge or write `docs/pfcanon/`.
+  - Update only your own task's Completion cell and, for the continuation, its PR line.
+  - A conflicting existing state is reported, not overwritten.
+- **Merging:** Nathan alone merges.
