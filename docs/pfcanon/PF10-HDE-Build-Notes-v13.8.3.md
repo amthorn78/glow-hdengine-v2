@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes  
-**Version: v13.8.2**  
+**Version: v13.8.3**  
 Effective Date: 2026.10.26  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -212,7 +212,8 @@ Details: \<specific information to drain to canon, its origin, and any evidence 
 * 2.27 HDE-CRD-0002: remediation of QA-110 finding QA110-F01 is approved as changed — the pre-push check's throwaway copies own their objects, so a full-history checkout stays unchanged, through new work unit WU-REM-02  
 * 2.28 HDE-CRD-0002 QA-110: the QA evidence review of checks 1 to 15 accepts fourteen results and escalates check 13 (QA110-F01), and the PR-35 result v1.1 records the remedy pull request \#734 as ready to merge  
 * 2.29 HDE-CRD-0002 QA-110: the QA evidence review v1.2 accepts checks 16 to 21, the approved QA run of 21 checks is complete, and the next stage is QA-120  
-* 2.30 HDE-CRD-0002 QA-120: the final QA Report records verdict PASS for the complete run of QA Plan v1.3 (checks 1 to 21), the QA RCA records its causes and lessons, and the next stage is CL-C-10
+* 2.30 HDE-CRD-0002 QA-120: the final QA Report records verdict PASS for the complete run of QA Plan v1.3 (checks 1 to 21), the QA RCA records its causes and lessons, and the next stage is CL-C-10  
+* 2.31 The change flow gains a close-mutation-set stage, CL-05, between QA-120 and the closure decision; it is Dev work and repairs its own close tooling
 
 # **2\) Numbered Addenda**
 
@@ -3352,5 +3353,115 @@ Timestamp: 102626 00:50 (UTC). Details: Records the QA-120 final QA Report v1.0 
 
 * Applies addenda 2.27 (the QA110-F01 remedy and its V-6 verification), 2.28 (QA-110 review v1.0 and PR-35 result), 2.29 (QA-110 review v1.2), 2.19 (deployment judged by release\_id) and 2.18 (no cost ceiling). Supersedes nothing and amends no earlier addendum.  
 * Numbering: this addendum is 2.30, as the Product Owner directed. PF10 v13.8 on main (SHA-256 439775924392a206ceffb70952b0af1975c24d4214fc73d4ed98fcf94220e13c) carries addenda through 2.28.
+
+## 2.31 The change flow gains a close-mutation-set stage, CL-05, between QA-120 and the closure decision; it is Dev work and repairs its own close tooling
+
+Timestamp: 102626 02:50 (UTC). Details: Records the Product Owner's finding of 2026-10-26: the close-pack machinery is built, but nothing in the prompt ecosystem, PF canon or the role set produces a change's close mutation set. It records his direction that the missing process be reusable and become part of the change flow, as a stage that repairs its own close tooling. The stage's prompt is written in Notion as a candidate for the next GCFPE Modification. Origin: the continuing HDE-CRD-0002 Isis session ([Isis-53](https://claude.ai/code/session_01NxRhYei7RDGmMPYdKEkpok)), after CL-C-10 v1.0 returned DO\_NOT\_CLOSE for the missing close mutation set.
+
+### Approval and source record
+
+* The Product Owner's words:  
+  * "the gap seems to be that the close pack machinery is now built, but there is no actual canonical process for creating in either in the prompt ecosystem, canon, or anyone else. Record this as a pf10 build notes addendum, GCFPE feedback, and then create a task to create the close pack. The prompt should be created by you (Isis). I will need you to determine if this is an Ops or Dev task first. Either way, it will need to return to CL-C-10."  
+  * On a draft that routed the close through ESC-30: "No, I don't want to do it this way. This will just loop back into the change flow. This needs to be a new process."  
+  * "'reusable' but It needs to become PART of the change flow, that is what I wanted the PF10 addendum and GCFPE feedback to reflect."  
+  * On who fixes a close-tooling defect: "The process fixes it".  
+  * "You can write it in Notion as a new prompt, it can be used as a candidate when I run the next modification to the GCFPE".  
+  * "the new prompt can just run in a standalone session".  
+* Recorded by Isis at the Product Owner's direction. No approval prompt produced this addendum.  
+* Where this addendum conflicts with an earlier addendum, an in-flight change document or a prompt's routing, it governs for the scope below.
+
+### Retained decisions and requirements
+
+1. The gap. These exist:  
+   * the generic close-pack writer tools/qa/generate\_epic\_close\_pack.py and its v2 schema (addenda 2.15 and 2.17);  
+   * the CRD close-run family, published by publish\_crd\_close\_run\_family;  
+   * the manual closeout validation workflow (addendum 2.13).  
+2. But no prompt, PF section or role produces a change's close mutation set with them. PF06 §3.5.1 and §3.5.2 require the close mutation set and the close PR, but name no producing stage, entry or owner. In release 100926.1:  
+   * CL-C-10 and CL-E-10 route DO\_NOT\_CLOSE only to an existing owner or to ESC-30;  
+   * QA-120 defers the close-pack measure;  
+   * no prompt authors a close-candidate source.  
+3. HDE-EPIC038 and HDE-EPIC040 closed by exceptional closure, and HDE-CRD-0002's closure decision had no next prompt.  
+4. A new stage, part of the change flow. CL-05 — Prepare and Publish the Close Mutation Set serves every Epic and CRD.  
+   * Entries:  
+     * QA-120's final QA Report with verdict: PASS;  
+     * a closure decision's DO\_NOT\_CLOSE whose return work is the close mutation set (missing, incomplete or defective).  
+   * Exit: the closure decision (CL-C-10 or CL-E-10), after the Product Owner merges the close pull request.  
+   * What it owns:  
+     * the close mutation set: the close pack, its two ledgers, the same-run close evidence, and their Index and Mirror registration;  
+     * any repair of the close tooling that the close needs.  
+   * What it never does. It never reopens implementation, QA or the closure decision. Close-tooling repair uses no ESC, RS or PR-10 to PR-40 stage.  
+5. Dev, not Ops. CL-05 is a PR work unit. It writes tracked repository state through the canonical writers, and its work lands by the Product Owner's merge:  
+   * PF06 §3.5.2.1: "The close PR MUST include the epic close-pack (canonical filenames)";  
+   * PF06 §3.5.2.3: the Index and Mirror trio "in the same authorized mutation set".  
+6. An Ops task "requires privileged access to systems outside the repository", and "Ops tasks are not repository PRs" (PF27 §3; PF06 §0.2; PF04 §9.1). An OPS-01 run only packages "already-produced" close-pack artifacts (PF06 §0.2).  
+7. Authority and actor.  
+   * The Product Owner's invocation of CL-05 for a change authorizes that change's close mutation set and any close-tooling repair it needs, and is the Proceed for both.  
+   * It runs as a standalone top-level session that the Product Owner starts with the stage page and the change ID. It needs no handoff to start and resolves its inputs from the change's records.  
+   * The closure authority (Isis) judges its result at the closure decision. The Product Owner alone merges.  
+8. Close-tooling repair.  
+   * What counts as a defect. CL-05 first rehearses the close in a throwaway clone. A close-tooling defect is one where the tools refuse or fail on correct inputs, or lack an admission the change needs.  
+   * How it is repaired. CL-05 repairs it in its own pull request:  
+     * the smallest change to the close-tooling surface: the writer, its source schemas, the close-run and close-pack admission in the canonical updater, the closeout workflow and their tests;  
+     * owner tests that reproduce the defect and prove the fix;  
+     * an amendment to the close-pack ADR when the fix changes a decision the ADR records.  
+   * Narrowing a recorded rule. A repair may narrow a close-tooling rule that the ADR or an earlier HDE Build Notes addendum records, but only where that rule refuses the change's own governed evidence of record. It keeps the rule's purpose and records the narrowing and its basis. Example: 2.15's "the feedback-dependency refusal kept", which refuses HDE-CRD-0002's QA check 3 primary path.  
+   * Limits. A repair never changes approved QA evidence, product code or PF canon.  
+9. Interim operation. Until a GCFPE Modification installs CL-05:  
+   * the candidate page runs at the Product Owner's direct invocation: [https\://app.notion.com/p/4054590a05eb8155b301e2cb6dec31d5](https://app.notion.com/p/4054590a05eb8155b301e2cb6dec31d5);  
+   * QA-120 PASS, and a closure decision's DO\_NOT\_CLOSE for the close mutation set, are read as routing to it;  
+   * a change's Implementation Plan needs no change-local Close Gate work unit. Where a Plan has one, as HDE-CRD-0002's WU-PR-07 T0 to T7, CL-05 performs it.  
+10. HDE-CRD-0002.  
+    * CL-05's first run performs CL-C-10 v1.0's return work and repairs close-tooling defect B-4.  
+    * Its result returns to CL-C-10. That decision records B-4, which supersedes CL-C-10 v1.0's "Nothing failed".
+
+### Epic, task, and status effects
+
+* No status change. HDE-CRD-0002 stays open under CL-C-10 v1.0 (DO\_NOT\_CLOSE).  
+* No PF09, PF30 or board row changes.  
+* Implementation Plan v1.1 is not edited. CL-05 performs its §7 WU-PR-07 T0 to T7.
+
+### Required canon drainage
+
+Owner of each: the Product Owner, through canon maintenance.
+
+* Change Process Guide §3.5.1 and §3.5.2: name the close-mutation-set stage as part of the change flow, with its entries, its exit to the closure decision and its ownership of close-tooling repair. State that it is Dev, and that an Ops run only packages or proves already-produced artifacts.  
+* Glow QA Guide §3.1.3: state that the close mutation set precedes the closure decision, outside the post-closure drainage rule.  
+* Plan Templates: a close-mutation-set task template beside the Ops Task Record.
+
+### Deferred obligations and unresolved work
+
+* GCFPE installation. Install CL-05 as a release member with the routing its installation notes give:  
+  * QA-120 pass\_crd and pass\_epic go to CL-05;  
+  * CL-C-10 and CL-E-10 gain a DO\_NOT\_CLOSE branch back to CL-05 for the close mutation set, and read it as an input;  
+  * a close-tooling defect is CL-05's to repair, not ESC-30's;  
+  * a graph part, registry entry and catalog row.  
+* Tracked as MB-030, with MB-027. Owner: the GCFPE-MGMT-10 maintenance owner, at the Product Owner's next Modification.  
+* B-4 repair: CL-05's first run, for HDE-CRD-0002.  
+* WU-PR-07 measure. Its "first attempt" clause cannot be met by the writer as accepted at [\#668](https://github.com/amthorn78/glow-hdengine-v2/issues/668); the measure is observed on the repaired writer. Owner: the Product Owner.  
+* PF10 numbering and publication: the Product Owner.
+
+### Scope boundaries and nonclaims
+
+* This addendum changes no selected prompt, skill, AGENTS.md, code, test, schema, graph part or permanent PF document, and edits no in-flight record.  
+* The CL-05 page is a candidate. It is not a selected release member until the register selects it.  
+* This addendum is not a QA verdict, acceptance, closure decision or Plan approval. It authorizes no close mutation set; the Product Owner's invocation of CL-05 does.
+
+### Evidence anchors
+
+* Direction: the Product Owner's words above, 2026-10-26, session [Isis-53](https://claude.ai/code/session_01NxRhYei7RDGmMPYdKEkpok).  
+* Stage and feedback:  
+  * the CL-05 candidate page, [https\://app.notion.com/p/4054590a05eb8155b301e2cb6dec31d5](https://app.notion.com/p/4054590a05eb8155b301e2cb6dec31d5);  
+  * the GCFPE Modification Backlog's MB-030 and MB-027.  
+* Records:  
+  * docs/ephemeral/HDE-CRD-0002-CL-C-10-closure-decision-v1.0.md (pull request [\#747](https://github.com/amthorn78/glow-hdengine-v2/pull/747));  
+  * docs/ephemeral/HDE-EPIC040-CL-E-10-closure-decision-v1.1.md;  
+  * docs/ephemeral/HDE-EPIC040-CLOSE01-closure-evidence-task-prompt-v1.0.md;  
+  * docs/ephemeral/GCFPE-alpha-feedback-epic-closure-evidence-task-v1.0.md.  
+* Repository state on main 58a27859: no audit/HDE-CRD-0002\_\*, no audit/docdeltas/hde-crd-0002\_\* and no audit/qa/hde-crd-0002/close/.
+
+### Relationship to existing HDE Build Notes guidance
+
+* Addenda 2.13, 2.15 and 2.17. This addendum adds to them who produces a change's close mutation set and how the result returns. It keeps their rules, except that a CL-05 repair may narrow one as rule 5 limits.  
+* Addendum 2.15's drainage statement. It stays consistent: the close mutation set is a closure prerequisite, and canon drainage is not.
 
 \<eof\>
