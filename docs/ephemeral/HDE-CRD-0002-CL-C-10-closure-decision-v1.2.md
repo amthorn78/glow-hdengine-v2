@@ -116,7 +116,7 @@ next: CL-20 — Prepare Closure Memo and Post-Closure Record — 100926.1, Isis;
 - `CI_APPLICABILITY_AND_EXACT_HEAD_OK`; 0 `##[error]` lines.
 
 **Push run on `main`: failed, a known intermittent failure (OBS-17).** Run 40359063642, job 121699262919, `test` on `1fb4731b`, event `push`, `reason=selected_lanes;paths=3`. Its log was read whole.
-- **What failed.** The changed-test step: 1 failed, 4,528 passed, 2 skipped. The failing test is `tests/qa/test_generate_epic_close_pack.py::test_manifest_reader_rejects_new_report_with_old_manifest`, at line 2891 (`assert _run(... "--check") == 0`, got 1). Its stderr: `EPIC_CLOSE_PACK_ERROR:MANIFEST_BINDING_MISMATCH` (the test's expected first refusal), then `EPIC_CLOSE_PACK_ERROR:CHECK_MODE_MUTATION` (the unexpected one).
+- **What failed.** The changed-test step: 1 failed, 4,528 passed, 2 skipped. The failing test is `tests/qa/test_generate_epic_close_pack.py::test_manifest_reader_rejects_new_report_with_old_manifest`, at line 2891 (`assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--check") == 0`, got 1). Its stderr: `EPIC_CLOSE_PACK_ERROR:MANIFEST_BINDING_MISMATCH` (the test's expected first refusal), then `EPIC_CLOSE_PACK_ERROR:CHECK_MODE_MUTATION` (the unexpected one).
 - **The other steps.** Every later lane was skipped, and the final step reported `APPLICABLE_CI_LANE_NOT_SUCCESSFUL`. `main` is red at `1fb4731b`.
 - **Classification.** This is OBS-17 recurring. It is not a new defect of this change.
   - The test came from HDE-EPIC039 (#396, `a74558c4`, 2026-08-21), before this change.
