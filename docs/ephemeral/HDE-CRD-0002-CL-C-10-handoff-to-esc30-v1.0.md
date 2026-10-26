@@ -39,5 +39,5 @@ Inputs:
 - docs/ephemeral/HDE-CRD-0002-remediation-review-QA110-F01-v1.0.md — prior remediation lineage (QA110-F01, ESC-40)
 - docs/pfcanon/PF10-HDE-Build-Notes-v13.8.2.md — HDE Build Notes in force (2.15, 2.16, 2.17, 2.24 bear on this finding)
 
-Minimum context: the inputs reach main through amthorn78/glow-hdengine-v2#747 and the pull request that carries CL-C-10 v1.1, which Nathan merges before ESC-30 starts.
+Minimum context: the inputs reach main through amthorn78/glow-hdengine-v2#748 (which contains #747's commit), which Nathan merges before ESC-30 starts.
 ```
