@@ -199,8 +199,13 @@ def test_closeout_validation_is_isolated_read_only_and_exact_head() -> None:
         "  pull_request:",
         "  workflow_dispatch:",
     ]
+    # A change to the close tooling re-validates every committed writer close
+    # pack (HDE-CRD-0002 CL-05, B-6).
     assert re.findall(r'(?m)^      - "([^"]+)"$', triggers) == [
         ".github/workflows/epic-closeout-validation.yml",
+        "tools/qa/generate_epic_close_pack.py",
+        "schemas/close_candidate_source.v*.json",
+        "schemas/epic_close_candidate_source.v*.json",
         "audit/*_close_candidate_source.json",
         "audit/*_close_report.md",
         "audit/*_MANIFEST.json",
@@ -412,6 +417,139 @@ def test_closeout_validation_selects_each_changed_writer_close_pack(
     else:
         assert result.returncode == 0, result.stderr
         assert result.stdout == expected
+
+
+_COMMITTED_WRITER_PACKS = {
+    "audit/HDE-CRD-0003_close_candidate_source.json": "{}\n",
+    "audit/HDE-CRD-0003_close_report.md": "# close\n",
+    "audit/HDE-CRD-0003_MANIFEST.json": (
+        '{"inputs":{"candidate_source":{"path":'
+        '"audit/HDE-CRD-0003_close_candidate_source.json"}},'
+        '"schema_version":"close_candidate_manifest.v2"}\n'
+    ),
+    "audit/EPIC-041_MANIFEST.json": (
+        '{"inputs":{"candidate_source":{"path":"audit/sources/epic041.json"}},'
+        '"schema_version":"epic_close_candidate_manifest.v1"}\n'
+    ),
+    "audit/sources/epic041.json": "{}\n",
+    "audit/history/EPIC-009_MANIFEST.json": "{not json\n",
+}
+_EVERY_COMMITTED_SOURCE = "audit/HDE-CRD-0003_close_candidate_source.json\naudit/sources/epic041.json\n"
+
+
+@pytest.mark.parametrize(
+    ("committed", "changed", "expected"),
+    [
+        (_COMMITTED_WRITER_PACKS, ".github/workflows/epic-closeout-validation.yml", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "tools/qa/generate_epic_close_pack.py", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "schemas/close_candidate_source.v2.json", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "schemas/epic_close_candidate_source.v1.json", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "schemas/close_candidate_source.v3.json", _EVERY_COMMITTED_SOURCE),
+        (_COMMITTED_WRITER_PACKS, "tests/qa/test_generate_epic_close_pack.py", ""),
+        (_COMMITTED_WRITER_PACKS, "tools/qa/qa_harness.py", ""),
+        (_COMMITTED_WRITER_PACKS, "schemas/hde_release_attestation.v1.json", ""),
+        ({}, "tools/qa/generate_epic_close_pack.py", ""),
+        (
+            {"audit/HDE-CRD-0004_MANIFEST.json": '{"schema_version":"close_candidate_manifest.v2"}\n'},
+            ".github/workflows/epic-closeout-validation.yml",
+            "CLOSEOUT_CANDIDATE_SOURCE_UNBOUND:audit/HDE-CRD-0004_MANIFEST.json",
+        ),
+        (
+            {"audit/HDE-CRD-0006_MANIFEST.json": "{not json\n"},
+            "tools/qa/generate_epic_close_pack.py",
+            "CLOSEOUT_MANIFEST_INVALID:audit/HDE-CRD-0006_MANIFEST.json",
+        ),
+    ],
+    ids=[
+        "workflow-change",
+        "writer-change",
+        "v2-schema-change",
+        "v1-schema-change",
+        "new-schema-version",
+        "writer-test-change",
+        "other-tool-change",
+        "other-schema-change",
+        "no-writer-pack-committed",
+        "committed-unbound-source",
+        "committed-manifest-invalid",
+    ],
+)
+def test_closeout_validation_revalidates_every_committed_writer_close_pack_on_a_tooling_change(
+    tmp_path: Path, committed: dict[str, str], changed: str, expected: str
+) -> None:
+    # A merged close pack keeps a hosted check: a pull request that changes the
+    # close tooling selects every committed writer close pack, unchanged or not
+    # (HDE-CRD-0002 CL-05, B-6).
+    repo = tmp_path / "repo"
+    files = {
+        "README.md": "base\n",
+        "audit/EPIC-027_MANIFEST.json": '{"epic":"EPIC-027"}\n',
+        "audit/EPIC-027_close_report.md": "# EPIC-027\n",
+        "audit/EPIC-012_close_report.md": "# EPIC-012, no manifest\n",
+        changed: "before\n",
+        **committed,
+    }
+    for relative, content in files.items():
+        (repo / relative).parent.mkdir(parents=True, exist_ok=True)
+        (repo / relative).write_text(content, encoding="utf-8")
+    _git(repo, "init", "-q")
+    base = _commit_all(repo, "base")
+    (repo / changed).write_text("after\n", encoding="utf-8")
+    _commit_all(repo, "change")
+
+    result = subprocess.run(
+        [sys.executable, "-I", "-", base],
+        cwd=repo,
+        input=_closeout_selection_script(),
+        text=True,
+        capture_output=True,
+    )
+
+    if expected.startswith("CLOSEOUT_"):
+        assert result.returncode != 0
+        assert result.stdout == ""
+        assert result.stderr.strip() == expected
+    else:
+        assert result.returncode == 0, result.stderr
+        assert result.stdout == expected
+
+
+def test_closeout_validation_path_filter_admits_exactly_the_paths_its_selection_reads() -> None:
+    text = (ROOT / ".github/workflows/epic-closeout-validation.yml").read_text(encoding="utf-8")
+    patterns = re.findall(r'(?m)^      - "([^"]+)"$', text.split("permissions:", 1)[0])
+    tracked = [
+        path
+        for path in subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True, text=True
+        ).stdout.split("\0")
+        if path
+    ]
+    tooling = re.compile(
+        r"\.github/workflows/epic-closeout-validation\.yml"
+        r"|tools/qa/generate_epic_close_pack\.py"
+        r"|schemas/(?:epic_)?close_candidate_source\.v[^/]*\.json"
+    )
+    close_pack = re.compile(
+        r"audit/[A-Za-z0-9_.-]+_(?:close_candidate_source\.json|close_report\.md|MANIFEST\.json)"
+    )
+    selected = {path for path in tracked if _github_path_filter_selects(patterns, path)}
+    assert selected == {path for path in tracked if tooling.fullmatch(path) or close_pack.fullmatch(path)}
+    assert {
+        ".github/workflows/epic-closeout-validation.yml",
+        "tools/qa/generate_epic_close_pack.py",
+        "schemas/close_candidate_source.v2.json",
+        "schemas/epic_close_candidate_source.v1.json",
+        "audit/HDE-CRD-0002_close_candidate_source.json",
+        "audit/HDE-CRD-0002_MANIFEST.json",
+    } <= selected
+    # The selection script reads the same tooling paths as this test.
+    assert (
+        '          TOOLING_RE = re.compile(\n'
+        '              r"\\.github/workflows/epic-closeout-validation\\.yml"\n'
+        '              r"|tools/qa/generate_epic_close_pack\\.py"\n'
+        '              r"|schemas/(?:epic_)?close_candidate_source\\.v[^/]*\\.json"\n'
+        '          )\n'
+    ) in text
 
 
 @pytest.mark.parametrize(
