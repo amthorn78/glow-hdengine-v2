@@ -25,8 +25,10 @@
 
 - Path: `docs/pfcanon/PF02-Canon-HDE-Architecture-v2.4.6.md`; title `PF02-Canon-HDE-Architecture`; version `v2.4.6`; status `Canon`; effective date `2026-10-09`; Last Update Gate `BN 13.5; HDE-EPIC040-specification-v1.1-approved.md; HDE-EPIC040-CL-E-10-closure-decision-v1.2.md`; invocation tag `INV-f2ac55d77ce9aacc`.
 - Blob `b0bf3d66965d0de91044b519a29bc30b1cc2d040` at both `9dda63dd3f05f496c3ff67e95da78550d3950c5a` (the ledger baseline, 2026-10-26T20:36:17Z) and `0838ba08254eaefc888019df49a06aa2ae99cc6c` (`main` when work started, 2026-10-26T21:18:50Z). `main` moved between them only by the ledger file; no newer PF02 exists in `docs/pfcanon/`.
-- Raw bytes: 140,533 bytes, 1,617 lines, LF only, no BOM, no final LF; SHA-256 `4bfa53ad9775f6b69432b28ae11048b6458461249186c9bb9161e51e5ecb28db`.
-- Coverage: read in full, lines 1–1617, including the front matter, every table and list, and §1 to §8.
+- Raw bytes: 140,533 bytes; LF only; no BOM; no final LF; SHA-256 `4bfa53ad9775f6b69432b28ae11048b6458461249186c9bb9161e51e5ecb28db`.
+- Line count: 1,617 LF characters, so 1,618 lines, the last of which is unterminated. `wc -l` reports 1,617, the figure the handoff and the redlines file state.
+- Coverage: read in full, lines 1–1618, including the front matter, every table and list, §1 to §8, and the closing §8.1 paragraph on line 1618.
+- Correction note: the version of this proof log at `6241cb7` gave the count as "1,617 lines" and the coverage as "lines 1–1617". The coverage was already complete; only its stated range was short by the unterminated final line.
 
 ## 4. Change source and selected units
 
