@@ -4755,6 +4755,95 @@ def test_v2_refuses_updater_outputs_and_the_close_run_family_as_causal_inputs(
     assert not (repo / CRD_REPORT_REL).exists()
 
 
+# HDE-CRD-0002's approved QA plan maps S06 only to check qa-03-attestation-debian, whose primary
+# path holds a word the feedback-dependency refusal rejects (close-tooling defect B-4).
+B4_CHECK = "qa-03-attestation-debian"
+
+
+@pytest.mark.parametrize(
+    ("case", "code"),
+    (
+        ("recorded_primary", None),
+        ("unrecorded_primary", "FEEDBACK_DEPENDENCY_PROHIBITED"),
+        ("another_changes_primary", "FEEDBACK_DEPENDENCY_PROHIBITED"),
+    ),
+)
+def test_v2_admits_a_recorded_qa_primary_whose_check_id_the_refusal_rejects(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+    code: str | None,
+) -> None:
+    # HDE Build Notes 2.31, B-4: the primary of a check the bound QA ledger records is governed
+    # evidence of record, so its path is not read as feedback; any other path keeps the refusal.
+    change_id = "HDE-CRD-0002"
+    primary_rel = _primary_rel(change_id, B4_CHECK)
+    source = _v2_source()
+    for item in source["evidence_inputs"]:
+        if item["binding"] == "qa_primary":
+            item["path"] = primary_rel
+    if case == "unrecorded_primary":
+        stray = _primary_rel(change_id, "qa-09-attestation-extra")
+        source["evidence_inputs"].append({"binding": "stray_primary", "path": stray})
+    elif case == "another_changes_primary":
+        stray = _primary_rel("HDE-CRD-0001", B4_CHECK)
+        source["evidence_inputs"].append({"binding": "stray_primary", "path": stray})
+    schema = json.loads((ROOT / close_pack.SCHEMA_V2_REL).read_text(encoding="utf-8"))
+    assert Draft202012Validator(schema).is_valid(source)
+    repo, source_rel = _init_v2_repo(tmp_path, source)
+    entry = {"check_id": B4_CHECK, "log_path": primary_rel, "status": "PASS"}
+    files = {
+        _ledger_paths(change_id)["qa_step_logs_manifest"]: (
+            json.dumps({B4_CHECK: entry}, sort_keys=True, separators=(",", ":")) + "\n"
+        ),
+        _qa_plan_rel(change_id): _qa_plan_text(
+            [str(item["criterion_id"]) for item in source["acceptance"]], check=B4_CHECK
+        ),
+        primary_rel: _primary_text("PASS", check=B4_CHECK),
+    }
+    if case != "recorded_primary":
+        files[stray] = _primary_text("PASS", check=B4_CHECK)
+    _write_and_commit(repo, files, "bind the QA primary of a check whose ID the refusal rejects")
+    if code is not None:
+        assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 1
+        assert _error(capsys) == f"EPIC_CLOSE_PACK_ERROR:{code}"
+        assert not (repo / CRD_REPORT_REL).exists()
+        return
+    assert _run(repo, monkeypatch, "--source", source_rel, "--write") == 0
+    report = (repo / CRD_REPORT_REL).read_text(encoding="utf-8")
+    assert f"`qa_primary` (`{primary_rel}`)" in report
+    assert "- Closure decision: SATISFIED" in report
+    _commit_all(repo, "commit the close pack")
+    assert _run(repo, monkeypatch, "--source", source_rel, "--check") == 0
+
+
+def test_v2_qa_primary_exemption_reaches_only_the_named_path_values() -> None:
+    # B-4: only the given QA primary paths leave the refusal; the head identity, the release
+    # manifest and every other value keep it, as in v1.
+    head = "2" * 40
+    primary = _primary_rel("HDE-CRD-0002", B4_CHECK)
+    with pytest.raises(close_pack.ClosePackError, match="FEEDBACK_DEPENDENCY_PROHIBITED"):
+        close_pack._require_feedback_free_values_v2([primary], CRD_SOURCE_REL, head)
+    close_pack._require_feedback_free_values_v2([primary], CRD_SOURCE_REL, head, frozenset({primary}))
+    for value in ("release attestation", f"{primary} {head}", "catalog/manifest.json"):
+        with pytest.raises(close_pack.ClosePackError, match="FEEDBACK_DEPENDENCY_PROHIBITED"):
+            close_pack._require_feedback_free_values_v2(
+                [value], CRD_SOURCE_REL, head, frozenset({primary, value})
+            )
+    source = _v2_source()
+    source["evidence_inputs"].extend(
+        (
+            {"binding": "own_primary", "path": primary},
+            {"binding": "other_primary", "path": _primary_rel("HDE-CRD-0001", B4_CHECK)},
+            {"binding": "not_a_primary", "path": f"audit/qa/hde-crd-0002/checks/{B4_CHECK}/notes.log"},
+        )
+    )
+    assert close_pack._qa_primary_inputs_v2(source) == frozenset(
+        {primary, _primary_rel("HDE-CRD-0002")}
+    )
+
+
 @pytest.mark.parametrize(
     ("identifier", "payload", "expected"),
     (
