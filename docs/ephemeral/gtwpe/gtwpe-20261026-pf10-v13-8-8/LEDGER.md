@@ -222,7 +222,7 @@ Empty. No source directs a change to the HDE-CRD-0002 Specification. Delta 01 is
 
 ## Execution destination
 
-- **Ledger branch and default document branch:** `docs/20261026-gtwpe-pf10-v13-8-8`, created from `9dda63dd3f05f496c3ff67e95da78550d3950c5a`. Ledger and default document draft PR: recorded in the PR body and in the triage result, and opened after this file's first commit.
+- **Ledger branch and default document branch:** `docs/20261026-gtwpe-pf10-v13-8-8`, created from `9dda63dd3f05f496c3ff67e95da78550d3950c5a`. Ledger and default document draft PR: **[#760](https://github.com/amthorn78/glow-hdengine-v2/pull/760)**, draft. It was opened after the first ledger commit, `88eed0818240afb5e2d49ae2343e2d48dd8de466`.
 - **Continuation if Nathan merges the ledger PR first:** `docs/20261026-gtwpe-pf10-v13-8-8-documents`. The first document session that finds the ledger PR merged creates this branch from the current `origin/main`, but only when it does not exist. It opens one shared draft PR and records that PR's reference on this line. Every later session fetches and reuses it.
 - **Collision evidence before creation:** `git ls-remote --heads origin` showed no branch matching `gtwpe`. A GitHub search for "gtwpe" PRs found #588 to #597, all closed, and none on these branch names. The baseline tree holds no `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/`.
 - **Rules for every session:**
