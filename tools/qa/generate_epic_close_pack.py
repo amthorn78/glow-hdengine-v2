@@ -2231,6 +2231,10 @@ PROHIBITED_CAUSAL_INPUTS = frozenset(
     }
 )
 CLOSE_RUN_INPUT_RE = re.compile(r"audit/qa/[^/]+/close(?:/|\Z)", re.IGNORECASE)
+# A check's QA primary under its change's QA root, as the canonical QA harness names it.
+QA_PRIMARY_INPUT_RE = re.compile(
+    r"audit/qa/(?P<directory>hde-(?:epic[0-9]{3}|crd-[0-9]{4,}))/checks/[a-z0-9][a-z0-9._-]*/primary\.log\Z"
+)
 # The pinned requirement-ID formats, one per change kind; a requirements document without its
 # change's format is refused. A CRD reads table rows as in HDE-CRD-0002's Specification
 # (| S01 | ... |); HDE-EPICNNN reads its own requirement paragraphs and acceptance rows as in
@@ -2397,14 +2401,34 @@ def _causal_strings_v2(source: Mapping[str, Any]) -> list[str]:
     return values
 
 
+def _qa_primary_inputs_v2(source: Mapping[str, Any]) -> frozenset[str]:
+    # Evidence paths in the QA-primary form of the source's own change.
+    directory = str(source["change_id"]).lower()
+    return frozenset(
+        str(item["path"])
+        for item in source["evidence_inputs"]
+        if (match := QA_PRIMARY_INPUT_RE.fullmatch(str(item["path"])))
+        and match["directory"] == directory
+    )
+
+
 def _require_feedback_free_values_v2(
-    values: Sequence[str], source_rel: str, head: str
+    values: Sequence[str],
+    source_rel: str,
+    head: str,
+    qa_primaries: frozenset[str] = frozenset(),
 ) -> None:
+    # A QA primary path names a check of the approved QA plan, not a hosted result, so the
+    # pattern does not read it; its ledger record is required once the ledger is read
+    # (HDE Build Notes 2.31, B-4). Every other value keeps the refusal unchanged.
     for value in (source_rel, *values):
         if (
             value.casefold().startswith("catalog/manifest.json")
             or head.casefold() in value.casefold()
-            or FEEDBACK_DEPENDENCY_RE.search(value) is not None
+            or (
+                FEEDBACK_DEPENDENCY_RE.search(value) is not None
+                and not (value in qa_primaries and QA_PRIMARY_INPUT_RE.fullmatch(value))
+            )
         ):
             raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
 
@@ -2896,7 +2920,8 @@ def _load_model_v2(
     if source.get("schema_version") != SOURCE_SCHEMA_VERSION_V2:
         raise _fail("SOURCE_SCHEMA_INVALID")
     causal_values = _causal_strings_v2(source)
-    _require_feedback_free_values_v2(causal_values, source_rel, head)
+    qa_primary_inputs = _qa_primary_inputs_v2(source)
+    _require_feedback_free_values_v2(causal_values, source_rel, head, qa_primary_inputs)
     if _report_body_structure_is_ambiguous(causal_values):
         raise _fail("REPORT_SECTION_AMBIGUOUS")
     if set(source["nonclaims"]) != set(NONCLAIM_TEXT_V2):
@@ -2938,6 +2963,14 @@ def _load_model_v2(
     ledger = _qa_ledger(
         next(s for s in bindings.values() if s.rel == ledger_rel).payload, str(source["change_id"]).lower()
     )
+    # A QA primary path the refusal would otherwise reject stands only as a primary the ledger
+    # records (HDE Build Notes 2.31, B-4).
+    recorded = {entry["log_path"] for entry in ledger.values()}
+    if any(
+        FEEDBACK_DEPENDENCY_RE.search(path) is not None and path not in recorded
+        for path in qa_primary_inputs
+    ):
+        raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
     crd = CHANGE_RE.fullmatch(str(source["change_id"])).group("crd") is not None  # type: ignore[union-attr]
     qa_primaries: list[FileSnapshot] = []
     for check_id, entry in sorted(ledger.items()):
