@@ -14,7 +14,12 @@
 - Handoff: "GTWPE 100926.1 T-PF02 document session (TW-DRAIN-10 then TW-APPLY-10)", from Nathan, 2026-10-26. It names the target, the assigned rows, the selected addenda with line ranges, the supporting cross-references, the closure evidence, the output paths and the destination rules.
 - Ledger: `docs/ephemeral/gtwpe/gtwpe-20261026-pf10-v13-8-8/LEDGER.md`, blob `74944b261c0ebb2f80a416fb004b9a913da592d1`. It is the same blob at the handoff's commit `13b64dddea4cfe0bb35e56c1833fbcd03af238c7` and on `origin/main` `0838ba08254eaefc888019df49a06aa2ae99cc6c`. Its "Precedence and closure controls" and "Held and deferred items" sections were read before work started. Task row T-PF02 agrees with the handoff on the target, rows and route.
 - Assigned rows: A07 (§3.4 against HDE Mechanics Guide §32.3); A08 with X04 (the §3.4 row); A10 with X06 (§3.3, §3.5 and §3.8.1 stale: the production mount of the dev-harness routes and the retired `/ops` routes, settled by S19-F03; the root helpers); A06 as context (the §3.8.1 start-helper posture stands).
-- Destination: #760 was merged at 2026-10-26T21:18:51Z (head `13b64dd`, landed as `0838ba0`), so the handoff's continuation applies. `git ls-remote --heads origin` showed no branch matching `gtwpe` and no pull request was open, so this session created `docs/20261026-gtwpe-pf10-v13-8-8-documents` from `origin/main` `0838ba08254eaefc888019df49a06aa2ae99cc6c`.
+- Destination: #760 was merged at 2026-10-26T21:18:51Z (head `13b64dd`, landed as `0838ba0`), so the handoff's continuation applies.
+  - When this session started, `git ls-remote --heads origin` showed no branch matching `gtwpe` and no pull request was open. The session therefore created `docs/20261026-gtwpe-pf10-v13-8-8-documents` locally from `origin/main` `0838ba08254eaefc888019df49a06aa2ae99cc6c`.
+  - Before this session's first push, another document session created the same branch on `origin`, with commits `28184ea` (T-PF07) and `253fc6b` (T-PF09.7), and opened the shared draft PR #761 at 2026-10-26T21:39:03Z.
+  - This session's first push was refused as non-fast-forward. It fetched the branch, replayed its one unpublished commit on top, and pushed `3fa8745` as a fast-forward.
+  - Nothing on the branch was overwritten, and no second PR was opened.
+  - Correction note: the first committed version of this proof log (at `3fa8745`) said that this session created the branch; this entry replaces that statement.
 
 ## 3. Target identity
 
